@@ -617,7 +617,7 @@ void R_SetupFrustum( void )
 R_SetupProjectionMatrix
 =============
 */
-static void R_SetupProjectionMatrix( const ref_params_t *fd, matrix4x4 m )
+static void R_SetupProjectionMatrix( const ref_params_t *fd, matrix4x4_ref m )
 {
 	GLdouble	xMin, xMax, yMin, yMax, zNear, zFar;
 
@@ -648,7 +648,7 @@ static void R_SetupProjectionMatrix( const ref_params_t *fd, matrix4x4 m )
 R_SetupModelviewMatrix
 =============
 */
-static void R_SetupModelviewMatrix( const ref_params_t *fd, matrix4x4 m )
+static void R_SetupModelviewMatrix( const ref_params_t *fd, matrix4x4_ref m )
 {
 #if 0
 	Matrix4x4_LoadIdentity( m );

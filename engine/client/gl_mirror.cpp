@@ -94,7 +94,7 @@ R_PlaneForMirror
 Get transformed mirrorplane and entity matrix
 ================
 */
-void R_PlaneForMirror( msurface_t *surf, mplane_t *out, matrix4x4 m )
+void R_PlaneForMirror( msurface_t *surf, mplane_t *out, matrix4x4_ref m )
 {
 	cl_entity_t	*ent;
 

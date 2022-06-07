@@ -343,7 +343,7 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 			if (copy)
 			{
 				pos[i] = pos2[i];
-				memcpy(q[i], q2[i], sizeof(q[i]));
+				q[i] = q2[i];
 			}
 		}
 	}

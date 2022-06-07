@@ -17,13 +17,17 @@ using vec3_t = moe::VectorBase<float, 3>;
 #endif
 using vec3_t_ref = vec3_t &;
 
-typedef vec_t		vec4_t[4];
-typedef vec_t		*vec4_t_ref;
-typedef vec_t		quat_t[4];
+using vec4_t = moe::VectorBase<float, 4>;
+using vec4_t_ref = vec4_t &;
+
 typedef byte		rgba_t[4];	// unsigned byte colorpack
 typedef byte		rgb_t[3];		// unsigned byte colorpack
-typedef vec_t		matrix3x4[3][4];
-typedef vec_t		matrix4x4[4][4];
+
+using matrix3x4 = moe::VectorBase<vec4_t, 3>;
+using matrix4x4 = moe::VectorBase<vec4_t, 4>;
+
+using matrix3x4_ref = matrix3x4 &;
+using matrix4x4_ref = matrix4x4 &;
 
 #ifndef time_point_t
 typedef float		time_point_t;

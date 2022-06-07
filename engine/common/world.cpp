@@ -123,7 +123,7 @@ trace_t World_CombineTraces( trace_t *cliptrace, trace_t *trace, edict_t *touch 
 World_TransformAABB
 ==================
 */
-void World_TransformAABB( matrix4x4 transform, const vec3_t mins, const vec3_t maxs, vec3_t_ref outmins, vec3_t_ref outmaxs )
+void World_TransformAABB( const matrix4x4 &transform, const vec3_t mins, const vec3_t maxs, vec3_t_ref outmins, vec3_t_ref outmaxs )
 {
 	vec3_t	p1, p2;
 	matrix4x4	itransform;

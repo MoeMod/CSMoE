@@ -78,7 +78,7 @@ void V_AdjustFov( float *fov_x, float *fov_y, float width, float height, qboolea
 
 ========================================================================
 */
-void Matrix4x4_Concat(matrix4x4 out, cmatrix4x4 in1, cmatrix4x4 in2 )
+void Matrix4x4_Concat(matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 in2 )
 {
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] + in1[0][2] * in2[2][0] + in1[0][3] * in2[3][0];
 	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] + in1[0][2] * in2[2][1] + in1[0][3] * in2[3][1];
@@ -105,7 +105,7 @@ Matrix4x4_CreateProjection
 NOTE: produce quake style world orientation
 ================
 */
-void Matrix4x4_CreateProjection( matrix4x4 out, float xMax, float xMin, float yMax, float yMin, float zNear, float zFar )
+void Matrix4x4_CreateProjection( matrix4x4_ref out, float xMax, float xMin, float yMax, float yMin, float zNear, float zFar )
 {
 	out[0][0] = ( 2.0f * zNear ) / ( xMax - xMin );
 	out[1][1] = ( 2.0f * zNear ) / ( yMax - yMin );
@@ -120,7 +120,7 @@ void Matrix4x4_CreateProjection( matrix4x4 out, float xMax, float xMin, float yM
 	out[2][3] = -( 2.0f * zFar * zNear ) / ( zFar - zNear );
 }
 
-void Matrix4x4_CreateOrtho( matrix4x4 out, float xLeft, float xRight, float yBottom, float yTop, float zNear, float zFar )
+void Matrix4x4_CreateOrtho( matrix4x4_ref out, float xLeft, float xRight, float yBottom, float yTop, float zNear, float zFar )
 {
 	out[0][0] = 2.0f / (xRight - xLeft);
 	out[1][1] = 2.0f / (yTop - yBottom);
@@ -142,7 +142,7 @@ Matrix4x4_CreateModelview
 NOTE: produce quake style world orientation
 ================
 */
-void Matrix4x4_CreateModelview( matrix4x4 out )
+void Matrix4x4_CreateModelview( matrix4x4_ref out )
 {
 	out[0][0] = out[1][1] = out[2][2] = 0.0f;
 	out[3][0] = out[0][3] = 0.0f;
@@ -174,7 +174,7 @@ void Matrix4x4_ToArrayFloatGL(cmatrix4x4 in, float out[16] )
 	out[15] = in[3][3];
 }
 
-void Matrix4x4_FromArrayFloatGL( matrix4x4 out, const float in[16] )
+void Matrix4x4_FromArrayFloatGL( matrix4x4_ref out, const float in[16] )
 {
 	out[0][0] = in[0];
 	out[1][0] = in[1];
@@ -194,7 +194,7 @@ void Matrix4x4_FromArrayFloatGL( matrix4x4 out, const float in[16] )
 	out[3][3] = in[15];
 }
 
-void Matrix4x4_CreateTranslate( matrix4x4 out, float x, float y, float z )
+void Matrix4x4_CreateTranslate( matrix4x4_ref out, float x, float y, float z )
 {
 	out[0][0] = 1.0f;
 	out[0][1] = 0.0f;
@@ -214,7 +214,7 @@ void Matrix4x4_CreateTranslate( matrix4x4 out, float x, float y, float z )
 	out[3][3] = 1.0f;
 }
 
-void Matrix4x4_CreateRotate( matrix4x4 out, float angle, float x, float y, float z )
+void Matrix4x4_CreateRotate( matrix4x4_ref out, float angle, float x, float y, float z )
 {
 	float	len, c, s;
 
@@ -248,7 +248,7 @@ void Matrix4x4_CreateRotate( matrix4x4 out, float angle, float x, float y, float
 	out[3][3]=1.0f;
 }
 
-void Matrix4x4_CreateScale( matrix4x4 out, float x )
+void Matrix4x4_CreateScale( matrix4x4_ref out, float x )
 {
 	out[0][0] = x;
 	out[0][1] = 0.0f;
@@ -268,7 +268,7 @@ void Matrix4x4_CreateScale( matrix4x4 out, float x )
 	out[3][3] = 1.0f;
 }
 
-void Matrix4x4_CreateScale3( matrix4x4 out, float x, float y, float z )
+void Matrix4x4_CreateScale3( matrix4x4_ref out, float x, float y, float z )
 {
 	out[0][0] = x;
 	out[0][1] = 0.0f;
@@ -288,7 +288,7 @@ void Matrix4x4_CreateScale3( matrix4x4 out, float x, float y, float z )
 	out[3][3] = 1.0f;
 }
 
-void Matrix4x4_ConcatTranslate( matrix4x4 out, float x, float y, float z )
+void Matrix4x4_ConcatTranslate( matrix4x4_ref out, float x, float y, float z )
 {
 	matrix4x4 base, temp;
 
@@ -297,7 +297,7 @@ void Matrix4x4_ConcatTranslate( matrix4x4 out, float x, float y, float z )
 	Matrix4x4_Concat( out, base, temp );
 }
 
-void Matrix4x4_ConcatRotate( matrix4x4 out, float angle, float x, float y, float z )
+void Matrix4x4_ConcatRotate( matrix4x4_ref out, float angle, float x, float y, float z )
 {
 	matrix4x4 base, temp;
 
@@ -306,7 +306,7 @@ void Matrix4x4_ConcatRotate( matrix4x4 out, float angle, float x, float y, float
 	Matrix4x4_Concat( out, base, temp );
 }
 
-void Matrix4x4_ConcatScale( matrix4x4 out, float x )
+void Matrix4x4_ConcatScale( matrix4x4_ref out, float x )
 {
 	matrix4x4	base, temp;
 
@@ -315,7 +315,7 @@ void Matrix4x4_ConcatScale( matrix4x4 out, float x )
 	Matrix4x4_Concat( out, base, temp );
 }
 
-void Matrix4x4_ConcatScale3( matrix4x4 out, float x, float y, float z )
+void Matrix4x4_ConcatScale3( matrix4x4_ref out, float x, float y, float z )
 {
 	matrix4x4  base, temp;
 

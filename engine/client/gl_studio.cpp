@@ -473,7 +473,7 @@ pfnStudioGetAliasTransform
 */
 static float ***GAME_EXPORT pfnStudioGetAliasTransform( void )
 {
-	return (float ***)g_aliastransform;
+	return (float ***)&g_aliastransform;
 }
 
 /*
@@ -484,7 +484,7 @@ pfnStudioGetRotationMatrix
 */
 static float ***GAME_EXPORT pfnStudioGetRotationMatrix( void )
 {
-	return (float ***)g_rotationmatrix;
+	return (float ***)&g_rotationmatrix;
 }
 
 /*
@@ -722,7 +722,7 @@ StudioFxTransform
 
 ====================
 */
-void R_StudioFxTransform( cl_entity_t *ent, matrix3x4 transform )
+void R_StudioFxTransform( cl_entity_t *ent, matrix3x4_ref transform )
 {
 	switch( ent->curstate.renderfx )
 	{
@@ -833,7 +833,7 @@ StudioCalcBoneQuaterion
 
 ====================
 */
-void R_StudioCalcBoneQuaterion( int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec4_t q )
+void R_StudioCalcBoneQuaterion( int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec4_t_ref q )
 {
 	int		j, k;
 	vec4_t		q1, q2;

@@ -71,7 +71,7 @@ void Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 	);
 }
 
-void Matrix3x4_ConcatTransforms( matrix3x4 out, cmatrix3x4 in1, cmatrix3x4 in2 )
+void Matrix3x4_ConcatTransforms( matrix3x4_ref out, cmatrix3x4 in1, cmatrix3x4 in2 )
 {
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] + in1[0][2] * in2[2][0];
 	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] + in1[0][2] * in2[2][1];
@@ -87,7 +87,7 @@ void Matrix3x4_ConcatTransforms( matrix3x4 out, cmatrix3x4 in1, cmatrix3x4 in2 )
 	out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] + in1[2][2] * in2[2][3] + in1[2][3];
 }
 
-void Matrix3x4_SetOrigin( matrix3x4 out, float x, float y, float z )
+void Matrix3x4_SetOrigin( matrix3x4_ref out, float x, float y, float z )
 {
 	out[0][3] = x;
 	out[1][3] = y;
@@ -99,7 +99,7 @@ void Matrix3x4_OriginFromMatrix( cmatrix3x4 in, vec3_t_ref out )
 	VectorSet(out, in[0][3], in[1][3], in[2][3]);
 }
 
-void Matrix3x4_FromOriginQuat( matrix3x4 out, const vec4_t quaternion, const vec3_t origin )
+void Matrix3x4_FromOriginQuat( matrix3x4_ref out, const vec4_t quaternion, const vec3_t origin )
 {
 	out[0][0] = 1.0f - 2.0f * quaternion[1] * quaternion[1] - 2.0f * quaternion[2] * quaternion[2];
 	out[1][0] = 2.0f * quaternion[0] * quaternion[1] + 2.0f * quaternion[3] * quaternion[2];
@@ -118,7 +118,7 @@ void Matrix3x4_FromOriginQuat( matrix3x4 out, const vec4_t quaternion, const vec
 	out[2][3] = origin[2];
 }
 
-void Matrix3x4_CreateFromEntity( matrix3x4 out, const vec3_t angles, const vec3_t origin, float scale )
+void Matrix3x4_CreateFromEntity( matrix3x4_ref out, const vec3_t angles, const vec3_t origin, float scale )
 {
 	float	angle, sr, sp, sy, cr, cp, cy;
 	
@@ -223,7 +223,7 @@ void Matrix3x4_TransformPositivePlane( cmatrix3x4 in, const vec3_t normal, float
 	*dist = d * scale + (out[0] * in[0][3] + out[1] * in[1][3] + out[2] * in[2][3] );
 }
 
-void Matrix3x4_Invert_Simple( matrix3x4 out, cmatrix3x4 in1 )
+void Matrix3x4_Invert_Simple( matrix3x4_ref out, cmatrix3x4 in1 )
 {
 	// we only support uniform scaling, so assume the first row is enough
 	// (note the lack of sqrt here, because we're trying to undo the scaling,
@@ -305,7 +305,7 @@ void Matrix4x4_VectorIRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 	);
 }
 
-void Matrix4x4_ConcatTransforms( matrix4x4 out, cmatrix4x4 in1, cmatrix4x4 in2 )
+void Matrix4x4_ConcatTransforms( matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 in2 )
 {
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] + in1[0][2] * in2[2][0];
 	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] + in1[0][2] * in2[2][1];
@@ -321,7 +321,7 @@ void Matrix4x4_ConcatTransforms( matrix4x4 out, cmatrix4x4 in1, cmatrix4x4 in2 )
 	out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] + in1[2][2] * in2[2][3] + in1[2][3];
 }
 
-void Matrix4x4_SetOrigin( matrix4x4 out, float x, float y, float z )
+void Matrix4x4_SetOrigin( matrix4x4_ref out, float x, float y, float z )
 {
 	out[0][3] = x;
 	out[1][3] = y;
@@ -335,7 +335,7 @@ void Matrix4x4_OriginFromMatrix( cmatrix4x4 in, float *out )
 	out[2] = in[2][3];
 }
 
-void Matrix4x4_FromOriginQuat( matrix4x4 out, const vec4_t quaternion, const vec3_t origin )
+void Matrix4x4_FromOriginQuat( matrix4x4_ref out, const vec4_t quaternion, const vec3_t origin )
 {
 	out[0][0] = 1.0f - 2.0f * quaternion[1] * quaternion[1] - 2.0f * quaternion[2] * quaternion[2];
 	out[1][0] = 2.0f * quaternion[0] * quaternion[1] + 2.0f * quaternion[3] * quaternion[2];
@@ -355,7 +355,7 @@ void Matrix4x4_FromOriginQuat( matrix4x4 out, const vec4_t quaternion, const vec
 	out[3][3] = 1.0f;
 }
 
-void Matrix4x4_CreateFromEntity( matrix4x4 out, const vec3_t angles, const vec3_t origin, float scale )
+void Matrix4x4_CreateFromEntity( matrix4x4_ref out, const vec3_t angles, const vec3_t origin, float scale )
 {
 	float	angle, sr, sp, sy, cr, cp, cy;
 
@@ -519,7 +519,7 @@ void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float
 	*dist = d * scale - ( out[0] * in[0][3] + out[1] * in[1][3] + out[2] * in[2][3] );
 }
 
-void Matrix4x4_Invert_Simple( matrix4x4 out, cmatrix4x4 in1 )
+void Matrix4x4_Invert_Simple( matrix4x4_ref out, cmatrix4x4 in1 )
 {
 	// we only support uniform scaling, so assume the first row is enough
 	// (note the lack of sqrt here, because we're trying to undo the scaling,
@@ -551,7 +551,7 @@ void Matrix4x4_Invert_Simple( matrix4x4 out, cmatrix4x4 in1 )
 	out[3][3] = 1.0f;
 }
 
-void Matrix4x4_Transpose( matrix4x4 out, cmatrix4x4 in1 )
+void Matrix4x4_Transpose( matrix4x4_ref out, cmatrix4x4 in1 )
 {
 	out[0][0] = in1[0][0];
 	out[0][1] = in1[1][0];
@@ -571,7 +571,7 @@ void Matrix4x4_Transpose( matrix4x4 out, cmatrix4x4 in1 )
 	out[3][3] = in1[3][3];
 }
 
-qboolean Matrix4x4_Invert_Full( matrix4x4 out, cmatrix4x4 in1 )
+qboolean Matrix4x4_Invert_Full( matrix4x4_ref out, cmatrix4x4 in1 )
 {
 	float	*temp;
 	float	*r[4];

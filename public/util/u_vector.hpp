@@ -43,7 +43,7 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align>
 	constexpr VectorBase_Gen(typename std::type_identity<U>::type ) : VectorBase_Gen((I, NAN)...)
 	{
 	}
-	constexpr explicit VectorBase_Gen(decltype(I, T())...args) : m_data{args...}
+	constexpr VectorBase_Gen(decltype(I, T())...args) : m_data{args...}
 	{
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;

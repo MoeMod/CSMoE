@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "r_studioint.h"
 #include "library.h"
 
-typedef int (*STUDIOAPI)( int, sv_blending_interface_t**, server_studio_api_t*,  float (*transform)[3][4], float (*bones)[MAXSTUDIOBONES][3][4] );
+typedef int (*STUDIOAPI)( int, sv_blending_interface_t**, server_studio_api_t*,  matrix3x4 *transform, matrix3x4 (*bones)[MAXSTUDIOBONES] );
 
 typedef struct mstudiocache_s
 {
@@ -337,7 +337,7 @@ StudioCalcBoneQuaterion
 
 ====================
 */
-static void Mod_StudioCalcBoneQuaterion( int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *q )
+static void Mod_StudioCalcBoneQuaterion( int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec4_t_ref q )
 {
 	int		j, k;
 	vec4_t		q1, q2;

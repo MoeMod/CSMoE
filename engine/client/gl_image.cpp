@@ -292,9 +292,9 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER );
 
 		if( tex->flags & TF_BORDER )
-			pglTexParameterfv( tex->target, GL_TEXTURE_BORDER_COLOR, zeroClampBorder );
+			pglTexParameterfv( tex->target, GL_TEXTURE_BORDER_COLOR, zeroClampBorder.data() );
 		else if( tex->flags & TF_ALPHA_BORDER )
-			pglTexParameterfv( tex->target, GL_TEXTURE_BORDER_COLOR, alphaZeroClampBorder );
+			pglTexParameterfv( tex->target, GL_TEXTURE_BORDER_COLOR, alphaZeroClampBorder.data() );
 	}
 	else
 	{

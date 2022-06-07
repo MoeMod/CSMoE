@@ -164,7 +164,7 @@ void CStudioModelRenderer::StudioCalcBoneAdj(float dadt, float *adj, const byte 
 	}
 }
 
-void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *q)
+void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec4_t_ref q)
 {
 	int j, k;
 	vec4_t q1, q2;
@@ -724,7 +724,7 @@ void CStudioModelRenderer::StudioSetupBones(void)
 				break;
 
 			pos[i] = pos2[i];
-			memcpy(q[i], q2[i], sizeof( q[i]));
+			q[i] = q2[i];
 		}
 	}
 

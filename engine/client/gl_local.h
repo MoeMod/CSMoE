@@ -278,9 +278,9 @@ void GL_CleanUpTextureUnits( int last );
 void GL_Bind( GLint tmu, GLenum texnum );
 void GL_MultiTexCoord2f( GLenum texture, GLfloat s, GLfloat t );
 void GL_SetTexCoordArrayMode( GLenum mode );
-void GL_LoadTexMatrix(vec4_t * const m );
+void GL_LoadTexMatrix( const matrix4x4 & m );
 void GL_LoadTexMatrixExt( const float *glmatrix );
-void GL_LoadMatrix(vec4_t * const source );
+void GL_LoadMatrix( const matrix4x4 &source );
 void GL_TexGen( GLenum coord, GLenum mode );
 void GL_SelectTexture( GLint texture );
 void GL_LoadIdentityTexMatrix( void );
@@ -379,27 +379,27 @@ void R_SetupFrustum( void );
 void R_FindViewLeaf( void );
 void R_DrawFog( void );
 
-#define cmatrix3x4 vec4_t *const
-#define cmatrix4x4 vec4_t *const
+using cmatrix3x4 = const matrix3x4 &;
+using cmatrix4x4 = const matrix4x4 &;
 //
 // gl_rmath.c
 //
 float V_CalcFov( float *fov_x, float width, float height );
 void V_AdjustFov( float *fov_x, float *fov_y, float width, float height, qboolean lock_x );
 void Matrix4x4_ToArrayFloatGL( cmatrix4x4 in, float out[16] );
-void Matrix4x4_FromArrayFloatGL( matrix4x4 out, const float in[16] );
-void Matrix4x4_Concat(matrix4x4 out, cmatrix4x4 in1, cmatrix4x4 in2 );
-void Matrix4x4_ConcatTranslate( matrix4x4 out, float x, float y, float z );
-void Matrix4x4_ConcatRotate( matrix4x4 out, float angle, float x, float y, float z );
-void Matrix4x4_ConcatScale( matrix4x4 out, float x );
-void Matrix4x4_ConcatScale3( matrix4x4 out, float x, float y, float z );
-void Matrix4x4_CreateTranslate( matrix4x4 out, float x, float y, float z );
-void Matrix4x4_CreateRotate( matrix4x4 out, float angle, float x, float y, float z );
-void Matrix4x4_CreateScale( matrix4x4 out, float x );
-void Matrix4x4_CreateScale3( matrix4x4 out, float x, float y, float z );
-void Matrix4x4_CreateProjection(matrix4x4 out, float xMax, float xMin, float yMax, float yMin, float zNear, float zFar);
-void Matrix4x4_CreateOrtho(matrix4x4 m, float xLeft, float xRight, float yBottom, float yTop, float zNear, float zFar);
-void Matrix4x4_CreateModelview( matrix4x4 out );
+void Matrix4x4_FromArrayFloatGL( matrix4x4_ref out, const float in[16] );
+void Matrix4x4_Concat(matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 in2 );
+void Matrix4x4_ConcatTranslate( matrix4x4_ref out, float x, float y, float z );
+void Matrix4x4_ConcatRotate( matrix4x4_ref out, float angle, float x, float y, float z );
+void Matrix4x4_ConcatScale( matrix4x4_ref out, float x );
+void Matrix4x4_ConcatScale3( matrix4x4_ref out, float x, float y, float z );
+void Matrix4x4_CreateTranslate( matrix4x4_ref out, float x, float y, float z );
+void Matrix4x4_CreateRotate( matrix4x4_ref out, float angle, float x, float y, float z );
+void Matrix4x4_CreateScale( matrix4x4_ref out, float x );
+void Matrix4x4_CreateScale3( matrix4x4_ref out, float x, float y, float z );
+void Matrix4x4_CreateProjection(matrix4x4_ref out, float xMax, float xMin, float yMax, float yMin, float zNear, float zFar);
+void Matrix4x4_CreateOrtho(matrix4x4_ref m, float xLeft, float xRight, float yBottom, float yTop, float zNear, float zFar);
+void Matrix4x4_CreateModelview( matrix4x4_ref out );
 
 //
 // gl_rmisc.

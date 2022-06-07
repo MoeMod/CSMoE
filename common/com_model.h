@@ -236,7 +236,7 @@ typedef struct mextrasurf_s
 	int		dlight_s, dlight_t;	// gl lightmap coordinates for dynamic lightmaps
 
 	int		mirrortexturenum;	// gl texnum
-	float		mirrormatrix[4][4];
+    matrix4x4		mirrormatrix;
 	struct mextrasurf_s* mirrorchain;	// for gl_texsort drawing
 	struct mextrasurf_s* detailchain;	// for detail textures drawing
 	color24* deluxemap;	// note: this is the actual deluxemap data for this surface
@@ -338,8 +338,6 @@ typedef struct model_s
 	char		suffix[MAX_MODEL_SUFFIX];
 
 } model_t;
-
-typedef vec_t vec4_t[4];
 
 typedef struct alight_s
 {

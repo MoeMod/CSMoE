@@ -366,8 +366,8 @@ qboolean BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t m
 qboolean BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius );
 float RadiusFromBounds( const vec3_t mins, const vec3_t maxs );
 
-void AngleQuaternion( const vec3_t angles, vec4_t q );
-void QuaternionSlerp( const vec4_t p, vec4_t q, float t, vec4_t qt );
+void AngleQuaternion( const vec3_t angles, vec4_t_ref q );
+void QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt );
 float RemapVal( float val, float A, float B, float C, float D );
 float ApproachVal( float target, float value, float speed );
 void InterpolateAngles( const vec3_t start, const vec3_t end, vec3_t_ref output, float frac );
@@ -378,42 +378,42 @@ void InterpolateAngles( const vec3_t start, const vec3_t end, vec3_t_ref output,
 #define Matrix3x4_LoadIdentity( mat )		Matrix3x4_Copy( mat, matrix3x4_identity )
 #define Matrix3x4_Copy( out, in )		Q_memcpy( out, in, sizeof( matrix3x4 ))
 
-#define cmatrix3x4 vec4_t *const
-#define cmatrix4x4 vec4_t *const
+using cmatrix3x4 = const matrix3x4 &;
+using cmatrix4x4 = const matrix4x4 &;
 
 void Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
 void Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
 void Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
 void Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix3x4_ConcatTransforms( matrix3x4 out, cmatrix3x4 in1, cmatrix3x4 in2 );
-void Matrix3x4_FromOriginQuat( matrix3x4 out, const vec4_t quaternion, const vec3_t origin );
-void Matrix3x4_CreateFromEntity( matrix3x4 out, const vec3_t angles, const vec3_t origin, float scale );
+void Matrix3x4_ConcatTransforms( matrix3x4_ref out, cmatrix3x4 in1, cmatrix3x4 in2 );
+void Matrix3x4_FromOriginQuat( matrix3x4_ref out, const vec4_t quaternion, const vec3_t origin );
+void Matrix3x4_CreateFromEntity( matrix3x4_ref out, const vec3_t angles, const vec3_t origin, float scale );
 void Matrix3x4_TransformPositivePlane( cmatrix3x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
-void Matrix3x4_SetOrigin( matrix3x4 out, float x, float y, float z );
-void Matrix3x4_Invert_Simple( matrix3x4 out, cmatrix3x4 in1 );
+void Matrix3x4_SetOrigin( matrix3x4_ref out, float x, float y, float z );
+void Matrix3x4_Invert_Simple( matrix3x4_ref out, cmatrix3x4 in1 );
 void Matrix3x4_OriginFromMatrix( cmatrix3x4 in, vec3_t_ref out );
-
-#define Matrix4x4_LoadIdentity( mat )	Matrix4x4_Copy( mat, matrix4x4_identity )
-#define Matrix4x4_Copy( out, in )	Q_memcpy( out, in, sizeof( matrix4x4 ))
 
 void Matrix4x4_VectorTransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
 void Matrix4x4_VectorITransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
 void Matrix4x4_VectorRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
 void Matrix4x4_VectorIRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix4x4_ConcatTransforms( matrix4x4 out, cmatrix4x4 in1, cmatrix4x4 in2 );
-void Matrix4x4_FromOriginQuat( matrix4x4 out, const vec4_t quaternion, const vec3_t origin );
-void Matrix4x4_CreateFromEntity( matrix4x4 out, const vec3_t angles, const vec3_t origin, float scale );
+void Matrix4x4_ConcatTransforms( matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 in2 );
+void Matrix4x4_FromOriginQuat( matrix4x4_ref out, const vec4_t quaternion, const vec3_t origin );
+void Matrix4x4_CreateFromEntity( matrix4x4_ref out, const vec3_t angles, const vec3_t origin, float scale );
 void Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
 void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
 void Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t_ref angles, vec3_t_ref origin );
-void Matrix4x4_SetOrigin( matrix4x4 out, float x, float y, float z );
-void Matrix4x4_Invert_Simple( matrix4x4 out, cmatrix4x4 in1 );
+void Matrix4x4_SetOrigin( matrix4x4_ref out, float x, float y, float z );
+void Matrix4x4_Invert_Simple( matrix4x4_ref out, cmatrix4x4 in1 );
 void Matrix4x4_OriginFromMatrix( cmatrix4x4 in, vec3_t_ref out );
-void Matrix4x4_Transpose( matrix4x4 out, cmatrix4x4 in1 );
-qboolean Matrix4x4_Invert_Full( matrix4x4 out, cmatrix4x4 in1 );
+void Matrix4x4_Transpose( matrix4x4_ref out, cmatrix4x4 in1 );
+qboolean Matrix4x4_Invert_Full( matrix4x4_ref out, cmatrix4x4 in1 );
 
 constexpr vec3_t		vec3_origin = { 0, 0, 0 };
 extern const matrix3x4	matrix3x4_identity;
 extern const matrix4x4	matrix4x4_identity;
+
+inline void Matrix4x4_Copy( matrix4x4_ref out, cmatrix4x4 in ) { out = in; }
+inline void Matrix4x4_LoadIdentity( matrix4x4_ref mat ) { Matrix4x4_Copy( mat, matrix4x4_identity ); }
 
 #endif//MATHLIB_H
