@@ -1062,8 +1062,7 @@ void Mod_StudioGetAttachment( const edict_t *e, int iAttachment, vec3_t_ref orig
 		vec3_t	forward, bonepos;
 		
 		Matrix3x4_OriginFromMatrix( studio_bones[pAtt[iAttachment].bone], bonepos );
-		VectorSubtract( origin, bonepos, forward ); // make forward
-		VectorNormalizeFast( forward );
+        forward = (origin - bonepos).Normalize();
 		VectorAngles( forward, angles );
 	}
 }

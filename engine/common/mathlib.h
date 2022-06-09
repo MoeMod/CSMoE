@@ -165,7 +165,7 @@ inline __m128 VectorScaleEx(__m128 a, float b)
 	return _mm_mul_ps(a, _mm_load_ps1(&b));
 }
 #define VectorScale(in, scale, out) ((out) = VectorScaleEx((in), (scale)))
-inline float VectorMax(__m128 x)
+inline float VectorMaxElement(__m128 x)
 {
 	float res;
 	x = _mm_blend_ps(_mm_setzero_ps(), x, 8); // x = { x[0], x[1], x[2], 0 }
@@ -286,31 +286,31 @@ qboolean VectorIsNull(__m128 v)
 #define DotProductAbs(x,y) (abs((x)[0]*(y)[0])+abs((x)[1]*(y)[1])+abs((x)[2]*(y)[2]))
 #define DotProductFabs(x,y) (fabs((x)[0]*(y)[0])+fabs((x)[1]*(y)[1])+fabs((x)[2]*(y)[2]))
 #define DotProduct(x,y) ((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
-#define CrossProduct(a,b,c) ((c)[0]=(a)[1]*(b)[2]-(a)[2]*(b)[1],(c)[1]=(a)[2]*(b)[0]-(a)[0]*(b)[2],(c)[2]=(a)[0]*(b)[1]-(a)[1]*(b)[0])
+//#define CrossProduct(a,b,c) ((c)[0]=(a)[1]*(b)[2]-(a)[2]*(b)[1],(c)[1]=(a)[2]*(b)[0]-(a)[0]*(b)[2],(c)[2]=(a)[0]*(b)[1]-(a)[1]*(b)[0])
 #define VectorSubtract(a,b,c) ((c)[0]=(a)[0]-(b)[0],(c)[1]=(a)[1]-(b)[1],(c)[2]=(a)[2]-(b)[2])
 #define VectorAdd(a,b,c) ((c)[0]=(a)[0]+(b)[0],(c)[1]=(a)[1]+(b)[1],(c)[2]=(a)[2]+(b)[2])
 #define VectorCopy(a,b) ((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
 #define VectorScale(in, scale, out) ((out)[0] = (in)[0] * (scale),(out)[1] = (in)[1] * (scale),(out)[2] = (in)[2] * (scale))
 #define VectorCompare(v1,v2)	((v1)[0]==(v2)[0] && (v1)[1]==(v2)[1] && (v1)[2]==(v2)[2])
-#define VectorMax(a) ( max((a)[0], max((a)[1], (a)[2])) )
-#define VectorAvg(a) ( ((a)[0] + (a)[1] + (a)[2]) / 3 )
-#define VectorLength(a) ( sqrt( DotProduct( a, a )))
-#define VectorLength2(a) (DotProduct( a, a ))
-#define VectorDistance(a, b) (sqrt( VectorDistance2( a, b )))
-#define VectorDistance2(a, b) (((a)[0] - (b)[0]) * ((a)[0] - (b)[0]) + ((a)[1] - (b)[1]) * ((a)[1] - (b)[1]) + ((a)[2] - (b)[2]) * ((a)[2] - (b)[2]))
+//#define VectorMaxElement(a) ( max((a)[0], max((a)[1], (a)[2])) )
+//#define VectorAvg(a) ( ((a)[0] + (a)[1] + (a)[2]) / 3 )
+//#define VectorLength(a) ( sqrt( DotProduct( a, a )))
+//#define VectorLength2(a) (DotProduct( a, a ))
+//#define VectorDistance(a, b) (sqrt( VectorDistance2( a, b )))
+//#define VectorDistance2(a, b) (((a)[0] - (b)[0]) * ((a)[0] - (b)[0]) + ((a)[1] - (b)[1]) * ((a)[1] - (b)[1]) + ((a)[2] - (b)[2]) * ((a)[2] - (b)[2]))
 #define VectorAverage(a,b,o)	((o)[0]=((a)[0]+(b)[0])*0.5,(o)[1]=((a)[1]+(b)[1])*0.5,(o)[2]=((a)[2]+(b)[2])*0.5)
 #define VectorSet(v, x, y, z) ((v)[0]=(x),(v)[1]=(y),(v)[2]=(z))
-#define VectorClear(x) ((x)[0]=(x)[1]=(x)[2]=0)
-#define VectorLerp( v1, lerp, v2, c ) ((c)[0] = (v1)[0] + (lerp) * ((v2)[0] - (v1)[0]), (c)[1] = (v1)[1] + (lerp) * ((v2)[1] - (v1)[1]), (c)[2] = (v1)[2] + (lerp) * ((v2)[2] - (v1)[2]))
-#define VectorNormalize( v ) { float ilength = (float)sqrt(DotProduct(v, v));if (ilength) ilength = 1.0f / ilength;v[0] *= ilength;v[1] *= ilength;v[2] *= ilength; }
-#define VectorNormalize2( v, dest ) {float ilength = (float)sqrt(DotProduct(v,v));if (ilength) ilength = 1.0f / ilength;dest[0] = v[0] * ilength;dest[1] = v[1] * ilength;dest[2] = v[2] * ilength; }
-#define VectorNormalizeFast( v ) {float	ilength = (float)rsqrt(DotProduct(v,v)); v[0] *= ilength; v[1] *= ilength; v[2] *= ilength; }
-#define VectorNormalizeLength( v ) VectorNormalizeLength2((v), (v))
+//#define VectorClear(x) ((x)[0]=(x)[1]=(x)[2]=0)
+//#define VectorLerp( v1, lerp, v2, c ) ((c)[0] = (v1)[0] + (lerp) * ((v2)[0] - (v1)[0]), (c)[1] = (v1)[1] + (lerp) * ((v2)[1] - (v1)[1]), (c)[2] = (v1)[2] + (lerp) * ((v2)[2] - (v1)[2]))
+//#define VectorNormalize( v ) { float ilength = (float)sqrt(DotProduct(v, v));if (ilength) ilength = 1.0f / ilength;v[0] *= ilength;v[1] *= ilength;v[2] *= ilength; }
+//#define VectorNormalize2( v, dest ) {float ilength = (float)sqrt(DotProduct(v,v));if (ilength) ilength = 1.0f / ilength;dest[0] = v[0] * ilength;dest[1] = v[1] * ilength;dest[2] = v[2] * ilength; }
+//#define VectorNormalizeFast( v ) {float	ilength = (float)rsqrt(DotProduct(v,v)); v[0] *= ilength; v[1] *= ilength; v[2] *= ilength; }
+//#define VectorNormalizeLength( v ) VectorNormalizeLength2((v), (v))
 #define VectorNegate(x, y) ((y)[0] = -(x)[0], (y)[1] = -(x)[1], (y)[2] = -(x)[2])
-#define VectorM(scale1, b1, c) ((c)[0] = (scale1) * (b1)[0],(c)[1] = (scale1) * (b1)[1],(c)[2] = (scale1) * (b1)[2])
+//#define VectorM(scale1, b1, c) ((c)[0] = (scale1) * (b1)[0],(c)[1] = (scale1) * (b1)[1],(c)[2] = (scale1) * (b1)[2])
 #define VectorMA(a, scale, b, c) ((c)[0] = (a)[0] + (scale) * (b)[0],(c)[1] = (a)[1] + (scale) * (b)[1],(c)[2] = (a)[2] + (scale) * (b)[2])
 #define VectorMAMAM(scale1, b1, scale2, b2, scale3, b3, c) ((c)[0] = (scale1) * (b1)[0] + (scale2) * (b2)[0] + (scale3) * (b3)[0],(c)[1] = (scale1) * (b1)[1] + (scale2) * (b2)[1] + (scale3) * (b3)[1],(c)[2] = (scale1) * (b1)[2] + (scale2) * (b2)[2] + (scale3) * (b3)[2])
-#define VectorIsNull( v ) ((v)[0] == 0.0f && (v)[1] == 0.0f && (v)[2] == 0.0f)
+//#define VectorIsNull( v ) ((v)[0] == 0.0f && (v)[1] == 0.0f && (v)[2] == 0.0f)
 #endif
 #define MakeRGBA( out, x, y, z, w ) Vector4Set( out, x, y, z, w )
 #define PlaneDist(point,plane) ((plane)->type < 3 ? (point)[(plane)->type] : DotProduct((point), (plane)->normal))
@@ -353,7 +353,6 @@ void SinCosFastVector2( float r1, float r2,
 #endif
 ;
 #endif
-float VectorNormalizeLength2( const vec3_t v, vec3_t_ref out );
 void VectorVectors( const vec3_t forward, vec3_t_ref right, vec3_t_ref up );
 void VectorAngles( const vec3_t forward, vec3_t_ref angles );
 void AngleVectors( const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up );
@@ -376,7 +375,7 @@ void InterpolateAngles( const vec3_t start, const vec3_t end, vec3_t_ref output,
 // matrixlib.c
 //
 #define Matrix3x4_LoadIdentity( mat )		Matrix3x4_Copy( mat, matrix3x4_identity )
-#define Matrix3x4_Copy( out, in )		Q_memcpy( out, in, sizeof( matrix3x4 ))
+#define Matrix3x4_Copy( out, in )		(out = in)
 
 using cmatrix3x4 = const matrix3x4 &;
 using cmatrix4x4 = const matrix4x4 &;

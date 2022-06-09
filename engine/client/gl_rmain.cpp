@@ -1068,7 +1068,7 @@ void R_DrawFog( void )
 	pglEnable( GL_FOG );
 	pglFogi( GL_FOG_MODE, GL_EXP );
 	pglFogf( GL_FOG_DENSITY, RI.fogDensity );
-	pglFogfv( GL_FOG_COLOR, RI.fogColor );
+	pglFogfv( GL_FOG_COLOR, RI.fogColor.data() );
 	pglHint( GL_FOG_HINT, GL_NICEST );
 }
 

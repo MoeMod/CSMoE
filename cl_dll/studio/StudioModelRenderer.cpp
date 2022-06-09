@@ -1501,7 +1501,7 @@ void CStudioModelRenderer::StudioDrawShadow( Vector origin, float scale )
 	p4.y = pmtrace.endpos.y - pmtrace.plane.normal.z;
 	p4.z = pmtrace.endpos.z + 2.0f + pmtrace.plane.normal.x + pmtrace.plane.normal.y;
 
-	IEngineStudio.StudioRenderShadow( m_iShadowSprite, (float *)p1, (float *)p2, (float *)p3, (float *)p4 );
+	IEngineStudio.StudioRenderShadow( m_iShadowSprite, p1.data(), p2.data(), p3.data(), p4.data() );
 }
 
 }

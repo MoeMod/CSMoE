@@ -1037,19 +1037,19 @@ static void R_DrawSpriteQuad( mspriteframe_t *frame, vec3_t org, vec3_t v_right,
 		pglTexCoord2f( 0.0f, 1.0f );
 		VectorMA( org, frame->down * scale, v_up, point );
 		VectorMA( point, frame->left * scale, v_right, point );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 		pglTexCoord2f( 0.0f, 0.0f );
 		VectorMA( org, frame->up * scale, v_up, point );
 		VectorMA( point, frame->left * scale, v_right, point );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 		pglTexCoord2f( 1.0f, 0.0f );
 		VectorMA( org, frame->up * scale, v_up, point );
 		VectorMA( point, frame->right * scale, v_right, point );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 		pglTexCoord2f( 1.0f, 1.0f );
 		VectorMA( org, frame->down * scale, v_up, point );
 		VectorMA( point, frame->right * scale, v_right, point );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 	pglEnd();
 }
 
@@ -1092,7 +1092,6 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	model_t		*model;
 	int		i, alpha, type;
 	float		angle, dot, sr, cr, flAlpha;
-	float		lerp = 1.0f, ilerp, scale;
 	vec3_t		v_forward, v_right, v_up;
 	vec3_t		origin, color, color2 = {};
 
@@ -1128,6 +1127,8 @@ void R_DrawSpriteModel( cl_entity_t *e )
 			else VectorCopy( parent->origin, origin );
 		}
 	}
+
+    float scale;
 
 	alpha = e->curstate.renderamt;
 	scale = e->curstate.scale;
@@ -1198,6 +1199,8 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		// NOTE: sprites with 'lightmap' looks ugly when alpha func is GL_GREATER 0.0
 		pglAlphaFunc( GL_GEQUAL, 0.5f );
 	}
+
+    float lerp = 1.0f, ilerp;
 
 	if( e->curstate.rendermode == kRenderNormal || e->curstate.rendermode == kRenderTransAlpha || e->curstate.rendermode == kRenderTransAdd)
 		frame = oldframe = R_GetSpriteFrame( model, e->curstate.frame, e->angles[YAW] );

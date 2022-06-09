@@ -213,17 +213,17 @@ float Q_atof( const char *str )
 	return val * sign;
 }
 #endif
-void Q_atov( float *vec, const char *str, size_t siz )
+void Q_atov( vec3_t_ref vec, const char *str )
 {
 	string	buffer;
 	char	*pstr, *pfront;
 	int	j;
 
 	Q_strncpy( buffer, str, sizeof( buffer ));
-	Q_memset( vec, 0, sizeof( vec_t ) * siz );
+    vec = {};
 	pstr = pfront = buffer;
 
-	for( j = 0; j < siz; j++ )
+	for( j = 0; j < 3; j++ )
 	{
 		vec[j] = Q_atof( pfront );
 

@@ -447,7 +447,7 @@ static float GAME_EXPORT pfnTraceModel( physent_t *pe, const vec3_t start, const
 		Matrix4x4_TransformPositivePlane( matrix, temp, trace->plane.dist, trace->plane.normal, &trace->plane.dist );
 	}
 
-	VectorLerp( start, trace->fraction, end, trace->endpos );
+    trace->endpos = lerp( start, end, trace->fraction );
 
 	return trace->fraction;
 }

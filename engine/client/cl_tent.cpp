@@ -1468,7 +1468,7 @@ void GAME_EXPORT CL_Sprite_Trail( int type, const vec3_t vecStart, const vec3_t 
 	Mod_GetFrames( modelIndex, &flFrameCount );
 
 	VectorSubtract( vecEnd, vecStart, vecDelta );
-	VectorNormalize2( vecDelta, vecDir );
+    vecDir = vecDelta.Normalize();
 
 	flAmplitude /= 256.0f;
 
@@ -1577,7 +1577,7 @@ void GAME_EXPORT CL_FunnelSprite( const vec3_t pos, int spriteIndex, int flags )
 
 			if( pTemp || pPart )
 			{
-				flDist = VectorNormalizeLength( dir );	// save the distance
+				flDist = dir.NormalizeInPlace();	// save the distance
 				if( vel < 64 ) vel = 64;
 				
 				vel += Com_RandomFloat( 64, 128  );
@@ -1632,7 +1632,7 @@ void GAME_EXPORT CL_SparkEffect( const vec3_t pos, int count, int velocityMin, i
 		m_vecDir[0] = Com_RandomFloat( velocityMin, velocityMax );
 		m_vecDir[1] = Com_RandomFloat( velocityMin, velocityMax );
 		m_vecDir[2] = Com_RandomFloat( velocityMin, velocityMax );
-		vel = VectorNormalizeLength( m_vecDir );
+		vel = m_vecDir.NormalizeInPlace();
 
 		CL_SparkleTracer( pos, m_vecDir, vel );
 	}
@@ -1681,7 +1681,7 @@ void GAME_EXPORT CL_SparkStreaks( const vec3_t pos, int count, int velocityMin, 
 		vel[0] = Com_RandomFloat( velocityMin, velocityMax );
 		vel[1] = Com_RandomFloat( velocityMin, velocityMax );
 		vel[2] = Com_RandomFloat( velocityMin, velocityMax );
-		speed = VectorNormalizeLength( vel );
+		speed = vel.NormalizeInPlace();
 
 		CL_SparkleTracer( pos, vel, speed );
 	}

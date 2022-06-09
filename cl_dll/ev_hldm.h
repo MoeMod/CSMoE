@@ -30,7 +30,7 @@ void EV_HLDM_FireBullets(int idx,
 						 float flDistance, int iBulletType, int iPenetration);
 void EV_CS16Client_KillEveryRound( struct tempent_s *te, float frametime, float currenttime );
 void EV_CS16Client_CreateSmoke(int type, Vector origin, Vector dir, int speed, float scale, int r, int g, int b , bool wind, Vector velocity = Vector(0, 0, 0), int framerate = 35 );
-void EV_HLDM_CreateSmoke(const vec3_t origin, const vec3_t dir, int speed, float scale, int r, int g, int b, int iSmokeType, float* base_velocity, bool bWind, int framerate);
+void EV_HLDM_CreateSmoke(const vec3_t origin, const vec3_t dir, int speed, float scale, int r, int g, int b, int iSmokeType, const vec3_t base_velocity, bool bWind, int framerate);
 
 }
 

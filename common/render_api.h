@@ -251,7 +251,7 @@ typedef struct render_interface_s
 	// setup map bounds for ortho-projection when we in dev_overview mode
 	void		(*GL_OrthoBounds)( const float *mins, const float *maxs );
 	// handle decals which hit mod_studio or mod_sprite
-	void		(*R_StudioDecalShoot)( int decalTexture, struct cl_entity_s *ent, const float *start, const float *pos, int flags, modelstate_t *state );
+	void		(*R_StudioDecalShoot)( int decalTexture, struct cl_entity_s *ent, const vec3_t start, const vec3_t pos, int flags, modelstate_t *state );
 	// prepare studio decals for save
 	int		(*R_CreateStudioDecalList)( decallist_t *pList, int count, qboolean changelevel );
 	// clear decals by engine request (e.g. for demo recording or vid_restart)
@@ -259,7 +259,7 @@ typedef struct render_interface_s
 	// grab r_speeds message
 	qboolean		(*R_SpeedsMessage)( char *out, size_t size );
 	// replace with built-in R_DrawCubemapView for make skyshots or envshots
-	qboolean		(*R_DrawCubemapView)( const float *origin, const float *angles, int size );
+	qboolean		(*R_DrawCubemapView)( const vec3_t origin, const vec3_t angles, int size );
 	// alloc or destroy studiomodel custom data
 	void		(*Mod_ProcessUserData)( struct model_s *mod, qboolean create, const byte *buffer );
 } render_interface_t;

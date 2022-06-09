@@ -217,7 +217,7 @@ float Q_atof( const char *str );
 #define Q_atoi atoi
 #define Q_atof atof
 #endif
-void Q_atov( float *vec, const char *str, size_t siz );
+void Q_atov( vec3_t_ref vec, const char *str );
 
 #ifndef XASH_SKIPCRTLIB
 

@@ -144,7 +144,7 @@ hull_t *SV_HullAutoSelect( model_t *model, const vec3_t mins, const vec3_t maxs,
 	// select the hull automatically
 	for( i = 0; i < MAX_MAP_HULLS; i++ )
 	{
-		curdiff = floor( VectorAvg( size )) - floor( VectorAvg( world.hull_sizes[i] ));
+		curdiff = floor( reduce( size ) / 3) - floor( reduce( world.hull_sizes[i] ) / 3);
 		curdiff = fabs( curdiff );
 
 		if( curdiff < lastdiff )
@@ -924,7 +924,7 @@ qboolean SV_RecursiveHullCheck( hull_t *hull, int num, float p1f, float p2f, con
 	if( frac > 1.0f ) frac = 1.0f;
 		
 	midf = p1f + ( p2f - p1f ) * frac;
-	VectorLerp( p1, frac, p2, mid );
+    mid = lerp( p1, p2, frac );
 
 	side = (t1 < 0);
 
@@ -972,7 +972,7 @@ qboolean SV_RecursiveHullCheck( hull_t *hull, int num, float p1f, float p2f, con
 		}
 
 		midf = p1f + (p2f - p1f) * frac;
-		VectorLerp( p1, frac, p2, mid );
+        mid = lerp( p1, p2, frac );
 	}
 
 	trace->fraction = midf;
@@ -1105,7 +1105,7 @@ void SV_ClipMoveToEntity( edict_t *ent, const vec3_t start, const vec3_t mins, c
 	if( trace->fraction != 1.0f )
 	{
 		// compute endpos (generic case)
-		VectorLerp( start, trace->fraction, end, trace->endpos );
+        trace->endpos = lerp( start, end, trace->fraction );
 
 		if( rotated )
 		{
@@ -1568,7 +1568,7 @@ static qboolean SV_RecursiveLightPoint( model_t *model, mnode_t *node, const vec
 
 	frac = front / ( front - back );
 
-	VectorLerp( start, frac, end, mid );
+    mid = lerp( start, end, frac );
 
 	// co down front side	
 	if( SV_RecursiveLightPoint( model, node->children[side], start, mid ))
@@ -1729,5 +1729,5 @@ int SV_LightForEntity( edict_t *pEdict )
 
 	SV_RecursiveLightPoint( sv.worldmodel, sv.worldmodel->nodes, start, end );
 
-	return VectorAvg( sv_pointColor );
+	return reduce( sv_pointColor ) / 3;
 }

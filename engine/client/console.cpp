@@ -161,7 +161,7 @@ void Con_SetColor_f( void )
 		break;
 	case 2:
 		VectorSet( color, g_color_table[7][0], g_color_table[7][1], g_color_table[7][2] );
-		Q_atov( color, Cmd_Argv( 1 ), 3 );
+		Q_atov( color, Cmd_Argv( 1 ) );
 		Con_DefaultColor( color[0], color[1], color[2] );
 		break;
 	case 4:

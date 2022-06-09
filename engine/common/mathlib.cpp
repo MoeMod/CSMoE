@@ -267,25 +267,6 @@ void SinFastVector3(float r1, float r2, float r3,
 	*s2 = s4f_z(sin_vector);
 }
 #endif
-#ifndef XASH_SIMD
-float VectorNormalizeLength2( const vec3_t v, vec3_t_ref out )
-{
-	float	length, ilength;
-
-	length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
-	length = sqrt( length );
-
-	if( length )
-	{
-		ilength = 1.0f / length;
-		out[0] = v[0] * ilength;
-		out[1] = v[1] * ilength;
-		out[2] = v[2] * ilength;
-	}
-
-	return length;
-}
-
 void VectorVectors( const vec3_t forward, vec3_t_ref right, vec3_t_ref up )
 {
 	float	d;
@@ -299,7 +280,6 @@ void VectorVectors( const vec3_t forward, vec3_t_ref right, vec3_t_ref up )
 	VectorNormalize( right );
 	CrossProduct( right, forward, up );
 }
-#endif
 /*
 =================
 AngleVectors

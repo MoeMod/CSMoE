@@ -232,7 +232,7 @@ int R_CountSurfaceDlights( msurface_t *surf )
 
 =======================================================================
 */
-static uint	r_pointColor[3];
+static moe::VectorBase<uint, 3>	r_pointColor;
 static vec3_t	r_lightSpot;
 
 /*
@@ -263,7 +263,7 @@ static qboolean R_RecursiveLightPoint( model_t *model, mnode_t *node, const vec3
 
 	frac = front / ( front - back );
 
-	VectorLerp( start, frac, end, mid );
+    mid = lerp( start, end, frac );
 
 	// co down front side	
 	if( R_RecursiveLightPoint( model, node->children[side], start, mid ))
@@ -477,7 +477,7 @@ get_light:
 			r_pointColor[1] += ambientLight->g;
 			r_pointColor[2] += ambientLight->b;
 
-			f = max( max( r_pointColor[0], r_pointColor[1] ), r_pointColor[2] );
+			f = VectorMaxElement( r_pointColor );
 			if( f > 1.0f ) VectorScale( r_pointColor, ( 255.0f / f ), r_pointColor );
 
 			ambientLight->r = r_pointColor[0];

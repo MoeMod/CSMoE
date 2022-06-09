@@ -1409,7 +1409,7 @@ static void Mod_CalcSurfaceBounds( msurface_t *surf, mextrasurf_t *info )
 Mod_BuildPolygon
 =================
 */
-static void Mod_BuildPolygon( mextrasurf_t *info, msurface_t *surf, int numVerts, const float *verts )
+static void Mod_BuildPolygon( mextrasurf_t *info, msurface_t *surf, int numVerts, const vec3_t *verts )
 {
 	float		s, t;
 	uint		bufSize;
@@ -1464,12 +1464,12 @@ static void Mod_BuildPolygon( mextrasurf_t *info, msurface_t *surf, int numVerts
 		mesh->elems[i*3+2] = i + 2;
 	}
 
-	for( i = 0; i < numVerts; i++, verts += 3 )
+	for( i = 0; i < numVerts; i++ )
 	{
 		glvert_t	*out = &mesh->verts[i];
 
 		// vertex
-		VectorSet( out->vertex, verts[0], verts[1], verts[2] );
+		out->vertex = verts[i];
 		VectorCopy( tangent, out->tangent );
 		VectorCopy( binormal, out->binormal );
 		VectorCopy( normal, out->normal );
@@ -1508,11 +1508,11 @@ static void Mod_BuildPolygon( mextrasurf_t *info, msurface_t *surf, int numVerts
 Mod_SubdividePolygon
 =================
 */
-static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numVerts, float *verts, float tessSize )
+static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numVerts, vec3_t *verts, float tessSize )
 {
 	vec3_t		vTotal, nTotal, tTotal, bTotal;
 	vec3_t		front[MAX_SIDE_VERTS], back[MAX_SIDE_VERTS];
-	float		*v, m, oneDivVerts, dist, dists[MAX_SIDE_VERTS];
+	float		m, oneDivVerts, dist, dists[MAX_SIDE_VERTS];
 	qboolean		lightmap = (surf->flags & SURF_DRAWTILED) ? false : true;
 	vec3_t		normal, tangent, binormal, mins, maxs;
 	mtexinfo_t	*texinfo = surf->texinfo;
@@ -1527,11 +1527,9 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 	
 	ClearBounds( mins, maxs );
 
-	for( i = 0, v = verts; i < numVerts; i++, v += 3 )
+	for( i = 0; i < numVerts; i++ )
 	{
-		vec3_t vv;
-		VectorSet(vv, v[0], v[1], v[2]);
-		AddPointToBounds( vv, mins, maxs );
+		AddPointToBounds( verts[i], mins, maxs );
 	}
 
 	for( i = 0; i < 3; i++ )
@@ -1542,26 +1540,24 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 		if( m - mins[i] < 8.0f ) continue;
 
 		// cut it
-		for( j = 0, v = verts + i; j < numVerts; j++, v += 3 )
-			dists[j] = *v - m;
+		for( j = 0; j < numVerts; j++ )
+			dists[j] = verts[j][i] - m;
 
 		// wrap cases
 		dists[j] = dists[0];
-		v -= i;
+        verts[j] = verts[0];
 
-		VectorCopy( verts, v );
-
-		for( f = j = b = 0, v = verts; j < numVerts; j++, v += 3 )
+		for( f = j = b = 0; j < numVerts; j++ )
 		{
 			if( dists[j] >= 0.0f )
 			{
-				VectorCopy( v, front[f] );
+                front[f] = verts[j];
 				f++;
 			}
 
 			if( dists[j] <= 0.0f )
 			{
-				VectorCopy( v, back[b] );
+                back[b] = verts[j];
 				b++;
 			}
 			
@@ -1572,15 +1568,13 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 			{
 				// clip point
 				dist = dists[j] / (dists[j] - dists[j+1]);
-				front[f][0] = back[b][0] = v[0] + (v[3] - v[0]) * dist;
-				front[f][1] = back[b][1] = v[1] + (v[4] - v[1]) * dist;
-				front[f][2] = back[b][2] = v[2] + (v[5] - v[2]) * dist;
+                front[f] = back[b] = fma((verts[j+1] - verts[j]), dist, verts[j]);
 				f++, b++;
 			}
 		}
 
-		Mod_SubdividePolygon( info, surf, f, (float *)front[0], tessSize );
-		Mod_SubdividePolygon( info, surf, b, (float *)back[0], tessSize );
+		Mod_SubdividePolygon( info, surf, f, front, tessSize );
+		Mod_SubdividePolygon( info, surf, b, back, tessSize );
 		return;
 	}
 
@@ -1619,17 +1613,17 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 
 	scale = ( 1.0f / tessSize );
 
-	for( i = 0; i < numVerts; i++, verts += 3 )
+	for( i = 0; i < numVerts; i++ )
 	{
 		glvert_t	*out = &mesh->verts[i+1];
 
 		// vertex
-		VectorCopy( verts, out->vertex );
+		VectorCopy( verts[i], out->vertex );
 		VectorCopy( normal, out->normal );
 		VectorCopy( tangent, out->tangent );
 		VectorCopy( binormal, out->binormal );
 
-		VectorAdd( vTotal, verts, vTotal );
+		VectorAdd( vTotal, verts[i], vTotal );
  		VectorAdd( nTotal, normal, nTotal );
  		VectorAdd( tTotal, tangent, tTotal );
  		VectorAdd( bTotal, binormal, bTotal );
@@ -1637,17 +1631,17 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 		if( lightmap )
 		{
 			// texture coordinates
-			s = DotProduct( verts, texinfo->vecs[0] ) + texinfo->vecs[0][3];
+			s = DotProduct( verts[i], texinfo->vecs[0] ) + texinfo->vecs[0][3];
 			s /= texinfo->texture->width;
 
-			t = DotProduct( verts, texinfo->vecs[1] ) + texinfo->vecs[1][3];
+			t = DotProduct( verts[i], texinfo->vecs[1] ) + texinfo->vecs[1][3];
 			t /= texinfo->texture->height;
 		}
 		else
 		{
 			// texture coordinates
-			s = DotProduct( verts, texinfo->vecs[0] ) * scale;
-			t = DotProduct( verts, texinfo->vecs[1] ) * scale;
+			s = DotProduct( verts[i], texinfo->vecs[0] ) * scale;
+			t = DotProduct( verts[i], texinfo->vecs[1] ) * scale;
 		}
 
 		out->stcoord[0] = s;
@@ -1659,12 +1653,12 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 		if( lightmap )
 		{
 			// lightmap texture coordinates
-			s = DotProduct( verts, texinfo->vecs[0] ) + texinfo->vecs[0][3] - surf->texturemins[0];
+			s = DotProduct( verts[i], texinfo->vecs[0] ) + texinfo->vecs[0][3] - surf->texturemins[0];
 			s += surf->light_s * LM_SAMPLE_SIZE;
 			s += LM_SAMPLE_SIZE >> 1;
 			s /= BLOCK_SIZE * LM_SAMPLE_SIZE;
 
-			t = DotProduct( verts, texinfo->vecs[1] ) + texinfo->vecs[1][3] - surf->texturemins[1];
+			t = DotProduct( verts[i], texinfo->vecs[1] ) + texinfo->vecs[1][3] - surf->texturemins[1];
 			t += surf->light_t * LM_SAMPLE_SIZE;
 			t += LM_SAMPLE_SIZE >> 1;
 			t /= BLOCK_SIZE * LM_SAMPLE_SIZE;
@@ -1830,12 +1824,12 @@ void Mod_BuildSurfacePolygons( msurface_t *surf, mextrasurf_t *info )
 	// subdivide water or sky sphere for Quake1 maps
 	if(( surf->flags & SURF_DRAWTURB && !( surf->flags & SURF_REFLECT )) || ( surf->flags & SURF_DRAWSKY && world.loading && world.sky_sphere ))
 	{
-		Mod_SubdividePolygon( info, surf, surf->numedges, verts[0], 64.0f );
+		Mod_SubdividePolygon( info, surf, surf->numedges, verts, 64.0f );
 		Mod_ConvertSurface( info, surf );
 	}
 	else
 	{
-		Mod_BuildPolygon( info, surf, surf->numedges, verts[0] );
+		Mod_BuildPolygon( info, surf, surf->numedges, verts );
 	}
 
 	if( info->mesh ) return;	// all done
@@ -1892,7 +1886,7 @@ void Mod_TesselatePolygon( msurface_t *surf, model_t *mod, float tessSize )
 		VectorCopy( v->position, verts[i] );
 	}
 
-	Mod_SubdividePolygon( info, surf, surf->numedges, verts[0], tessSize );
+	Mod_SubdividePolygon( info, surf, surf->numedges, verts, tessSize );
 	Mod_ConvertSurface( info, surf );
 
 	// restore loadmodel value
@@ -2573,7 +2567,7 @@ static void Mod_FindModelOrigin( const char *entities, const char *modelname, ve
 
 			if( !Q_stricmp( keyname, "origin" ))
 			{
-				Q_atov( origin, token, 3 );
+				Q_atov( origin, token );
 				origin_found = true;
 			}
 		}
