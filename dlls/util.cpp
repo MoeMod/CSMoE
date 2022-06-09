@@ -2582,5 +2582,17 @@ float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDam
 	}
 }
 
+void UTIL_TE_Sprite(const short sprite, const float x, const float y, const float z, const byte scale, const byte brightness)
+{
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_SPRITE);
+	WRITE_COORD(x);
+	WRITE_COORD(y);
+	WRITE_COORD(z);
+	WRITE_SHORT(sprite);
+	WRITE_BYTE(scale);
+	WRITE_BYTE(brightness);
+	MESSAGE_END();
+}
 
 }

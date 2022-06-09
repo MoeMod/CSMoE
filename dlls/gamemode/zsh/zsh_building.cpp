@@ -88,6 +88,11 @@ namespace sv
 		m_iProgress = 0;
 		m_iTotalProgress = m_pClass->GetTotalProgress();
 
+		UTIL_TE_Sprite(g_sModelIndexSmokePuff, pev->origin.x + pev->maxs.x, pev->origin.y, pev->origin.z, 35, 70);
+		UTIL_TE_Sprite(g_sModelIndexSmokePuff, pev->origin.x + pev->mins.x, pev->origin.y, pev->origin.z, 35, 70);
+		UTIL_TE_Sprite(g_sModelIndexSmokePuff, pev->origin.x, pev->origin.y + pev->maxs.y, pev->origin.z, 35, 70);
+		UTIL_TE_Sprite(g_sModelIndexSmokePuff, pev->origin.x, pev->origin.y + pev->mins.y, pev->origin.z, 35, 70);
+
 		m_pClass->OnSettle();
 		return true;
 	}
