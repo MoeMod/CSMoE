@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include <cmath>
 #include <utility>
 #include <numeric>
+#include <algorithm>
 #include <type_traits>
 
 typedef struct lua_State lua_State;
