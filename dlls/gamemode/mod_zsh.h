@@ -52,11 +52,13 @@ namespace sv {
 		void OnThink() override;
 		void GiveDefaultItems() override;
 		void CmdStart(struct usercmd_s* cmd, unsigned int random_seed) override;
+		void UpdateStatusBar(CBaseEntity* pEntity, char* sbuf0, int* newSBarState) override;
 		//int ComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax) override { return 600; }
 
 	public:
 		CZSHBuilding* CreateBuilding(const zsh::ZSHBuildingClass iBuilding);
 		void AddResource(zsh::ResourceType_e type, int amount);
+
 	public:
 		CMod_ZombieShelter* const m_pModZSH;
 		/* ืสิด */

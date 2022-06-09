@@ -588,6 +588,21 @@ namespace sv {
 		}
 	}
 
+
+	void CPlayerModStrategy_ZSH::UpdateStatusBar(CBaseEntity* pEntity, char* sbuf0, int* newSBarState)
+	{
+		if (!FClassnameIs(pEntity->pev, "zsh_building"))
+			return;
+
+		Q_strcpy(sbuf0, "1 %c1%i3(%i4%%)");
+
+		newSBarState[SBAR_ID_TARGETTYPE] = SBAR_TARGETTYPE_WALL;
+		newSBarState[SBAR_ID_TARGETHEALTH] = pEntity->pev->health;
+		newSBarState[SBAR_ID_TARGETHEALTH_PERCENT] = (int)((pEntity->pev->health / pEntity->pev->max_health) * 100);
+
+		m_pPlayer->m_flStatusBarDisappearDelay = gpGlobals->time + 2.0s;
+	}
+
 	CZSHBuilding* CPlayerModStrategy_ZSH::CreateBuilding(const ZSHBuildingClass iBuilding)
 	{
 		CZSHBuilding* pBuilding = CreateClassPtr<CZSHBuilding>();

@@ -83,6 +83,8 @@ public:
 	virtual void ZombiBombExploded(float &flKickRate, float &flRadius, float &flDamage) = 0;
 	virtual void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) = 0;
 	virtual void Holster_Post(CBasePlayerWeapon* weapon) = 0;
+	virtual void UpdateStatusBar(CBaseEntity *pEntity, char *sbuf0, int* newSBarState) = 0;
+	
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -132,6 +134,7 @@ public:
 	void ZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) {};
 	void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) {};
 	void Holster_Post(CBasePlayerWeapon* weapon) {};
+	void UpdateStatusBar(CBaseEntity* pEntity, char* sbuf0, int *newSBarState) override {};
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

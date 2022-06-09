@@ -7941,6 +7941,8 @@ void CBasePlayer::UpdateStatusBar()
 
 				m_flStatusBarDisappearDelay = gpGlobals->time + 2.0s;
 			}
+
+			m_pModStrategy->UpdateStatusBar(pEntity, sbuf0, newSBarState);
 		}
 	}
 	else if (m_flStatusBarDisappearDelay > gpGlobals->time)
@@ -7949,6 +7951,7 @@ void CBasePlayer::UpdateStatusBar()
 		newSBarState[ SBAR_ID_TARGETTYPE ] = m_izSBarState[ SBAR_ID_TARGETTYPE ];
 		newSBarState[ SBAR_ID_TARGETNAME ] = m_izSBarState[ SBAR_ID_TARGETNAME ];
 		newSBarState[ SBAR_ID_TARGETHEALTH ] = m_izSBarState[ SBAR_ID_TARGETHEALTH ];
+		newSBarState[ SBAR_ID_TARGETHEALTH_PERCENT ] = m_izSBarState[ SBAR_ID_TARGETHEALTH_PERCENT ];
 	}
 
 	BOOL bForceResend = FALSE;
