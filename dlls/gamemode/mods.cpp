@@ -34,6 +34,7 @@ GNU General Public License for more details.
 #include "mod_zbz.h"
 #include "mod_z4.h"
 #include "mod_z4e.h"
+#include "mod_zsh.h"
 
 namespace sv {
 
@@ -60,6 +61,7 @@ std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "zbz", DefaultFactory<CMod_ZombieZ> },
 	{ "z4", DefaultFactory<CMod_ZombieIV> },
 	{ "z4e", DefaultFactory<CMod_Z4E> },
+	{ "zsh", DefaultFactory<CMod_ZombieShelter> },
 	// custom
 	{ "zb3f2p", DefaultFactory<CMod_ZB3F2P> },
 };

@@ -55,7 +55,7 @@ public:
 
 	void Precache() override
 	{
-		PRECACHE_MODEL("models/y20s2sacr4_grenade.mdl");
+		PRECACHE_MODEL("models/ef_fireball2.mdl");
 
 		m_ExpIndex = PRECACHE_MODEL("sprites/ef_y20s2scar.spr");
 

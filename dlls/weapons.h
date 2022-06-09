@@ -910,6 +910,51 @@ private:
 	int m_iEffectSprite;
 	int m_iExplosionSprite;
 };
+
+class CM3DragonCannon : public CGrenade
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+	BOOL GetKickRate(float& ground, float& air_falling, float& air_moving, float& ducking, float& velocityModifier);
+
+public:
+	void EXPORT FlyingThink(void);
+	void EXPORT FlyingTouch(CBaseEntity* pOther);
+
+public:
+	static CM3DragonCannon* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner);
+
+
+private:
+	int m_iType;
+	float m_iM3DragonmExp;
+	float m_flNumFrames;
+};
+
+
+class CM3DragonCannon_Dragon : public CBaseEntity
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+	BOOL GetKickRate(float& ground, float& air_falling, float& air_moving, float& ducking, float& velocityModifier);
+
+public:
+	void EXPORT OnThink(void);
+	void EXPORT OnSharkThink(CBaseEntity* pOther);
+
+public:
+	static CM3DragonCannon_Dragon* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+
+
+private:
+	float m_flNumFrames;
+	int m_iTeam;
+};
+
 #ifdef ENABLE_SHIELD
 class CWShield : public CBaseEntity
 {

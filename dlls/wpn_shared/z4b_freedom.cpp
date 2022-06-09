@@ -44,8 +44,8 @@ namespace sv {
     static constexpr int ZoomFOV1 = 40;
     static constexpr int ZoomFOV2 = 10;
     static constexpr const char *V_Model = "models/z4b/v_freedom.mdl";
-    static constexpr const char *P_Model = "models/p_awp.mdl";
-    static constexpr const char *W_Model = "models/w_awp.mdl";
+    static constexpr const char *P_Model = "models/z4b/p_freedom.mdl";
+    static constexpr const char *W_Model = "models/z4b/w_freedom.mdl";
     static constexpr const char *EventFile = "events/freedom.sc";
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
     static constexpr const char *ClassName = "z4b_freedom";
@@ -59,11 +59,14 @@ namespace sv {
 		ANIM_SHOOT3,
 		ANIM_RELOAD,
 		ANIM_DRAW,
+		ANIM_TITANSB,
+		ANIM_AIMON,
+		ANIM_AIMOFF,
 	};
     static constexpr float PlayerMaxSpeed = 193;
     static constexpr int DamageDefault = 147;
-    static constexpr int DamageZB = 450;
-    static constexpr int DamageZBS = 700;
+    static constexpr int DamageZB = 700;
+    static constexpr int DamageZBS = 900;
     static constexpr float RangeModifier = 0.99;
     static constexpr auto BulletType = BULLET_PLAYER_338MAG;
     static constexpr int Penetration = 3;
@@ -84,6 +87,8 @@ namespace sv {
 	}
 	void Precache() override
 	{
+		PRECACHE_MODEL("models/z4b/v_sight_free_A.mdl");
+		PRECACHE_MODEL("models/z4b/v_sight_free_B.mdl");
 		PRECACHE_SOUND("weapons/freedom-1.wav");
 		return Base::Precache();
 	}
@@ -121,29 +126,93 @@ namespace sv {
 		return TRUE;
 	}
 
+	void SpecialScope()
+	{
+		if (m_pPlayer->m_iFOV != 90)
+		{
+#ifndef CLIENT_DLL
+			m_pPlayer->UpdateShieldCrosshair(FALSE);
+#endif
+			m_pPlayer->pev->viewmodel = MAKE_STRING(V_Model);
+			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+		}
+		else
+		{
+#ifndef CLIENT_DLL
+			m_pPlayer->UpdateShieldCrosshair(FALSE);
+#endif
+			m_pPlayer->pev->viewmodel = MAKE_STRING("models/z4b/v_sight_free_A.mdl");
+			if(m_iWeaponState)
+				m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 80;
+			else
+				m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 45;
+			SetThink(NULL);
+		}
+	}
+
+	void SecondaryAttack() override
+	{
+		if (!m_iWeaponState)
+		{
+			if (m_pPlayer->m_iFOV != 90 && m_pPlayer->m_flNextAttack < 0s)
+			{
+				SpecialScope();
+				SendWeaponAnim(ANIM_AIMOFF, 0);
+				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.16s;
+				m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+			}
+			else
+			{
+				SendWeaponAnim(ANIM_AIMON, 0);
+				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.16s;
+				m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+				SetThink(&CFreedom::SpecialScope);
+				pev->nextthink = gpGlobals->time + 0.5s;
+			}
+			m_pPlayer->m_flNextAttack = 0.5s;
+		}
+	}
+
 	void Reload(void)
 	{
 		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 			return;
 
+		if (m_pPlayer->pev->fov != 90)
+		{
+			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+			m_pPlayer->pev->viewmodel = MAKE_STRING(V_Model);
+		}
+
 		if (DefaultReload(6, ANIM_RELOAD, 2.8s))
 		{
 #ifndef CLIENT_DLL
-			m_pPlayer->SetAnimation(PLAYER_RELOAD);				
-#endif
+			m_pPlayer->SetAnimation(PLAYER_RELOAD);	
+#endif		
 			m_pPlayer->m_flNextAttack = 1.46s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.8s;
-			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.8s;
-			if (m_pPlayer->pev->fov != 90)
-			{
-				m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 10;
-				SecondaryAttack();
-			}
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.8s;		
 		}
 	}
 
 	void ItemPostFrame(void)
 	{
+		if (m_flNextPrimaryAttack <= UTIL_WeaponTimeBase())
+		{
+			if (m_pPlayer->m_bResumeZoom)
+			{
+				m_pPlayer->m_iFOV = m_pPlayer->m_iLastZoom;
+				m_pPlayer->pev->fov = m_pPlayer->m_iFOV;
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/z4b/v_sight_free_A.mdl");
+
+				if (m_pPlayer->m_iFOV == m_pPlayer->m_iLastZoom)
+				{
+					// return the fade level in zoom.
+					m_pPlayer->m_bResumeZoom = false;
+				}
+			}
+		}
+
 		if (m_pPlayer->pev->button & IN_USE && m_pPlayer->m_flNextAttack < 0s)
 		{
 			m_flLastFire = invalid_time_point;
@@ -155,8 +224,8 @@ namespace sv {
 #endif
 				if (m_pPlayer->pev->fov != 90)
 				{
-					m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 10;
-					SecondaryAttack();
+					m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+					m_pPlayer->pev->viewmodel = MAKE_STRING(V_Model);
 				}
 				SendWeaponAnim(ANIM_RELOAD, UseDecrement() != FALSE);//change to sniper
 				strcpy(m_pPlayer->m_szAnimExtention, "rifle");
@@ -168,8 +237,8 @@ namespace sv {
 #endif
 				if (m_pPlayer->pev->fov != 90)
 				{
-					m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 10;
-					SecondaryAttack();
+					m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+					m_pPlayer->pev->viewmodel = MAKE_STRING(V_Model);
 				}
 				m_iWeaponState = 1;
 				SendWeaponAnim(ANIM_RELOAD, UseDecrement() != FALSE);//change to shotgun
@@ -274,9 +343,12 @@ namespace sv {
 			m_pPlayer->m_bResumeZoom = true;
 			m_pPlayer->m_iLastZoom = m_pPlayer->m_iFOV;
 			m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 90;
+			m_pPlayer->pev->viewmodel = MAKE_STRING(V_Model);
 		}
-		else // not zoomed, so bullets diverts more
+		else
+		{ // not zoomed, so bullets diverts more
 			flSpread += 0.05;
+		}
 
 		if (m_iClip <= 0)
 		{

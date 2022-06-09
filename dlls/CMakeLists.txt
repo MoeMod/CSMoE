@@ -226,6 +226,8 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_siren.cpp
 	./m95tigernet.cpp
 	./client/ghosthuntermenu.cpp
+	./gamemode/mod_zsh.cpp
+	./gamemode/zsh/zsh_building.cpp
 	)
 
 set (HLWPN_SRCS

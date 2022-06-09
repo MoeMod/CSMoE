@@ -360,7 +360,7 @@ int CKnife::Swing(int fFirst)
 				flDamage *= 5.5f;
 #endif
 
-			pEntity->TraceAttack(m_pPlayer->pev, flDamage, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
+			pEntity->TraceAttack(m_pPlayer->pev, flDamage, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET | DMG_KNIFE_SLASH);
 		}
 		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 

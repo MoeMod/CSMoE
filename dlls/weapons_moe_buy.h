@@ -156,7 +156,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_CSGO_SAWEDOFF, "csgo_sawedoff",         "匪喷Sawed-Off",                  1100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_CSGO_BIZON, "csgo_bizon",         "野牛PP-Bizon",                  1400, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 //#endif
-	//{ WEAPON_Z4B_FREEDOM, "z4b_freedom",         "自由",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_Z4B_FREEDOM, "z4b_freedom",         "自由",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	//{ WEAPON_Z4B_CSG12SS, "z4b_csg12ss",         "CSG-12",           1700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_SPRIFLE, "weapon_sprifle",         "狂暴蒸汽",           5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_INFINITY, "weapon_infinity",    "恒宇双星", 1500, PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },

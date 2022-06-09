@@ -15,7 +15,9 @@ namespace sv {
         
     void ShowGhostHunterMenu(CBasePlayer *adminid)
     {
-        ImMenu(adminid, [](auto context, CBasePlayer *adminid){
+        ImMenu(adminid, [round = g_pGameRules->m_iTotalRoundsPlayed](auto context, CBasePlayer *adminid){
+            if (round != g_pGameRules->m_iTotalRoundsPlayed)
+                return;
             context.begin("请选择要使用的英雄");
             if (context.item("MasterHunter", "终极猎手"))
             {

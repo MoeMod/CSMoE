@@ -496,6 +496,7 @@ TL_ADD(CSpear)
 TL_ADD(CSGMissileCannon)
 TL_ADD(CWhipSwordStabBox)
 TL_ADD(CPumpkinGrenade)
+TL_ADD(CZSHBuilding)
 
 
 #endif
