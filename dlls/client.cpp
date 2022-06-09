@@ -1767,7 +1767,7 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 
 				if (player->m_iTeam != SPECTATOR) {
 					// notify other clients of player joined to team spectator
-					UTIL_LogPrintf
+					UTIL_LogPrintfDetail
 							(
 									"\"%s<%i><%s><%s>\" joined team \"SPECTATOR\"\n",
 									STRING(player->pev->netname),
@@ -1980,7 +1980,7 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 							player->pev->netname) : "<unconnected>"
 			);
 
-	UTIL_LogPrintf
+	UTIL_LogPrintfDetail
 			(
 					"\"%s<%i><%s><%s>\" joined team \"%s\"\n",
 					STRING(player->pev->netname),
@@ -3665,7 +3665,7 @@ void EXT_FUNC ClientUserInfoChanged(edict_t *pEntity, char *infobuffer)
 				WRITE_STRING(szName);
 			MESSAGE_END();
 
-			UTIL_LogPrintf
+			UTIL_LogPrintfDetail
 			(
 				"\"%s<%i><%s><%s>\" changed name to \"%s\"\n",
 				STRING(pEntity->v.netname),

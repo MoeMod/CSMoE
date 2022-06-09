@@ -229,7 +229,7 @@ void CC4::PrimaryAttack(void)
 					TheCareerTasks->HandleEvent(EVENT_BOMB_PLANTED, m_pPlayer);
 				}
 
-				UTIL_LogPrintf("\"%s<%i><%s><TERRORIST>\" triggered \"Planted_The_Bomb\"\n", STRING(m_pPlayer->pev->netname), GETPLAYERUSERID(m_pPlayer->edict()), GETPLAYERAUTHID(m_pPlayer->edict()));
+				UTIL_LogPrintfDetail("\"%s<%i><%s><TERRORIST>\" triggered \"Planted_The_Bomb\"\n", STRING(m_pPlayer->pev->netname), GETPLAYERUSERID(m_pPlayer->edict()), GETPLAYERAUTHID(m_pPlayer->edict()));
 				g_pGameRules->m_bBombDropped = false;
 #endif
 				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/c4_plant.wav", VOL_NORM, ATTN_NORM);

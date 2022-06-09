@@ -71,11 +71,11 @@ void Log_Printf( const char *fmt, ... )
 
 void Log_PrintServerVars( void )
 {
+#ifndef XASH_DEDICATED
 	cvar_t *var;
 
 	if ( !svs.log.active )
 		return;
-
 	Log_Printf( "Server cvars start\n" );
 
 	for ( var = Cvar_GetList(); var != NULL; var = var->next )
@@ -84,6 +84,7 @@ void Log_PrintServerVars( void )
 			Log_Printf( "Server cvar \"%s\" = \"%s\"\n", var->name, var->string );
 	}
 	Log_Printf( "Server cvars end\n" );
+#endif
 }
 
 void Log_Close( void )

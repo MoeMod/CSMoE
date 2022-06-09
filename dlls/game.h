@@ -32,8 +32,8 @@
 #pragma once
 #endif
 
-#define LOG_ENEMYATTACK		1
-#define LOG_TEAMMATEATTACK	2
+#define LOG_ENEMYATTACK		2
+#define LOG_TEAMMATEATTACK	4
 
 // playerid
 #define PLAYERID_MODE_EVERYONE	0

@@ -156,6 +156,7 @@ set(XASH_ENGINE_SOURCES
 	server/sv_pmove.cpp
 	server/sv_save.cpp
 	server/sv_world.cpp
+	server/sv_security.cpp
 
 )
 

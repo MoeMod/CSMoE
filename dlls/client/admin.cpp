@@ -96,10 +96,17 @@ namespace sv {
         void LogAndPrintAdmin(CBasePlayer *adminid, const std::string &action, const std::string &reason, const std::string &targetname = "")
         {
             std::string adminname = GetPlayerName(adminid);
-            if(targetname.empty())
+            if (targetname.empty())
+            {
                 PrintToChatAll(" ^3[柑橘CitruS] ^7 管理员 ^2" + adminname + " ^7因为" + reason + "使用权限 ^2" + action + " ^7");
+                UTIL_LogPrintf("%s 因为 %s 使用权限 %s", adminname.c_str(), reason.c_str(), action.c_str());
+            }
             else
+            {
                 PrintToChatAll(" ^3[柑橘CitruS] ^7 管理员 ^2" + adminname + " ^7因为" + reason + "把 ^2" + targetname + " ^7进行 ^2" + action + " ^7");
+                UTIL_LogPrintf("%s 因为 %s 把 %s 进行", adminname.c_str(), reason.c_str(), targetname.c_str(), action.c_str());
+            }
+
         }
 
         void DelayedChangeLevel(std::string map)

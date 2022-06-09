@@ -1771,7 +1771,7 @@ void CEscapeZone::EscapeTouch(CBaseEntity *pOther)
 			p->m_bEscaped = true;
 			g_pGameRules->CheckWinConditions();
 
-			UTIL_LogPrintf
+			UTIL_LogPrintfDetail
 			(
 				"\"%s<%i><%s><TERRORIST>\" triggered \"Terrorist_Escaped\"\n",
 				STRING(p->pev->netname),
@@ -1781,7 +1781,7 @@ void CEscapeZone::EscapeTouch(CBaseEntity *pOther)
 
 			for (int i = 1; i <= gpGlobals->maxClients; ++i)
 			{
-				CBasePlayer *pPlayer = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(i));
+				CBasePlayer* pPlayer = static_cast<CBasePlayer*>(UTIL_PlayerByIndex(i));
 
 				if (pPlayer == NULL || FNullEnt(pPlayer->pev))
 					continue;
@@ -1809,17 +1809,17 @@ void CVIP_SafetyZone::Spawn()
 	SetTouch(&CVIP_SafetyZone::VIP_SafetyTouch);
 }
 
-void CVIP_SafetyZone::VIP_SafetyTouch(CBaseEntity *pOther)
+void CVIP_SafetyZone::VIP_SafetyTouch(CBaseEntity* pOther)
 {
 	if (!pOther->IsPlayer())
 		return;
 
-	CBasePlayer *p = static_cast<CBasePlayer *>(pOther);
+	CBasePlayer* p = static_cast<CBasePlayer*>(pOther);
 	p->m_signals.Signal(SIGNAL_VIPSAFETY);
 
 	if (p->m_bIsVIP)
 	{
-		UTIL_LogPrintf
+		UTIL_LogPrintfDetail
 		(
 			"\"%s<%i><%s><CT>\" triggered \"Escaped_As_VIP\"\n",
 			STRING(p->pev->netname),

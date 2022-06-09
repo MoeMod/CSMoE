@@ -317,18 +317,18 @@ void CHostage::IdleThink()
 				if (player != NULL)
 				{
 					player->AddAccount(1000);
-					UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Rescued_A_Hostage\"\n", STRING(player->pev->netname),
+					UTIL_LogPrintfDetail("\"%s<%i><%s><CT>\" triggered \"Rescued_A_Hostage\"\n", STRING(player->pev->netname),
 						GETPLAYERUSERID(player->edict()), GETPLAYERAUTHID(player->edict()));
 				}
 
 				SendHostageEventMsg();
 
 				MESSAGE_BEGIN(MSG_SPEC, SVC_DIRECTOR);
-					WRITE_BYTE(9);
-					WRITE_BYTE(DRC_CMD_EVENT);
-					WRITE_SHORT(player != NULL ? player->entindex() : 0);
-					WRITE_SHORT(entindex());
-					WRITE_LONG(15);
+				WRITE_BYTE(9);
+				WRITE_BYTE(DRC_CMD_EVENT);
+				WRITE_SHORT(player != NULL ? player->entindex() : 0);
+				WRITE_SHORT(entindex());
+				WRITE_LONG(15);
 				MESSAGE_END();
 
 				pev->effects |= EF_NODRAW;
@@ -440,10 +440,10 @@ void CHostage::RePosition()
 	m_flNextFullThink = gpGlobals->time + RandomDuration(0.1s, 0.2s);
 }
 
-int CHostage::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+int CHostage::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
 	float flActualDamage;
-	CBasePlayer *pAttacker = NULL;
+	CBasePlayer* pAttacker = NULL;
 
 	flActualDamage = GetModifiedDamage(flDamage, m_LastHitGroup);
 
@@ -461,11 +461,11 @@ int CHostage::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 	if (pevAttacker != NULL)
 	{
-		CBaseEntity *pAttackingEnt = GetClassPtr<CBaseEntity>(pevAttacker);
+		CBaseEntity* pAttackingEnt = GetClassPtr<CBaseEntity>(pevAttacker);
 
 		if (pAttackingEnt->Classify() == CLASS_VEHICLE)
 		{
-			CBaseEntity *pDriver = ((CFuncVehicle *)pAttackingEnt)->m_pDriver;
+			CBaseEntity* pDriver = ((CFuncVehicle*)pAttackingEnt)->m_pDriver;
 
 			if (pDriver != NULL)
 			{
@@ -641,7 +641,7 @@ void CHostage::SetDeathActivity()
 	}
 }
 
-void CHostage::AnnounceDeath(CBasePlayer *pAttacker)
+void CHostage::AnnounceDeath(CBasePlayer* pAttacker)
 {
 	ClientPrint(pAttacker->pev, HUD_PRINTCENTER, "#Killed_Hostage");
 
@@ -656,19 +656,19 @@ void CHostage::AnnounceDeath(CBasePlayer *pAttacker)
 		CHalfLifeTraining::HostageDied();
 	}
 
-	UTIL_LogPrintf("\"%s<%i><%s><%s>\" triggered \"Killed_A_Hostage\"\n", STRING(pAttacker->pev->netname), GETPLAYERUSERID(pAttacker->edict()),
+	UTIL_LogPrintfDetail("\"%s<%i><%s><%s>\" triggered \"Killed_A_Hostage\"\n", STRING(pAttacker->pev->netname), GETPLAYERUSERID(pAttacker->edict()),
 		GETPLAYERAUTHID(pAttacker->edict()), GetTeam(pAttacker->m_iTeam));
 
 	MESSAGE_BEGIN(MSG_SPEC, SVC_DIRECTOR);
-		WRITE_BYTE(9);
-		WRITE_BYTE(DRC_CMD_EVENT);
-		WRITE_SHORT(ENTINDEX(pAttacker->edict()));
-		WRITE_SHORT(ENTINDEX(edict()));
-		WRITE_LONG(15);
+	WRITE_BYTE(9);
+	WRITE_BYTE(DRC_CMD_EVENT);
+	WRITE_SHORT(ENTINDEX(pAttacker->edict()));
+	WRITE_SHORT(ENTINDEX(edict()));
+	WRITE_LONG(15);
 	MESSAGE_END();
 }
 
-void CHostage::ApplyHostagePenalty(CBasePlayer *pAttacker)
+void CHostage::ApplyHostagePenalty(CBasePlayer* pAttacker)
 {
 	if (pAttacker->m_iTeam != TERRORIST)
 		return;
@@ -688,7 +688,7 @@ void CHostage::ApplyHostagePenalty(CBasePlayer *pAttacker)
 	}
 }
 
-void CHostage::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
+void CHostage::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
 	if (!pActivator->IsPlayer())
 		return;
@@ -696,7 +696,7 @@ void CHostage::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 	if (!IsAlive())
 		return;
 
-	CBasePlayer *pPlayer = (CBasePlayer *)pActivator;
+	CBasePlayer* pPlayer = (CBasePlayer*)pActivator;
 
 	if (pPlayer->m_iTeam != CT)
 	{
@@ -777,7 +777,7 @@ void CHostage::PlayFollowRescueSound()
 	}
 }
 
-void CHostage::GiveCTTouchBonus(CBasePlayer *pPlayer)
+void CHostage::GiveCTTouchBonus(CBasePlayer* pPlayer)
 {
 	if (m_bTouched)
 		return;
@@ -786,7 +786,7 @@ void CHostage::GiveCTTouchBonus(CBasePlayer *pPlayer)
 	g_pGameRules->m_iAccountCT += 100;
 
 	pPlayer->AddAccount(150);
-	UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Touched_A_Hostage\"\n", STRING(pPlayer->pev->netname), GETPLAYERUSERID(pPlayer->edict()), GETPLAYERAUTHID(pPlayer->edict()));
+	UTIL_LogPrintfDetail("\"%s<%i><%s><CT>\" triggered \"Touched_A_Hostage\"\n", STRING(pPlayer->pev->netname), GETPLAYERUSERID(pPlayer->edict()), GETPLAYERAUTHID(pPlayer->edict()));
 }
 
 int CHostage::ObjectCaps()

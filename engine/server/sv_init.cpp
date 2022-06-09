@@ -700,6 +700,9 @@ void SV_InitGame( void )
 	{
 		if( !Cvar_VariableValue( "coop" ) && !Cvar_VariableValue( "teamplay" ))
 			Cvar_FullSet( "deathmatch", "1",  CVAR_LATCH );
+
+		// 2022.06.09 default log on
+		svs.log.active = true;
 	}
 
 	// init clients

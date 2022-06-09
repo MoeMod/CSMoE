@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "server.h"
 #include "net_encode.h"
 #include "net_api.h"
+#include "sv_security.h"
 
 const char *clc_strings[11] =
 {
@@ -383,6 +384,9 @@ gotnewcl:
 
 	auto osname = Info_ValueForKey(newcl->useragent, "o");
 	svgame.dllFuncs.pfnClientOperationSystem(newcl->edict, osname);
+
+	//Rehlds Security
+	Rehlds_Security_ClientConnected(svs.currentPlayerNum);
 }
 
 /*
@@ -3265,6 +3269,15 @@ SV_ExecuteUserCommand
 */
 void SV_ExecuteClientCommand( sv_client_t *cl, const char *s )
 {
+	//check string commands rate for this player
+//#ifdef REHLDS_FIXES
+	g_StringCommandsRateLimiter.StringCommandIssued(cl - svs.clients);
+
+	if (cl->state < cs_connected) {
+		return; //return if player was kicked
+	}
+//#endif
+
 	ucmd_t	*u;
 
 	svs.currentPlayer = cl;
@@ -3569,6 +3582,19 @@ static void SV_ParseClientMove( sv_client_t *cl, sizebuf_t *msg )
 		if( !player->v.fixangle )
 			VectorCopy( cmds[0].viewangles, player->v.v_angle );
 	}
+
+	//check move commands rate for this player
+#ifdef XASH_DEDICATED
+	int numCmdsToIssue = numcmds;
+	if (net_drop > 0) {
+		numCmdsToIssue += net_drop;
+	}
+	g_MoveCommandRateLimiter.MoveCommandsIssued(cl - svs.clients, numCmdsToIssue);
+
+	if (cl->state < cs_connected) {
+		return; //return if player was kicked
+	}
+#endif
 
 	player->v.button = cmds[0].buttons;
 	player->v.light_level = cmds[0].lightlevel;

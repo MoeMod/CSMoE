@@ -1,6 +1,8 @@
 #pragma once
 
+#include "DatabaseConfig.h"
 #include <boost/mysql.hpp>
+#include <boost/asio.hpp>
 
 class MySqlConnection : public std::enable_shared_from_this<MySqlConnection>
 {
@@ -72,7 +74,7 @@ public:
         );
     }
 
-    void on_handshake(boost::system::error_code ec) {
+    void on_handshake(const boost::system::error_code &ec) {
         if (ec)
             return fail(ec, "handshake");
 
@@ -89,7 +91,7 @@ public:
         using namespace std::chrono_literals;
         std::shared_ptr<boost::asio::system_timer> st = std::make_shared<boost::asio::system_timer>(ioc);
         st->expires_after(20s);
-        st->async_wait([sp = shared_from_this(), st](const boost::system::error_code& ec) { sp->on_ping(ec); });
+        st->async_wait([sp = shared_from_this(), st](const boost::system::error_code ec) { sp->on_ping(ec); });
     }
 
     void on_ping(const boost::system::error_code& ec)
@@ -99,7 +101,7 @@ public:
         if (auto desired = Status::available; status.compare_exchange_strong(desired, Status::on_ping))
         {
             // unique connection here
-            connection.async_query("SELECT 1=1;", [sp = shared_from_this()](const boost::system::error_code &ec, boost::mysql::tcp_resultset &&res) {
+            connection.async_query("SELECT 1=1;", [sp = shared_from_this()](const boost::system::error_code &ec, boost::mysql::tcp_resultset res) {
                 std::shared_ptr<boost::mysql::tcp_resultset> pres = std::make_shared<boost::mysql::tcp_resultset>(std::move(res));
                 pres->async_read_all([sp, pres](const boost::system::error_code& ec, std::vector<boost::mysql::row> res) {
                     assert(sp->status.load() == Status::on_ping);

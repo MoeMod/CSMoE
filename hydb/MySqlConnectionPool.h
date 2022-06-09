@@ -5,7 +5,7 @@
 #include <mutex>
 
 #include <vector>
-#include <boost/mysql.hpp>
+#include "MySqlConnection.h"
 #include "DatabaseConfig.h"
 
 class MySqlConnection;

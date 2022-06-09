@@ -1,7 +1,5 @@
 #include "MySqlConnectionPool.h"
 #include "DatabaseConfig.h"
-#include <boost/asio.hpp>
-#include "MySqlConnection.h"
 
 #include <mutex>
 

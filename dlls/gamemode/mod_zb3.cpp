@@ -238,7 +238,7 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 	iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("50AE", MAX_AMMO_50AE);
 	m_pPlayer->GiveAmmo(iAmount, "50AE", iAmount);
 
-	UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Became_Hero\"\n", STRING(m_pPlayer->pev->netname), GETPLAYERUSERID(m_pPlayer->edict()), GETPLAYERAUTHID(m_pPlayer->edict()));
+	UTIL_LogPrintfDetail("\"%s<%i><%s><CT>\" triggered \"Became_Hero\"\n", STRING(m_pPlayer->pev->netname), GETPLAYERUSERID(m_pPlayer->edict()), GETPLAYERAUTHID(m_pPlayer->edict()));
 	UTIL_ClientPrintAll(HUD_PRINTTALK, "%s 被选中成为英雄！", STRING(m_pPlayer->pev->netname));
 	//UTIL_ClientPrintAll(HUD_PRINTTALK, "%s Become a hero！", STRING(m_pPlayer->pev->netname));
 }

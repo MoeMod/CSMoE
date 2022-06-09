@@ -1728,7 +1728,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 				else
 					ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Got_bomb");
 
-				UTIL_LogPrintf("\"%s<%i><%s><TERRORIST>\" triggered \"Got_The_Bomb\"\n",
+				UTIL_LogPrintfDetail("\"%s<%i><%s><TERRORIST>\" triggered \"Got_The_Bomb\"\n",
 					STRING(pPlayer->pev->netname),
 					GETPLAYERUSERID(pPlayer->edict()),
 					GETPLAYERAUTHID(pPlayer->edict()));

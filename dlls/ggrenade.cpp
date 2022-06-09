@@ -1887,7 +1887,7 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 
 	if (player->m_bHasDefuser)
 	{
-		UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Begin_Bomb_Defuse_With_Kit\"\n",
+		UTIL_LogPrintfDetail("\"%s<%i><%s><CT>\" triggered \"Begin_Bomb_Defuse_With_Kit\"\n",
 			STRING(player->pev->netname),
 			GETPLAYERUSERID(player->edict()),
 			GETPLAYERAUTHID(player->edict()));
@@ -1907,7 +1907,7 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 	}
 	else
 	{
-		UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Begin_Bomb_Defuse_Without_Kit\"\n",
+		UTIL_LogPrintfDetail("\"%s<%i><%s><CT>\" triggered \"Begin_Bomb_Defuse_Without_Kit\"\n",
 			STRING(player->pev->netname),
 			GETPLAYERUSERID(player->edict()),
 			GETPLAYERAUTHID(player->edict()));
@@ -1927,9 +1927,9 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 	}
 }
 
-CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vector vecAngles)
+CGrenade* CGrenade::ShootSatchelCharge(entvars_t* pevOwner, Vector vecStart, Vector vecAngles)
 {
-	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
+	CGrenade* pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->pev->movetype = MOVETYPE_TOSS;
 
 	if (pGrenade->pev->classname)
@@ -1973,7 +1973,7 @@ CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vec
 	pGrenade->pev->friction = 0.9f;
 	pGrenade->m_bJustBlew = false;
 
-	CBasePlayer *owner = dynamic_cast<CBasePlayer *>(CBasePlayer::Instance(pevOwner));
+	CBasePlayer* owner = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pevOwner));
 
 	if (owner != NULL && owner->IsPlayer())
 	{
@@ -1985,9 +1985,9 @@ CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vec
 	return pGrenade;
 }
 
-CGrenade *CGrenade::ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent)
+CGrenade* CGrenade::ShootSmokeGrenade(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent)
 {
-	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
+	CGrenade* pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->Spawn();
 
 	UTIL_SetOrigin(pGrenade->pev, vecStart);
@@ -2027,11 +2027,11 @@ void AnnounceFlashInterval(float interval, float offset)
 		return;
 
 	MESSAGE_BEGIN(MSG_ALL, gmsgScenarioIcon);
-		WRITE_BYTE(1);
-		WRITE_STRING("bombticking");
-		WRITE_BYTE(255);
-		WRITE_SHORT((int)interval);	// interval
-		WRITE_SHORT((int)offset);
+	WRITE_BYTE(1);
+	WRITE_STRING("bombticking");
+	WRITE_BYTE(255);
+	WRITE_SHORT((int)interval);	// interval
+	WRITE_SHORT((int)offset);
 	MESSAGE_END();
 }
 
@@ -2105,14 +2105,14 @@ void CGrenade::C4Think()
 		m_flNextBlink = gpGlobals->time + 2.0s;
 
 		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
-			WRITE_BYTE(TE_GLOWSPRITE);
-			WRITE_COORD(pev->origin.x);
-			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z + 5.0f);
-			WRITE_SHORT(g_sModelIndexC4Glow);
-			WRITE_BYTE(1);
-			WRITE_BYTE(3);
-			WRITE_BYTE(255);
+		WRITE_BYTE(TE_GLOWSPRITE);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z + 5.0f);
+		WRITE_SHORT(g_sModelIndexC4Glow);
+		WRITE_BYTE(1);
+		WRITE_BYTE(3);
+		WRITE_BYTE(255);
 		MESSAGE_END();
 	}
 
@@ -2125,12 +2125,12 @@ void CGrenade::C4Think()
 		}
 
 		MESSAGE_BEGIN(MSG_ALL, gmsgScenarioIcon);
-			WRITE_BYTE(0);
+		WRITE_BYTE(0);
 		MESSAGE_END();
 
 		if (m_pentCurBombTarget)
 		{
-			CBaseEntity *pBombTarget = CBaseEntity::Instance(m_pentCurBombTarget);
+			CBaseEntity* pBombTarget = CBaseEntity::Instance(m_pentCurBombTarget);
 
 			if (pBombTarget)
 			{
@@ -2138,7 +2138,7 @@ void CGrenade::C4Think()
 			}
 		}
 
-		CBasePlayer *pBombOwner = dynamic_cast<CBasePlayer *>(CBaseEntity::Instance(pev->owner));
+		CBasePlayer* pBombOwner = dynamic_cast<CBasePlayer*>(CBaseEntity::Instance(pev->owner));
 		if (pBombOwner != NULL)
 		{
 			pBombOwner->pev->frags += 3.0f;
@@ -2158,7 +2158,7 @@ void CGrenade::C4Think()
 	// if the defusing process has started
 	if (m_bStartDefuse && m_pBombDefuser != nullptr)
 	{
-		CBasePlayer *pPlayer = static_cast<CBasePlayer *>(m_pBombDefuser);
+		CBasePlayer* pPlayer = static_cast<CBasePlayer*>(m_pBombDefuser);
 
 		// if the defusing process has not ended yet
 		if (gpGlobals->time < m_flDefuseCountDown)
@@ -2197,18 +2197,18 @@ void CGrenade::C4Think()
 
 			if (TheBots != NULL)
 			{
-				TheBots->OnEvent(EVENT_BOMB_DEFUSED, (CBaseEntity *)m_pBombDefuser);
+				TheBots->OnEvent(EVENT_BOMB_DEFUSED, (CBaseEntity*)m_pBombDefuser);
 			}
 
 			MESSAGE_BEGIN(MSG_SPEC, SVC_DIRECTOR);
-				WRITE_BYTE(9);
-				WRITE_BYTE(DRC_CMD_EVENT);
-				WRITE_SHORT(ENTINDEX(m_pBombDefuser->edict()));
-				WRITE_SHORT(0);
-				WRITE_LONG(15 | DRC_FLAG_FINAL | DRC_FLAG_FACEPLAYER | DRC_FLAG_DRAMATIC);
+			WRITE_BYTE(9);
+			WRITE_BYTE(DRC_CMD_EVENT);
+			WRITE_SHORT(ENTINDEX(m_pBombDefuser->edict()));
+			WRITE_SHORT(0);
+			WRITE_LONG(15 | DRC_FLAG_FINAL | DRC_FLAG_FACEPLAYER | DRC_FLAG_DRAMATIC);
 			MESSAGE_END();
 
-			UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Defused_The_Bomb\"\n",
+			UTIL_LogPrintfDetail("\"%s<%i><%s><CT>\" triggered \"Defused_The_Bomb\"\n",
 				STRING(m_pBombDefuser->pev->netname),
 				GETPLAYERUSERID(m_pBombDefuser->edict()),
 				GETPLAYERAUTHID(m_pBombDefuser->edict()));

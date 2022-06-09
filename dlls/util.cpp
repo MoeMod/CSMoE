@@ -1505,6 +1505,21 @@ void UTIL_LogPrintf(const char *fmt, ...)
 	ALERT(at_logged, "%s", string);
 }
 
+void UTIL_LogPrintfDetail(const char* fmt, ...)
+{
+	if (logdetail.value == 0.0f)
+		return;
+
+	va_list argptr;
+	static char string[1024];
+
+	va_start(argptr, fmt);
+	vsprintf(string, fmt, argptr);
+	va_end(argptr);
+
+	ALERT(at_logged, "%s", string);
+}
+
 NOXREF float UTIL_DotPoints(const Vector &vecSrc, const Vector &vecCheck, const Vector &vecDir)
 {
 	Vector2D vec2LOS = (vecCheck - vecSrc).Make2D();

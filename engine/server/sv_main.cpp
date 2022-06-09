@@ -19,6 +19,7 @@ GNU General Public License for more details.
 
 #include "errno.h"
 #include "Sequence.h"
+#include "sv_security.h"
 #define HEARTBEAT_SECONDS	(sv_nat->integer?60.0f:300.0f) 		// 1 or 5 minutes
 
 convar_t	*sv_zmax;
@@ -705,6 +706,9 @@ void Host_ServerFrame( void )
 
 	// send a heartbeat to the master if needed
 	Master_Heartbeat ();
+
+	//Rehlds Security
+	Rehlds_Security_Frame();
 }
 
 //============================================================================
@@ -987,7 +991,7 @@ void SV_Init( void )
 	mp_consistency = Cvar_Get( "mp_consistency", "1", CVAR_SERVERNOTIFY, "enable consistency check in multiplayer" );
 	clockwindow = Cvar_Get( "clockwindow", "0.5", 0, "timewindow to execute client moves" );
 	sv_novis = Cvar_Get( "sv_novis", "0", 0, "disable server-side visibility checking" );
-	sv_skipshield = Cvar_Get( "sv_skipshield", "0", CVAR_ARCHIVE, "skip shield hitbox");
+	sv_skipshield = Cvar_Get( "sv_skipshield", "2", CVAR_ARCHIVE, "skip shield hitbox");
 	sv_trace_messages = Cvar_Get( "sv_trace_messages", "0", CVAR_ARCHIVE|CVAR_LATCH, "enable server usermessages tracing (good for developers)" );
 	sv_corpse_solid = Cvar_Get( "sv_corpse_solid", "0", CVAR_ARCHIVE, "make corpses solid" );
 	sv_fixmulticast = Cvar_Get( "sv_fixmulticast", "1", CVAR_ARCHIVE, "do not send multicast to not spawned clients" );
@@ -1023,6 +1027,9 @@ void SV_Init( void )
 #ifdef XASH_64BIT
 	Cmd_AddCommand( "str64stats", SV_PrintStr64Stats_f, "show 64 bit string pool stats" );
 #endif
+
+	//Rehlds Security
+	Rehlds_Security_Init();
 
 	SV_InitFilter();
 	SV_ClearSaveDir ();	// delete all temporary *.hl files
@@ -1091,6 +1098,8 @@ void SV_Shutdown( qboolean reconnect )
 	{
 		return;
 	}
+
+	Rehlds_Security_Shutdown();
 
 	// rcon will be disconnected
 	SV_EndRedirect();
