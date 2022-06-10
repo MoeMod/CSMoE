@@ -85,45 +85,52 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	if (fb_width <= 0 || fb_height <= 0)
 		return;
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
+	pglShadeModel(GL_SMOOTH);
+	g_imguiRenderMode = kRenderTransAlpha;
+	GL_SetRenderMode(kRenderTransAlpha);
+	// Render command lists
+#if 1
+    for (int n = 0; n < draw_data->CmdListsCount; n++)
+    {
+        const ImDrawList* cmd_list = draw_data->CmdLists[n];
+        const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
+        const ImDrawIdx* idx_buffer = cmd_list->IdxBuffer.Data;
+        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+        {
+            const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
+            if (pcmd->UserCallback)
+            {
+                pcmd->UserCallback(cmd_list, pcmd);
+            }
+            else
+            {
+				pglEnable( GL_BLEND );
+				pglEnable( GL_ALPHA_TEST );
+				pglAlphaFunc( GL_GREATER, 0.0f );
+				pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+				pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-	// We are using the OpenGL fixed pipeline to make the example code simpler to read!
-	// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers, polygon fill.
-	GLint last_texture; pglGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-	GLint last_polygon_mode[2]; pglGetIntegerv(GL_POLYGON_MODE, last_polygon_mode);
-	GLint last_viewport[4]; pglGetIntegerv(GL_VIEWPORT, last_viewport);
-	GLint last_scissor_box[4]; pglGetIntegerv(GL_SCISSOR_BOX, last_scissor_box);
-	//pglPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
-	GLboolean last_enable_blend = pglIsEnabled(GL_BLEND);
-	GLboolean last_enable_cull_face = pglIsEnabled(GL_CULL_FACE);
-	GLboolean last_enable_depth_test = pglIsEnabled(GL_DEPTH_TEST);
-	GLboolean last_enable_scissor_test = pglIsEnabled(GL_SCISSOR_TEST);
+				GL_Bind( GL_KEEP_UNIT, (ptrdiff_t)pcmd->TextureId );
 
-	pglEnable(GL_BLEND);
-	pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	pglDisable(GL_CULL_FACE);
-	pglDisable(GL_DEPTH_TEST);
-	pglEnable(GL_SCISSOR_TEST);
-	pglEnableClientState(GL_VERTEX_ARRAY);
+                pglScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+
+                pglBegin(GL_TRIANGLES);
+                for(int i = 0; i < pcmd->ElemCount; ++i)
+                {
+                    auto vtx = vtx_buffer + idx_buffer[i];
+                    pglColor4ubv((ImU8 *)&vtx->col);
+                    pglTexCoord2f(vtx->uv.x, vtx->uv.y);
+                    pglVertex2f(vtx->pos.x, vtx->pos.y);
+                }
+                pglEnd();
+            }
+            idx_buffer += pcmd->ElemCount;
+        }
+    }
+#else
+    pglEnableClientState(GL_VERTEX_ARRAY);
 	pglEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	pglEnableClientState(GL_COLOR_ARRAY);
-	pglEnable(GL_TEXTURE_2D);
-	pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	pglShadeModel(GL_SMOOTH);
-
-	g_imguiRenderMode = kRenderTransTexture;
-	GL_SetRenderMode(kRenderTransTexture);
-
-	// Setup viewport, orthographic projection matrix
-//	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
-//	glMatrixMode(GL_PROJECTION);
-//	glPushMatrix();
-//	glLoadIdentity();
-//	glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
-//	glMatrixMode(GL_MODELVIEW);
-//	glPushMatrix();
-//	glLoadIdentity();
-
-	// Render command lists
 	for (int n = 0; n < draw_data->CmdListsCount; n++)
 	{
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];
@@ -155,21 +162,7 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	pglDisableClientState(GL_COLOR_ARRAY);
 	pglDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	pglDisableClientState(GL_VERTEX_ARRAY);
-	pglBindTexture(GL_TEXTURE_2D, (GLuint)last_texture);
-//	pglMatrixMode(GL_MODELVIEW);
-//	pglPopMatrix();
-//	pglMatrixMode(GL_PROJECTION);
-//	pglPopMatrix();
-	//pglPopAttrib();
-
-	if (last_enable_blend) pglEnable(GL_BLEND); else pglDisable(GL_BLEND);
-	if (last_enable_cull_face) pglEnable(GL_CULL_FACE); else pglDisable(GL_CULL_FACE);
-	if (last_enable_depth_test) pglEnable(GL_DEPTH_TEST); else pglDisable(GL_DEPTH_TEST);
-	if (last_enable_scissor_test) pglEnable(GL_SCISSOR_TEST); else pglDisable(GL_SCISSOR_TEST);
-
-	pglPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
-//	pglViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
-	pglScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
+#endif
 }
 
 //=============

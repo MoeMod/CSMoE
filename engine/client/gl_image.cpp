@@ -1567,13 +1567,13 @@ int GL_LoadTexture_DDS(const char *name, GLvoid* data, int type, int size, int w
 	switch (type)
 	{
 	case 1:
-		pglCompressedTexImage2DARB(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_S3TC_DXT1_EXT, w, h, 0, size, data);
+		pglCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_S3TC_DXT1_EXT, w, h, 0, size, data);
 		break;
 	case 2:
-		pglCompressedTexImage2DARB(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, w, h, 0, size, data);
+		pglCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, w, h, 0, size, data);
 		break;
 	case 3:
-		pglCompressedTexImage2DARB(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, w, h, 0, size, data);
+		pglCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, w, h, 0, size, data);
 		break;
 	}
 
