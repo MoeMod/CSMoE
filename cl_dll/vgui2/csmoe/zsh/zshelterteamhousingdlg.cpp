@@ -30,6 +30,12 @@ ZShelterTeamHousingDialog::ZShelterTeamHousingDialog(void) : Frame(NULL, CZSHELT
 
 	LoadControlSettings("resource/popup_zshelterteamhousingdlg.res", "GAME");
 
+	int screenWide, screenTall;
+	surface()->GetScreenSize(screenWide, screenTall);
+	int wide, tall;
+	GetSize(wide, tall);
+	SetPos((screenWide / 2) - wide / 2, (screenTall / 2) - tall / 2);
+
 	FindControl<Label>("TitleLabel")->SetScheme("BaseUI");
 
 	m_pSubDialog = new ZShelterTeamHousingSubDialog(this, "ZShelterTeamHousingSubDialog");
@@ -58,7 +64,7 @@ ZShelterTeamHousingDialog::ZShelterTeamHousingDialog(void) : Frame(NULL, CZSHELT
 		auto iter = std::find_if(cfg.begin(), cfg.end(), [i](const cl::zsht_buildmenu_s& data) { return i == data.id; });
 		if (iter != cfg.end())
 		{
-			if (iter->wood == iter->iron == iter->power == 0) {
+			if (iter->wood == 0 && iter->iron == 0 && iter->power == 0) {
 				m_HousingSlot[i].m_WoodLabel->SetVisible(false);
 				m_HousingSlot[i].m_IronLabel->SetVisible(false);
 				m_HousingSlot[i].m_ElectricLabel->SetVisible(false);
