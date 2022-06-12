@@ -160,3 +160,6 @@ HOOK_EVENT(skull4_left, FireSKULL4_Left);
 HOOK_EVENT(skull4_right, FireSKULL4_Right);
 HOOK_EVENT(skull6, FireSKULL6);
 HOOK_EVENT(skull1, FireSKULL1);
+HOOK_EVENT(m3dragon, FireM3Dragon);
+HOOK_EVENT(m3dragonm, FireM3Dragonm);
+HOOK_EVENT(herochainsaw, FireHeroChainsaw);

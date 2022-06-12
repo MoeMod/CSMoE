@@ -35,6 +35,7 @@ public:
 	IGameUIPanel* CreateGameUIPanelByName(const char* pszName) override;
 
     bool ShowVGUIMenu(int iMenu) override;
+	bool ShowVGUIMenuByName(const char* szName) override;
     bool HideVGUIMenu(int iMenu) override;
     void UpdateGameMode() override;
 

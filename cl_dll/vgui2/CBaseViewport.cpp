@@ -111,6 +111,9 @@ void CBaseViewport::SetParent( vgui2::VPANEL parent )
 	// restore proportionality on animation controller
 	// TODO: should all panels be restored to being proportional? 
 	m_pAnimController->SetProportional( true );
+
+	SetKeyBoardInputEnabled(false);
+	SetMouseInputEnabled(false);
 }
 
 bool CBaseViewport::UseVGUI1()

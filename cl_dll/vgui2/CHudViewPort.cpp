@@ -10,6 +10,7 @@
 #include "hud.h"
 #include "parsemsg.h"
 #include "csmoe/BuyMenu/cstrikebuymenu.h"
+#include "csmoe/zsh/zshelterteamhousingdlg.h"
 
 using cl::gHUD;
 using cl::gEngfuncs;
@@ -32,7 +33,7 @@ void CHudViewport::Start()
 
 	gEngfuncs.pfnHookUserMsg("VGUIMenu", [](const char *pszName, int iSize, void *pbuf) { return s_pHudViewPort->MsgFunc_MOTD(pszName, iSize, pbuf); });
 
-	gEngfuncs.pfnAddCommand("motd_open", []() { s_pHudViewPort->m_pMOTD->Activate(gHUD.m_szServerName, "wow"); });
+    gEngfuncs.pfnAddCommand("motd_open", []() { s_pHudViewPort->m_pMOTD->Activate(gHUD.m_szServerName, "wow"); });
 }
 
 int CHudViewport::MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf)
@@ -79,7 +80,7 @@ void CHudViewport::CreateDefaultPanels()
 {
 	AddNewPanel(CreatePanelByName("ClientMOTD"));
     AddNewPanel(CreatePanelByName(PANEL_BUY));
-	//AddNewPanel(CreatePanelByName(VIEWPORT_PANEL_SCORE));
+    //AddNewPanel(CreatePanelByName(VIEWPORT_PANEL_SCORE));
 
 	AddNewGameUIPanel(CreateGameUIPanelByName("GameUITestPanel"));
 }
@@ -94,7 +95,7 @@ IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
 			m_pMOTD = new CClientMOTD(this);
 		pPanel = m_pMOTD;
 	}
-	if (Q_strcmp(PANEL_BUY, pszName) == 0)
+	else if (Q_strcmp(PANEL_BUY, pszName) == 0)
 	{
 		if(!m_pBuyMenu)
         {
@@ -103,6 +104,10 @@ IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
         }
 		pPanel = m_pBuyMenu;
 	}
+    else if (Q_strcmp(CZSHELTERTEAMHOUSINGDLG_NAME, pszName) == 0)
+    {
+        pPanel = new ZShelterTeamHousingDialog();
+    }
 
 	/*else if (Q_strcmp(VIEWPORT_PANEL_SCORE, pszName) == 0)
 	{
@@ -123,7 +128,6 @@ IGameUIPanel *CHudViewport::CreateGameUIPanelByName(const char *pszName)
 	
 	return pPanel;
 }
-
 
 bool CHudViewport::ShowVGUIMenu(int iMenu)
 {
@@ -204,4 +208,17 @@ void CHudViewport::UpdateGameMode()
 {
     if(m_pBuyMenu)
         m_pBuyMenu->UpdateGameMode();
+}
+
+bool CHudViewport::ShowVGUIMenuByName(const char* szName)
+{
+    auto pPanel = FindPanelByName(szName);
+    if (pPanel == nullptr)
+        pPanel = CreatePanelByName(szName);
+
+    if (pPanel == nullptr)
+        return false;
+
+    ShowPanel(pPanel, true);
+    return true;
 }

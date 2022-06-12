@@ -200,6 +200,9 @@ public:
 	Panel *FindSiblingByName(const char *siblingName);
 	void CallParentFunction(KeyValues *message);
 
+	template <class T>
+	T* FindControl(const char* pszName, bool recurseDown = false) { return dynamic_cast<T*>(FindChildByName(pszName, recurseDown)); }
+
 	virtual void SetAutoDelete(bool state);		// if set to true, panel automatically frees itself when parent is deleted
 	virtual bool IsAutoDeleteSet();
 	virtual void DeletePanel();				// simply does a  { delete this; }

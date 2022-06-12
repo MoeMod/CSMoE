@@ -219,6 +219,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("knife_dragonsword");
 	UTIL_PrecacheOtherWeapon("knife_dgaxe");
 	UTIL_PrecacheOther("ammo_dgaxe");
+	UTIL_PrecacheOtherWeapon("weapon_infinity");
 	UTIL_PrecacheOtherWeapon("weapon_infinityss");
 	UTIL_PrecacheOtherWeapon("weapon_infinitysb");
 	UTIL_PrecacheOtherWeapon("weapon_infinitysr");
@@ -346,6 +347,9 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_50aeaz");
 	UTIL_PrecacheOther("ammo_depletedalloy");
 	UTIL_PrecacheOther("ammo_buckshotaz");
+	UTIL_PrecacheOtherWeapon("weapon_m3dragon");
+	UTIL_PrecacheOtherWeapon("weapon_m3dragonm");
+	UTIL_PrecacheOtherWeapon("weapon_herochainsaw");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

@@ -851,9 +851,9 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 		{
 			// 龙炮套 90%
 			if(!RANDOM_LONG(0, 5))
-				m_pPlayer->GiveNamedItem("z4b_cannontiger");
+				m_pPlayer->GiveNamedItem("weapon_m3dragon");
 			else
-				m_pPlayer->GiveNamedItem("weapon_cannon");
+				m_pPlayer->GiveNamedItem("weapon_m3dragonm");
 
 			if(!RANDOM_LONG(0, 5))
 				m_pPlayer->GiveNamedItem("z4b_infinityx");
@@ -863,7 +863,7 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 			if(!RANDOM_LONG(0, 5))
 				m_pPlayer->GiveNamedItem("knife_skullt9");
 			else
-				m_pPlayer->GiveNamedItem("knife_holysword");
+				m_pPlayer->GiveNamedItem("knife_skullaxe");
 
 			
 			m_pPlayer->GiveNamedItem("weapon_hegrenade");

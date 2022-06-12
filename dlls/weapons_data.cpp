@@ -106,7 +106,7 @@ const char *GetCSModelName(WeaponIdType item_id)
 			modelName = "models/w_shield.mdl";
 			break;
 		default:
-			ALERT(at_console, "CBasePlayer::PackDeadPlayerItems(): Unhandled item- not creating weaponbox\n");
+			ALERT(at_console, "CBasePlayer::PackDeadPlayerItems(): Unhandled item %d not creating weaponbox\n", item_id);
 	}
 
 	return modelName;

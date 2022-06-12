@@ -228,6 +228,8 @@ set(HLDLL_SRCS
 	./client/ghosthuntermenu.cpp
 	./gamemode/mod_zsh.cpp
 	./gamemode/zsh/zsh_building.cpp
+	./m3dragoncannon.cpp
+	./m3dragoncannon_dragon.cpp
 	)
 
 set (HLWPN_SRCS
@@ -440,6 +442,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_heartstimulater.cpp
 	../dlls/wpn_shared/z4b_syringe.cpp
 	../dlls/wpn_shared/wpn_skull1.cpp
+	../dlls/wpn_shared/wpn_m3dragon.cpp
+	../dlls/wpn_shared/wpn_m3dragonm.cpp
+	../dlls/wpn_shared/wpn_herochainsaw.cpp
 	)
 
 set(PM_SRCS

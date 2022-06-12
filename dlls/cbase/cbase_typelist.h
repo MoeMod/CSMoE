@@ -234,6 +234,9 @@ TL_ADD(CKnifeHeartStimulater)
 TL_ADD(CSyringe)
 TL_ADD(CSKULL1)
 TL_ADD(CPumpkin)
+TL_ADD(CM3Dragon)
+TL_ADD(CM3Dragonm)
+TL_ADD(CHeroChainsaw)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
@@ -497,6 +500,8 @@ TL_ADD(CSGMissileCannon)
 TL_ADD(CWhipSwordStabBox)
 TL_ADD(CPumpkinGrenade)
 TL_ADD(CZSHBuilding)
+TL_ADD(CM3DragonCannon)
+TL_ADD(CM3DragonCannon_Dragon)
 
 
 #endif

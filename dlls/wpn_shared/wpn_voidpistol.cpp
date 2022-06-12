@@ -372,7 +372,6 @@ namespace sv {
 		Vector vecForward;
 		Vector m_vecStartOrigin;
 		Vector m_vecStartVelocity;
-		TeamName m_iTeam;
 
 	protected:
 		void Remove()

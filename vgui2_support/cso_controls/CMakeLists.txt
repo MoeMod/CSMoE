@@ -1,6 +1,8 @@
 
 add_library(cso_controls STATIC
 	TexturedButton.cpp
+	RoundPanel.cpp
+	SignalImagePanel.cpp
 )
 target_include_directories(cso_controls PUBLIC
 		../interfaces/

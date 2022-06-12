@@ -403,7 +403,7 @@ namespace sv {
 			return flDamage;
 		}
 
-		void Init(Vector vecVelocity, float flDamage, TeamName iTeam, float avelocity, int iMode, CBasePlayer* pTarget)
+		void Init(Vector vecVelocity, float flDamage, int iTeam, float avelocity, int iMode, CBasePlayer* pTarget)
 		{
 			pev->avelocity.z = avelocity;
 			m_ArrowDamage = flDamage;
@@ -423,7 +423,6 @@ namespace sv {
 		float m_ArrowDamage;
 		time_point_t m_flStartFadeTime;
 		time_point_t m_flStartFllowTime;
-		TeamName m_iTeam;
 	};
 
 	LINK_ENTITY_TO_CLASS(huntbow_arrow, CHuntbowArrow);

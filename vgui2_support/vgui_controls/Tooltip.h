@@ -43,6 +43,8 @@ public:
 	void SetTooltipDelay(int tooltipDelayMilliseconds);
 	int GetTooltipDelay();
 
+	void SetBackgroundSkin(IScheme* pScheme, const char* szSkin);
+
 private:
 	virtual void ApplySchemeSettings(IScheme *pScheme);
 	CUtlVector<char> m_Text;

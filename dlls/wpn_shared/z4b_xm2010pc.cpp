@@ -231,7 +231,6 @@ public:
 	float m_flTouchDamage;
 	float m_flExplodeDamage;
 	float m_flExplodeRadius;
-	TeamName m_iTeam;
 	int m_iSprBeam;
 	int m_iModelShell;
 	int m_iSprEffect2;

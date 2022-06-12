@@ -473,7 +473,7 @@ namespace sv {
 
 	bool CPlayerModStrategy_ZSH::ClientCommand(const char* pcmd)
 	{
-		if (FStrEq(pcmd, "zsh_build") && CMD_ARGC_() == 2)
+		if (FStrEq(pcmd, "zsht_RequestBuild") && CMD_ARGC_() == 2)
 		{
 			for (auto&& pr : g_BuildingClassList)
 			{

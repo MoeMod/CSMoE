@@ -358,9 +358,29 @@ namespace vgui2
 		//Move to front.
 		_parent->_childDar.MoveElementToEnd(this);
 
+		// Validate the Z order
+		int i = _parent->_childDar.GetCount() - 2;
+		while (i >= 0)
+		{
+			if (_parent->_childDar[i]->_zpos > _zpos)
+			{
+				// we can't be in front of this; swap positions
+				_parent->_childDar.SetElementAt(_parent->_childDar[i], i + 1);
+				_parent->_childDar.SetElementAt(this, i);
+
+				// check the next value
+				i--;
+			}
+			else
+			{
+				// order valid
+				break;
+			}
+		}
+
 		//Move the panel back until the first panel
 		//that is either on the same Z pos or behind it.
-		for (int i = _parent->_childDar.Count() - 2; i >= 0; --i)
+		/*for (int i = _parent->_childDar.Count() - 2; i >= 0; --i)
 		{
 			auto pSibling = _parent->_childDar[i];
 
@@ -370,7 +390,7 @@ namespace vgui2
 				_parent->_childDar.RemoveElement(this);
 				break;
 			}
-		}
+		}*/
 	}
 
 	void VPanel::MoveToBack()

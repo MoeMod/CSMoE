@@ -165,20 +165,24 @@ void TextEntry::ApplySchemeSettings(IScheme *pScheme)
 	_font = pScheme->GetFont("Default", IsProportional() );
 	_smallfont = pScheme->GetFont( "DefaultVerySmall", IsProportional() );
 
-	const char *resourceString = pScheme->GetResourceString("TextEntry/TopLeft");
-
-	if (resourceString[0])
+	// skip if it already set background
+	if (!m_bImageBackground)
 	{
-		m_bImageBackground = true;
-		m_pTopBackground[0] = scheme()->GetImage(resourceString, true);
-		m_pTopBackground[1] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/TopCenter"), true);
-		m_pTopBackground[2] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/TopRight"), true);
-		m_pCenterBackground[0] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/MiddleLeft"), true);
-		m_pCenterBackground[1] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/MiddleCenter"), true);
-		m_pCenterBackground[2] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/MiddleRight"), true);
-		m_pBottomBackground[0] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/BottomLeft"), true);
-		m_pBottomBackground[1] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/BottomCenter"), true);
-		m_pBottomBackground[2] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/BottomRight"), true);
+		const char* resourceString = pScheme->GetResourceString("TextEntry/TopLeft");
+
+		if (resourceString[0])
+		{
+			m_bImageBackground = true;
+			m_pTopBackground[0] = scheme()->GetImage(resourceString, true);
+			m_pTopBackground[1] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/TopCenter"), true);
+			m_pTopBackground[2] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/TopRight"), true);
+			m_pCenterBackground[0] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/MiddleLeft"), true);
+			m_pCenterBackground[1] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/MiddleCenter"), true);
+			m_pCenterBackground[2] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/MiddleRight"), true);
+			m_pBottomBackground[0] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/BottomLeft"), true);
+			m_pBottomBackground[1] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/BottomCenter"), true);
+			m_pBottomBackground[2] = scheme()->GetImage(pScheme->GetResourceString("TextEntry/BottomRight"), true);
+		}
 	}
 
 	SetFont( _font );
@@ -4259,7 +4263,7 @@ void TextEntry::SetDrawLanguageIDAtLeft( bool state )
 	m_bDrawLanguageIDAtLeft = state;
 }
 
-void TextEntry::SetBackgroundSkin(IScheme* pScheme, char* szSkin)
+void TextEntry::SetBackgroundSkin(IScheme* pScheme, const char* szSkin)
 {
 	char buffer[64];
 	auto va = [&buffer](const char* format, auto...args) { sprintf(buffer, format, args...); return buffer; };

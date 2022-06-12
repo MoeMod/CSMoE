@@ -142,7 +142,8 @@ static void SDLash_KeyEvent( SDL_KeyboardEvent key, int down )
 		}
 	}
 
-	if (SDL_IsTextInputActive() && down)
+	// this will swallow [ctrl + c\v]
+	/*if (SDL_IsTextInputActive() && down)
 	{
 		if (SDL_GetModState() & KMOD_CTRL)
 		{
@@ -153,7 +154,7 @@ static void SDLash_KeyEvent( SDL_KeyboardEvent key, int down )
 			}
 			return;
 		}
-	}
+	}*/
 
 	Key_Event( keynum, down );
 }

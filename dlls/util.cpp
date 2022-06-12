@@ -2595,4 +2595,61 @@ void UTIL_TE_Sprite(const short sprite, const float x, const float y, const floa
 	MESSAGE_END();
 }
 
+
+float UTIL_CalculateDamageRate(Vector vecSrc, CBaseEntity* pOther)
+{
+	TraceResult tr;
+	float rate = 0.0;
+
+	if (!pOther->IsPlayer())
+	{
+		UTIL_TraceLine(vecSrc, pOther->pev->origin, ignore_monsters, NULL, &tr);
+
+		return tr.flFraction < 1.0 ? 0.0 : 1.0;
+	}
+
+	UTIL_TraceLine(vecSrc, pOther->pev->origin, ignore_monsters, NULL, &tr);
+
+	if (tr.flFraction == 1.0)
+		rate = 0.4;
+
+	UTIL_TraceLine(vecSrc, pOther->pev->origin + Vector(0, 0, 25), ignore_monsters, NULL, &tr);
+
+	if (tr.flFraction == 1.0)
+		rate += 0.2;
+
+	UTIL_TraceLine(vecSrc, pOther->pev->origin + Vector(0, 0, FBitSet(pOther->pev->flags, FL_DUCKING) ? -14 : -34), ignore_monsters, NULL, &tr);
+
+	if (tr.flFraction == 1.0)
+		rate += 0.2;
+
+	Vector2D vecDir = pOther->pev->origin.Make2D() - vecSrc.Make2D();
+	float dis2D = vecDir.LengthSquared();
+
+	if (!dis2D)
+	{
+		vecDir.x = 0.0;
+		vecDir.y = 1.0;
+
+		UTIL_TraceLine(vecSrc, pOther->pev->origin + Vector(0, 13, 0), ignore_monsters, NULL, &tr);
+	}
+	else
+	{
+		vecDir.x /= dis2D;
+		vecDir.y /= dis2D;
+
+		UTIL_TraceLine(vecSrc, pOther->pev->origin + Vector(-vecDir.y, vecDir.x, 0.0) * 13, ignore_monsters, NULL, &tr);
+	}
+
+	if (tr.flFraction == 1.0)
+		rate += 0.1;
+
+	UTIL_TraceLine(vecSrc, pOther->pev->origin - Vector(-vecDir.y, vecDir.x, 0.0) * 13, ignore_monsters, NULL, &tr);
+
+	if (tr.flFraction == 1.0)
+		rate += 0.1;
+
+	return rate;
+}
+
 }

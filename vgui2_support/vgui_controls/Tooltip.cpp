@@ -31,7 +31,7 @@ static int s_iTooltipWindowCount = 0;
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-Tooltip::Tooltip(Panel *parent, const char *text) 
+Tooltip::Tooltip(Panel *parent, const char *text)
 {
 	if (!s_TooltipWindow.Get())
 	{
@@ -325,4 +325,12 @@ void Tooltip::HideTooltip()
 	}
 	_makeVisible = false;
 	_isDirty = true;
+}
+
+void Tooltip::SetBackgroundSkin(IScheme* pScheme, const char* szSkin)
+{
+	if (s_TooltipWindow.Get())
+	{
+		s_TooltipWindow->SetBackgroundSkin(pScheme, szSkin);
+	}
 }

@@ -190,7 +190,7 @@ namespace sv {
 			EMIT_SOUND_DYN(edict(), CHAN_AUTO, "weapons/plasmagun_exp.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
 		}
 
-		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, TeamName iTeam, int type = 0)
+		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, int iTeam, int type = 0)
 		{
 			std::tie(m_flTouchDamage, RadiusDamageAmount, RadiusDamageRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flExplodeRadius, iTeam);
 			m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
@@ -204,7 +204,6 @@ namespace sv {
 		float RadiusDamageAmount;
 		float RadiusDamageRadius;
 		const KnockbackData RadiusDamageKnockback = { 800.0f, 800.0, 800.0f, 800.0f, 0.5f };
-		TeamName m_iTeam;
 		int m_iSprEffect;
 		int m_iSprExplo;
 		Vector m_vecStartVelocity;

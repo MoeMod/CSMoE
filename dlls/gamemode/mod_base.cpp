@@ -80,7 +80,7 @@ edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(CHalfLifeMultiplay *mod, 
 	// completely rewrites it
 
 	// select spawnpoint from both teams.
-	TeamName iBackupTeam = pPlayer->m_iTeam;
+	TeamName iBackupTeam = (TeamName)pPlayer->m_iTeam;
 	pPlayer->m_iTeam = static_cast<TeamName>(RANDOM_LONG(TERRORIST, CT));
 
 	// gat valid spawn point

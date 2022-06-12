@@ -187,7 +187,7 @@ namespace sv {
 			pev->nextthink = gpGlobals->time + 10.0s;
 		}
 
-		void Init(Vector vecVelocity, float flDamage, TeamName iTeam, float flGravity)
+		void Init(Vector vecVelocity, float flDamage, int iTeam, float flGravity)
 		{
 			pev->gravity = flGravity;
 			m_ArrowDamage = flDamage;
@@ -197,7 +197,6 @@ namespace sv {
 
 		int m_iModelLight1;
 		float m_ArrowDamage;
-		TeamName m_iTeam;
 
 	protected:
 		void Remove()

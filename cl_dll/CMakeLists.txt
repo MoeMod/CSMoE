@@ -277,6 +277,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_heartstimulater.cpp
 	../dlls/wpn_shared/z4b_syringe.cpp
 	../dlls/wpn_shared/wpn_skull1.cpp
+	../dlls/wpn_shared/wpn_m3dragon.cpp
+	../dlls/wpn_shared/wpn_m3dragonm.cpp
+	../dlls/wpn_shared/wpn_herochainsaw.cpp
 	)
 
 set (HUD_SRCS
@@ -409,6 +412,8 @@ if(XASH_VGUI2)
 		vgui2/csmoe/BuyMenu/cstrikebuymouseoverpanelbutton.cpp
 		vgui2/csmoe/BuyMenu/cstrikebuysubmenu.cpp
 		vgui2/csmoe/BuyMenu/WeaponImagePanel.cpp
+		vgui2/csmoe/zsh/zshelterteamhousingdlg.cpp
+		vgui2/csmoe/zsh/zshelterteamhousingsubdlg.cpp
 	)
 	add_definitions(-DXASH_VGUI2=1)
 else()
@@ -424,6 +429,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
 else()
 	set(INPUT_SRCS ./input_xash3d.cpp)
 endif()
+
+set(GAME_SHARED_SRCS
+	../game_shared/configs/cfg_zsht.cpp
+    )
 
 set (CLDLL_SOURCES
 	./cdll_int.cpp
@@ -450,6 +459,7 @@ set (CLDLL_SOURCES
 	${STUDIORENDER_SRCS}
 	${IMGUI_SRCS}
 	${VGUI2_SRCS}
+	${GAME_SHARED_SRCS}
 )
 
 include_directories (

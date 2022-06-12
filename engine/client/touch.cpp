@@ -1933,6 +1933,7 @@ void Touch_Shutdown( void )
 	Cmd_RemoveCommand( "touch_generate_code" );
 
 	touch.initialized = false;
+	touch.list_edit.clear();
 	Mem_FreePool( &touch.mempool );
 }
 #endif

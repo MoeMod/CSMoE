@@ -382,6 +382,7 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[];
+	int m_iTeam;
 };
 
 inline int FNullEnt(CBaseEntity* ent) { return (!ent) || FNullEnt(ent->edict()); }

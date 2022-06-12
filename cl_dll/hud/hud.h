@@ -466,6 +466,7 @@ public:
 	CHudUserCmd(OldStyleMenuClose);
 	CHudUserCmd(OldStyleMenuOpen);
 	CHudUserCmd(ShowVGUIMenu);
+	CHudUserCmd(ShowVGUIMenu2);
 
 	void ShowVGUIMenu( int menuType ); // cs16client extension
 

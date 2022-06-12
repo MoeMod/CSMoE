@@ -265,7 +265,6 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	time_point_t m_flEjectBrass;
 	int m_iKevlar;
 	bool m_bNotKilled;
-	TeamName m_iTeam;
 	CPlayerAccount m_iAccount;
 	bool m_bHasPrimary;
 	time_point_t m_flDeathThrowTime;

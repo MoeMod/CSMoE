@@ -196,7 +196,6 @@ template<> struct PrivateData<class CGrenade, CBaseMonster>
 	time_point_t m_flNextBlink;
 	time_point_t m_fNextDefuse;
 	bool m_bJustBlew;
-	int m_iTeam;
 	int m_iCurWave;
 	edict_t *m_pentCurBombTarget;
 	int m_SGSmoke;
@@ -917,42 +916,57 @@ public:
 	void Spawn(void);
 	void Precache(void);
 	int GetWeaponsId(void);
-	BOOL GetKickRate(float& ground, float& air_falling, float& air_moving, float& ducking, float& velocityModifier);
 
 public:
 	void EXPORT FlyingThink(void);
 	void EXPORT FlyingTouch(CBaseEntity* pOther);
 
 public:
-	static CM3DragonCannon* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner);
-
+	static CM3DragonCannon* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	float GetArmorRatioModifier() { return 1.1; }
+	bool RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
+	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.3f }; }
 
 private:
+	float GetDirectDamage();
+	float GetExplodeDamage();
 	int m_iType;
-	float m_iM3DragonmExp;
+	int m_iM3DragonmExp;
 	float m_flNumFrames;
 };
 
 
-class CM3DragonCannon_Dragon : public CBaseEntity
+class CM3DragonCannon_Dragon : public CBaseAnimating
 {
 public:
 	void Spawn(void);
 	void Precache(void);
 	int GetWeaponsId(void);
-	BOOL GetKickRate(float& ground, float& air_falling, float& air_moving, float& ducking, float& velocityModifier);
 
 public:
 	void EXPORT OnThink(void);
-	void EXPORT OnSharkThink(CBaseEntity* pOther);
-
+	void EXPORT OnSharkThink(void);
+	bool CylinderDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, float flHeight, float flKnockBack, Vector vecDir, int bitsDamageType, bool bDistanceCheck = true);	//SME
+	
 public:
 	static CM3DragonCannon_Dragon* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
-
+	float GetArmorRatioModifier() { return 1.1; }
+	KnockbackData GetKnockBackData() override { return { -1.0f, -1.0f, -1.0f, -1.0f, 0.6f }; }
 
 private:
-	float m_flNumFrames;
-	int m_iTeam;
+	void StartFadeOut();
+	void FadeOut();
+
+	float GetAttackRange();
+	float GetDamage();
+	duration_t GetLifeTime();
+	int m_iType;
+	int m_iSharkEffect;
+	int m_iWaterEffect;
+	time_point_t m_flAttackInterval;
+	time_point_t m_flRemoveTime;
+	time_point_t m_flSplashTime;
+	time_point_t m_flCreateSharkTime;
 };
 
 #ifdef ENABLE_SHIELD

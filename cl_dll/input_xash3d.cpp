@@ -7,6 +7,9 @@
 #include "in_defs.h"
 #include "view.h"
 
+#include "vgui/ISurface.h"
+#include "vgui_controls/controls.h"
+
 using namespace cl;
 
 namespace cl {
@@ -166,52 +169,55 @@ void IN_Move( float frametime, usercmd_t *cmd )
 		V_StopPitchDrift();
 	}
 
-	if( CL_IsDead( ) )
+	if (!vgui2::surface()->IsCursorVisible())
 	{
-		viewangles = dead_viewangles; // HACKHACK: see below
-	}
-	else
-	{
-		gEngfuncs.GetViewAngles( viewangles );
-	}
-
-	if( gHUD.GetSensitivity() != 0 )
-	{
-		rel_yaw *= gHUD.GetSensitivity();
-		rel_pitch *= gHUD.GetSensitivity();
-	}
-	else
-	{
-		rel_yaw *= sensitivity->value;
-		rel_pitch *= sensitivity->value;
-	}
-	if(gHUD.m_MOTD.cl_hide_motd->value == 0.0f && gHUD.m_MOTD.m_bShow)
-	{
-		gHUD.m_MOTD.scroll += rel_pitch;
-	}
-	else
-	{
-		viewangles[PITCH] += rel_pitch;
-		viewangles[YAW] += rel_yaw;
-		if( bLadder )
+		if( CL_IsDead( ) )
 		{
-			if( cl_laddermode->value == 1 )
-				viewangles[YAW] -= ac_sidemove * 5;
-			ac_sidemove = 0;
+			viewangles = dead_viewangles; // HACKHACK: see below
 		}
+		else
+		{
+			gEngfuncs.GetViewAngles( viewangles );
+		}
+
+		if( gHUD.GetSensitivity() != 0 )
+		{
+			rel_yaw *= gHUD.GetSensitivity();
+			rel_pitch *= gHUD.GetSensitivity();
+		}
+		else
+		{
+			rel_yaw *= sensitivity->value;
+			rel_pitch *= sensitivity->value;
+		}
+		if(gHUD.m_MOTD.cl_hide_motd->value == 0.0f && gHUD.m_MOTD.m_bShow)
+		{
+			gHUD.m_MOTD.scroll += rel_pitch;
+		}
+		else
+		{
+			viewangles[PITCH] += rel_pitch;
+			viewangles[YAW] += rel_yaw;
+			if( bLadder )
+			{
+				if( cl_laddermode->value == 1 )
+					viewangles[YAW] -= ac_sidemove * 5;
+				ac_sidemove = 0;
+			}
+		}
+		if (viewangles[PITCH] > cl_pitchdown->value)
+			viewangles[PITCH] = cl_pitchdown->value;
+		if (viewangles[PITCH] < -cl_pitchup->value)
+			viewangles[PITCH] = -cl_pitchup->value;
+
+
+		if( !CL_IsDead( ) )
+		{
+			gEngfuncs.SetViewAngles( viewangles );
+		}
+
+		dead_viewangles = viewangles;
 	}
-	if (viewangles[PITCH] > cl_pitchdown->value)
-		viewangles[PITCH] = cl_pitchdown->value;
-	if (viewangles[PITCH] < -cl_pitchup->value)
-		viewangles[PITCH] = -cl_pitchup->value;
-
-
-	if( !CL_IsDead( ) )
-	{
-		gEngfuncs.SetViewAngles( viewangles );
-	}
-
-	dead_viewangles = viewangles;
 
 	if( ac_movecount )
 	{

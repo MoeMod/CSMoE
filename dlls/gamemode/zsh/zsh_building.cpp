@@ -80,7 +80,7 @@ namespace sv
 		pev->takedamage = DAMAGE_AIM;
 		pev->flags |= FL_MONSTER;
 		pev->deadflag = DEAD_NO;
-		pev->health = 100.0f;
+		pev->health = 1.0f;
 		pev->max_health = m_pClass->GetHealth();
 		pev->rendermode = kRenderTransColor;
 		pev->renderamt = 100.0f;

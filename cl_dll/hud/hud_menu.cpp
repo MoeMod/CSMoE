@@ -52,6 +52,7 @@ DECLARE_MESSAGE( m_Menu, AllowSpec )
 DECLARE_COMMAND( m_Menu, OldStyleMenuOpen )
 DECLARE_COMMAND( m_Menu, OldStyleMenuClose )
 DECLARE_COMMAND( m_Menu, ShowVGUIMenu )
+DECLARE_COMMAND( m_Menu, ShowVGUIMenu2 )
 
 int CHudMenu :: Init( void )
 {
@@ -64,6 +65,7 @@ int CHudMenu :: Init( void )
 	HOOK_COMMAND( "client_buy_open", OldStyleMenuOpen );
 	HOOK_COMMAND( "client_buy_close", OldStyleMenuClose );
 	HOOK_COMMAND( "showvguimenu", ShowVGUIMenu );
+	HOOK_COMMAND( "showvguimenu2", ShowVGUIMenu2 );
 
 	_extended_menus = CVAR_CREATE("_extended_menus", "1", FCVAR_ARCHIVE);
 
@@ -421,6 +423,17 @@ void CHudMenu::UserCmd_ShowVGUIMenu()
 
 	int menuType = atoi(gEngfuncs.Cmd_Argv(1));
 	ShowVGUIMenu(menuType);
+}
+
+void CHudMenu::UserCmd_ShowVGUIMenu2()
+{
+	if (gEngfuncs.Cmd_Argc() < 2)
+	{
+		ConsolePrint("usage: showvguimenu2 <name>\n");
+		return;
+	}
+
+	g_pViewport->ShowVGUIMenuByName(gEngfuncs.Cmd_Argv(1));
 }
 
 }

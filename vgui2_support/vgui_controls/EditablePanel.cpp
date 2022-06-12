@@ -127,6 +127,65 @@ void EditablePanel::OnKeyCodeTyped(KeyCode code)
 	else
 	{
 		BaseClass::OnKeyCodeTyped(code);
+
+		wchar_t unichar = 0;
+		// 2022.06.11 hot key check
+		if (KEY_0 <= code && code <= KEY_9) {
+			unichar = ('0' + (int)code - 1);
+		}
+		else if (KEY_A <= code && code <= KEY_Z) {
+			unichar = ('a' + ((int)code - (int)KEY_A));
+		}
+		else {
+			switch (code) {
+			case KEY_LBRACKET:
+				unichar = ('[');
+				break;
+			case KEY_RBRACKET:
+				unichar = (']');
+				break;
+			case KEY_SEMICOLON:
+				unichar = ('.');
+				break;
+			case KEY_APOSTROPHE:
+				unichar = ('\'');
+				break;
+			case KEY_BACKQUOTE:
+				unichar = ('`');
+				break;
+			case KEY_COMMA:
+				unichar = (',');
+				break;
+			case KEY_PERIOD:
+				unichar = ('.');
+				break;
+			case KEY_SLASH:
+				unichar = ('/');
+				break;
+			case KEY_BACKSLASH:
+				unichar = ('\\');
+				break;
+			case KEY_MINUS:
+				unichar = ('-');
+				break;
+			case KEY_EQUAL:
+				unichar = ('=');
+				break;
+			case KEY_SPACE:
+				unichar = (' ');
+				break;
+			}
+		}
+
+		if (unichar)
+		{
+			Panel* panel = GetFocusNavGroup().FindPanelByHotkey(unichar);
+			if (panel)
+			{
+				// tell the panel to Activate
+				PostMessage(panel, new KeyValues("Hotkey"));
+			}
+		}
 	}
 }
 

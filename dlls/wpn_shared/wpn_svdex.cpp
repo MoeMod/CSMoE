@@ -203,7 +203,7 @@ namespace sv {
 			return Remove();
 		}
 
-		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, TeamName iTeam)
+		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, int iTeam)
 		{
 			std::tie(m_flTouchDamage, m_flExplodeDamage, m_flExplodeRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flExplodeRadius, iTeam);
 			pev->velocity = std::move(vecVelocity);
@@ -215,7 +215,6 @@ namespace sv {
 		float m_flTouchDamage;
 		float m_flExplodeDamage;
 		float m_flExplodeRadius;
-		TeamName m_iTeam;
 		int m_iSprEffect;
 
 	protected:

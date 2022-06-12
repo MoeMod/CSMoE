@@ -925,7 +925,7 @@ TutorMessageEvent *CCSTutor::CreateTutorMessageEvent(TutorMessageID mid, CBaseEn
 		case YOU_KILLED_A_TEAMMATE:
 		case TEAMMATE_KILLED_ONE_LEFT:
 		case LAST_TEAMMATE_KILLED:
-			ConstructRecentDeathsList(localPlayer->m_iTeam, enemyList, sizeof(enemyList), event);
+			ConstructRecentDeathsList((TeamName)localPlayer->m_iTeam, enemyList, sizeof(enemyList), event);
 			event->AddParameter(enemyList);
 			break;
 		case TEAMMATE_KILLED:
@@ -968,7 +968,7 @@ TutorMessageEvent *CCSTutor::CreateTutorMessageEvent(TutorMessageID mid, CBaseEn
 				break;
 			}
 
-			ConstructRecentDeathsList(localPlayer->m_iTeam, teammateList, sizeof(teammateList), event);
+			ConstructRecentDeathsList((TeamName)localPlayer->m_iTeam, teammateList, sizeof(teammateList), event);
 			event->AddParameter(teammateList);
 
 			break;

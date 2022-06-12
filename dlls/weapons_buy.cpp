@@ -91,7 +91,6 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "elite",	WEAPON_ELITE },
 	{ "fiveseven",	WEAPON_FIVESEVEN },
 	{ "mp5navy",	WEAPON_MP5N },
-	{ "chainsaw",	WEAPON_CHAINSAW },
 	
 	{ "anaconda",	WEAPON_ANACONDA },
 	{ "deagled",	WEAPON_DEAGLED },
@@ -124,6 +123,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "qbarrel",	WEAPON_QBARREL },
 	{ "tbarrel",	WEAPON_TBARREL },
 	{ "csg12ss",	WEAPON_Z4B_CSG12SS },
+	{ "m3dragon",	WEAPON_M3DRAGON },
+	{ "m3dragonm",	WEAPON_M3DRAGONM },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -234,6 +235,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "sgmissilem",	WEAPON_SGMISSILEM },
 	{ "sgmissileex",	WEAPON_SGMISSILEEX },
 	{ "syringe",	WEAPON_Z4B_SYRINGE },
+	{ "chainsawm",	WEAPON_CHAINSAWM },
+	{ "herochainsaw",	WEAPON_HEROCHAINSAW },
 	
 	{ NULL,		WEAPON_NONE }
 };
@@ -415,6 +418,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "csgo_sawedoff",	WEAPONCLASS_SHOTGUN },
 	{ "qbarrel",	WEAPONCLASS_SHOTGUN },
 	{ "tbarrel",	WEAPONCLASS_SHOTGUN },
+	{ "csg12ss",	WEAPONCLASS_SHOTGUN },
+	{ "m3dragon",	WEAPONCLASS_SHOTGUN },
+	{ "m3dragonm",	WEAPONCLASS_SHOTGUN },
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -429,8 +435,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "bison",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "tmpdragon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "spsmg",	WEAPONCLASS_SUBMACHINEGUN },
-	{ "csg12ss",	WEAPONCLASS_SUBMACHINEGUN },
-
+	
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
 	{ "ak47l",	WEAPONCLASS_RIFLE },
@@ -510,6 +515,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 
 	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
+	{ "chainsawm",	WEAPONCLASS_EQUIPMENT },
+	{ "herochainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "cannon",	WEAPONCLASS_EQUIPMENT },
 	{ "z4b_cannonplasma",	WEAPONCLASS_EQUIPMENT },
 	{ "z4b_cannontiger",	WEAPONCLASS_EQUIPMENT },
@@ -771,6 +778,8 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_SKULL4:
 	case WEAPON_SKULL6:
 	case WEAPON_M249EP:
+	case WEAPON_M3DRAGON:
+	case WEAPON_M3DRAGONM:
 		return true;
 	default:
 		break;

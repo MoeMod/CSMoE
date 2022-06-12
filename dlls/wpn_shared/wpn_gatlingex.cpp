@@ -224,7 +224,6 @@ namespace sv {
 			time_point_t m_flAnimEndTime;
 			float m_flMaxFrames;
 			Vector m_vecNormalVeclocity;
-			TeamName m_iTeam;
 
 
 		protected:

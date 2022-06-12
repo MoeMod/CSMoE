@@ -733,6 +733,21 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	if (m_bIsVIP)
 		flRatio *= 0.5;
 
+	CBaseEntity* pInflictor = CBaseEntity::Instance(pevInflictor);
+
+	if (pInflictor)
+	{
+		if (CVAR_GET_FLOAT("mp_friendlyfire") != 0)
+		{
+			if (g_pGameRules->IsTeamplay() && pInflictor->m_iTeam == m_iTeam)
+				teamAttack = TRUE;
+
+			pAttack = (CBasePlayer*)GET_PRIVATE(ENT(pevAttacker));
+		}
+		else if (g_pGameRules->IsTeamplay() && pInflictor->m_iTeam == m_iTeam && pev != pevAttacker)
+			return 0;
+	}
+
 	flDamage = m_pModStrategy->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 
 	if (bitsDamageType & (DMG_EXPLOSION | DMG_BLAST))
@@ -1100,6 +1115,11 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			flDamage *= 0.35;
 		}
 
+		if (!Q_strcmp(STRING(pevInflictor->classname), "weapon_m95tiger"))
+		{
+			pevInflictor->iuser1 += 1;
+		}
+
 		if (pAttack->m_pActiveItem)
 		{
 			if (!FNullEnt(ENT(pevInflictor)) && !teamAttack)
@@ -1118,9 +1138,25 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_BUFFM4
 					|| pWeapon->m_iId == WEAPON_BUFFAK
 					|| pWeapon->m_iId == WEAPON_REVIVEGUN
-					|| pWeapon->m_iId == WEAPON_SGMISSILEEX)
+					|| pWeapon->m_iId == WEAPON_SGMISSILEEX
+					|| pWeapon->m_iId == WEAPON_M3DRAGON
+					|| pWeapon->m_iId == WEAPON_M3DRAGONM)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
+				}
+
+				if (pWeapon->m_iId == WEAPON_M3DRAGON
+					|| pWeapon->m_iId == WEAPON_M3DRAGONM)
+				{
+					if (pevInflictor == pevAttacker)
+					{
+						pWeapon->pev->iuser1 += 1;
+
+						MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pAttacker->pev);
+						WRITE_BYTE(1);
+						WRITE_BYTE(pWeapon->pev->iuser1);
+						MESSAGE_END();
+					}
 				}
 			}		
 		
@@ -1282,10 +1318,6 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		MESSAGE_END();
 	}
 #endif
-	if (!Q_strcmp(STRING(pevInflictor->classname), "weapon_m95tiger"))
-	{
-		pevInflictor->iuser1 += 1;
-	}
 
 	if (m_iBuff & BUFF_REVIVE && flDamage > pev->health)
 	{
@@ -8984,6 +9016,10 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_SKULL4:
 		case WEAPON_SKULL6:
 		case WEAPON_M249EP:
+		case WEAPON_M3DRAGON:
+		case WEAPON_M3DRAGONM:
+		case WEAPON_HEROCHAINSAW:
+		case WEAPON_CHAINSAWM:
 			return TRUE;
 		}
 	}

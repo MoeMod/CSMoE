@@ -189,7 +189,7 @@ struct Z4B_M4A1MW_WeaponData
 			}
 		}
 
-		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, TeamName iTeam, int type = 0)
+		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, int iTeam, int type = 0)
 		{
 			std::tie(m_flTouchDamage, RadiusDamageAmount, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, iTeam);
 			m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
@@ -201,7 +201,6 @@ struct Z4B_M4A1MW_WeaponData
 		float m_flTouchDamage;
 		float RadiusDamageAmount;
 		float m_flExplodeRadius;
-		TeamName m_iTeam;
 		int m_iSprEffect;
 		int m_iSprExplo;
 		Vector m_vecStartVelocity;

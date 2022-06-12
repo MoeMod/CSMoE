@@ -195,7 +195,7 @@ public:
 		return Remove();
 	}
 
-	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, TeamName iTeam)
+	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, int iTeam)
 	{
 		std::tie(m_flTouchDamage, m_flExplodeDamage, m_flExplodeRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flExplodeRadius, iTeam);
 		pev->velocity = std::move(vecVelocity);
@@ -207,7 +207,6 @@ public:
 	float m_flTouchDamage;
 	float m_flExplodeDamage;
 	float m_flExplodeRadius;
-	TeamName m_iTeam;
 
 protected:
 	void Remove()
@@ -448,7 +447,7 @@ public:
 		Remove();
 	}
 
-	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flAdditionalDamage, float flExplodeRadius, TeamName iTeam)
+	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flAdditionalDamage, float flExplodeRadius, int iTeam)
 	{
 		std::tie(m_flTouchDamage, m_flExplodeDamage, m_flAdditionalDamage, m_flExplodeRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flAdditionalDamage, flExplodeRadius, iTeam);
 		m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
@@ -467,7 +466,6 @@ public:
 	float m_flExplodeDamage;
 	float m_flAdditionalDamage;
 	float m_flExplodeRadius;
-	TeamName m_iTeam;
 
 	Vector m_vecStartOrigin;
 	Vector m_vecStartVelocity;

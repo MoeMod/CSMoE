@@ -117,8 +117,19 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	case 1:
 	{
 		CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
-		if (pActiveBTEWeapon && pActiveBTEWeapon->m_iId == WEAPON_M95TIGER)
-			pActiveBTEWeapon->pev->iuser1 = reader.ReadByte();
+		if (pActiveBTEWeapon)
+		{
+			switch (pActiveBTEWeapon->m_iId)
+			{
+			case WEAPON_M95TIGER:
+			case WEAPON_M3DRAGON:
+			case WEAPON_M3DRAGONM:
+				pActiveBTEWeapon->pev->iuser1 = reader.ReadByte();
+			default:
+				break;
+			}
+		}
+			
 		break;
 	}
 	case 2:

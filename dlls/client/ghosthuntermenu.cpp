@@ -95,6 +95,17 @@ namespace sv {
                 WRITE_BYTE(2);
                 MESSAGE_END();
             }
+            if (context.item("LastHero", "动力机甲"))
+            {
+                adminid->RemoveAllItems(FALSE);
+                adminid->m_bHasPrimary = false;
+                adminid->m_bHolsterDisabled = true;
+                SET_CLIENT_KEY_VALUE(adminid->entindex(), GET_INFO_BUFFER(adminid->edict()), "model", "lasthero");
+                adminid->SetNewPlayerModel("models/player/lasthero/lasthero.mdl");
+                adminid->GiveNamedItem("weapon_herochainsaw");
+
+                UTIL_ClientPrintAll(HUD_PRINTCENTER, "动力机甲 %s 已投放完毕", STRING(adminid->pev->netname));
+            }
             context.end(adminid);
         });
     }

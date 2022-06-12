@@ -1418,6 +1418,8 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		|| weaponid == WEAPON_ZGUN
 		|| weaponid == WEAPON_HUNTBOW
 		|| weaponid == WEAPON_CHAINSAW
+		|| weaponid == WEAPON_CHAINSAWM
+		|| weaponid == WEAPON_HEROCHAINSAW
 		|| weaponid == WEAPON_Z4B_BARRETTD)
 		return;
 

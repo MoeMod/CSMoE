@@ -677,7 +677,9 @@ void BaseUISurface::CreatePopup(vgui2::VPANEL panel, bool minimised, bool showTa
 	vgui2::ipanel()->SetMouseInputEnabled(panel, mouseInput);
 
 	// TODO: implement vgui2::Dar
-	staticPopupList.push_back(panel);
+    std::vector<vgui2::VPANEL>::iterator it = std::find(staticPopupList.begin(), staticPopupList.end(), panel);
+    if(it == staticPopupList.end())
+	    staticPopupList.push_back(panel);
 }
 
 void BaseUISurface::SwapBuffers(vgui2::VPANEL) {

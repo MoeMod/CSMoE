@@ -534,6 +534,7 @@ bool UTIL_AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecS
 void UTIL_AddKickRateBoost(CBaseEntity* pEntity, const Vector2D& vecDir, float flVelocityModifier, float flForce, float flBoost);
 float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flBaseDamage, float flMaxRange);
 float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flRange, Vector& vecDir);
+float UTIL_CalculateDamageRate(Vector vecSrc, CBaseEntity* pOther);
 void UTIL_TE_Sprite(const short sprite, const float x, const float y, const float z, const byte scale, const byte brightness);
 
 }
