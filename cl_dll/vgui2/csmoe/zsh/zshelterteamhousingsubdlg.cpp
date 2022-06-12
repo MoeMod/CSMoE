@@ -166,6 +166,7 @@ void ZShelterTeamHousingSubDialog::UpdateHousingSlot(int index, cl::zsht_buildme
 	if (index >= CZSHELTERTEAMHOUSINGSUBDLG_BUILD_NUM) return;
 
 	ShowHousingSlot(index, true);
+	m_HousingSlot[index].m_BtnImagePanel_n->SetCommand(data.command.c_str());
 	m_HousingSlot[index].m_BtnImagePanel_n->GetTooltip()->SetText(data.Tooltip.c_str());
 	m_HousingSlot[index].m_BtnLabel->GetTooltip()->SetText(m_HousingSlot[index].m_BtnImagePanel_n->GetTooltip()->GetText());
 	m_HousingSlot[index].m_BtnLabel->SetText(data.Name.c_str());
