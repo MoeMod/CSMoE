@@ -500,11 +500,12 @@ float RadiusFromBounds( const vec3_t mins, const vec3_t maxs )
 RotatePointAroundVector
 ====================
 */
-void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees )
+vec3_t RotatePointAroundVector( const vec3_t dir, const vec3_t point, float degrees )
 {
 	float	t0, t1;
 	float	angle, c, s;
 	vec3_t	vr, vu, vf;
+    vec3_t dst;
 
 	angle = DEG2RAD( degrees );
 	SinCos( angle, &s, &c );
@@ -528,6 +529,12 @@ void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t poi
 	dst[2] = (t0 * vr[0] + t1 * vu[0] + vf[2] * vf[0]) * point[0]
 	       + (t0 * vr[1] + t1 * vu[1] + vf[2] * vf[1]) * point[1]
 	       + (t0 * vr[2] + t1 * vu[2] + vf[2] * vf[2]) * point[2];
+    return dst;
+}
+
+void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees )
+{
+    dst = RotatePointAroundVector(dir, point, degrees);
 }
 
 //

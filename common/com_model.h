@@ -49,7 +49,7 @@ typedef enum
 // plane_t structure
 typedef struct mplane_s
 {
-	vec3_t	normal;			// surface normal
+	vec3_c	normal;			// surface normal
 	float	dist;			// closest appoach to origin
 	byte	type;			// for texture axis selection and fast side tests
 	byte	signbits;		// signx + signy<<1 + signz<<1
@@ -58,7 +58,7 @@ typedef struct mplane_s
 
 typedef struct
 {
-	vec3_t		position;
+	vec3_c		position;
 } mvertex_t;
 
 typedef struct
@@ -98,13 +98,13 @@ typedef struct
 // FIXME: align to 32 bytes
 typedef struct glvert_s
 {
-	vec3_t		vertex;		// position
-	vec3_t		normal;		// normal
+	vec3_c		vertex;		// position
+	vec3_c		normal;		// normal
 	vec2_t		stcoord;		// ST texture coords
 	vec2_t		lmcoord;		// ST lightmap coords
 	vec2_t		sccoord;		// ST scissor coords (decals only) - for normalmap coords migration
-	vec3_t		tangent;		// tangent
-	vec3_t		binormal;		// binormal
+	vec3_c		tangent;		// tangent
+	vec3_c		binormal;		// binormal
 	byte		color[4];		// colors per vertex
 } glvert_t;
 
@@ -152,8 +152,8 @@ struct decal_s
 	short		entityIndex;	// Entity this is attached to
 
 	// Xash3D added
-	vec3_t		position;		// location of the decal center in world space.
-	vec3_t		saxis;		// direction of the s axis in world space
+	vec3_c		position;		// location of the decal center in world space.
+	vec3_c		saxis;		// direction of the s axis in world space
 	struct msurfmesh_s* mesh;		// decal mesh in local space
 	int		reserved[4];	// for future expansions
 };
@@ -250,8 +250,8 @@ typedef struct hull_s
 	mplane_t* planes;
 	int			firstclipnode;
 	int			lastclipnode;
-	vec3_t		clip_mins;
-	vec3_t		clip_maxs;
+	vec3_c		clip_mins;
+	vec3_c		clip_maxs;
 } hull_t;
 
 #if !defined( CACHE_USER ) && !defined( QUAKEDEF_H )
@@ -277,7 +277,7 @@ typedef struct model_s
 	//
 	// volume occupied by the model
 	//		
-	vec3_t		mins, maxs;
+	vec3_c		mins, maxs;
 	float		radius;
 
 	//
@@ -385,7 +385,7 @@ typedef struct player_info_s
 	int		gaitsequence;
 	float	gaitframe;
 	float	gaityaw;
-	vec3_t	prevgaitorigin;
+	vec3_c	prevgaitorigin;
 
 	customization_t customdata;
 } player_info_t;

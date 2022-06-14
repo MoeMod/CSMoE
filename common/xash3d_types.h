@@ -10,11 +10,8 @@ typedef float		vec_t;
 typedef vec_t		vec2_t[2];
 typedef vec_t       *vec2_t_ref;
 
-#ifdef XASH_SIMD
 using vec3_t = moe::VectorBase<float, 3, 16>;
-#else
-using vec3_t = moe::VectorBase<float, 3>;
-#endif
+using vec3_c = moe::VectorBase<float, 3>;
 using vec3_t_ref = vec3_t &;
 
 using vec4_t = moe::VectorBase<float, 4>;

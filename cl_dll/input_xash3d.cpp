@@ -6,6 +6,7 @@
 #include "input.h"
 #include "in_defs.h"
 #include "view.h"
+#include "pm_math.h"
 
 #include "vgui/ISurface.h"
 #include "vgui_controls/controls.h"
@@ -29,6 +30,7 @@ bool bMouseInUse = false;
 
 extern Vector dead_viewangles;
 extern bool evdev_open;
+extern vec3_t v_origin;
 
 inline namespace input_xash3d {
 constexpr auto F = 1U<<0;	// Forward
@@ -44,6 +46,7 @@ constexpr auto S = 1U<<5;	// Side stop
 }
 
 bool CL_IsDead();
+void V_SmoothInterpolateAngles( vec3_t startAngle, vec3_t endAngle, vec3_t_ref finalAngle, float degreesPerSec );
 
 void IN_ToggleButtons( float forwardmove, float sidemove )
 {
@@ -140,6 +143,27 @@ void IN_ClientLookEvent( float relyaw, float relpitch )
 #endif
 	rel_yaw += relyaw;
 	rel_pitch += relpitch;
+}
+
+vec3_t IN_CalcAutoAimAngle(const vec3_t viewangles)
+{
+    gEngfuncs.pEventAPI->EV_SetTraceHull( 3 ); // g-cont. player hull for better detect moving platforms
+
+    const auto start = v_origin;
+    vec3_t forward, right, up;
+    AngleVectors(viewangles, forward, right, up);
+    const auto end = start + forward * 1024;
+    pmtrace_t tr;
+    gEngfuncs.pEventAPI->EV_PlayerTraceExt( start, end, PM_NORMAL, []( physent_t *pe ) -> int { return !pe->player; }, &tr );
+
+    if(tr.fraction >= 1)
+        return nullptr;
+
+    vec3_t new_viewangles;
+    VectorAngles(tr.endpos - start, new_viewangles);
+    NormalizeAngles(new_viewangles);
+    new_viewangles[0] *= -1;
+    return new_viewangles;
 }
 
 // Rotate camera and add move values to usercmd

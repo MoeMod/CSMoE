@@ -64,6 +64,9 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align, Base> : Base
 		std::copy_n(arr, N, this->m_data);
 	}
 
+    template<class T2, std::size_t Align2, class Base2>
+    constexpr VectorBase_Gen(const VectorBase_Gen<T2, N, std::index_sequence<I...>, Align2, Base2> &other) : VectorBase_Gen{ other[I]... } {}
+
 	T &operator[](std::size_t i)
 	{
 		return this->m_data[i];
@@ -84,10 +87,6 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align, Base> : Base
 	void CopyToIter(OutputIter arr) const
 	{
 		std::copy(std::begin(this->m_data), std::end(this->m_data), arr);
-	}
-	void CopyToArray(T *arr) const
-	{
-		return CopyToIter(arr);
 	}
 };
 
@@ -179,13 +178,18 @@ struct alignas(16) VectorBase4f_SIMD_Data
 
 struct alignas(16) VectorBase3f_SIMD_Data
 {
-    constexpr VectorBase3f_SIMD_Data() : m_data{} {}
+    constexpr VectorBase3f_SIMD_Data() : m_data{}, m_data_unused{} {}
     union
     {
-        float m_data[3];
+        struct
+        {
+            float m_data[3];
+            float m_data_unused;
+        };
         struct
         {
             float x, y, z;
+            float w_ununsed;
         };
         __m128 m_xmm;
     };
@@ -194,6 +198,11 @@ struct alignas(16) VectorBase3f_SIMD_Data
 template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 16, VectorBase3f_SIMD_Data>
 {
     using Base = VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 16, VectorBase3f_SIMD_Data>;
+    using Base::Base;
+
+    constexpr VectorBase_Storage(float x1, float y1, float z1) : Base{ x1, y1, z1 }
+    {
+    }
 
     VectorBase_Storage(__m128 xmm)
     {
@@ -251,8 +260,8 @@ template<class T> inline auto rsqrt(T x) -> decltype(1 / sqrt(x)) {
 
 }
 
-template<class VecType, std::size_t...I>
-constexpr bool equal_impl(VecType v1, VecType v2, std::index_sequence<I...>)
+template<class VecTypeA, class VecTypeB, std::size_t...I>
+constexpr bool equal_impl(VecTypeA v1, VecTypeB v2, std::index_sequence<I...>)
 {
 	return (... && (v1.template get<I>() == v2.template get<I>()));
 }
@@ -312,10 +321,6 @@ struct VectorBase : VectorBase_Storage<T, N, Align>
 	constexpr bool operator==(VectorBase v) const
 	{
 		return equal_impl(*this, v, std::make_index_sequence<N>());
-	}
-	constexpr bool operator!=(VectorBase v) const
-	{
-		return !equal_impl(*this, v, std::make_index_sequence<N>());
 	}
 	constexpr VectorBase operator+(VectorBase v) const
 	{
@@ -504,6 +509,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
     using Base::Base;
 
     using T = float;
+    using value_type = float;
     static constexpr auto N = 4;
     static constexpr auto Align = 16;
     static constexpr auto XmmMask = 0x7F; // 0x7F for vector3f
@@ -718,6 +724,11 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 };
 #endif
 
+template<class T, std::size_t N, std::size_t Align1, std::size_t Align2> constexpr bool operator==(VectorBase<T, N, Align1> a, VectorBase<T, N, Align2> b)
+{
+    return equal_impl(a, b, std::make_index_sequence<N>());
+}
+
 template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorAdd(VectorBase<T, N, Align> a, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
 	return out = a + b;
@@ -767,6 +778,7 @@ template<class T, std::size_t Align> constexpr VectorBase<T, 3, Align> CrossProd
 {
 	return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
 }
+
 #ifdef U_VECTOR_SIMD
 inline VectorBase<float, 3, 16> CrossProduct(VectorBase<float, 3, 16> a, VectorBase<float, 3, 16> b)
 {
@@ -777,6 +789,7 @@ inline VectorBase<float, 3, 16> CrossProduct(VectorBase<float, 3, 16> a, VectorB
     return _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 0, 2, 1));
 }
 #endif
+
 template<class T, std::size_t Align> constexpr void CrossProduct(VectorBase<T, 3, Align> a, VectorBase<T, 3, Align> b, VectorBase<T, 3, Align> &out)
 {
 	out = CrossProduct(a, b);

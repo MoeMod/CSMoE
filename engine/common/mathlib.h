@@ -358,6 +358,7 @@ void VectorAngles( const vec3_t forward, vec3_t_ref angles );
 void AngleVectors( const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up );
 void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t_ref angles );
 void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees );
+vec3_t RotatePointAroundVector( const vec3_t dir, const vec3_t point, float degrees );
 
 void ClearBounds(vec3_t_ref mins, vec3_t_ref maxs );
 void AddPointToBounds( const vec3_t v, vec3_t_ref mins, vec3_t_ref maxs );
@@ -400,6 +401,7 @@ void Matrix4x4_ConcatTransforms( matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 i
 void Matrix4x4_FromOriginQuat( matrix4x4_ref out, const vec4_t quaternion, const vec3_t origin );
 void Matrix4x4_CreateFromEntity( matrix4x4_ref out, const vec3_t angles, const vec3_t origin, float scale );
 void Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
+vec3_t Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, float *dist );
 void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
 void Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t_ref angles, vec3_t_ref origin );
 void Matrix4x4_SetOrigin( matrix4x4_ref out, float x, float y, float z );

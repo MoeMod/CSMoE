@@ -589,13 +589,13 @@ void R_SetupFrustum( void )
 	}
 
 	// rotate RI.vforward right by FOV_X/2 degrees
-	RotatePointAroundVector( RI.frustum[0].normal, RI.cull_vup, RI.cull_vforward, -( 90 - RI.refdef.fov_x / 2 ));
+    RI.frustum[0].normal = RotatePointAroundVector( RI.cull_vup, RI.cull_vforward, -( 90 - RI.refdef.fov_x / 2 ));
 	// rotate RI.vforward left by FOV_X/2 degrees
-	RotatePointAroundVector( RI.frustum[1].normal, RI.cull_vup, RI.cull_vforward, 90 - RI.refdef.fov_x / 2 );
+    RI.frustum[1].normal = RotatePointAroundVector( RI.cull_vup, RI.cull_vforward, 90 - RI.refdef.fov_x / 2 );
 	// rotate RI.vforward up by FOV_X/2 degrees
-	RotatePointAroundVector( RI.frustum[2].normal, RI.cull_vright, RI.cull_vforward, 90 - RI.refdef.fov_y / 2 );
+    RI.frustum[2].normal = RotatePointAroundVector( RI.cull_vright, RI.cull_vforward, 90 - RI.refdef.fov_y / 2 );
 	// rotate RI.vforward down by FOV_X/2 degrees
-	RotatePointAroundVector( RI.frustum[3].normal, RI.cull_vright, RI.cull_vforward, -( 90 - RI.refdef.fov_y / 2 ));
+    RI.frustum[3].normal = RotatePointAroundVector( RI.cull_vright, RI.cull_vforward, -( 90 - RI.refdef.fov_y / 2 ));
 	// negate forward vector
 	VectorNegate( RI.cull_vforward, RI.frustum[4].normal );
 
