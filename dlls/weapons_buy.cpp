@@ -111,6 +111,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "voidpistol",	WEAPON_VOIDPISTOL },
 	{ "y21s1jetgunmd",	WEAPON_Y21S1JETGUNMD },
 	{ "m950",	WEAPON_M950 },
+	{ "m950se",	WEAPON_M950SE },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -166,6 +167,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "heavyzg",	WEAPON_HEAVYZG },
 	{ "ak47g",	WEAPON_AK47G },
 	{ "skull4",	WEAPON_SKULL4 },
+	{ "ethereal",	WEAPON_ETHEREAL },
+	{ "crow5",	WEAPON_CROW5 },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -215,6 +218,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "skull8",	WEAPON_SKULL8 },
 	{ "skull6",	WEAPON_SKULL6 },
 	{ "m249ep",	WEAPON_M249EP },
+	{ "thanatos7",	WEAPON_THANATOS7 },
+	{ "crow7",	WEAPON_CROW7 },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -237,6 +242,9 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "syringe",	WEAPON_Z4B_SYRINGE },
 	{ "chainsawm",	WEAPON_CHAINSAWM },
 	{ "herochainsaw",	WEAPON_HEROCHAINSAW },
+	{ "winggun",	WEAPON_WINGGUN },
+	{ "railgun",	WEAPON_RAILGUN },
+	{ "chainsawm",	WEAPON_CHAINSAWEX },
 	
 	{ NULL,		WEAPON_NONE }
 };
@@ -407,6 +415,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "y21s1jetgunmd",	WEAPONCLASS_PISTOL },
 	{ "m950",	WEAPONCLASS_PISTOL },
 	{ "csgo_r8",	WEAPONCLASS_PISTOL },
+	{ "m950se",	WEAPONCLASS_PISTOL },
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -435,6 +444,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "bison",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "tmpdragon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "spsmg",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "thanatos7",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "crow7",	WEAPONCLASS_SUBMACHINEGUN },
 	
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
@@ -463,6 +474,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "heavyzg",	WEAPONCLASS_RIFLE },
 	{ "ak47g",	WEAPONCLASS_RIFLE },
 	{ "skull4",	WEAPONCLASS_RIFLE },
+	{ "ethereal",	WEAPONCLASS_RIFLE },
+	{ "railgun",	WEAPONCLASS_RIFLE },
+	{ "crow5",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -516,6 +530,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsawm",	WEAPONCLASS_EQUIPMENT },
+	{ "chainsawex",	WEAPONCLASS_EQUIPMENT },
 	{ "herochainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "cannon",	WEAPONCLASS_EQUIPMENT },
 	{ "z4b_cannonplasma",	WEAPONCLASS_EQUIPMENT },
@@ -532,6 +547,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "sgmissile",	WEAPONCLASS_EQUIPMENT },
 	{ "sgmissilem",	WEAPONCLASS_EQUIPMENT },
 	{ "sgmissileex",	WEAPONCLASS_EQUIPMENT },
+	{ "winggun",	WEAPONCLASS_EQUIPMENT },
 
 	{ "syringe",	WEAPONCLASS_EQUIPMENT },
 	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
@@ -780,6 +796,10 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_M249EP:
 	case WEAPON_M3DRAGON:
 	case WEAPON_M3DRAGONM:
+	case WEAPON_ETHEREAL:
+	case WEAPON_RAILGUN:
+	case WEAPON_WINGGUN:
+	case WEAPON_CROW5:
 		return true;
 	default:
 		break;
@@ -820,6 +840,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_Y21S1JETGUNMD:
 	case WEAPON_M950:
 	case WEAPON_SKULL1:
+	case WEAPON_M950SE:
 		return true;
 	default:
 		break;

@@ -1,0 +1,404 @@
+/*
+thanatos7.cpp
+Copyright (C) 2019 Moemod Haoyuan
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "player.h"
+#include "weapons.h"
+
+#include "weapons/WeaponTemplate.hpp"
+#include "weapons/KnifeAttack.h"
+
+
+#ifndef CLIENT_DLL
+namespace sv {
+	class CThanatos7Scythe : public CBaseAnimating
+	{
+	public:
+		CThanatos7Scythe()
+		{
+			m_flRemoveTime = invalid_time_point;
+			m_flDamageTime = invalid_time_point;
+		}
+
+		KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.6f }; }
+		float GetArmorRatioModifier() { return 1.5; }
+		int GetWeaponsId(void) { return WEAPON_THANATOS7; }
+
+		void Spawn() override
+		{
+			Precache();
+
+			SetThink(&CThanatos7Scythe::ScytheThink);
+			SetTouch(&CThanatos7Scythe::ScytheTouch);
+			SET_MODEL(this->edict(), "models/thanatos7_scythe.mdl");
+
+			pev->rendermode = kRenderNormal;
+			pev->renderfx = kRenderFxNone;
+			pev->renderamt = 255;
+			pev->solid = SOLID_TRIGGER;
+			pev->movetype = MOVETYPE_FLY;
+
+			pev->frame = 0;
+			pev->sequence = 0;
+
+			ResetSequenceInfo();
+
+			UTIL_SetSize(pev, { -2, -2, -2 }, { 2, 2, 2 });
+
+			m_flRemoveTime = gpGlobals->time + 10.0s;
+			m_flDamageTime = gpGlobals->time + 0.1s;
+
+			pev->nextthink = gpGlobals->time + 0.1s;
+		}
+
+		void Precache() override
+		{
+			PRECACHE_MODEL("models/thanatos7_scythe.mdl");
+		}
+
+		void RadiusDamage()
+		{
+			CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+			CBasePlayer* pAttackPlayer = nullptr;
+			if (pAttacker && pAttacker->IsPlayer())
+				pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+			if (!pAttackPlayer)
+				return;
+
+			if (pAttackPlayer->m_bIsZombie)
+				return;
+
+			TraceResult tr;
+			CBaseEntity* pEntity = NULL;
+
+			Vector vecEnd;
+			int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
+			float flDamage = GetScytheDamage();
+			while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 32.0)) != NULL)
+			{
+				if (pEntity->pev->takedamage == DAMAGE_NO)
+					continue;
+
+				if (pEntity->edict() == pev->owner)
+					continue;
+
+				if(bIsWallBetweenEntity(pEntity, pAttackPlayer))
+					continue;
+
+				pEntity->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_BULLET);
+			}
+		}
+
+		void EXPORT ScytheTouch(CBaseEntity* pOther)
+		{
+			if (!pOther)
+				return;
+
+			if (pOther->edict() == pev->owner)
+				return;
+
+			float flDamage = GetDirectDamage();
+
+			entvars_t* pevOwner = VARS(pev->owner);
+
+			if (!pOther->IsDormant())
+			{
+				if (pOther->pev->takedamage != DAMAGE_NO)
+				{
+					TraceResult tr = UTIL_GetGlobalTrace();
+
+					ClearMultiDamage();
+					tr.iHitgroup = HITGROUP_CHEST;
+					pOther->TraceAttack(pevOwner, flDamage, pev->velocity, &tr, DMG_BULLET | DMG_SLASH);
+					ApplyMultiDamage(pev, pevOwner);
+				}
+			}
+
+			pev->solid = SOLID_NOT;
+			pev->movetype = MOVETYPE_NONE;
+			pev->velocity = g_vecZero;
+			pev->nextthink = gpGlobals->time + 0.4s;
+		}
+
+		void EXPORT ScytheThink()
+		{
+			pev->nextthink = gpGlobals->time + 0.1s;
+			if (m_flRemoveTime <= gpGlobals->time)
+			{
+				Remove();
+				return;
+			}
+
+			if (m_flDamageTime < gpGlobals->time)
+			{
+				RadiusDamage();
+				m_flDamageTime = gpGlobals->time + 0.5s;
+			}
+		}
+
+		time_point_t m_flRemoveTime;
+		time_point_t m_flDamageTime;
+
+	private:
+		float GetDirectDamage()
+		{
+			float flDamage = 75;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 850;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 2050;
+			return flDamage;
+		}
+
+		float GetScytheDamage()
+		{
+			float flDamage = 65;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 520;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 1350;
+			return flDamage;
+		}
+
+	protected:
+		void Remove()
+		{
+			SetThink(nullptr);
+			SetTouch(nullptr);
+			pev->effects |= EF_NODRAW; // 0x80u
+			return UTIL_Remove(this);
+		}
+	};
+
+	LINK_ENTITY_TO_CLASS(thanatos7_scythe, CThanatos7Scythe)
+}
+#endif
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+    class CThanatos7 : public LinkWeaponTemplate< CThanatos7,
+            TGeneralData,
+            BuildTGetItemInfoFromCSW<WEAPON_M249>::template type,
+            TPrecacheEvent,
+            TGetDamageDefault,
+            TPrimaryAttackRifle,
+            TFireRifle,
+			TRecoilKickBack
+    >
+    {
+    public:
+
+    static constexpr const char *V_Model = "models/v_thanatos7.mdl";
+    static constexpr const char *P_Model = "models/p_thanatos7.mdl";
+    static constexpr const char *W_Model = "models/w_thanatos7.mdl";
+    static constexpr const char *EventFile = "events/thanatos7.sc";
+    static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
+    static constexpr const char *ClassName = "weapon_thanatos7";
+    static constexpr const char *AnimExtension = "m249";
+    static constexpr int MaxClip = 120;
+	enum
+	{
+		ANIM_IDLE1,
+        ANIM_BIDLE1,
+        ANIM_BIDLE2,
+		ANIM_SHOOT1,
+        ANIM_BSHOOT1,
+		ANIM_SHOOT2,
+        ANIM_BSHOOT2,
+		ANIM_RELOAD,
+        ANIM_BRELOAD,
+        ANIM_SCYTHESHOOT,
+        ANIM_SCYTHERELOAD,
+		ANIM_DRAW,
+        ANIM_BDRAW,
+	};
+    static constexpr float PlayerMaxSpeed = 230;
+    static constexpr float ArmorRatioModifier = 1.6f;
+	static constexpr float PrimaryAttackWalkingMiniumSpeed = 140;
+    static constexpr const auto &SpreadCalcNotOnGround = 0.4*A + 0.04;
+    static constexpr const auto &SpreadCalcWalking = 0.07*A + 0.04;
+    static constexpr const auto &SpreadCalcDefault = 0.0275*A;
+
+	static constexpr const auto& CycleTime = 0.14s;
+    static constexpr int DamageDefault = 38;
+    static constexpr int DamageZB = 52;
+    static constexpr int DamageZBS = 55;
+    static constexpr const auto &AccuracyCalc = (N * N * N / 200.0) + 0.35;
+    static constexpr float AccuracyDefault = 0.2;
+    static constexpr float AccuracyMax = 1.25;
+    static constexpr float RangeModifier = 0.98;
+    static constexpr auto BulletType = BULLET_PLAYER_762MM;
+    /*static constexpr*/ int Penetration = 2;
+    KnockbackData KnockBack = { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f };
+
+	KickBackData KickBackWalking = { 1.5f, 0.45f, 0.225f, 0.05f, 6.5f, 2.5f, 7 };
+	KickBackData KickBackNotOnGround = { 2.0f, 1.0f, 0.5f, 0.35f, 9.0f, 6.0f, 5 };
+	KickBackData KickBackDucking = { 0.9f, 0.35f, 0.15f, 0.025f, 5.5f, 1.5f, 9 };
+	KickBackData KickBackDefault = { 1.0f, 0.375f, 0.175f, 0.038f, 5.75f, 1.75f, 8 };
+
+    int GetItemInfo(ItemInfo* p) override
+    {
+        p->pszName = STRING(pev->classname);
+        p->pszAmmo1 = "762NatoBox";
+        p->iMaxAmmo1 = 240;
+		p->pszAmmo2 = "Thanatos7Scythe";
+		p->iMaxAmmo2 = 1;
+        p->iMaxClip = 120;
+        p->iSlot = 0;
+        p->iPosition = 4;
+        p->iId = m_iId = WEAPON_THANATOS7;
+        p->iFlags = 0;
+        p->iWeight = M249_WEIGHT;
+
+        return 1;
+    }
+
+	void Precache(void) override
+	{
+		PRECACHE_SOUND("weapons/thanatos7_scytheshoot.wav");
+		Base::Precache();
+	}
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
+	{
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
+		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+	}
+
+    BOOL Deploy(void) override
+    {
+        m_flAccuracy = 0.2;
+        m_iShotsFired = 0;
+
+        return DefaultDeploy(V_Model, P_Model, m_iWeaponState & WPNSTATE_M4A1_SILENCED ? ANIM_BDRAW : ANIM_DRAW, "m249", UseDecrement() != FALSE, 0.75s, 2.0s);
+    }
+
+    void FireEvent(const Vector& vecDir)
+    {
+        int flags = 0;
+#ifdef CLIENT_WEAPONS
+        flags = FEV_NOTHOST;
+#else
+        flags = 0;
+#endif
+        bool bmode = m_iWeaponState & WPNSTATE_M4A1_SILENCED;
+        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), bmode, FALSE);
+    }
+
+    void SecondaryAttack() override
+    {
+        if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
+        {
+            m_iWeaponState &= ~WPNSTATE_M4A1_SILENCED;
+            SendWeaponAnim(ANIM_SCYTHESHOOT, UseDecrement() != FALSE);
+            //create entity
+
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/thanatos7_scytheshoot.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
+#ifndef CLIENT_DLL
+			Vector vecAngle = m_pPlayer->pev->v_angle;
+			vecAngle[0] = 360.0 - vecAngle[0];
+			UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+			Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8;
+			CThanatos7Scythe* pEnt = static_cast<CThanatos7Scythe*>(CBaseEntity::Create("thanatos7_scythe", vecSrc, vecAngle, ENT(m_pPlayer->pev)));
+
+			if (pEnt)
+			{
+				pEnt->m_iTeam = m_pPlayer->m_iTeam;
+				pEnt->pev->velocity = gpGlobals->v_forward * 1000;
+			}
+#endif
+        }
+        else
+        {      
+            SendWeaponAnim(ANIM_SCYTHERELOAD, UseDecrement() != FALSE);
+            SetThink(&CThanatos7::Task_Charge);
+            pev->nextthink = gpGlobals->time + 3.8s;         
+        }
+
+        m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.8s;
+        m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3.8s;
+        m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 3.8s;
+       
+    }
+
+    void Task_Charge()
+    {
+        m_iWeaponState |= WPNSTATE_M4A1_SILENCED;
+
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 1;
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
+		WRITE_BYTE(CBasePlayer::GetAmmoIndex("Thanatos7Scythe"));
+		WRITE_BYTE(1);
+		MESSAGE_END();
+#endif
+        SetThink(nullptr);
+    }
+
+    void WeaponIdle(void) override
+    {
+        ResetEmptySound();
+        m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+
+        if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
+            return;
+
+        if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
+            SendWeaponAnim(RANDOM_LONG(0,2) ? ANIM_BIDLE1 : ANIM_BIDLE2, UseDecrement() != FALSE);
+        else
+            SendWeaponAnim(ANIM_IDLE1, UseDecrement() != FALSE);
+
+        m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
+    }
+
+    void Holster(int skiplocal) override
+    {
+        SetThink(nullptr);
+        CBasePlayerWeapon::Holster();
+    }
+
+    void Reload(void) override
+    {
+        if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+            return;
+
+        if (DefaultReload(120, m_iWeaponState & WPNSTATE_M4A1_SILENCED ? ANIM_BRELOAD : ANIM_RELOAD, 3.5s))
+        {
+#ifndef CLIENT_DLL
+            m_pPlayer->SetAnimation(PLAYER_RELOAD);
+#endif
+            m_flAccuracy = 0.2;
+            m_iShotsFired = 0;
+            m_bDelayFire = false;
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.5s;
+        }
+    }
+
+#ifndef CLIENT_DLL
+    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762natobox" , 60 }; }
+#endif
+    float GetArmorRatioModifier() override { return 1.5; }
+    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 140 }; }
+    		 	
+};
+LINK_ENTITY_TO_CLASS(weapon_thanatos7, CThanatos7)
+}

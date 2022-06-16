@@ -3090,7 +3090,13 @@ static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 {
 	g_iRenderMode = bound( 0, rendermode, kRenderTransAdd );
 	pglShadeModel( GL_SMOOTH );	// enable gouraud shading
+	
 	if( clgame.ds.cullMode != GL_NONE ) GL_Cull( GL_FRONT );
+	if (RI.currententity)
+	{
+		if(RI.currententity->curstate.iuser1 == 15734)
+			GL_Cull(0);
+	}
 
 	// enable depthmask on studiomodels
 	if( glState.drawTrans && g_iRenderMode != kRenderTransAdd )

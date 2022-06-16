@@ -294,8 +294,8 @@ namespace cl {
 	static_assert(luash::GetAmountOfPrivateDataFields<CBaseDelay>::value == 35);
 	static_assert(luash::GetAmountOfPrivateDataFields<CBaseAnimating>::value == 40);
 	static_assert(luash::GetAmountOfPrivateDataFields<CBaseToggle>::value == 59);
-	static_assert(luash::GetAmountOfPrivateDataFields<CBaseMonster>::value == 76);
-	static_assert(luash::GetAmountOfPrivateDataFields<CBasePlayer>::value > 76);
+	static_assert(luash::GetAmountOfPrivateDataFields<CBaseMonster>::value == 75);
+	static_assert(luash::GetAmountOfPrivateDataFields<CBasePlayer>::value > 75);
 	static_assert(luash::GetAmountOfPrivateDataFields<CBasePlayerItem>::value == 43);
 	static_assert(luash::GetAmountOfPrivateDataFields<CBasePlayerWeapon>::value == 78);
 }

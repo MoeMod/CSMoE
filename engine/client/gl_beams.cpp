@@ -1821,7 +1821,7 @@ CL_BeamPoints_Stretch
 Create beam between two points
 ==============
 */
-BEAM* CL_BeamPoints_Stretch(const vec3_t start, const vec3_t end, int modelIndex, float life, float width,
+BEAM* GAME_EXPORT CL_BeamPoints_Stretch(const vec3_t start, const vec3_t end, int modelIndex, float life, float width,
 	float brightness, int startFrame, float framerate, float r, float g, float b)
 {
 	BEAM* pBeam;

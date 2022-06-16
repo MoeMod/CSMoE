@@ -196,6 +196,8 @@ struct efx_api_s
 	short		(*R_LookupColor)			(unsigned char r, unsigned char g, unsigned char b);
 	void		(*R_DecalRemoveAll)			(int textureIndex); //textureIndex points to the decal index in the array, not the actual texture index.
 	void		(*R_FireCustomDecal)		(int textureIndex, int entity, int modelIndex, const vec3_t position, int flags, float scale);
+	TEMPENTITY* (*R_TempCustomModel)			(const vec3_t pos, const vec3_t angles, const vec3_t velocity, float life, int modelIndex, int sequence, float framerate, bool fadeOut, int brightness, int rendermode, int entity, float fadeSpeed, bool fadeIn, float fadeInSpeed, float scale, int frameMax, int flags);
+	BEAM*		(*R_BeamPoints_Stretch)(const vec3_t start, const vec3_t end, int modelIndex, float life, float width, float brightness, int startFrame, float framerate, float r, float g, float b);
 };
 
 extern efx_api_t efx;

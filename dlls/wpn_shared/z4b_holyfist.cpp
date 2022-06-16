@@ -256,6 +256,7 @@ void CKnifeHolyFist::Explode()
 	MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, m_pPlayer->pev);
 	WRITE_BYTE(16);
 	WRITE_SHORT(m_pPlayer->entindex());
+	WRITE_BYTE(15);
 	MESSAGE_END();
 }
 #endif
@@ -367,6 +368,7 @@ void CKnifeHolyFist::Reload()
 		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, m_pPlayer->pev);
 		WRITE_BYTE(16);
 		WRITE_SHORT(m_pPlayer->entindex());
+		WRITE_BYTE(15);
 		MESSAGE_END();
 #endif
 	}

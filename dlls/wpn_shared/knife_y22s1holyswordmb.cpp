@@ -449,7 +449,7 @@ namespace sv {
 #endif
 		m_flNextTimeCanHolster = m_flTimeBuff = m_tNextThink = m_flTimeCheckCharge = invalid_time_point;
 		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
+		m_iDefaultAmmo = 100;
 		m_iState = 0;
 		m_iState2 = 0;
 		FallInit();

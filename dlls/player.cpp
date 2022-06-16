@@ -723,6 +723,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	m_flSaveArmorAmount = pev->armorvalue;
 	if (bitsDamageType & (DMG_EXPLOSION | DMG_BLAST | DMG_FALL))
 		m_LastHitGroup = HITGROUP_GENERIC;
+	else if (pevInflictor != pevAttacker && bitsDamageType == DMG_GENERIC)
+		m_LastHitGroup = HITGROUP_GENERIC;
 
 	else if (m_LastHitGroup == HITGROUP_SHIELD && (bitsDamageType & DMG_BULLET))
 		return 0;
@@ -1140,7 +1142,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_REVIVEGUN
 					|| pWeapon->m_iId == WEAPON_SGMISSILEEX
 					|| pWeapon->m_iId == WEAPON_M3DRAGON
-					|| pWeapon->m_iId == WEAPON_M3DRAGONM)
+					|| pWeapon->m_iId == WEAPON_WINGGUN)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -9020,6 +9022,12 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_M3DRAGONM:
 		case WEAPON_HEROCHAINSAW:
 		case WEAPON_CHAINSAWM:
+		case WEAPON_ETHEREAL:
+		case WEAPON_RAILGUN:
+		case WEAPON_THANATOS7:
+		case WEAPON_CROW7:
+		case WEAPON_WINGGUN:
+		case WEAPON_CHAINSAWEX:
 			return TRUE;
 		}
 	}

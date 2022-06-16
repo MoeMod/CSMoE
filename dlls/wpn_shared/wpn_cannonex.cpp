@@ -127,7 +127,7 @@ void CCannonEX::SecondaryAttack(void)
 	strcpy(m_pPlayer->m_szAnimExtention, "skullaxe");
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-	UTIL_TempModel(g_vecZero, m_pPlayer->pev->angles, g_vecZero, m_iDragonFXModelIndex, (m_flTransformTime.count() * 10.0), 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0);
+	UTIL_TempModel(g_vecZero, m_pPlayer->pev->angles, g_vecZero, m_iDragonFXModelIndex, (m_flTransformTime.count() * 10.0), 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 255, 0);
 #endif
 	strcpy(m_pPlayer->m_szAnimExtention, "carbine");
 
@@ -291,8 +291,8 @@ void CCannonEX::Explode(void)
 		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 	}
 
-	UTIL_TempModel(m_pPlayer->pev->origin, m_pPlayer->pev->angles, g_vecZero, m_iExplodeModelIndex, 1, 0, 5, true, 16, 255, kRenderTransAdd, NULL, false, 0, 0, 256, 0);
-	UTIL_TempModel(m_pPlayer->pev->origin, m_pPlayer->pev->angles, g_vecZero, m_iExplodeEffectModelIndex, 6, 0, 428, 0, 0, 255, kRenderTransAdd, NULL, false, 0, 0, 256, 0);
+	UTIL_TempModel(m_pPlayer->pev->origin, m_pPlayer->pev->angles, g_vecZero, m_iExplodeModelIndex, 1, 0, 5, true, 16, 255, kRenderTransAdd, NULL, false, 0, 0, 255, 0);
+	UTIL_TempModel(m_pPlayer->pev->origin, m_pPlayer->pev->angles, g_vecZero, m_iExplodeEffectModelIndex, 6, 0, 255, 0, 0, 255, kRenderTransAdd, NULL, false, 0, 0, 255, 0);
 
 	EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/cannonexplo.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 #endif

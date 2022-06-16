@@ -25,7 +25,6 @@ template<> struct PrivateData<class CBaseMonster, CBaseToggle>
 {
 	Activity m_Activity;
 	Activity m_IdealActivity;
-	int m_LastHitGroup;
 	int m_bitsDamageType;
 	BYTE m_rgbTimeBasedDamage[CDMG_TIMEBASED];
 	MONSTERSTATE m_MonsterState;

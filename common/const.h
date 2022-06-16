@@ -664,6 +664,7 @@
 #define MSG_PAS_R			7	// Reliable to PAS
 #define MSG_ONE_UNRELIABLE		8	// Send to one client, but don't put in reliable stream, put in unreliable datagram ( could be dropped )
 #define MSG_SPEC			9	// Sends to all spectator proxies
+#define MSG_EXCLUDESOURCE			10	// Sends to all spectator proxies
 
 // contents of a spot in the world
 #define CONTENTS_EMPTY		-1

@@ -45,6 +45,7 @@ void CM3Dragonm::Precache(void)
 	PRECACHE_MODEL("models/v_m3dragonm.mdl");
 	PRECACHE_MODEL("models/w_m3dragonm.mdl");
 	PRECACHE_MODEL("models/p_m3dragonm.mdl");
+	PRECACHE_MODEL("sprites/muzzleflash106.spr");
 
 	PRECACHE_SOUND("weapons/m3dragonm-2.wav");
 	PRECACHE_SOUND("weapons/m3dragonm_gas_loop.wav");

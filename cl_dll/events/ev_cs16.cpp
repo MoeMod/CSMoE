@@ -656,9 +656,18 @@ void EV_HLDM_DecalGunshot(pmtrace_t *pTrace, int iBulletType, float scale, int r
 
 			switch (iBulletType)
 			{
-				default:
-					iColorIndex = 30;
-					break;
+			case BULLET_PLAYER_ETHEREAL:
+			case BULLET_PLAYER_RAILBEAM:
+			case BULLET_PLAYER_DEPLETEDALLOY:
+				iColorIndex = 12;
+				break;
+
+			case BULLET_PLAYER_556LVB:
+				iColorIndex = 2;
+				break;
+			default:
+				iColorIndex = 30;
+				break;
 			}
 
 			gEngfuncs.pEfxAPI->R_StreakSplash(pTrace->endpos, gEngfuncs.pfnRandomFloat(4.0, 10.0) * pTrace->plane.normal, iColorIndex, iStreakCount, gEngfuncs.pfnRandomFloat(4.0, 10.0) * pTrace->plane.normal[2], -75, 75);
@@ -666,9 +675,24 @@ void EV_HLDM_DecalGunshot(pmtrace_t *pTrace, int iBulletType, float scale, int r
 
 		switch (iBulletType)
 		{
-			default:
-				decalname = EV_HLDM_DamageDecal(pe);
-				break;
+		case BULLET_PLAYER_CHAINSAW:
+			decalname = NULL;
+			break;
+		case BULLET_PLAYER_RAILBEAM:
+		{
+			char cRailBeamDecal[32] = "{sfshot";
+			decalname = cRailBeamDecal;
+			break;
+		}
+		case BULLET_PLAYER_BUFFM249:
+		{
+			char cRailBeamDecal[32] = "{buffm249";
+			decalname = cRailBeamDecal;
+			break;
+		}
+		default:
+			decalname = EV_HLDM_DamageDecal(pe);
+			break;
 		}
 
 		EV_HLDM_GunshotDecalTrace(pTrace, decalname, cTextureType);
@@ -717,6 +741,7 @@ void EV_DescribeBulletTypeParameters(int iBulletType, int &iPenetrationPower, fl
 		break;
 	}
 
+	case BULLET_PLAYER_556LVB:
 	case BULLET_PLAYER_556MM:
 	{
 		iPenetrationPower = 35;
@@ -742,6 +767,27 @@ void EV_DescribeBulletTypeParameters(int iBulletType, int &iPenetrationPower, fl
 	{
 		iPenetrationPower = 25;
 		flPenetrationDistance = 800;
+		break;
+	}
+
+	case BULLET_PLAYER_RAILBEAM:
+	{
+		iPenetrationPower = 100;
+		flPenetrationDistance = 1000;
+		break;
+	}
+
+	case BULLET_PLAYER_DESPERADO:
+	{
+		iPenetrationPower = 35;
+		flPenetrationDistance = 1200;
+		break;
+	}
+
+	case BULLET_PLAYER_ETHEREAL:
+	{
+		iPenetrationPower = 35;
+		flPenetrationDistance = 4000;
 		break;
 	}
 
@@ -834,7 +880,7 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 
 		while (iShots > 0)
 		{
-			if (iBulletType == BULLET_PLAYER_BUCKSHOT)
+			if (iBulletType == BULLET_PLAYER_BUCKSHOT || iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT)
 			{
 				do
 				{
@@ -972,6 +1018,17 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 						break;
 					case BULLET_PLAYER_BUCKSHOT:
 						break;
+					case BULLET_PLAYER_WINGGUN_BUCKSHOT:
+					{
+						int sModelIndexParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_particle.spr");
+
+						vec3_t fwd;
+						VectorSubtract(tr.endpos, forward, fwd);
+						gEngfuncs.pEfxAPI->R_Sprite_Trail(TE_SPRITETRAIL, tr.endpos, fwd, sModelIndexParticle, 2, 0.5, 0.04, 100,
+							255, 10);
+						break;
+					}
+						
 					case BULLET_PLAYER_MP5:
 						if (!tracer)
 							chTextureType = EV_HLDM_PlayTextureSound(idx, &tr, vecStart, vecEnd, iBulletType);
@@ -1069,6 +1126,11 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, const vec3_t up, int cShots, vec3_t vecSrc, const vec3_t vecDirShooting, const vec3_t vecSpread, float flDistance, int iBulletType, int iPenetration)
 {
     return EV_HLDM_FireBullets(idx, forward, right, up, cShots, vecSrc, vecDirShooting, vecSpread, flDistance, iBulletType, 0, 0, iPenetration, 0, false, 0.0f);
+}
+
+void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, const vec3_t up, int cShots, vec3_t vecSrc, const vec3_t vecDirShooting, const vec3_t vecSpread, float flDistance, int iBulletType, int iTracerFreq, int* tracerCount, int iPenetration)
+{
+	return EV_HLDM_FireBullets(idx, forward, right, up, cShots, vecSrc, vecDirShooting, vecSpread, flDistance, iBulletType, iTracerFreq, tracerCount, iPenetration, 0, false, 0.0f);
 }
 
 void EV_CS16Client_KillEveryRound( TEMPENTITY *te, float frametime, float current_time )

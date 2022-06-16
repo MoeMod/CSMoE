@@ -1667,6 +1667,9 @@ CBaseEntity::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, 
 	Vector vecOrigin = ptr->vecEndPos - vecDir * 4;
 
 	if (pev->takedamage == DAMAGE_YES) {
+
+		m_LastHitGroup = ptr->iHitgroup;
+
 		AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
 
 		int blood = BloodColor();
@@ -1797,6 +1800,22 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 				                     DMG_BULLET);
 				TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
 				DecalGunshot(&tr, iBulletType, false, pev, false);
+				if (iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT)
+				{
+					if (pEntity->IsPlayer())
+					{
+						CBasePlayer* player = (CBasePlayer*)pEntity;
+						if (!(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
+						{
+							auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+							if (strategy)
+							{
+								strategy->SetStunSpeedTime(1.0s);
+								strategy->SetStunGravityTime(1.0s);
+							}
+						}
+					}				
+				}
 			} else {
 				float flDamage;
 
@@ -2051,6 +2070,7 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 			iPenetrationPower = 39;
 			flPenetrationDistance = 5000;
 			break;
+		case BULLET_PLAYER_556LVB:
 		case BULLET_PLAYER_556MM:
 			iPenetrationPower = 35;
 			flPenetrationDistance = 4000;
@@ -2067,6 +2087,26 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 			iPenetrationPower = 25;
 			flPenetrationDistance = 800;
 			break;
+		case BULLET_PLAYER_RAILBEAM:
+		{
+			flPenetrationDistance = 10000;
+			iPenetrationPower = 100;
+			iSparksAmount = 30;
+			break;
+		}
+		case BULLET_PLAYER_ETHEREAL:
+		{
+			flPenetrationDistance = 4500;
+			iPenetrationPower = 36;
+			break;
+		}
+		case BULLET_PLAYER_DESPERADO:
+		{
+			flPenetrationDistance = 1200;
+			iPenetrationPower = 35;
+			iSparksAmount = 20;
+			break;
+		}
 		default:
 			iPenetrationPower = 0;
 			flPenetrationDistance = 0;

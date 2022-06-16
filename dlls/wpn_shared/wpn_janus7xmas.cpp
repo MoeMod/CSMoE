@@ -254,7 +254,7 @@ namespace sv {
 			VecEnd = pEntity->pev->origin;
 			entvars_t * const pevAttacker = VARS(pev->owner);
 			entvars_t * const pevInflictor = this->pev;
-			//pEntity->m_LastHitGroup = HITGROUP_CHEST;
+			pEntity->m_LastHitGroup = HITGROUP_CHEST;
 			pEntity->TakeDamage(pevInflictor, pevAttacker, GetDamageB(), DMG_BULLET);
 		}
 		else

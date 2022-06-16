@@ -490,7 +490,7 @@ void CPlayerModStrategy_ZBZ::OnThink()
 			m_pPlayer->TakeDamage(atk->pev, atk->pev, 20.0f + 20.0f * g_pGameRules->m_iTotalRoundsPlayed, DMG_BURN | DMG_NOMORALE);
 		}
 		float flSlow = 0.8f - 0.01f * g_pGameRules->m_iTotalRoundsPlayed;
-		if(m_pPlayer->m_flVelocityModifier > flSlow && m_pPlayer->m_iBuff & BUFF_IGNORE_KNOCKBACK)
+		if(m_pPlayer->m_flVelocityModifier > flSlow && m_pPlayer->m_iBuff & ~BUFF_IGNORE_KNOCKBACK)
 			m_pPlayer->m_flVelocityModifier = flSlow;
 
 		m_bIsFiring = !fireElapsed;

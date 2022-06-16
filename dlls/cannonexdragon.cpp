@@ -101,8 +101,6 @@ namespace sv {
 		m_flEffectTime = gpGlobals->time;
 		m_iEffectState = EFFECT_FADEIN;
 
-		int iAmount = int(DragonAppearance() / m_flFlameInterval);
-
 		if (pOwner)
 		{
 			UTIL_SetOrigin(pev, pOwner->pev->origin + Vector(0, 0, m_flDragonHeight));
@@ -189,16 +187,6 @@ namespace sv {
 
 			vecStart = vecStart + (vecEnd - vecStart) * tr.flFraction;
 		}
-	}
-
-	duration_t CCannonEXDragon::DragonAppearance(void)
-	{
-		if (!m_pWeapon)
-			return 6.0s;
-
-		SET_MODEL(ENT(pev), "models/cannonexdragon.mdl");
-
-		return 6.0s;
 	}
 
 	float CCannonEXDragon::GetDamageAmount(void)

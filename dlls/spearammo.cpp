@@ -135,16 +135,22 @@ namespace sv {
 			vecSrc = pHitEntity->pev->origin;
 
 	
-		if (pHitEntity && pHitEntity->IsPlayer())
+		if (pHitEntity)
 		{
-			CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pHitEntity);
-			if (pPlayer->pev->takedamage != DAMAGE_NO)
+			if (pHitEntity->pev->takedamage != DAMAGE_NO)
 			{
-				pPlayer->m_LastHitGroup = m_LastHitGroup;
+				pHitEntity->m_LastHitGroup = m_LastHitGroup;
 
-				float flRatio = 1.0;
+				float flRatio;
 
-				pPlayer->TakeDamage(pev, pevOwner, m_flHitDamage * flRatio, DMG_BULLET | DMG_NEVERGIB);
+				/*
+				if (IsZSMonster(pHitEntity))
+					flRatio = 1.28;
+				else
+				*/
+				flRatio = 1.0;
+
+				pHitEntity->TakeDamage(pev, pevOwner, m_flHitDamage * flRatio, DMG_BULLET);
 			}
 		}
 
@@ -162,7 +168,7 @@ namespace sv {
 			if (pEntity->IsBSPModel())
 				continue;
 
-			if (pEntity->IsPlayer() && ENT(pEntity->pev) != pev->owner && g_pGameRules->PlayerRelationship(m_pOwner, pEntity) == GR_TEAMMATE)
+			if (pEntity->IsPlayer() && ENT(pEntity->pev) != pev->owner && pEntity->m_iTeam == m_iTeam)
 				continue;
 
 			Vector vecDir;
@@ -176,12 +182,12 @@ namespace sv {
 				flDamage *= m_flOwnerDamageModifier;
 
 
-			pEntity->TakeDamage(pev, pevOwner, flDamage, DMG_EXPLOSION | DMG_NEVERGIB);
+			pEntity->m_LastHitGroup = HITGROUP_CHEST;
+
+			pEntity->TakeDamage(pev, pevOwner, flDamage, DMG_EXPLOSION);
 
 			if (pEntity->IsPlayer())
 			{
-				CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pEntity);
-				pPlayer->m_LastHitGroup = HITGROUP_CHEST;
 				pEntity->pev->velocity += vecDir * (flDamage / m_flExplodeDamage) * m_flExplodeForce;
 
 				if (pEntity->pev->velocity.z <= 199)
@@ -262,9 +268,8 @@ namespace sv {
 
 		if (m_hLockingEntity == entityPushing)
 		{
-			if (entityBehind->IsPlayer() && g_pGameRules->PlayerRelationship(m_pOwner, entityBehind) != GR_TEAMMATE)
+			if (entityBehind->IsPlayer() && m_iTeam != entityBehind->m_iTeam)
 			{
-				CBasePlayer* pPlayer = static_cast<CBasePlayer*>(entityBehind);
 				Vector vecDir = CalcCrowdForceDir(entityPushing, entityBehind);
 
 				if (vecDir.x || vecDir.y || vecDir.z)
@@ -295,7 +300,7 @@ namespace sv {
 						{
 							entvars_t* pevOwner = VARS(pev->owner);
 
-							pPlayer->m_LastHitGroup = HITGROUP_CHEST;
+							entityBehind->m_LastHitGroup = HITGROUP_CHEST;
 
 							entityBehind->TakeDamage(pev, pevOwner, m_flCrowdDamage, DMG_BULLET | DMG_NEVERGIB);
 
@@ -405,12 +410,8 @@ namespace sv {
 		ClearMultiDamage();
 
 		pOther->TraceAttack(VARS(pev->owner), m_flHitDamage, m_vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
-		if (pOther->IsPlayer())
-		{
-			CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pOther);
-			m_LastHitGroup = pPlayer->m_LastHitGroup;
-		}
-		
+
+		m_LastHitGroup = pOther->m_LastHitGroup;		
 		m_flHitDamage = gMultiDamage.amount;
 	}
 
@@ -538,7 +539,7 @@ namespace sv {
 			return;
 		}
 
-		if (pOther->IsPlayer() && g_pGameRules->PlayerRelationship(m_pOwner, pOther) == GR_TEAMMATE)
+		if (pOther->IsPlayer() && pOther->m_iTeam == m_iTeam)
 		{
 			pev->origin += m_vecDirection * 0.5 * 39.37;
 

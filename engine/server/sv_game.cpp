@@ -331,6 +331,9 @@ qboolean SV_Send( int dest, const vec3_t origin, const edict_t *ent, qboolean ex
 	case MSG_SPEC:
 		specproxy = reliable = true;
 		break;
+	case MSG_EXCLUDESOURCE:
+		excludeSource = true;
+		break;
 	default:
 		Host_Error( "SV_Send: bad dest: %i\n", dest );
 		return false;

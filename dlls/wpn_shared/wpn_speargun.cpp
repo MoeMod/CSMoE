@@ -159,6 +159,7 @@ void CSpearGun::PrimaryAttack(void)
 	{
 		m_hSpears[index] = pSpear;
 
+		pSpear->m_iTeam = m_pPlayer->m_iTeam;
 		pSpear->pev->origin = vecSrc;
 		pSpear->pev->angles = vecAngles;
 		pSpear->pev->owner = m_pPlayer->edict();

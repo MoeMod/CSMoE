@@ -65,6 +65,7 @@ void CL_BreakModel( const vec3_t pos, const vec3_t size, const vec3_t dir, float
 struct tempent_s *CL_TempModel( const vec3_t pos, const vec3_t dir, const vec3_t angles, float life, int modelIndex, int soundtype );
 struct tempent_s *CL_TempSprite( const vec3_t pos, const vec3_t dir, float scale, int modelIndex, int rendermode, int renderfx, float a, float life, int flags );
 struct tempent_s *CL_DefaultSprite( const vec3_t pos, int spriteIndex, float framerate );
+struct tempent_s* CL_TempCustomModel(const vec3_t pos, const vec3_t angles, const vec3_t velocity, float life, int modelIndex, int sequence, float framerate, bool fadeOut, int brightness, int rendermode, int entity, float fadeSpeed, bool fadeIn, float fadeInSpeed, float scale, int frameMax, int flags);
 void CL_Sprite_Explode( struct tempent_s *pTemp, float scale, int flags );
 void CL_Sprite_Smoke( struct tempent_s *pTemp, float scale );
 void CL_Spray( const vec3_t pos, const vec3_t dir, int modelIndex, int count, int speed, int iRand, int renderMode );
@@ -100,6 +101,8 @@ struct beam_s *CL_BeamEntPoint( int startEnt, const vec3_t end, int modelIndex, 
 struct beam_s *CL_BeamRing( int startEnt, int endEnt, int modelIndex, float life, float width, float amplitude, float brightness, float speed, int startFrame, float framerate, float r, float g, float b );
 struct beam_s *CL_BeamFollow( int startEnt, int modelIndex, float life, float width, float r, float g, float b, float brightness );
 void CL_BeamKill( int deadEntity );
+struct beam_s* CL_BeamPoints_Stretch(const vec3_t start, const vec3_t end, int modelIndex, float life, float width,
+	float brightness, int startFrame, float framerate, float r, float g, float b);
 
 
 // TriAPI

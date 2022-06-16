@@ -529,7 +529,7 @@ bool UTIL_IsGame(const char *gameName);
 float UTIL_GetPlayerGaitYaw(int playerIndex);
 int UTIL_ReadFlags(const char* c);
 void UTIL_BroadcastStuffText(const char* fmt, ...);
-void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vector& vecVelocity, int iModelIndex, int life, int sequence, int framerate, bool fadeOut, int fadeSpeed, int brightness, int rendermode, CBaseEntity* pEntity, bool fadeIn, int fadeInSpeed, int scale, int frameMax, int flags);
+void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vector& vecVelocity, int iModelIndex, int life, int sequence, int framerate, bool fadeOut, int fadeSpeed, int brightness, int rendermode, CBaseEntity* pEntity, bool fadeIn, int fadeInSpeed, int scale, int frameMax, int flags, bool excludeSource = false);
 bool UTIL_AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr);
 void UTIL_AddKickRateBoost(CBaseEntity* pEntity, const Vector2D& vecDir, float flVelocityModifier, float flForce, float flBoost);
 float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flBaseDamage, float flMaxRange);

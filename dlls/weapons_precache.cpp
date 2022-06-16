@@ -350,6 +350,16 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_m3dragon");
 	UTIL_PrecacheOtherWeapon("weapon_m3dragonm");
 	UTIL_PrecacheOtherWeapon("weapon_herochainsaw");
+	UTIL_PrecacheOtherWeapon("weapon_chainsawm");
+	UTIL_PrecacheOtherWeapon("weapon_ethereal");
+	UTIL_PrecacheOther("ammo_ether");
+	UTIL_PrecacheOtherWeapon("weapon_railgun");
+	UTIL_PrecacheOtherWeapon("weapon_thanatos7");
+	UTIL_PrecacheOtherWeapon("weapon_crow7");
+	UTIL_PrecacheOtherWeapon("weapon_winggun");
+	UTIL_PrecacheOther("ammo_winggun");
+	UTIL_PrecacheOtherWeapon("weapon_m950se");
+	UTIL_PrecacheOtherWeapon("weapon_chainsawex");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

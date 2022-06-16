@@ -136,7 +136,8 @@ namespace sv {
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-		float flDamage, flDistance, flSpread, flCycleTime;
+		float flDamage, flDistance, flSpread;
+		duration_t flCycleTime;
 		int cShots;
 
 		GetFireInfo(flDamage, flDistance, flSpread, cShots, flCycleTime);
@@ -190,14 +191,14 @@ namespace sv {
 	}
 
 
-	void GetFireInfo(float& flDamage, float& flFireDistance, float& flFireSpread, int& cShots, float& flCycleTime)
+	void GetFireInfo(float& flDamage, float& flFireDistance, float& flFireSpread, int& cShots, duration_t& flCycleTime)
 	{
 		if (!(m_iWeaponState & WPNSTATE_GLOCK18_BURST_MODE))
 		{
 			flFireDistance = 3048;
 			flFireSpread = 0.0775;
 			cShots = 7;
-			flCycleTime = 0.29;
+			flCycleTime = 0.29s;
 			flDamage = 0;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
@@ -211,7 +212,7 @@ namespace sv {
 			flFireDistance = 6048;
 			flFireSpread = 0.01;
 			cShots = 3;
-			flCycleTime = 0.5;
+			flCycleTime = 0.5s;
 			flDamage = 23;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
@@ -224,5 +225,5 @@ namespace sv {
 
 
 };
-LINK_ENTITY_TO_CLASS(z4b_skull11, CSKULL11)
+LINK_ENTITY_TO_CLASS(weapon_skull11, CSKULL11)
 }

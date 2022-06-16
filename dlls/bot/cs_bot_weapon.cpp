@@ -480,7 +480,7 @@ bool CCSBot::IsUsingShotgun() const
 	if (WeaponIDToWeaponClass(weapon->m_iId) == WEAPONCLASS_SHOTGUN)
 		return true;
 
-	if (weapon->m_iId == WEAPON_SGDRILL || weapon->m_iId == WEAPON_SGMISSILE || weapon->m_iId == WEAPON_SGMISSILEM || weapon->m_iId == WEAPON_SGMISSILEEX)
+	if (weapon->m_iId == WEAPON_SGDRILL || weapon->m_iId == WEAPON_SGMISSILE || weapon->m_iId == WEAPON_SGMISSILEM || weapon->m_iId == WEAPON_SGMISSILEEX || weapon->m_iId == WEAPON_WINGGUN)
 		return true;
 
 	return false;

@@ -217,7 +217,7 @@ namespace sv {
         UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
         Vector vecSrc = m_pPlayer->GetGunPosition();
 
-        Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.98, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+        Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556LVB, GetDamage(), 0.98, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
         FireEvent(vecDir);
 

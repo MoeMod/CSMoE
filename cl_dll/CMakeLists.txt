@@ -280,6 +280,14 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m3dragon.cpp
 	../dlls/wpn_shared/wpn_m3dragonm.cpp
 	../dlls/wpn_shared/wpn_herochainsaw.cpp
+	../dlls/wpn_shared/wpn_chainsawm.cpp
+	../dlls/wpn_shared/wpn_ethereal.cpp
+	../dlls/wpn_shared/wpn_railgun.cpp
+	../dlls/wpn_shared/wpn_thanatos7.cpp
+	../dlls/wpn_shared/wpn_crow7.cpp
+	../dlls/wpn_shared/wpn_winggun.cpp
+	../dlls/wpn_shared/wpn_m950se.cpp
+	../dlls/wpn_shared/wpn_chainsawex.cpp
 	)
 
 set (HUD_SRCS

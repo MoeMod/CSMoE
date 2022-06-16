@@ -145,7 +145,7 @@ void EV_FireChainsaw(event_args_s *args)
 	EV_HLDM_FireBullets( idx,
 		forward, right,	up,
 		1, vecSrc, vecAiming,
-		Vector(0, 0, 0), args->fparam1, BULLET_PLAYER_CROWBAR,
+		Vector(0, 0, 0), args->fparam1, BULLET_PLAYER_CHAINSAW,
 		1 );
 }
 

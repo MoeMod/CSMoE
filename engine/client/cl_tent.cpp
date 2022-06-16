@@ -1787,6 +1787,75 @@ void GAME_EXPORT CL_TempSphereModel( const vec3_t pos, float speed, float life, 
 	}
 }
 
+/*
+==============
+CL_TempCustomModel
+
+CutomModel
+==============
+*/
+TEMPENTITY* GAME_EXPORT CL_TempCustomModel(const vec3_t pos, const vec3_t angles, const vec3_t velocity, float life, int modelIndex, int sequence, float framerate, bool fadeOut, int brightness, int rendermode, int entity, float fadeSpeed, bool fadeIn, float fadeInSpeed, float scale, int frameMax, int flags)
+{
+	//for (int i = 0; i < 2; i++)
+	//{
+	TEMPENTITY* pTemp = CL_TempEntAlloc(pos, Mod_Handle(modelIndex));
+
+	if (!pTemp)
+	{
+		MsgDev(D_INFO, "No temp ent.\n");
+		return NULL;
+	}
+
+	int frameCount;
+	Mod_GetFrames(modelIndex, &frameCount);
+
+	pTemp->entity.angles = angles;
+	pTemp->entity.baseline.origin = velocity;
+
+	if (frameMax > 0)
+		pTemp->frameMax = frameMax;
+	else
+		pTemp->frameMax = frameCount;
+
+	pTemp->entity.curstate.rendermode = rendermode;
+	pTemp->entity.curstate.renderamt = brightness * 2;
+	pTemp->entity.curstate.sequence = sequence;
+	pTemp->entity.curstate.modelindex = 0;
+	pTemp->entity.curstate.framerate = framerate;
+	pTemp->flags |= FTENT_SPRANIMATE;
+	pTemp->entity.curstate.animtime = cl.time;
+
+	if (flags > 0)
+		pTemp->flags |= flags;
+
+	pTemp->die = cl.time + life;
+
+	if (fadeOut)
+	{
+		pTemp->flags |= FTENT_FADEOUT;
+		pTemp->entity.baseline.renderamt = brightness;
+		pTemp->fadeSpeed = fadeSpeed;
+	}
+
+	if (fadeIn)
+	{
+		pTemp->flags |= FTENT_FADEIN;
+		pTemp->entity.baseline.fuser1 = fadeInSpeed;
+	}
+
+	if (entity > 0)
+	{
+		pTemp->flags |= FTENT_PLYRATTACHMENT;
+		pTemp->clientIndex = entity;
+		pTemp->tentOffset = pos;
+	}
+
+	if (scale > 0)
+		pTemp->entity.curstate.scale = scale;
+
+	return pTemp;
+}
+
 
 void R_TempSphereModel(vec3_t pos, float speed, float life, int count, int modelIndex, bool bAnglesCalc)
 {
@@ -2208,63 +2277,7 @@ void R_TempModel(sizebuf_t* msg)
 	frameMax = BF_ReadShort(msg);
 	flags = BF_ReadLong(msg);
 
-	for (int i = 0; i < 2; i++)
-	{
-		TEMPENTITY* pTemp = CL_TempEntAlloc(pos, Mod_Handle(modelIndex));
-
-		if (!pTemp)
-		{
-			MsgDev(D_INFO, "No temp ent.\n");
-			return;
-		}
-
-		int frameCount;
-		Mod_GetFrames(modelIndex, &frameCount);
-
-		pTemp->entity.angles = angles;
-		pTemp->entity.baseline.origin = velocity;
-
-		if (frameMax > 0)
-			pTemp->frameMax = frameMax;
-		else
-			pTemp->frameMax = frameCount;
-
-		pTemp->entity.curstate.rendermode = rendermode;
-		pTemp->entity.curstate.renderamt = brightness * 2;
-		pTemp->entity.curstate.sequence = sequence;
-		pTemp->entity.curstate.modelindex = 0;
-		pTemp->entity.curstate.framerate = framerate;
-		pTemp->flags |= FTENT_SPRANIMATE;
-		pTemp->entity.curstate.animtime = cl.time;
-
-		if (flags > 0)
-			pTemp->flags |= flags;
-
-		pTemp->die = cl.time + life;
-
-		if (fadeOut)
-		{
-			pTemp->flags |= FTENT_FADEOUT;
-			pTemp->entity.baseline.renderamt = brightness;
-			pTemp->fadeSpeed = fadeSpeed;
-		}
-
-		if (fadeIn)
-		{
-			pTemp->flags |= FTENT_FADEIN;
-			pTemp->entity.baseline.fuser1 = fadeInSpeed;
-		}
-
-		if (entity > 0)
-		{
-			pTemp->flags |= FTENT_PLYRATTACHMENT;
-			pTemp->clientIndex = entity;
-			pTemp->tentOffset = pos;
-		}
-
-		if (scale > 0)
-			pTemp->entity.curstate.scale = scale;
-	}
+	CL_TempCustomModel(pos, angles, velocity, life, modelIndex, sequence, framerate, fadeOut, brightness, rendermode, entity, fadeSpeed, fadeIn, fadeInSpeed, scale, frameMax, flags);
 }
 
 TEMPENTITY* R_TempSprite2(vec3_t pos, vec3_t dir, float scale, int modelIndex, int rendermode, int renderfx, float brightness, float life, int flags, float framerate)

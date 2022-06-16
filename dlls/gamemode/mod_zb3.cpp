@@ -626,7 +626,7 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 				else
 				{
 					char szText[256];
-					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题武器撼宇碎星Zero^7", STRING(pEntity->v.netname));
+					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题武器【天龙】m3^7", STRING(pEntity->v.netname));
 					MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
 					WRITE_BYTE(ENTINDEX(pEntity));
 					WRITE_STRING(szText);
@@ -637,9 +637,19 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 
 						DropPrimary(pPlayer);
 						//pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
-						pPlayer->GiveNamedItem("weapon_sgmissileex");
-						int iAmount = pPlayer->m_pModStrategy->ComputeMaxAmmo("sgdrill_buckshot", 105);
-						pPlayer->GiveAmmo(iAmount, "sgdrill_buckshot", iAmount);
+						if (RANDOM_LONG(0, 5))
+						{
+							pPlayer->GiveNamedItem("weapon_m3dragon");
+							int iAmount = pPlayer->m_pModStrategy->ComputeMaxAmmo("buckshot", 32);
+							pPlayer->GiveAmmo(iAmount, "buckshot", iAmount);
+						}
+						else
+						{
+							pPlayer->GiveNamedItem("weapon_winggun");
+							int iAmount = pPlayer->m_pModStrategy->ComputeMaxAmmo("WingGunBuckShot", 50);
+							pPlayer->GiveAmmo(iAmount, "WingGunBuckShot", iAmount);
+						}
+
 					}
 				}
 
@@ -851,9 +861,9 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 		{
 			// 龙炮套 90%
 			if(!RANDOM_LONG(0, 5))
-				m_pPlayer->GiveNamedItem("weapon_m3dragon");
+				m_pPlayer->GiveNamedItem("weapon_cannonex");
 			else
-				m_pPlayer->GiveNamedItem("weapon_m3dragonm");
+				m_pPlayer->GiveNamedItem("weapon_cannon");
 
 			if(!RANDOM_LONG(0, 5))
 				m_pPlayer->GiveNamedItem("z4b_infinityx");

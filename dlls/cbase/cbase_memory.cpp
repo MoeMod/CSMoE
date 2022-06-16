@@ -38,6 +38,9 @@ CBaseEntity::CBaseEntity()
 	assert(pev != nullptr);
 	assert("auto var of CBaseEntity is not allowed!" && (g_CreateEntityLock.try_lock() == false));
 	g_CreateEntityLock.unlock();
+
+	m_iTeam = 0;
+	m_LastHitGroup = 0;
 }
 
 CBaseEntity::~CBaseEntity()

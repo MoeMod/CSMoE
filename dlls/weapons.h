@@ -587,6 +587,7 @@ public:
 			|| m_iId == WEAPON_Y21S1JETGUNMD
 			|| m_iId == WEAPON_M950
 			|| m_iId == WEAPON_SKULL1
+			|| m_iId == WEAPON_M950SE
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -742,7 +743,6 @@ public:
 public:
 	float GetDamageAmount(void);
 	float GetKickRateMagnitude(void);
-	duration_t DragonAppearance(void);
 	void InitializeData(void);
 
 public:

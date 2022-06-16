@@ -9,7 +9,7 @@
 #include "sv_security.h"
 
 cvar_t sv_rehlds_movecmdrate_max_avg = { "sv_rehlds_movecmdrate_max_avg", "1800", 0, 1800.0f, NULL };
-cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "5500", 0, 5500.0f, NULL };
+cvar_t sv_rehlds_movecmdrate_max_burst = { "sv_rehlds_movecmdrate_max_burst", "6000", 0, 6000.0f, NULL };
 cvar_t sv_rehlds_stringcmdrate_max_avg = { "sv_rehlds_stringcmdrate_max_avg", "250", 0, 250.0f, NULL };
 cvar_t sv_rehlds_stringcmdrate_max_burst = { "sv_rehlds_stringcmdrate_max_burst", "500", 0, 500.0f, NULL };
 
@@ -77,7 +77,7 @@ void CMoveCommandRateLimiter::CheckBurstRate(unsigned int clientId) {
 		else
 		{
 			Log_Printf("%s Banned for move commands flooding (burst) (%.1f)\n", cl->name, (m_CurrentMoveCmds[clientId] / dt));
-			Cbuf_AddText(va("banid %.1f %s\n", sv_rehlds_movecmdrate_burst_punish.value, cl->userid));
+			Cbuf_AddText(va("banid %.1f #%d\n", sv_rehlds_movecmdrate_burst_punish.value, cl->userid));
 			SV_ClientPrintf(cl, PRINT_HIGH, "Banned for move commands flooding (burst)\n");
 			SV_DropClient(cl);
 		}
@@ -99,7 +99,7 @@ void CMoveCommandRateLimiter::CheckAverageRate(unsigned int clientId) {
 		else
 		{
 			Log_Printf("%s Banned for move commands flooding (Avg) (%.1f)\n", cl->name, m_AverageMoveCmdRate[clientId]);
-			Cbuf_AddText(va("banid %.1f %s\n", sv_rehlds_movecmdrate_avg_punish.value, cl->userid));
+			Cbuf_AddText(va("banid %.1f #%d\n", sv_rehlds_movecmdrate_avg_punish.value, cl->userid));
 			SV_ClientPrintf(cl, PRINT_HIGH, "Banned for move commands flooding (Avg)\n");
 			SV_DropClient(cl);
 		}
@@ -162,7 +162,7 @@ void CStringCommandsRateLimiter::CheckBurstRate(unsigned int clientId) {
 		else
 		{
 			Log_Printf("%s Banned for string commands flooding (burst) (%.1f)\n", cl->name, (m_CurrentStringCmds[clientId] / dt));
-			Cbuf_AddText(va("banid %.1f %s\n", sv_rehlds_stringcmdrate_burst_punish.value, cl->userid));
+			Cbuf_AddText(va("banid %.1f #%d\n", sv_rehlds_stringcmdrate_burst_punish.value, cl->userid));
 			SV_ClientPrintf(cl, PRINT_HIGH, "Banned for string commands flooding (burst)\n");
 			SV_DropClient(cl);
 		}
@@ -184,7 +184,7 @@ void CStringCommandsRateLimiter::CheckAverageRate(unsigned int clientId) {
 		else
 		{
 			Log_Printf("%s Banned for string commands flooding (Avg) (%.1f)\n", cl->name, m_AverageStringCmdRate[clientId]);
-			Cbuf_AddText(va("banid %.1f %s\n", sv_rehlds_stringcmdrate_avg_punish.value, cl->userid));
+			Cbuf_AddText(va("banid %.1f #%d\n", sv_rehlds_stringcmdrate_avg_punish.value, cl->userid));
 			SV_ClientPrintf(cl, PRINT_HIGH, "Banned for string commands flooding (Avg)\n");
 			SV_DropClient(cl);
 		}

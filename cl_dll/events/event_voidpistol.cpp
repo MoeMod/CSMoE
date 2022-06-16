@@ -129,13 +129,7 @@ void EV_FireVoidpistol( event_args_t *args )
 		}
 
 			EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iPShell, TE_BOUNCE_SHELL);
-			if (args->fparam1 == 2.0)
-			{
-				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_STATIC, "weapons/voidpistol_beep.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-			}
-			else
-				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			
 
 			if (args->iparam1)
 			{
@@ -152,6 +146,14 @@ void EV_FireVoidpistol( event_args_t *args )
 	}
 	else
 	{
+		if (args->fparam1 == 2.0)
+		{
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_STATIC, "weapons/voidpistol_beep.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		}
+		else
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
 		if (args->bparam2)
 		{
 			switch (args->iparam2)

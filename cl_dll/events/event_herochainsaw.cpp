@@ -100,7 +100,7 @@ void EV_FireHeroChainsaw(event_args_s *args)
 	EV_HLDM_FireBullets(idx,
 		forward, right, up,
 		1, vecSrc, vecAiming,
-		vSpread, 85.0, BULLET_NONE,
+		vSpread, 85.0, BULLET_PLAYER_CHAINSAW,
 		2);
 }
 

@@ -1,5 +1,5 @@
 /*
-herochainsaw.cpp
+chainsawm.cpp
 Copyright (C) 2019 Moemod Haoyuan
 
 This program is free software: you can redistribute it and/or modify
@@ -29,20 +29,20 @@ namespace sv {
 
 #define WPNSTATE_CHAINSAW_SLASH	(1<<1)
 
-    class CHeroChainsaw : public LinkWeaponTemplate< CHeroChainsaw,
+    class CChainsawm : public LinkWeaponTemplate< CChainsawm,
             TGeneralData,
             BuildTGetItemInfoFromCSW<WEAPON_M249>::template type,
             TPrecacheEvent     
     >
     {
     public:
-    static constexpr const char *V_Model = "models/v_herochainsaw.mdl";
-    static constexpr const char *P_Model = "models/p_herochainsaw.mdl";
-    static constexpr const char *W_Model = "models/w_herochainsaw.mdl";
-    static constexpr const char *EventFile = "events/herochainsaw.sc";
+    static constexpr const char *V_Model = "models/v_chainsawm.mdl";
+    static constexpr const char *P_Model = "models/p_chainsawm.mdl";
+    static constexpr const char *W_Model = "models/w_chainsawm.mdl";
+    static constexpr const char *EventFile = "events/chainsawm.sc";
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
-    static constexpr const char *ClassName = "weapon_herochainsaw";
-    static constexpr const char *AnimExtension = "herochainsaw";
+    static constexpr const char *ClassName = "weapon_chainsawm";
+    static constexpr const char *AnimExtension = "chainsawm";
     static constexpr int MaxClip = 200;
     KnockbackData KnockBack = { 290.0f, 85.0f, 50.0f, 150.0f, 0.25f };
 	enum
@@ -65,7 +65,7 @@ namespace sv {
 
     KnockbackData GetKnockBackData() override
     {
-        if (m_iWeaponState |= WPNSTATE_CHAINSAW_SLASH)
+        if (m_iWeaponState & WPNSTATE_CHAINSAW_SLASH)
             return { 290.0f, 85.0f, 50.0f, 150.0f, 0.9f };
         else
             return { 290.0f, 85.0f, 50.0f, 150.0f, 0.25f };
@@ -74,10 +74,6 @@ namespace sv {
     void Precache(void)
     {
         Base::Precache();
-     
-        PRECACHE_SOUND("weapons/herochainsaw_attack_end.wav");
-        PRECACHE_SOUND("weapons/herochainsaw_slash1.wav");
-        PRECACHE_SOUND("weapons/herochainsaw_slash2.wav");
     }
 
 
@@ -91,7 +87,7 @@ namespace sv {
         p->iMaxClip = 200;
         p->iSlot = 0;
         p->iPosition = 4;
-        p->iId = m_iId = WEAPON_HEROCHAINSAW;
+        p->iId = m_iId = WEAPON_CHAINSAWM;
         p->iFlags = 0;
         p->iWeight = M249_WEIGHT;
         return 1;
@@ -136,7 +132,7 @@ namespace sv {
         m_iShotsFired = 0;
         m_flAttackLoop = invalid_time_point;
 
-        return DefaultDeploy("models/v_herochainsaw.mdl", "models/p_herochainsaw.mdl", ANIM_DRAW, "chainsaw", UseDecrement() != FALSE);
+        return DefaultDeploy("models/v_chainsawm.mdl", "models/p_chainsawm.mdl", ANIM_DRAW, "chainsaw", UseDecrement() != FALSE);
     }
 
     void Reload(void)
@@ -213,7 +209,7 @@ namespace sv {
         UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
         vecSrc = m_pPlayer->GetGunPosition();
-        vecEnd = vecSrc + gpGlobals->v_forward * 99.0;
+        vecEnd = vecSrc + gpGlobals->v_forward * 77.0;
 
         UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
@@ -269,7 +265,7 @@ namespace sv {
 
         flDamage = GetSecondaryAttackDamage();
       
-        while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, 125.0)) != NULL)
+        while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, 90.0)) != NULL)
         {
             if (pEntity == m_pPlayer)
                 continue;
@@ -358,7 +354,7 @@ namespace sv {
         flags = 0;
 #endif
 
-        if (m_flAttackLoop != invalid_time_point)
+        if (m_flAttackLoop == invalid_time_point)
         {
             SendWeaponAnim(ANIM_ATTACK1_START, UseDecrement() != FALSE);
 
@@ -411,17 +407,11 @@ namespace sv {
         if (m_iClip <= 0)
         {
             SendWeaponAnim(ANIM_SLASH4 - (RANDOM_LONG(0, 1) != 0), UseDecrement() != FALSE);
-           
         }
         else
         {
-            SendWeaponAnim(ANIM_SLASH2 - (RANDOM_LONG(0, 1) != 0), UseDecrement() != FALSE);        
+            SendWeaponAnim(ANIM_SLASH2 - (RANDOM_LONG(0, 1) != 0), UseDecrement() != FALSE);
         }
-
-        if(RANDOM_LONG(0, 1))
-            EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/herochainsaw_slash1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-        else
-            EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/herochainsaw_slash2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.15s;
@@ -455,8 +445,6 @@ namespace sv {
         {
             SendWeaponAnim(ANIM_ATTACK1_END, UseDecrement() != FALSE);
 
-            EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/herochainsaw_attack_end.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-
             m_flNextPrimaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
             m_flAttackLoop = invalid_time_point;
         }
@@ -475,5 +463,5 @@ namespace sv {
     }
     		 	
 };
-LINK_ENTITY_TO_CLASS(weapon_herochainsaw, CHeroChainsaw)
+LINK_ENTITY_TO_CLASS(weapon_chainsawm, CChainsawm)
 }

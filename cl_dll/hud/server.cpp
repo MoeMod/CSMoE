@@ -49,8 +49,11 @@ enum
 	HUMAN_DEBUFF_SHOOTINGDOWN_HEAD,
 	HOLYFIST_GLITCH,
 	HOLYFIST_GLITCH_RING,
+	WINGGUN_WING,
 };
+
 TEMPENTITY *iHolyFistRingEffect[33];
+TEMPENTITY *iWingGunEffect[33];
 
 void CreateAttachedEntitiesToPlayer(int entity, int type);
 void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
@@ -179,18 +182,53 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		break;
 	case 16:		
 		arg1 = reader.ReadShort();
+		arg2 = reader.ReadByte();
 
-		if (iHolyFistRingEffect[arg1])
+		switch (arg2)
 		{
-			iHolyFistRingEffect[arg1]->die = gHUD.m_flTime;
-			iHolyFistRingEffect[arg1] = nullptr;
+		case WINGGUN_WING:
+		{
+			if (iWingGunEffect[arg1])
+			{
+				iWingGunEffect[arg1]->die = gHUD.m_flTime;
+				iWingGunEffect[arg1] = nullptr;
+				break;
+			}
+
+			if (!iWingGunEffect[arg1])
+				iWingGunEffect[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_idle.spr"),
+					Vector(0.0, 0.0, 50.0), 15.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.5, kRenderTransAdd, 30.0);
 			break;
 		}
+		case HOLYFIST_GLITCH_RING:
+		{
+			if (iHolyFistRingEffect[arg1])
+			{
+				iHolyFistRingEffect[arg1]->die = gHUD.m_flTime;
+				iHolyFistRingEffect[arg1] = nullptr;
+				break;
+			}
 
-		if(!iHolyFistRingEffect[arg1])
-			iHolyFistRingEffect[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/terminator_ring.spr"),
-				Vector(0.0, 0.0, 0.0), 5.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.7, kRenderTransAdd, 1.0);
+			if (!iHolyFistRingEffect[arg1])
+				iHolyFistRingEffect[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/terminator_ring.spr"),
+					Vector(0.0, 0.0, 0.0), 5.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.7, kRenderTransAdd, 1.0);
+			break;
+		}
+		default:
+			break;
+		}	
 		break;
+	case 17:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+
+
+		cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(arg1);
+
+
+		break;
+	}
 	case 79:	// stop sound
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadShort();

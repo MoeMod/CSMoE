@@ -74,9 +74,9 @@ namespace sv {
 		{
 			PRECACHE_MODEL("models/v_balrog9.mdl");
 			PRECACHE_MODEL("models/p_balrog9.mdl");
-#ifndef CLIENT_DLL
+
 			PRECACHE_MODEL("sprites/muzzleflash20.spr");
-#endif
+
 			PRECACHE_SOUND("weapons/balrog9_slash1.wav");
 			PRECACHE_SOUND("weapons/balrog9_slash2.wav");
 			PRECACHE_SOUND("weapons/balrog9_hit1.wav");

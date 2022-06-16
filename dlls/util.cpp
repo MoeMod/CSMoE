@@ -2401,9 +2401,12 @@ void UTIL_BroadcastStuffText(const char* fmt, ...)
 }
 
 
-void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vector& vecVelocity, int iModelIndex, int life, int sequence, int framerate, bool fadeOut, int fadeSpeed, int brightness, int rendermode, CBaseEntity* pEntity, bool fadeIn, int fadeInSpeed, int scale, int frameMax, int flags)
-{
-	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vector& vecVelocity, int iModelIndex, int life, int sequence, int framerate, bool fadeOut, int fadeSpeed, int brightness, int rendermode, CBaseEntity* pEntity, bool fadeIn, int fadeInSpeed, int scale, int frameMax, int flags, bool excludeSource)
+{	
+	if(excludeSource)
+		MESSAGE_BEGIN(MSG_EXCLUDESOURCE, SVC_TEMPENTITY, g_vecZero, pEntity->edict());
+	else
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 	WRITE_BYTE(TE_TEMPMODEL);
 	WRITE_COORD(vecOrigin.x);
 	WRITE_COORD(vecOrigin.y);

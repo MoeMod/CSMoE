@@ -146,7 +146,15 @@ namespace sv {
 			}
 			else
 				vecVelocity = vecEnd.Normalize() * flKnockBack * ((flRadius - flDistance) / flRadius);
-			pEntity->pev->velocity.z = flKnockBack;
+			
+			if (pEntity->IsPlayer())
+			{
+				CBasePlayer* player = (CBasePlayer*)pEntity;
+				player->pev->velocity += vecVelocity;
+			}
+			else
+				pEntity->pev->velocity += vecVelocity;
+			
 		}
 
 		return bHit;

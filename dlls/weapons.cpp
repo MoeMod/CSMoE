@@ -1372,6 +1372,7 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_Y21S1JETGUNMD:
 		case WEAPON_M950:
 		case WEAPON_SKULL1:
+		case WEAPON_M950SE:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

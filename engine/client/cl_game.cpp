@@ -3957,6 +3957,8 @@ static efx_api_t gEfxApi =
 	CL_LookupColor,
 	CL_DecalRemoveAll,
 	CL_FireCustomDecal,
+	CL_TempCustomModel,
+	CL_BeamPoints_Stretch,
 };
 
 static event_api_t gEventApi =

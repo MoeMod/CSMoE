@@ -55,6 +55,17 @@ int DLLEXPORT HUD_AddEntity( int type, struct cl_entity_s *ent, const char *mode
 	// each frame every entity passes this function, so the overview hooks
 	// it to filter the overview entities
 
+	/*	if (!strcmp(RI.currententity->model->name, "models/ef_winggun_wing.mdl"))
+		GL_Cull(0);
+	if (!strcmp(RI.currententity->model->name, "models/ef_winggun_wingparticle.mdl"))
+		GL_Cull(0);
+	if (!strcmp(RI.currententity->model->name, "models/ef_whipsword_slash.mdl"))
+		GL_Cull(0);
+	if (!strcmp(RI.currententity->model->name, "models/ef_whipsword_slash_loop.mdl"))
+		GL_Cull(0);
+	if (!strcmp(RI.currententity->model->name, "models/ef_whipsword_slash_skill.mdl"))
+		GL_Cull(0);*/
+
 	if ( g_iUser1 )
 	{
 		gHUD.m_Spectator.AddOverviewEntity( type, ent, modelname );
