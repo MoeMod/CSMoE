@@ -564,6 +564,11 @@ void Mod_Init( void )
 
 void Mod_ClearAll( qboolean keep_playermodel )
 {
+#ifndef XASH_DEDICATED
+	// clear lru texture data before clear models!!
+	xe::TexLru_Clear();
+#endif
+
 	model_t	*plr = com_models[MAX_MODELS-1];
 	model_t	*mod;
 	int	i;
@@ -3186,8 +3191,10 @@ void Mod_LoadWorld( const char *name, uint *checksum, qboolean multiplayer )
 {
 	int	i;
 
+#ifndef XASH_DEDICATED
 	// clear lru texture data before clear models!!
 	xe::TexLru_Clear();
+#endif
 	// now replacement table is invalidate
 	Q_memset( com_models, 0, sizeof( com_models ));
 
