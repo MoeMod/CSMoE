@@ -876,7 +876,6 @@ public:
 	int VidInit(void);
 	int Draw(float flTime);
 	void InitHUDData(void);
-	void Reset(void);
 	void Shutdown();
 	void Draw2DQuad_Custom(float x, float y, float scale, int num, int iTexID, int alpha);
 	CHudMsgFunc(HitMsg);
@@ -1001,7 +1000,6 @@ class CHudSiFiammo : public CHudBase
 {
 public:
 	int Init(void);
-	void Reset(void);
 	void InitHUDData(void);
 	int VidInit(void);
 	void Shutdown(void);

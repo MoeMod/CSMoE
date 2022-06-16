@@ -134,9 +134,7 @@ int CHudSpecialCrossHair::VidInit()
 
 void CHudSpecialCrossHair::Reset(void)
 {
-	DisplayTime = 0;
-	std::fill(std::begin(m_pCurTexture), std::end(m_pCurTexture), nullptr);
-	VidInit();
+	iWeapon = DisplayTime = 0;
 }
 
 int CHudSpecialCrossHair::Draw(float flTime)
@@ -202,6 +200,7 @@ int CHudSpecialCrossHair::Draw(float flTime)
 			DrawHuntbowCrossHair(iX, iY, wide, height, iStoredType);
 		else
 			DrawHuntbowCrossHair(iX, iY, wide, height, iType);
+		break;
 	}
 	case WPN_SKULLT9:
 	{

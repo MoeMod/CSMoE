@@ -53,12 +53,6 @@ int CHudSiFiammo:: Init( void )
 	return 1;
 }
 
-void CHudSiFiammo::Reset(void)
-{
-	m_iTex = nullptr;
-	VidInit();
-}
-
 void CHudSiFiammo:: InitHUDData( void )
 {
 	g_clip.value = 0;
@@ -112,7 +106,8 @@ int CHudSiFiammo:: Draw( float flTime )
 		int new_style = (int)hud_sifiammo_style->value;
 		if (new_style >= 2 && new_style <= 9) {
 			current_style = new_style;
-			Reset();
+			m_iTex = nullptr;
+			VidInit();
 		}
 	}
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);

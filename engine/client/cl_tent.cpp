@@ -887,6 +887,9 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	if (RP_LOCALCLIENT(RI.currententity) && !RI.thirdPerson && (RI.params & RP_MIRRORVIEW))
 		pTemp->entity.curstate.effects |= EF_REFLECTONLY;
 
+	if (RP_LOCALCLIENT(parent))
+		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+
 	CL_TEntAddEntity(&pTemp->entity);
 }
 
@@ -1002,10 +1005,10 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 
 	// play playermodel muzzleflashes only for mirror pass
 	if (RP_LOCALCLIENT(RI.currententity) && !RI.thirdPerson && (RI.params & RP_MIRRORVIEW))
-	{
 		pTemp->entity.curstate.effects |= EF_REFLECTONLY;
-		//pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
-	}
+
+	if (RP_LOCALCLIENT(parent))
+		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
 
 	CL_TEntAddEntity( &pTemp->entity );
 }

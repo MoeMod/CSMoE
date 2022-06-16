@@ -61,21 +61,14 @@ int CHudHitIndicator:: Init( void )
 	HOOK_MESSAGE(HitMsg);
 
 	hud_hitindicator_style = CVAR_CREATE( "hud_hitstyle", "2", FCVAR_ARCHIVE);
-	current_style = 3;   //Ĭ����ë������
+	current_style = 3;
 	return 1;
-}
-
-void CHudHitIndicator::Reset(void)
-{
-	std::fill(std::begin(m_iTex), std::end(m_iTex), nullptr);
-	VidInit();
 }
 
 void CHudHitIndicator:: InitHUDData( void )
 {
 	memset(pList, 0, sizeof(pList) );
 }
-
 
 int CHudHitIndicator:: VidInit( void )
 {
@@ -119,7 +112,8 @@ int CHudHitIndicator:: Draw( float flTime )
 		int new_style = (int)hud_hitindicator_style->value;
 		if (new_style >= 2 && new_style <= 8) {
 			current_style = new_style;
-			Reset();
+			std::fill(std::begin(m_iTex), std::end(m_iTex), nullptr);
+			VidInit();
 		}
 	}
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
