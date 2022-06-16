@@ -227,10 +227,10 @@ namespace sv {
         ANIM_SLASH3,
         ANIM_SLASH4,
         ANIM_EMPTY,
-        ANIM_CHARGE,
-        ANIM_CHARGE_FINISH,
-        ANIM_IDLE_CHARGED,
-        ANIM_CHARGED_SHOOT,
+        ANIM_SKILL_START,
+        ANIM_SKILL_LOOP,
+        ANIM_CHARGING_LOOP,
+        ANIM_SKILL_END,
 	};
 
     int m_iChargeState;
@@ -248,6 +248,11 @@ namespace sv {
 
     void Precache(void)
     {
+        PRECACHE_SOUND("weapons/chainsawex_idle.wav");
+        PRECACHE_SOUND("weapons/chainsawex_attack1_end.wav");
+        PRECACHE_SOUND("weapons/herochainsaw_slash1.wav");
+        PRECACHE_SOUND("weapons/herochainsaw_slash2.wav");
+
         Base::Precache();
     }
 
@@ -469,9 +474,9 @@ namespace sv {
             if (classify && classify != CLASS_MACHINE)
             {
                 if (m_iClip <= 0)
-                    EMIT_SOUND_DYN(ENT(pEntity->pev), CHAN_WEAPON, "weapons/chainsaw_hit3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+                    EMIT_SOUND_DYN(ENT(pEntity->pev), CHAN_WEAPON, "weapons/chainsawex_hit3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
                 else
-                    EMIT_SOUND_DYN(ENT(pEntity->pev), CHAN_WEAPON, "weapons/chainsaw_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+                    EMIT_SOUND_DYN(ENT(pEntity->pev), CHAN_WEAPON, "weapons/chainsawex_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
             }
 
             ClearMultiDamage();
@@ -585,7 +590,7 @@ namespace sv {
             {
                 if (m_iChargeState > 1)
                 {
-                    SendWeaponAnim(ANIM_ATTACK1_LOOP);
+                    SendWeaponAnim(ANIM_CHARGING_LOOP);
 
                     m_iChargeState = 3;
                     m_flTimeCheckCharge = gpGlobals->time + 999999s;
@@ -593,21 +598,21 @@ namespace sv {
                 }
                 else
                 {
-                    SendWeaponAnim(ANIM_ATTACK1_LOOP);
+                    SendWeaponAnim(ANIM_SKILL_LOOP);
 
                     m_iChargeState = 2;
-                    m_flTimeCheckCharge = gpGlobals->time + 0.7s;
-                    m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
+                    m_flTimeCheckCharge = gpGlobals->time + 1.7s - 0.53s;
+                    m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s - 0.53s;
                 }
             }
         }
         else
         {
-            SendWeaponAnim(ANIM_ATTACK1_START);
+            SendWeaponAnim(ANIM_SKILL_START);
 
-            m_flTimeCheckCharge = gpGlobals->time + 1.7s;
+            m_flTimeCheckCharge = gpGlobals->time + 0.53s;
             m_iChargeState = 1;
-            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.53s;
         }
 
 
@@ -617,7 +622,7 @@ namespace sv {
     {
         if (m_iChargeState >= 2)
         {
-            SendWeaponAnim(ANIM_ATTACK1_END, UseDecrement() != FALSE);
+            SendWeaponAnim(ANIM_SKILL_END, UseDecrement() != FALSE);
             //create entity
 
             EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/thanatos7_scytheshoot.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
@@ -691,6 +696,8 @@ namespace sv {
         {
             SendWeaponAnim(ANIM_ATTACK1_END, UseDecrement() != FALSE);
 
+            EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsawex_attack1_end.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
             m_flNextPrimaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
             m_flAttackLoop = invalid_time_point;
         }
@@ -698,7 +705,9 @@ namespace sv {
         {
             SendWeaponAnim(ANIM_IDLE1, UseDecrement() != FALSE);
 
-            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0s;
+            EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsawex_idle.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
         }
         else
         {

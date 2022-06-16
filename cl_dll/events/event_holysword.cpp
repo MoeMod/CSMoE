@@ -149,6 +149,7 @@ void EV_FireHolySword(event_args_t *args)
 				pEnt->tentOffset = Vector(0, 0, -32);
 				pEnt->die = gHUD.m_flTime + 0.5;
 				pEnt->flags |= FTENT_NONE;
+				pEnt->entity.curstate.effects |= EF_NOCULL;
 			}
 		}
 

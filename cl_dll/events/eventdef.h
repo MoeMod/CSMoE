@@ -170,3 +170,4 @@ HOOK_EVENT(thanatos7, FireThanatos7);
 HOOK_EVENT(crow7, FireCrow7);
 HOOK_EVENT(winggun, FireWingGun);
 HOOK_EVENT(m950se, FireM950SE);
+HOOK_EVENT(chainsawex, FireChainsawEX);
