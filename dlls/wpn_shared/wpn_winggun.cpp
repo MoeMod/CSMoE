@@ -38,7 +38,7 @@ namespace sv {
 			Precache();
 
 			SET_MODEL(this->edict(), "models/ef_winggun_wingparticle.mdl");
-			pev->iuser1 = 13756412;
+			pev->effects |= EF_NOCULL;
 			pev->solid = SOLID_NOT;
 			pev->movetype = MOVETYPE_NOCLIP;
 			pev->takedamage = DAMAGE_NO;
@@ -161,7 +161,7 @@ namespace sv {
 			Precache();
 	
 			SET_MODEL(this->edict(), "models/ef_winggun_wing.mdl");
-			pev->iuser1 = 13756412;
+			pev->effects |= EF_NOCULL;
 			pev->solid = SOLID_NOT;
 			pev->movetype = MOVETYPE_NOCLIP;
 			pev->takedamage = DAMAGE_NO;

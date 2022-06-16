@@ -3094,7 +3094,7 @@ static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 	if( clgame.ds.cullMode != GL_NONE ) GL_Cull( GL_FRONT );
 	if (RI.currententity)
 	{
-		if(RI.currententity->curstate.iuser1 == 15734)
+		if(RI.currententity->curstate.effects & EF_NOCULL)
 			GL_Cull(0);
 	}
 

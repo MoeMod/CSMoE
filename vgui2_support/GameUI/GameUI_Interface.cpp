@@ -187,6 +187,13 @@ void UI_ConnectionProgress_f(void)
 		m_iState = STATE_CONNECTING;
 		if (g_pGameUI)
 		{
+			if (g_hLoadingDialog.Get() && !g_hLoadingDialog->IsVisible())
+			{
+				g_pGameUI->ConnectToServer("", 0, 0);
+				g_pGameUI->LoadingStarted("", "");
+				g_pGameUI->StartProgressBar("", 24);
+				g_pGameUI->ContinueProgressBar(4, 0);
+			}
 			g_pGameUI->SetProgressBarStatusText("#GameUI_ParseServerInfo");
 		}
 	}

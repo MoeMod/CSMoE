@@ -196,7 +196,7 @@ typedef enum
 #define CS_SIZE		64	// size of one config string
 #define CS_TIME		16	// size of time string
 
-#define MAX_DECALS		512	// touching TE_DECAL messages, etc
+#define MAX_DECALS		1024	// touching TE_DECAL messages, etc
 #define MAX_STATIC_ENTITIES	512	// static entities that moved on the client when level is spawn
 
 #define GI              SI.GameInfo
