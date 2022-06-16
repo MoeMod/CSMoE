@@ -27,7 +27,7 @@ KeyCode CGameUIFuncs::GetVGUI2KeyCodeForBind(const char *bind) {
         auto bind2 = Key_BindingForKey(keynum);
         if(bind2 && !strcmp(bind, bind2))
         {
-            return KeyCode_VirtualKeyToVGUI(keynum);
+            return KeyCode_EngineKeyToVGUI(keynum);
         }
     }
 	return vgui2::KEY_NONE;

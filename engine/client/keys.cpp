@@ -584,6 +584,9 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 		return;
 	}
 
+	int clicks = down;
+	down = min(down, 1);
+
 	if (IME_HandleKeyEvent(key, down))
 	{
 		return;
@@ -615,7 +618,7 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 		keys[key].repeats = 0;
 	}
 
-	VGui_KeyEvent( key, down );
+	VGui_KeyEvent( key, clicks);
 	Touch_KeyEvent( key, down );
 
 	// console key is hardcoded, so the user can never unbind it
@@ -626,11 +629,6 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 			return;
 
 		Con_ToggleConsole_f();
-
-		// vgui console
-		if (down) {
-			UI_KeyEvent(key, true);
-		}
 		return;
 	}
 
@@ -655,9 +653,15 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 			Key_Message( key );
 			return;
 		case key_console:
-			if( cls.state == ca_active && !cl.background )
-				Key_SetKeyDest( key_game );
-			else UI_SetActiveMenu( true );
+
+#if XASH_VGUI2
+			if (cls.state == ca_active)
+				UI_SetActiveMenu(false);
+#else
+			if (cls.state == ca_active && !cl.background)
+				Key_SetKeyDest(key_game);
+			else UI_SetActiveMenu(true);
+#endif
 			return;
 		case key_menu:
 			UI_KeyEvent( key, true );
@@ -890,6 +894,12 @@ void CL_CharEvent( int ch )
 	{
 		UI_CharEvent( ch );
 	}
+#ifdef XASH_VGUI2
+	else if (cls.key_dest == key_console)
+	{
+		UI_CharEvent(ch);
+	}
+#endif
 	else if( cls.key_dest == key_game ) // typing support for VGUI
 	{
 		VGui_KeyEvent( ch, 2 );

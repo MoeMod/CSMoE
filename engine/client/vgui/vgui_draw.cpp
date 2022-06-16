@@ -507,11 +507,10 @@ void VGui_KeyEvent( int key, int down )
 		SDLash_EnableTextInput( 1, false );
 #endif
 #endif
-
 	switch( key )
 	{
 	case K_MOUSE1:
-		vgui.Mouse( down?VGUI_MouseAction::MA_PRESSED:VGUI_MouseAction::MA_RELEASED, (int)VGUI_MouseCode::MOUSE_LEFT );
+		vgui.Mouse( down&&down%2==0?VGUI_MouseAction::MA_DOUBLE:down?VGUI_MouseAction::MA_PRESSED:VGUI_MouseAction::MA_RELEASED, (int)VGUI_MouseCode::MOUSE_LEFT);
 		return;
 	case K_MOUSE2:
 		vgui.Mouse( down?VGUI_MouseAction::MA_PRESSED:VGUI_MouseAction::MA_RELEASED, (int)VGUI_MouseCode::MOUSE_RIGHT );

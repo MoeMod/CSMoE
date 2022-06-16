@@ -148,6 +148,7 @@ void CLoadingDialog::Open(bool bShowBackground)
 
 		m_pInfoLabel->SetVisible(true);
 		m_pCancelButton->SetVisible(true);
+		m_pCancelButton->SetContentAlignment(vgui2::Label::a_center);
 	}
 }
 
@@ -176,6 +177,7 @@ void CLoadingDialog::SetupControlSettingsForErrorDisplay(const char *settingsFil
 	m_pCancelButton->SetCommand("Close");
 	m_pInfoLabel->InvalidateLayout();
 	m_pCancelButton->SetVisible(true);
+	m_pCancelButton->SetContentAlignment(vgui2::Label::a_center);
 
 	m_szBackgroundImage[0] = 0;
 }
@@ -334,6 +336,7 @@ void CLoadingDialog::SetSecondaryProgress(float progress)
 		m_bShowingSecondaryProgress = true;
 		m_pProgress2->SetVisible(true);
 		m_flSecondaryProgressStartTime = (float)vgui2::system()->GetFrameTime();
+		m_pCancelButton->SetContentAlignment(vgui2::Label::a_center);
 	}
 
 	// if progress has increased then update the progress counters

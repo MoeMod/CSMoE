@@ -932,6 +932,14 @@ void COptionsSubKeyboard::OnKeyCodeTyped(vgui2::KeyCode code)
 		return;
 	}
 
+	if (vgui2::KEY_ENTER == code)
+	{
+		// start editing
+		PostMessage(this, new KeyValues("Command", "command", "ChangeKey"));
+		// message handled, don't pass on
+		return;
+	}
+
 	BaseClass::OnKeyCodeTyped( code );
 }
 

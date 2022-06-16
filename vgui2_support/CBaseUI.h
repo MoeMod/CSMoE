@@ -31,7 +31,6 @@ private:
 	CSysModule *m_hStaticGameUIModule;
 #endif
 	
-	bool m_bConsoleShowing = false;
 	bool m_bHidingGameUI = false;
 };
 

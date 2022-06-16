@@ -33,6 +33,7 @@
 #include "GameLoading.h"
 
 #include "GameUI_Interface.h"
+#include "menu_int.h"
 
 IServerBrowser *serverbrowser = NULL;
 static CBasePanel *staticPanel = NULL;
@@ -44,6 +45,10 @@ static IEngineVGui* enginevguifuncs = nullptr;
 IGameUIFuncs* gameuifuncs = nullptr;
 IBaseUI* baseuifuncs = nullptr;
 
+namespace ui {
+	extern ui_enginefuncs_t engfuncs;
+}
+
 namespace vgui2 {
 extern cl_enginefunc_t gEngfuncs;
 }
@@ -52,6 +57,141 @@ cl_enginefunc_t* engine = &gEngfuncs;
 
 vgui2::DHANDLE<CLoadingDialog> g_hLoadingDialog;
 vgui2::DHANDLE<CGameLoading>g_hGameLoading;
+
+namespace vgui2 {
+enum EState
+{
+	STATE_NONE,
+	STATE_MENU, // do not hide when disconnected or in game
+	STATE_DOWNLOAD, // enlarge your connectionprogress window
+	STATE_CONNECTING, // showing single progress
+	STATE_CONSOLE // do not show until state reset
+};
+
+enum ESource
+{
+	SOURCE_CONSOLE,
+	SOURCE_SERVERBROWSER,
+	SOURCE_CREATEGAME
+};
+
+EState m_iState = STATE_NONE;
+ESource m_iSource = SOURCE_CONSOLE;
+
+char sDownloadString[512] = "";
+char sCommonString[512] = "";
+
+void UI_ConnectionProgress_f(void)
+{
+	if (!strcmp(engine->Cmd_Argv(1), "disconnect"))
+	{
+		if (g_pGameUI)
+		{
+			g_pGameUI->StopProgressBar(false, "");
+			//g_pGameUI->StopProgressBar(true, "#GameUI_DisconnectedFrom");
+			g_pGameUI->DisconnectFromServer();
+		}
+		return;
+	}
+
+	else if (!strcmp(engine->Cmd_Argv(1), "dl"))
+	{
+		m_iState = STATE_DOWNLOAD;
+		if (g_pGameUI)
+		{
+			snprintf(sDownloadString, sizeof(sDownloadString) - 1, "正在下载资源 %s", engine->Cmd_Argv(2));
+			g_pGameUI->SetProgressBarStatusText(sDownloadString);
+			int iCurrent = atoi(engine->Cmd_Argv(4));
+			int iTotal = atoi(engine->Cmd_Argv(5));
+			g_pGameUI->SetSecondaryProgressBar((float)iCurrent / iTotal + 0.01f / iTotal * engine->pfnGetCvarFloat("scr_download"));
+			snprintf(sDownloadString, sizeof(sDownloadString) - 1, "%d / %d %s", iCurrent + 1, iTotal, engine->Cmd_Argv(6));
+			g_pGameUI->SetSecondaryProgressBarText(sDownloadString);
+		}
+	}
+
+	else if (!strcmp(engine->Cmd_Argv(1), "dlend"))
+	{
+		if (g_pGameUI)
+		{
+			g_pGameUI->StopProgressBar(true, "#GameUI_DisconnectedFrom");
+			g_pGameUI->DisconnectFromServer();
+		}
+		m_iState = STATE_NONE;
+		return;
+	}
+
+	else if (!strcmp(engine->Cmd_Argv(1), "stufftext"))
+	{
+		m_iState = STATE_CONNECTING;
+		if (g_pGameUI)
+		{
+			g_pGameUI->ContinueProgressBar(atof(engine->Cmd_Argv(2)) * 20 + 4, 0);
+
+			const char* arg = gEngfuncs.Cmd_Argv(3);
+			if (!strcmp(arg + 8, "baselines"))
+				g_pGameUI->SetProgressBarStatusText("#GameUI_ParseBaseline");
+			else
+				g_pGameUI->SetProgressBarStatusText("#GameUI_CheckCRCs");
+		}
+	}
+
+	else if (!strcmp(engine->Cmd_Argv(1), "precache"))
+	{
+		m_iState = STATE_CONNECTING;
+		g_pGameUI->SetProgressBarStatusText("#GameUI_PrecacheResources");
+	}
+
+	else if (!strcmp(engine->Cmd_Argv(1), "menu"))
+	{
+		m_iState = STATE_MENU;
+		m_iSource = SOURCE_SERVERBROWSER;
+		if (g_pGameUI)
+		{
+			g_pGameUI->ConnectToServer("", 0, 0);
+			g_pGameUI->LoadingStarted("", "");
+			g_pGameUI->StartProgressBar("", 24);
+			g_pGameUI->ContinueProgressBar(4, 0);
+			g_pGameUI->SetProgressBarStatusText("#GameUI_EstablishingConnection");
+		}
+	}
+
+	else if (!strcmp(engine->Cmd_Argv(1), "localserver"))
+	{
+		m_iState = STATE_MENU;
+		m_iSource = SOURCE_CREATEGAME;
+		if (g_pGameUI)
+		{
+			g_pGameUI->ConnectToServer("", 0, 0);
+			g_pGameUI->LoadingStarted("", "");
+			g_pGameUI->StartProgressBar("", 24);
+			g_pGameUI->ContinueProgressBar(4, 0);
+			g_pGameUI->SetProgressBarStatusText("#GameUI_StartingServer");
+		}
+	}
+
+	else if (!strcmp(engine->Cmd_Argv(1), "changelevel"))
+	{
+		m_iState = STATE_MENU;
+		if (g_pGameUI)
+		{
+			g_pGameUI->ConnectToServer("", 0, 0);
+			g_pGameUI->LoadingStarted("", "");
+			g_pGameUI->StartProgressBar("", 24);
+			g_pGameUI->ContinueProgressBar(4, 0);
+			g_pGameUI->SetProgressBarStatusText("服务器正在更换地图...");
+		}
+	}
+
+	else if (!strcmp(engine->Cmd_Argv(1), "serverinfo"))
+	{
+		m_iState = STATE_CONNECTING;
+		if (g_pGameUI)
+		{
+			g_pGameUI->SetProgressBarStatusText("#GameUI_ParseServerInfo");
+		}
+	}
+}
+}
 
 CGameUI &GameUI(void)
 {
@@ -103,6 +243,9 @@ void CGameUI::Initialize(CreateInterfaceFn *factories, int count)
 	vgui2::localize()->AddFile(vgui2::filesystem(), "Resource/cstrike_%language%.txt");
 	vgui2::localize()->AddFile(vgui2::filesystem(), "Resource/csmoe_%language%.txt");
 
+	gameuifuncs = static_cast<IGameUIFuncs*>(pEngFactory(ENGINE_GAMEUIFUNCS_INTERFACE_VERSION, nullptr));
+	enginevguifuncs = static_cast<IEngineVGui*>(pEngFactory(VENGINE_VGUI_VERSION, nullptr));
+
 	staticPanel = new CBasePanel();
 	staticPanel->SetBounds(0, 0, 640, 480);
 	staticPanel->SetPaintBorderEnabled(false);
@@ -111,9 +254,6 @@ void CGameUI::Initialize(CreateInterfaceFn *factories, int count)
 	staticPanel->SetVisible(true);
 	staticPanel->SetMouseInputEnabled(false);
 	staticPanel->SetKeyBoardInputEnabled(false);
-
-	gameuifuncs = static_cast<IGameUIFuncs*>(pEngFactory(ENGINE_GAMEUIFUNCS_INTERFACE_VERSION, nullptr));
-	enginevguifuncs = static_cast<IEngineVGui*>(pEngFactory(VENGINE_VGUI_VERSION, nullptr));
 	
 	staticPanel->SetParent(enginevguifuncs->GetPanel(PANEL_GAMEUIDLL));
 	
@@ -146,6 +286,8 @@ void CGameUI::Initialize(CreateInterfaceFn *factories, int count)
 		*/
 	
 	vgui2::surface()->SetAllowHTMLJavaScript(true);
+
+	engine->pfnAddCommand("menu_connectionprogress", UI_ConnectionProgress_f);
 }
 
 void CGameUI::Start(struct cl_enginefuncs_s *engineFuncs, int interfaceVersion, void *system)
@@ -203,7 +345,7 @@ int CGameUI::ActivateGameUI(void)
 	staticPanel->OnGameUIActivated();
 	staticPanel->SetVisible(true);
 
-	engine->pfnClientCmd("setpause");
+	//engine->pfnClientCmd("setpause");
 	engine->pfnClientCmd("citrus_servers_show");
 
 	return 1;
@@ -225,6 +367,15 @@ void CGameUI::RunFrame(void)
 	vgui2::surface()->GetScreenSize(wide, tall);
 	staticPanel->SetSize(wide, tall);
 
+	if (m_bLoadlingLevel)
+	{
+		if ((m_iState != STATE_MENU && ui::engfuncs.pfnClientInGame()))
+		{
+			m_iState = STATE_NONE;
+			LoadingFinished("", "");
+		}
+	}
+
 	if (staticPanel->IsVisible())
         staticPanel->RunFrame();
 }
@@ -240,6 +391,7 @@ void CGameUI::ConnectToServer(const char *game, int IP, int port)
 	//engine->pfnClientCmd("fmod stop\n");
 
 	baseuifuncs->HideGameUI();
+	engine->pfnClientCmd("citrus_servers_hide\n");
 	/*
 	KeyValues *pKV = new KeyValues("ConnectedToGame");
 	pKV->SetInt("ip", IP);
@@ -269,8 +421,8 @@ void CGameUI::HideGameUI(void)
 
 	staticPanel->SetVisible(false);
 
-	engine->pfnClientCmd("unpause");
-	engine->pfnClientCmd("hideconsole");
+	//engine->pfnClientCmd("unpause");
+	//engine->pfnClientCmd("hideconsole");
 	engine->pfnClientCmd("citrus_servers_hide");
 
 	if (GameConsole().IsConsoleVisible())
@@ -300,8 +452,8 @@ void CGameUI::LoadingStarted(const char *resourceType, const char *resourceName)
 	}
 	g_hGameLoading->Activate();*/
 
-	engine->pfnClientCmd("unpause");
-	engine->pfnClientCmd("hideconsole");
+	//engine->pfnClientCmd("unpause");
+	//engine->pfnClientCmd("hideconsole");
 	GameConsole().Hide();
 
 	staticPanel->OnLevelLoadingStarted(resourceName);
@@ -316,6 +468,7 @@ void CGameUI::LoadingFinished(const char *resourceType, const char *resourceName
 		g_hGameLoading->SetVisible(false);
 		g_hGameLoading->SetAutoDelete(true);
 	}
+	StopProgressBar(false, "");
 
 	staticPanel->OnLevelLoadingFinished();
 	baseuifuncs->HideGameUI();
@@ -328,7 +481,7 @@ void CGameUI::StartProgressBar(const char *progressType, int progressSteps)
 		if (g_hGameLoading->IsVisible())
 		{
 			g_hGameLoading->SetProgressRange(0, progressSteps);
-			g_hGameLoading->SetProgressPoint(0.0f);
+			g_hGameLoading->SetProgressPoint(0);
 
 			if (!stricmp(progressType, "Server"))
 			{
@@ -348,7 +501,7 @@ void CGameUI::StartProgressBar(const char *progressType, int progressSteps)
 
 	m_szPreviousStatusText[0] = 0;
 	g_hLoadingDialog->SetProgressRange(0, progressSteps);
-	g_hLoadingDialog->SetProgressPoint(0.0f);
+	g_hLoadingDialog->SetProgressPoint(0);
 	g_hLoadingDialog->Open();
 }
 
@@ -366,7 +519,7 @@ int CGameUI::ContinueProgressBar(int progressPoint, float progressFraction)
 	{
 		g_hLoadingDialog = new CLoadingDialog(staticPanel);
 		g_hLoadingDialog->SetProgressRange(0, 24);
-		g_hLoadingDialog->SetProgressPoint(0.0f);
+		g_hLoadingDialog->SetProgressPoint(0);
 		g_hLoadingDialog->Open();
 	}
 

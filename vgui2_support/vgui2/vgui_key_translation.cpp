@@ -10,11 +10,15 @@
 #endif
 #include <tier0/dbg.h>
 #include "vgui_key_translation.h"
+#include "../engine/keydefs.h"
 
 
 static vgui2::KeyCode s_pVirtualKeyToKeyCode[256];
 static int s_pKeyCodeToVirtual[vgui2::KEY_LAST];
 static bool g_bInit = false;
+
+static vgui2::KeyCode s_pEngineKeyToKeyCode[256];
+static bool g_bEngineKeyInit = false;
 
 void KeyCode_InitKeyTranslationTable(void)
 {
@@ -140,6 +144,115 @@ void KeyCode_InitKeyTranslationTable(void)
 	s_pKeyCodeToVirtual[0] = 0;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Converts an engine key code code into a vgui key
+//-----------------------------------------------------------------------------
+int KeyCode_InitKeyTranslationTable2(void)
+{
+	memset(s_pEngineKeyToKeyCode, vgui2::KEY_NONE, sizeof(s_pEngineKeyToKeyCode));
+
+	s_pEngineKeyToKeyCode['0'] = vgui2::KEY_0;
+	s_pEngineKeyToKeyCode['1'] = vgui2::KEY_1;
+	s_pEngineKeyToKeyCode['2'] = vgui2::KEY_2;
+	s_pEngineKeyToKeyCode['3'] = vgui2::KEY_3;
+	s_pEngineKeyToKeyCode['4'] = vgui2::KEY_4;
+	s_pEngineKeyToKeyCode['5'] = vgui2::KEY_5;
+	s_pEngineKeyToKeyCode['6'] = vgui2::KEY_6;
+	s_pEngineKeyToKeyCode['7'] = vgui2::KEY_7;
+	s_pEngineKeyToKeyCode['8'] = vgui2::KEY_8;
+	s_pEngineKeyToKeyCode['9'] = vgui2::KEY_9;
+	s_pEngineKeyToKeyCode['a'] = vgui2::KEY_A;
+	s_pEngineKeyToKeyCode['b'] = vgui2::KEY_B;
+	s_pEngineKeyToKeyCode['c'] = vgui2::KEY_C;
+	s_pEngineKeyToKeyCode['d'] = vgui2::KEY_D;
+	s_pEngineKeyToKeyCode['e'] = vgui2::KEY_E;
+	s_pEngineKeyToKeyCode['f'] = vgui2::KEY_F;
+	s_pEngineKeyToKeyCode['g'] = vgui2::KEY_G;
+	s_pEngineKeyToKeyCode['h'] = vgui2::KEY_H;
+	s_pEngineKeyToKeyCode['i'] = vgui2::KEY_I;
+	s_pEngineKeyToKeyCode['j'] = vgui2::KEY_J;
+	s_pEngineKeyToKeyCode['k'] = vgui2::KEY_K;
+	s_pEngineKeyToKeyCode['l'] = vgui2::KEY_L;
+	s_pEngineKeyToKeyCode['m'] = vgui2::KEY_M;
+	s_pEngineKeyToKeyCode['n'] = vgui2::KEY_N;
+	s_pEngineKeyToKeyCode['o'] = vgui2::KEY_O;
+	s_pEngineKeyToKeyCode['p'] = vgui2::KEY_P;
+	s_pEngineKeyToKeyCode['q'] = vgui2::KEY_Q;
+	s_pEngineKeyToKeyCode['r'] = vgui2::KEY_R;
+	s_pEngineKeyToKeyCode['s'] = vgui2::KEY_S;
+	s_pEngineKeyToKeyCode['t'] = vgui2::KEY_T;
+	s_pEngineKeyToKeyCode['u'] = vgui2::KEY_U;
+	s_pEngineKeyToKeyCode['v'] = vgui2::KEY_V;
+	s_pEngineKeyToKeyCode['w'] = vgui2::KEY_W;
+	s_pEngineKeyToKeyCode['x'] = vgui2::KEY_X;
+	s_pEngineKeyToKeyCode['y'] = vgui2::KEY_Y;
+	s_pEngineKeyToKeyCode['z'] = vgui2::KEY_Z;
+	s_pEngineKeyToKeyCode[K_KP_INS] = vgui2::KEY_PAD_0;
+	s_pEngineKeyToKeyCode[K_KP_END] = vgui2::KEY_PAD_1;
+	s_pEngineKeyToKeyCode[K_KP_DOWNARROW] = vgui2::KEY_PAD_2;
+	s_pEngineKeyToKeyCode[K_KP_PGDN] = vgui2::KEY_PAD_3;
+	s_pEngineKeyToKeyCode[K_KP_LEFTARROW] = vgui2::KEY_PAD_4;
+	s_pEngineKeyToKeyCode[K_KP_5] = vgui2::KEY_PAD_5;
+	s_pEngineKeyToKeyCode[K_KP_RIGHTARROW] = vgui2::KEY_PAD_6;
+	s_pEngineKeyToKeyCode[K_KP_HOME] = vgui2::KEY_PAD_7;
+	s_pEngineKeyToKeyCode[K_KP_UPARROW] = vgui2::KEY_PAD_8;
+	s_pEngineKeyToKeyCode[K_KP_PGUP] = vgui2::KEY_PAD_9;
+	s_pEngineKeyToKeyCode[K_KP_SLASH] = vgui2::KEY_PAD_DIVIDE;
+	s_pEngineKeyToKeyCode[K_KP_MINUS] = vgui2::KEY_PAD_MINUS;
+	s_pEngineKeyToKeyCode[K_KP_PLUS] = vgui2::KEY_PAD_PLUS;
+	s_pEngineKeyToKeyCode[K_KP_ENTER] = vgui2::KEY_PAD_ENTER;
+	s_pEngineKeyToKeyCode[K_KP_DEL] = vgui2::KEY_PAD_DECIMAL;
+	s_pEngineKeyToKeyCode['*'] = vgui2::KEY_PAD_MULTIPLY;
+	s_pEngineKeyToKeyCode['['] = vgui2::KEY_LBRACKET;
+	s_pEngineKeyToKeyCode[']'] = vgui2::KEY_RBRACKET;
+	s_pEngineKeyToKeyCode[';'] = vgui2::KEY_SEMICOLON;
+	s_pEngineKeyToKeyCode['\''] = vgui2::KEY_APOSTROPHE;
+	s_pEngineKeyToKeyCode['`'] = vgui2::KEY_BACKQUOTE;
+	s_pEngineKeyToKeyCode[','] = vgui2::KEY_COMMA;
+	s_pEngineKeyToKeyCode['.'] = vgui2::KEY_PERIOD;
+	s_pEngineKeyToKeyCode['/'] = vgui2::KEY_SLASH;
+	s_pEngineKeyToKeyCode['\\'] = vgui2::KEY_BACKSLASH;
+	s_pEngineKeyToKeyCode['-'] = vgui2::KEY_MINUS;
+	s_pEngineKeyToKeyCode['='] = vgui2::KEY_EQUAL;
+	s_pEngineKeyToKeyCode[K_ENTER] = vgui2::KEY_ENTER;
+	s_pEngineKeyToKeyCode[K_SPACE] = vgui2::KEY_SPACE;
+	s_pEngineKeyToKeyCode[K_BACKSPACE] = vgui2::KEY_BACKSPACE;
+	s_pEngineKeyToKeyCode[K_TAB] = vgui2::KEY_TAB;
+	s_pEngineKeyToKeyCode[K_CAPSLOCK] = vgui2::KEY_CAPSLOCK;
+	s_pEngineKeyToKeyCode[K_ESCAPE] = vgui2::KEY_ESCAPE;
+	s_pEngineKeyToKeyCode[K_INS] = vgui2::KEY_INSERT;
+	s_pEngineKeyToKeyCode[K_DEL] = vgui2::KEY_DELETE;
+	s_pEngineKeyToKeyCode[K_HOME] = vgui2::KEY_HOME;
+	s_pEngineKeyToKeyCode[K_END] = vgui2::KEY_END;
+	s_pEngineKeyToKeyCode[K_PGUP] = vgui2::KEY_PAGEUP;
+	s_pEngineKeyToKeyCode[K_PGDN] = vgui2::KEY_PAGEDOWN;
+	s_pEngineKeyToKeyCode[K_PAUSE] = vgui2::KEY_BREAK;
+	s_pEngineKeyToKeyCode[K_SHIFT] = vgui2::KEY_LSHIFT;
+	s_pEngineKeyToKeyCode[K_SHIFT] = vgui2::KEY_RSHIFT;
+	s_pEngineKeyToKeyCode[K_ALT] = vgui2::KEY_LALT;
+	s_pEngineKeyToKeyCode[K_ALT] = vgui2::KEY_RALT;
+	s_pEngineKeyToKeyCode[K_CTRL] = vgui2::KEY_LCONTROL;
+	s_pEngineKeyToKeyCode[K_CTRL] = vgui2::KEY_RCONTROL;
+	s_pEngineKeyToKeyCode[K_UPARROW] = vgui2::KEY_UP;
+	s_pEngineKeyToKeyCode[K_LEFTARROW] = vgui2::KEY_LEFT;
+	s_pEngineKeyToKeyCode[K_DOWNARROW] = vgui2::KEY_DOWN;
+	s_pEngineKeyToKeyCode[K_RIGHTARROW] = vgui2::KEY_RIGHT;
+	s_pEngineKeyToKeyCode[K_F1] = vgui2::KEY_F1;
+	s_pEngineKeyToKeyCode[K_F2] = vgui2::KEY_F2;
+	s_pEngineKeyToKeyCode[K_F3] = vgui2::KEY_F3;
+	s_pEngineKeyToKeyCode[K_F4] = vgui2::KEY_F4;
+	s_pEngineKeyToKeyCode[K_F5] = vgui2::KEY_F5;
+	s_pEngineKeyToKeyCode[K_F6] = vgui2::KEY_F6;
+	s_pEngineKeyToKeyCode[K_F7] = vgui2::KEY_F7;
+	s_pEngineKeyToKeyCode[K_F8] = vgui2::KEY_F8;
+	s_pEngineKeyToKeyCode[K_F9] = vgui2::KEY_F9;
+	s_pEngineKeyToKeyCode[K_F10] = vgui2::KEY_F10;
+	s_pEngineKeyToKeyCode[K_F11] = vgui2::KEY_F11;
+	s_pEngineKeyToKeyCode[K_F12] = vgui2::KEY_F12;
+
+	return 0;
+}
+
 vgui2::KeyCode KeyCode_VirtualKeyToVGUI(int key)
 {
 	if (key < 0 || key >= sizeof(s_pVirtualKeyToKeyCode) / sizeof(s_pVirtualKeyToKeyCode[0]))
@@ -160,4 +273,18 @@ int KeyCode_VGUIToVirtualKey(vgui2::KeyCode code)
 		KeyCode_InitKeyTranslationTable();
 
 	return s_pKeyCodeToVirtual[code];
+}
+
+vgui2::KeyCode KeyCode_EngineKeyToVGUI(int key)
+{
+	if (key < 0 || key >= sizeof(s_pEngineKeyToKeyCode) / sizeof(s_pEngineKeyToKeyCode[0]))
+	{
+		Assert(false);
+		return vgui2::KEY_NONE;
+	}
+
+	if (!g_bEngineKeyInit)
+		KeyCode_InitKeyTranslationTable2();
+
+	return s_pEngineKeyToKeyCode[key];
 }

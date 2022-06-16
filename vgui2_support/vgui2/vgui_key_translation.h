@@ -15,6 +15,7 @@
 // Convert from Windows scan codes to VGUI key codes.
 vgui2::KeyCode KeyCode_VirtualKeyToVGUI( int key );
 int			  KeyCode_VGUIToVirtualKey( vgui2::KeyCode keycode );
+vgui2::KeyCode KeyCode_EngineKeyToVGUI(int key);
 
 
 #endif // VGUI_KEY_TRANSLATION_H

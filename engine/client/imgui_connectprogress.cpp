@@ -260,7 +260,7 @@ void UI_ConnectionProgress_f(void)
 
 void ImGui_ConnectProgress_Init()
 {
-	Cmd_AddCommand("menu_connectionprogress", UI_ConnectionProgress_f, "open ConnectionProgress");
+	//Cmd_AddCommand("menu_connectionprogress", UI_ConnectionProgress_f, "open ConnectionProgress");
 }
 
 void ImGui_ConnectProgress_OnGUI()

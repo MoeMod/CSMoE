@@ -27,12 +27,17 @@
 #include "keydefs.h"
 #include "FileSystem.h"
 #include "LoadingDialog.h"
+#include "menu_int.h"
+#include "keydest.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 extern IBaseUI *baseuifuncs;
 
+namespace ui{
+	extern ui_enginefuncs_t engfuncs;
+}
 
 //#include "Taskbar.h"
 //extern CTaskbar *g_pTaskbar;
@@ -509,6 +514,10 @@ void CGameConsoleDialog::OnCommand(const char *command)
 	}
 	else
 	{
+		if (!stricmp(command, "Close"))
+		{
+			ui::engfuncs.pfnSetKeyDest(key_menu);
+		}
 		BaseClass::OnCommand(command);
 	}
 }
@@ -581,7 +590,7 @@ void CGameConsoleDialog::OnKeyCodeTyped(KeyCode code)
 		{
 			m_pEntry->SetText( "" );
 			m_pEntry->IgnoreNextTextInput( true );
-			PostMessage( this, new KeyValues( "Close" ) );
+			/*PostMessage( this, new KeyValues( "Close" ) );
 
 			if ( baseuifuncs )
 			{
@@ -593,7 +602,7 @@ void CGameConsoleDialog::OnKeyCodeTyped(KeyCode code)
 				{
 					baseuifuncs->HideGameUI();
 				}
-			}
+			}*/
 		}
 	}
 }

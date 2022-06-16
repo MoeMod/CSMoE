@@ -120,9 +120,9 @@ namespace ui {
 	{
 		char cmd[256];
         if(ep.protocol() == boost::asio::ip::udp::v6())
-		    snprintf(cmd, 256, "connect [%s]:%d", ep.address().to_string().c_str(), (int)ep.port());
+		    snprintf(cmd, 256, "connect [%s]:%d;menu_connectionprogress menu server", ep.address().to_string().c_str(), (int)ep.port());
 		else
-            snprintf(cmd, 256, "connect %s:%d", ep.address().to_string().c_str(), (int)ep.port());
+            snprintf(cmd, 256, "connect %s:%d;menu_connectionprogress menu server", ep.address().to_string().c_str(), (int)ep.port());
 		Cbuf_AddText(cmd);
 	}
 

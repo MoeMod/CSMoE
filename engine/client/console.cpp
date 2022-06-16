@@ -24,6 +24,14 @@ GNU General Public License for more details.
 
 #if XASH_VGUI2
 #include "vgui2_surface.h"
+#include "IBaseUI.h"
+#include "GameUI/IGameUI.h"
+
+namespace vgui2 {
+extern IBaseUI* staticUIFuncs;
+extern IGameUI* staticGameUIFuncs;
+}
+
 #endif
 #if XASH_IMGUI
 #include "imgui_console.h"
@@ -282,7 +290,7 @@ void Con_ToggleConsole_f( void )
 	if( !host.developer ) return;	// disabled
 
 	if( UI_CreditsActive( )) return; // disabled by final credits
-
+#ifndef XASH_VGUI2
 	// show console only in game or by special call from menu
 	if( cls.state != ca_active || cls.key_dest == key_menu )
 		return;
@@ -290,17 +298,47 @@ void Con_ToggleConsole_f( void )
 	Con_ClearTyping();
 	Con_ClearNotify();
 
-	if( cls.key_dest == key_console )
+	if (cls.key_dest == key_console)
 	{
-		if( Cvar_VariableInteger( "sv_background" ) || Cvar_VariableInteger( "cl_background" ))
-			UI_SetActiveMenu( true );
-		else UI_SetActiveMenu( false );
+		if (Cvar_VariableInteger("sv_background") || Cvar_VariableInteger("cl_background"))
+			UI_SetActiveMenu(true);
+		else UI_SetActiveMenu(false);
 	}
 	else
 	{
-		UI_SetActiveMenu( false );
-		Key_SetKeyDest( key_console );
+		UI_SetActiveMenu(false);
+		Key_SetKeyDest(key_console);
 	}
+#else
+	if (cls.key_dest == key_console)
+	{
+		if (vgui2::staticUIFuncs && vgui2::staticGameUIFuncs)
+		{
+			if (cls.state == ca_active)
+			{
+				Key_SetKeyDest(key_game);
+				UI_SetActiveMenu(false);
+			}
+			else
+			{
+				Key_SetKeyDest(key_menu);
+			}
+			vgui2::staticUIFuncs->HideConsole();
+		}
+	}
+	else
+	{
+		if (cls.state == ca_active)
+		{
+			UI_SetActiveMenu(true);
+		}
+		Key_SetKeyDest(key_console);
+		if (vgui2::staticUIFuncs && vgui2::staticGameUIFuncs)
+		{
+			vgui2::staticUIFuncs->ShowConsole();
+		}
+	}
+#endif // !XASH_VGUI2
 }
 
 /*
@@ -1761,6 +1799,7 @@ Draws the console with the solid background
 */
 void Con_DrawSolidConsole( float frac, qboolean fill )
 {
+#ifndef XASH_VGUI2
 	int	i, x, y;
 	int	rows;
 	short	*text;
@@ -1889,6 +1928,7 @@ void Con_DrawSolidConsole( float frac, qboolean fill )
 	// draw the input prompt, user text, and cursor if desired
 	Con_DrawInput();
 	pglColor4ub( 255, 255, 255, 255 );
+#endif // XASH_VGUI2
 }
 
 /*
@@ -1938,11 +1978,13 @@ void Con_DrawConsole( void )
 	case ca_uninitialized:
 		break;
 	case ca_disconnected:
-		if( cls.key_dest != key_menu && host.developer )
+#ifndef XASH_VGUI2
+		if (cls.key_dest != key_menu && host.developer)
 		{
-			Con_DrawSolidConsole( con_maxfrac->value, true );
-			Key_SetKeyDest( key_console );
+			Con_DrawSolidConsole(con_maxfrac->value, true);
+			Key_SetKeyDest(key_console);
 		}
+#endif // !XASH_VGUI2
 		break;
 	case ca_connected:
 	case ca_connecting:
@@ -2117,7 +2159,9 @@ void Con_CharEvent( int key )
 	// distribute the key down event to the apropriate handler
 	if( cls.key_dest == key_console )
 	{
-		Field_CharEvent( &con.input, key );
+#ifndef XASH_VGUI2
+		Field_CharEvent(&con.input, key);
+#endif // !XASH_VGUI2
 	}
 	else if( cls.key_dest == key_message )
 	{

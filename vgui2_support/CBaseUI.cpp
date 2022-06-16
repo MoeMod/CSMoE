@@ -324,27 +324,22 @@ void CBaseUI::Shutdown() {
 int CBaseUI::Key_Event(int down, int keynum, const char* pszCurrentBinding) {
 	if (keynum == '`' || keynum == '~')
 	{
-		if (!m_bConsoleShowing)
-			ShowConsole();
-		else
-			HideConsole();
+		// toggle console in keys.cpp -> Key_Event Con_ToggleConsole_f
 	}
 	else
 	{
 		if (keynum == K_ESCAPE && down)
 		{
 			const char* pszLevelName = gEngfuncs.pfnGetLevelName();
-
-			if (staticGameUIFuncs->IsGameUIActive() &&
-				pszLevelName &&
-				*pszLevelName)
+			if (pszLevelName && *pszLevelName)
 			{
-				HideGameUI();
-				return false;
-			}
-			else
-			{
+				if (staticGameUIFuncs->IsGameUIActive())
+				{
+					HideGameUI();
+					return false;
+				}
 				ActivateGameUI();
+				HideConsole();
 				return true;
 			}
 		}
@@ -420,19 +415,15 @@ void CBaseUI::ActivateGameUI() {
 		staticClient->HideClientUI();
 		staticClient->HideScoreBoard();
 	}
-
-	if (m_bConsoleShowing)
-		staticGameConsole->Activate();
 }
 
 void CBaseUI::HideConsole() {
-	m_bConsoleShowing = false;
 	staticGameConsole->Hide();
 }
 
 void CBaseUI::ShowConsole() {
-	m_bConsoleShowing = true;
 	staticGameConsole->Activate();
+	ui::engfuncs.pfnSetKeyDest(key_console);
 }
 
 bool CBaseUI::IsGameUIVisible() {
