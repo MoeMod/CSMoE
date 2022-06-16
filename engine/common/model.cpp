@@ -26,6 +26,10 @@ GNU General Public License for more details.
 #include "mod_decryptor.h"
 #include "mod_extend_seq.h"
 
+#ifndef XASH_DEDICATED
+#include "gl_texlru.h"
+#endif
+
 #define MAX_SIDE_VERTS		512	// per one polygon
 
 world_static_t	world;
@@ -3182,6 +3186,8 @@ void Mod_LoadWorld( const char *name, uint *checksum, qboolean multiplayer )
 {
 	int	i;
 
+	// clear lru texture data before clear models!!
+	xe::TexLru_Clear();
 	// now replacement table is invalidate
 	Q_memset( com_models, 0, sizeof( com_models ));
 

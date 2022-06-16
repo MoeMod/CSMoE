@@ -22,5 +22,6 @@ namespace xe {
 	int TexLru_LoadTextureExternal(const char *name, mstudiotexture_t* ptexture, int flags, imgfilter_t *filter);
 	int TexLru_LoadTextureInternal(const char *name, const char *model_name, mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter);
 	void TexLru_Upload( mstudiotexture_t *ptexture );
-    void TexLru_Shrink();
+	void TexLru_Shrink();
+	void TexLru_Clear();
 }
