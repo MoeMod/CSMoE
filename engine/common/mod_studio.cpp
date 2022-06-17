@@ -1192,14 +1192,10 @@ void Mod_StudioComputeBounds( void *buffer, vec3_t_ref mins, vec3_t_ref maxs )
 
 	for( i = 0; i < bodyCount; i++ )
 	{
-		float *vertIndex = (float *)((byte *)pstudiohdr + m_pSubModel[i].vertindex);
+		vec3_c *pverts = (vec3_c *)((byte *)pstudiohdr + m_pSubModel[i].vertindex);
 
 		for( j = 0; j < m_pSubModel[i].numverts; j++ )
-		{
-			vec3_t temp;
-			VectorSet(temp, *(vertIndex + (3 * j) + 0), *(vertIndex + (3 * j) + 1), *(vertIndex + (3 * j) + 2));
-			Mod_StudioBoundVertex(vecmins1, vecmaxs1, &counter1, temp);
-		}
+			Mod_StudioBoundVertex( vecmins1, vecmaxs1, &counter1, pverts[j] );
 	}
 
 	pbones = (mstudiobone_t *)((byte *)pstudiohdr + pstudiohdr->boneindex);
