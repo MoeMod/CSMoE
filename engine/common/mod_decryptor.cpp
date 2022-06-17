@@ -19,6 +19,14 @@ static const byte g_pDecryptorKey_21[32] =
 	0xD9, 0x91, 0x07, 0x3A, 0x14, 0x74, 0xFE, 0x22
 };
 
+static const byte g_pDecryptorKey_22[32] =
+{
+	0x73, 0x62, 0x74, 0x69, 0x74, 0x61, 0x6E, 0xE0,
+	0x8C, 0xC6, 0xF1, 0x96, 0xFB, 0x38, 0x75, 0x68,
+	0x88, 0x7A, 0x78, 0x86, 0x78, 0x86, 0x67, 0x70,
+	0xD9, 0x91, 0x07, 0x3A, 0x14, 0x74, 0xFE, 0x22
+};
+
 IceKey g_Decryptor(4);
 
 void DecryptChunk(byte *pData, size_t uDataSize)
@@ -67,12 +75,14 @@ void Mod_DecryptModel(const char *model_name, byte *buffer)
 			studiohdr->numhitboxes = 20;
 	}
 
-	if (studiohdr->version == 20 || studiohdr->version == 21)
+	if (studiohdr->version == 20 || studiohdr->version == 21 || studiohdr->version == 22)
 	{
 		if (studiohdr->version == 20)
 			g_Decryptor.set(g_pDecryptorKey_20);
 		else if (studiohdr->version == 21)
 			g_Decryptor.set(g_pDecryptorKey_21);
+		else if (studiohdr->version == 22)
+			g_Decryptor.set(g_pDecryptorKey_22);
 
 		mstudiotexture_t *ptexture = (mstudiotexture_t *)(buffer + studiohdr->textureindex);
 

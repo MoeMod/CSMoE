@@ -49,6 +49,7 @@ GNU General Public License for more details.
 #endif
 #include "cpu.h"
 #include "cook.h"
+#include "model_encrypt.h"
 
 #if defined _WIN32 && defined XASH_DEDICATED
 #include "textconsole.h"
@@ -896,6 +897,7 @@ void Host_Frame( float time )
     NET_Run();
 	HTTP_Run();
     xe::Cook_Run();
+	xe::ModelEncrypt_Run();
 
 	host.framecount++;
 }
@@ -1466,7 +1468,8 @@ int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bCh
 	Android_Init();
 #endif
 
-    xe::Cook_Init();
+	xe::Cook_Init();
+	xe::ModelEncrypt_Init();
 
 	HTTP_Init();
 
