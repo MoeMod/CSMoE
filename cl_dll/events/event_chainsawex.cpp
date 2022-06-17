@@ -26,6 +26,12 @@
 *
 */
 #include "events.h"
+#include "r_studioint.h"
+#include "studio.h"
+
+namespace cl {
+	extern engine_studio_api_t IEngineStudio;
+}
 
 namespace cl::event::chainsawex {
 
@@ -62,7 +68,7 @@ void EV_FireChainsawEX(event_args_s *args)
 	vec3_t up, right, forward;
 	vec3_t vSpread;
 
-	cl_entity_t* ent = gEngfuncs.GetViewModel();
+	cl_entity_t* viewent = gEngfuncs.GetViewModel();
 	idx = args->entindex;
 	int righthand = gHUD.cl_righthand->value;
 
@@ -79,25 +85,73 @@ void EV_FireChainsawEX(event_args_s *args)
 
 	if (EV_IsLocal(idx))
 	{
+		if (args->iparam2 == 1)
+		{
+			model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_chaincharging.spr", false);
+			if (pModel)
+			{
+				int iAttachment = 1;
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], pModel);
+
+				if (!pEnt)
+					return;
+
+				if (!viewent)
+					return;
+
+				int clientindex = viewent->index;
+				cl_entity_t* parent = gEngfuncs.GetEntityByIndex(clientindex);
+
+				if (!parent)
+					return;
+
+				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+				pEnt->die = gHUD.m_flTime + 1.17;
+				pEnt->entity.curstate.frame = 0.0f;
+				pEnt->entity.curstate.framerate = 36.0f;
+				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				pEnt->entity.curstate.aiment = clientindex;
+				pEnt->entity.curstate.solid = SOLID_NOT;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderfx = kRenderFxNone;
+				pEnt->frameMax = 42;
+				pEnt->entity.curstate.scale = 0.04;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.curstate.body = iAttachment + 1;
+				pEnt->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
+				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+
+				pEnt->callback = [](tempent_s* ent, float frametime, float currenttime)
+				{
+					cl_entity_t* parent = gEngfuncs.GetEntityByIndex(ent->entity.curstate.aiment);
+					if (ent->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
+					{
+						ent->entity.curstate.renderamt = 0;
+						ent->die = gHUD.m_flTime;
+					}
+				};
+			}
+			return;
+		}
 		g_iShotsFired++;
+	}
+
+	if (args->bparam1 == TRUE)
+	{
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
 	}
 	else
 	{
-		if (args->bparam1 == TRUE)
+		if (!args->bparam2)
 		{
-			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex-1_start.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
+			return;
 		}
-		else
-		{
-			if (!args->bparam2)
-			{
-				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex-1_start.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
-				return;
-			}
 
-			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex-1.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
-		}
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex-1.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
 	}
+	
 	
 	EV_GetGunPosition(args, vecSrc, origin);
 
