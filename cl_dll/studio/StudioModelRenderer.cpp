@@ -1426,6 +1426,8 @@ void CStudioModelRenderer::StudioRenderFinal_Hardware(void)
 			IEngineStudio.GL_SetRenderMode(rendermode);
 			IEngineStudio.StudioSetRenderamt(m_pCurrentEntity->curstate.renderamt);
 			IEngineStudio.StudioDrawPoints();
+			if (gHUD.cl_shadows->value >= 2.0f)
+				IEngineStudio.GL_StudioDrawShadow();
 		}
 	}
 

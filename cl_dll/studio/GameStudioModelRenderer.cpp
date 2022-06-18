@@ -778,7 +778,7 @@ int CGameStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t *pplaye
 	if (isLocalPlayer)
 		RestorePlayerState(pplayer);
 
-	if( gHUD.cl_shadows->value != 0.0f )
+	if( gHUD.cl_shadows->value != 1.0f )
 	{
 		Vector chestpos;
 
