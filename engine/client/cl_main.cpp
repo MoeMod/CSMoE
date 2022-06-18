@@ -1493,6 +1493,9 @@ boost::asio::awaitable<void> CL_PrepSound( void )
 	S_BeginRegistration();
 	co_await CL_CheckFrameSmooth();
 
+	if (cls.state == ca_disconnected)
+		co_return;
+
 	for( i = 0; i < MAX_SOUNDS - 1 && cl.sound_precache[i+1][0]; i++ )
 	{
 		cl.sound_index[i+1] = S_RegisterSound( cl.sound_precache[i+1] );
@@ -1502,9 +1505,15 @@ boost::asio::awaitable<void> CL_PrepSound( void )
 		co_await CL_CheckFrameSmooth();
 	}
 
+	if (cls.state == ca_disconnected)
+		co_return;
+
 	S_EndRegistration();
 
 	co_await CL_CheckFrameSmooth();
+
+	if (cls.state == ca_disconnected)
+		co_return;
 
 	if( host.soundList )
 	{
@@ -1522,6 +1531,9 @@ boost::asio::awaitable<void> CL_PrepSound( void )
 			co_await CL_CheckFrameSmooth();
 		}
 	}
+
+	if (cls.state == ca_disconnected)
+		co_return;
 
 	host.soundList = NULL;
 	host.numsounds = 0;
@@ -1556,6 +1568,9 @@ boost::asio::awaitable<void> CL_PrepVideo( void )
 
 	co_await CL_CheckFrameSmooth();
 
+	if (cls.state == ca_disconnected)
+		co_return;
+
 	cl.worldmodel = Mod_Handle( 1 ); // get world pointer
 	Cvar_SetFloat( "scr_loading", 25.0f );
 
@@ -1580,6 +1595,9 @@ boost::asio::awaitable<void> CL_PrepVideo( void )
 		co_await CL_CheckFrameSmooth();
 	}
 
+	if (cls.state == ca_disconnected)
+		co_return;
+
 	// update right muzzleflash indexes
 	CL_RegisterMuzzleFlashes ();
 
@@ -1593,6 +1611,9 @@ boost::asio::awaitable<void> CL_PrepVideo( void )
 	V_SetupOverviewState(); // set overview bounds
 
 	co_await CL_CheckFrameSmooth();
+
+	if (cls.state == ca_disconnected)
+		co_return;
 
 	// must be called after lightmap loading!
 	clgame.dllFuncs.pfnVidInit();
@@ -1651,6 +1672,9 @@ boost::asio::awaitable<void> CL_PrepVideo( void )
 			co_await CL_CheckFrameSmooth();
 		}
 	}
+
+	if (cls.state == ca_disconnected)
+		co_return;
 
 	host.soundList = NULL;
 	host.numsounds = 0;

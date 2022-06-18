@@ -627,8 +627,13 @@ void CL_ParseServerData( sizebuf_t *msg )
 		return;
 	}
 #endif
-	if( !cls.changedemo )
-		UI_SetActiveMenu( cl.background );
+
+#ifndef XASH_VGUI2
+	// dont hide game when connecting server
+	if (!cls.changedemo)
+		UI_SetActiveMenu(cl.background);
+#endif // !XASH_VGUI2
+
 	if( cl.maxclients > 1 && !CL_IsPlaybackDemo() )
 		Cbuf_AddText( "menu_connectionprogress serverinfo server\n" );
 
