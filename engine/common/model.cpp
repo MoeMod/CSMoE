@@ -38,8 +38,8 @@ byte		*mod_base;
 mempool_t		*com_studiocache;		// cache for submodels
 mempool_t		*mempool_mdl;		// cache for submodels
 static model_t	*com_models[MAX_MODELS];	// shared replacement modeltable
-static model_t	cm_models[MAX_MODELS];
-static int	cm_nummodels = 0;
+model_t	cm_models[MAX_MODELS];
+int	cm_nummodels = 0;
 static byte	visdata[MAX_MAP_LEAFS/8];	// intermediate buffer
 int		bmodel_version;		// global stuff to detect bsp version
 char		modelname[64];		// short model name (without path and ext)

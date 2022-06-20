@@ -67,3 +67,6 @@
 [submodule "3rdparty/boost-mysql"]
 	path = 3rdparty/boost-mysql
 	url = https://github.com/anarthal/mysql
+[submodule "3rdparty/bullet3"]
+	path = 3rdparty/bullet3
+	url = https://github.com/bulletphysics/bullet3

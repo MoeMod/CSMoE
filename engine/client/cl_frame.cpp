@@ -27,6 +27,10 @@ GNU General Public License for more details.
 #include "dlight.h"
 #include "input.h"
 
+#ifdef XASH_RAGDOLL
+#include "physics.h"
+#endif
+
 #define MAX_FORWARD		6
 
 qboolean CL_IsPlayerIndex( int idx )
@@ -558,6 +562,15 @@ qboolean CL_AddVisibleEntity( cl_entity_t *ent, int entityType )
 	}
 	else
 	{
+#ifdef XASH_RAGDOLL
+		if (entityType == ET_NORMAL && ent->model)
+		{
+			if (ent->model->type == mod_brush && ent->curstate.solid == SOLID_BSP)
+			{
+				physics::gPhysicsManager.CreateBrushModel(ent);
+			}
+		}
+#endif
 		// check for adding this entity
 		if( !clgame.dllFuncs.pfnAddEntity( entityType, ent, ent->model->name ))
 			return false;

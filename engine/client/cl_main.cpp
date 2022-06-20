@@ -32,6 +32,10 @@ GNU General Public License for more details.
 #include "imgui_menu_msgbox.h"
 #endif
 
+#ifdef XASH_RAGDOLL
+#include "physics.h"
+#endif
+
 #include <optional>
 #include <chrono>
 #include <boost/asio.hpp>
@@ -2315,6 +2319,10 @@ void CL_InitLocal( void )
 	Cmd_AddCommand( "trysaveconfig", CL_TrySaveConfig_f, "schedule config save on disconnected state" );
 
     Voice_RegisterCvars();
+
+#ifdef XASH_RAGDOLL
+	physics::gPhysicsManager.Init();
+#endif
 }
 
 //============================================================================

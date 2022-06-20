@@ -25,6 +25,10 @@ GNU General Public License for more details.
 #include "particledef.h"
 #include "entity_types.h"
 
+#ifdef XASH_RAGDOLL
+#include "physics.h"
+#endif
+
 #include <type_traits>
 
 #define IsLiquidContents( cnt )	( cnt == CONTENTS_WATER || cnt == CONTENTS_SLIME || cnt == CONTENTS_LAVA )
@@ -1122,6 +1126,9 @@ void R_DrawEntitiesOnList( void )
 	if( RI.drawWorld )
 		clgame.dllFuncs.pfnDrawNormalTriangles();
 
+#ifdef XASH_RAGDOLL
+	physics::gPhysicsManager.DebugDraw();
+#endif
 	// NOTE: some mods with custom renderer may generate glErrors
 	// so we clear it here
 	while( pglGetError() != GL_NO_ERROR );

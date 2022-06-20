@@ -311,6 +311,10 @@ endif()
 if(XASH_SINGLE_BINARY)
 set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES})
 endif()
+if(NOT XASH_DEDICATED AND XASH_RAGDOLL)
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} client/physics.cpp)
+add_definitions(-DXASH_RAGDOLL=1)
+endif()
 
 
 include_directories(
@@ -445,6 +449,7 @@ if(XASH_STATIC_GAMELIB)
 		else()
 			target_link_libraries(${XASH_ENGINE} PRIVATE xashmenu)
 		endif()
+		target_link_libraries(${XASH_ENGINE} PUBLIC 3rdparty-bullet3 )
 	endif()
 endif()
 
@@ -522,7 +527,7 @@ if(XASH_TBBMALLOC)
 	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-tbbmalloc)
 endif()
 
-target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus)
+target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus )
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)

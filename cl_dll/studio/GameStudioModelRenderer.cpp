@@ -100,6 +100,9 @@ mstudioanim_t *CGameStudioModelRenderer::LookupAnimation(mstudioseqdesc_t *pseqd
 
 void CGameStudioModelRenderer::StudioSetupBones(void)
 {
+	if (!IEngineStudio.StudioSetupBones_Pre(m_pCurrentEntity, m_pStudioHeader))
+		return;
+
 	int i;
 	double f;
 
@@ -377,6 +380,8 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 			ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
 		}
 	}
+
+	IEngineStudio.StudioSetupBones_Post(m_pCurrentEntity, m_pStudioHeader);
 }
 
 void CGameStudioModelRenderer::StudioEstimateGait(entity_state_t *pplayer)
@@ -778,7 +783,7 @@ int CGameStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t *pplaye
 	if (isLocalPlayer)
 		RestorePlayerState(pplayer);
 
-	if( gHUD.cl_shadows->value != 1.0f )
+	if( gHUD.cl_shadows->value == 1.0f )
 	{
 		Vector chestpos;
 

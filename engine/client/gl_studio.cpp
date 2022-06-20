@@ -26,6 +26,10 @@ GNU General Public License for more details.
 #include "cl_tent.h"
 #include "gl_texlru.h"
 
+#ifdef XASH_RAGDOLL
+#include "physics.h"
+#endif
+
 // NOTE: enable this if you want merge both 'model' and 'modelT' files into one model slot.
 // otherwise it's uses two slots in models[] array for models with external textures
 #define STUDIO_MERGE_TEXTURES
@@ -89,7 +93,6 @@ convar_t			*r_drawviewmodel;
 convar_t			*r_customdraw_playermodel;
 convar_t			*cl_himodels;
 convar_t			*cl_righthand;
-cvar_t			r_shadows = { "r_shadows", "0", 0, 0 };	// dead cvar. especially disabled
 cvar_t			r_shadowalpha = { "r_shadowalpha", "0.5", 0, 0.8f };
 static r_studio_interface_t	*pStudioDraw;
 static float		aliasXscale, aliasYscale;	// software renderer scale
@@ -98,8 +101,8 @@ static matrix3x4		g_rotationmatrix;
 static vec3_t		g_chrome_origin;
 static vec2_t		g_chrome[MAXSTUDIOVERTS];	// texture coords for surface normals
 static sortedmesh_t		g_sortedMeshes[MAXSTUDIOMESHES];
-static matrix3x4		g_bonestransform[MAXSTUDIOBONES];
-static matrix3x4		g_lighttransform[MAXSTUDIOBONES];
+matrix3x4		g_bonestransform[MAXSTUDIOBONES];
+matrix3x4		g_lighttransform[MAXSTUDIOBONES];
 static matrix3x4		g_rgCachedBonesTransform[MAXSTUDIOBONES];
 static matrix3x4		g_rgCachedLightTransform[MAXSTUDIOBONES];
 static vec3_t		g_chromeright[MAXSTUDIOBONES];// chrome vector "right" in bone reference frames
@@ -2973,6 +2976,213 @@ static model_t *GAME_EXPORT R_StudioSetupPlayerModel( int index )
 	return cl.playermodels[index];
 }
 
+int GameStudioRenderer_StudioDrawModel(int flags)
+{
+#ifdef XASH_RAGDOLL
+	using namespace physics;
+	auto currententity = RI.currententity;
+
+	if((flags & STUDIO_RENDER) &&
+		!currententity->player && 
+		/*currententity->index &&
+		currententity->curstate.messagenum == cl.parsecount &&*/
+		currententity->curstate.renderfx != kRenderFxDeadPlayer
+		)
+	{
+		int entindex = currententity->index;
+		auto model = currententity->model;
+
+		int iActivityType = GetSequenceActivityType(model, &currententity->curstate);
+
+		auto ragdoll = gPhysicsManager.FindRagdoll(entindex);
+		if (!ragdoll)
+		{
+			auto cfg = gPhysicsManager.LoadRagdollConfig(model);
+
+			if (cfg && cfg->state == 1 && bv_enable->value)
+			{
+				pStudioDraw->StudioDrawModel(0);
+
+				ragdoll = gPhysicsManager.CreateRagdoll(cfg, entindex, m_pStudioHeader, iActivityType, false);
+
+				goto has_ragdoll;
+			}
+		}
+		else
+		{
+			/*if (!iActivityType)
+			{
+				gPhysicsManager.RemoveRagdoll(entindex);
+				return pStudioDraw->StudioDrawModel(flags);
+			}*/
+
+		has_ragdoll:
+
+			if (gPhysicsManager.UpdateKinematic(ragdoll, iActivityType, &currententity->curstate))
+			{
+				//Monster don't have barnacle animation
+				/*if (ragdoll->m_iActivityType == 2)
+				{
+					cl_entity_t *barnacleEntity = gCorpseManager.FindBarnacleForPlayer(&currententity->curstate);
+
+					gPhysicsManager.ApplyBarnacle(ragdoll, barnacleEntity);
+				}*/
+			}
+
+			if (ragdoll->m_iActivityType > 0)
+			{
+				int iuser4 = currententity->curstate.iuser4;
+				currententity->curstate.iuser4 = 114514;
+
+				vec3_t saved_origin;
+				VectorCopy(currententity->origin, saved_origin);
+				gPhysicsManager.GetRagdollOrigin(ragdoll, currententity->origin);
+
+				int result = pStudioDraw->StudioDrawModel(flags);
+
+				VectorCopy(saved_origin, currententity->origin);
+
+				currententity->curstate.iuser4 = iuser4;
+
+				return result;
+			}
+			else
+			{
+				int iuser4 = currententity->curstate.iuser4;
+				currententity->curstate.iuser4 = 114515;
+
+				int result = pStudioDraw->StudioDrawModel(flags);
+
+				currententity->curstate.iuser4 = iuser4;
+
+				return result;
+			}
+		}
+	}
+#endif
+	return pStudioDraw->StudioDrawModel(flags);
+}
+
+int GameStudioRenderer_StudioDrawPlayer(int flags, struct entity_state_s* pplayer)
+{
+#ifdef XASH_RAGDOLL
+	using namespace physics;
+	if (flags & STUDIO_RENDER)
+	{
+		auto currententity = RI.currententity;
+
+		int playerindex = pplayer->number;
+
+		auto model = R_StudioSetupPlayerModel(playerindex - 1);
+
+		int iActivityType = GetSequenceActivityType(model, pplayer);
+
+		auto ragdoll = gPhysicsManager.FindRagdoll(playerindex);
+
+		if (!ragdoll)
+		{
+			auto cfg = gPhysicsManager.LoadRagdollConfig(model);
+
+			if (cfg && cfg->state == 1 && bv_enable->value)
+			{
+				pStudioDraw->StudioDrawPlayer(0, pplayer);
+
+				ragdoll = gPhysicsManager.CreateRagdoll(cfg, playerindex, m_pStudioHeader, iActivityType, true);
+
+				goto has_ragdoll;
+			}
+		}
+		else
+		{
+			//model changed ?
+			if (ragdoll->m_studiohdr != Mod_Extradata(model))
+			{
+				gPhysicsManager.RemoveRagdoll(playerindex);
+				return pStudioDraw->StudioDrawPlayer(flags, pplayer);
+			}
+
+		has_ragdoll:
+
+			int oldActivityType = ragdoll->m_iActivityType;
+
+			if (gPhysicsManager.UpdateKinematic(ragdoll, iActivityType, pplayer))
+			{
+				//Transform from whatever to barnacle
+				/*if (ragdoll->m_iActivityType == 2)
+				{
+					cl_entity_t* barnacleEntity = gCorpseManager.FindBarnacleForPlayer(&currententity->curstate);
+
+					if (barnacleEntity)
+					{
+						gPhysicsManager.ApplyBarnacle(ragdoll, barnacleEntity);
+					}
+					else
+					{
+						cl_entity_t* gargantuaEntity = gCorpseManager.FindGargantuaForPlayer(&currententity->curstate);
+						if (gargantuaEntity)
+						{
+							gPhysicsManager.ApplyGargantua(ragdoll, gargantuaEntity);
+						}
+					}
+				}
+
+				//Transform from Death or barnacle to idle
+				else */if (oldActivityType > 0 && ragdoll->m_iActivityType == 0)
+				{
+					pStudioDraw->StudioDrawPlayer(0, pplayer);
+
+					gPhysicsManager.ResetPose(ragdoll, pplayer);
+				}
+
+			}
+
+			//Teleport ?
+			else if (oldActivityType == 0 && ragdoll->m_iActivityType == 0 &&
+				VectorDistance(currententity->curstate.origin, currententity->latched.prevorigin) > 500)
+			{
+				pStudioDraw->StudioDrawPlayer(0, pplayer);
+
+				gPhysicsManager.ResetPose(ragdoll, pplayer);
+			}
+
+			if (ragdoll->m_iActivityType > 0)
+			{
+				int number = currententity->curstate.number;
+				int iuser4 = currententity->curstate.iuser4;
+				currententity->curstate.number = pplayer->number;
+				currententity->curstate.iuser4 = 1919810;
+
+				vec3_t saved_origin;
+				VectorCopy(currententity->origin, saved_origin);
+				gPhysicsManager.GetRagdollOrigin(ragdoll, currententity->origin);
+
+				int result = pStudioDraw->StudioDrawPlayer(flags, pplayer);
+
+				VectorCopy(saved_origin, currententity->origin);
+
+				currententity->curstate.number = number;
+				currententity->curstate.iuser4 = iuser4;
+				return result;
+			}
+			else
+			{
+				int number = currententity->curstate.number;
+				int iuser4 = currententity->curstate.iuser4;
+				currententity->curstate.number = pplayer->number;
+				currententity->curstate.iuser4 = 1919811;
+
+				int result = pStudioDraw->StudioDrawPlayer(flags, pplayer);
+
+				currententity->curstate.number = number;
+				currententity->curstate.iuser4 = iuser4;
+				return result;
+			}
+		}
+	}
+#endif
+	return pStudioDraw->StudioDrawPlayer(flags, pplayer);
+}
+
 /*
 ===============
 R_StudioClientEvents
@@ -3224,37 +3434,34 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 
 	pglDepthMask( GL_TRUE );
 
-	if( r_shadows.value != 0.0f /* || 1 */ )
+	if (RI.currententity->baseline.movetype != MOVETYPE_FLY)
 	{
-		if( RI.currententity->baseline.movetype != MOVETYPE_FLY )
+		rendermode = RI.currententity->baseline.rendermode;
+
+		if(rendermode == kRenderNormal && RI.currententity != &clgame.viewent )
 		{
-			rendermode = RI.currententity->baseline.rendermode;
+			shadow_alpha = 1.0f - r_shadowalpha.value * 0.5f;
+			pglDisable( GL_TEXTURE_2D );
+			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+			pglEnable( GL_BLEND );
+			pglShadeModel( GL_FLAT );
+			shadow_alpha2 = 1.0f - shadow_alpha;
 
-			if( rendermode == kRenderNormal && RI.currententity != &clgame.viewent )
-			{
-				shadow_alpha = 1.0f - r_shadowalpha.value * 0.5f;
-				pglDisable( GL_TEXTURE_2D );
-				pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-				pglEnable( GL_BLEND );
-				pglShadeModel( GL_FLAT );
-				shadow_alpha2 = 1.0f - shadow_alpha;
+			pglColor4f( 0.0f, 0.0f, 0.0f, shadow_alpha2 );
 
-				pglColor4f( 0.0f, 0.0f, 0.0f, shadow_alpha2 );
+			depthmode = GL_LESS;
+			pglDepthFunc( depthmode );
 
-				depthmode = GL_LESS;
-				pglDepthFunc( depthmode );
+			R_StudioDrawPlanarShadow();
 
-				R_StudioDrawPlanarShadow();
+			depthmode2 = GL_LEQUAL;
+			pglDepthFunc( depthmode2 );
 
-				depthmode2 = GL_LEQUAL;
-				pglDepthFunc( depthmode2 );
+			pglEnable( GL_TEXTURE_2D );
+			pglDisable( GL_BLEND );
 
-				pglEnable( GL_TEXTURE_2D );
-				pglDisable( GL_BLEND );
-
-				pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-				pglShadeModel( GL_SMOOTH );
-			}
+			pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+			pglShadeModel( GL_SMOOTH );
 		}
 	}
 }
@@ -3785,11 +3992,11 @@ void R_DrawStudioModelInternal( cl_entity_t *e, qboolean follow_entity )
 	else
 	{
 		// select the properly method
-		if( e->player )
-			result = pStudioDraw->StudioDrawPlayer( flags, &e->curstate );
-		else result = pStudioDraw->StudioDrawModel( flags );
+		if (e->player)
+			result = GameStudioRenderer_StudioDrawPlayer(flags, &e->curstate);
+		else result = GameStudioRenderer_StudioDrawModel(flags);
 	}
-
+	
 	// old frame must be restored
 	if( !RP_NORMALPASS( )) e->latched.prevframe = prevFrame;
 
@@ -4286,6 +4493,48 @@ void Mod_UnloadStudioModel( model_t *mod )
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 		
+bool GAME_EXPORT StudioSetupBones_Pre(struct cl_entity_s* ent, studiohdr_t* pstudiohdr)
+{
+#ifdef XASH_RAGDOLL
+	if (ent->curstate.iuser4 == 114514)
+	{
+		if (physics::gPhysicsManager.SetupBones(pstudiohdr, ent->index))
+			return false;
+	}
+	else if (ent->curstate.iuser4 == 1919810)
+	{
+		if (physics::gPhysicsManager.SetupBones(pstudiohdr, ent->curstate.number))
+			return false;
+	}
+#endif
+	return true;
+}
+
+void GAME_EXPORT StudioSetupBones_Post(struct cl_entity_s* ent, studiohdr_t* pstudiohdr)
+{
+#ifdef XASH_RAGDOLL
+	/*if (IsEntityBarnacle(currententity))
+	{
+		auto player = gCorpseManager.FindPlayerForBarnacle(currententity->index);
+		if (player)
+		{
+			gPhysicsManager.MergeBarnacleBones(m_pStudioHeader, player->index);
+		}
+	}*/
+
+	if (ent->curstate.iuser4 == 114515)
+	{
+		if (physics::gPhysicsManager.SetupJiggleBones(pstudiohdr, ent->index))
+			return;
+	}
+	else if (ent->curstate.iuser4 == 1919811)
+	{
+		if (physics::gPhysicsManager.SetupJiggleBones(pstudiohdr, ent->curstate.number))
+			return;
+	}
+#endif
+}
+
 static engine_studio_api_t gStudioAPI =
 {
 	Mod_Calloc,
@@ -4334,6 +4583,8 @@ static engine_studio_api_t gStudioAPI =
 	R_StudioSetRenderamt,
 	R_StudioSetCullState,
 	R_StudioRenderShadow,
+	StudioSetupBones_Pre,
+	StudioSetupBones_Post
 };
 
 static r_studio_interface_t gStudioDraw =

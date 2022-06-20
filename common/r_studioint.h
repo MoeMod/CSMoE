@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+#include "studio.h"
+
 #define STUDIO_INTERFACE_VERSION 1
 
 typedef struct engine_studio_api_s
@@ -152,6 +154,9 @@ typedef struct engine_studio_api_s
 	void (*StudioSetRenderamt)(int iRenderamt);	//!!!CZERO added for rendering glass on viewmodels
 	void (*StudioSetCullState)(int iCull);
 	void (*StudioRenderShadow)(int iSprite, float *p1, float *p2, float *p3, float *p4);
+
+	bool (*StudioSetupBones_Pre)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
+	void (*StudioSetupBones_Post)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
 
 } engine_studio_api_t;
 

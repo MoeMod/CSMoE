@@ -20,6 +20,10 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "mod_local.h"
 
+#ifdef XASH_RAGDOLL
+#include "physics.h"
+#endif
+
 typedef struct
 {
 	const char	*texname;
@@ -478,5 +482,9 @@ void R_NewMap( void )
 
 	GL_BuildLightmaps ();
 	R_GenerateVBO();
+
+#ifdef XASH_RAGDOLL
+	physics::gPhysicsManager.NewMap();
+#endif
 }
 #endif // XASH_DEDICATED

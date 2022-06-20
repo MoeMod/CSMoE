@@ -28,6 +28,10 @@ GNU General Public License for more details.
 #include "imgui_impl_xash.h"
 #endif
 
+#ifdef XASH_RAGDOLL
+#include "physics.h"
+#endif
+
 /*
 ===============
 V_SetupRefDef
@@ -310,6 +314,18 @@ void V_CalcRefDef( void )
 {
 	R_Set2DMode( false );
 	tr.framecount++;	// g-cont. keep actual frame for all viewpasses
+
+#ifdef XASH_RAGDOLL
+	if (CL_IsThirdPerson())
+	{
+		auto local = CL_GetLocalPlayer();
+
+		if (local && local->player && physics::GetSequenceActivityType(local->model, &local->curstate))
+		{
+			physics::gPhysicsManager.SyncPlayerView(local, &cl.refdef);
+		}
+	}
+#endif
 
 	do
 	{

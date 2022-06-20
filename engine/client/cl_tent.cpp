@@ -27,6 +27,9 @@ GNU General Public License for more details.
 #include "wadfile.h"	// acess decal size
 #include "sound.h"
 
+#ifdef XASH_RAGDOLL
+#include "physics.h"
+#endif
 /*
 ==============================================================
 
@@ -309,6 +312,14 @@ void CL_AddTempEnts( void )
 	double	ft = cl.time - cl.oldtime;
 	float	gravity = clgame.movevars.gravity;
 
+#ifdef XASH_RAGDOLL
+	if (cls.state >= ca_connected && physics::gPhysicsManager.HasRagdolls())
+	{
+		physics::gPhysicsManager.SetGravity(gravity);
+		physics::gPhysicsManager.UpdateTempEntity(&cl_active_tents, ft, cl.time);
+		physics::gPhysicsManager.StepSimulation(ft);
+	}
+#endif
 	clgame.dllFuncs.pfnTempEntUpdate( ft, cl.time, gravity, &cl_free_tents, &cl_active_tents, CL_TEntAddEntity, CL_TEntPlaySound );	// callbacks
 }
 
