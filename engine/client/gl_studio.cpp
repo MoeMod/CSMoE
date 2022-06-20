@@ -2192,16 +2192,15 @@ static void R_StudioDrawPoints_legacy( void )
 
 				if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 				{
-					vec3_t	scaled_vertex;
 					nv = g_xformnorms[ptricmds[1]];
-					VectorMA( av, scale, nv, scaled_vertex );
+                    vec3_t	scaled_vertex = fma( av, scale, nv );
 					pglVertex3fv( scaled_vertex.data() );
 				}
 				else
 				{
 					pglVertex3fv( av.data() );
 					ASSERT( g_nNumArrayVerts < MAXARRAYVERTS );
-					VectorCopy( av, g_xarrayverts[g_nNumArrayVerts] ); // store off vertex
+                    g_xarrayverts[g_nNumArrayVerts] = av; // store off vertex
 					g_nNumArrayVerts++;
 				}
 			}
@@ -2372,7 +2371,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 	}
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglVertexPointer( 3, GL_FLOAT, 12, g_xarrayverts );
+	pglVertexPointer( 3, GL_FLOAT, sizeof(vec3_t), g_xarrayverts );
 
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );
@@ -3183,7 +3182,7 @@ static void R_StudioDrawPlanarShadow( void )
 		pglEnable( GL_STENCIL_TEST );
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglVertexPointer( 3, GL_FLOAT, 12, g_xarrayverts );
+	pglVertexPointer( 3, GL_FLOAT, sizeof(vec3_t), g_xarrayverts );
 
 #if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
 	if( pglDrawRangeElements )

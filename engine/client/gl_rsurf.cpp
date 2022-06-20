@@ -153,7 +153,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 	poly->flags = warpface->flags;
 	warpface->polys = poly;
 	poly->numverts = numverts + 2;
-	verts_p = (float *)poly + ( ( sizeof( void* ) + sizeof( int ) ) >> 1 ); // pointer glpoly_t->verts
+	verts_p = poly->verts[0]; // pointer glpoly_t->verts
 	VectorClear( total );
 	total_s = total_ls = 0.0f;
 	total_t = total_lt = 0.0f;
@@ -330,7 +330,7 @@ void GL_BuildPolygonFromSurface( model_t *mod, msurface_t *fa )
 	poly->flags = fa->flags;
 	fa->polys = poly;
 	poly->numverts = lnumverts;
-	verts_p = (float *)poly + (( sizeof( void* ) + sizeof( int ) ) >> 1); //pointer glpoly_t->verts
+	verts_p = poly->verts[0]; //pointer glpoly_t->verts
 
 	for( i = 0; i < lnumverts; i++ )
 	{
@@ -2561,9 +2561,9 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
 		// replace lightmap texcoord array by dlight array
 		pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dlight_vbo );
 		if( vbos.dlight_vbo  )
-			pglTexCoordPointer( 2, GL_FLOAT, sizeof( float ) * 2, 0 );
+			pglTexCoordPointer( 2, GL_FLOAT, sizeof( vec2_t ), 0 );
 		else
-			pglTexCoordPointer( 2, GL_FLOAT, sizeof( float ) * 2, vbos.dlight_tc );
+			pglTexCoordPointer( 2, GL_FLOAT, sizeof( vec2_t ), vbos.dlight_tc );
 
 		// clear the block
 		LM_InitBlock();
@@ -2677,9 +2677,9 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
 					R_SetDecalMode( false );
 					GL_SelectTexture( mtst.tmu_lm );
 					if( vbos.dlight_vbo )
-						pglTexCoordPointer( 2, GL_FLOAT, sizeof( float ) * 2, 0 );
+						pglTexCoordPointer( 2, GL_FLOAT, sizeof( vec2_t ), 0 );
 					else
-						pglTexCoordPointer( 2, GL_FLOAT, sizeof( float ) * 2, vbos.dlight_tc );
+						pglTexCoordPointer( 2, GL_FLOAT, sizeof( vec2_t ), vbos.dlight_tc );
 
 					pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
 					pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t,pos) );

@@ -326,7 +326,7 @@ void R_AddSkyBoxSurface( msurface_t *fa )
 	}
 
 	// calculate vertex values for sky box
-	for( p = fa->polys, verts_p = (float *)p + ( ( sizeof( void* ) + sizeof( int ) ) >> 1 ); p; p = p->next )
+	for( p = fa->polys, verts_p = p->verts[0]; p; p = p->next )
 	{
 		for( i = 0; i < p->numverts; i++ )
 			VectorSubtract( &verts_p[VERTEXSIZE * i], RI.cullorigin, verts[i] );

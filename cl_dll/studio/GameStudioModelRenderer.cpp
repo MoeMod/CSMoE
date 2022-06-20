@@ -62,7 +62,7 @@ void CounterStrike_GetSequence(int *seq, int *gaitseq)
 	*gaitseq = g_gaitseq;
 }
 
-void CounterStrike_GetOrientation(float *o, float *a)
+void CounterStrike_GetOrientation(vec3_t_ref o, vec3_t_ref a)
 {
 	VectorCopy(g_clorg, o);
 	VectorCopy(g_clang, a);
@@ -674,7 +674,7 @@ void CGameStudioModelRenderer::SetupClientAnimation(entity_state_t *pplayer)
 
 	int oldseq = st->sequence;
 	CounterStrike_GetSequence(&st->sequence, &st->gaitsequence);
-	CounterStrike_GetOrientation((float *)&st->origin, (float *)&st->angles);
+	CounterStrike_GetOrientation(st->origin, st->angles);
 	VectorCopy(st->angles, st->realangles);
 
 	if (st->sequence != oldseq)

@@ -188,7 +188,7 @@ void Mod_SetStudioHullPlane( mplane_t *pl, int bone, int axis, float offset )
 	pl->type = 5;
 	
 	VectorSet(pl->normal, studio_bones[bone][0][axis], studio_bones[bone][1][axis], studio_bones[bone][2][axis]);
-	
+
 	pl->dist = (pl->normal[0] * studio_bones[bone][0][3]) + (pl->normal[1] * studio_bones[bone][1][3]) + (pl->normal[2] * studio_bones[bone][2][3]) + offset;
 }
 
@@ -571,28 +571,13 @@ StudioSlerpBones
 static void Mod_StudioSlerpBones( vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s )
 {
 	int	i;
-	vec4_t	q3;
-	float	s1;
 
 	s = bound( 0.0f, s, 1.0f );
-	s1 = 1.0f - s;
 
 	for( i = 0; i < mod_studiohdr->numbones; i++ )
 	{
-		QuaternionSlerp( q1[i], q2[i], s, q3 );
-		q1[i][0] = q3[0];
-		q1[i][1] = q3[1];
-		q1[i][2] = q3[2];
-		q1[i][3] = q3[3];
-
-#ifdef XASH_SIMD
-		VectorScale(pos1[i], s1, pos1[i]);
-		VectorMA(pos2[i], s, pos1[i], pos1[i]);
-#else
-		pos1[i][0] = pos1[i][0] * s1 + pos2[i][0] * s;
-		pos1[i][1] = pos1[i][1] * s1 + pos2[i][1] * s;
-		pos1[i][2] = pos1[i][2] * s1 + pos2[i][2] * s;
-#endif
+		QuaternionSlerp( q1[i], q2[i], s, q1[i] );
+        pos1[i] = lerp(pos1[i], pos2[i], s);
 	}
 }
 
@@ -1086,9 +1071,7 @@ void Mod_GetBonePosition( const edict_t *e, int iBone, vec3_t_ref origin, vec3_t
 		e->v.controller, e->v.blending, iBone, e );
 
 	if( origin ) Matrix3x4_OriginFromMatrix( studio_bones[iBone], origin );
-	vec3_t temp;
-	VectorSet(temp, studio_bones[iBone][0][0], studio_bones[iBone][0][1], studio_bones[iBone][0][2]);
-	if( angles ) VectorAngles(temp, angles ); // bone forward to angles
+	if( angles ) VectorAngles({ studio_bones[iBone][0][0], studio_bones[iBone][0][1], studio_bones[iBone][0][2] }, angles ); // bone forward to angles
 }
 
 /*
@@ -1127,7 +1110,7 @@ void Mod_StudioBoundVertex( vec3_t_ref out_mins, vec3_t_ref out_maxs, int *count
 StudioAccumulateBoneVerts
 ====================
 */
-void Mod_StudioAccumulateBoneVerts( vec3_t_ref mins1, vec3_t_ref maxs1, int *counter1, vec3_t mins2, vec3_t maxs2, int *counter2 )
+void Mod_StudioAccumulateBoneVerts( vec3_t_ref mins1, vec3_t_ref maxs1, int *counter1, vec3_t_ref mins2, vec3_t_ref maxs2, int *counter2 )
 {
 	vec3_t	midpoint;
 
