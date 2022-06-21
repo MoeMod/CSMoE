@@ -312,11 +312,10 @@ void CNavArea::Load(SteamFile *file, unsigned int version)
 	file->Read(&m_attributeFlags, sizeof(unsigned char));
 
 	// load extent of area
-	file->Read(&m_extent, 6 * sizeof(float));
+	file->Read(&m_extent.lo, 3 * sizeof(float));
+	file->Read(&m_extent.hi, 3 * sizeof(float));
 
-	m_center.x = (m_extent.lo.x + m_extent.hi.x) / 2.0f;
-	m_center.y = (m_extent.lo.y + m_extent.hi.y) / 2.0f;
-	m_center.z = (m_extent.lo.z + m_extent.hi.z) / 2.0f;
+	m_center = midpoint(m_extent.lo, m_extent.hi);
 
 	// load heights of implicit corners
 	file->Read(&m_neZ, sizeof(float));
@@ -404,8 +403,8 @@ void CNavArea::Load(SteamFile *file, unsigned int version)
 			file->Read(&encounter.from.id, sizeof(unsigned int));
 			file->Read(&encounter.to.id, sizeof(unsigned int));
 
-			file->Read(&encounter.path.from.x, 3 * sizeof(float));
-			file->Read(&encounter.path.to.x, 3 * sizeof(float));
+			file->Read(&encounter.path.from, 3 * sizeof(float));
+			file->Read(&encounter.path.to, 3 * sizeof(float));
 
 			// read list of spots along this path
 			unsigned char spotCount;

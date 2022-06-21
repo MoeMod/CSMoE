@@ -83,11 +83,6 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align, Base> : Base
 	{
 		return this->m_data;
 	}
-	template<class OutputIter>
-	void CopyToIter(OutputIter arr) const
-	{
-		std::copy(std::begin(this->m_data), std::end(this->m_data), arr);
-	}
 };
 
 template<class T, size_t N, std::size_t Align> struct alignas(Align) VectorBase_Data
@@ -176,7 +171,7 @@ struct alignas(16) VectorBase4f_SIMD_Data
     };
 };
 
-struct alignas(16) VectorBase3f_SIMD_Data
+struct VectorBase3f_SIMD_Data
 {
     constexpr VectorBase3f_SIMD_Data() : m_data{}, m_data_unused{} {}
     union
@@ -194,6 +189,7 @@ struct alignas(16) VectorBase3f_SIMD_Data
         __m128 m_xmm;
     };
 };
+static_assert(sizeof(VectorBase3f_SIMD_Data) == 16 && alignof(VectorBase3f_SIMD_Data) == 16);
 
 template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 16, VectorBase3f_SIMD_Data>
 {
