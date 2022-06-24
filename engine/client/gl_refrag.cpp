@@ -163,19 +163,13 @@ void R_AddEfrags( cl_entity_t *ent )
 		if( !phdr ) return;
 		pseqdesc = (mstudioseqdesc_t *)((byte *)phdr + phdr->seqindex);
 
-		for( i = 0; i < 3; i++ )
-		{
-			r_emins[i] = ent->origin[i] + pseqdesc[0].bbmin[i];
-			r_emaxs[i] = ent->origin[i] + pseqdesc[0].bbmax[i];
-		}
+        r_emins = ent->origin + pseqdesc[0].bbmin;
+        r_emaxs = ent->origin + pseqdesc[0].bbmax;
 	}
 	else
 	{
-		for( i = 0; i < 3; i++ )
-		{
-			r_emins[i] = ent->origin[i] + ent->model->mins[i];
-			r_emaxs[i] = ent->origin[i] + ent->model->maxs[i];
-		}
+        r_emins = ent->origin + ent->model->mins;
+        r_emaxs = ent->origin + ent->model->maxs;
 	}
 
 	R_SplitEntityOnNode( cl.worldmodel->nodes );

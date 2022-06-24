@@ -109,7 +109,7 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 
 	static vec3_t pos[MAXSTUDIOBONES];
 	static vec4_t q[MAXSTUDIOBONES];
-	float bonematrix[3][4];
+    matrix3x4 bonematrix;
 
 	static vec3_t pos2[MAXSTUDIOBONES];
 	static vec4_t q2[MAXSTUDIOBONES];
@@ -1030,7 +1030,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 }
 
 
-void CGameStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, float transform[3][4])
+void CGameStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, matrix3x4_ref transform)
 {
 	switch (ent->curstate.renderfx)
 	{

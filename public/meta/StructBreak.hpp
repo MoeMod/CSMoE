@@ -11,7 +11,7 @@ namespace detail {
         return f(BOOST_PP_ENUM_PARAMS(BOOST_PP_INC(N), x)); \
     } \
 
-    BOOST_PP_REPEAT(255, APPLYER_DEF, ~)
+    BOOST_PP_REPEAT(233, APPLYER_DEF, ~)
 #undef APPLYER_DEF
 }
 

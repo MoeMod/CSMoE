@@ -379,8 +379,6 @@ void R_SetupFrustum( void );
 void R_FindViewLeaf( void );
 void R_DrawFog( void );
 
-using cmatrix3x4 = const matrix3x4 &;
-using cmatrix4x4 = const matrix4x4 &;
 //
 // gl_rmath.c
 //

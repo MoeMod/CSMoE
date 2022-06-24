@@ -1235,11 +1235,8 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	case SPR_FWD_PARALLEL_ORIENTED:
 		angle = e->angles[ROLL] * (M_PI2 / 360.0f);
 		SinCos( angle, &sr, &cr );
-		for( i = 0; i < 3; i++ )
-		{
-			v_right[i] = (RI.vright[i] * cr + RI.vup[i] * sr);
-			v_up[i] = RI.vright[i] * -sr + RI.vup[i] * cr;
-		}
+        v_right = RI.vright * cr + RI.vup * sr;
+        v_up = RI.vright * -sr + RI.vup * cr;
 		break;
 	case SPR_FWD_PARALLEL: // normal sprite
 	default:

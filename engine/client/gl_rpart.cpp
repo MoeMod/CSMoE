@@ -432,16 +432,14 @@ void CL_UpdateParticle( particle_t *p, float ft )
 		p->ramp += time2;
 		if( p->ramp >= 8 ) p->die = -1;
 		else p->color = ramp1[(int)p->ramp];
-		for( i = 0; i < 3; i++ )
-			p->vel[i] += p->vel[i] * dvel;
+        p->vel *= 1 + dvel;
 		p->vel[2] -= grav;
 		break;
 	case pt_explode2:
 		p->ramp += time3;
 		if( p->ramp >= 8 ) p->die = -1;
 		else p->color = ramp2[(int)p->ramp];
-		for( i = 0; i < 3; i++ )
-			p->vel[i] -= p->vel[i] * ft;
+        p->vel *= 1 - ft;
 		p->vel[2] -= grav;
 		break;
 	case pt_blob:
@@ -1171,8 +1169,7 @@ static void CL_DrawLine( const vec3_t start, const vec3_t end, int pcolor, float
 		p = CL_AllocParticle( NULL );
 		if( !p ) return;
 
-		for( i = 0; i < 3; i++ )
-			p->org[i] = start[i] + curdist * diff[i];
+        p->org = fma(curdist, diff, start);
 
 		p->color = pcolor;
 		p->type = pt_static;

@@ -407,22 +407,10 @@ void ClearBounds( vec3_t_ref mins, vec3_t_ref maxs )
 AddPointToBounds
 =================
 */
-void AddPointToBounds( const vec3_t v, vec3_t_ref mins, vec3_t_ref maxs )
+void AddPointToBounds( const vec3_t v, vec3_t_ref out_mins, vec3_t_ref out_maxs )
 {
-#ifdef XASH_SIMD
-	VectorMins(v, mins, mins);
-	VectorMaxs(v, maxs, maxs);
-#else
-	float	val;
-	int	i;
-
-	for( i = 0; i < 3; i++ )
-	{
-		val = v[i];
-		if( val < mins[i] ) mins[i] = val;
-		if( val > maxs[i] ) maxs[i] = val;
-	}
-#endif
+    out_mins = mins(v, out_mins);
+    out_maxs = maxs(v, out_maxs);
 }
 
 /*
@@ -581,26 +569,17 @@ void QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt )
 {
 	float	omega, sclp, sclq;
 	float	cosom, sinom;
-	float	a = 0.0f;
-	float	b = 0.0f;
-	int	i;
 
 	// decide if one of the quaternions is backwards
-	for( i = 0; i < 4; i++ )
-	{
-		a += (p[i] - q[i]) * (p[i] - q[i]);
-		b += (p[i] + q[i]) * (p[i] + q[i]);
-	}
+    float a = (p-q).LengthSquared();
+    float b = (p+q).LengthSquared();
 
 	if( a > b )
 	{
-		for( i = 0; i < 4; i++ )
-		{
-			q[i] = -q[i];
-		}
+		q = -q;
 	}
 
-	cosom = p[0] * q[0] + p[1] * q[1] + p[2] * q[2] + p[3] * q[3];
+	cosom = DotProduct(p, q);
 
 	if(( 1.0 + cosom ) > 0.000001f )
 	{
@@ -626,8 +605,7 @@ void QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt )
 			sclq = t;
 		}
 
-		for( i = 0; i < 4; i++ )
-			qt[i] = sclp * p[i] + sclq * q[i];
+        qt = sclp * p + sclq * q;
 	}
 	else
 	{
@@ -638,7 +616,6 @@ void QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt )
 		sclp = sin(( 1.0f - t ) * ( 0.5f * M_PI ));
 		sclq = sin( t * ( 0.5f * M_PI ));
 
-		for( i = 0; i < 3; i++ )
-			qt[i] = sclp * p[i] + sclq * qt[i];
+        qt = sclp * p + sclq * qt;
 	}
 }

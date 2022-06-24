@@ -572,7 +572,7 @@ static void Mod_StudioSlerpBones( vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_
 {
 	int	i;
 
-	s = bound( 0.0f, s, 1.0f );
+    s = std::clamp( s, 0.0f, 1.0f );
 
 	for( i = 0; i < mod_studiohdr->numbones; i++ )
 	{

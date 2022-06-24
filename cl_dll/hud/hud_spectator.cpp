@@ -1273,7 +1273,7 @@ void CHudSpectator::DrawOverviewEntities()
 	vec3_t			origin, angles, point, forward, right, left, up, world, screen, offset;
 	float			x,y,z, r,g,b, sizeScale = 4.0f;
 	cl_entity_t *	ent;
-	float rmatrix[3][4];	// transformation matrix
+	matrix3x4 rmatrix;	// transformation matrix
 
 	float			zScale = (90.0f - v_angles[0] ) / 90.0f;
 

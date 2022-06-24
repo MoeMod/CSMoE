@@ -26,6 +26,9 @@ using matrix4x4 = moe::VectorBase<vec4_t, 4>;
 using matrix3x4_ref = matrix3x4 &;
 using matrix4x4_ref = matrix4x4 &;
 
+using cmatrix3x4 = const matrix3x4 &;
+using cmatrix4x4 = const matrix4x4 &;
+
 #ifndef time_point_t
 typedef float		time_point_t;
 #endif

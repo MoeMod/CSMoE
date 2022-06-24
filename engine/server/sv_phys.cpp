@@ -508,7 +508,6 @@ Slide off of the impacting object
 int SV_ClipVelocity( vec3_t in, vec3_t normal, vec3_t_ref out, float overbounce )
 {
 	float	backoff;
-	float	change;
 	int	i, blocked;
 
 	blocked = 0;
@@ -517,11 +516,9 @@ int SV_ClipVelocity( vec3_t in, vec3_t normal, vec3_t_ref out, float overbounce 
 	
 	backoff = DotProduct( in, normal ) * overbounce;
 
+    out = in - normal * backoff;
 	for( i = 0; i < 3; i++ )
 	{
-		change = normal[i] * backoff;
-		out[i] = in[i] - change;
-
 		if( out[i] > -1.0f && out[i] < 1.0f )
 			out[i] = 0.0f;
 	}
@@ -873,12 +870,9 @@ static edict_t *SV_PushMove( edict_t *pusher, float movetime )
 		return NULL;
 	}
 
-	for( i = 0; i < 3; i++ )
-	{
-		lmove[i] = pusher->v.velocity[i] * movetime;
-		mins[i] = pusher->v.absmin[i] + lmove[i];
-		maxs[i] = pusher->v.absmax[i] + lmove[i];
-	}
+    lmove = pusher->v.velocity * movetime;
+    mins = pusher->v.absmin + lmove;
+    maxs = pusher->v.absmax + lmove;
 
 	pushed_p = svgame.pushed;
 
@@ -991,8 +985,7 @@ static edict_t *SV_PushRotate( edict_t *pusher, float movetime )
 		return NULL;
 	}
 
-	for( i = 0; i < 3; i++ )
-		amove[i] = pusher->v.avelocity[i] * movetime;
+    amove = pusher->v.avelocity * movetime;
 
 	// create pusher initial position
 	Matrix4x4_CreateFromEntity( start_l, pusher->v.angles, pusher->v.origin, 1.0f );

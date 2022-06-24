@@ -29,8 +29,8 @@ sv_blending_interface_t svBlending =
 server_studio_api_t IEngineStudio;
 studiohdr_t *g_pstudiohdr;
 
-float (*g_pRotationMatrix)[3][4];
-float (*g_pBoneTransform)[128][3][4];
+matrix3x4 (*g_pRotationMatrix);
+matrix3x4 (*g_pBoneTransform)[MAXSTUDIOBONES];
 
 int ExtractBbox(void *pmodel, int sequence, vec3_t_ref mins, vec3_t_ref maxs)
 {
@@ -551,8 +551,8 @@ C_DLLEXPORT int Server_GetBlendingInterface(int version, struct sv_blending_inte
 	IEngineStudio.LoadCacheFile = pstudio->LoadCacheFile;
 	IEngineStudio.Mod_Extradata = ((struct server_studio_api_s *)pstudio)->Mod_Extradata;
 
-	g_pRotationMatrix = (float (*)[3][4])rotationmatrix;
-	g_pBoneTransform = (float (*)[128][3][4])bonetransform;
+	g_pRotationMatrix = rotationmatrix;
+	g_pBoneTransform = bonetransform;
 
 	return 1;
 }
@@ -593,28 +593,24 @@ void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 {
 	int i;
-	float a = 0;
-	float b = 0;
 
-	for (i = 0; i < 4; ++i)
-	{
-		a += (p[i] - q[i]) * (p[i] - q[i]);
-		b += (p[i] + q[i]) * (p[i] + q[i]);
-	}
+    // decide if one of the quaternions is backwards
+    float a = (p-q).LengthSquared();
+    float b = (p+q).LengthSquared();
 
 	if (a > b)
 	{
-		for (i = 0; i < 4; ++i)
-			q[i] = -q[i];
+        q = -q;
 	}
 
 	float sclp, sclq;
-	float cosom = (p[0] * q[0] + p[1] * q[1] + p[2] * q[2] + p[3] * q[3]);
+	float cosom = DotProduct(p, q);
 
 	if ((1.0 + cosom) > 0.00000001)
 	{
 		if ((1.0 - cosom) > 0.00000001)
 		{
+            // TODO(MoeMod) : SIMD opt
 			float cosomega = acos((float)cosom);
 
 			float omega = cosomega;
@@ -629,8 +625,7 @@ void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 			sclp = 1.0 - t;
 		}
 
-		for (i = 0; i < 4; ++i)
-			qt[i] = sclp * p[i] + sclq * q[i];
+        qt = sclp * p + sclq * q;
 	}
 	else
 	{
@@ -642,12 +637,11 @@ void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 		sclp = sin((1.0 - t) * 0.5 * M_PI);
 		sclq = sin(t * 0.5 * M_PI);
 
-		for (i = 0; i < 3; ++i)
-			qt[i] = sclp * p[i] + sclq * qt[i];
+        qt = sclp * p + sclq * qt;
 	}
 }
 
-void QuaternionMatrix(const vec4_t quaternion, float (*matrix)[4])
+void QuaternionMatrix(const vec4_t quaternion, matrix3x4_ref matrix)
 {
 	matrix[0][0] = 1.0 - 2.0 * quaternion[1] * quaternion[1] - 2.0 * quaternion[2] * quaternion[2];
 	matrix[1][0] = 2.0 * quaternion[0] * quaternion[1] + 2.0 * quaternion[3] * quaternion[2];
@@ -902,29 +896,13 @@ void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioani
 void StudioSlerpBones(vec4_t *q1, vec3_t pos1[], vec4_t *q2, vec3_t pos2[], float s)
 {
 	int i;
-	vec4_t q3;
-	float s1;
 
-	if (s < 0)
-		s = 0;
-
-	else if (s > 1.0)
-		s = 1.0;
-
-	s1 = 1.0 - s;
+    s = std::clamp( s, 0.0f, 1.0f );
 
 	for (i = 0; i < g_pstudiohdr->numbones; ++i)
 	{
-		QuaternionSlerp(q1[i], q2[i], s, q3);
-
-		q1[i][0] = q3[0];
-		q1[i][1] = q3[1];
-		q1[i][2] = q3[2];
-		q1[i][3] = q3[3];
-
-		pos1[i][0] = pos1[i][0] * s1 + pos2[i][0] * s;
-		pos1[i][1] = pos1[i][1] * s1 + pos2[i][1] * s;
-		pos1[i][2] = pos1[i][2] * s1 + pos2[i][2] * s;
+        QuaternionSlerp( q1[i], q2[i], s, q1[i] );
+        pos1[i] = lerp(pos1[i], pos2[i], s);
 	}
 }
 
@@ -942,7 +920,7 @@ void StudioCalcRotations(mstudiobone_t *pbones, int *chain, int chainlength, flo
 	}
 }
 
-void ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
+void ConcatTransforms(cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out)
 {
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] + in1[0][2] * in2[2][0];
 	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] + in1[0][2] * in2[2][1];
@@ -977,7 +955,7 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, vec3_t angl
 	mstudiobone_t *pbones;
 	mstudioseqdesc_t *pseqdesc;
 	mstudioanim_t *panim;
-	float bonematrix[3][4];
+	matrix3x4 bonematrix;
 	int chain[MAXSTUDIOBONES];
 	int chainlength;
 	vec3_t temp_angles;

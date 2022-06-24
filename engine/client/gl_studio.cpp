@@ -449,9 +449,9 @@ pfnStudioGetBoneTransform
 
 ===============
 */
-static float ****GAME_EXPORT pfnStudioGetBoneTransform( void )
+static matrix3x4 (* GAME_EXPORT pfnStudioGetBoneTransform( void ))[MAXSTUDIOBONES]
 {
-	return (float ****)g_bonestransform;
+	return &g_bonestransform;
 }
 
 /*
@@ -460,9 +460,9 @@ pfnStudioGetLightTransform
 
 ===============
 */
-static float ****GAME_EXPORT pfnStudioGetLightTransform( void )
+static matrix3x4 (* GAME_EXPORT pfnStudioGetLightTransform( void ))[MAXSTUDIOBONES]
 {
-	return (float ****)g_lighttransform;
+	return &g_lighttransform;
 }
 
 /*
@@ -471,9 +471,9 @@ pfnStudioGetAliasTransform
 
 ===============
 */
-static float ***GAME_EXPORT pfnStudioGetAliasTransform( void )
+static matrix3x4 * GAME_EXPORT pfnStudioGetAliasTransform( void )
 {
-	return (float ***)&g_aliastransform;
+	return &g_aliastransform;
 }
 
 /*
@@ -482,9 +482,9 @@ pfnStudioGetRotationMatrix
 
 ===============
 */
-static float ***GAME_EXPORT pfnStudioGetRotationMatrix( void )
+static matrix3x4 *GAME_EXPORT pfnStudioGetRotationMatrix( void )
 {
-	return (float ***)&g_rotationmatrix;
+	return &g_rotationmatrix;
 }
 
 /*

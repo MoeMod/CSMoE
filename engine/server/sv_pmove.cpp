@@ -713,11 +713,9 @@ static void SV_SetupPMove( playermove_t *pmove, sv_client_t *cl, usercmd_t *ucmd
 	pmove->numphysent = 0;
 	pmove->nummoveent = 0;
 
-	for( i = 0; i < 3; i++ )
-	{
-		absmin[i] = clent->v.origin[i] - 256.0f;
-		absmax[i] = clent->v.origin[i] + 256.0f;
-	}
+    constexpr vec3_t delta = { 256.0f, 256.0f, 256.0f};
+    absmin = clent->v.origin - delta;
+    absmax = clent->v.origin + delta;
 
 	SV_CopyEdictToPhysEnt( &svgame.pmove->physents[0], &svgame.edicts[0] );
 	svgame.pmove->visents[0] = svgame.pmove->physents[0];

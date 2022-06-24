@@ -2047,12 +2047,10 @@ static void Mod_LoadVertexes( const dlump_t *l )
 
 	VectorSubtract( world.maxs, world.mins, world.size );
 
-	for( i = 0; i < 3; i++ )
-	{
-		// spread the mins / maxs by a pixel
-		world.mins[i] -= 1.0f;
-		world.maxs[i] += 1.0f;
-	}
+    // spread the mins / maxs by a pixel
+    vec3_t delta = { 1, 1, 1 };
+    world.mins -= delta;
+    world.maxs += delta;
 }
 
 /*
