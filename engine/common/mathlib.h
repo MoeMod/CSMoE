@@ -229,8 +229,24 @@ void VectorCopy(const VectorTypeA& a, VectorTypeB& b)
     (b)[2] = (a)[2];
 }
 
+template <class VectorTypeA>
+void VectorCopy(const VectorTypeA& a, float *b)
+{
+    (b)[0] = (a)[0];
+    (b)[1] = (a)[1];
+    (b)[2] = (a)[2];
+}
+
 template <class VectorTypeA, class VectorTypeB, class VectorTypeC>
 void VectorScale(const VectorTypeA& a, VectorTypeB b, VectorTypeC &c)
+{
+    (c)[0] = (a)[0] * (b);
+    (c)[1] = (a)[1] * (b);
+    (c)[2] = (a)[2] * (b);
+}
+
+template <class VectorTypeA, class VectorTypeB>
+void VectorScale(const VectorTypeA& a, VectorTypeB b, float *c)
 {
     (c)[0] = (a)[0] * (b);
     (c)[1] = (a)[1] * (b);

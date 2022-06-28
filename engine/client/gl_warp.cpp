@@ -204,7 +204,7 @@ loc1:
 	// clip it
 	sides[i] = sides[0];
 	dists[i] = dists[0];
-	VectorCopy( vecs, ( vecs + ( i * 3 )));
+    vecs[i] = vecs[0];
 	newc[0] = newc[1] = 0;
 
 	for( i = 0; i < nump; i++ )
