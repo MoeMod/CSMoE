@@ -29,7 +29,7 @@ namespace sv::moe {
 namespace cl::moe {
 #endif
 
-using Vector2D = ::moe::VectorBase<float, 2>;
-using Vector = ::moe::VectorBase<float, 3, 16>;
+using Vector2D = vec2_t;
+using Vector = vec3_t;
 
 }

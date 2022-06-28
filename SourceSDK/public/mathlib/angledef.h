@@ -27,5 +27,7 @@ float anglemod(float a);
 #endif
 constexpr auto M_PI = 3.14159265358979323846;	// matches value in gcc v2 math.h
 constexpr float M_PI_F = (float)M_PI;	// matches value in gcc v2 math.h
+constexpr auto M_PI2 = 6.28318530717958647692;	// matches value in gcc v2 math.h
+constexpr float M_PI2_F = (float)M_PI2;	// matches value in gcc v2 math.h
 constexpr float RAD2DEG(float x) { return (x) * static_cast<float>(180.f / M_PI); }
 constexpr float DEG2RAD(float x) { return (x) * static_cast<float>(M_PI / 180.f); }

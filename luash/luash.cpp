@@ -2,6 +2,8 @@
 #include "util/u_vector_luash.hpp"
 
 namespace moe {
+    template void VectorBase<float, 2>::LuaPush(lua_State* L) const;
+    template void VectorBase<float, 2>::LuaGet(lua_State* L, int idx);
     template void VectorBase<float, 3>::LuaPush(lua_State* L) const;
     template void VectorBase<float, 3>::LuaGet(lua_State* L, int idx);
 #ifdef U_VECTOR_SIMD

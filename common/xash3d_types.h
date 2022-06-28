@@ -7,8 +7,8 @@
 typedef unsigned char byte;
 typedef int		sound_t;
 typedef float		vec_t;
-typedef vec_t		vec2_t[2];
-typedef vec_t       *vec2_t_ref;
+using vec2_t = moe::VectorBase<float, 2>;
+using vec2_t_ref = vec2_t &;
 
 using vec3_t = moe::VectorBase<float, 3, 16>;
 using vec3_c = moe::VectorBase<float, 3>;
