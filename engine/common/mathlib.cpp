@@ -21,18 +21,7 @@ GNU General Public License for more details.
 #include "common.h"
 #include "mathlib.h"
 
-#ifdef XASH_VECTORIZE_SINCOS
-// Test shown that this is not so effictively
-#if defined(__SSE__) || defined(_M_IX86_FP)
-#if defined(__SSE2__) || defined(_M_IX86_FP)
-  #define USE_SSE2
- #endif
-#include "sse_mathfun.h"
-#endif
-#if defined(__ARM_NEON__) || defined(__NEON__)
-	#include "neon_mathfun.h"
-#endif
-#endif
+#include "util/u_vector_angle.hpp"
 
 /*
 =================
@@ -288,20 +277,7 @@ AngleVectors
 */
 void GAME_EXPORT AngleVectors( const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up )
 {
-	static float	sr, sp, sy, cr, cp, cy;
-
-#ifdef XASH_VECTORIZE_SINCOS
-	SinCosFastVector3( DEG2RAD(angles[YAW]), DEG2RAD(angles[PITCH]), DEG2RAD(angles[ROLL]),
-		&sy, &sp, &sr,
-		&cy, &cp, &cr);
-#else
-	SinCos( DEG2RAD( angles[YAW] ), &sy, &cy );
-	SinCos( DEG2RAD( angles[PITCH] ), &sp, &cp );
-	SinCos( DEG2RAD( angles[ROLL] ), &sr, &cr );
-#endif
-	VectorSet(forward, cp * cy, cp * sy, -sp);
-	VectorSet(right, (-1.0f * sr * sp * cy + -1.0f * cr * -sy), (-1.0f * sr * sp * sy + -1.0f * cr * cy), (-1.0f * sr * cp));
-	VectorSet(up, (cr * sp * cy + -sr * -sy), (cr * sp * sy + -sr * cy), (cr * cp));
+	return moe::AngleVectors(angles, forward, right, up);
 }
 
 /*
@@ -312,27 +288,7 @@ VectorAngles
 */
 void VectorAngles( const vec3_t forward, vec3_t_ref angles )
 {
-	float	tmp, yaw, pitch;
-	
-	if( forward[1] == 0 && forward[0] == 0 )
-	{
-		// fast case
-		yaw = 0;
-		if( forward[2] > 0 )
-			pitch = 90.0f;
-		else pitch = 270.0f;
-	}
-	else
-	{
-		yaw = ( atan2( forward[1], forward[0] ) * 180 / M_PI );
-		if( yaw < 0 ) yaw += 360;
-		
-		tmp = sqrt( forward[0] * forward[0] + forward[1] * forward[1] );
-		pitch = ( atan2( forward[2], tmp ) * 180 / M_PI );
-		if( pitch < 0 ) pitch += 360;
-	}
-	
-	VectorSet( angles, pitch, yaw, 0 ); 
+	return moe::VectorAngles(forward, angles);
 }
 
 /*
@@ -463,24 +419,9 @@ qboolean BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const v
 RadiusFromBounds
 =================
 */
-float RadiusFromBounds( const vec3_t mins, const vec3_t maxs )
+float RadiusFromBounds( const vec3_t mins_v, const vec3_t maxs_v )
 {
-	vec3_t	corner;
-#ifdef XASH_SIMD
-	vec3_t mins_abs;
-	vec3_t maxs_abs;
-	VectorAbs(mins, mins_abs);
-	VectorAbs(maxs, maxs_abs);
-	VectorMaxs(mins_abs, maxs_abs, corner);
-#else
-	int	i;
-
-	for( i = 0; i < 3; i++ )
-	{
-		corner[i] = fabs( mins[i] ) > fabs( maxs[i] ) ? fabs( mins[i] ) : fabs( maxs[i] );
-	}
-#endif
-	return VectorLength( corner );
+	return maxs(abs(mins_v), abs(maxs_v)).Length();
 }
 
 /*
