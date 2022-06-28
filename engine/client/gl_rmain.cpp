@@ -1548,7 +1548,7 @@ R_EnvShot
 
 =================
 */
-static void R_EnvShot( const float *vieworg, const char *name, int skyshot, int shotsize )
+static void R_EnvShot( const vec3_t vieworg, const char *name, int skyshot, int shotsize )
 {
 	static vec3_t viewPoint;
 

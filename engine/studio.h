@@ -113,12 +113,12 @@ typedef struct
 	char		name[64];
 	int		length;
 
-	float		eyeposition[3];	// ideal eye position
-	float		min[3];		// ideal movement hull size
-	float		max[3];
+    vec3_c		eyeposition;	// ideal eye position
+    vec3_c		min;		// ideal movement hull size
+    vec3_c		max;
 
-	float		bbmin[3];		// clipping bounding box
-	float		bbmax[3];
+    vec3_c		bbmin;		// clipping bounding box
+    vec3_c		bbmax;
 
 	int		flags;
 

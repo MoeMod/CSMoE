@@ -223,7 +223,7 @@ typedef struct render_api_s
 		
 	// Misc renderer functions
 	void		(*GL_DrawParticles)( const vec3_t vieworg, const vec3_t fwd, const vec3_t rt, const vec3_t up, unsigned int clipFlags );
-	void		(*EnvShot)( const float *vieworg, const char *name, qboolean skyshot, int shotsize ); // creates a cubemap or skybox into gfx\env folder
+	void		(*EnvShot)( const vec3_t vieworg, const char *name, qboolean skyshot, int shotsize ); // creates a cubemap or skybox into gfx\env folder
 	int		(*COM_CompareFileTime)( const char *filename1, const char *filename2, int *iCompare );
 	void		(*Host_Error)( const char *error, ... ); // cause Host Error
 	int		(*SPR_LoadExt)( const char *szPicName, unsigned int texFlags ); // extended version of SPR_Load
