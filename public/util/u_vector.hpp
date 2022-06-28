@@ -27,12 +27,14 @@ typedef struct lua_State lua_State;
 
 #ifdef __SSE__
 #include <xmmintrin.h>
-#define U_VECTOR_SIMD 1
+#define U_VECTOR_SSE 1
+#define U_VECTOR_SIMD U_VECTOR_SSE
 #endif
 
 #if defined(__ARM_NEON) || defined(__ARM_NEON__)
-#include "sse2neon.h"
-#define U_VECTOR_SIMD 1
+#include <arm_neon.h>
+#define U_VECTOR_NEON 2
+#define U_VECTOR_SIMD U_VECTOR_NEON
 #endif
 
 namespace moe {
@@ -157,7 +159,13 @@ struct VectorBase_Storage<T, 3, Align> : VectorBase_Gen<T, 3, std::index_sequenc
 
 #ifdef U_VECTOR_SIMD
 
-struct alignas(16) VectorBase4f_SIMD_Data
+#if U_VECTOR_NEON
+    using xmm_t = float32x4_t;
+#elif U_VECTOR_SSE
+    using xmm_t = __m128;
+#endif
+
+struct VectorBase4f_SIMD_Data
 {
     constexpr VectorBase4f_SIMD_Data() : m_data{} {}
     union
@@ -167,7 +175,7 @@ struct alignas(16) VectorBase4f_SIMD_Data
         {
             float x, y, z, w;
         };
-        __m128 m_xmm;
+        xmm_t m_xmm;
     };
 };
 
@@ -186,7 +194,7 @@ struct VectorBase3f_SIMD_Data
             float x, y, z;
             float w_ununsed;
         };
-        __m128 m_xmm;
+        xmm_t m_xmm;
     };
 };
 static_assert(sizeof(VectorBase3f_SIMD_Data) == 16 && alignof(VectorBase3f_SIMD_Data) == 16);
@@ -200,12 +208,12 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
     {
     }
 
-    VectorBase_Storage(__m128 xmm)
+    VectorBase_Storage(xmm_t xmm)
     {
         this->m_xmm = xmm;
     }
 
-    operator __m128() const
+    operator xmm_t() const
     {
         return this->m_xmm;
     }
@@ -390,27 +398,17 @@ struct VectorBase : VectorBase_Storage<T, N, Align>
 		return (b - a) / 2 + a;
 	}
 
-    friend T max_element(VectorBase a)
-    {
-        return *std::max_element(a.data(), a.data() + N);
-    }
-
-    friend T min_element(VectorBase a)
-    {
-        return *std::min_element(a.data(), a.data() + N);
-    }
-
     friend VectorBase maxs(VectorBase a, VectorBase b)
     {
         using std::max;
-        std::transform(a.data(), a.data() + N, b.data(), a.data(), max);
+        std::transform(a.data(), a.data() + N, b.data(), a.data(), [](auto a, auto b){ return max(a, b); });
         return a;
     }
 
     friend VectorBase mins(VectorBase a, VectorBase b)
     {
         using std::min;
-        std::transform(a.data(), a.data() + N, b.data(), a.data(), min);
+        std::transform(a.data(), a.data() + N, b.data(), a.data(), [](auto a, auto b){ return min(a, b); });
         return a;
     }
 
@@ -422,7 +420,7 @@ struct VectorBase : VectorBase_Storage<T, N, Align>
     friend VectorBase abs(VectorBase a)
     {
         using std::abs;
-        std::transform(a.data(), a.data() + N, abs);
+        std::transform(a.data(), a.data() + N, a.data(), [](auto x){ return abs(x); });
         return a;
     }
 
@@ -521,17 +519,29 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 
     bool operator==(VectorBase v) const
     {
+#if U_VECTOR_NEON
+        return !vaddvq_u32(vceqq_f32(*this, v));
+#elif U_VECTOR_SSE
         __m128 c = _mm_cmpeq_ps(*this, v.m_xmm); // c = a==b
         __m128i d = _mm_cvtps_epi32(c); // d = (int)c
         return _mm_movemask_epi8(_mm_cmpeq_epi32(d, _mm_setzero_si128())) & 0x0FFF;
+#endif
     }
     VectorBase operator+(VectorBase v) const
     {
+#if U_VECTOR_NEON
+        return vaddq_f32(*this, v);
+#elif U_VECTOR_SSE
         return _mm_add_ps(*this, v.m_xmm);
+#endif
     }
     VectorBase operator-(VectorBase v) const
     {
+#if U_VECTOR_NEON
+        return vsubq_f32(*this, v);
+#elif U_VECTOR_SSE
         return _mm_sub_ps(*this, v.m_xmm);
+#endif
     }
     VectorBase operator+() const
     {
@@ -539,15 +549,27 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
     }
     VectorBase operator-() const
     {
+#if U_VECTOR_NEON
+        return vnegq_f32(*this);
+#elif U_VECTOR_SSE
         return VectorBase(_mm_setzero_ps()) - *this;
+#endif
     }
     VectorBase operator*(float fl) const
     {
+#ifdef U_VECTOR_NEON
+        return vmulq_n_f32(*this, fl);
+#elif U_VECTOR_SSE
         return _mm_mul_ps(*this, _mm_load_ps1(&fl));
+#endif
     }
     VectorBase operator/(T fl) const
     {
+#ifdef U_VECTOR_NEON
+        return *this * (1 / fl);
+#elif U_VECTOR_SSE
         return _mm_div_ps(*this, _mm_load_ps1(&fl));
+#endif
     }
     friend VectorBase operator*(T fl, VectorBase vec)
     {
@@ -572,25 +594,33 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 
     friend T DotProduct(VectorBase v1, VectorBase v2)
     {
+#if U_VECTOR_NEON
+        return vaddvq_f32(vmulq_f32(v1, v2));
+#elif U_VECTOR_SSE
         return _mm_cvtss_f32(_mm_dp_ps(v1.m_xmm, v2.m_xmm, XmmMask));
+#endif
     }
 
     friend VectorBase fma(T x, VectorBase y, VectorBase z)
     {
-#ifndef U_VECTOR_USE_FMA
-        return _mm_add_ps(_mm_mul_ps(_mm_load_ps1(&x), y), z);
-#else
+#if U_VECTOR_NEON
+        return vfmaq_n_f32(z, y, x);
+#elif U_VECTOR_FMA
         return _mm_fmadd_ps(_mm_load_ps1(&x), y, z);
+#elif U_VECTOR_SSE
+        return _mm_add_ps(_mm_mul_ps(_mm_load_ps1(&x), y), z);
 #endif
     }
 
     // (a*b)+c
     friend VectorBase fma(VectorBase x, T y, VectorBase z)
     {
-#ifndef U_VECTOR_USE_FMA
-        return _mm_add_ps(_mm_mul_ps(x, _mm_load_ps1(&y)), z);
-#else
+#if U_VECTOR_NEON
+        return vfmaq_n_f32(z, x, y);
+#elif U_VECTOR_FMA
         return _mm_fmadd_ps(x, _mm_load_ps1(&y), z);
+#elif U_VECTOR_SSE
+        return _mm_add_ps(_mm_mul_ps(x, _mm_load_ps1(&y)), z);
 #endif
     }
 
@@ -606,51 +636,55 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
         return lerp(a, b, 0.5f);
     }
 
-    friend T max_element(VectorBase x)
-    {
-        __m128 a = _mm_shuffle_ps(x, x, _MM_SHUFFLE(0,0,3,2));
-        __m128 b = _mm_max_ps(x, a);
-        __m128 c = _mm_shuffle_ps(b, b, _MM_SHUFFLE(0,0,0,1));
-        __m128 d = _mm_max_ps(b, c);
-        return _mm_cvtss_f32(d);
-    }
-
-    friend T min_element(VectorBase x)
-    {
-        __m128 a = _mm_shuffle_ps(x, x, _MM_SHUFFLE(0,0,3,2));
-        __m128 b = _mm_min_ps(x, a);
-        __m128 c = _mm_shuffle_ps(b, b, _MM_SHUFFLE(0,0,0,1));
-        __m128 d = _mm_min_ps(b, c);
-        return _mm_cvtss_f32(d);
-    }
-
     friend VectorBase maxs(VectorBase a, VectorBase b)
     {
+#if U_VECTOR_NEON
+        return vmaxq_f32(a, b);
+#elif U_VECTOR_SSE
         return _mm_max_ps(a, b);
+#endif
     }
 
     friend VectorBase mins(VectorBase a, VectorBase b)
     {
+#if U_VECTOR_NEON
+        return vminq_f32(a, b);
+#elif U_VECTOR_SSE
         return _mm_min_ps(a, b);
+#endif
     }
 
     friend T reduce(VectorBase a)
     {
+#if U_VECTOR_NEON
+        return vaddvq_f32(a);
+#elif U_VECTOR_SSE
         __m128 x = a;
-        //x = _mm_blend_ps(_mm_setzero_ps(), x, 8); // x = { x[0], x[1], x[2], 0 }
         x = _mm_hadd_ps(x, x); // x = { x[1]+x[0], x[3]+x[2], x[1]+x[0], x[3]+x[2] }
         x = _mm_hadd_ps(x, x); // x = { sum(x), ... }
         return _mm_cvtss_f32(x);
+#endif
     }
 
     friend VectorBase abs(VectorBase a)
     {
-        return _mm_max_ps(_mm_sub_ps(_mm_setzero_ps(), a), a);
+#if U_VECTOR_NEON
+        constexpr int32x4_t mask = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0};
+        return vreinterpretq_f32_s32(vandq_s32(vreinterpretq_s32_f32(a), mask));
+#elif U_VECTOR_SSE
+        // 0x7fffffff = ~(-0.0f)
+        __m128 mask = _mm_castsi128_ps(_mm_set_epi32(0x7fffffff, 0x7fffffff, 0x7fffffff, 0));
+        return _mm_and_ps(a, mask);
+#endif
     }
 
     T LengthSquared() const
     {
+#ifdef U_VECTOR_NEON
+        return vaddvq_f32(vmulq_f32(*this, *this));
+#elif U_VECTOR_SSE
         return _mm_cvtss_f32(_mm_dp_ps(*this, *this, XmmMask));
+#endif
     }
     template<class ValType>
     constexpr bool IsLengthLessThan(ValType length) const
@@ -665,17 +699,29 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 
     T Length() const
     {
+#if U_VECTOR_NEON
+        return sqrt(vaddvq_f32(vmulq_f32(*this, *this))) ;
+#elif U_VECTOR_SSE
         return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(*this, *this, XmmMask)));
+#endif
     }
 
     T LengthReverse() const
     {
+#if U_VECTOR_NEON
+        return vrsqrtes_f32(vaddvq_f32(vmulq_f32(*this, *this)));
+#elif U_VECTOR_SSE
         return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_dp_ps(*this, *this, XmmMask)));
+#endif
     }
 
     VectorBase Normalize() const
     {
+#if U_VECTOR_NEON
+        return vmulq_n_f32(*this, vrsqrtes_f32(vaddvq_f32(vmulq_f32(*this, *this))));
+#elif U_VECTOR_SSE
         return _mm_mul_ps(*this, _mm_rsqrt_ps(_mm_dp_ps(*this, *this, XmmMask)));
+#endif
     }
 
     T NormalizeInPlace()
@@ -778,11 +824,32 @@ template<class T, std::size_t Align> constexpr VectorBase<T, 3, Align> CrossProd
 #ifdef U_VECTOR_SIMD
 inline VectorBase<float, 3, 16> CrossProduct(VectorBase<float, 3, 16> a, VectorBase<float, 3, 16> b)
 {
+#if U_VECTOR_NEON
+    float32x4_t vec_a = { a.y, a.z, a.x, a.y }; //Q register = [aj, ai, ak, aj]
+    float32x4_t vec_b = { b.y, b.z, b.x, b.y }; //Q register = [bj, bi, bk, bj]
+    float32x4_t vec_a_rot = vextq_f32(vec_a, vec_a, 1);
+    float32x4_t vec_b_rot = vextq_f32(vec_b, vec_b, 1);
+
+    // vec_a     = [ aj, ai, ak, aj ]
+    // vec_b_rot = [ bj, bj, bi, bk ]
+    // vec_a_rot = [ aj, aj, ai, ak ]
+    // vec_b     = [ bj, bi, bk, bj ]
+
+    float32x4_t prod = vmulq_f32(vec_a, vec_b_rot);
+
+    // prod = [ ajbj, aibj, akbi, ajbk ]
+
+    prod = vmlsq_f32(prod, vec_a_rot, vec_b);
+    // prod = [ ajbj-ajbj, aibj-ajbi, akbi-aibk, ajbk-akbj ]
+
+    return prod;
+#elif U_VECTOR_SSE
     __m128 result = _mm_sub_ps(
             _mm_mul_ps(b.m_xmm, _mm_shuffle_ps(a.m_xmm, a.m_xmm, _MM_SHUFFLE(3, 0, 2, 1))),
             _mm_mul_ps(a.m_xmm, _mm_shuffle_ps(b.m_xmm, b.m_xmm, _MM_SHUFFLE(3, 0, 2, 1)))
     );
     return _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 0, 2, 1));
+#endif
 }
 #endif
 
@@ -801,7 +868,7 @@ template<class T, std::size_t N, std::size_t Align> constexpr bool VectorCompare
 	return a == b;
 }
 
-template<class T, std::size_t N, std::size_t Align> constexpr VectorBase<T, N, Align> &VectorCopy(VectorBase<T, N, Align> in,  VectorBase<T, N, Align> &out)
+template<class T, std::size_t N, std::size_t Align, std::size_t Align2> constexpr VectorBase<T, N, Align> &VectorCopy(VectorBase<T, N, Align2> in,  VectorBase<T, N, Align> &out)
 {
 	return out = in;
 }
@@ -823,7 +890,7 @@ template<class T, std::size_t N, std::size_t Align> inline void VectorLerp(Vecto
 
 template<class T, std::size_t N, std::size_t Align> constexpr T VectorMaxElement(VectorBase<T, N, Align> in)
 {
-    return max_element(in);
+    return *std::max_element(in.data(), in.data() + N);
 }
 
 template<class T, std::size_t N, std::size_t Align> constexpr bool VectorIsNull(VectorBase<T, N, Align> in)
