@@ -16,7 +16,7 @@
 
 #include "bspfile.h"	// we need some declarations from it
 
-typedef vec_t		vec2_t[2];
+#include "xash3d_types.h"
 
 /*
 ==============================================================================

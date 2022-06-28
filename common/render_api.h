@@ -249,7 +249,7 @@ typedef struct render_interface_s
 	// build all the lightmaps on new level or when gamma is changed
 	void		(*GL_BuildLightmaps)( void );
 	// setup map bounds for ortho-projection when we in dev_overview mode
-	void		(*GL_OrthoBounds)( const float *mins, const float *maxs );
+	void		(*GL_OrthoBounds)( const vec2_t mins, const vec2_t maxs );
 	// handle decals which hit mod_studio or mod_sprite
 	void		(*R_StudioDecalShoot)( int decalTexture, struct cl_entity_s *ent, const vec3_t start, const vec3_t pos, int flags, modelstate_t *state );
 	// prepare studio decals for save

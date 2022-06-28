@@ -1302,7 +1302,7 @@ StudioSetupChrome
 
 ====================
 */
-void R_StudioSetupChrome( float *pchrome, int bone, const vec3_t normal )
+void R_StudioSetupChrome( vec2_t_ref pchrome, int bone, const vec3_t normal )
 {
 	float	n;
 

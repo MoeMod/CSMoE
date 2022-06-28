@@ -512,7 +512,7 @@ void R_RemoveEfrags( struct cl_entity_s *ent );
 void R_AddEfrags( struct cl_entity_s *ent );
 void R_DecalRemoveAll( int texture );
 byte *Mod_GetCurrentVis( void );
-void Mod_SetOrthoBounds( float *mins, float *maxs );
+void Mod_SetOrthoBounds( const vec2_t mins, const vec2_t maxs );
 void R_NewMap( void );
 
 /*

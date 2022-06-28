@@ -54,7 +54,7 @@ byte *Mod_GetCurrentVis( void )
 	return Mod_LeafPVS( r_viewleaf, cl.worldmodel );
 }
 
-void Mod_SetOrthoBounds( float *mins, float *maxs )
+void Mod_SetOrthoBounds( const vec2_t mins, const vec2_t maxs )
 {
 	if( clgame.drawFuncs.GL_OrthoBounds )
 	{
