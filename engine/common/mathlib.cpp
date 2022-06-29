@@ -21,18 +21,7 @@ GNU General Public License for more details.
 #include "common.h"
 #include "mathlib.h"
 
-#ifdef XASH_VECTORIZE_SINCOS
-// Test shown that this is not so effictively
-#if defined(__SSE__) || defined(_M_IX86_FP)
-#if defined(__SSE2__) || defined(_M_IX86_FP)
-  #define USE_SSE2
- #endif
-#include "sse_mathfun.h"
-#endif
-#if defined(__ARM_NEON__) || defined(__NEON__)
-	#include "neon_mathfun.h"
-#endif
-#endif
+#include "util/u_vector_angle.hpp"
 
 /*
 =================
@@ -267,25 +256,6 @@ void SinFastVector3(float r1, float r2, float r3,
 	*s2 = s4f_z(sin_vector);
 }
 #endif
-#ifndef XASH_SIMD
-float VectorNormalizeLength2( const vec3_t v, vec3_t_ref out )
-{
-	float	length, ilength;
-
-	length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
-	length = sqrt( length );
-
-	if( length )
-	{
-		ilength = 1.0f / length;
-		out[0] = v[0] * ilength;
-		out[1] = v[1] * ilength;
-		out[2] = v[2] * ilength;
-	}
-
-	return length;
-}
-
 void VectorVectors( const vec3_t forward, vec3_t_ref right, vec3_t_ref up )
 {
 	float	d;
@@ -299,7 +269,6 @@ void VectorVectors( const vec3_t forward, vec3_t_ref right, vec3_t_ref up )
 	VectorNormalize( right );
 	CrossProduct( right, forward, up );
 }
-#endif
 /*
 =================
 AngleVectors
@@ -308,20 +277,7 @@ AngleVectors
 */
 void GAME_EXPORT AngleVectors( const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up )
 {
-	static float	sr, sp, sy, cr, cp, cy;
-
-#ifdef XASH_VECTORIZE_SINCOS
-	SinCosFastVector3( DEG2RAD(angles[YAW]), DEG2RAD(angles[PITCH]), DEG2RAD(angles[ROLL]),
-		&sy, &sp, &sr,
-		&cy, &cp, &cr);
-#else
-	SinCos( DEG2RAD( angles[YAW] ), &sy, &cy );
-	SinCos( DEG2RAD( angles[PITCH] ), &sp, &cp );
-	SinCos( DEG2RAD( angles[ROLL] ), &sr, &cr );
-#endif
-	VectorSet(forward, cp * cy, cp * sy, -sp);
-	VectorSet(right, (-1.0f * sr * sp * cy + -1.0f * cr * -sy), (-1.0f * sr * sp * sy + -1.0f * cr * cy), (-1.0f * sr * cp));
-	VectorSet(up, (cr * sp * cy + -sr * -sy), (cr * sp * sy + -sr * cy), (cr * cp));
+	return moe::AngleVectors(angles, forward, right, up);
 }
 
 /*
@@ -332,27 +288,7 @@ VectorAngles
 */
 void VectorAngles( const vec3_t forward, vec3_t_ref angles )
 {
-	float	tmp, yaw, pitch;
-	
-	if( forward[1] == 0 && forward[0] == 0 )
-	{
-		// fast case
-		yaw = 0;
-		if( forward[2] > 0 )
-			pitch = 90.0f;
-		else pitch = 270.0f;
-	}
-	else
-	{
-		yaw = ( atan2( forward[1], forward[0] ) * 180 / M_PI );
-		if( yaw < 0 ) yaw += 360;
-		
-		tmp = sqrt( forward[0] * forward[0] + forward[1] * forward[1] );
-		pitch = ( atan2( forward[2], tmp ) * 180 / M_PI );
-		if( pitch < 0 ) pitch += 360;
-	}
-	
-	VectorSet( angles, pitch, yaw, 0 ); 
+	return moe::VectorAngles(forward, angles);
 }
 
 /*
@@ -427,22 +363,10 @@ void ClearBounds( vec3_t_ref mins, vec3_t_ref maxs )
 AddPointToBounds
 =================
 */
-void AddPointToBounds( const vec3_t v, vec3_t_ref mins, vec3_t_ref maxs )
+void AddPointToBounds( const vec3_t v, vec3_t_ref out_mins, vec3_t_ref out_maxs )
 {
-#ifdef XASH_SIMD
-	VectorMins(v, mins, mins);
-	VectorMaxs(v, maxs, maxs);
-#else
-	float	val;
-	int	i;
-
-	for( i = 0; i < 3; i++ )
-	{
-		val = v[i];
-		if( val < mins[i] ) mins[i] = val;
-		if( val > maxs[i] ) maxs[i] = val;
-	}
-#endif
+    out_mins = mins(v, out_mins);
+    out_maxs = maxs(v, out_maxs);
 }
 
 /*
@@ -495,24 +419,9 @@ qboolean BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const v
 RadiusFromBounds
 =================
 */
-float RadiusFromBounds( const vec3_t mins, const vec3_t maxs )
+float RadiusFromBounds( const vec3_t mins_v, const vec3_t maxs_v )
 {
-	vec3_t	corner;
-#ifdef XASH_SIMD
-	vec3_t mins_abs;
-	vec3_t maxs_abs;
-	VectorAbs(mins, mins_abs);
-	VectorAbs(maxs, maxs_abs);
-	VectorMaxs(mins_abs, maxs_abs, corner);
-#else
-	int	i;
-
-	for( i = 0; i < 3; i++ )
-	{
-		corner[i] = fabs( mins[i] ) > fabs( maxs[i] ) ? fabs( mins[i] ) : fabs( maxs[i] );
-	}
-#endif
-	return VectorLength( corner );
+	return maxs(abs(mins_v), abs(maxs_v)).Length();
 }
 
 /*
@@ -520,11 +429,12 @@ float RadiusFromBounds( const vec3_t mins, const vec3_t maxs )
 RotatePointAroundVector
 ====================
 */
-void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees )
+vec3_t RotatePointAroundVector( const vec3_t dir, const vec3_t point, float degrees )
 {
 	float	t0, t1;
 	float	angle, c, s;
 	vec3_t	vr, vu, vf;
+    vec3_t dst;
 
 	angle = DEG2RAD( degrees );
 	SinCos( angle, &s, &c );
@@ -548,6 +458,12 @@ void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t poi
 	dst[2] = (t0 * vr[0] + t1 * vu[0] + vf[2] * vf[0]) * point[0]
 	       + (t0 * vr[1] + t1 * vu[1] + vf[2] * vf[1]) * point[1]
 	       + (t0 * vr[2] + t1 * vu[2] + vf[2] * vf[2]) * point[2];
+    return dst;
+}
+
+void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees )
+{
+    dst = RotatePointAroundVector(dir, point, degrees);
 }
 
 //
@@ -594,26 +510,17 @@ void QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt )
 {
 	float	omega, sclp, sclq;
 	float	cosom, sinom;
-	float	a = 0.0f;
-	float	b = 0.0f;
-	int	i;
 
 	// decide if one of the quaternions is backwards
-	for( i = 0; i < 4; i++ )
-	{
-		a += (p[i] - q[i]) * (p[i] - q[i]);
-		b += (p[i] + q[i]) * (p[i] + q[i]);
-	}
+    float a = (p-q).LengthSquared();
+    float b = (p+q).LengthSquared();
 
 	if( a > b )
 	{
-		for( i = 0; i < 4; i++ )
-		{
-			q[i] = -q[i];
-		}
+		q = -q;
 	}
 
-	cosom = p[0] * q[0] + p[1] * q[1] + p[2] * q[2] + p[3] * q[3];
+	cosom = DotProduct(p, q);
 
 	if(( 1.0 + cosom ) > 0.000001f )
 	{
@@ -639,8 +546,7 @@ void QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt )
 			sclq = t;
 		}
 
-		for( i = 0; i < 4; i++ )
-			qt[i] = sclp * p[i] + sclq * q[i];
+        qt = sclp * p + sclq * q;
 	}
 	else
 	{
@@ -651,7 +557,6 @@ void QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt )
 		sclp = sin(( 1.0f - t ) * ( 0.5f * M_PI ));
 		sclq = sin( t * ( 0.5f * M_PI ));
 
-		for( i = 0; i < 3; i++ )
-			qt[i] = sclp * p[i] + sclq * qt[i];
+        qt = sclp * p + sclq * qt;
 	}
 }

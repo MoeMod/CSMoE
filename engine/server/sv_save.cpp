@@ -1130,13 +1130,13 @@ void SV_SaveClientState( SAVERESTOREDATA *pSaveData, const char *level )
 		nameSize = Q_strlen( entry->name ) + 1;
 		decalScale = (entry->scale * 4096);
 
-		FS_Write( pFile, (float *)localPos, 3);
+		FS_Write( pFile, &localPos, 3 * sizeof(float));
 		FS_Write( pFile, &nameSize, sizeof( nameSize ));
 		FS_Write( pFile, entry->name, nameSize ); 
 		FS_Write( pFile, &entry->entityIndex, sizeof( entry->entityIndex ));
 		FS_Write( pFile, &entry->flags, sizeof( entry->flags ));
 		FS_Write( pFile, &decalScale, sizeof( decalScale ));
-		FS_Write( pFile, (float *)entry->impactPlaneNormal, 3);
+		FS_Write( pFile, &entry->impactPlaneNormal, 3 * sizeof(float));
 
 		if( entry->flags & FDECAL_STUDIO )
 		{
@@ -1165,8 +1165,8 @@ void SV_SaveClientState( SAVERESTOREDATA *pSaveData, const char *level )
 
 		FS_Write( pFile, &nameSize, sizeof( nameSize ));
 		FS_Write( pFile, entry->model, nameSize ); 
-		FS_Write( pFile, (float *)entry->origin, 3);
-		FS_Write( pFile, (float *)entry->angles, 3);
+		FS_Write( pFile, &entry->origin, 3 * sizeof(float));
+		FS_Write( pFile, &entry->angles, 3 * sizeof(float));
 		FS_Write( pFile, &entry->sequence, sizeof( entry->sequence ));
 		FS_Write( pFile, &entry->frame, sizeof( entry->frame ));
 		FS_Write( pFile, &entry->colormap, sizeof( entry->colormap ));
@@ -1200,7 +1200,7 @@ void SV_SaveClientState( SAVERESTOREDATA *pSaveData, const char *level )
 
 		FS_Write( pFile, &nameSize, sizeof( nameSize ));
 		FS_Write( pFile, entry->name, nameSize ); 
-		FS_Write( pFile, (float *)entry->origin, 3);
+		FS_Write( pFile, &entry->origin, 3 * sizeof(float));
 		FS_Write( pFile, &entry->entnum, sizeof( entry->entnum ));
 		FS_Write( pFile, &entry->volume, sizeof( entry->volume ));
 		FS_Write( pFile, &entry->attenuation, sizeof( entry->attenuation ));
@@ -1301,13 +1301,13 @@ void SV_LoadClientState( SAVERESTOREDATA *pSaveData, const char *level, qboolean
 
 			entry = &decalList[i];
 
-			FS_Read( pFile, (float *)localPos, 3);
+			FS_Read( pFile, &localPos, 3 * sizeof(float));
 			FS_Read( pFile, &nameSize, sizeof( nameSize ));
 			FS_Read( pFile, entry->name, nameSize ); 
 			FS_Read( pFile, &entry->entityIndex, sizeof( entry->entityIndex ));
 			FS_Read( pFile, &entry->flags, sizeof( entry->flags ));
 			FS_Read( pFile, &decalScale, sizeof( decalScale ));
-			FS_Read( pFile, (float *)entry->impactPlaneNormal, 3);
+			FS_Read( pFile, &entry->impactPlaneNormal, 3 * sizeof(float));
 
 			if( pSaveData->fUseLandmark && ( entry->flags & FDECAL_USE_LANDMARK ))
 				VectorAdd( localPos, pSaveData->vecLandmarkOffset, entry->position );
@@ -1354,8 +1354,8 @@ void SV_LoadClientState( SAVERESTOREDATA *pSaveData, const char *level, qboolean
 
 			FS_Read( pFile, &nameSize, sizeof( nameSize ));
 			FS_Read( pFile, entry->model, nameSize ); 
-			FS_Read( pFile, (float *)entry->origin, 3);
-			FS_Read( pFile, (float *)entry->angles, 3);
+			FS_Read( pFile, &entry->origin, 3 * sizeof(float));
+			FS_Read( pFile, &entry->angles, 3 * sizeof(float));
 			FS_Read( pFile, &entry->sequence, sizeof( entry->sequence ));
 			FS_Read( pFile, &entry->frame, sizeof( entry->frame ));
 			FS_Read( pFile, &entry->colormap, sizeof( entry->colormap ));
@@ -1391,7 +1391,7 @@ void SV_LoadClientState( SAVERESTOREDATA *pSaveData, const char *level, qboolean
 
 			FS_Read( pFile, &nameSize, sizeof( nameSize ));
 			FS_Read( pFile, entry->name, nameSize ); 
-			FS_Read( pFile, (float *)entry->origin, 3);
+			FS_Read( pFile, &entry->origin, 3 * sizeof(float));
 			FS_Read( pFile, &entry->entnum, sizeof( entry->entnum ));
 			FS_Read( pFile, &entry->volume, sizeof( entry->volume ));
 			FS_Read( pFile, &entry->attenuation, sizeof( entry->attenuation ));

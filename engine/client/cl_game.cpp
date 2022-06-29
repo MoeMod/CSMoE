@@ -3313,7 +3313,7 @@ TriVertex3fv
 */
 void GAME_EXPORT TriVertex3fv( const vec3_t v )
 {
-	pglVertex3fv( (const float *)v );
+	pglVertex3fv( v.data() );
 }
 
 /*
@@ -3455,7 +3455,7 @@ void GAME_EXPORT TriFog( const vec3_t flFogColor, float flStart, float flEnd, in
 	pglFogi(GL_FOG_MODE, GL_EXP);
 	pglFogf(GL_FOG_DENSITY, RI.fogDensity);
 #endif
-	pglFogfv(GL_FOG_COLOR, (float *)RI.fogColor);
+	pglFogfv(GL_FOG_COLOR, RI.fogColor.data());
 	pglHint(GL_FOG_HINT, GL_NICEST);
 }
 

@@ -177,18 +177,16 @@ void R_DecalComputeBasis( msurface_t *surf, vec3_t pSAxis, vec3_t textureSpaceBa
 			// S = N cross T
 			CrossProduct( textureSpaceBasis[2], textureSpaceBasis[1], textureSpaceBasis[0] );
 
-			VectorNormalizeFast( textureSpaceBasis[0] );
-			VectorNormalizeFast( textureSpaceBasis[1] );
+            textureSpaceBasis[0].NormalizeInPlace();
+            textureSpaceBasis[1].NormalizeInPlace();
 			return;
 		}
 		// Fall through to the standard algorithm for parallel or antiparallel
 	}
 
 	// original Half-Life algorithm: get textureBasis from linked surface
-	VectorCopy( surf->texinfo->vecs[0], textureSpaceBasis[0] );
-	VectorCopy( surf->texinfo->vecs[1], textureSpaceBasis[1] );
-	VectorNormalizeFast( textureSpaceBasis[0] );
-	VectorNormalizeFast( textureSpaceBasis[1] );
+    textureSpaceBasis[0] = vec3_t(surf->texinfo->vecs[0]).Normalize();
+    textureSpaceBasis[1] = vec3_t(surf->texinfo->vecs[1]).Normalize();
 }
 
 void R_SetupDecalTextureSpaceBasis( decal_t *pDecal, msurface_t *surf, int texture, vec3_t textureSpaceBasis[3], float decalWorldScale[2] )
@@ -318,7 +316,9 @@ void R_ClipIntersect( float *one, float *two, float *out, int edge )
 		out[5] = one[5] + (two[4] - one[5]) * t;
 	}
 
-	VectorLerp( one, t, two, out );
+    out[0] = one[0] + t * (two[0] - one[0]);
+    out[1] = one[1] + t * (two[1] - one[1]);
+    out[2] = one[2] + t * (two[2] - one[2]);
 }
 
 static int SHClip( float *vert, int vertCount, float *out, int edge )

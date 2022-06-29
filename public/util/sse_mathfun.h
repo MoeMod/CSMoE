@@ -51,6 +51,34 @@ typedef __m128i v4si; // vector of 4 int (sse2)
 typedef __m64 v2si;   // vector of 2 int (mmx)
 #endif
 
+#if defined(USE_SSE2)
+/// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2. This has the advantage of not destroying the input operand, but the disadvantage is that it requires a
+/// float->int->float pipe transition, which costs a clock cycle. Profiling shows this to be a very small win.
+#define shuffle1_ps(reg, shuffle) _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((reg)), (shuffle)))
+#else // We only have SSE 1, so must use the slightly worse shufps instruction, which always destroys the input operand - or we have AVX where we can use this operation without destroying input
+#define shuffle1_ps(reg, shuffle) _mm_shuffle_ps((simd4f)(reg), (simd4f)(reg), (shuffle))
+#endif
+
+/// Returns the lowest element of the given sse register as a float.
+/// @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast", since
+/// the resulting float is represented in an XMM register as well.
+#ifndef __GNUC__
+#define s4f_x(s4f) _mm_cvtss_f32((s4f))
+// Given a 4-channel single-precision simd4f variable [w z y x], returns the second channel 'y' as a float.
+#define s4f_y(s4f) _mm_cvtss_f32(shuffle1_ps((s4f), _MM_SHUFFLE(1,1,1,1)))
+// Given a 4-channel single-precision simd4f variable [w z y x], returns the third channel 'z' as a float.
+// @note The intrinsic _mm_movehl_ps() is theoretically better than _mm_unpackhi_ps() or a shuffle to extract the z channel because it has throughput latency of 0.33 compared to 1.0 that the
+//       other have. However using _mm_movehl_ps() is tricky since in a blind use, VS2013 compiler easily emits a redundant movaps when targeting pre-AVX, so it might not be worth it.
+#define s4f_z(s4f) _mm_cvtss_f32(_mm_unpackhi_ps((s4f), (s4f)))
+// Given a 4-channel single-precision simd4f variable [w z y x], returns the fourth channel 'w' as a float.
+#define s4f_w(s4f) _mm_cvtss_f32(shuffle1_ps((s4f), _MM_SHUFFLE(3,3,3,3)))
+#else
+#define s4f_x(s4f) (s4f)[0]
+#define s4f_y(s4f) (s4f)[1]
+#define s4f_z(s4f) (s4f)[2]
+#define s4f_w(s4f) (s4f)[3]
+#endif
+
 /* declare some SSE constants -- why can't I figure a better way to do that? */
 #define _PS_CONST(Name, Val)                                            \
   static const ALIGN16_BEG float _ps_##Name[4] ALIGN16_END = { Val, Val, Val, Val }
@@ -109,7 +137,7 @@ typedef union xmm_mm_union {
 /* natural logarithm computed for 4 simultaneous float 
    return NaN for x <= 0
 */
-v4sf log_ps(v4sf x) {
+inline v4sf log_ps(v4sf x) {
 #ifdef USE_SSE2
   v4si emm0;
 #else
@@ -211,7 +239,7 @@ _PS_CONST(cephes_exp_p3, 4.1665795894E-2);
 _PS_CONST(cephes_exp_p4, 1.6666665459E-1);
 _PS_CONST(cephes_exp_p5, 5.0000001201E-1);
 
-v4sf exp_ps(v4sf x) {
+inline v4sf exp_ps(v4sf x) {
   v4sf tmp = _mm_setzero_ps(), fx;
 #ifdef USE_SSE2
   v4si emm0;
@@ -239,7 +267,7 @@ v4sf exp_ps(v4sf x) {
   emm0 = _mm_cvttps_epi32(fx);
   tmp  = _mm_cvtepi32_ps(emm0);
 #endif
-  /* if greater, subtract 1 */
+  /* if greater, substract 1 */
   v4sf mask = _mm_cmpgt_ps(tmp, fx);    
   mask = _mm_and_ps(mask, one);
   fx = _mm_sub_ps(tmp, mask);
@@ -329,7 +357,7 @@ _PS_CONST(cephes_FOPI, 1.27323954473516); // 4 / M_PI
    Since it is based on SSE intrinsics, it has to be compiled at -O2 to
    deliver full speed.
 */
-v4sf sin_ps(v4sf x) { // any x
+inline v4sf sin_ps(v4sf x) { // any x
   v4sf xmm1, xmm2 = _mm_setzero_ps(), xmm3, sign_bit, y;
 
 #ifdef USE_SSE2
@@ -446,7 +474,7 @@ v4sf sin_ps(v4sf x) { // any x
 }
 
 /* almost the same as sin_ps */
-v4sf cos_ps(v4sf x) { // any x
+inline v4sf cos_ps(v4sf x) { // any x
   v4sf xmm1, xmm2 = _mm_setzero_ps(), xmm3, y;
 #ifdef USE_SSE2
   v4si emm0, emm2;
@@ -565,7 +593,7 @@ v4sf cos_ps(v4sf x) { // any x
 
 /* since sin_ps and cos_ps are almost identical, sincos_ps could replace both of them..
    it is almost as fast, and gives you a free cosine with your sine */
-void sincos_ps(v4sf x, v4sf *s, v4sf *c) {
+inline void sincos_ps(v4sf x, v4sf *s, v4sf *c) {
   v4sf xmm1, xmm2, xmm3 = _mm_setzero_ps(), sign_bit_sin, y;
 #ifdef USE_SSE2
   v4si emm0, emm2, emm4;

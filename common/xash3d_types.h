@@ -7,14 +7,11 @@
 typedef unsigned char byte;
 typedef int		sound_t;
 typedef float		vec_t;
-typedef vec_t		vec2_t[2];
-typedef vec_t       *vec2_t_ref;
+using vec2_t = moe::VectorBase<float, 2>;
+using vec2_t_ref = vec2_t &;
 
-#ifdef XASH_SIMD
-using vec3_t = moe::VectorBase<float, 3, 16>;
-#else
 using vec3_t = moe::VectorBase<float, 3>;
-#endif
+using vec3_c = moe::VectorBase<float, 3>;
 using vec3_t_ref = vec3_t &;
 
 using vec4_t = moe::VectorBase<float, 4>;
@@ -28,6 +25,9 @@ using matrix4x4 = moe::VectorBase<vec4_t, 4>;
 
 using matrix3x4_ref = matrix3x4 &;
 using matrix4x4_ref = matrix4x4 &;
+
+using cmatrix3x4 = const matrix3x4 &;
+using cmatrix4x4 = const matrix4x4 &;
 
 #ifndef time_point_t
 typedef float		time_point_t;

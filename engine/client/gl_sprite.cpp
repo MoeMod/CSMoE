@@ -1037,19 +1037,19 @@ static void R_DrawSpriteQuad( mspriteframe_t *frame, vec3_t org, vec3_t v_right,
 		pglTexCoord2f( 0.0f, 1.0f );
 		VectorMA( org, frame->down * scale, v_up, point );
 		VectorMA( point, frame->left * scale, v_right, point );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 		pglTexCoord2f( 0.0f, 0.0f );
 		VectorMA( org, frame->up * scale, v_up, point );
 		VectorMA( point, frame->left * scale, v_right, point );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 		pglTexCoord2f( 1.0f, 0.0f );
 		VectorMA( org, frame->up * scale, v_up, point );
 		VectorMA( point, frame->right * scale, v_right, point );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 		pglTexCoord2f( 1.0f, 1.0f );
 		VectorMA( org, frame->down * scale, v_up, point );
 		VectorMA( point, frame->right * scale, v_right, point );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 	pglEnd();
 }
 
@@ -1092,7 +1092,6 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	model_t		*model;
 	int		i, alpha, type;
 	float		angle, dot, sr, cr, flAlpha;
-	float		lerp = 1.0f, ilerp, scale;
 	vec3_t		v_forward, v_right, v_up;
 	vec3_t		origin, color, color2 = {};
 
@@ -1128,6 +1127,8 @@ void R_DrawSpriteModel( cl_entity_t *e )
 			else VectorCopy( parent->origin, origin );
 		}
 	}
+
+    float scale;
 
 	alpha = e->curstate.renderamt;
 	scale = e->curstate.scale;
@@ -1199,6 +1200,8 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		pglAlphaFunc( GL_GEQUAL, 0.5f );
 	}
 
+    float lerp = 1.0f, ilerp;
+
 	if( e->curstate.rendermode == kRenderNormal || e->curstate.rendermode == kRenderTransAlpha || e->curstate.rendermode == kRenderTransAdd)
 		frame = oldframe = R_GetSpriteFrame( model, e->curstate.frame, e->angles[YAW] );
 	else lerp = R_GetSpriteFrameInterpolant( e, &oldframe, &frame );
@@ -1232,11 +1235,8 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	case SPR_FWD_PARALLEL_ORIENTED:
 		angle = e->angles[ROLL] * (M_PI2 / 360.0f);
 		SinCos( angle, &sr, &cr );
-		for( i = 0; i < 3; i++ )
-		{
-			v_right[i] = (RI.vright[i] * cr + RI.vup[i] * sr);
-			v_up[i] = RI.vright[i] * -sr + RI.vup[i] * cr;
-		}
+        v_right = RI.vright * cr + RI.vup * sr;
+        v_up = RI.vright * -sr + RI.vup * cr;
 		break;
 	case SPR_FWD_PARALLEL: // normal sprite
 	default:

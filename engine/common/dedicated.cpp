@@ -306,29 +306,28 @@ can be done reasonably.
 #include "gl_local.h"
 #include "mod_local.h"
 
-static void BoundPoly( int numverts, float *verts, vec3_t mins, vec3_t maxs )
+static void BoundPoly( int numverts, const vec3_t *verts, vec3_t_ref mins, vec3_t_ref maxs )
 {
 	int	i, j;
-	float	*v;
 
 	mins[0] = mins[1] = mins[2] = 99999.0f;
 	maxs[0] = maxs[1] = maxs[2] = -99999.0f;
 
-	for( i = 0, v = verts; i < numverts; i++ )
+	for( i = 0; i < numverts; i++ )
 	{
-		for( j = 0; j < 3; j++, v++ )
+		for( j = 0; j < 3; j++ )
 		{
-			if( *v < mins[j] ) mins[j] = *v;
-			if( *v > maxs[j] ) maxs[j] = *v;
+			if( verts[i][j] < mins[j] ) mins[j] = verts[i][j];
+			if( verts[i][j] > maxs[j] ) maxs[j] = verts[i][j];
 		}
 	}
 }
 
-static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts )
+static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *verts )
 {
 	int	i, j, k, f, b;
 	vec3_t	mins, maxs;
-	float	m, frac, s, t, *v, vertsDiv, *verts_p;
+	float	m, frac, s, t, vertsDiv, *verts_p;
 	vec3_t	front[SUBDIVIDE_SIZE], back[SUBDIVIDE_SIZE], total;
 	float	dist[SUBDIVIDE_SIZE], total_s, total_t, total_ls, total_lt;
 	glpoly_t	*poly;
@@ -348,28 +347,26 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts
 		if( m - mins[i] < 8 ) continue;
 
 		// cut it
-		v = verts + i;
-		for( j = 0; j < numverts; j++, v += 3 )
-			dist[j] = *v - m;
+		//vec3_t *v = verts + i;
+		for( j = 0; j < numverts; j++ )
+			dist[j] = verts[j][i] - m;
 
 		// wrap cases
 		dist[j] = dist[0];
-		v -= i;
-		VectorCopy( verts, v );
+        verts[j] = verts[0];
 
 		f = b = 0;
-		v = verts;
-		for( j = 0; j < numverts; j++, v += 3 )
+		for( j = 0; j < numverts; j++ )
 		{
 			if( dist[j] >= 0 )
 			{
-				VectorCopy( v, front[f] );
+                front[f] = verts[j];
 				f++;
 			}
 
 			if( dist[j] <= 0 )
 			{
-				VectorCopy (v, back[b]);
+                back[b] = verts[j];
 				b++;
 			}
 
@@ -380,15 +377,14 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts
 			{
 				// clip point
 				frac = dist[j] / ( dist[j] - dist[j+1] );
-				for( k = 0; k < 3; k++ )
-					front[f][k] = back[b][k] = v[k] + frac * (v[3+k] - v[k]);
+                front[f] = back[b] = fma((verts[j+1] - verts[j]), frac, verts[j]);
 				f++;
 				b++;
 			}
 		}
 
-		SubdividePolygon_r( warpface, f, front[0] );
-		SubdividePolygon_r( warpface, b, back[0] );
+		SubdividePolygon_r( warpface, f, front );
+		SubdividePolygon_r( warpface, b, back );
 		return;
 	}
 
@@ -398,25 +394,25 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts
 	poly->flags = warpface->flags;
 	warpface->polys = poly;
 	poly->numverts = numverts + 2;
-	verts_p = (float *)poly + ( ( sizeof( void* ) + sizeof( int ) ) >> 1 ); // pointer glpoly_t->verts
+	verts_p = poly->verts[0]; // pointer glpoly_t->verts
 	VectorClear( total );
 	total_s = total_ls = 0.0f;
 	total_t = total_lt = 0.0f;
 
-	for( i = 0; i < numverts; i++, verts += 3 )
+	for( i = 0; i < numverts; i++ )
 	{
-		VectorCopy( verts, &verts_p[VERTEXSIZE * ( i + 1 )] );
-		VectorAdd( total, verts, total );
+		VectorCopy( verts[i], &verts_p[VERTEXSIZE * ( i + 1 )] );
+		VectorAdd( total, verts[i], total );
 
 		if( warpface->flags & SURF_DRAWTURB )
 		{
-			s = DotProduct( verts, warpface->texinfo->vecs[0] );
-			t = DotProduct( verts, warpface->texinfo->vecs[1] );
+			s = DotProduct( verts[i], warpface->texinfo->vecs[0] );
+			t = DotProduct( verts[i], warpface->texinfo->vecs[1] );
 		}
 		else
 		{
-			s = DotProduct( verts, warpface->texinfo->vecs[0] ) + warpface->texinfo->vecs[0][3];
-			t = DotProduct( verts, warpface->texinfo->vecs[1] ) + warpface->texinfo->vecs[1][3];
+			s = DotProduct( verts[i], warpface->texinfo->vecs[0] ) + warpface->texinfo->vecs[0][3];
+			t = DotProduct( verts[i], warpface->texinfo->vecs[1] ) + warpface->texinfo->vecs[1][3];
 			s /= warpface->texinfo->texture->width;
 			t /= warpface->texinfo->texture->height;
 		}
@@ -431,13 +427,13 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts
 		if( !( warpface->flags & SURF_DRAWTURB ))
 		{
 			// lightmap texture coordinates
-			s = DotProduct( verts, warpface->texinfo->vecs[0] ) + warpface->texinfo->vecs[0][3];
+			s = DotProduct( verts[i], warpface->texinfo->vecs[0] ) + warpface->texinfo->vecs[0][3];
 			s -= warpface->texturemins[0];
 			s += warpface->light_s * LM_SAMPLE_SIZE;
 			s += LM_SAMPLE_SIZE >> 1;
 			s /= BLOCK_SIZE * LM_SAMPLE_SIZE; //fa->texinfo->texture->width;
 
-			t = DotProduct( verts, warpface->texinfo->vecs[1] ) + warpface->texinfo->vecs[1][3];
+			t = DotProduct( verts[i], warpface->texinfo->vecs[1] ) + warpface->texinfo->vecs[1][3];
 			t -= warpface->texturemins[1];
 			t += warpface->light_t * LM_SAMPLE_SIZE;
 			t += LM_SAMPLE_SIZE >> 1;
@@ -474,7 +470,7 @@ void GL_SubdivideSurface( msurface_t *fa )
 	vec3_t	verts[SUBDIVIDE_SIZE];
 	int	numverts;
 	int	i, lindex;
-	float	*vec;
+	vec3_t vec;
 
 	// convert edges back to a normal polygon
 	numverts = 0;
@@ -489,7 +485,7 @@ void GL_SubdivideSurface( msurface_t *fa )
 	}
 
 	// do subdivide
-	SubdividePolygon_r( fa, numverts, verts[0] );
+	SubdividePolygon_r( fa, numverts, verts );
 }
 
 int pfnDrawConsoleString( int x, int y, const char *string )

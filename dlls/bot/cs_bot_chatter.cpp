@@ -73,7 +73,7 @@ void BotMeme::Transmit(CCSBot *pSender) const
 			continue;
 
 		// ignore enemies, since we can't hear them talk
-		if (pSender->m_iTeam != pSender->m_iTeam)
+		if (pSender->m_iTeam != pPlayer->m_iTeam)
 			continue;
 
 		// no teamplay chat what jb?

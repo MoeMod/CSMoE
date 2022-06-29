@@ -87,10 +87,10 @@ typedef struct engine_studio_api_s
 	void (*GetAliasScale)(float *x, float *y);
 
 	// Get bone, light, alias, and rotation matrices
-	float ****(*StudioGetBoneTransform) (void);
-	float ****(*StudioGetLightTransform)(void);
-	float ***(*StudioGetAliasTransform) (void);
-	float ***(*StudioGetRotationMatrix) (void);
+    matrix3x4 (*(*StudioGetBoneTransform) (void))[MAXSTUDIOBONES];
+    matrix3x4 (*(*StudioGetLightTransform)(void))[MAXSTUDIOBONES];
+    matrix3x4 *(*StudioGetAliasTransform) (void);
+    matrix3x4 *(*StudioGetRotationMatrix) (void);
 
 	// Set up body part, and get submodel pointers
 	void (*StudioSetupModel)(int bodypart, void **ppbodypart, void **ppsubmodel);

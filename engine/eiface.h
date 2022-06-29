@@ -333,7 +333,7 @@ typedef struct saverestore_s
 	// smooth transition
 	int		fUseLandmark;
 	char		szLandmarkName[20];		// landmark we'll spawn near in next level
-	vec3_t		vecLandmarkOffset;		// for landmark transitions
+	vec3_c		vecLandmarkOffset;		// for landmark transitions
 	float		time;
 	char		szCurrentMapName[32];	// To check global entities
 } SAVERESTOREDATA;

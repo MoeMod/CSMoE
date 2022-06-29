@@ -818,26 +818,22 @@ void SetObjectCollisionBox(entvars_t *pev)
 	if (pev->solid == SOLID_BSP && (pev->angles.x || pev->angles.y || pev->angles.z))
 	{
 		float v, max = 0;
-		int i;
-
-		for (i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 		{
-			v = fabs(((float *)pev->mins)[i]);
+			v = fabs(pev->mins[i]);
 
 			if (v > max)
 				max = v;
 
-			v = fabs(((float *)pev->maxs)[i]);
+			v = fabs(pev->maxs[i]);
 
 			if (v > max)
 				max = v;
 		}
 
-		for (i = 0; i < 3; i++)
-		{
-			((float *)pev->absmin)[i] = ((float *)pev->origin)[i] - max;
-			((float *)pev->absmax)[i] = ((float *)pev->origin)[i] + max;
-		}
+		vec3_t vecmax { max, max, max };
+        pev->absmin = pev->origin - vecmax;
+        pev->absmax = pev->origin + vecmax;
 	}
 	else
 	{

@@ -98,7 +98,7 @@ void Mod_DecryptModel(const char *model_name, byte *buffer)
 			for (int j = 0; j < pbodypart[i].nummodels; j++)
 			{
 				if (pmodel[j].numverts > 0)
-					DecryptData(buffer + pmodel[j].vertindex, pmodel[j].numverts * sizeof(vec3_t));
+					DecryptData(buffer + pmodel[j].vertindex, pmodel[j].numverts * sizeof(vec3_c));
 			}
 		}
 

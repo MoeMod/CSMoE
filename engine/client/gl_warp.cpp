@@ -101,17 +101,17 @@ static qboolean CheckSkybox( const char *name )
 	return false;
 }
 
-void DrawSkyPolygon( int nump, float *vecs )
+void DrawSkyPolygon( int nump, vec3_t *vecs )
 {
 	int	i, j, axis;
-	float	s, t, dv, *vp;
+	float	s, t, dv;
 	vec3_t	v, av;
 
 	// decide which face it maps to
 	VectorClear( v );
 
-	for( i = 0, vp = vecs; i < nump; i++, vp += 3 )
-		VectorAdd( vp, v, v );
+	for( i = 0; i < nump; i++ )
+		VectorAdd( vecs[i], v, v );
 
 	av[0] = fabs( v[0] );
 	av[1] = fabs( v[1] );
@@ -124,8 +124,9 @@ void DrawSkyPolygon( int nump, float *vecs )
 	else axis = (v[2] < 0) ? 5 : 4;
 
 	// project new texture coords
-	for( i = 0, vp = vecs; i < nump; i++, vp += 3 )
+	for( i = 0; i < nump; i++ )
 	{
+        const auto vp = vecs[i];
 		j = vec_to_st[axis][2];
 		dv = (j > 0) ? vp[j-1] : -vp[-j-1];
 
@@ -149,10 +150,10 @@ void DrawSkyPolygon( int nump, float *vecs )
 ClipSkyPolygon
 ==============
 */
-void ClipSkyPolygon( int nump, float *vecs, int stage )
+void ClipSkyPolygon( int nump, vec3_t *vecs, int stage )
 {
-	const float	*norm;
-	float		*v, d, e;
+    vec3_t norm;
+	float		d, e;
 	qboolean		front, back;
 	float		dists[MAX_CLIP_VERTS + 1];
 	int		sides[MAX_CLIP_VERTS + 1];
@@ -172,8 +173,9 @@ loc1:
 
 	front = back = false;
 	norm = skyclip[stage];
-	for( i = 0, v = vecs; i < nump; i++, v += 3 )
+	for( i = 0; i < nump; i++ )
 	{
+        const auto v = vecs[i];
 		d = DotProduct( v, norm );
 		if( d > ON_EPSILON )
 		{
@@ -202,11 +204,12 @@ loc1:
 	// clip it
 	sides[i] = sides[0];
 	dists[i] = dists[0];
-	VectorCopy( vecs, ( vecs + ( i * 3 )));
+    vecs[i] = vecs[0];
 	newc[0] = newc[1] = 0;
 
-	for( i = 0, v = vecs; i < nump; i++, v += 3 )
+	for( i = 0; i < nump; i++ )
 	{
+        const auto v = vecs[i];
 		switch( sides[i] )
 		{
 		case SIDE_FRONT:
@@ -240,8 +243,8 @@ loc1:
 	}
 
 	// continue
-	ClipSkyPolygon( newc[0], newv[0][0], stage + 1 );
-	ClipSkyPolygon( newc[1], newv[1][0], stage + 1 );
+	ClipSkyPolygon( newc[0], newv[0], stage + 1 );
+	ClipSkyPolygon( newc[1], newv[1], stage + 1 );
 }
 
 void MakeSkyVec( float s, float t, int axis )
@@ -278,7 +281,7 @@ void MakeSkyVec( float s, float t, int axis )
 	t = 1.0f - t;
 
 	pglTexCoord2f( s, t );
-	pglVertex3fv( v );
+	pglVertex3fv( v.data() );
 }
 
 /*
@@ -323,11 +326,11 @@ void R_AddSkyBoxSurface( msurface_t *fa )
 	}
 
 	// calculate vertex values for sky box
-	for( p = fa->polys, verts_p = (float *)p + ( ( sizeof( void* ) + sizeof( int ) ) >> 1 ); p; p = p->next )
+	for( p = fa->polys, verts_p = p->verts[0]; p; p = p->next )
 	{
 		for( i = 0; i < p->numverts; i++ )
 			VectorSubtract( &verts_p[VERTEXSIZE * i], RI.cullorigin, verts[i] );
-		ClipSkyPolygon( p->numverts, verts[0], 0 );
+		ClipSkyPolygon( p->numverts, verts, 0 );
 	}
 }
 
@@ -384,7 +387,7 @@ void R_DrawSkyBox( void )
 	pglDisable( GL_ALPHA_TEST );
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
-	if( clgame.movevars.skyangle && !VectorIsNull( (float *)&clgame.movevars.skydir_x ))
+	if( clgame.movevars.skyangle && clgame.movevars.skydir_x && clgame.movevars.skydir_y && clgame.movevars.skydir_z )
 	{
 		matrix4x4	m;
 		Matrix4x4_CreateRotate( m, clgame.movevars.skyangle, clgame.movevars.skydir_x, clgame.movevars.skydir_y, clgame.movevars.skydir_z );

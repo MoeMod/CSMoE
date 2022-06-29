@@ -320,7 +320,7 @@ static void CL_BulletTracerDraw( particle_t *p, float frametime )
 
 	// calculate distance
 	VectorCopy( p->vel, vecDir );
-	totalDist = VectorNormalizeLength( vecDir );
+	totalDist = vecDir.NormalizeInPlace();
 
 	length = p->ramp; // ramp used as length
 
@@ -371,19 +371,19 @@ static void CL_BulletTracerDraw( particle_t *p, float frametime )
 
 	VectorMA( vecStart, -width, cross, tmp );	
 	pglTexCoord2f( 1.0f, 0.0f );
-	pglVertex3fv( tmp );
+	pglVertex3fv( tmp.data() );
 
 	VectorMA( vecStart, width, cross, tmp );
 	pglTexCoord2f( 0.0f, 0.0f );
-	pglVertex3fv( tmp );
+	pglVertex3fv( tmp.data() );
 
 	VectorMA( vecEnd, width, cross, tmp );
 	pglTexCoord2f( 0.0f, fOffset );
-	pglVertex3fv( tmp );
+	pglVertex3fv( tmp.data() );
 
 	VectorMA( vecEnd, -width, cross, tmp );
 	pglTexCoord2f( 1.0f, fOffset );
-	pglVertex3fv( tmp );
+	pglVertex3fv( tmp.data() );
 
 	pglEnd();
 }
@@ -432,16 +432,14 @@ void CL_UpdateParticle( particle_t *p, float ft )
 		p->ramp += time2;
 		if( p->ramp >= 8 ) p->die = -1;
 		else p->color = ramp1[(int)p->ramp];
-		for( i = 0; i < 3; i++ )
-			p->vel[i] += p->vel[i] * dvel;
+        p->vel *= 1 + dvel;
 		p->vel[2] -= grav;
 		break;
 	case pt_explode2:
 		p->ramp += time3;
 		if( p->ramp >= 8 ) p->die = -1;
 		else p->color = ramp2[(int)p->ramp];
-		for( i = 0; i < 3; i++ )
-			p->vel[i] -= p->vel[i] * ft;
+        p->vel *= 1 - ft;
 		p->vel[2] -= grav;
 		break;
 	case pt_blob:
@@ -1064,7 +1062,7 @@ void GAME_EXPORT CL_RocketTrail(const vec3_t vStart, const vec3_t end, int type 
 
 	VectorCopy(vStart, start);
 	VectorSubtract( end, start, vec );
-	len = VectorNormalizeLength( vec );
+	len = vec.NormalizeInPlace();
 
 	if( type < 128 )
 	{
@@ -1163,7 +1161,7 @@ static void CL_DrawLine( const vec3_t start, const vec3_t end, int pcolor, float
 
 	// Determine distance;
 	VectorSubtract( end, start, diff );
-	len = VectorNormalizeLength( diff );
+	len = diff.NormalizeInPlace();
 	curdist = 0;
 
 	while( curdist <= len )
@@ -1171,8 +1169,7 @@ static void CL_DrawLine( const vec3_t start, const vec3_t end, int pcolor, float
 		p = CL_AllocParticle( NULL );
 		if( !p ) return;
 
-		for( i = 0; i < 3; i++ )
-			p->org[i] = start[i] + curdist * diff[i];
+        p->org = fma(curdist, diff, start);
 
 		p->color = pcolor;
 		p->type = pt_static;
@@ -1473,16 +1470,16 @@ void CL_DrawTracer( vec3_t start, vec3_t delta, float width, rgb_t color, int al
 	pglBegin( GL_QUADS );
 
 	pglTexCoord2f( 0.0f, endV );
-	pglVertex3fv( verts[2] );
+	pglVertex3fv( verts[2].data() );
 
 	pglTexCoord2f( 1.0f, endV );
-	pglVertex3fv( verts[3] );
+	pglVertex3fv( verts[3].data() );
 
 	pglTexCoord2f( 1.0f, startV );
-	pglVertex3fv( verts[1] );
+	pglVertex3fv( verts[1].data() );
 
 	pglTexCoord2f( 0.0f, startV );
-	pglVertex3fv( verts[0] );
+	pglVertex3fv( verts[0].data() );
 
 	pglEnd();
 }
@@ -1561,7 +1558,7 @@ void GAME_EXPORT CL_TracerEffect( const vec3_t start, const vec3_t end )
 	VectorSubtract( end, start, dir );
 	VectorCopy( dir, p->vel );
 
-	dist = VectorNormalizeLength( dir );
+	dist = dir.NormalizeInPlace();
 
 	// don't make small tracers
 	if( dist <= traceroffset->value )

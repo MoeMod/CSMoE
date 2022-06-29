@@ -902,7 +902,7 @@ byte *GL_ResampleTexture( const byte *source, int inWidth, int inHeight, int out
 				normal[1] = (pix1[1] * (1.0f/127.0f) - 1.0f) + (pix2[1] * (1.0f/127.0f) - 1.0f) + (pix3[1] * (1.0f/127.0f) - 1.0f) + (pix4[1] * (1.0f/127.0f) - 1.0f);
 				normal[2] = (pix1[2] * (1.0f/127.0f) - 1.0f) + (pix2[2] * (1.0f/127.0f) - 1.0f) + (pix3[2] * (1.0f/127.0f) - 1.0f) + (pix4[2] * (1.0f/127.0f) - 1.0f);
 
-				if( !VectorNormalizeLength( normal ))
+				if( !normal.NormalizeInPlace())
 					VectorSet( normal, 0.0f, 0.0f, 1.0f );
 
 				((byte *)(out+x))[0] = (byte)(128 + 127 * normal[0]);
@@ -987,7 +987,7 @@ static void GL_BuildMipMap( byte *in, int width, int height, qboolean isNormalMa
 				normal[1] = (in[1] * (1.0f/127.0f) - 1.0f) + (in[5] * (1.0f/127.0f) - 1.0f) + (in[width+1] * (1.0f/127.0f) - 1.0f) + (in[width+5] * (1.0f/127.0f) - 1.0f);
 				normal[2] = (in[2] * (1.0f/127.0f) - 1.0f) + (in[6] * (1.0f/127.0f) - 1.0f) + (in[width+2] * (1.0f/127.0f) - 1.0f) + (in[width+6] * (1.0f/127.0f) - 1.0f);
 
-				if( !VectorNormalizeLength( normal ))
+				if( !normal.NormalizeInPlace())
 					VectorSet( normal, 0.0f, 0.0f, 1.0f );
 
 				out[0] = (byte)(128 + 127 * normal[0]);

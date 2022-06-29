@@ -432,7 +432,7 @@ void CXashFileSystem::FindClose(FileFindHandle_t handle)
 {
     findData_t *ptr = (findData_t *)handle;
 
-    if( ptr->search )
+    if( ptr && ptr->search )
         Mem_Free( ptr->search );
     delete ptr;
     return;

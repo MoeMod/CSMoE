@@ -60,10 +60,10 @@ void CStudioModelRenderer::Init(void)
 
 	IEngineStudio.GetModelCounters(&m_pStudioModelCount, &m_pModelsDrawn);
 
-	m_pbonetransform = (float (*)[MAXSTUDIOBONES][3][4])IEngineStudio.StudioGetBoneTransform();
-	m_plighttransform = (float (*)[MAXSTUDIOBONES][3][4])IEngineStudio.StudioGetLightTransform();
-	m_paliastransform = (float (*)[3][4])IEngineStudio.StudioGetAliasTransform();
-	m_protationmatrix = (float (*)[3][4])IEngineStudio.StudioGetRotationMatrix();
+	m_pbonetransform = IEngineStudio.StudioGetBoneTransform();
+	m_plighttransform = IEngineStudio.StudioGetLightTransform();
+	m_paliastransform = IEngineStudio.StudioGetAliasTransform();
+	m_protationmatrix = IEngineStudio.StudioGetRotationMatrix();
 }
 
 CStudioModelRenderer::CStudioModelRenderer(void)
@@ -293,27 +293,13 @@ void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, mstudiobon
 void CStudioModelRenderer::StudioSlerpBones(vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s)
 {
 	int i;
-	vec4_t q3;
-	float s1;
 
-	if (s < 0)
-		s = 0;
-	else if (s > 1.0)
-		s = 1.0;
-
-	s1 = 1.0 - s;
+    s = std::clamp( s, 0.0f, 1.0f );
 
 	for (i = 0; i < m_pStudioHeader->numbones; i++)
 	{
-		QuaternionSlerp(q1[i], q2[i], s, q3);
-
-		q1[i][0] = q3[0];
-		q1[i][1] = q3[1];
-		q1[i][2] = q3[2];
-		q1[i][3] = q3[3];
-		pos1[i][0] = pos1[i][0] * s1 + pos2[i][0] * s;
-		pos1[i][1] = pos1[i][1] * s1 + pos2[i][1] * s;
-		pos1[i][2] = pos1[i][2] * s1 + pos2[i][2] * s;
+        QuaternionSlerp( q1[i], q2[i], s, q1[i] );
+        pos1[i] = lerp(pos1[i], pos2[i], s);
 	}
 }
 
@@ -424,7 +410,7 @@ void CStudioModelRenderer::StudioSetUpTransform(int trivial_accept)
 
 	if (!IEngineStudio.IsHardware())
 	{
-		static float viewmatrix[3][4];
+		static matrix3x4 viewmatrix;
 
 		VectorCopy(m_vRight, viewmatrix[0]);
 		VectorCopy(m_vUp, viewmatrix[1]);
@@ -518,7 +504,7 @@ void CStudioModelRenderer::StudioCalcRotations(vec3_t pos[], vec4_t *q, mstudios
 		pos[pseqdesc->motionbone][2] += s * pseqdesc->linearmovement[2];
 }
 
-void CStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, float transform[3][4])
+void CStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, matrix3x4_ref transform)
 {
 	switch (ent->curstate.renderfx)
 	{
@@ -618,7 +604,7 @@ void CStudioModelRenderer::StudioSetupBones(void)
 
 	static vec3_t pos[MAXSTUDIOBONES];
 	static vec4_t q[MAXSTUDIOBONES];
-	float bonematrix[3][4];
+	matrix3x4 bonematrix;
 
 	static vec3_t pos2[MAXSTUDIOBONES];
 	static vec4_t q2[MAXSTUDIOBONES];
@@ -802,7 +788,7 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 	mstudioanim_t *panim;
 
 	static vec3_t pos[MAXSTUDIOBONES];
-	float bonematrix[3][4];
+	matrix3x4 bonematrix;
 	static vec4_t q[MAXSTUDIOBONES];
 
 	if( !m_pStudioHeader || !m_pCurrentEntity )
@@ -1503,7 +1489,7 @@ void CStudioModelRenderer::StudioDrawShadow( Vector origin, float scale )
 	p4.y = pmtrace.endpos.y - pmtrace.plane.normal.z;
 	p4.z = pmtrace.endpos.z + 2.0f + pmtrace.plane.normal.x + pmtrace.plane.normal.y;
 
-	IEngineStudio.StudioRenderShadow( m_iShadowSprite, (float *)p1, (float *)p2, (float *)p3, (float *)p4 );
+	IEngineStudio.StudioRenderShadow( m_iShadowSprite, p1.data(), p2.data(), p3.data(), p4.data() );
 }
 
 }

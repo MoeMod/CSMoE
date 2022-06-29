@@ -506,7 +506,7 @@ void InitRain( void )
 }
 
 
-void SetPoint( float x, float y, float z, float (*matrix)[4])
+void SetPoint( float x, float y, float z, cmatrix3x4 matrix)
 {
 	Vector point( x, y, z ), result;
 
@@ -574,7 +574,7 @@ void DrawRain( void )
 		const model_s *pTexture = gEngfuncs.GetSpritePointer( Rain.hsprSnow );
 		float visibleHeight = Rain.globalHeight - SNOWFADEDIST;
 		vec3_t normal;
-		float  matrix[3][4];
+		matrix3x4 matrix;
 
 		gEngfuncs.GetViewAngles( normal );
 		AngleMatrix (normal, matrix);	// calc view matrix

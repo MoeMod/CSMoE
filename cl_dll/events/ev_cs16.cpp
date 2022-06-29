@@ -495,7 +495,7 @@ void EV_CS16Client_CreateSmoke(int type, Vector origin, Vector dir, int speed, f
 	}
 }
 
-void EV_HLDM_CreateSmoke(const vec3_t origin, const vec3_t dir, int speed, float scale, int r, int g, int b, int iSmokeType, float *base_velocity, bool bWind, int framerate)
+void EV_HLDM_CreateSmoke(const vec3_t origin, const vec3_t dir, int speed, float scale, int r, int g, int b, int iSmokeType, const vec3_t base_velocity, bool bWind, int framerate)
 {
 	char model[256];
 	int model_index;

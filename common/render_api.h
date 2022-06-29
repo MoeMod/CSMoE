@@ -223,7 +223,7 @@ typedef struct render_api_s
 		
 	// Misc renderer functions
 	void		(*GL_DrawParticles)( const vec3_t vieworg, const vec3_t fwd, const vec3_t rt, const vec3_t up, unsigned int clipFlags );
-	void		(*EnvShot)( const float *vieworg, const char *name, qboolean skyshot, int shotsize ); // creates a cubemap or skybox into gfx\env folder
+	void		(*EnvShot)( const vec3_t vieworg, const char *name, qboolean skyshot, int shotsize ); // creates a cubemap or skybox into gfx\env folder
 	int		(*COM_CompareFileTime)( const char *filename1, const char *filename2, int *iCompare );
 	void		(*Host_Error)( const char *error, ... ); // cause Host Error
 	int		(*SPR_LoadExt)( const char *szPicName, unsigned int texFlags ); // extended version of SPR_Load
@@ -249,9 +249,9 @@ typedef struct render_interface_s
 	// build all the lightmaps on new level or when gamma is changed
 	void		(*GL_BuildLightmaps)( void );
 	// setup map bounds for ortho-projection when we in dev_overview mode
-	void		(*GL_OrthoBounds)( const float *mins, const float *maxs );
+	void		(*GL_OrthoBounds)( const vec2_t mins, const vec2_t maxs );
 	// handle decals which hit mod_studio or mod_sprite
-	void		(*R_StudioDecalShoot)( int decalTexture, struct cl_entity_s *ent, const float *start, const float *pos, int flags, modelstate_t *state );
+	void		(*R_StudioDecalShoot)( int decalTexture, struct cl_entity_s *ent, const vec3_t start, const vec3_t pos, int flags, modelstate_t *state );
 	// prepare studio decals for save
 	int		(*R_CreateStudioDecalList)( decallist_t *pList, int count, qboolean changelevel );
 	// clear decals by engine request (e.g. for demo recording or vid_restart)
@@ -259,7 +259,7 @@ typedef struct render_interface_s
 	// grab r_speeds message
 	qboolean		(*R_SpeedsMessage)( char *out, size_t size );
 	// replace with built-in R_DrawCubemapView for make skyshots or envshots
-	qboolean		(*R_DrawCubemapView)( const float *origin, const float *angles, int size );
+	qboolean		(*R_DrawCubemapView)( const vec3_t origin, const vec3_t angles, int size );
 	// alloc or destroy studiomodel custom data
 	void		(*Mod_ProcessUserData)( struct model_s *mod, qboolean create, const byte *buffer );
 } render_interface_t;

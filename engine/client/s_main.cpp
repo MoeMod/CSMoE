@@ -798,7 +798,7 @@ void SND_Spatialize( channel_t *ch )
 	else VectorSubtract( ch->origin, s_listener.origin, source_vec );
 
 	// normalize source_vec and get distance from listener to source
-	dist = VectorNormalizeLength( source_vec );
+	dist = source_vec.NormalizeInPlace();
 	dot = DotProduct( s_listener.right, source_vec );
 
 	// for sounds with a radius, spatialize left/right evenly within the radius

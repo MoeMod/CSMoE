@@ -452,9 +452,9 @@ pfnStudioGetBoneTransform
 
 ===============
 */
-static float ****GAME_EXPORT pfnStudioGetBoneTransform( void )
+static matrix3x4 (* GAME_EXPORT pfnStudioGetBoneTransform( void ))[MAXSTUDIOBONES]
 {
-	return (float ****)g_bonestransform;
+	return &g_bonestransform;
 }
 
 /*
@@ -463,9 +463,9 @@ pfnStudioGetLightTransform
 
 ===============
 */
-static float ****GAME_EXPORT pfnStudioGetLightTransform( void )
+static matrix3x4 (* GAME_EXPORT pfnStudioGetLightTransform( void ))[MAXSTUDIOBONES]
 {
-	return (float ****)g_lighttransform;
+	return &g_lighttransform;
 }
 
 /*
@@ -474,9 +474,9 @@ pfnStudioGetAliasTransform
 
 ===============
 */
-static float ***GAME_EXPORT pfnStudioGetAliasTransform( void )
+static matrix3x4 * GAME_EXPORT pfnStudioGetAliasTransform( void )
 {
-	return (float ***)&g_aliastransform;
+	return &g_aliastransform;
 }
 
 /*
@@ -485,9 +485,9 @@ pfnStudioGetRotationMatrix
 
 ===============
 */
-static float ***GAME_EXPORT pfnStudioGetRotationMatrix( void )
+static matrix3x4 *GAME_EXPORT pfnStudioGetRotationMatrix( void )
 {
-	return (float ***)&g_rotationmatrix;
+	return &g_rotationmatrix;
 }
 
 /*
@@ -1305,7 +1305,7 @@ StudioSetupChrome
 
 ====================
 */
-void R_StudioSetupChrome( float *pchrome, int bone, const vec3_t normal )
+void R_StudioSetupChrome( vec2_t_ref pchrome, int bone, const vec3_t normal )
 {
 	float	n;
 
@@ -1395,8 +1395,7 @@ static void R_StudioCalcAttachments( void )
 		Matrix3x4_VectorTransform( g_lighttransform[pAtt[i].bone], pAtt[i].org, RI.currententity->attachment[i] );
 		VectorSubtract( RI.currententity->attachment[i], RI.currententity->origin, localOrg ); //gr2
 		Matrix3x4_OriginFromMatrix( g_lighttransform[pAtt[i].bone], bonepos );
-		VectorSubtract( localOrg, bonepos, forward );	// make forward
-		VectorNormalizeFast( forward );
+        forward = (localOrg - bonepos).Normalize();
 		VectorAngles( forward, localAng );
 	}
 }
@@ -1713,7 +1712,7 @@ R_StudioLighting
 
 ===============
 */
-void R_StudioLighting( float *lv, int bone, int flags, const vec3_t normal )
+void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 {
 	float		_max, ambient;
 	vec3_t		illum;
@@ -1769,7 +1768,7 @@ void R_StudioLighting( float *lv, int bone, int flags, const vec3_t normal )
 		}
 	}
 	
-	_max = VectorMax( illum );
+	_max = VectorMaxElement( illum );
 
 	if( _max > 1.0f )
 		VectorScale( illum, ( 1.0f / _max ), lv );
@@ -1965,12 +1964,13 @@ static void R_StudioDrawPoints_legacy( void )
 	int		i, j, m_skinnum;
 	byte		*pvertbone;
 	byte		*pnormbone;
-	vec3_t		*pstudioverts;
-	vec3_t		*pstudionorms;
+	vec3_c		*pstudioverts;
+	vec3_c		*pstudionorms;
 	mstudiotexture_t	*ptexture;
 	mstudiomesh_t	*pmesh;
 	short		*pskinref;
-	float		*av, *lv, *nv, scale = 0.0f;
+	float		scale = 0.0f;
+    vec3_t      av, lv, nv;
 
 	R_StudioSetupTextureHeader ();
 
@@ -1992,8 +1992,8 @@ static void R_StudioDrawPoints_legacy( void )
 	ASSERT( ptexture != NULL );
 
 	pmesh = (mstudiomesh_t *)((byte *)m_pStudioHeader + m_pSubModel->meshindex);
-	pstudioverts = (vec3_t *)((byte *)m_pStudioHeader + m_pSubModel->vertindex);
-	pstudionorms = (vec3_t *)((byte *)m_pStudioHeader + m_pSubModel->normindex);
+	pstudioverts = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->vertindex);
+	pstudionorms = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->normindex);
 
 	pskinref = (short *)((byte *)m_pTextureHeader + m_pTextureHeader->skinindex);
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
@@ -2010,7 +2010,6 @@ static void R_StudioDrawPoints_legacy( void )
 			Matrix3x4_VectorRotate( g_bonestransform[pnormbone[i]], pstudionorms[i], g_xformnorms[i] );
 	}
 
-	lv = (float *)g_lightvalues;
 	for( j = 0; j < m_pSubModel->nummesh; j++ )
 	{
 		g_nFaceFlags = ptexture[pskinref[pmesh[j].skinref]].flags;
@@ -2019,12 +2018,12 @@ static void R_StudioDrawPoints_legacy( void )
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
 
-		for( i = 0; i < pmesh[j].numnorms; i++, lv += 3, pstudionorms++, pnormbone++ )
+		for( i = 0; i < pmesh[j].numnorms; i++, pstudionorms++, pnormbone++ )
 		{
-			R_StudioLighting( lv, *pnormbone, g_nFaceFlags, *pstudionorms );
+			R_StudioLighting( g_lightvalues[i], *pnormbone, g_nFaceFlags, *pstudionorms );
 
 			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
-				R_StudioSetupChrome( g_chrome[(vec3_t *)lv - g_lightvalues], *pnormbone, *pstudionorms );
+				R_StudioSetupChrome( g_chrome[i], *pnormbone, *pstudionorms );
 		}
 	}
 
@@ -2187,7 +2186,7 @@ static void R_StudioDrawPoints_legacy( void )
 					}
 					else
 					{
-						lv = (float *)g_lightvalues[ptricmds[1]];
+						lv = g_lightvalues[ptricmds[1]];
 						pglColor4f( lv[0], lv[1], lv[2], alpha );
 					}
 				}
@@ -2196,16 +2195,15 @@ static void R_StudioDrawPoints_legacy( void )
 
 				if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 				{
-					vec3_t	scaled_vertex;
-					nv = (float *)g_xformnorms[ptricmds[1]];
-					VectorMA( av, scale, nv, scaled_vertex );
-					pglVertex3fv( scaled_vertex );
+					nv = g_xformnorms[ptricmds[1]];
+                    vec3_t	scaled_vertex = fma( av, scale, nv );
+					pglVertex3fv( scaled_vertex.data() );
 				}
 				else
 				{
-					pglVertex3fv( av );
+					pglVertex3fv( av.data() );
 					ASSERT( g_nNumArrayVerts < MAXARRAYVERTS );
-					VectorCopy( av, g_xarrayverts[g_nNumArrayVerts] ); // store off vertex
+                    g_xarrayverts[g_nNumArrayVerts] = av; // store off vertex
 					g_nNumArrayVerts++;
 				}
 			}
@@ -2229,7 +2227,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 	GLubyte alpha = 255 * a;
 	int i;
 	vec2_t uv;
-	float *av, *lv, *nv;
+	vec3_t av, lv, nv;
 	uint startArrayVerts = g_nNumArrayVerts;
 	uint startArrayElems = g_nNumArrayElems;
 
@@ -2327,7 +2325,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				}
 				else
 				{
-					lv = (float *)g_lightvalues[ptricmds[1]];
+					lv = g_lightvalues[ptricmds[1]];
 					cl[0] = lv[0]*255;
 					cl[1] = lv[1]*255;
 					cl[2] = lv[2]*255;
@@ -2365,7 +2363,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 			av = g_xformverts[ptricmds[0]];
 			if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 			{
-				nv = (float *)g_xformnorms[ptricmds[1]];
+				nv = g_xformnorms[ptricmds[1]];
 				VectorMA( av, scale, nv, av );
 			}
 
@@ -2376,7 +2374,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 	}
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglVertexPointer( 3, GL_FLOAT, 12, g_xarrayverts );
+	pglVertexPointer( 3, GL_FLOAT, sizeof(vec3_t), g_xarrayverts );
 
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );
@@ -2571,8 +2569,8 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	int		i, j, m_skinnum;
 	byte		*pvertbone;
 	byte		*pnormbone;
-	vec3_t		*pstudioverts;
-	vec3_t		*pstudionorms;
+	vec3_c		*pstudioverts;
+	vec3_c		*pstudionorms;
 	mstudiotexture_t	*ptexture;
 	mstudiomesh_t	*pmesh;
 	short		*pskinref;
@@ -2604,8 +2602,8 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	ASSERT( ptexture != NULL );
 
 	pmesh = (mstudiomesh_t *)((byte *)m_pStudioHeader + m_pSubModel->meshindex);
-	pstudioverts = (vec3_t *)((byte *)m_pStudioHeader + m_pSubModel->vertindex);
-	pstudionorms = (vec3_t *)((byte *)m_pStudioHeader + m_pSubModel->normindex);
+	pstudioverts = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->vertindex);
+	pstudionorms = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->normindex);
 
 	pskinref = (short *)((byte *)m_pTextureHeader + m_pTextureHeader->skinindex);
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
@@ -2628,8 +2626,6 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 			Matrix3x4_VectorRotate( g_bonestransform[pnormbone[i]], pstudionorms[i], g_xformnorms[i] );
 	}
 
-	lv = (float *)g_lightvalues;
-
 	for( j = 0; j < m_pSubModel->nummesh; j++ )
 	{
 		g_nFaceFlags = ptexture[pskinref[pmesh[j].skinref]].flags;
@@ -2638,13 +2634,13 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
 
-		for( i = 0; i < pmesh[j].numnorms; i++, lv += 3, pstudionorms++, pnormbone++ )
+		for( i = 0; i < pmesh[j].numnorms; i++, pstudionorms++, pnormbone++ )
 		{
-			R_StudioLighting( lv, *pnormbone, g_nFaceFlags, *pstudionorms );
+			R_StudioLighting( g_lightvalues[i], *pnormbone, g_nFaceFlags, *pstudionorms );
 
 			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 			{
-				R_StudioSetupChrome( g_chrome[(vec3_t *)lv - g_lightvalues], *pnormbone, *pstudionorms );
+				R_StudioSetupChrome( g_chrome[i], *pnormbone, *pstudionorms );
 			}
 		}
 	}
@@ -2735,21 +2731,21 @@ static void GAME_EXPORT R_StudioDrawHulls( void )
 
 		pglBegin( GL_QUAD_STRIP );
 		for( j = 0; j < 10; j++ )
-			pglVertex3fv( v2[j & 7] );
+			pglVertex3fv( v2[j & 7].data() );
 		pglEnd( );
 	
 		pglBegin( GL_QUAD_STRIP );
-		pglVertex3fv( v2[6] );
-		pglVertex3fv( v2[0] );
-		pglVertex3fv( v2[4] );
-		pglVertex3fv( v2[2] );
+		pglVertex3fv( v2[6].data() );
+		pglVertex3fv( v2[0].data() );
+		pglVertex3fv( v2[4].data() );
+		pglVertex3fv( v2[2].data() );
 		pglEnd( );
 
 		pglBegin( GL_QUAD_STRIP );
-		pglVertex3fv( v2[1] );
-		pglVertex3fv( v2[7] );
-		pglVertex3fv( v2[3] );
-		pglVertex3fv( v2[5] );
+		pglVertex3fv( v2[1].data() );
+		pglVertex3fv( v2[7].data() );
+		pglVertex3fv( v2[3].data() );
+		pglVertex3fv( v2[5].data() );
 		pglEnd( );			
 	}
 
@@ -2782,18 +2778,18 @@ static void GAME_EXPORT R_StudioDrawAbsBBox( void )
 
 	for( i = 0; i < 2; i += 1 )
 	{
-		pglVertex3fv( bbox[i+0] );
-		pglVertex3fv( bbox[i+2] );
-		pglVertex3fv( bbox[i+4] );
-		pglVertex3fv( bbox[i+6] );
-		pglVertex3fv( bbox[i+0] );
-		pglVertex3fv( bbox[i+4] );
-		pglVertex3fv( bbox[i+2] );
-		pglVertex3fv( bbox[i+6] );
-		pglVertex3fv( bbox[i*2+0] );
-		pglVertex3fv( bbox[i*2+1] );
-		pglVertex3fv( bbox[i*2+4] );
-		pglVertex3fv( bbox[i*2+5] );
+		pglVertex3fv( bbox[i+0].data() );
+		pglVertex3fv( bbox[i+2].data() );
+		pglVertex3fv( bbox[i+4].data() );
+		pglVertex3fv( bbox[i+6].data() );
+		pglVertex3fv( bbox[i+0].data() );
+		pglVertex3fv( bbox[i+4].data() );
+		pglVertex3fv( bbox[i+2].data() );
+		pglVertex3fv( bbox[i+6].data() );
+		pglVertex3fv( bbox[i*2+0].data() );
+		pglVertex3fv( bbox[i*2+1].data() );
+		pglVertex3fv( bbox[i*2+4].data() );
+		pglVertex3fv( bbox[i*2+5].data() );
 	}
 
 	pglEnd();
@@ -2824,9 +2820,9 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 			pglBegin( GL_LINES );
 			
 			Matrix3x4_OriginFromMatrix( g_bonestransform[pbones[i].parent], point );
-			pglVertex3fv( point );
+			pglVertex3fv( point.data() );
 			Matrix3x4_OriginFromMatrix( g_bonestransform[i], point );
-			pglVertex3fv( point );
+			pglVertex3fv( point.data() );
 			
 			pglEnd();
 
@@ -2835,10 +2831,10 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 			if( pbones[pbones[i].parent].parent != -1 )
 			{
 				Matrix3x4_OriginFromMatrix( g_bonestransform[pbones[i].parent], point );
-				pglVertex3fv( point );
+				pglVertex3fv( point.data() );
 			}
 			Matrix3x4_OriginFromMatrix( g_bonestransform[i], point );
-			pglVertex3fv( point );
+			pglVertex3fv( point.data() );
 			pglEnd();
 		}
 		else
@@ -2848,7 +2844,7 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 			pglColor3f( 0.8f, 0, 0 );
 			pglBegin( GL_POINTS );
 			Matrix3x4_OriginFromMatrix( g_bonestransform[i], point );
-			pglVertex3fv( point );
+			pglVertex3fv( point.data() );
 			pglEnd();
 		}
 	}
@@ -2877,23 +2873,23 @@ static void R_StudioDrawAttachments( void )
 		
 		pglBegin( GL_LINES );
 		pglColor3f( 1, 0, 0 );
-		pglVertex3fv( v[0] );
+		pglVertex3fv( v[0].data() );
 		pglColor3f( 1, 1, 1 );
-		pglVertex3fv (v[1] );
+		pglVertex3fv (v[1].data() );
 		pglColor3f( 1, 0, 0 );
-		pglVertex3fv (v[0] );
+		pglVertex3fv (v[0].data() );
 		pglColor3f( 1, 1, 1 );
-		pglVertex3fv (v[2] );
+		pglVertex3fv (v[2].data() );
 		pglColor3f( 1, 0, 0 );
-		pglVertex3fv (v[0] );
+		pglVertex3fv (v[0].data() );
 		pglColor3f( 1, 1, 1 );
-		pglVertex3fv( v[3] );
+		pglVertex3fv( v[3].data() );
 		pglEnd();
 
 		pglPointSize( 5.0f );
 		pglColor3f( 0, 1, 0 );
 		pglBegin( GL_POINTS );
-		pglVertex3fv( v[0] );
+		pglVertex3fv( v[0].data() );
 		pglEnd();
 		pglPointSize( 1.0f );
 	}
@@ -3382,12 +3378,12 @@ void R_StudioDeformShadow( void )
 	dist2 = -1.0f / DotProduct( g_mvShadowVec, g_shadowTrace.plane.normal );
 	VectorScale( g_mvShadowVec, dist2, g_mvShadowVec );
 
-	for( numVerts = 0, verts = g_xarrayverts[0];
+	for( numVerts = 0;
 		 numVerts < g_nNumArrayVerts;
-		 numVerts++, verts += 3 )
+		 numVerts++ )
 	{
-		dist2 = DotProduct( verts, g_shadowTrace.plane.normal ) - dist;
-		if( dist2 > 0.0f ) VectorMA( verts, dist2, g_mvShadowVec, verts );
+		dist2 = DotProduct( g_xarrayverts[numVerts], g_shadowTrace.plane.normal ) - dist;
+		if( dist2 > 0.0f ) VectorMA( g_xarrayverts[numVerts], dist2, g_mvShadowVec, g_xarrayverts[numVerts] );
 	}
 }
 
@@ -3402,7 +3398,7 @@ static void R_StudioDrawPlanarShadow( void )
 		pglEnable( GL_STENCIL_TEST );
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglVertexPointer( 3, GL_FLOAT, 12, g_xarrayverts );
+	pglVertexPointer( 3, GL_FLOAT, sizeof(vec3_t), g_xarrayverts );
 
 #if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
 	if( pglDrawRangeElements )
@@ -3783,7 +3779,7 @@ static int GAME_EXPORT R_StudioDrawPlayer( int flags, entity_state_t *pplayer )
 		if( RI.currententity->index > 0 )
 		{
 			cl_entity_t *ent = CL_GetEntityByIndex( RI.currententity->index );
-			Q_memcpy( ent->attachment, RI.currententity->attachment, sizeof( vec3_t ) * 4 );
+			Q_memcpy( ent->attachment, RI.currententity->attachment, sizeof( vec3_t ) * 16 );
 		}
 	}
 
@@ -3926,7 +3922,7 @@ static int GAME_EXPORT R_StudioDrawModel( int flags )
 		if( RI.currententity->index > 0 )
 		{
 			cl_entity_t *ent = CL_GetEntityByIndex( RI.currententity->index );
-			Q_memcpy( ent->attachment, RI.currententity->attachment, sizeof( vec3_t ) * 4 );
+			Q_memcpy( ent->attachment, RI.currententity->attachment, sizeof( vec3_t ) * 16 );
 		}
 	}
 

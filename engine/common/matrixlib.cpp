@@ -16,13 +16,6 @@ GNU General Public License for more details.
 #include "common.h"
 #include "mathlib.h"
 
-const matrix3x4 matrix3x4_identity =
-{
-{ 1, 0, 0, 0 },	// PITCH	[forward], org[0]
-{ 0, 1, 0, 0 },	// YAW	[right]  , org[1]
-{ 0, 0, 1, 0 },	// ROLL	[up]     , org[2]
-};
-
 /*
 ========================================================================
 
@@ -248,14 +241,6 @@ void Matrix3x4_Invert_Simple( matrix3x4_ref out, cmatrix3x4 in1 )
 	out[1][3] = -(in1[0][3] * out[1][0] + in1[1][3] * out[1][1] + in1[2][3] * out[1][2]);
 	out[2][3] = -(in1[0][3] * out[2][0] + in1[1][3] * out[2][1] + in1[2][3] * out[2][2]);
 }
-
-const matrix4x4 matrix4x4_identity =
-{
-{ 1, 0, 0, 0 },	// PITCH
-{ 0, 1, 0, 0 },	// YAW
-{ 0, 0, 1, 0 },	// ROLL
-{ 0, 0, 0, 1 },	// ORIGIN
-};
 
 /*
 ========================================================================
@@ -517,6 +502,13 @@ void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float
 		(normal[0] * in[2][0] + normal[1] * in[2][1] + normal[2] * in[2][2]) * iscale
 	);
 	*dist = d * scale - ( out[0] * in[0][3] + out[1] * in[1][3] + out[2] * in[2][3] );
+}
+
+vec3_t Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, float *dist )
+{
+    vec3_t out;
+    Matrix4x4_TransformStandardPlane(in, normal, d, out, dist);
+    return out;
 }
 
 void Matrix4x4_Invert_Simple( matrix4x4_ref out, cmatrix4x4 in1 )

@@ -379,8 +379,6 @@ void R_SetupFrustum( void );
 void R_FindViewLeaf( void );
 void R_DrawFog( void );
 
-using cmatrix3x4 = const matrix3x4 &;
-using cmatrix4x4 = const matrix4x4 &;
 //
 // gl_rmath.c
 //
@@ -514,7 +512,7 @@ void R_RemoveEfrags( struct cl_entity_s *ent );
 void R_AddEfrags( struct cl_entity_s *ent );
 void R_DecalRemoveAll( int texture );
 byte *Mod_GetCurrentVis( void );
-void Mod_SetOrthoBounds( float *mins, float *maxs );
+void Mod_SetOrthoBounds( const vec2_t mins, const vec2_t maxs );
 void R_NewMap( void );
 
 /*

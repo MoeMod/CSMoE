@@ -62,7 +62,7 @@ void CounterStrike_GetSequence(int *seq, int *gaitseq)
 	*gaitseq = g_gaitseq;
 }
 
-void CounterStrike_GetOrientation(float *o, float *a)
+void CounterStrike_GetOrientation(vec3_t_ref o, vec3_t_ref a)
 {
 	VectorCopy(g_clorg, o);
 	VectorCopy(g_clang, a);
@@ -112,7 +112,7 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 
 	static vec3_t pos[MAXSTUDIOBONES];
 	static vec4_t q[MAXSTUDIOBONES];
-	float bonematrix[3][4];
+    matrix3x4 bonematrix;
 
 	static vec3_t pos2[MAXSTUDIOBONES];
 	static vec4_t q2[MAXSTUDIOBONES];
@@ -679,7 +679,7 @@ void CGameStudioModelRenderer::SetupClientAnimation(entity_state_t *pplayer)
 
 	int oldseq = st->sequence;
 	CounterStrike_GetSequence(&st->sequence, &st->gaitsequence);
-	CounterStrike_GetOrientation((float *)&st->origin, (float *)&st->angles);
+	CounterStrike_GetOrientation(st->origin, st->angles);
 	VectorCopy(st->angles, st->realangles);
 
 	if (st->sequence != oldseq)
@@ -1035,7 +1035,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 }
 
 
-void CGameStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, float transform[3][4])
+void CGameStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, matrix3x4_ref transform)
 {
 	switch (ent->curstate.renderfx)
 	{

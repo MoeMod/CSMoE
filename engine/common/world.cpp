@@ -82,23 +82,11 @@ void InsertLinkBefore( link_t *l, link_t *before )
 World_MoveBounds
 ==================
 */
-void World_MoveBounds( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, vec3_t_ref boxmins, vec3_t_ref boxmaxs )
+void World_MoveBounds( const vec3_t start, vec3_t mins_in, vec3_t maxs_in, const vec3_t end, vec3_t_ref boxmins, vec3_t_ref boxmaxs )
 {
-	int	i;
-	
-	for( i = 0; i < 3; i++ )
-	{
-		if( end[i] > start[i] )
-		{
-			boxmins[i] = start[i] + mins[i] - 1.0f;
-			boxmaxs[i] = end[i] + maxs[i] + 1.0f;
-		}
-		else
-		{
-			boxmins[i] = end[i] + mins[i] - 1.0f;
-			boxmaxs[i] = start[i] + maxs[i] + 1.0f;
-		}
-	}
+	constexpr vec3_t delta = { 1, 1, 1 };
+    boxmins = mins(start, end) + mins_in - delta;
+    boxmaxs = maxs(start, end) + maxs_in + delta;
 }
 
 trace_t World_CombineTraces( trace_t *cliptrace, trace_t *trace, edict_t *touch )

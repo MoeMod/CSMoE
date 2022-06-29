@@ -121,7 +121,7 @@ void R_PlaneForMirror( msurface_t *surf, mplane_t *out, matrix4x4_ref m )
 		tmp = *out;
 
 		// transform mirror plane by entity matrix
-		Matrix4x4_TransformPositivePlane( m, tmp.normal, tmp.dist, out->normal, &out->dist );
+        out->normal = Matrix4x4_TransformPositivePlane( m, tmp.normal, tmp.dist, &out->dist );
 	}
 	else Matrix4x4_LoadIdentity( m );
 }
@@ -463,17 +463,15 @@ void R_FindBmodelMirrors( cl_entity_t *e, qboolean static_entity )
 	{
 		if( !VectorIsNull( e->angles ))
 		{
-			for( i = 0; i < 3; i++ )
-			{
-				mins[i] = e->origin[i] - clmodel->radius;
-				maxs[i] = e->origin[i] + clmodel->radius;
-			}
+            vec3_t delta = { clmodel->radius, clmodel->radius, clmodel->radius };
+            mins = e->origin - delta;
+            maxs = e->origin + delta;
 			rotated = true;
 		}
 		else
 		{
-			VectorAdd( e->origin, clmodel->mins, mins );
-			VectorAdd( e->origin, clmodel->maxs, maxs );
+            mins = e->origin + clmodel->mins;
+            maxs = e->origin + clmodel->maxs;
 			rotated = false;
 		}
 

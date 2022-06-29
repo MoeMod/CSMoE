@@ -34,7 +34,7 @@ constexpr int nanmask = 255 << 23;
 
 inline bool IS_NAN(float x) { return ((*reinterpret_cast<int *>(&(x)) & nanmask) == nanmask); }
 
-inline void AngleMatrix(const vec3_t angles, float (*matrix)[4])
+inline void AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
@@ -64,7 +64,7 @@ inline void AngleMatrix(const vec3_t angles, float (*matrix)[4])
 	matrix[2][3] = 0.0;
 }
 
-inline void AngleIMatrix(const vec3_t angles, float (*matrix)[4])
+inline void AngleIMatrix(const vec3_t angles, matrix3x4_ref matrix)
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
@@ -157,7 +157,7 @@ AngleBetweenVectors
 ===================
 */
 
-inline void VectorTransform(const vec3_t in1, float (*in2)[4], vec3_t_ref out)
+inline void VectorTransform(const vec3_t in1, cmatrix3x4 in2, vec3_t_ref out)
 {
 	out[0] = DotProduct( in1, vec3_t(in2[0][0], in2[0][1], in2[0][2]) ) + in2[0][3];
 	out[1] = DotProduct( in1, vec3_t(in2[1][0], in2[1][1], in2[1][2]) ) + in2[1][3];

@@ -148,11 +148,7 @@ static qboolean ComputeBeamEntPosition( int beamEnt, vec3_t_ref pt )
 
 static void ComputeBeamPerpendicular( const vec3_t vecBeamDelta, vec3_t_ref pPerp )
 {
-	// Direction in worldspace of the center of the beam
-	vec3_t	vecBeamCenter;
-
-	VectorNormalize2( vecBeamDelta, vecBeamCenter );
-	CrossProduct( RI.vforward, vecBeamCenter, pPerp );
+	CrossProduct( RI.vforward, vecBeamDelta.Normalize(), pPerp );
 	VectorNormalize( pPerp );
 }
 
@@ -168,8 +164,7 @@ static void ComputeNormal( const vec3_t vStartPos, const vec3_t vNextPos, vec3_t
 
 	// Get a vector that is perpendicular to us and perpendicular to the beam.
 	// This is used to fatten the beam.
-	CrossProduct( vTangentY, vDirToBeam, pNormal );
-	VectorNormalizeFast( pNormal );
+    pNormal = CrossProduct( vTangentY, vDirToBeam ).Normalize();
 }
 
 static void SetBeamRenderMode( int rendermode )
@@ -192,7 +187,7 @@ general code for drawing beams
 ================
 */
 static void CL_DrawSegsStretch(int modelIndex, float frame, int rendermode, const vec3_t source, const vec3_t delta,
-	float width, float* color)
+	float width, const vec3_t color)
 {
 	HSPRITE	m_hSprite;
 	beamseg_t	curSeg, nextSeg;
@@ -233,26 +228,26 @@ static void CL_DrawSegsStretch(int modelIndex, float frame, int rendermode, cons
 
 	pglColor4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
 	pglTexCoord2f(0.0f, curSeg.texcoord);
-	pglNormal3fv(vAveNormal);
-	pglVertex3fv(vPoint1);
+	pglNormal3fv(vAveNormal.data());
+	pglVertex3fv(vPoint1.data());
 
 	pglColor4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
 	pglTexCoord2f(1.0f, curSeg.texcoord);
-	pglNormal3fv(vAveNormal);
-	pglVertex3fv(vPoint2);
+	pglNormal3fv(vAveNormal.data());
+	pglVertex3fv(vPoint2.data());
 
 	VectorMA(nextSeg.pos, (nextSeg.width * 0.5f), vAveNormal, vPoint1);
 	VectorMA(nextSeg.pos, (-nextSeg.width * 0.5f), vAveNormal, vPoint2);
 
 	pglColor4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
 	pglTexCoord2f(0.0f, nextSeg.texcoord);
-	pglNormal3fv(vAveNormal);
-	pglVertex3fv(vPoint1);
+	pglNormal3fv(vAveNormal.data());
+	pglVertex3fv(vPoint1.data());
 
 	pglColor4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
 	pglTexCoord2f(1.0f, nextSeg.texcoord);
-	pglNormal3fv(vAveNormal);
-	pglVertex3fv(vPoint2);
+	pglNormal3fv(vAveNormal.data());
+	pglVertex3fv(vPoint2.data());
 
 	pglEnd();
 }
@@ -264,7 +259,7 @@ general code for drawing beams
 ================
 */
 static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3_t source, const vec3_t delta,
-						 float width, float scale, float freq, float speed, int segments, int flags, float *color )
+						 float width, float scale, float freq, float speed, int segments, int flags, const vec3_t color )
 {
 	int	noiseIndex, noiseStep;
 	int	i, total_segs, segs_drawn;
@@ -416,13 +411,11 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 			if( segs_drawn > 1 )
 			{
 				// Average this with the previous normal
-				VectorAdd( vNormal, vLastNormal, vAveNormal );
-				VectorScale( vAveNormal, 0.5f, vAveNormal );
-				VectorNormalizeFast( vAveNormal );
+                vAveNormal = midpoint(vNormal, vLastNormal).Normalize();
 			}
 			else
 			{
-				VectorCopy( vNormal, vAveNormal );
+                vAveNormal = vNormal;
 			}
 
 			VectorCopy( vNormal, vLastNormal );
@@ -433,13 +426,13 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 
 			pglColor4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
 			pglTexCoord2f( 0.0f, curSeg.texcoord );
-			pglNormal3fv( vAveNormal );
-			pglVertex3fv( vPoint1 );
+			pglNormal3fv( vAveNormal.data() );
+			pglVertex3fv( vPoint1.data() );
 
 			pglColor4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
 			pglTexCoord2f( 1.0f, curSeg.texcoord );
-			pglNormal3fv( vAveNormal );
-			pglVertex3fv( vPoint2 );
+			pglNormal3fv( vAveNormal.data() );
+			pglVertex3fv( vPoint2.data() );
 		}
 
 		curSeg = nextSeg;
@@ -454,13 +447,13 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 			// specify the points.
 			pglColor4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
 			pglTexCoord2f( 0.0f, curSeg.texcoord );
-			pglNormal3fv( vLastNormal );
-			pglVertex3fv( vPoint1 );
+			pglNormal3fv( vLastNormal.data() );
+			pglVertex3fv( vPoint1.data() );
 
 			pglColor4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
 			pglTexCoord2f( 1.0f, curSeg.texcoord );
-			pglNormal3fv( vLastNormal );
-			pglVertex3fv( vPoint2 );
+			pglNormal3fv( vLastNormal.data() );
+			pglVertex3fv( vPoint2.data() );
 		}
 
 		vLast += vStep; // Advance texture scroll (v axis only)
@@ -477,7 +470,7 @@ Draw beamdisk
 ================
 */
 static void CL_DrawDisk( int modelIndex, float frame, int rendermode, const vec3_t source, const vec3_t delta,
-						 float width, float scale, float freq, float speed, int segments, float *color )
+						 float width, float scale, float freq, float speed, int segments, const vec3_t color )
 {
 	float	div, length, fraction;
 	float	w, vLast, vStep;
@@ -520,7 +513,7 @@ static void CL_DrawDisk( int modelIndex, float frame, int rendermode, const vec3
 
 		pglColor4f( color[0], color[1], color[2], 1.0f );
 		pglTexCoord2f( 1.0f, vLast );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 
 		SinCos( fraction * M_PI2, &s, &c );
 		point[0] = s * w + source[0];
@@ -529,7 +522,7 @@ static void CL_DrawDisk( int modelIndex, float frame, int rendermode, const vec3
 
 		pglColor4f( color[0], color[1], color[2], 1.0f );
 		pglTexCoord2f( 0.0f, vLast );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 
 		vLast += vStep;	// Advance texture scroll (v axis only)
 	}
@@ -544,7 +537,7 @@ Draw beam cylinder
 ================
 */
 static void CL_DrawCylinder( int modelIndex, float frame, int rendermode, const vec3_t source, const vec3_t delta,
-							 float width, float scale, float freq, float speed, int segments, float *color )
+							 float width, float scale, float freq, float speed, int segments, const vec3_t color )
 {
 	float	length, fraction;
 	float	div, vLast, vStep;
@@ -589,7 +582,7 @@ static void CL_DrawCylinder( int modelIndex, float frame, int rendermode, const 
 
 		pglColor4f( 0.0f, 0.0f, 0.0f, 1.0f );
 		pglTexCoord2f( 1.0f, vLast );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 
 		point[0] = s * freq * (delta[2] + width) + source[0];
 		point[1] = c * freq * (delta[2] + width) + source[1];
@@ -597,7 +590,7 @@ static void CL_DrawCylinder( int modelIndex, float frame, int rendermode, const 
 
 		pglColor4f( color[0], color[1], color[2], 1.0f );
 		pglTexCoord2f( 0.0f, vLast );
-		pglVertex3fv( point );
+		pglVertex3fv( point.data() );
 
 		vLast += vStep;	// Advance texture scroll (v axis only)
 	}
@@ -613,7 +606,7 @@ Draw beamring
 ================
 */
 void CL_DrawRing( int modelIndex, float frame, int rendermode, const vec3_t source, const vec3_t delta, float width,
-				  float amplitude, float freq, float speed, int segments, float *color )
+				  float amplitude, float freq, float speed, int segments, const vec3_t color )
 {
 	int	i, j, noiseIndex, noiseStep;
 	float	div, length, fraction, factor, vLast, vStep;
@@ -727,11 +720,11 @@ void CL_DrawRing( int modelIndex, float frame, int rendermode, const vec3_t sour
 			vLast += vStep;	// Advance texture scroll (v axis only)
 			pglColor4f( color[0], color[1], color[2], 1.0f );
 			pglTexCoord2f( 1.0f, vLast );
-			pglVertex3fv( last2 );
+			pglVertex3fv( last2.data() );
 
 			pglColor4f( color[0], color[1], color[2], 1.0f );
 			pglTexCoord2f( 0.0f, vLast );
-			pglVertex3fv( last1 );
+			pglVertex3fv( last1.data() );
 		}
 
 		VectorCopy( screen, screenLast );
@@ -754,9 +747,9 @@ CL_DrawLaser
 Helper to drawing laser
 ==============
 */
-void CL_DrawLaser( BEAM *pbeam, int frame, int rendermode, float *color, int spriteIndex )
+void CL_DrawLaser( BEAM *pbeam, int frame, int rendermode, const vec3_t color, int spriteIndex )
 {
-	float	color2[3];
+	vec3_t	color2;
 	vec3_t	beamDir;
 	float	flDot;
 
@@ -813,7 +806,7 @@ Draw beam trail
 */
 static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int rendermode, const vec3_t delta,
 							vec3_t_ref screen, vec3_t_ref screenLast, float die, const vec3_t source, int flags, float width,
-							float amplitude, float freq, float *color )
+							float amplitude, float freq, const vec3_t color )
 {
 	float	fraction;
 	float	div;
@@ -860,11 +853,11 @@ static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int re
 	{
 		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
 		pglTexCoord2f( 1.0f, 1.0f );
-		pglVertex3fv( last2 );
+		pglVertex3fv( last2.data() );
 
 		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
 		pglTexCoord2f( 0.0f, 1.0f );
-		pglVertex3fv( last1 );
+		pglVertex3fv( last1.data() );
 
 		VectorCopy( last2, saved_last2 );
 		saved_nColor[0] = nColor[0];
@@ -910,25 +903,25 @@ static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int re
 		}
 		else
 		{
-			VectorClear( nColor );
+            nColor[0] = nColor[1] = nColor[2] = 0;
 			fraction = 0.0;
 		}
 
 		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
 		pglTexCoord2f( 0.0f, 0.0f );
-		pglVertex3fv( last1 );
+		pglVertex3fv( last1.data() );
 
 		pglColor4ub( saved_nColor[0], saved_nColor[1], saved_nColor[2], 255 );
 		pglTexCoord2f( 1.0f, 1.0f );
-		pglVertex3fv( saved_last2 );
+		pglVertex3fv( saved_last2.data() );
 
 		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
 		pglTexCoord2f( 0.0f, 0.0f );
-		pglVertex3fv( last1 );
+		pglVertex3fv( last1.data() );
 
 		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
 		pglTexCoord2f( 1.0f, 0.0f );
-		pglVertex3fv( last2 );
+		pglVertex3fv( last2.data() );
 
 		VectorCopy( screen, screenLast );
 
@@ -1392,7 +1385,7 @@ CL_DrawBeamFollow
 Helper to drawing beam follow
 ==============
 */
-void CL_DrawBeamFollow( int spriteIndex, BEAM *pbeam, int frame, int rendermode, float frametime, float *color )
+void CL_DrawBeamFollow( int spriteIndex, BEAM *pbeam, int frame, int rendermode, float frametime, const vec3_t color )
 {
 	particle_t	*particles;
 	particle_t	*pnew;
