@@ -737,7 +737,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 
     bool IsZero(T tolerance = std::numeric_limits<T>::epsilon()) const
     {
-        return LengthSquared() > tolerance;
+        return LengthSquared() <= tolerance;
     }
 
     constexpr VectorBase<T, 2> Make2D() const
@@ -897,7 +897,8 @@ template<class T, std::size_t N, std::size_t Align> constexpr T VectorMaxElement
 
 template<class T, std::size_t N, std::size_t Align> constexpr bool VectorIsNull(VectorBase<T, N, Align> in)
 {
-    return in.IsZero();
+    //return in.IsZero();
+    return in == VectorBase<T, N, Align>{};
 }
 
 }
