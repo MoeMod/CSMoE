@@ -25,8 +25,10 @@ GNU General Public License for more details.
 
 typedef struct lua_State lua_State;
 
-#ifdef __SSE__
-#include <xmmintrin.h>
+#if defined __SSE__ || defined __x86_64__ || defined _M_X64 || defined _M_AMD64 || defined _M_IX86_FP
+#include <xmmintrin.h> // sse
+#include <emmintrin.h> // sse2
+#include <smmintrin.h> // sse4.1
 #define U_VECTOR_SSE 1
 #define U_VECTOR_SIMD U_VECTOR_SSE
 #endif
@@ -733,7 +735,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
         return flLen;
     }
 
-    constexpr bool IsZero(T tolerance = std::numeric_limits<T>::epsilon()) const
+    bool IsZero(T tolerance = std::numeric_limits<T>::epsilon()) const
     {
         return LengthSquared() > tolerance;
     }

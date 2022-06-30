@@ -196,18 +196,18 @@ namespace physics
 	{
 		matrix4x4 matrix;
 		Matrix4x4_LoadIdentity(matrix);
-		memcpy(&matrix, matrix3, sizeof(float[3][4]));
+		// TODO : no more memcpy
+		memcpy(&matrix, &matrix3, sizeof(float[3][4]));
 		matrix4x4 matrix4x4_transposed;
 		Matrix4x4_Transpose(matrix4x4_transposed, matrix);
 		trans.setFromOpenGLMatrix((float*)&matrix4x4_transposed);
 	}
 
-	void TransformToMatrix3x4(const btTransform& trans, matrix3x4_ref matrix3x4)
+	void TransformToMatrix3x4(const btTransform& trans, matrix3x4_ref matrix4)
 	{
 		float matrix4x4_transposed[4][4];
 		trans.getOpenGLMatrix((float*)matrix4x4_transposed);
 
-		float matrix4[4][4];
 		matrix4[0][0] = matrix4x4_transposed[0][0];
 		matrix4[0][1] = matrix4x4_transposed[1][0];
 		matrix4[0][2] = matrix4x4_transposed[2][0];
@@ -220,12 +220,10 @@ namespace physics
 		matrix4[2][1] = matrix4x4_transposed[1][2];
 		matrix4[2][2] = matrix4x4_transposed[2][2];
 		matrix4[2][3] = matrix4x4_transposed[3][2];
-		matrix4[3][0] = matrix4x4_transposed[0][3];
-		matrix4[3][1] = matrix4x4_transposed[1][3];
-		matrix4[3][2] = matrix4x4_transposed[2][3];
-		matrix4[3][3] = matrix4x4_transposed[3][3];
-
-		memcpy(matrix3x4, matrix4, sizeof(float[3][4]));
+		//matrix4[3][0] = matrix4x4_transposed[0][3];
+		//matrix4[3][1] = matrix4x4_transposed[1][3];
+		//matrix4[3][2] = matrix4x4_transposed[2][3];
+		//matrix4[3][3] = matrix4x4_transposed[3][3];
 	}
 
 	//GoldSrcToBullet Scaling
@@ -299,8 +297,8 @@ namespace physics
 		Vec3BulletToGoldSrc(from);
 		Vec3BulletToGoldSrc(to);
 
-		pglVertex3fv(from);
-		pglVertex3fv(to);
+		pglVertex3fv(from.data());
+		pglVertex3fv(to.data());
 		pglEnd();
 		pglDisable(GL_ALPHA_TEST);
 
@@ -2363,8 +2361,8 @@ namespace physics
 				matrix3x4 bonematrix_3x4;
 				TransformToMatrix3x4(bonematrix, bonematrix_3x4);
 
-				memcpy(g_bonestransform[rig->boneindex], bonematrix_3x4, sizeof(bonematrix_3x4));
-				memcpy(g_lighttransform[rig->boneindex], bonematrix_3x4, sizeof(bonematrix_3x4));
+				g_bonestransform[rig->boneindex] = bonematrix_3x4;
+				g_lighttransform[rig->boneindex] = bonematrix_3x4;
 			}
 			else
 			{//Kinematic rigs
@@ -2404,8 +2402,8 @@ namespace physics
 			matrix3x4 bonematrix_3x4;
 			TransformToMatrix3x4(bonematrix, bonematrix_3x4);
 
-			memcpy(g_bonestransform[rig->boneindex], bonematrix_3x4, sizeof(bonematrix_3x4));
-			memcpy(g_lighttransform[rig->boneindex], bonematrix_3x4, sizeof(bonematrix_3x4));
+			g_bonestransform[rig->boneindex] = bonematrix_3x4;
+			g_lighttransform[rig->boneindex] = bonematrix_3x4;
 		}
 
 		for (size_t index = 0; index < ragdoll->m_nonKeyBones.size(); index++)

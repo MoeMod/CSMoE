@@ -3134,7 +3134,7 @@ int GameStudioRenderer_StudioDrawPlayer(int flags, struct entity_state_s* pplaye
 
 			//Teleport ?
 			else if (oldActivityType == 0 && ragdoll->m_iActivityType == 0 &&
-				VectorDistance(currententity->curstate.origin, currententity->latched.prevorigin) > 500)
+				Distance(currententity->curstate.origin, currententity->latched.prevorigin) > 500)
 			{
 				pStudioDraw->StudioDrawPlayer(0, pplayer);
 
