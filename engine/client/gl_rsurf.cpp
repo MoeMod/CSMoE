@@ -61,8 +61,8 @@ void Mod_SetOrthoBounds( const vec2_t mins, const vec2_t maxs )
 		clgame.drawFuncs.GL_OrthoBounds( mins, maxs );
 	}
 
-	Vector2Average( maxs, mins, world_orthocenter );
-	Vector2Subtract( maxs, world_orthocenter, world_orthohalf );
+    world_orthocenter = midpoint( maxs, mins );
+    world_orthohalf = maxs - world_orthocenter;
 }
 
 static void BoundPoly( int numverts, const vec3_t *verts, vec3_t_ref mins, vec3_t_ref maxs )
@@ -86,7 +86,8 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 {
 	int	i, j, f, b;
 	vec3_t	mins, maxs;
-	float	m, frac, s, t, vertsDiv, *verts_p;
+	float	m, frac, s, t, vertsDiv;
+    vertex_t *verts_p;
 	vec3_t	front[SUBDIVIDE_SIZE], back[SUBDIVIDE_SIZE], total;
 	float	dist[SUBDIVIDE_SIZE], total_s, total_t, total_ls, total_lt;
 	glpoly_t	*poly;
@@ -153,14 +154,13 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 	poly->flags = warpface->flags;
 	warpface->polys = poly;
 	poly->numverts = numverts + 2;
-	verts_p = poly->verts[0]; // pointer glpoly_t->verts
 	VectorClear( total );
 	total_s = total_ls = 0.0f;
 	total_t = total_lt = 0.0f;
 
 	for( i = 0; i < numverts; i++ )
 	{
-		VectorCopy( verts[i], &verts_p[VERTEXSIZE * ( i + 1 )] );
+        verts[i] = poly->verts[i + 1].xyz;
 		VectorAdd( total, verts[i], total );
 
 		if( warpface->flags & SURF_DRAWTURB )
@@ -176,8 +176,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 			t /= warpface->texinfo->texture->height; 
 		}
 
-		verts_p[VERTEXSIZE * ( i + 1 ) + 3] = s;
-		verts_p[VERTEXSIZE * ( i + 1 ) + 4] = t;
+        poly->verts[i + 1].s1t1 = { s, t };
  
 		total_s += s;
 		total_t += t;
@@ -198,8 +197,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 			t += LM_SAMPLE_SIZE >> 1;
 			t /= BLOCK_SIZE * LM_SAMPLE_SIZE; //fa->texinfo->texture->height;
 
-			verts_p[VERTEXSIZE * ( i + 1 ) + 5] = s;
-			verts_p[VERTEXSIZE * ( i + 1 ) + 6] = t;
+            poly->verts[i + 1].s2t2 = { s, t };
 
 			total_ls += s;
 			total_lt += t;
@@ -208,18 +206,16 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 
 	vertsDiv = ( 1.0f / (float)numverts );
 
-	VectorScale( total, vertsDiv, &verts_p[0] );
-	verts_p[3] = total_s * vertsDiv;
-	verts_p[4] = total_t * vertsDiv;
+    poly->verts[0].xyz = total * vertsDiv;
+    poly->verts[0].s1t1 = { total_s * vertsDiv, total_t * vertsDiv };
 
 	if( !( warpface->flags & SURF_DRAWTURB ))
 	{
-		verts_p[5] = total_ls * vertsDiv;
-		verts_p[6] = total_lt * vertsDiv;
+        poly->verts[0].s2t2 = { total_ls * vertsDiv, total_lt * vertsDiv };
 	}
 
 	// copy first vertex to last
-	Q_memcpy(&verts_p[VERTEXSIZE * ( i + 1 )], &verts_p[VERTEXSIZE], VERTEXSIZE * sizeof( float ) );
+    poly->verts[i + 1] = poly->verts[1];
 }
 
 void GL_SetupFogColorForSurfaces( void )
@@ -297,7 +293,6 @@ void GL_BuildPolygonFromSurface( model_t *mod, msurface_t *fa )
 	int		vertpage;
 	texture_t		*tex;
 	gltexture_t	*glt;
-    float		*verts_p;
     vec3_t      vec;
 	float		s, t;
 	glpoly_t		*poly;
@@ -330,7 +325,6 @@ void GL_BuildPolygonFromSurface( model_t *mod, msurface_t *fa )
 	poly->flags = fa->flags;
 	fa->polys = poly;
 	poly->numverts = lnumverts;
-	verts_p = poly->verts[0]; //pointer glpoly_t->verts
 
 	for( i = 0; i < lnumverts; i++ )
 	{
@@ -353,9 +347,8 @@ void GL_BuildPolygonFromSurface( model_t *mod, msurface_t *fa )
 		t = DotProduct( vec, fa->texinfo->vecs[1] ) + fa->texinfo->vecs[1][3];
 		t /= fa->texinfo->texture->height;
 
-		VectorCopy( vec, &verts_p[VERTEXSIZE * i] );
-		verts_p[VERTEXSIZE * i + 3] = s;
-		verts_p[VERTEXSIZE * i + 4] = t;
+        poly->verts[i].xyz = vec;
+        poly->verts[i].s1t1 = {s, t};
 
 		// lightmap texture coordinates
 		s = DotProduct( vec, fa->texinfo->vecs[0] ) + fa->texinfo->vecs[0][3];
@@ -370,8 +363,7 @@ void GL_BuildPolygonFromSurface( model_t *mod, msurface_t *fa )
 		t += LM_SAMPLE_SIZE >> 1;
 		t /= BLOCK_SIZE * LM_SAMPLE_SIZE; //fa->texinfo->texture->height;
 
-		verts_p[VERTEXSIZE * i + 5] = s;
-		verts_p[VERTEXSIZE * i + 6] = t;
+        poly->verts[i].s2t2 = {s, t};
 	}
 
 	// remove co-linear points - Ed
@@ -380,26 +372,21 @@ void GL_BuildPolygonFromSurface( model_t *mod, msurface_t *fa )
 		for( i = 0; i < lnumverts; i++ )
 		{
 			vec3_t	v1, v2;
-			float	*prev, *pthis, *next;
+			vertex_t	*prev, *pthis, *next;
 
-			prev = &verts_p[VERTEXSIZE * ((i + lnumverts - 1) % lnumverts)];
-			next = &verts_p[VERTEXSIZE * ((i + 1) % lnumverts)];
-			pthis = &verts_p[VERTEXSIZE * i];
+			prev = &poly->verts[((i + lnumverts - 1) % lnumverts)];
+			next = &poly->verts[((i + 1) % lnumverts)];
+			pthis = &poly->verts[i];
 
-			VectorSubtract( pthis, prev, v1 );
-			VectorNormalize( v1 );
-			VectorSubtract( next, prev, v2 );
-			VectorNormalize( v2 );
+            v1 = (pthis->xyz - prev->xyz).Normalize();
+            v2 = (next->xyz - prev->xyz).Normalize();
 
 			// skip co-linear points
 			if(( fabs( v1[0] - v2[0] ) <= 0.001f) && (fabs( v1[1] - v2[1] ) <= 0.001f) && (fabs( v1[2] - v2[2] ) <= 0.001f))
 			{
-				int	j, k;
-
-				for( j = i + 1; j < lnumverts; j++ )
+				for( int j = i + 1; j < lnumverts; j++ )
 				{
-					for( k = 0; k < VERTEXSIZE; k++ )
-					verts_p[VERTEXSIZE * ( j - 1 ) + k] = verts_p[VERTEXSIZE * j + k];
+                    poly->verts[( j - 1 )] = poly->verts[j];
 				}
 
 				// retry next vertex next time, which is now current vertex
@@ -795,8 +782,7 @@ static void R_BuildDeluxeMap( msurface_t *surf, byte *dest, int stride )
 		for( s = 0; s < smax; s++ )
 		{
 			int l;
-			vec3_t n; // = *(Vector*)bl;
-			VectorCopy(bl, n);
+			vec3_t n( bl[0], bl[1], bl[2] ); // = *(Vector*)bl;
 
 			VectorNormalize(n);
 
@@ -818,7 +804,6 @@ DrawGLPoly
 */
 void DrawGLPoly( glpoly_t *p, float xScale, float yScale )
 {
-	float		*v;
 	float		sOffset, sy;
 	float		tOffset, cy;
 	cl_entity_t	*e = RI.currententity;
@@ -866,13 +851,13 @@ void DrawGLPoly( glpoly_t *p, float xScale, float yScale )
 
 	pglBegin( GL_POLYGON );
 
-	for( i = 0, v = p->verts[0]; i < p->numverts; i++, v += VERTEXSIZE )
+	for( i = 0; i < p->numverts; i++ )
 	{
 		if( hasScale )
-			pglTexCoord2f(( v[3] + sOffset ) * xScale, ( v[4] + tOffset ) * yScale );
-		else pglTexCoord2f( v[3] + sOffset, v[4] + tOffset );
+			pglTexCoord2f(( p->verts[i].s1t1[0] + sOffset ) * xScale, ( p->verts[i].s1t1[1] + tOffset ) * yScale );
+		else pglTexCoord2f( p->verts[i].s1t1[0] + sOffset, p->verts[i].s1t1[1] + tOffset );
 
-		pglVertex3fv( v );
+		pglVertex3fv( p->verts[i].xyz.data() );
 	}
 
 	pglEnd();
@@ -898,17 +883,15 @@ void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 
 	for( ; p != NULL; p = p->chain )
 	{
-		float	*v;
 		int	i;
 
 		pglBegin( GL_POLYGON );
 
-		v = p->verts[0];
-		for( i = 0; i < p->numverts; i++, v += VERTEXSIZE )
+		for( i = 0; i < p->numverts; i++ )
 		{
-			if( !dynamic ) pglTexCoord2f( v[5], v[6] );
-			else pglTexCoord2f( v[5] - soffset, v[6] - toffset );
-			pglVertex3fv( v );
+			if( !dynamic ) pglTexCoord2f( p->verts[i].s2t2[0], p->verts[i].s2t2[1] );
+			else pglTexCoord2f( p->verts[i].s2t2[0] - soffset, p->verts[i].s2t2[1] - toffset );
+			pglVertex3fv( p->verts[i].xyz.data() );
 		}
 		pglEnd ();
 	}
@@ -2035,13 +2018,9 @@ void R_GenerateVBO()
 				// fill vbovertex_t
 				for( l = 0; l < surf->polys->numverts; l++ )
 				{
-					float *v = surf->polys->verts[l];
-
-					VectorCopy( v, vbo->array[len + l].pos );
-					vbo->array[len + l].gl_tc[0] = v[3];
-					vbo->array[len + l].gl_tc[1] = v[4];
-					vbo->array[len + l].lm_tc[0] = v[5];
-					vbo->array[len + l].lm_tc[1] = v[6];
+                    vbo->array[len + l].pos = surf->polys->verts[l].xyz;
+					vbo->array[len + l].gl_tc = surf->polys->verts[l].s1t1;
+					vbo->array[len + l].lm_tc = surf->polys->verts[l].s2t2;
 #ifdef NO_TEXTURE_MATRIX
 					if( cl.worldmodel->textures[j]->dt_texturenum )
 					{
@@ -2100,7 +2079,7 @@ generate decal mesh and put it to array
 void R_AddDecalVBO( decal_t *pdecal, msurface_t *surf )
 {
 	int numVerts, i;
-	float *v;
+	vertex_t *v;
 	int decalindex = pdecal - &gDecalPool[0];
 
 	if( !vbos.decaldata )
@@ -2115,8 +2094,9 @@ void R_AddDecalVBO( decal_t *pdecal, msurface_t *surf )
 		return;
 	}
 
+    // TODO(MoeMod) : How this works?
 	for( i = 0; i < numVerts; i++ )
-		Q_memcpy( &vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i], v + i * VERTEXSIZE, VERTEXSIZE * 4 );
+		Q_memcpy( &vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i], &v[i], VERTEXSIZE * 4 );
 
 	pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decaldata->decalvbo );
 	pglBufferSubDataARB( GL_ARRAY_BUFFER_ARB, decalindex * sizeof( vbovertex_t ) * DECAL_VERTS_CUT, sizeof( vbovertex_t ) * numVerts, &vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT] );
@@ -2702,18 +2682,18 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
 			}
 
 			// build index and texcoords arrays
-			vbos.dlight_tc[indexbase][0] = surf->polys->verts[0][5] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
-			vbos.dlight_tc[indexbase][1] = surf->polys->verts[0][6] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
-			vbos.dlight_tc[indexbase + 1][0] = surf->polys->verts[1][5] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
-			vbos.dlight_tc[indexbase + 1][1] = surf->polys->verts[1][6] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
+			vbos.dlight_tc[indexbase][0] = surf->polys->verts[0].s2t2[0] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
+			vbos.dlight_tc[indexbase][1] = surf->polys->verts[0].s2t2[1] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
+			vbos.dlight_tc[indexbase + 1][0] = surf->polys->verts[1].s2t2[0] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
+			vbos.dlight_tc[indexbase + 1][1] = surf->polys->verts[1].s2t2[1] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
 
 			for( index = indexbase + 2; index < indexbase + surf->polys->numverts; index++ )
 			{
 				dlightarray[dlightindex++] = indexbase;
 				dlightarray[dlightindex++] = index - 1;
 				dlightarray[dlightindex++] = index;
-				vbos.dlight_tc[index][0] = surf->polys->verts[index - indexbase][5] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
-				vbos.dlight_tc[index][1] = surf->polys->verts[index - indexbase][6] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
+				vbos.dlight_tc[index][0] = surf->polys->verts[index - indexbase].s2t2[0] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
+				vbos.dlight_tc[index][1] = surf->polys->verts[index - indexbase].s2t2[1] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
 			}
 
 			if( vbos.dlight_vbo )
@@ -2732,15 +2712,14 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
 				if( numVerts == -1 )
 				{
 					// build decal array
-					float *v = R_DecalSetupVerts( pdecal, surf, pdecal->texture, &numVerts );
+					vertex_t *v = R_DecalSetupVerts( pdecal, surf, pdecal->texture, &numVerts );
 
-					for( i = 0; i < numVerts; i++, v += VERTEXSIZE )
+					for( i = 0; i < numVerts; i++ )
 					{
-						VectorCopy( v, vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].pos );
-						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc[0] = v[3];
-						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc[1] = v[4];
-						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc[0] = v[5] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
-						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc[1] = v[6] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
+                        vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].pos = v[i].xyz;
+						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc = v[i].s1t1;
+						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc = v[i].s2t2 -
+                                vec2_t( ( surf->light_s - info->dlight_s ), ( surf->light_t - info->dlight_t ) ) * ( 1.0f / (float)BLOCK_SIZE );
 					}
 				}
 				else
@@ -2749,10 +2728,9 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
 					for( i = 0; i < numVerts; i++ )
 					{
 						VectorCopy( vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].pos, vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].pos );
-						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc[0] = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].gl_tc[0];
-						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc[1] = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].gl_tc[1];
-						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc[0] = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].lm_tc[0] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
-						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc[1] = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].lm_tc[1] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
+						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].gl_tc;
+						vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].lm_tc -
+                                vec2_t ( ( surf->light_s - info->dlight_s ), ( surf->light_t - info->dlight_t ) ) * ( 1.0f / (float)BLOCK_SIZE );
 					}
 				}
 				if( vbos.dlight_vbo )
@@ -3080,18 +3058,16 @@ void R_DrawVBO( qboolean drawlightmap, qboolean drawtextures )
 					if( vbos.decaldata->decals[decalindex].numVerts == -1 )
 					{
 						int numVerts;
-						float *v;
-
-						v = R_DecalSetupVerts( pdecal, lightmapchain, pdecal->texture, &numVerts );
+						vertex_t *v = R_DecalSetupVerts( pdecal, lightmapchain, pdecal->texture, &numVerts );
 
 						// to many verts to keep in sparse array, so build it now
 						pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
-						pglVertexPointer( 3, GL_FLOAT, VERTEXSIZE * 4, v );
-						pglTexCoordPointer( 2, GL_FLOAT, VERTEXSIZE * 4, v + 3 );
+						pglVertexPointer( 3, GL_FLOAT, VERTEXSIZE * 4, &v->xyz );
+						pglTexCoordPointer( 2, GL_FLOAT, VERTEXSIZE * 4, &v->s1t1 );
 						if( drawlightmap )
 						{
 							GL_SelectTexture( mtst.tmu_lm );
-							pglTexCoordPointer( 2, GL_FLOAT, VERTEXSIZE * 4, v + 5 );
+							pglTexCoordPointer( 2, GL_FLOAT, VERTEXSIZE * 4, &v->s2t2 );
 						}
 
 						pglDrawArrays( GL_TRIANGLE_FAN, 0, numVerts );
@@ -3588,7 +3564,6 @@ void R_DrawTriangleOutlines( void )
 	int		i, j;
 	msurface_t	*surf;
 	glpoly_t		*p;
-	float		*v;
 		
 	if( !gl_wireframe->integer )
 		return;
@@ -3607,9 +3582,8 @@ void R_DrawTriangleOutlines( void )
 			for( ; p != NULL; p = p->chain )
 			{
 				pglBegin( GL_POLYGON );
-				v = p->verts[0];
-				for( j = 0; j < p->numverts; j++, v += VERTEXSIZE )
-					pglVertex3fv( v );
+				for( j = 0; j < p->numverts; j++ )
+					pglVertex3fv( p->verts[i].xyz.data() );
 				pglEnd ();
 			}
 		}
@@ -3623,9 +3597,8 @@ void R_DrawTriangleOutlines( void )
 		for( ; p != NULL; p = p->chain )
 		{
 			pglBegin( GL_POLYGON );
-			v = p->verts[0];
-			for( j = 0; j < p->numverts; j++, v += VERTEXSIZE )
-				pglVertex3fv( v );
+			for( j = 0; j < p->numverts; j++ )
+				pglVertex3fv( p->verts[i].xyz.data() );
 			pglEnd ();
 		}
 	}

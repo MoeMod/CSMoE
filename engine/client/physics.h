@@ -272,7 +272,7 @@ namespace physics {
 
 	typedef struct brushvertex_s
 	{
-		vec3_t	pos;
+		vec3_c	pos;
 	}brushvertex_t;
 
 	typedef struct brushface_s

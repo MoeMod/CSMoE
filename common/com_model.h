@@ -108,13 +108,21 @@ typedef struct glvert_s
 	byte		color[4];		// colors per vertex
 } glvert_t;
 
+typedef struct vertex_s
+{
+    vec3_c xyz;
+    vec2_t s1t1;
+    vec2_t s2t2;
+} vertex_t;
+static_assert(sizeof(vertex_t) == VERTEXSIZE * sizeof(float));
+
 typedef struct glpoly_s
 {
 	struct glpoly_s* next;
 	struct glpoly_s* chain;
 	int		numverts;
 	int		flags;          		// for SURF_UNDERWATER
-	float		verts[4][VERTEXSIZE];	// variable sized (xyz s1t1 s2t2)
+    vertex_t		verts[4];	// variable sized (xyz s1t1 s2t2)
 } glpoly_t;
 
 typedef struct mnode_s

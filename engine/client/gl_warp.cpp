@@ -310,7 +310,6 @@ void R_AddSkyBoxSurface( msurface_t *fa )
 	vec3_t	verts[MAX_CLIP_VERTS];
 	glpoly_t	*p;
 	int	i;
-	float *verts_p;
 
 	if( r_fastsky->integer )
 		return;
@@ -326,10 +325,10 @@ void R_AddSkyBoxSurface( msurface_t *fa )
 	}
 
 	// calculate vertex values for sky box
-	for( p = fa->polys, verts_p = p->verts[0]; p; p = p->next )
+	for( p = fa->polys; p; p = p->next )
 	{
 		for( i = 0; i < p->numverts; i++ )
-			VectorSubtract( &verts_p[VERTEXSIZE * i], RI.cullorigin, verts[i] );
+			VectorSubtract( p->verts[i].xyz, RI.cullorigin, verts[i] );
 		ClipSkyPolygon( p->numverts, verts, 0 );
 	}
 }
@@ -387,7 +386,7 @@ void R_DrawSkyBox( void )
 	pglDisable( GL_ALPHA_TEST );
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
-	if( clgame.movevars.skyangle && clgame.movevars.skydir_x && clgame.movevars.skydir_y && clgame.movevars.skydir_z )
+	if( clgame.movevars.skyangle && (clgame.movevars.skydir_x || clgame.movevars.skydir_y || clgame.movevars.skydir_z) )
 	{
 		matrix4x4	m;
 		Matrix4x4_CreateRotate( m, clgame.movevars.skyangle, clgame.movevars.skydir_x, clgame.movevars.skydir_y, clgame.movevars.skydir_z );
@@ -603,7 +602,7 @@ Does a water warp on the pre-fragmented glpoly_t chain
 void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 {
 	glpoly_t	*p;
-	float	*v, nv, waveHeight;
+	float	nv, waveHeight;
 	float	s, t, os, ot;
 	int	i;
 
@@ -619,18 +618,18 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 	{
 		pglBegin( GL_POLYGON );
 
-		for( i = 0, v = p->verts[0]; i < p->numverts; i++, v += VERTEXSIZE )
+		for( i = 0; i < p->numverts; i++ )
 		{
 			if( waveHeight )
 			{
-				nv = r_turbsin[(int)(cl.time * 160.0f + v[1] + v[0]) & 255] + 8.0f;
-				nv = (r_turbsin[(int)(v[0] * 5.0f + cl.time * 171.0f - v[1]) & 255] + 8.0f ) * 0.8f + nv;
-				nv = nv * waveHeight + v[2];
+				nv = r_turbsin[(int)(cl.time * 160.0f + p->verts[i].xyz.y + p->verts[i].xyz.x) & 255] + 8.0f;
+				nv = (r_turbsin[(int)(p->verts[i].xyz.x * 5.0f + cl.time * 171.0f - p->verts[i].xyz.y) & 255] + 8.0f ) * 0.8f + nv;
+				nv = nv * waveHeight + p->verts[i].xyz.z;
 			}
-			else nv = v[2];
+			else nv = p->verts[i].xyz.z;
 
-			os = v[3];
-			ot = v[4];
+			os = p->verts[i].s1t1[0];
+			ot = p->verts[i].s1t1[1];
 
 			s = os + r_turbsin[(int)((ot * 0.125f + cl.time ) * TURBSCALE) & 255];
 			s *= ( 1.0f / SUBDIVIDE_SIZE );
@@ -641,7 +640,7 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 			if( glState.activeTMU != 0 )
 				GL_MultiTexCoord2f( glState.activeTMU, s, t );
 			else pglTexCoord2f( s, t );
-			pglVertex3f( v[0], v[1], nv );
+			pglVertex3f( p->verts[i].xyz.x, p->verts[i].xyz.y, nv );
 		}
 		pglEnd();
 	}
@@ -660,7 +659,6 @@ EmitSkyPolys
 void EmitSkyPolys( msurface_t *fa )
 {
 	glpoly_t	*p;
-	float	*v;
 	int	i;
 	float	s, t;
 	vec3_t	dir;
@@ -670,9 +668,9 @@ void EmitSkyPolys( msurface_t *fa )
 	{
 		pglBegin( GL_POLYGON );
 
-		for( i = 0, v = p->verts[0]; i < p->numverts; i++, v += VERTEXSIZE )
+		for( i = 0; i < p->numverts; i++ )
 		{
-			VectorSubtract( v, RI.vieworg, dir );
+			VectorSubtract( p->verts[i].xyz, RI.vieworg, dir );
 			dir[2] *= 3.0f; // flatten the sphere
 
 			length = VectorLength( dir );
@@ -685,7 +683,7 @@ void EmitSkyPolys( msurface_t *fa )
 			t = ( speedscale + dir[1] ) * (1.0f / 128.0f);
 
 			pglTexCoord2f( s, t );
-			pglVertex3fv( v );
+			pglVertex3fv( p->verts[i].xyz.data() );
 		}
 		pglEnd ();
 	}

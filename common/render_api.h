@@ -195,7 +195,7 @@ typedef struct render_api_s
 
 	// Decals manipulating (draw & remove)
 	void		(*DrawSingleDecal)( struct decal_s *pDecal, struct msurface_s *fa );
-	float		*(*R_DecalSetupVerts)( struct decal_s *pDecal, struct msurface_s *surf, int texture, int *outCount );
+	struct vertex_s		*(*R_DecalSetupVerts)( struct decal_s *pDecal, struct msurface_s *surf, int texture, int *outCount );
 	void		(*R_EntityRemoveDecals)( struct model_s *mod ); // remove all the decals from specified entity (BSP only)
 
 	// AVIkit support

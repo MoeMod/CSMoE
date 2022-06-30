@@ -463,13 +463,9 @@ namespace physics
 
 			for (poly = surf[i].polys; poly; poly = poly->next)
 			{
-				auto v = poly->verts[0];
-
-				for (int j = 0; j < 3; j++, v += VERTEXSIZE)
+				for (int j = 0; j < 3; j++)
 				{
-					Vertexes[j].pos[0] = v[0];
-					Vertexes[j].pos[1] = v[1];
-					Vertexes[j].pos[2] = v[2];
+					Vertexes[j].pos = poly->verts[j].xyz;
 					Vec3GoldSrcToBullet(Vertexes[j].pos);
 				}
 				m_worldVertexArray->vVertexBuffer.emplace_back(Vertexes[0]);
@@ -477,13 +473,11 @@ namespace physics
 				m_worldVertexArray->vVertexBuffer.emplace_back(Vertexes[2]);
 				iNumVerts += 3;
 
-				for (int j = 0; j < (poly->numverts - 3); j++, v += VERTEXSIZE)
+				for (int j = 0; j < (poly->numverts - 3); j++)
 				{
 					memcpy(&Vertexes[1], &Vertexes[2], sizeof(brushvertex_t));
 
-					Vertexes[2].pos[0] = v[0];
-					Vertexes[2].pos[1] = v[1];
-					Vertexes[2].pos[2] = v[2];
+					Vertexes[2].pos = poly->verts[j].xyz;
 					Vec3GoldSrcToBullet(Vertexes[2].pos);
 
 					m_worldVertexArray->vVertexBuffer.emplace_back(Vertexes[0]);

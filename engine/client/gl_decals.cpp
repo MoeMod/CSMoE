@@ -54,8 +54,8 @@ typedef struct
 	vec3_t		m_Basis[3];
 } decalinfo_t;
 
-static float	g_DecalClipVerts[MAX_DECALCLIPVERT][VERTEXSIZE];
-static float	g_DecalClipVerts2[MAX_DECALCLIPVERT][VERTEXSIZE];
+static vertex_t	g_DecalClipVerts[MAX_DECALCLIPVERT];
+static vertex_t	g_DecalClipVerts2[MAX_DECALCLIPVERT];
 
 decal_t	gDecalPool[MAX_RENDER_DECALS];
 static int	gDecalCount;
@@ -213,17 +213,14 @@ void R_SetupDecalTextureSpaceBasis( decal_t *pDecal, msurface_t *surf, int textu
 }
 
 // Build the initial list of vertices from the surface verts into the global array, 'verts'.
-void R_SetupDecalVertsForMSurface( decal_t *pDecal, msurface_t *surf,	vec3_t textureSpaceBasis[3], float *verts )
+void R_SetupDecalVertsForMSurface( decal_t *pDecal, msurface_t *surf,	vec3_t textureSpaceBasis[3], vertex_t *verts )
 {
-	float	*v;
-	int	i;
-
-	for( i = 0, v = surf->polys->verts[0]; i < surf->polys->numverts; i++, v += VERTEXSIZE, verts += VERTEXSIZE )
+	for( int i = 0; i < surf->polys->numverts; i++ )
 	{
-		VectorCopy( v, verts ); // copy model space coordinates
-		verts[3] = DotProduct( verts, textureSpaceBasis[0] ) - pDecal->dx + 0.5f;
-		verts[4] = DotProduct( verts, textureSpaceBasis[1] ) - pDecal->dy + 0.5f;
-		verts[5] = verts[6] = 0.0f;
+        verts[i].xyz = surf->polys->verts[i].xyz;
+		verts[i].s1t1[0] = DotProduct( verts[i].xyz, textureSpaceBasis[0] ) - pDecal->dx + 0.5f;
+        verts[i].s1t1[1] = DotProduct( verts[i].xyz, textureSpaceBasis[1] ) - pDecal->dy + 0.5f;
+		verts[i].s2t2 = { 0.0f, 0.0f };
 	}
 }
 
@@ -243,31 +240,31 @@ void R_SetupDecalClip( decal_t *pDecal, msurface_t *surf, int texture, vec3_t te
 // Clip polygon to decal in texture space
 // JAY: This code is lame, change it later.  It does way too much work per frame
 // It can be made to recursively call the clipping code and only copy the vertex list once
-int R_ClipInside( float *vert, int edge )
+static int R_ClipInside( vertex_t *vert, int edge )
 {
 	switch( edge )
 	{
 	case LEFT_EDGE:
-		if( vert[3] > 0.0f )
+		if( vert->s1t1[0] > 0.0f )
 			return 1;
 		return 0;
 	case RIGHT_EDGE:
-		if( vert[3] < 1.0f )
+		if( vert->s1t1[0] < 1.0f )
 			return 1;
 		return 0;
 	case TOP_EDGE:
-		if( vert[4] > 0.0f )
+		if( vert->s1t1[1] > 0.0f )
 			return 1;
 		return 0;
 	case BOTTOM_EDGE:
-		if( vert[4] < 1.0f )
+		if( vert->s1t1[1] < 1.0f )
 			return 1;
 		return 0;
 	}
 	return 0;
 }
 
-void R_ClipIntersect( float *one, float *two, float *out, int edge )
+void R_ClipIntersect( vertex_t *one, vertex_t *two, vertex_t *out, int edge )
 {
 	float	t;
 
@@ -284,73 +281,70 @@ void R_ClipIntersect( float *one, float *two, float *out, int edge )
 		if( edge == LEFT_EDGE )
 		{
 			// left
-			t = ((one[3] - 0.0f) / (one[3] - two[3]));
-			out[3] = out[5] = 0.0f;
+			t = ((one->s1t1[0] - 0.0f) / (one->s1t1[0] - two->s1t1[0]));
+			out->s1t1[0] = out->s2t2[0] = 0.0f;
 		}
 		else
 		{	
 			// right
-			t = ((one[3] - 1.0f) / (one[3] - two[3]));
-			out[3] = out[5] = 1.0f;
+			t = ((one->s1t1[0] - 1.0f) / (one->s1t1[0] - two->s1t1[0]));
+			out->s1t1[0] = out->s2t2[0] = 1.0f;
 		}
 
-		out[4] = one[4] + (two[4] - one[4]) * t;
-		out[6] = one[6] + (two[6] - one[6]) * t;
+		out->s1t1[1] = one->s1t1[1] + (two->s1t1[1] - one->s1t1[1]) * t;
+		out->s2t2[1] = one->s2t2[1] + (two->s2t2[1] - one->s2t2[1]) * t;
 	}
 	else
 	{
 		if( edge == TOP_EDGE )
 		{
 			// top
-			t = ((one[4] - 0.0f)  / (one[4] - two[4]));
-			out[4] = out[6] = 0.0f;
+			t = ((one->s1t1[1] - 0.0f)  / (one->s1t1[1] - two->s1t1[1]));
+			out->s1t1[1] = out->s2t2[1] = 0.0f;
 		}
 		else
 		{	
 			// bottom
-			t = ((one[4] - 1.0f) / (one[4] - two[4]));
-			out[4] = out[6] = 1.0f;
+			t = ((one->s1t1[1] - 1.0f) / (one->s1t1[1] - two->s1t1[1]));
+			out->s1t1[1] = out->s2t2[1] = 1.0f;
 		}
 
-		out[3] = one[3] + (two[3] - one[3]) * t;
-		out[5] = one[5] + (two[4] - one[5]) * t;
+		out->s1t1[0] = one->s1t1[0] + (two->s1t1[0] - one->s1t1[0]) * t;
+		out->s2t2[0] = one->s2t2[0] + (two->s1t1[1] - one->s2t2[0]) * t;
+        // TODO : Wrong Index?
 	}
 
-    out[0] = one[0] + t * (two[0] - one[0]);
-    out[1] = one[1] + t * (two[1] - one[1]);
-    out[2] = one[2] + t * (two[2] - one[2]);
+    out->xyz = lerp(one->xyz, two->xyz, t);
 }
 
-static int SHClip( float *vert, int vertCount, float *out, int edge )
+static int SHClip( vertex_t *vert, int vertCount, vertex_t *out, int edge )
 {
 	int	j, outCount;
-	float	*s, *p;
+	vertex_t	*s, *p;
 
 	outCount = 0;
 
-	s = &vert[(vertCount - 1) * VERTEXSIZE];
+	s = &vert[(vertCount - 1)];
 
 	for( j = 0; j < vertCount; j++ )
 	{
-		p = &vert[j * VERTEXSIZE];
+		p = &vert[j];
 
 		if( R_ClipInside( p, edge ))
 		{
 			if( R_ClipInside( s, edge ))
 			{
 				// Add a vertex and advance out to next vertex
-				Q_memcpy( out, p, sizeof( float ) * VERTEXSIZE );
-				out += VERTEXSIZE;
+				*out++ = *p;
 				outCount++;
 			}
 			else
 			{
 				R_ClipIntersect( s, p, out, edge );
-				out += VERTEXSIZE;
+				out++;
 				outCount++;
 
-				Q_memcpy( out, p, sizeof( float ) * VERTEXSIZE );
-				out += VERTEXSIZE;
+                *out++ = *p;
 				outCount++;
 			}
 		}
@@ -359,7 +353,7 @@ static int SHClip( float *vert, int vertCount, float *out, int edge )
 			if( R_ClipInside( s, edge ))
 			{
 				R_ClipIntersect( p, s, out, edge );
-				out += VERTEXSIZE;
+				out++;
 				outCount++;
 			}
 		}
@@ -370,16 +364,16 @@ static int SHClip( float *vert, int vertCount, float *out, int edge )
 	return outCount;
 }
 
-float *R_DoDecalSHClip( float *pInVerts, decal_t *pDecal, int nStartVerts, int *pVertCount )
+vertex_t *R_DoDecalSHClip( vertex_t *pInVerts, decal_t *pDecal, int nStartVerts, int *pVertCount )
 {
-	float	*pOutVerts = g_DecalClipVerts[0];
+    vertex_t	*pOutVerts = g_DecalClipVerts;
 	int	outCount;
 
 	// clip the polygon to the decal texture space
-	outCount = SHClip( pInVerts, nStartVerts, g_DecalClipVerts2[0], LEFT_EDGE );
-	outCount = SHClip( g_DecalClipVerts2[0], outCount, g_DecalClipVerts[0], RIGHT_EDGE );
-	outCount = SHClip( g_DecalClipVerts[0], outCount, g_DecalClipVerts2[0], TOP_EDGE );
-	outCount = SHClip( g_DecalClipVerts2[0], outCount, pOutVerts, BOTTOM_EDGE );
+	outCount = SHClip( pInVerts, nStartVerts, g_DecalClipVerts2, LEFT_EDGE );
+	outCount = SHClip( g_DecalClipVerts2, outCount, g_DecalClipVerts, RIGHT_EDGE );
+	outCount = SHClip( g_DecalClipVerts, outCount, g_DecalClipVerts2, TOP_EDGE );
+	outCount = SHClip( g_DecalClipVerts2, outCount, pOutVerts, BOTTOM_EDGE );
 
 	if( pVertCount )
 		*pVertCount = outCount;
@@ -390,7 +384,7 @@ float *R_DoDecalSHClip( float *pInVerts, decal_t *pDecal, int nStartVerts, int *
 //-----------------------------------------------------------------------------
 // Generate clipped vertex list for decal pdecal projected onto polygon psurf
 //-----------------------------------------------------------------------------
-float *R_DecalVertsClip( decal_t *pDecal, msurface_t *surf, int texture, int *pVertCount )
+vertex_t *R_DecalVertsClip( decal_t *pDecal, msurface_t *surf, int texture, int *pVertCount )
 {
 	float	decalWorldScale[2];
 	vec3_t	textureSpaceBasis[3]; 
@@ -399,13 +393,13 @@ float *R_DecalVertsClip( decal_t *pDecal, msurface_t *surf, int texture, int *pV
 	R_SetupDecalClip( pDecal, surf, texture, textureSpaceBasis, decalWorldScale );
 
 	// build the initial list of vertices from the surface verts.
-	R_SetupDecalVertsForMSurface( pDecal, surf, textureSpaceBasis, g_DecalClipVerts[0] );
+	R_SetupDecalVertsForMSurface( pDecal, surf, textureSpaceBasis, g_DecalClipVerts );
 
-	return R_DoDecalSHClip( g_DecalClipVerts[0], pDecal, surf->polys->numverts, pVertCount );
+	return R_DoDecalSHClip( g_DecalClipVerts, pDecal, surf->polys->numverts, pVertCount );
 }
 
 // Generate lighting coordinates at each vertex for decal vertices v[] on surface psurf
-static void R_DecalVertsLight( float *v, msurface_t *surf, int vertCount )
+static void R_DecalVertsLight( vertex_t *v, msurface_t *surf, int vertCount )
 {
 	float		s, t;
 	mtexinfo_t	*tex;
@@ -413,21 +407,20 @@ static void R_DecalVertsLight( float *v, msurface_t *surf, int vertCount )
 
 	tex = surf->texinfo;
 
-	for( j = 0; j < vertCount; j++, v += VERTEXSIZE )
+	for( j = 0; j < vertCount; j++ )
 	{
 		// lightmap texture coordinates
-		s = DotProduct( v, tex->vecs[0] ) + tex->vecs[0][3] - surf->texturemins[0];
+		s = DotProduct( v[j].xyz, tex->vecs[0] ) + tex->vecs[0][3] - surf->texturemins[0];
 		s += surf->light_s * LM_SAMPLE_SIZE;
 		s += LM_SAMPLE_SIZE >> 1;
 		s /= BLOCK_SIZE * LM_SAMPLE_SIZE; //fa->texinfo->texture->width;
 
-		t = DotProduct( v, tex->vecs[1] ) + tex->vecs[1][3] - surf->texturemins[1];
+		t = DotProduct( v[j].xyz, tex->vecs[1] ) + tex->vecs[1][3] - surf->texturemins[1];
 		t += surf->light_t * LM_SAMPLE_SIZE;
 		t += LM_SAMPLE_SIZE >> 1;
 		t /= BLOCK_SIZE * LM_SAMPLE_SIZE; //fa->texinfo->texture->height;
 
-		v[5] = s;
-		v[6] = t;
+        v[j].s2t2 = { s, t };
 	}
 }
 
@@ -522,7 +515,7 @@ creates mesh for decal on first rendering
 */
 msurfmesh_t *R_DecalCreateMesh( decalinfo_t *decalinfo, decal_t *pdecal, msurface_t *surf )
 {
-	float		*v;
+    vertex_t		*v;
 	uint		i, bufSize;
 	qboolean	createSTverts = false;
 	int		numVerts, numElems;
@@ -571,20 +564,18 @@ msurfmesh_t *R_DecalCreateMesh( decalinfo_t *decalinfo, decal_t *pdecal, msurfac
 	inv_h = 1.0f / surf->texinfo->texture->height;
 
 	// fill the mesh
-	for( i = 0; i < numVerts; i++, v += VERTEXSIZE )
+	for( i = 0; i < numVerts; i++ )
 	{
 		glvert_t	*out = &mesh->verts[i];
-		VectorCopy( v, out->vertex );
+		VectorCopy( v[i].xyz, out->vertex );
 		VectorCopy( decalinfo->m_Basis[0], out->tangent );
 		VectorCopy( decalinfo->m_Basis[1], out->binormal );
 		VectorCopy( decalinfo->m_Basis[2], out->normal );
 
-		out->stcoord[0] = v[3];
-		out->stcoord[1] = v[4];
-		out->lmcoord[0] = v[5];
-		out->lmcoord[1] = v[6];
-		out->sccoord[0] = (( DotProduct( v , surf->texinfo->vecs[0] ) + surf->texinfo->vecs[0][3] ) * inv_w );
-		out->sccoord[1] = (( DotProduct( v , surf->texinfo->vecs[1] ) + surf->texinfo->vecs[1][3] ) * inv_h );
+		out->stcoord = v[i].s1t1;
+		out->lmcoord = v[i].s2t2;
+		out->sccoord[0] = (( DotProduct( v[i].xyz , surf->texinfo->vecs[0] ) + surf->texinfo->vecs[0][3] ) * inv_w );
+		out->sccoord[1] = (( DotProduct( v[i].xyz , surf->texinfo->vecs[1] ) + surf->texinfo->vecs[1][3] ) * inv_h );
 
 		// clear colors (it can be used for vertex lighting)
 		Q_memset( out->color, 0xFF, sizeof( out->color ));
@@ -916,9 +907,9 @@ void R_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const vec3
 // Build the vertex list for a decal on a surface and clip it to the surface.
 // This is a template so it can work on world surfaces and dynamic displacement 
 // triangles the same way.
-float *R_DecalSetupVerts( decal_t *pDecal, msurface_t *surf, int texture, int *outCount )
+vertex_t *R_DecalSetupVerts( decal_t *pDecal, msurface_t *surf, int texture, int *outCount )
 {
-	float	*v;
+	vertex_t *v = g_DecalClipVerts;
 	int	i, count;
 
 	if( pDecal->mesh )
@@ -926,19 +917,17 @@ float *R_DecalSetupVerts( decal_t *pDecal, msurface_t *surf, int texture, int *o
 		count = pDecal->mesh->numVerts;
 
 		// if we have mesh so skip clipping and just copy vertexes out (perf)
-		for( i = 0, v = g_DecalClipVerts[0]; i < count; i++, v += VERTEXSIZE )
+		for( i = 0; i < count; i++ )
 		{
 			glvert_t	*p = &pDecal->mesh->verts[i];
 
-			VectorCopy( p->vertex, v );
-			v[3] = p->stcoord[0];
-			v[4] = p->stcoord[1];
-			v[5] = p->lmcoord[0];
-			v[6] = p->lmcoord[1];
+            v[i].xyz = p->vertex;
+			v[i].s1t1 = p->stcoord;
+			v[i].s2t2 = p->lmcoord;
 		}
 
 		// restore pointer
-		v = g_DecalClipVerts[0];
+		v = g_DecalClipVerts;
 	}
 	else
 	{
@@ -954,7 +943,7 @@ float *R_DecalSetupVerts( decal_t *pDecal, msurface_t *surf, int texture, int *o
 
 void DrawSingleDecal( decal_t *pDecal, msurface_t *fa )
 {
-	float	*v;
+	vertex_t	*v;
 	int	i, numVerts;
 
 	v = R_DecalSetupVerts( pDecal, fa, pDecal->texture, &numVerts );
@@ -964,10 +953,10 @@ void DrawSingleDecal( decal_t *pDecal, msurface_t *fa )
 
 	pglBegin( GL_POLYGON );
 
-	for( i = 0; i < numVerts; i++, v += VERTEXSIZE )
+	for( i = 0; i < numVerts; i++ )
 	{
-		pglTexCoord2f( v[3], v[4] );
-		pglVertex3fv( v );
+		pglTexCoord2f( v[i].s1t1[0], v[i].s1t1[1] );
+		pglVertex3fv( v[i].xyz.data() );
 	}
 
 	pglEnd();
@@ -1009,7 +998,7 @@ void DrawSurfaceDecals( msurface_t *fa )
 		{
 			if( p->texture )
 			{
-				float *o, *v;
+				vertex_t *o;
 				int i, numVerts;
 				o = R_DecalSetupVerts( p, fa, p->texture, &numVerts );
 
@@ -1020,13 +1009,13 @@ void DrawSurfaceDecals( msurface_t *fa )
 				pglStencilOp( GL_KEEP, GL_KEEP, GL_REPLACE );
 				pglBegin( GL_POLYGON );
 
-				for( i = 0, v = o; i < numVerts; i++, v += VERTEXSIZE )
+				for( i = 0; i < numVerts; i++ )
 				{
-					v[5] = ( DotProduct( v, tex->vecs[0] ) + tex->vecs[0][3] ) / tex->texture->width;
-					v[6] = ( DotProduct( v, tex->vecs[1] ) + tex->vecs[1][3] ) / tex->texture->height;
+					o[i].s2t2[0] = ( DotProduct( o[i].xyz, tex->vecs[0] ) + tex->vecs[0][3] ) / tex->texture->width;
+					o[i].s2t2[1] = ( DotProduct( o[i].xyz, tex->vecs[1] ) + tex->vecs[1][3] ) / tex->texture->height;
 
-					pglTexCoord2f( v[5], v[6] );
-					pglVertex3fv( v );
+					pglTexCoord2f( o[i].s2t2[0], o[i].s2t2[1] );
+					pglVertex3fv( o[i].xyz.data() );
 				}
 
 				pglEnd();
@@ -1035,10 +1024,10 @@ void DrawSurfaceDecals( msurface_t *fa )
 				pglEnable( GL_ALPHA_TEST );
 				pglBegin( GL_POLYGON );
 
-				for( i = 0, v = o; i < numVerts; i++, v += VERTEXSIZE )
+				for( i = 0; i < numVerts; i++ )
 				{
-					pglTexCoord2f( v[5], v[6] );
-					pglVertex3fv( v );
+					pglTexCoord2f( o[i].s2t2[0], o[i].s2t2[1] );
+					pglVertex3fv( o[i].xyz.data() );
 				}
 
 				pglEnd();
