@@ -325,9 +325,10 @@ static void BoundPoly( int numverts, const vec3_t *verts, vec3_t_ref mins, vec3_
 
 static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *verts )
 {
-	int	i, j, k, f, b;
+	int	i, j, f, b;
 	vec3_t	mins, maxs;
-	float	m, frac, s, t, vertsDiv, *verts_p;
+	float	m, frac, s, t, vertsDiv;
+    vertex_t *verts_p;
 	vec3_t	front[SUBDIVIDE_SIZE], back[SUBDIVIDE_SIZE], total;
 	float	dist[SUBDIVIDE_SIZE], total_s, total_t, total_ls, total_lt;
 	glpoly_t	*poly;
@@ -389,19 +390,18 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 	}
 
 	// add a point in the center to help keep warp valid
-	poly = (glpoly_t *)Mem_ZeroAlloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
+	poly = (glpoly_t*)Mem_ZeroAlloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
 	poly->next = warpface->polys;
 	poly->flags = warpface->flags;
 	warpface->polys = poly;
 	poly->numverts = numverts + 2;
-	verts_p = poly->verts[0]; // pointer glpoly_t->verts
 	VectorClear( total );
 	total_s = total_ls = 0.0f;
 	total_t = total_lt = 0.0f;
 
 	for( i = 0; i < numverts; i++ )
 	{
-		VectorCopy( verts[i], &verts_p[VERTEXSIZE * ( i + 1 )] );
+        verts[i] = poly->verts[i + 1].xyz;
 		VectorAdd( total, verts[i], total );
 
 		if( warpface->flags & SURF_DRAWTURB )
@@ -417,8 +417,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 			t /= warpface->texinfo->texture->height;
 		}
 
-		verts_p[VERTEXSIZE * ( i + 1 ) + 3] = s;
-		verts_p[VERTEXSIZE * ( i + 1 ) + 4] = t;
+        poly->verts[i + 1].s1t1 = { s, t };
 
 		total_s += s;
 		total_t += t;
@@ -439,8 +438,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 			t += LM_SAMPLE_SIZE >> 1;
 			t /= BLOCK_SIZE * LM_SAMPLE_SIZE; //fa->texinfo->texture->height;
 
-			verts_p[VERTEXSIZE * ( i + 1 ) + 5] = s;
-			verts_p[VERTEXSIZE * ( i + 1 ) + 6] = t;
+            poly->verts[i + 1].s2t2 = { s, t };
 
 			total_ls += s;
 			total_lt += t;
@@ -449,18 +447,16 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 
 	vertsDiv = ( 1.0f / (float)numverts );
 
-	VectorScale( total, vertsDiv, &verts_p[0] );
-	verts_p[3] = total_s * vertsDiv;
-	verts_p[4] = total_t * vertsDiv;
+    poly->verts[0].xyz = total * vertsDiv;
+    poly->verts[0].s1t1 = { total_s * vertsDiv, total_t * vertsDiv };
 
 	if( !( warpface->flags & SURF_DRAWTURB ))
 	{
-		verts_p[5] = total_ls * vertsDiv;
-		verts_p[6] = total_lt * vertsDiv;
+        poly->verts[0].s2t2 = { total_ls * vertsDiv, total_lt * vertsDiv };
 	}
 
 	// copy first vertex to last
-	Q_memcpy(&verts_p[VERTEXSIZE * ( i + 1 )], &verts_p[VERTEXSIZE], VERTEXSIZE * sizeof( float ) );
+    poly->verts[i + 1] = poly->verts[1];
 }
 
 
