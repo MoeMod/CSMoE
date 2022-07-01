@@ -249,6 +249,13 @@ namespace physics
 		vec[2] *= G2BScale;
 	}
 
+	void Vec3GoldSrcToBullet(vec3_c &vec)
+	{
+		vec[0] *= G2BScale;
+		vec[1] *= G2BScale;
+		vec[2] *= G2BScale;
+	}
+
 	void Vector3GoldSrcToBullet(btVector3& vec)
 	{
 		vec.m_floats[0] *= G2BScale;
