@@ -1764,7 +1764,7 @@ For each texture build index arrays (vbotexture_t) every frame.
 //#define NO_TEXTURE_MATRIX // need debug
 typedef struct vbovertex_s
 {
-	vec3_t pos;
+	vec3_c pos;
 	vec2_t gl_tc;
 	vec2_t lm_tc;
 #ifdef NO_TEXTURE_MATRIX

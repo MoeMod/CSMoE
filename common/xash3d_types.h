@@ -10,7 +10,7 @@ typedef float		vec_t;
 using vec2_t = moe::VectorBase<float, 2>;
 using vec2_t_ref = vec2_t &;
 
-using vec3_t = moe::VectorBase<float, 3>;
+using vec3_t = moe::VectorBase<float, 3, 16>;
 using vec3_c = moe::VectorBase<float, 3>;
 using vec3_t_ref = vec3_t &;
 
