@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include <boost/container/pmr/global_resource.hpp>
 #include <boost/container/pmr/synchronized_pool_resource.hpp>
 #include <boost/container/pmr/unsynchronized_pool_resource.hpp>
-#include <boost/align/align_up.hpp>
+#include <boost/align.hpp>
 
 #include <bit>
 
@@ -293,8 +293,8 @@ public:
 
 typedef struct alignas(std::max_align_t) memheader_s {
     mempool_t *pool;
-    size_t size;
-    size_t header_size;
+    uint size;
+    uint header_size;
 #ifdef XASH_MEMDBG
     const char *filename;
     int fileline;
@@ -415,12 +415,15 @@ MEMDBG_ALLOC_FUNC_BEGIN
     align = boost::alignment::align_up(align, alignof(std::max_align_t));
     auto header_size = boost::alignment::align_up(sizeof(memheader_t), align);
 #ifdef XASH_MEMDBG
-    auto alloc_size = header_size + size + sizeof(std::max_align_t);
+    auto alloc_size = header_size + size + align + sizeof(std::max_align_t);
 #else
-    auto alloc_size = header_size + size;
+    auto alloc_size = header_size + size + align;
 #endif
     void *mem = poolptr->AlignedAlloc(alloc_size, align);
-    auto header = (memheader_t *)((byte *)mem + header_size - sizeof(memheader_t));
+    void *data = (byte *)mem + header_size;
+    data = boost::alignment::align(align, size, data, alloc_size);
+    header_size = (byte *)data - (byte *)mem;
+    auto header = (memheader_t *)((byte *)data - sizeof(memheader_t));
     header->pool = poolptr;
     header->size = size;
     header->header_size = header_size;
@@ -432,7 +435,7 @@ MEMDBG_ALLOC_FUNC_BEGIN
     *((byte *)mem + header_size + size) = MEMHEADER_SENTINEL2;
 #endif
 
-    return (byte *)mem + header_size;
+    return data;
 }
 MEMDBG_ALLOC_FUNC_END
 
