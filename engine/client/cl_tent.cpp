@@ -54,7 +54,7 @@ CL_InitTempents
 */
 void CL_InitTempEnts( void )
 {
-	cl_tempents = (TEMPENTITY*)Mem_ZeroAlloc( cls.mempool, sizeof( TEMPENTITY ) * GI->max_tents );
+	cl_tempents = (TEMPENTITY*)Mem_AlignedAlloc( cls.mempool, sizeof( TEMPENTITY ) * GI->max_tents, alignof(TEMPENTITY) );
 	CL_ClearTempEnts();
 }
 

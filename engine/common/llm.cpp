@@ -19,7 +19,11 @@ GNU General Public License for more details.
 #include <boost/container/pmr/global_resource.hpp>
 #include <boost/container/pmr/synchronized_pool_resource.hpp>
 #include <boost/container/pmr/unsynchronized_pool_resource.hpp>
-#include <boost/container/pmr/monotonic_buffer_resource.hpp>
+#include <boost/align/align_up.hpp>
+
+#include <bit>
+
+#include "tier0/platform.h"
 
 #ifdef XASH_TBBMALLOC
 #include <tbb/scalable_allocator.h>
@@ -290,6 +294,7 @@ public:
 typedef struct alignas(std::max_align_t) memheader_s {
     mempool_t *pool;
     size_t size;
+    size_t header_size;
 #ifdef XASH_MEMDBG
     const char *filename;
     int fileline;
@@ -363,13 +368,10 @@ MEMDBG_ALLOC_FUNC_BEGIN
 #else
     auto alloc_size = sizeof(memheader_t) + size;
 #endif
-    memheader_t *mem;
-    if(poolptr)
-        mem = (memheader_t *)poolptr->Alloc(alloc_size);
-    else
-        mem = (memheader_t *)malloc(alloc_size);
+    memheader_t *mem = (memheader_t *)poolptr->Alloc(alloc_size);
     mem->pool = poolptr;
     mem->size = size;
+    mem->header_size = sizeof(memheader_t);
 #ifdef XASH_MEMDBG
     mem->filename = filename;
     mem->fileline = fileline;
@@ -391,13 +393,10 @@ MEMDBG_ALLOC_FUNC_BEGIN
 #else
     auto alloc_size = sizeof(memheader_t) + size;
 #endif
-    memheader_t *mem;
-    if(poolptr)
-        mem = (memheader_t *)poolptr->CAlloc(1, alloc_size);
-    else
-        mem = (memheader_t *)calloc(1, alloc_size);
+    memheader_t *mem = (memheader_t *)poolptr->CAlloc(1, alloc_size);
     mem->pool = poolptr;
     mem->size = size;
+    mem->header_size = sizeof(memheader_t);
 #ifdef XASH_MEMDBG
     mem->filename = filename;
     mem->fileline = fileline;
@@ -407,6 +406,33 @@ MEMDBG_ALLOC_FUNC_BEGIN
 #endif
 
     return mem + 1;
+}
+MEMDBG_ALLOC_FUNC_END
+
+void *LLM_FUNCTION_MANGLE(Mem_AlignedAlloc)( mempool_t *poolptr, size_t size, size_t align LLM_EXTRA_ARG_DEF )
+MEMDBG_ALLOC_FUNC_BEGIN
+{
+    align = boost::alignment::align_up(align, alignof(std::max_align_t));
+    auto header_size = boost::alignment::align_up(sizeof(memheader_t), align);
+#ifdef XASH_MEMDBG
+    auto alloc_size = header_size + size + sizeof(std::max_align_t);
+#else
+    auto alloc_size = header_size + size;
+#endif
+    void *mem = poolptr->AlignedAlloc(alloc_size, align);
+    auto header = (memheader_t *)((byte *)mem + header_size - sizeof(memheader_t));
+    header->pool = poolptr;
+    header->size = size;
+    header->header_size = header_size;
+#ifdef XASH_MEMDBG
+    header->filename = filename;
+    header->fileline = fileline;
+    header->sentinel1 = MEMHEADER_SENTINEL1;
+
+    *((byte *)mem + header_size + size) = MEMHEADER_SENTINEL2;
+#endif
+
+    return (byte *)mem + header_size;
 }
 MEMDBG_ALLOC_FUNC_END
 
@@ -429,26 +455,27 @@ void LLM_FUNCTION_MANGLE(Mem_Free)( void *data LLM_EXTRA_ARG_DEF )
 {
     if(!data)
         return;
-    auto mem = (memheader_t *)data - 1;
+    auto header = (memheader_t *)data - 1;
 #ifdef XASH_MEMDBG
-    if( mem->sentinel1 != MEMHEADER_SENTINEL1 )
+    if( header->sentinel1 != MEMHEADER_SENTINEL1 )
     {
-        mem->filename = Mem_CheckFilename( mem->filename ); // make sure what we don't crash var_args
-        DebugBreak();
-        Sys_Error( "Mem_Free: trashed header sentinel 1 (alloc at %s:%i, free at %s:%i)\n", mem->filename, mem->fileline, filename, fileline );
+        header->filename = Mem_CheckFilename( header->filename ); // make sure what we don't crash var_args
+        DebuggerBreak();
+        Sys_Error( "Mem_Free: trashed header sentinel 1 (alloc at %s:%i, free at %s:%i)\n", header->filename, header->fileline, filename, fileline );
     }
 
-    if( *((byte *)mem + sizeof( memheader_t ) + mem->size ) != MEMHEADER_SENTINEL2 )
+    if( *((byte *)data + header->size ) != MEMHEADER_SENTINEL2 )
     {
-        mem->filename = Mem_CheckFilename( mem->filename ); // make sure what we don't crash var_args
-        DebugBreak();
-        Sys_Error( "Mem_Free: trashed header sentinel 2 (alloc at %s:%i, free at %s:%i)\n", mem->filename, mem->fileline, filename, fileline );
+        header->filename = Mem_CheckFilename( header->filename ); // make sure what we don't crash var_args
+        DebuggerBreak();
+        Sys_Error( "Mem_Free: trashed header sentinel 2 (alloc at %s:%i, free at %s:%i)\n", header->filename, header->fileline, filename, fileline );
     }
-    mem->sentinel1 = 0xCDCDCDCD;
-    *((byte*)mem + sizeof(memheader_t) + mem->size) = 0xCD;
+    header->sentinel1 = 0xCDCDCDCD;
+    *((byte*)data + header->size) = 0xCD;
 #endif
-    if(mem->pool)
-        mem->pool->Free(mem);
+    auto mem = (byte *)data - header->header_size;
+    if(header->pool)
+        header->pool->Free(mem);
     else
         free(mem);
 }

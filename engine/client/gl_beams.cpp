@@ -954,8 +954,8 @@ CL_InitViewBeams
 */
 void CL_InitViewBeams( void )
 {
-	cl_viewbeams = (BEAM*)Mem_ZeroAlloc(cls.mempool, sizeof(BEAM) * GI->max_beams);
-	cl_beamtrails = (particle_t*)Mem_ZeroAlloc(cls.mempool, sizeof(particle_t) * GI->max_beams * BEAM_TRAILS);
+	cl_viewbeams = (BEAM*)Mem_AlignedAlloc(cls.mempool, sizeof(BEAM) * GI->max_beams, alignof(BEAM));
+	cl_beamtrails = (particle_t*)Mem_AlignedAlloc(cls.mempool, sizeof(particle_t) * GI->max_beams * BEAM_TRAILS, alignof(particle_t));
 	CL_ClearViewBeams();
 }
 

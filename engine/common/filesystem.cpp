@@ -2021,7 +2021,7 @@ void FS_Init( void )
 				continue;
 
 			if( !SI.games[SI.numgames] )
-				SI.games[SI.numgames] = (gameinfo_t *)Mem_ZeroAlloc( fs_mempool, sizeof( gameinfo_t ));
+				SI.games[SI.numgames] = (gameinfo_t *)Mem_AlignedAlloc( fs_mempool, sizeof( gameinfo_t ), alignof( gameinfo_t ));
 
 			if( FS_ParseGameInfo( dirs.strings[i], SI.games[SI.numgames] ))
 				SI.numgames++; // added

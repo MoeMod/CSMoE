@@ -2941,7 +2941,7 @@ void *GAME_EXPORT pfnPvAllocEntPrivateData( edict_t *pEdict, long cb )
 	if( cb > 0 )
 	{
 		// a poke646 have memory corrupt in somewhere - this is trashed last four bytes :(
-		pEdict->pvPrivateData = Mem_ZeroAlloc( svgame.mempool, (cb + 15) & ~15 );
+		pEdict->pvPrivateData = Mem_AlignedAlloc( svgame.mempool, (cb + 15) & ~15, 16 );
 	}
 
 	return pEdict->pvPrivateData;
@@ -5280,7 +5280,7 @@ qboolean SV_LoadProgs( const char *name )
 	SV_InitSaveRestore ();
 	svgame.globals->maxEntities = GI->max_edicts;
 	svgame.globals->maxClients = sv_maxclients->integer;
-	svgame.edicts = (edict_t*)Mem_ZeroAlloc( svgame.mempool, sizeof( edict_t ) * svgame.globals->maxEntities );
+	svgame.edicts = (edict_t*)Mem_AlignedAlloc( svgame.mempool, sizeof( edict_t ) * svgame.globals->maxEntities, alignof(edict_t) );
 	svgame.numEntities = svgame.globals->maxClients + 1; // clients + world
 
 	for( i = 0, e = svgame.edicts; i < svgame.globals->maxEntities; i++, e++ )

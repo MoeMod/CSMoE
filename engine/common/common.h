@@ -859,6 +859,7 @@ void pfnResetTutorMessageDecayData( void );
 */
 #define Z_Malloc( size )		Mem_Alloc( host.mempool, size )
 #define Z_ZeroMalloc( size )		Mem_ZeroAlloc( host.mempool, size )
+#define Z_AlignedAlloc( size, align )	Mem_AlignedAlloc( host.mempool, size, align )
 #define Z_Realloc( ptr, size )	Mem_Realloc( host.mempool, ptr, size )
 #define Z_Free( ptr )		if( ptr ) Mem_Free( ptr )
 

@@ -1229,9 +1229,10 @@ void CL_InitEdicts( void )
 
 	CL_UPDATE_BACKUP = ( cl.maxclients == 1 ) ? SINGLEPLAYER_BACKUP : MULTIPLAYER_BACKUP;
 	cls.num_client_entities = CL_UPDATE_BACKUP * 64;
-	cls.packet_entities = (entity_state_t*)Z_Realloc( cls.packet_entities, sizeof( entity_state_t ) * cls.num_client_entities );
-	clgame.entities = (cl_entity_t*)Mem_ZeroAlloc( clgame.mempool, sizeof( cl_entity_t ) * clgame.maxEntities );
-	clgame.static_entities = (cl_entity_t*)Mem_ZeroAlloc( clgame.mempool, sizeof( cl_entity_t ) * MAX_STATIC_ENTITIES );
+    Z_Free(cls.packet_entities);
+	cls.packet_entities = (entity_state_t*)Z_AlignedAlloc( sizeof( entity_state_t ) * cls.num_client_entities, alignof(entity_state_t) );
+	clgame.entities = (cl_entity_t*)Mem_AlignedAlloc( clgame.mempool, sizeof( cl_entity_t ) * clgame.maxEntities, alignof(cl_entity_t) );
+	clgame.static_entities = (cl_entity_t*)Mem_AlignedAlloc( clgame.mempool, sizeof( cl_entity_t ) * MAX_STATIC_ENTITIES, alignof(cl_entity_t) );
 	clgame.numStatics = 0;
 
 	if(( clgame.maxRemapInfos - 1 ) != clgame.maxEntities )

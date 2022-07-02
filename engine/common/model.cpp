@@ -1930,7 +1930,7 @@ static void Mod_LoadSurfaces( const dlump_t *l )
 
 	loadmodel->numsurfaces = count;
 	loadmodel->surfaces = (msurface_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( msurface_t ));
-	loadmodel->cache.data = (mextrasurf_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( mextrasurf_t ));
+	loadmodel->cache.data = (mextrasurf_t*)Mem_AlignedAlloc( loadmodel->mempool, count * sizeof( mextrasurf_t ), alignof(mextrasurf_t));
 	out = loadmodel->surfaces;
 	info = (mextrasurf_t *)loadmodel->cache.data;
 
