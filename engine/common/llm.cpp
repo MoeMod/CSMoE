@@ -420,6 +420,7 @@ MEMDBG_ALLOC_FUNC_BEGIN
     auto alloc_size = header_size + size + align;
 #endif
     void *mem = poolptr->AlignedAlloc(alloc_size, align);
+    memset(mem, 0, alloc_size);
     void *data = (byte *)mem + header_size;
     data = boost::alignment::align(align, size, data, alloc_size);
     header_size = (byte *)data - (byte *)mem;

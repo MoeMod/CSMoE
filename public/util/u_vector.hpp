@@ -524,9 +524,8 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 #if U_VECTOR_NEON
         return !vaddvq_u32(vceqq_f32(*this, v));
 #elif U_VECTOR_SSE
-        __m128 c = _mm_cmpeq_ps(*this, v.m_xmm); // c = a==b
-        __m128i d = _mm_cvtps_epi32(c); // d = (int)c
-        return _mm_movemask_epi8(_mm_cmpeq_epi32(d, _mm_setzero_si128())) & 0x0FFF;
+        // from bullet3
+        return 0xF == _mm_movemask_ps(_mm_cmpeq_ps(*this, v.m_xmm));
 #endif
     }
     VectorBase operator+(VectorBase v) const
@@ -661,10 +660,11 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 #if U_VECTOR_NEON
         return vaddvq_f32(a);
 #elif U_VECTOR_SSE
-        __m128 x = a;
-        x = _mm_hadd_ps(x, x); // x = { x[1]+x[0], x[3]+x[2], x[1]+x[0], x[3]+x[2] }
-        x = _mm_hadd_ps(x, x); // x = { sum(x), ... }
-        return _mm_cvtss_f32(x);
+        // Disable SSE3 _mm_hadd_ps that is extremely slow on all existing Intel's architectures
+        // (from Nehalem to Haswell)
+        a = _mm_add_ps(a, _mm_movehl_ps(a, a));
+        a = _mm_add_ss(a, _mm_shuffle_ps(a, a, 1));
+        return _mm_cvtss_f32(a);
 #endif
     }
 
