@@ -31,7 +31,14 @@ typedef struct
 } wavinfo_t;
 
 // custom stdio
-typedef ssize_t (*pfread)( void *handle, void *buf, size_t count );
+/* A little hack to help MSVC not having ssize_t. */
+#ifdef _MSC_VER
+#include <stddef.h>
+typedef ptrdiff_t mpg123_ssize_t;
+#else
+typedef ssize_t mpg123_ssize_t;
+#endif
+typedef mpg123_ssize_t(*pfread)( void *handle, void *buf, size_t count );
 typedef off_t (*pfseek)( void *handle, off_t offset, int whence );
 
 extern void *create_decoder( int *error );
