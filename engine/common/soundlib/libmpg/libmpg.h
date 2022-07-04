@@ -25,18 +25,18 @@ GNU General Public License for more details.
 
 typedef struct
 {
-	int	rate;		// num samples per second (e.g. 11025 - 11 khz)
+	long	rate;		// num samples per second (e.g. 11025 - 11 khz)
 	int	channels;		// num channels (1 - mono, 2 - stereo)
 	int	playtime;		// stream size in milliseconds
 } wavinfo_t;
 
 // custom stdio
-typedef long (*pfread)( void *handle, void *buf, size_t count );
-typedef long (*pfseek)( void *handle, long offset, int whence );
+typedef ssize_t (*pfread)( void *handle, void *buf, size_t count );
+typedef off_t (*pfseek)( void *handle, off_t offset, int whence );
 
 extern void *create_decoder( int *error );
-extern int feed_mpeg_header( void *mpg, const char *data, long bufsize, long streamsize, wavinfo_t *sc );
-extern int feed_mpeg_stream( void *mpg, const char *data, long bufsize, char *outbuf, size_t *outsize );
+extern int feed_mpeg_header( void *mpg, const char *data, size_t bufsize, long streamsize, wavinfo_t *sc );
+extern int feed_mpeg_stream( void *mpg, const char *data, size_t bufsize, char *outbuf, size_t *outsize );
 extern int open_mpeg_stream( void *mpg, void *file, pfread f_read, pfseek f_seek, wavinfo_t *sc );
 extern int read_mpeg_stream( void *mpg, char *outbuf, size_t *outsize  );
 extern int get_stream_pos( void *mpg );

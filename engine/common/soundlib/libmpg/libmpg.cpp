@@ -13,8 +13,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#include "mpg123.h"
+#include "common.h"
 #include "libmpg.h"
+#include "mpg123.h"
 
 void *create_decoder( int *error )
 {
@@ -22,24 +23,24 @@ void *create_decoder( int *error )
 	mpg123_init();
 	
 	int ret = 0;
-	auto mpg = mpg123_new( &ret );
+    mpg123_handle *mpg = mpg123_new( NULL, &ret );
 	if( !mpg ) return NULL;
 
-	ret = mpg123_param( mpg, MPG123_FLAGS, MPG123_FUZZY|MPG123_SEEKBUFFER|MPG123_GAPLESS );
+	ret = mpg123_param( mpg, MPG123_FLAGS, MPG123_FUZZY|MPG123_SEEKBUFFER|MPG123_GAPLESS, 0 );
 	if( ret != MPG123_OK && error )
 		*error = 1;
 
 	// let the seek index auto-grow and contain an entry for every frame
-	ret = mpg123_param( mpg, MPG123_INDEX_SIZE, -1 );
+	ret = mpg123_param( mpg, MPG123_INDEX_SIZE, -1, 0 );
 	if( ret != MPG123_OK && error )
 		*error = 1;
 
 	return mpg;
 }
 
-int feed_mpeg_header( void *mpg, const char *data, long bufsize, long streamsize, wavinfo_t *sc )
+int feed_mpeg_header( void *mpg, const char *data, size_t bufsize, long streamsize, wavinfo_t *sc )
 {
-	mpg123_handle_t	*mh = (mpg123_handle_t *)mpg;
+    mpg123_handle	*mh = (mpg123_handle *)mpg;
 	int		ret, no;
 
 	if( !mh || !sc ) return 0;
@@ -49,7 +50,7 @@ int feed_mpeg_header( void *mpg, const char *data, long bufsize, long streamsize
 		return 0;
 
 	// feed input chunk and get first chunk of decoded audio.
-	ret = mpg123_decode( mh, (byte*)data, bufsize, NULL, 0, NULL );
+	ret = mpg123_decode( mh, (const unsigned char*)data, bufsize, NULL, 0, NULL );
 
 	if( ret != MPG123_NEW_FORMAT )
 		return 0;	// there were errors
@@ -59,15 +60,15 @@ int feed_mpeg_header( void *mpg, const char *data, long bufsize, long streamsize
 	mpg123_format( mh, sc->rate, sc->channels, MPG123_ENC_SIGNED_16 );
 
 	// some hacking to get function get_songlen to working properly
-	mh->rdat.filelen = streamsize;
-	sc->playtime = get_songlen( mh, -1 ) * 1000;
+    mpg123_set_filesize(mh, streamsize);
+	sc->playtime = mpg123_framelength(mh) * mpg123_tpf(mh) * 1000;
 
 	return 1;
 }
 
-int feed_mpeg_stream( void *mpg, const char *data, long bufsize, char *outbuf, size_t *outsize )
+int feed_mpeg_stream( void *mpg, const char *data, size_t bufsize, char *outbuf, size_t *outsize )
 {
-	switch( mpg123_decode( (mpg123_handle_t *)mpg, (byte*)data, bufsize, (byte*)outbuf, OUTBUF_SIZE, outsize ))
+	switch( mpg123_decode( (mpg123_handle *)mpg, (const unsigned char*)data, bufsize, outbuf, OUTBUF_SIZE, outsize ))
 	{
 	case MPG123_NEED_MORE:
 		return MP3_NEED_MORE;
@@ -80,7 +81,7 @@ int feed_mpeg_stream( void *mpg, const char *data, long bufsize, char *outbuf, s
 
 int open_mpeg_stream( void *mpg, void *file, pfread f_read, pfseek f_seek, wavinfo_t *sc )
 {
-	mpg123_handle_t	*mh = (mpg123_handle_t *)mpg;
+    mpg123_handle	*mh = (mpg123_handle *)mpg;
 	int		ret, no;
 
 	if( !mh || !sc ) return 0;
@@ -99,14 +100,14 @@ int open_mpeg_stream( void *mpg, void *file, pfread f_read, pfseek f_seek, wavin
 
 	mpg123_format_none( mh );
 	mpg123_format( mh, sc->rate, sc->channels, MPG123_ENC_SIGNED_16 );
-	sc->playtime = get_songlen( mh, -1 ) * 1000;
+	sc->playtime = mpg123_framelength(mh) * mpg123_tpf(mh) * 1000;
 
 	return 1;
 }
 
 int read_mpeg_stream( void *mpg, char *outbuf, size_t *outsize  )
 {
-	switch( mpg123_read( (mpg123_handle_t *)mpg, (byte*)outbuf, OUTBUF_SIZE, outsize ))
+	switch( mpg123_read( (mpg123_handle *)mpg, (byte*)outbuf, OUTBUF_SIZE, outsize ))
 	{
 	case MPG123_OK:
 		return MP3_OK;
@@ -117,16 +118,21 @@ int read_mpeg_stream( void *mpg, char *outbuf, size_t *outsize  )
 
 int get_stream_pos(void* mpg)
 {
-	return mpg123_tell((mpg123_handle_t*)mpg);
+	return mpg123_tell((mpg123_handle*)mpg);
 }
 
 int set_stream_pos(void* mpg, int curpos)
 {
-	return mpg123_seek((mpg123_handle_t*)mpg, curpos, SEEK_SET);
+	return mpg123_seek((mpg123_handle*)mpg, curpos, SEEK_SET);
 }
 
 void close_decoder(void* mpg)
 {
-	mpg123_delete((mpg123_handle_t*)mpg);
+	mpg123_delete((mpg123_handle*)mpg);
 	mpg123_exit();
+}
+
+const char *get_error( void *mh )
+{
+    return mpg123_strerror( (mpg123_handle*)mh );
 }

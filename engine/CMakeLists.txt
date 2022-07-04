@@ -124,18 +124,7 @@ set(XASH_ENGINE_SOURCES
 	common/soundlib/snd_mp3.cpp
 	common/soundlib/snd_utils.cpp
 	common/soundlib/snd_wav.cpp
-	common/soundlib/libmpg/dct36.cpp
-	common/soundlib/libmpg/dct64.cpp
-	common/soundlib/libmpg/format.cpp
-	common/soundlib/libmpg/frame.cpp
-	common/soundlib/libmpg/index.cpp
-	common/soundlib/libmpg/layer3.cpp
 	common/soundlib/libmpg/libmpg.cpp
-	common/soundlib/libmpg/mpg123.cpp
-	common/soundlib/libmpg/parse.cpp
-	common/soundlib/libmpg/reader.cpp
-	common/soundlib/libmpg/synth.cpp
-	common/soundlib/libmpg/tabinit.cpp
 	common/Sequence.cpp
 	common/mod_decryptor.cpp 
 	common/mod_extend_seq.cpp 
@@ -527,7 +516,7 @@ if(XASH_TBBMALLOC)
 	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-tbbmalloc)
 endif()
 
-target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus )
+target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus 3rdparty-mpg123)
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)
