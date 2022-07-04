@@ -204,6 +204,12 @@ namespace sv {
 			SetTouch(nullptr);
 			SetThink(nullptr);
 			pev->effects |= EF_NODRAW; // 0x80u
+
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_KILLBEAM);
+			WRITE_SHORT(this->entindex());
+			MESSAGE_END();
+
 			return UTIL_Remove(this);
 		}
 

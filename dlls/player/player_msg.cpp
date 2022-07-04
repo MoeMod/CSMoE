@@ -157,7 +157,7 @@ void LinkUserMessages()
 	gmsgMOTD = REG_USER_MSG("MOTD", -1);
 	gmsgServerName = REG_USER_MSG("ServerName", -1);
 	gmsgAmmoPickup = REG_USER_MSG("AmmoPickup", 2);
-	gmsgWeapPickup = REG_USER_MSG("WeapPickup", 1);
+	gmsgWeapPickup = REG_USER_MSG("WeapPickup", 2);
 	gmsgItemPickup = REG_USER_MSG("ItemPickup", -1);
 	gmsgHideWeapon = REG_USER_MSG("HideWeapon", 1);
 	gmsgSetFOV = REG_USER_MSG("SetFOV", 1);
@@ -268,7 +268,7 @@ void WriteWeaponInfo(CBasePlayer *pPlayer, const ItemInfo &II)
 	WRITE_BYTE(II.iMaxAmmo2);
 	WRITE_BYTE(II.iSlot);
 	WRITE_BYTE(II.iPosition);
-	WRITE_BYTE(II.iId);
+	WRITE_SHORT(II.iId);
 	WRITE_BYTE(II.iFlags);
 	MESSAGE_END();
 }

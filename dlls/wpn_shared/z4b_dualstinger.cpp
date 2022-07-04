@@ -372,7 +372,7 @@ void CKnifeDualStinger::DelayPrimaryAttack()
 void CKnifeDualStinger::DelaySecondaryAttack()
 {
 #ifndef CLIENT_DLL
-	switch (KnifeAttack(GetSecondaryAttackDamage(), 115, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	switch (KnifeAttack(GetSecondaryAttackDamage(), 95, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_PLAYER:
 	{

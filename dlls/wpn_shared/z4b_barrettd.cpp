@@ -102,6 +102,7 @@ namespace sv {
 
 	void Precache() override
 	{
+		m_iShellId = PRECACHE_MODEL("models/rshell_big.mdl");
 		return Base::Precache();
 	}
     	
@@ -135,6 +136,7 @@ namespace sv {
 
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
+		m_pPlayer->m_flEjectBrass = gpGlobals->time + 1.0s;
 		m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 		m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 

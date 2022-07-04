@@ -2615,9 +2615,22 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 #ifdef STUDIO_SKINNING_OMP_MIN
 #pragma omp parallel for private(i) if(m_pSubModel->numverts > STUDIO_SKINNING_OMP_MIN)
 #endif
-	for( i = 0; i < m_pSubModel->numverts; i++ )
-		Matrix3x4_VectorTransform( g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i] );
+	for (i = 0; i < m_pSubModel->numverts; i++)
+	{
+		Matrix3x4_VectorTransform(g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i]);
+		//scale multi by Rentro
+		if (RI.currententity->curstate.scale != 1.0f) {
+			vec3_t temp1, temp2;
+			float scale_offset = 0.0f;
 
+			scale_offset = -RI.currententity->curstate.mins[2];
+			VectorCopy(RI.currententity->origin, temp1);
+			VectorSubtract(g_xformverts[i], temp1, temp2);
+			VectorScale(temp2, RI.currententity->curstate.scale - 1.0f, temp2);
+			VectorAdd(g_xformverts[i], temp2, g_xformverts[i]);
+			g_xformverts[i][2] += scale_offset * (RI.currententity->curstate.scale - 1.0f);
+		}
+	}
 	if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 	{
 		scale = RI.currententity->curstate.renderamt * (1.0f / 255.0f);

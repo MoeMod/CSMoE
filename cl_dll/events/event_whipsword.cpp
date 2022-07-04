@@ -130,7 +130,7 @@ void EV_FireWhipSword(event_args_t* args)
 				pEnt->entity.curstate.frame = 0;
 				pEnt->entity.curstate.rendermode = kRenderTransAdd;
 				pEnt->entity.curstate.framerate = 1.0;
-				pEnt->entity.curstate.effects |= EF_NOCULL;
+				//pEnt->entity.curstate.effects |= EF_NOCULL;
 				pEnt->tentOffset = Vector(0, 0, 12);
 				pEnt->die = gHUD.m_flTime + 0.7;
 				pEnt->clientIndex = idx;
@@ -250,7 +250,7 @@ void EV_FireWhipSword(event_args_t* args)
 				g_WhipSwordSlashEffect->entity.curstate.animtime = gHUD.m_flTime;
 				g_WhipSwordSlashEffect->entity.curstate.frame = 0;
 				g_WhipSwordSlashEffect->entity.curstate.framerate = 1.0;
-				g_WhipSwordSlashEffect->entity.curstate.effects |= EF_NOCULL;
+				//g_WhipSwordSlashEffect->entity.curstate.effects |= EF_NOCULL;
 				g_WhipSwordSlashEffect->tentOffset = Vector(0, 0, 12);
 				g_WhipSwordSlashEffect->die = gHUD.m_flTime + 5.0;
 				g_WhipSwordSlashEffect->clientIndex = idx;

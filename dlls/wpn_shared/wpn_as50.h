@@ -54,7 +54,6 @@ public:
 public:
 	void AS50Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage() const;
-	int m_iShell;
 
 private:
 	unsigned short m_usFireAS50;

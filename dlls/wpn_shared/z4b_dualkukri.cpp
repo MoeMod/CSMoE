@@ -189,7 +189,7 @@ void CKnifeDualKukri::SecondaryAttack(void)
 void CKnifeDualKukri::DelayPrimaryAttack()
 {
 #ifndef CLIENT_DLL
-	switch (KnifeAttack(GetPrimaryAttackDamage(), 85, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	switch (KnifeAttack(GetPrimaryAttackDamage(), 75, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_PLAYER:
 	{
@@ -220,7 +220,7 @@ void CKnifeDualKukri::DelayPrimaryAttack()
 void CKnifeDualKukri::DelaySecondaryAttack()
 {
 #ifndef CLIENT_DLL
-	switch (KnifeAttack(GetSecondaryAttackDamage(), 135, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	switch (KnifeAttack(GetSecondaryAttackDamage(), 115, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_PLAYER:
 	{

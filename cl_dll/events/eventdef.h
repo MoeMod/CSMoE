@@ -171,3 +171,8 @@ HOOK_EVENT(crow7, FireCrow7);
 HOOK_EVENT(winggun, FireWingGun);
 HOOK_EVENT(m950se, FireM950SE);
 HOOK_EVENT(chainsawex, FireChainsawEX);
+HOOK_EVENT(lasersg, FireLaserSg);
+HOOK_EVENT(wondercannon, FireWonderCannon);
+HOOK_EVENT(y22s2sfpistol, FireY22S2SFPistol);
+HOOK_EVENT(sfpistol, FireSFPistol);
+HOOK_EVENT(stunrifle, FireStunRifle);

@@ -3960,6 +3960,8 @@ static efx_api_t gEfxApi =
 	CL_FireCustomDecal,
 	CL_TempCustomModel,
 	CL_BeamPoints_Stretch,
+	CL_KillAttachedTentsFromEntity,
+	CL_AttachTentToModel,
 };
 
 static event_api_t gEventApi =

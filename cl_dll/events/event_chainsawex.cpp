@@ -30,10 +30,37 @@
 #include "studio.h"
 
 namespace cl {
+	extern TEMPENTITY* g_pChainsawEXParticles[33];
+
 	extern engine_studio_api_t IEngineStudio;
 }
 
 namespace cl::event::chainsawex {
+
+TEMPENTITY* g_iChainCharging;
+
+void ResetMuzz(struct tempent_s* ent, float frametime, float currenttime)
+{
+	cl_entity_t* parent = gEngfuncs.GetEntityByIndex(ent->entity.curstate.aiment);
+	int index = ent->entity.curstate.iuser1;
+	float die = ent->entity.curstate.fuser1;
+
+	if (die <= currenttime)
+	{
+		ent->entity.curstate.renderamt = 0;
+		ent->die = currenttime;
+		g_pChainsawEXParticles[index] = nullptr;
+		g_iChainCharging = nullptr;
+	}
+
+	if (ent->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
+	{
+		ent->entity.curstate.renderamt = 0;
+		ent->die = currenttime;
+		g_pChainsawEXParticles[index] = nullptr;
+		g_iChainCharging = nullptr;
+	}
+}
 
 enum chainsawex_e
 {
@@ -87,52 +114,42 @@ void EV_FireChainsawEX(event_args_s *args)
 	{
 		if (args->iparam2 == 1)
 		{
-			model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_chaincharging.spr", false);
-			if (pModel)
+			if (args->bparam1)
 			{
-				int iAttachment = 1;
-				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], pModel);
-
-				if (!pEnt)
-					return;
-
-				if (!viewent)
-					return;
-
-				int clientindex = viewent->index;
-				cl_entity_t* parent = gEngfuncs.GetEntityByIndex(clientindex);
-
-				if (!parent)
-					return;
-
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-				pEnt->die = gHUD.m_flTime + 1.17;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 36.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.aiment = clientindex;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 42;
-				pEnt->entity.curstate.scale = 0.04;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.body = iAttachment + 1;
-				pEnt->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
-				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
-
-				pEnt->callback = [](tempent_s* ent, float frametime, float currenttime)
+				if (g_iChainCharging)
 				{
-					cl_entity_t* parent = gEngfuncs.GetEntityByIndex(ent->entity.curstate.aiment);
-					if (ent->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
-					{
-						ent->entity.curstate.renderamt = 0;
-						ent->die = gHUD.m_flTime;
-					}
-				};
+					g_iChainCharging->die = gHUD.m_flTime;
+					g_iChainCharging = nullptr;
+				}
+				return;
+			}
+
+			int iMuzzModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_chaincharging.spr");
+
+			if (!g_iChainCharging)
+				g_iChainCharging = gEngfuncs.pEfxAPI->R_AttachTentToModel(viewent->index, 1, 1.17, iMuzzModelIndex, 36, 255, kRenderTransAdd, 0.1, 41, FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP, EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL);
+
+			if (g_iChainCharging)
+			{
+				g_iChainCharging->callback = ResetMuzz;
+				g_iChainCharging->entity.curstate.iuser1 = idx;
+				g_iChainCharging->entity.curstate.fuser1 = gHUD.m_flTime + 1.17;
 			}
 			return;
+		}
+		else if(!args->bparam1)
+		{
+			int iMuzzModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_chainattack.spr");
+
+			if (!g_pChainsawEXParticles[idx])
+				g_pChainsawEXParticles[idx] = gEngfuncs.pEfxAPI->R_AttachTentToModel(viewent->index, 2, 99, iMuzzModelIndex, 30, 255, kRenderTransAdd, 0.08, 0, FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP, EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL);
+
+			if (g_pChainsawEXParticles[idx])
+			{
+				g_pChainsawEXParticles[idx]->callback = ResetMuzz;
+				g_pChainsawEXParticles[idx]->entity.curstate.iuser1 = idx;
+				g_pChainsawEXParticles[idx]->entity.curstate.fuser1 = gHUD.m_flTime + 0.15;
+			}
 		}
 		g_iShotsFired++;
 	}

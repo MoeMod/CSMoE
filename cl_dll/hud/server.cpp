@@ -229,6 +229,54 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		break;
 	}
+	case 18:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadShort();
+		
+		switch (arg1)
+		{
+		case 0:
+		{
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel({ 0, 0, 10 }, { 0, 0, 0 }, { 0, 0, 0 }, 999, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_wondercannon_bomb_set.spr"), 0, 15, false, 255, kRenderTransAdd, arg2, 0, false, 0, 0.2, 21, FTENT_PERSIST | FTENT_SPRANIMATELOOP | FTENT_PLYRATTACHMENT);
+			break;
+		}
+		case 1:
+		{
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel({ 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, 999, gEngfuncs.pEventAPI->EV_FindModelIndex("models/ef_wondercannon_area.mdl"), 0, 1.0, false, 255, kRenderTransAdd, arg2, 0, false, 0, 1.0, 200, FTENT_PERSIST | FTENT_PLYRATTACHMENT);
+			break;
+		}
+		default:
+			break;
+		}
+		
+		break;
+	}
+	case 19:
+	{
+		arg1 = reader.ReadShort();
+		arg2 = reader.ReadShort();
+
+		cl_entity_t* pEnt = gEngfuncs.GetEntityByIndex(arg1);
+		cl_entity_t* pLinkEnt = gEngfuncs.GetEntityByIndex(arg2);
+
+		vec3_t vecBeamStart, vecBeamEnd;
+		vecBeamStart = pEnt->origin;
+		vecBeamEnd = pLinkEnt->origin;
+
+		int iBeamIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_wondercannon_chain.spr");
+
+		BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Stretch(vecBeamStart, vecBeamEnd, iBeamIndex, 1.0, 30.0, 255, 0, 30.0, 255, 255, 255);
+
+		if (pBeam)
+		{
+			pBeam->startEntity = arg1;
+			pBeam->endEntity = arg2;
+			pBeam->flags = FBEAM_STARTENTITY | FBEAM_ENDENTITY;
+		}
+
+		break;
+	}
 	case 79:	// stop sound
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadShort();
@@ -239,6 +287,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	}
 	return 1;
 }
+
 //useless
 //void EnableWallHack(int enable, int iTarget)
 //{

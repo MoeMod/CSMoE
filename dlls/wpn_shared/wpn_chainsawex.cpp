@@ -43,7 +43,7 @@ namespace sv {
 
             SetThink(&CChainsawEX_Scythe::ScytheThink);
             SetTouch(&CChainsawEX_Scythe::ScytheTouch);
-            SET_MODEL(this->edict(), "models/thanatos7_scythe.mdl");
+            SET_MODEL(this->edict(), "models/ef_chainsawex.mdl");
 
             pev->rendermode = kRenderNormal;
             pev->renderfx = kRenderFxNone;
@@ -56,7 +56,7 @@ namespace sv {
 
             ResetSequenceInfo();
 
-            UTIL_SetSize(pev, { -2, -2, -2 }, { 2, 2, 2 });
+            UTIL_SetSize(pev, { -8, -8, -8 }, { 8, 8, 8 });
 
             m_flRemoveTime = gpGlobals->time + 7.0s;
             m_flDamageTime = gpGlobals->time + 0.1s;
@@ -66,7 +66,7 @@ namespace sv {
 
         void Precache() override
         {
-            PRECACHE_MODEL("models/thanatos7_scythe.mdl");
+            PRECACHE_MODEL("models/ef_chainsawex.mdl");
         }
 
         void RadiusDamage()
@@ -88,7 +88,7 @@ namespace sv {
             Vector vecEnd;
             int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
             float flDamage = GetScytheDamage();
-            while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 32.0)) != NULL)
+            while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 60.0)) != NULL)
             {
                 if (pEntity->pev->takedamage == DAMAGE_NO)
                     continue;
@@ -258,6 +258,8 @@ namespace sv {
         PRECACHE_SOUND("weapons/chainsawex_charge.wav");
         PRECACHE_SOUND("weapons/chainsawex_charge_end.wav");
 
+        PRECACHE_MODEL("sprites/ef_chainattack.spr");
+        PRECACHE_MODEL("sprites/ef_chaincharging.spr");
         Base::Precache();
     }
 
@@ -316,7 +318,6 @@ namespace sv {
         m_iWeaponState &= ~WPNSTATE_CHAINSAW_SLASH;
         m_iShotsFired = 0;
         m_flAttackLoop = invalid_time_point;
-
         m_iChargeState = 0;
         m_flTimeCheckCharge = gpGlobals->time + 999999s;
 
@@ -325,6 +326,8 @@ namespace sv {
 
     void Reload(void)
     {
+        PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 1, TRUE, TRUE);
+
         if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
             return;
 
@@ -551,8 +554,6 @@ namespace sv {
             m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
             m_flAttackLoop = gpGlobals->time + 0.5s;
 
-            PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero,g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100.0), int(m_pPlayer->pev->punchangle.y * 100.0), FALSE, FALSE);
-
             return;
         }
 
@@ -571,7 +572,6 @@ namespace sv {
         m_flTimeWeaponIdle = m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.063s;
 
         Attack1();
-
         PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100.0), int(m_pPlayer->pev->punchangle.y * 100.0), FALSE, TRUE);
 #ifndef CLIENT_DLL
         if (!m_iClip && !m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
@@ -609,12 +609,16 @@ namespace sv {
                     m_flTimeCheckCharge = gpGlobals->time + 1.7s - 0.53s;
                     m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s - 0.53s;
 
-                    PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_SKILL_LOOP, 1, FALSE, TRUE);
+                    PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 1, FALSE, TRUE);
+
                 }
             }
         }
         else
         {
+            if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 10)
+                return;
+
             SendWeaponAnim(ANIM_SKILL_START);
 
             EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsawex_charge.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
@@ -622,6 +626,7 @@ namespace sv {
             m_flTimeCheckCharge = gpGlobals->time + 0.53s;
             m_iChargeState = 1;
             m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.53s;
+            m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 99999s;
         }
 
 
@@ -629,14 +634,26 @@ namespace sv {
 
     void OnAttack2Released()
     {
+        //turn off
+        PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 1, TRUE, TRUE);
+
+
         if (m_iChargeState >= 3)
         {
+#ifndef CLIENT_DLL
+            m_pPlayer->SetAnimation(PLAYER_ATTACK2);
+#endif
             SendWeaponAnim(ANIM_SKILL_END, UseDecrement() != FALSE);
             //create entity
 
             EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsawex-2.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 
+            m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 10;
+
 #ifndef CLIENT_DLL
+            if (!m_iClip && !m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+                m_pPlayer->SetSuitUpdate("!HEV_AMO0", 0, 0);
+
             Vector vecAngle = m_pPlayer->pev->v_angle;
             vecAngle[0] = 360.0 - vecAngle[0];
             UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
@@ -649,6 +666,9 @@ namespace sv {
                 pEnt->pev->velocity = gpGlobals->v_forward * 1000;
             }
 #endif
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
+            m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.15s;
+            m_flAttackLoop = invalid_time_point;
             m_iChargeState = 0;
             return;
         }

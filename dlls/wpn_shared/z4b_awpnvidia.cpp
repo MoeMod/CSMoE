@@ -104,6 +104,7 @@ namespace sv {
 
 	void Precache() override
 	{
+		m_iShellId = PRECACHE_MODEL("models/rshell_big.mdl");
 		m_iSprBeam = PRECACHE_MODEL("sprites/zbeam1.spr");
 		m_iSprEffect2 = PRECACHE_MODEL("sprites/plasmabomb.spr");
 		return Base::Precache();

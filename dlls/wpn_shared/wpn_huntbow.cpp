@@ -368,6 +368,11 @@ namespace sv {
 
 			if (m_flStartFadeTime < gpGlobals->time)
 			{
+				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+				WRITE_BYTE(TE_KILLBEAM);
+				WRITE_SHORT(this->entindex());
+				MESSAGE_END();
+
 				SetThink(&CBaseEntity::SUB_Remove);
 			}
 			pev->nextthink = gpGlobals->time + 0.01s;

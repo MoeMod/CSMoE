@@ -222,6 +222,11 @@ namespace sv {
 		{
 			pev->effects |= EF_NODRAW;
 
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_KILLBEAM);
+			WRITE_SHORT(this->entindex());
+			MESSAGE_END();
+
 			SetThink(&CBaseEntity::SUB_Remove);
 			SetTouch(NULL);
 
@@ -229,6 +234,11 @@ namespace sv {
 		}
 		else
 		{
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_KILLBEAM);
+			WRITE_SHORT(this->entindex());
+			MESSAGE_END();
+
 			UTIL_Remove(this);
 		}
 	}

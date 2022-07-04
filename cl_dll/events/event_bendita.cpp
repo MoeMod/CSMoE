@@ -43,16 +43,25 @@ static const char *SOUNDS_NAME = "weapons/bendita-1.wav";
 
 void EV_FireBendita( event_args_t *args )
 {
+	vec3_t ShellVelocity, ShellOrigin;
 	vec3_t vecSrc, vecAiming;
+	vec3_t velocity;
 
 	int idx = args->entindex;
-	Vector origin( args->origin );
+	Vector origin(args->origin);
 	Vector angles(
 		args->iparam1 / 100.0f + args->angles[0],
 		args->iparam2 / 100.0f + args->angles[1],
 		args->angles[2]
-		);
+	);
 	Vector forward, right, up;
+	cl_entity_t* ent;
+	int righthand;
+
+	ent = gEngfuncs.GetViewModel();
+	righthand = gHUD.cl_righthand->value;
+
+	int shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/rshell_big.mdl");
 
 	AngleVectors( angles, forward, right, up );
 
@@ -62,6 +71,27 @@ void EV_FireBendita( event_args_t *args )
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( Com_RandomLong(BENDITA_SHOOT1, BENDITA_SHOOT3), 2 );
 	}
+
+	if (EV_IsLocal(idx))
+	{
+		float vecScale[3] = { 20.0, -8.0, -10.0 };
+
+		if (righthand == 0)
+		{
+			vecScale[2] = 0 - vecScale[2];
+			vecScale[0] = 17.0;
+		}
+
+		EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, vecScale[0], vecScale[1], vecScale[2], true);
+
+		VectorCopy(ent->attachment[1], ShellOrigin);
+		VectorScale(ShellVelocity, 1.5, ShellVelocity);
+		ShellVelocity[2] -= 50.0;
+	}
+	else
+		EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, -4.0, false);
+
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
 
 	PLAY_EVENT_SOUND( SOUNDS_NAME );
 

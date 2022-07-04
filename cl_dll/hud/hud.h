@@ -926,7 +926,7 @@ private:
 	int iStoredType;
 	int iWeapon;
 	int DisplayTime;
-	SharedTexture m_pCurTexture[11];
+	SharedTexture m_pCurTexture[12];
 };
 
 //

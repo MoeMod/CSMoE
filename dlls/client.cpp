@@ -3330,7 +3330,6 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 						MESSAGE_END();
 
 						player->m_bNightVisionOn = false;
-
 						for (int i = 1; i <= gpGlobals->maxClients; ++i)
 						{
 							CBasePlayer *pObserver = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(i));
@@ -3338,6 +3337,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 							if (pObserver && pObserver->IsObservingPlayer(player))
 							{
 								EMIT_SOUND(ENT(pObserver->pev), CHAN_ITEM, "items/nvg_off.wav", RANDOM_FLOAT(0.92, 1), ATTN_NORM);
+
 
 								MESSAGE_BEGIN(MSG_ONE, gmsgNVGToggle, NULL, pObserver->pev);
 									WRITE_BYTE(0); // disable nightvision
@@ -4577,6 +4577,7 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
       state->gravity = ent->v.gravity;
       state->usehull = (ent->v.flags & FL_DUCKING) ? 1 : 0;
       state->health = (int)ent->v.health;
+	  state->playerclass = ent->v.playerclass;
    }
    else
       state->playerclass = ent->v.playerclass;

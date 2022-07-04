@@ -588,6 +588,8 @@ public:
 			|| m_iId == WEAPON_M950
 			|| m_iId == WEAPON_SKULL1
 			|| m_iId == WEAPON_M950SE
+			|| m_iId == WEAPON_SFPISTOL
+			|| m_iId == WEAPON_Y22S2SFPISTOL
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -968,6 +970,116 @@ private:
 	time_point_t m_flSplashTime;
 	time_point_t m_flCreateSharkTime;
 };
+class CY22s2SFpistolField : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT OnThink(void);
+
+public:
+	static CY22s2SFpistolField* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	float GetArmorRatioModifier() { return 1.1; }
+	KnockbackData GetKnockBackData() override { return { -1.0f, -1.0f, -1.0f, -1.0f, 0.6f }; }
+	void DoDebuff(void);
+
+private:
+	float GetAttackRange();
+	duration_t GetLifeTime();
+	int m_iType;
+	time_point_t m_flAttackInterval;
+	time_point_t m_flRemoveTime;
+};
+
+#ifndef CLIENT_DLL
+class CPianoGunWave : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT FlyingThink(void);
+	void EXPORT FlyingTouch(CBaseEntity* pOther);
+	void EXPORT AttachmentThink(void);
+
+public:
+	static CPianoGunWave* Create(int iWpnType, int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	float GetArmorRatioModifier() { return 1.1; }
+	void RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
+	//void RadiusAttack(float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer);
+	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.3f }; }
+private:
+	void StartFadeOut();
+	void FadeOut();
+private:
+	float GetDirectDamage();
+	float GetExplodeDamage();
+	//float GetRadiusDamage();
+
+	time_point_t m_flRemoveTime;
+	int m_iType;
+	int m_iWpnType;
+	int m_iPianoNoteExp[2];
+	int m_iPianoShootMuzzle;
+
+};
+
+
+class CWonderCannon;
+class CWonderCannonChain : public CBaseEntity
+{
+public:
+	enum DamageType
+	{
+		EXPTYPE_BASE,
+		EXPTYPE_SINGLE,
+		EXPTYPE_MULTI,
+		EXPTYPE_FINAL,
+	};
+
+	CWonderCannonChain()
+	{
+		m_flNextDamage = invalid_time_point;
+		m_tTimeRemove = invalid_time_point;
+		m_iExpTime = 0;
+		m_iCount = 0;
+		m_iAttachedEntCount = 0;
+		m_tTimeRemove = gpGlobals->time + 5.0s;
+	}
+
+	void Spawn();
+	void Precache();
+	
+	void EXPORT OnThink(void);
+	void Init(CBasePlayer* pOwner, CWonderCannon* pWeapon, CBaseEntity* pAttachedEnt, CUtlVector<CBaseEntity*>* pList);
+	void DoExpDamage(float flDamage, CBaseEntity* pAttachedEnt);
+	void Remove();
+	float GetArmorRatioModifier() { return 1.3; }
+	int GetWeaponsId(void) { return WEAPON_WONDERCANNON; }
+	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; }
+	int m_iAttachedEntCount;
+	int m_iExpTime;
+	int m_iCount;
+
+private:
+	float GetDamage(DamageType iType) const;
+
+	time_point_t m_flNextDamage;
+	time_point_t m_tTimeRemove;
+	
+	int m_iCache_Exp[4];
+
+	CUtlVector<CBaseEntity*>* m_pEnemyList;
+	CBasePlayer* m_pOwner;
+	CBaseEntity* m_pAttachedEnt;
+	CWonderCannon* m_pWeapon;
+};
+#endif
 
 #ifdef ENABLE_SHIELD
 class CWShield : public CBaseEntity

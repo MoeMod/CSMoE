@@ -653,6 +653,10 @@
 // byte (life in 0.1's)
 // byte (anglecalc)
 
+#define TE_KILLENTITYATTACHMENTS	135	// will expire all TENTS attached to a ent.
+// short (entity index of ent)
+
+
 #define MSG_BROADCAST		0	// unreliable to all
 #define MSG_ONE			1	// reliable to one (msg_entity)
 #define MSG_ALL			2	// reliable to all

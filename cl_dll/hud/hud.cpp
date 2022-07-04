@@ -285,6 +285,8 @@ CHud :: ~CHud()
 	m_pHudList = NULL;
 }
 
+void ResetSFPistolEntities(void);
+
 void CHud :: VidInit( void )
 {
 	static bool firstinit = true;
@@ -428,6 +430,7 @@ void CHud :: VidInit( void )
 
 	g_pViewport->VidInit();
 	gFog.VidInit();
+	ResetSFPistolEntities();
 
 	if( firstinit && gEngfuncs.CheckParm( "-firsttime", NULL ) )
 	{

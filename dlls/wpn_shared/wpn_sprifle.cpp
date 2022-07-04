@@ -68,6 +68,12 @@ namespace sv {
 
 	float GetArmorRatioModifier() override { return 1.95; }
 
+	void Precache() override
+	{
+		m_iShellId = PRECACHE_MODEL("models/rshell_big.mdl");
+		return Base::Precache();
+	}
+
 	int GetItemInfo(ItemInfo* p)
 	{
 		p->pszName = STRING(pev->classname);
@@ -169,6 +175,7 @@ namespace sv {
 #endif
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
+		m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.2s;
 		m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 		m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 

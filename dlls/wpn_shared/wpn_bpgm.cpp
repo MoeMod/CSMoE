@@ -71,6 +71,7 @@ namespace sv {
 
 	void Precache() override
 	{
+		m_iShellId = PRECACHE_MODEL("models/rshell_big.mdl");
 		return Base::Precache();
 	}
 

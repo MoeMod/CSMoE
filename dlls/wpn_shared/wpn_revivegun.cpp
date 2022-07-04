@@ -135,7 +135,7 @@ BOOL CReviveGun::Deploy(void)
 #endif
 		return TRUE;
 	}
-
+	
 	return FALSE;
 }
 

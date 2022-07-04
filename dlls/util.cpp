@@ -2529,11 +2529,28 @@ bool UTIL_AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecS
 	return false;
 }
 
-void UTIL_AddKickRateBoost(CBaseEntity* pEntity, const Vector2D& vecDir, float flVelocityModifier, float flForce, float flBoost)
+void UTIL_AddKickRateBoost(CBaseEntity* pEntity, const Vector2D& vecDir, float flVelocityModifier, float flForce, float flBoost, bool ApplyAll)
 {
-	pEntity->pev->velocity.x = vecDir.x * flVelocityModifier * flForce;
-	pEntity->pev->velocity.y = vecDir.y * flVelocityModifier * flForce;
-	pEntity->pev->velocity.z = flVelocityModifier * flBoost;
+	if (pEntity->IsPlayer())
+	{
+		CBasePlayer* player = (CBasePlayer*)pEntity;
+
+		if (ApplyAll || (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK)))
+		{
+			player->pev->velocity.x = vecDir.x * flVelocityModifier * flForce;
+			player->pev->velocity.y = vecDir.y * flVelocityModifier * flForce;
+			if (flBoost)
+				player->pev->velocity.z = flVelocityModifier * flBoost;
+		}
+	}
+	else
+	{
+		pEntity->pev->velocity.x = vecDir.x * flVelocityModifier * flForce;
+		pEntity->pev->velocity.y = vecDir.y * flVelocityModifier * flForce;
+		if (flBoost)
+			pEntity->pev->velocity.z = flVelocityModifier * flBoost;
+	}
+	
 }
 
 float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flBaseDamage, float flMaxRange)

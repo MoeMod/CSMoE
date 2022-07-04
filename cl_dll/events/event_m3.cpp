@@ -45,6 +45,9 @@ static const char *SOUNDS_NAME = "weapons/m3-1.wav";
 void EV_FireM3( event_args_t *args )
 {
 	vec3_t vecSrc, vecAiming;
+	vec3_t velocity;
+	vec3_t ShellVelocity;
+	vec3_t ShellOrigin;
 	int    idx = args->entindex;
 	Vector origin( args->origin );
 	Vector angles(
@@ -53,7 +56,12 @@ void EV_FireM3( event_args_t *args )
 		args->angles[2]
 		);
 	Vector forward, right, up;
+	cl_entity_t* ent;
+	int righthand;
 
+	ent = gEngfuncs.GetViewModel();
+	idx = args->entindex;
+	righthand = gHUD.cl_righthand->value;
 	AngleVectors( angles, forward, right, up );
 
 	if ( EV_IsLocal( idx ) )
@@ -62,6 +70,22 @@ void EV_FireM3( event_args_t *args )
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(M3_SHOOT1, M3_SHOOT2), 2);
 	}
+
+	if (EV_IsLocal(idx))
+	{
+		float vecScale[3] = { 22.0, -9.0, -11.0 };
+
+		if (righthand == 0)
+			vecScale[2] = 0 - vecScale[2];
+
+		EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, vecScale[0], vecScale[1], vecScale[2], true);
+
+		VectorCopy(ent->attachment[1], ShellOrigin);
+		VectorScale(ShellVelocity, 1.25, ShellVelocity);
+		ShellVelocity[2] -= 50;
+	}
+	else
+		EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, -4.0, false);
 
 	PLAY_EVENT_SOUND( SOUNDS_NAME );
 

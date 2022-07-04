@@ -111,7 +111,7 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 	pWeapon->hAmmo2 = 0;
 
 	sprintf(sz, "sprites/%s.txt", pWeapon->szName);
-	if (strncmp(pWeapon->szName, "knife_dgaxe", 11) && strncmp(pWeapon->szName, "knife_skullt9", 13) && strncmp(pWeapon->szName, "knife_summonknife", 17) && strncmp(pWeapon->szName, "knife_y22s1holyswordmb", 22))
+	if (strncmp(pWeapon->szName, "knife_dgaxe", 11) && strncmp(pWeapon->szName, "knife_skullt9", 13) && strncmp(pWeapon->szName, "knife_summonknife", 17) && strncmp(pWeapon->szName, "knife_y22s1holyswordmb", 22) && strncmp(pWeapon->szName, "knife_y22s2sfsword", 18))
 	{
 		if (!strncmp(pWeapon->szName, "knife_", 6))
 		{
@@ -639,7 +639,7 @@ int CHudAmmo::MsgFunc_AmmoPickup( const char *pszName, int iSize, void *pbuf )
 int CHudAmmo::MsgFunc_WeapPickup( const char *pszName, int iSize, void *pbuf )
 {
 	BufferReader reader( pszName, pbuf, iSize );
-	int iIndex = reader.ReadByte();
+	int iIndex = reader.ReadShort();
 
 	// Add the weapon to the history
 	gHR.AddToHistory(HISTSLOT_WEAP, iIndex);
@@ -651,7 +651,7 @@ int CHudAmmo::MsgFunc_WeapPickup( const char *pszName, int iSize, void *pbuf )
 int CHudAmmo::MsgFunc_WeapDrop(const char* pszName, int iSize, void* pbuf)
 {
 	BufferReader reader(pszName, pbuf, iSize);
-	int iIndex = reader.ReadByte();
+	int iIndex = reader.ReadShort();
 	if (!iIndex) {
 		gWR.DropAllWeapons();
 	} else {
@@ -706,21 +706,25 @@ int CHudAmmo::MsgFunc_CurWeapon(const char *pszName, int iSize, void *pbuf )
 	BufferReader reader( pszName, pbuf, iSize );
 
 	int iState = reader.ReadByte();
-	int iId = reader.ReadByte();
-
-	// fuck 128 limit
-	int iClip;
-	if (iSize == 4)
+	int iId = 0;
+	int iClip = 0;
+	if (iSize == 3)
 	{
-		iClip = reader.ReadShort();
+		iId = reader.ReadByte();
+		iClip = reader.ReadByte();
 	}
-	else
+	else if (iSize == 4)
 	{
+		iId = reader.ReadShort();
 		iClip = reader.ReadByte();
 		if (iClip == 255)
 			iClip = -1;
 	}
-
+	else
+	{
+		iId = reader.ReadShort();
+		iClip = reader.ReadShort();
+	}
 
 	if ( iId < 1 )
 	{
@@ -798,7 +802,7 @@ int CHudAmmo::MsgFunc_WeaponList(const char *pszName, int iSize, void *pbuf )
 
 	Weapon.iSlot = reader.ReadChar();
 	Weapon.iSlotPos = reader.ReadChar();
-	Weapon.iId = reader.ReadByte();
+	Weapon.iId = reader.ReadShort();
 	Weapon.iFlags = reader.ReadByte();
 	Weapon.iClip = 0;
 
@@ -825,16 +829,23 @@ int CHudAmmo::MsgFunc_Crosshair(const char *pszName, int iSize, void *pbuf)
 
 int CHudAmmo::MsgFunc_Brass( const char *pszName, int iSize, void *pbuf )
 {
-	BufferReader reader( pszName, pbuf, iSize );
-	reader.ReadByte(); // unused!
+	bool useNewBehavior = true;
 
+	BufferReader reader( pszName, pbuf, iSize );
+	if (!useNewBehavior)
+	{
+		reader.ReadByte(); // unused!
+	}
 	Vector origin, velocity;
 	origin.x = reader.ReadCoord();
 	origin.y = reader.ReadCoord();
 	origin.z = reader.ReadCoord();
-	reader.ReadCoord(); // unused!
-	reader.ReadCoord(); // unused!
-	reader.ReadCoord(); // unused!
+	if (!useNewBehavior)
+	{
+		reader.ReadCoord(); // unused!
+		reader.ReadCoord(); // unused!
+		reader.ReadCoord(); // unused!
+	}	
 	velocity.x = reader.ReadCoord();
 	velocity.y = reader.ReadCoord();
 	velocity.z = reader.ReadCoord();
@@ -842,7 +853,11 @@ int CHudAmmo::MsgFunc_Brass( const char *pszName, int iSize, void *pbuf )
 	float Rotation = M_PI * reader.ReadAngle() / 180.0f;
 	int ModelIndex = reader.ReadShort();
 	int BounceSoundType = reader.ReadByte();
-	int Life = reader.ReadByte();
+	int Life = 2.5;
+	if (!useNewBehavior)
+	{
+		Life = reader.ReadByte();
+	}
 	int Client = reader.ReadByte();
 
 	float sin, cos, x, y;

@@ -32,6 +32,11 @@ void DLLEXPORT HUD_DrawNormalTriangles( void )
 	gHUD.m_Spectator.DrawOverview();
 }
 
+extern "C"
+{
+	void HUD_CreateBeams(void);
+}
+
 /*
 =================
 HUD_DrawTransparentTriangles
@@ -45,6 +50,7 @@ void DLLEXPORT HUD_DrawTransparentTriangles( void )
 	ProcessRain();
 	DrawRain();
 	DrawFXObjects();
+	HUD_CreateBeams();
 }
 
 }

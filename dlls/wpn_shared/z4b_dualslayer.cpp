@@ -147,7 +147,7 @@ public:
 		float flDamage = 120;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 1405 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
+			flDamage = 1605 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -159,7 +159,7 @@ public:
 		float flDamage = 80;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 1040 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
+			flDamage = 1140 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -342,7 +342,7 @@ void CKnifeDualSlayer::SecondaryAttack(void)
 void CKnifeDualSlayer::DelaySkillAttack()
 {
 #ifndef CLIENT_DLL
-	switch (KnifeAttack(GetSkillAttackDamage(), 130, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, true))
+	switch (KnifeAttack(GetSkillAttackDamage(), 135, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, true))
 	{
 	case HIT_PLAYER:
 	{
@@ -394,7 +394,7 @@ void CKnifeDualSlayer::DelayPrimaryAttack()
 void CKnifeDualSlayer::DelaySecondaryAttack()
 {
 #ifndef CLIENT_DLL
-	switch (KnifeAttack(GetSecondaryAttackDamage(), 135, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	switch (KnifeAttack(GetSecondaryAttackDamage(), 115, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_PLAYER:
 	{

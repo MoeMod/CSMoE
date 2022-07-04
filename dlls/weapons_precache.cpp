@@ -360,6 +360,14 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_winggun");
 	UTIL_PrecacheOtherWeapon("weapon_m950se");
 	UTIL_PrecacheOtherWeapon("weapon_chainsawex");
+	UTIL_PrecacheOtherWeapon("weapon_lasersg");
+	UTIL_PrecacheOtherWeapon("weapon_wondercannon");
+	UTIL_PrecacheOtherWeapon("knife_y22s2sfsword");
+	UTIL_PrecacheOtherWeapon("weapon_sfpistol");
+	UTIL_PrecacheOtherWeapon("weapon_y22s2sfpistol");
+	UTIL_PrecacheOtherWeapon("weapon_pianogun");
+	UTIL_PrecacheOtherWeapon("weapon_stunrifle");
+
 
 	if (g_pGameRules->IsDeathmatch())
 	{

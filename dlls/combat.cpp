@@ -18,6 +18,8 @@
 #include "bot_include.h"
 #include <dlls/gamemode/mod_zb1.h>
 
+#include "wpn_shared/wpn_wondercannon.h"
+
 namespace sv {
 
 
@@ -2072,6 +2074,7 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 			break;
 		case BULLET_PLAYER_556LVB:
 		case BULLET_PLAYER_556MM:
+		case BULLET_PLAYER_WONDERCANNON:
 			iPenetrationPower = 35;
 			flPenetrationDistance = 4000;
 			break;
@@ -2209,6 +2212,29 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		}
 		if (tr.flFraction != 1.0f) {
 			CBaseEntity *pEntity = CBaseEntity::Instance(tr.pHit);
+
+			if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+			{
+				if (iBulletType == BULLET_PLAYER_WONDERCANNON)
+				{
+					if (iPenetration >= 2 && pevAttacker)
+					{
+						CBasePlayer* pAttack = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pevAttacker));
+						if (pAttack)
+						{
+							if (pAttack->m_pActiveItem)
+							{
+								CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
+
+								CWonderCannon* pLinkWeapon = dynamic_cast<CWonderCannon*>(pWeapon);
+								if (pLinkWeapon)
+									pLinkWeapon->DoExpAttachVicStart(pEntity);
+							}
+						}
+					}
+				}
+			}
+
 			iPenetration--;
 
 			flCurrentDistance = tr.flFraction * flDistance;

@@ -360,6 +360,8 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 
 	if (!strcmp(szAmmoClassName, "bowarrow"))
 		ret = 60;
+	if (!strcmp(szAmmoClassName, "pianogun_energycell"))
+		ret = 360;
 	else if (!strcmp(szAmmoClassName, "CannonAmmo"))
 		ret = 20;
 	else if (!strcmp(szAmmoClassName, "CannonEXAmmo"))

@@ -192,14 +192,16 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
+		m_pPlayer->GiveNamedItem("weapon_stunrifle");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
+		m_pPlayer->GiveNamedItem("weapon_pianogun");
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("weapon_winggun");
+		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
 		break;
@@ -387,6 +389,27 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 			GiveSlotAmmo(m_pPlayer, iSlot);
 		}
 		m_pPlayer->GiveNamedItem("weapon_hegrenade");
+#if 0
+		if (m_pPlayer->entindex()==1)
+		{
+
+			CBaseEntity* Entity = UTIL_PlayerByIndex(1);
+			if (Entity)
+			{
+				CBasePlayer* TargetPlayer = static_cast<CBasePlayer*>(Entity);
+
+				TargetPlayer->RemoveAllItems(FALSE);
+				TargetPlayer->GiveNamedItem("weapon_pianogun");
+				TargetPlayer->GiveNamedItem("weapon_y22s2sfpistol");
+				TargetPlayer->GiveNamedItem("knife_holysword");
+
+				GiveSlotAmmo(TargetPlayer, 1);
+				GiveSlotAmmo(TargetPlayer, 2);
+				TargetPlayer->m_iBuff |= BUFF_AVOID_INFECT;
+
+			}
+		}
+#endif
 		return;
 	}
 	

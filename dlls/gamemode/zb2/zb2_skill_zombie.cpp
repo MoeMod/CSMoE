@@ -794,7 +794,7 @@ namespace sv {
 		if (m_pPlayer->IsBot())
 		{
 			pTail->Initialize(2.0s);
-			pTail->pev->velocity = gpGlobals->v_forward * 1800;
+			pTail->pev->velocity = gpGlobals->v_forward * 1400;
 		}
 		else
 		{

@@ -153,7 +153,7 @@ public:
 		float flDamage = 120;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 1605 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
+			flDamage = 1705 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -438,7 +438,7 @@ void CKnifeHolyFist::DelayPrimaryAttack()
 void CKnifeHolyFist::DelaySecondaryAttack()
 {
 #ifndef CLIENT_DLL
-	switch (KnifeAttack(GetSecondaryAttackDamage(), 115, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	switch (KnifeAttack(GetSecondaryAttackDamage(), 105, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_PLAYER:
 	{

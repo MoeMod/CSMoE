@@ -498,6 +498,9 @@ bool CCSBot::IsUsingMachinegun() const
 	if (weapon != NULL && WeaponIDToWeaponClass(weapon->m_iId) == WEAPONCLASS_MACHINEGUN)
 		return true;
 
+	if(weapon->m_iId == WEAPON_WONDERCANNON || weapon->m_iId == WEAPON_PIANOGUN || weapon->m_iId == WEAPON_PIANOGUNEX)
+		return true;
+
 	return false;
 }
 

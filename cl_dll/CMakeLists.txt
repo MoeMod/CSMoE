@@ -288,6 +288,13 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_winggun.cpp
 	../dlls/wpn_shared/wpn_m950se.cpp
 	../dlls/wpn_shared/wpn_chainsawex.cpp
+	../dlls/wpn_shared/wpn_lasersg.cpp
+	../dlls/wpn_shared/wpn_wondercannon.cpp
+	../dlls/wpn_shared/knife_y22s2sfsword.cpp
+	../dlls/wpn_shared/wpn_sfpistol.cpp
+	../dlls/wpn_shared/wpn_y22s2sfpistol.cpp
+	../dlls/wpn_shared/wpn_pianogun.cpp
+	../dlls/wpn_shared/wpn_stunrifle.cpp
 	)
 
 set (HUD_SRCS

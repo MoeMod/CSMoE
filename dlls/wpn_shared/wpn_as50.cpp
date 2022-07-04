@@ -55,7 +55,7 @@ void CAS50::Precache(void)
 	PRECACHE_SOUND("weapons/as50-1.wav");
 	PRECACHE_SOUND("weapons/zoom.wav");
 
-	m_iShellId = m_iShell = PRECACHE_MODEL("models/rshell_big.mdl");
+	m_iShellId = PRECACHE_MODEL("models/rshell_big.mdl");
 	m_usFireAS50 = PRECACHE_EVENT(1, "events/as50.sc");
 }
 
@@ -159,7 +159,6 @@ void CAS50::AS50Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 #endif
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55s;
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 

@@ -760,6 +760,9 @@ namespace sv {
 			if (m_bChargeFinish)
 			{
 				SendWeaponAnim(ANIM_WINGSPECIALSHOT, UseDecrement() != FALSE);
+#ifndef CLIENT_DLL
+				m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
 				SpecialShoot();
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.2s;
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.2s;

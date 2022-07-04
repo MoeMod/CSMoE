@@ -439,7 +439,7 @@ void CVoidpistol::Precache(void)
 	PRECACHE_MODEL("sprites/muzzleflash141.spr");
 
 
-
+	PRECACHE_SOUND("weapons/voidpistol_beep.wav");
 	PRECACHE_SOUND("weapons/voidpistol-1.wav");
 	PRECACHE_SOUND("weapons/voidpistol-2.wav");
 
@@ -786,6 +786,11 @@ void CVoidpistol::VoidpistolFireB(float flSpread, duration_t flCycleTime, BOOL f
 	
 #endif
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
+
+		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/voidpistol-1.wav", VOL_NORM, ATTN_NORM);
+
+		EMIT_SOUND(ENT(pev), CHAN_STATIC, "weapons/voidpistol_beep.wav", VOL_NORM, ATTN_NORM);
+
 		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireVoidpistol, 0, g_vecZero, g_vecZero, 2.0, 0.0, 0, 0, IsModeCEnabled(m_iCharging), FALSE);
 
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
@@ -876,6 +881,8 @@ void CVoidpistol::VoidpistolFireA(float flSpread, duration_t flCycleTime, BOOL f
 	{
 		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 1;
 	}
+
+	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/voidpistol-1.wav", VOL_NORM, ATTN_NORM);
 
 	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireVoidpistol, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), 1, IsModeCEnabled(m_iCharging), FALSE);
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;

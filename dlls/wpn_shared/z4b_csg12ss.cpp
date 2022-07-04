@@ -287,6 +287,7 @@ namespace sv {
 
 		if (m_pPlayer->pev->button & IN_USE && m_pPlayer->m_flNextAttack < 0s && !m_iWeaponState)
 		{
+#if 0
 			if (m_iClip == 1 && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 			{
 				SendWeaponAnim(ANIM_SUICIDE, UseDecrement() != FALSE);
@@ -299,6 +300,7 @@ namespace sv {
 				m_tNextThink = gpGlobals->time + 3.0s;
 				return;
 			}
+#endif
 			SendWeaponAnim(ANIM_MELEE, UseDecrement() != FALSE);
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 			m_pPlayer->m_flNextAttack = 1.2s;

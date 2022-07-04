@@ -864,7 +864,7 @@ namespace sv {
 	private:
 		float GetKickRateBonus() const { return 1.0f + 0.02f * g_pGameRules->m_iTotalRoundsPlayed; }
 		float GetRadiusBonus() const { return 1.0f + 0.1f * g_pGameRules->m_iTotalRoundsPlayed; }
-		float GetDamageBonus() const { return 1.0f + 0.5f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetDamageBonus() const { return 1.0f + 0.3f * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
 
 	class ZSkill_ClawEnhacement : public CZombieZSkill_Base
@@ -2050,6 +2050,8 @@ namespace sv {
 				return;
 
 			if (host->v.team != ent->v.team)
+				return;
+			if (host->v.flags & FL_SPECTATOR)
 				return;
 
 			state->solid = SOLID_NOT;		

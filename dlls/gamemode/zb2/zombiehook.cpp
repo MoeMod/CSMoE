@@ -42,7 +42,7 @@ void CZombieHook::Spawn(void)
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
 	pev->nextthink = gpGlobals->time + 0.1s;
-	m_flPullingSpeed = 400;
+	m_flPullingSpeed = 350;
 }
 
 void CZombieHook::Precache(void)

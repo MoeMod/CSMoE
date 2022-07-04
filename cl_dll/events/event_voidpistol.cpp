@@ -87,73 +87,26 @@ void EV_FireVoidpistol( event_args_t *args )
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
-		//cl_entity_t* ent = gEngfuncs.GetViewModel();
 		if((args->iparam2))
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(args->bparam1 ? VOIDPISTOL_SHOOTC : VOIDPISTOL_SHOOTA, 2);
 		else
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(args->bparam1 ? VOIDPISTOL_SHOOTC : VOIDPISTOL_SHOOTB, 2);
 
-		/*struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash140.spr", false);
-		if (pModel)
+		if (args->iparam1)
 		{
+			EV_GetGunPosition(args, vecSrc, origin);
+			Vector vSpread(args->fparam1, args->fparam2, 0.0f);
 
-			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel);
-
-			pEnt->entity.curstate.frame = 0;
-			pEnt->entity.curstate.framerate = 30.0;
-
-			pEnt->entity.curstate.scale = 0.04;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.baseline.origin = Vector(0, 0, 0);
-			pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-			pEnt->entity.curstate.solid = SOLID_NOT;
-
-			pEnt->die = gHUD.m_flTime + 0.4;
-			pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-
-			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-				cl_entity_t* ent = gEngfuncs.GetViewModel();
-				pEnt->entity.origin = ent->attachment[0];
-			};
-
-		}*/
-
-		if (!gHUD.cl_righthand->value)
-		{
-			EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, -16.0, 0);
+			EV_HLDM_FireBullets(idx,
+				forward, right, up,
+				1, vecSrc, forward,
+				vSpread, 8192.0, BULLET_PLAYER_50AE,
+				2);
 		}
-		else
-		{
-			EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, 16.0, 0);
-		}
-
-			EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iPShell, TE_BOUNCE_SHELL);
-			
-
-			if (args->iparam1)
-			{
-				EV_GetGunPosition(args, vecSrc, origin);
-				Vector vSpread(args->fparam1, args->fparam2, 0.0f);
-
-				EV_HLDM_FireBullets(idx,
-					forward, right, up,
-					1, vecSrc, forward,
-					vSpread, 8192.0, BULLET_PLAYER_50AE,
-					2);
-			}
 		
 	}
 	else
 	{
-		if (args->fparam1 == 2.0)
-		{
-			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_STATIC, "weapons/voidpistol_beep.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-		}
-		else
-			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-
 		if (args->bparam2)
 		{
 			switch (args->iparam2)
@@ -285,9 +238,6 @@ void EV_FireVoidpistol( event_args_t *args )
 
 		}
 	}
-	
-
-	
 }
 
 }

@@ -385,11 +385,9 @@ void CFrequency1::CalcIsTarget()
 
 		if (!is_target_avaliable(iIndex))
 			continue;
-
 		m_iIsTarget[iIndex] = 1;
 	}
 }
-
 
 bool CFrequency1::is_target_avaliable(int iIndex)
 {

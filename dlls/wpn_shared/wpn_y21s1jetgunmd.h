@@ -18,7 +18,7 @@ class CY21s1Jetgunmd : public CBasePlayerWeapon
 		ANIM_SHOOT_END,
 		ANIM_DASH_START,
 		ANIM_DASH_LOOP,
-		ANIM_DASH_END,
+		ANIM_DASH_END
     };
 public:
 	void Spawn() override;

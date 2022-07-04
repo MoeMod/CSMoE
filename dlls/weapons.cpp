@@ -548,7 +548,17 @@ void CBasePlayerWeapon::EjectBrassLate()
 	vecRight = RANDOM_FLOAT(50, 70) * gpGlobals->v_right;
 
 	vecShellVelocity = (m_pPlayer->pev->velocity + vecRight + vecUp) + gpGlobals->v_forward * 25;
-	soundType = (m_iId == WEAPON_XM1014 || m_iId == WEAPON_M3) ? 2 : 1;
+	soundType = (m_iId == WEAPON_XM1014 
+		|| m_iId == WEAPON_M3
+		|| m_iId == WEAPON_M3DRAGON
+		|| m_iId == WEAPON_M3DRAGONM
+		|| m_iId == WEAPON_Z4B_CSG12SS
+		|| m_iId == WEAPON_M1887
+		|| m_iId == WEAPON_Z4B_M37SE
+		|| m_iId == WEAPON_Z4B_CSG12SS
+		|| m_iId == WEAPON_CSGO_MAG7
+		|| m_iId == WEAPON_CSGO_SAWEDOFF)
+		? TE_BOUNCE_SHOTSHELL : TE_BOUNCE_SHELL;
 
 	EjectBrass(pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_up * -9 + gpGlobals->v_forward * 16, gpGlobals->v_right * -9,
 		vecShellVelocity, pev->angles.y, m_iShellId, soundType, m_pPlayer->entindex());
@@ -944,7 +954,7 @@ int CBasePlayerItem::AddToPlayer(CBasePlayer *pPlayer)
 	WriteWeaponInfo(pPlayer, II);
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgWeapPickup, NULL, pPlayer->pev);
-		WRITE_BYTE(m_iId);
+		WRITE_SHORT(m_iId);
 	MESSAGE_END();
 
 	return TRUE;
@@ -1129,8 +1139,7 @@ int CBasePlayerWeapon::UpdateClientData(CBasePlayer *pPlayer)
 	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgCurWeapon, NULL, pPlayer->pev);
 			WRITE_BYTE(state);
-			WRITE_BYTE(m_iId);
-		//	WRITE_BYTE(m_iClip);
+			WRITE_SHORT(m_iId);
 			WRITE_SHORT(m_iClip);
 		MESSAGE_END();
 
@@ -1373,6 +1382,8 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_M950:
 		case WEAPON_SKULL1:
 		case WEAPON_M950SE:
+		case WEAPON_SFPISTOL:
+		case WEAPON_Y22S2SFPISTOL:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

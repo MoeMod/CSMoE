@@ -708,6 +708,33 @@ void GAME_EXPORT CL_KillAttachedTents( int client )
 
 /*
 ==============
+CL_KillAttachedTentsFromEntity
+
+Detach entity from entity
+==============
+*/
+void GAME_EXPORT CL_KillAttachedTentsFromEntity(int entity)
+{
+	int	i;
+
+	for (i = 0; i < GI->max_tents; i++)
+	{
+		TEMPENTITY* pTemp = &cl_tempents[i];
+
+		if (pTemp->flags & FTENT_PLYRATTACHMENT)
+		{
+			// this TEMPENTITY is entity attached.
+			// if it is attached to this entity, set it to die instantly.
+			if (pTemp->clientIndex == entity)
+			{
+				pTemp->die = cl.time; // good enough, it will die on next tent update. 
+			}
+		}
+	}
+}
+
+/*
+==============
 CL_RicochetSprite
 
 Create ricochet sprite
@@ -1870,6 +1897,59 @@ TEMPENTITY* GAME_EXPORT CL_TempCustomModel(const vec3_t pos, const vec3_t angles
 	return pTemp;
 }
 
+TEMPENTITY* GAME_EXPORT CL_AttachTentToModel(int clientindex, int iAttachment, float life, int modelIndex, float framerate, int brightness, int rendermode, float scale, int frameMax, int flags, int eflags)
+{
+	cl_entity_t* parent = CL_GetEntityByIndex(clientindex);
+	if (!parent)
+	{
+		MsgDev(D_INFO, "No viewmodel.\n");
+		return NULL;
+	}
+
+	TEMPENTITY* pTemp = CL_TempEntAlloc(parent->attachment[iAttachment], Mod_Handle(modelIndex));
+
+	if (!pTemp)
+	{
+		MsgDev(D_INFO, "No attached temp ent.\n");
+		return NULL;
+	}
+
+	int frameCount;
+	Mod_GetFrames(modelIndex, &frameCount);
+
+	if (frameMax > 0)
+		pTemp->frameMax = frameMax;
+	else
+		pTemp->frameMax = frameCount;
+	
+	pTemp->flags |= FTENT_SPRANIMATE;
+
+	if(flags)
+		pTemp->flags |= flags;
+
+	if (eflags)
+		pTemp->entity.curstate.eflags |= eflags;
+	
+	if (life >= 998)
+	{
+		life /= framerate;
+	}
+	
+	pTemp->entity.curstate.rendermode = rendermode;
+	pTemp->entity.curstate.renderamt = brightness;
+	pTemp->entity.curstate.framerate = framerate;
+	pTemp->entity.curstate.renderfx = 0;
+	pTemp->die = cl.time + life;
+	pTemp->entity.curstate.frame = 0.0f;
+	pTemp->entity.curstate.movetype = MOVETYPE_FOLLOW;
+	pTemp->entity.curstate.aiment = clientindex;
+	pTemp->frameMax = frameCount - 1;
+	pTemp->entity.curstate.body = iAttachment + 1;
+	pTemp->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
+	pTemp->entity.curstate.scale = scale;
+
+	return pTemp;
+}
 
 void R_TempSphereModel(vec3_t pos, float speed, float life, int count, int modelIndex, bool bAnglesCalc)
 {
@@ -2906,6 +2986,10 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 		count = BF_ReadShort(&buf);
 		life = (float)(BF_ReadByte(&buf) * 0.1f);
 		R_TempSphereModel(pos, vel, life, count, modelIndex, BF_ReadByte(&buf) != 0);
+		break;
+	case TE_KILLENTITYATTACHMENTS:
+		entityIndex = BF_ReadShort(&buf);	// playernum
+		CL_KillAttachedTentsFromEntity(entityIndex);
 		break;
 	default:
 		MsgDev( D_ERROR, "ParseTempEntity: illegible TE message %i\n", type );

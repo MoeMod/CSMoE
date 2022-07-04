@@ -46,6 +46,7 @@ enum
 	WPN_HUNTBOW,
 	WPN_SKULLT9,
 	WPN_WHIPSWORD,
+	WPN_Y22S2SFSWORD,
 };
 
 enum
@@ -65,6 +66,7 @@ enum
 	SKULLT9_AIM_ON,
 	WHIPSWORD_AIM_OFF,
 	WHIPSWORD_AIM_ON,
+	Y22S2SFSWORD_AIM_ON,
 };
 
 int CHudSpecialCrossHair::Init()
@@ -129,6 +131,7 @@ int CHudSpecialCrossHair::VidInit()
 	R_InitTexture(m_pCurTexture[8], "sprites/skullt9_aim_on.tga");
 	R_InitTexture(m_pCurTexture[9], "sprites/whipsword_aim_off.tga");
 	R_InitTexture(m_pCurTexture[10], "sprites/whipsword_aim_on.tga");
+	R_InitTexture(m_pCurTexture[11], "sprites/y22s2sfsword_aim_on.tga");
 	return 1;
 }
 
@@ -265,6 +268,29 @@ int CHudSpecialCrossHair::Draw(float flTime)
 		default:
 			break;
 		}
+
+		break;
+	}
+	case WPN_Y22S2SFSWORD:
+	{
+		wide = 220;
+		height = 220;
+
+		float x = ScreenWidth / 2;
+		float y = ScreenHeight / 2;
+		const float flScale = 0.0f;
+		float iX, iY;
+		iX = x - wide / 2;
+		iY = y - height / 2;
+
+		switch (iType)
+		{
+		case Y22S2SFSWORD_AIM_ON:m_pCurTexture[iType - 4]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		case AIM_NO:return 1;
+		default:
+			break;
+		}
+
 
 		break;
 	}

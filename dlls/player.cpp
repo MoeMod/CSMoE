@@ -946,7 +946,6 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				m_bKilledByGrenade = true;
 		}
 
-#ifdef XASH_DEDICATED
 		if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && (int)flDamage > 0) {
 			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
 			WRITE_LONG((long)flDamage);
@@ -954,7 +953,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			WRITE_BYTE(0);
 			MESSAGE_END();
 		}
-#endif
+
 		LogAttack(pAttack, this, teamAttack, (int)flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 		fTookDamage = CBaseMonster::TakeDamage(pevInflictor, pevAttacker, (int)flDamage, bitsDamageType);
 
@@ -1142,7 +1141,12 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_REVIVEGUN
 					|| pWeapon->m_iId == WEAPON_SGMISSILEEX
 					|| pWeapon->m_iId == WEAPON_M3DRAGON
-					|| pWeapon->m_iId == WEAPON_WINGGUN)
+					|| pWeapon->m_iId == WEAPON_WINGGUN
+					|| pWeapon->m_iId == WEAPON_CHAINSAWEX
+					|| pWeapon->m_iId == WEAPON_LASERSG
+					|| pWeapon->m_iId == WEAPON_WONDERCANNON
+					|| pWeapon->m_iId == WEAPON_PIANOGUN
+					|| pWeapon->m_iId == WEAPON_PIANOGUNEX)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -1306,7 +1310,6 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		Pain(m_LastHitGroup, false);
 	}
 
-#ifdef XASH_DEDICATED
 	if (CBaseEntity::Instance(pevAttacker)->IsPlayer()) {
 		int hitBits = 0;
 		if (m_LastHitGroup == HITGROUP_HEAD) hitBits |= (1 << 0);
@@ -1319,7 +1322,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		WRITE_BYTE(hitBits);
 		MESSAGE_END();
 	}
-#endif
+
 
 	if (m_iBuff & BUFF_REVIVE && flDamage > pev->health)
 	{
@@ -9028,6 +9031,9 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_CROW7:
 		case WEAPON_WINGGUN:
 		case WEAPON_CHAINSAWEX:
+		case WEAPON_WONDERCANNON:
+		case WEAPON_CROSSBOWEX21:
+		case WEAPON_STUNRIFLE:
 			return TRUE;
 		}
 	}
@@ -10160,7 +10166,7 @@ void CBasePlayer::RemoveWeapon(int iWeaponID) {
 	m_setWeaponID.erase(iWeaponID);
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgWeapDrop, NULL, pev);
-	WRITE_BYTE(iWeaponID);
+	WRITE_SHORT(iWeaponID);
 	MESSAGE_END();
 }
 
@@ -10172,7 +10178,7 @@ void CBasePlayer::ClearWeapon(bool removeSuit) {
 	m_setWeaponID.clear();
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgWeapDrop, NULL, pev);
-	WRITE_BYTE(WEAPON_NONE);
+	WRITE_SHORT(WEAPON_NONE);
 	MESSAGE_END();
 }
 
