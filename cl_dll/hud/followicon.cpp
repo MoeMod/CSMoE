@@ -2,13 +2,13 @@
 #include "followicon.h"
 #include "cl_util.h"
 #include "draw_util.h"
-#include "triangleapi.h"
-
 #include "calcscreen.h"
 
 #include <tuple>
 
 #include "gamemode/mods_const.h"
+
+namespace cl {
 
 int CHudFollowIcon::Init(void)
 {
@@ -20,11 +20,11 @@ int CHudFollowIcon::Init(void)
 
 int CHudFollowIcon::VidInit(void)
 {
-	if (!m_pTexture_BombAB[0]) 
+	if (!m_pTexture_BombAB[0])
 		m_pTexture_BombAB[0] = R_LoadTextureUnique("resource/helperhud/c4_a");
-	if (!m_pTexture_BombAB[1]) 
+	if (!m_pTexture_BombAB[1])
 		m_pTexture_BombAB[1] = R_LoadTextureUnique("resource/helperhud/c4_b");
-	if (!m_pTexture_Supplybox) 
+	if (!m_pTexture_Supplybox)
 		m_pTexture_Supplybox = R_LoadTextureUnique("resource/helperhud/supplybox");
 	m_iFlags |= HUD_DRAW;
 	return 1;
@@ -39,7 +39,7 @@ void CHudFollowIcon::Shutdown(void)
 
 void CHudFollowIcon::Reset(void)
 {
-	
+
 }
 
 int CHudFollowIcon::Draw(float time)
@@ -50,15 +50,11 @@ int CHudFollowIcon::Draw(float time)
 		float xyScreen[2];
 		if (CalcScreen(m_vecBombTargets[i], xyScreen))
 		{
-			gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-			m_pTexture_BombAB[i]->Bind();
-
-			DrawUtils::Draw2DQuadScaled(xyScreen[0] - 15, xyScreen[1] - 25, xyScreen[0] + 16, xyScreen[1] + 26);
+			m_pTexture_BombAB[i]->Draw2DQuadScaled(xyScreen[0] - 15, xyScreen[1] - 25, xyScreen[0] + 16, xyScreen[1] + 26);
 		}
 	}
 
-	if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3)
+	if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 	{
 		if (g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_CT)
 		{
@@ -70,10 +66,7 @@ int CHudFollowIcon::Draw(float time)
 				float xyScreen[2];
 				if (CalcScreen(g_HostageInfo[i].origin, xyScreen))
 				{
-					gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-					m_pTexture_Supplybox->Bind();
-					DrawUtils::Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
+					m_pTexture_Supplybox->Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
 
 					char szBuffer[16];
 					sprintf(szBuffer, "[%im]", static_cast<int>((g_HostageInfo[i].origin - gHUD.m_vecOrigin).Length() / 42.0f));
@@ -86,8 +79,10 @@ int CHudFollowIcon::Draw(float time)
 
 			}
 		}
-		
+
 	}
 
 	return 1;
+}
+
 }

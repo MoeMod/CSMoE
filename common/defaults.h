@@ -117,9 +117,11 @@ Default build-depended cvar and constant values
 #if defined __ANDROID__ || TARGET_OS_IPHONE || defined __SAILFISH__
 	#define DEFAULT_TOUCH_ENABLE "1"
 	#define DEFAULT_M_IGNORE "1"
+	#define DEFAULT_SLEEPTIME "1"
 #else
 	#define DEFAULT_TOUCH_ENABLE "0"
 	#define DEFAULT_M_IGNORE "0"
+	#define DEFAULT_SLEEPTIME "0"
 #endif
 
 #if defined __ANDROID__ || TARGET_OS_IPHONE || defined __SAILFISH__ || defined __EMSCRIPTEN__ || defined XASH_STATIC_GAMELIB

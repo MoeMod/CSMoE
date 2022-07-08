@@ -85,7 +85,7 @@ HUD_SendWeaponAnim
 Change weapon model animation
 =====================
 */
-void HUD_SendWeaponAnim( int iAnim, int iWeaponId, int iBody, int iForce )
+void HUD_SendWeaponAnim( int iAnim, int iWeaponId, int iBody, int iForce, float framerate )
 {
 	if( g_runfuncs || iForce )
 	{
@@ -93,7 +93,10 @@ void HUD_SendWeaponAnim( int iAnim, int iWeaponId, int iBody, int iForce )
 		g_currentweapon = iWeaponId;
 
 		// Tell animation system new info
-		gEngfuncs.pfnWeaponAnim( iAnim, iBody );
+		if(framerate == 1.0f)
+			gEngfuncs.pfnWeaponAnim( iAnim, iBody );
+		else
+			gEngfuncs.pfnWeaponAnim2(iAnim, iBody, framerate);
 	}
 }
 
@@ -133,7 +136,7 @@ void HUD_PlaySound( char *sound, float volume )
 	if ( !g_runfuncs || !g_finalstate )
 		return;
 
-	gEngfuncs.pfnPlaySoundByNameAtLocation( sound, volume, (float *)&g_finalstate->playerstate.origin );
+	gEngfuncs.pfnPlaySoundByNameAtLocation( sound, volume, g_finalstate->playerstate.origin );
 }
 
 /*
@@ -144,7 +147,7 @@ Directly queue up an event on the client
 =====================
 */
 void HUD_PlaybackEvent( int flags, const edict_t *pInvoker, unsigned short eventindex, float delay,
-	float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
+                        const vec3_t origin, const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
 {
 	if ( !g_runfuncs || !g_finalstate )
 	     return;
@@ -160,22 +163,6 @@ void HUD_PlaybackEvent( int flags, const edict_t *pInvoker, unsigned short event
 								iparam1, iparam2,
 								bparam1, bparam2 );
 }
-
-
-
-/*
-=====================
-UTIL_WeaponTimeBase
-
-Always 0.0 on client, even if not predicting weapons ( won't get called
- in that case )
-=====================
-*/
-inline std::chrono::duration<float> UTIL_WeaponTimeBase( void )
-{
-	return {};
-}
-
 
 static unsigned int glSeed = 0;
 

@@ -56,13 +56,13 @@ typedef struct mobile_engfuncs_s
 	void (*pfnTouchAddDefaultButton)( const char *name, const char *texturefile, const char *command, float x1, float y1, float x2, float y2, unsigned char *color, int round, float aspect, int flags );
 
 	// hide/show buttons by pattern
-	void (*pfnTouchHideButtons)( const char *name, unsigned char hide );
+	void (*pfnTouchHideButtons)( const char *name, bool hide );
 
 	// remove button with given name
 	void (*pfnTouchRemoveButton)( const char *name );
 
 	// when enabled, only client buttons shown
-	void (*pfnTouchSetClientOnly)( unsigned char state );
+	void (*pfnTouchSetClientOnly)( bool state );
 
 	// Clean defaults list
 	void (*pfnTouchResetDefaultButtons)( void );

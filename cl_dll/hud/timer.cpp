@@ -33,14 +33,23 @@ version.
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
-#include "vgui_parser.h"
 #include <string.h>
 #include "draw_util.h"
-#include "triangleapi.h"
 #include "gamemode/mods_const.h"
+#include "legacy/hud_scoreboard_legacy.h"
+
+#include "vgui_controls/controls.h"
+#include "vgui/ILocalize.h"
+
+namespace cl {
 
 DECLARE_MESSAGE( m_Timer, RoundTime )
 DECLARE_MESSAGE( m_Timer, ShowTimer )
+
+CHudTimer::CHudTimer()
+{
+	CHudScoreBoardLegacy::BuildNumberRC(m_iNum_BottomC, 8, 12);
+}
 
 int CHudTimer::Init()
 {
@@ -48,7 +57,7 @@ int CHudTimer::Init()
 	HOOK_MESSAGE( ShowTimer );
 	m_iFlags = 0;
 	m_bPanicColorChange = false;
-	gHUD.AddHudElem(this);	
+	gHUD.AddHudElem(this);
 	return 1;
 }
 
@@ -61,6 +70,54 @@ int CHudTimer::VidInit()
 {
 	m_HUD_timer = gHUD.GetSpriteIndex( "stopwatch" );
 	R_InitTexture(m_pTexture_Black, "resource/hud/csgo/black");
+
+	if (!m_iNum_Bottom)
+		m_iNum_Bottom = R_LoadTextureShared("resource/hud/hud_sb_num_bottom");
+
+	if (!m_iColon_Bottom)
+		m_iColon_Bottom = R_LoadTextureUnique("resource/hud/hud_sb_num_bottom_colon");
+
+	return 1;
+}
+
+int CHudTimer::DrawNEWHudTimer(float fTime)
+{
+	int r, g, b;
+	// time must be positive
+	int minutes = max(0, (int)(m_iTime + m_fStartTime - gHUD.m_flTime) / 60);
+	int seconds = max(0, (int)(m_iTime + m_fStartTime - gHUD.m_flTime) - (minutes * 60));
+
+	if (minutes * 60 + seconds > 20)
+	{
+		DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
+	}
+	else
+	{
+		m_flPanicTime += gHUD.m_flTimeDelta;
+		// add 0.1 sec, so it's not flicker fast
+		if (m_flPanicTime > ((float)seconds / 40.0f) + 0.1f)
+		{
+			m_flPanicTime = 0;
+			m_bPanicColorChange = !m_bPanicColorChange;
+		}
+		DrawUtils::UnpackRGB(r, g, b, m_bPanicColorChange ? RGB_WHITE : RGB_REDISH);
+	}
+
+	int iX, iY;
+	iX = ScreenWidth / 2 - 20;
+	iY = 60;
+	DrawUtils::ScaleColors(r, g, b, 255);
+
+	CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Bottom, m_iNum_BottomC, minutes, iX, iY, DHN_2DIGITS, 1, 1.0, r, g, b);
+
+	int iH = m_iColon_Bottom->h();	//10
+	int iW = m_iColon_Bottom->w();	//3
+
+	iX = ScreenWidth / 2 - 1;
+	m_iColon_Bottom->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0.0f, 0.0f, 1.0f, 1.0f, r, g, b);
+
+	CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Bottom, m_iNum_BottomC, seconds, iX + iW + 1, iY, DHN_2DIGITS, 1, 1.0, r, g, b);
+
 	return 1;
 }
 
@@ -71,6 +128,12 @@ int CHudTimer::Draw( float fTime )
 
 	if (!(gHUD.m_iWeaponBits & (1<<(WEAPON_SUIT)) ))
 		return 1;
+	if (gHUD.m_hudstyle->value == 2 && (gHUD.m_iModRunning == MOD_NONE || gHUD.m_iModRunning == MOD_DM || gHUD.m_iModRunning == MOD_TDM || gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ))
+	{
+		DrawNEWHudTimer(fTime);
+		return 1;
+	}
+
 	int r, g, b;
 	// time must be positive
 	int minutes = max( 0, (int)( m_iTime + m_fStartTime - gHUD.m_flTime ) / 60);
@@ -78,13 +141,13 @@ int CHudTimer::Draw( float fTime )
 
 	if( minutes * 60 + seconds > 20 )
 	{
-		DrawUtils::UnpackRGB(r,g,b, gHUD.m_csgohud->value? RGB_WHITE : RGB_YELLOWISH );
+		DrawUtils::UnpackRGB(r,g,b, gHUD.m_hudstyle->value == 1 ? RGB_WHITE : RGB_YELLOWISH );
 	}
 	else
 	{
 		m_flPanicTime += gHUD.m_flTimeDelta;
 		// add 0.1 sec, so it's not flicker fast
-		if (gHUD.m_csgohud->value)
+		if (gHUD.m_hudstyle->value == 1)
 			DrawUtils::UnpackRGB(r, g, b, RGB_REDISH);
 		else
 		{
@@ -101,47 +164,49 @@ int CHudTimer::Draw( float fTime )
 
 	DrawUtils::ScaleColors( r, g, b,  MIN_ALPHA );
 
-    
+
     int iWatchWidth = gHUD.GetSpriteRect(m_HUD_timer).right - gHUD.GetSpriteRect(m_HUD_timer).left;
-    
-	int x = ScreenWidth/2;
+	int iNumberWidth = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left;
+
 	int y = ScreenHeight - 1.5 * gHUD.m_iFontHeight ;
-    
-	if (gHUD.m_csgohud->value && gHUD.m_iModRunning == MOD_NONE)
-	{ 
+
+	if (gHUD.m_hudstyle->value == 1 && gHUD.m_iModRunning == MOD_NONE)
+	{
+		int x = ScreenWidth / 2;
+
 		y = 5;
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 100);
-		m_pTexture_Black->Bind();
-		DrawUtils::Draw2DQuadScaled(x - 120 / 2, y, x + 120 / 2, y + 70);
+		m_pTexture_Black->Draw2DQuadScaled(x - 120 / 2, y, x + 120 / 2, y + 70);
 
 		y = 17;
-		
-		int iWidth = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left;
 		x = DrawUtils::DrawHudNumber2(x - 46, y, true, 2, minutes, r * 255, g * 255, b * 255);
 		// draw :
 		FillRGBA(x + iWatchWidth / 4 , y + gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 255);
 		FillRGBA(x + iWatchWidth / 4, y + gHUD.m_iFontHeight - gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 255);
-		
+
 
 		x = DrawUtils::DrawHudNumber2(x + iWatchWidth / 2, y, true, 2, seconds, r * 255, g * 255, b * 255);
 
-		m_closestRight = x + (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 1.5;
+		m_closestRight = x + (iNumberWidth) * 1.5;
 	}
 	else
 	{
+		int space = iWatchWidth / 4;
+		int x = ScreenWidth / 2 - 2 * space - iNumberWidth * 2;
 		SPR_Set(gHUD.GetSprite(m_HUD_timer), r, g, b);
 		SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_HUD_timer));
 
-		int x = ScreenWidth / 2;
-		x = DrawUtils::DrawHudNumber2(x + iWatchWidth / 4, y, false, 2, minutes, r, g, b);
+		x += iWatchWidth;
+		x = DrawUtils::DrawHudNumber2(x, y, false, 2, minutes, r, g, b);
+
 		// draw :
-		FillRGBA(x + iWatchWidth / 4, y + gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
-		FillRGBA(x + iWatchWidth / 4, y + gHUD.m_iFontHeight - gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
+		x += space;
+		FillRGBA(x, y + gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
+		FillRGBA(x, y + gHUD.m_iFontHeight - gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
 
-		x = DrawUtils::DrawHudNumber2(x + iWatchWidth / 2, y, true, 2, seconds, r, g, b);
+		x += space;
+		x = DrawUtils::DrawHudNumber2(x, y, true, 2, seconds, r, g, b);
 
-		m_closestRight = x + (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 1.5;
+		m_closestRight = x + (iNumberWidth) * 1.5;
 	}
 
 	return 1;
@@ -275,9 +340,10 @@ int CHudProgressBar::MsgFunc_BotProgress(const char *pszName, int iSize, void *p
 		}
 		strncpy(m_szHeader, reader.ReadString(), sizeof(m_szHeader));
 		if( m_szHeader[0] == '#' )
-			m_szLocalizedHeader = Localize(m_szHeader + 1);
-		else
-			m_szLocalizedHeader = m_szHeader;
+        {
+            vgui2::localize()->ConvertUnicodeToANSI(vgui2::localize()->Find(m_szHeader), m_szHeader, sizeof(m_szHeader));
+        }
+            m_szLocalizedHeader = m_szHeader;
 		break;
 	case REMOVE_BOTPROGRESS:
 	default:
@@ -289,4 +355,6 @@ int CHudProgressBar::MsgFunc_BotProgress(const char *pszName, int iSize, void *p
 	}
 
 	return 1;
+}
+
 }

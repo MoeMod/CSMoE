@@ -38,7 +38,7 @@ typedef struct cldll_func_s
 	void	(*IN_Accumulate)( void );
 	void	(*CL_CreateMove)( float frametime, struct usercmd_s *cmd, int active );
 	int	(*CL_IsThirdPerson)( void );
-	void	(*CL_CameraOffset)( float *ofs );
+	void	(*CL_CameraOffset)( vec3_t_ref ofs );
 	struct kbutton_s *(*KB_Find)( const char *name );
 	void	(*CAM_Think)( void );		// camera stuff
 	void	(*pfnCalcRefdef)( ref_params_t *pparams );
@@ -54,7 +54,7 @@ typedef struct cldll_func_s
 	void	(*pfnTxferPredictionData)( entity_state_t *ps, const entity_state_t *pps, clientdata_t *pcd, const clientdata_t *ppcd, weapon_data_t *wd, const weapon_data_t *pwd );
 	void	(*pfnDemo_ReadBuffer)( int size, byte *buffer );
 	int	(*pfnConnectionlessPacket)( const struct netadr_s *net_from, const char *args, char *buffer, int *size );
-	int	(*pfnGetHullBounds)( int hullnumber, float *mins, float *maxs );
+	int	(*pfnGetHullBounds)( int hullnumber, vec3_t_ref mins, vec3_t_ref maxs );
 	void	(*pfnFrame)( double time );
 	int	(*pfnKey_Event)( int eventcode, int keynum, const char *pszCurrentBinding );
 	void	(*pfnTempEntUpdate)( double frametime, double client_time, double cl_gravity, struct tempent_s **ppTempEntFree, struct tempent_s **ppTempEntActive, int ( *Callback_AddVisibleEntity )( cl_entity_t *pEntity ), void ( *Callback_TempEntPlaySound )( struct tempent_s *pTemp, float damp ));
@@ -72,7 +72,9 @@ typedef struct cldll_func_s
 	int (*pfnTouchEvent)( int type, int fingerID, float x, float y, float dx, float dy );
 	void (*pfnMoveEvent)( float forwardmove, float sidemove );
 	void (*pfnLookEvent)( float relyaw, float relpitch );
+	// CSMoE extension
 	void (*pfnOnGUI)( struct ImGuiContext *context );
+	void (*CL_OnPrecache)(int type, const char* name, int index); // 1=model 2=sound 3=generic 4=event
 } cldll_func_t;
 
 #endif//CDLL_EXP_H

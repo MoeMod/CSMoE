@@ -26,13 +26,16 @@ extern "C"
 #define FS_API_EXPORT "FS_GetAPI"
 
 #ifndef FS_OFFSET_T_DEFINED
-#include <unistd.h> // off_t
+#include <sys/types.h> // off_t
 typedef off_t         fs_offset_t;
 #endif
 
 #ifndef FILE_T_DEFINED
 typedef struct file_s file_t; // normal file
 #endif
+
+#undef PATH_MAX
+#define PATH_MAX 4096 // Try workaround some strange bugs
 
 typedef struct
 {

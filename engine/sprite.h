@@ -27,6 +27,7 @@ SPRITE MODELS
 
 #define IDSPRITEHEADER	(('P'<<24)+('S'<<16)+('D'<<8)+'I')	// little-endian "IDSP"
 #define SPRITE_VERSION	2				// Half-Life sprites
+#define SPRITE_VERSION_DDS	3				// Half-Life sprites
 
 typedef enum
 {

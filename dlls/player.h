@@ -32,6 +32,9 @@
 #pragma once
 #endif
 
+#include <string>
+#include <set>
+
 #include "pm_materials.h"
 #include "player/hintmessage.h"
 #include "weapons.h"
@@ -136,6 +139,7 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define SBAR_TARGETTYPE_TEAMMATE	1
 #define SBAR_TARGETTYPE_ENEMY		2
 #define SBAR_TARGETTYPE_HOSTAGE		3
+#define SBAR_TARGETTYPE_WALL		4
 
 #define CHAT_INTERVAL			1.0f
 #define CSUITNOREPEAT			32
@@ -147,6 +151,20 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 
 #define SOUND_FLASHLIGHT_ON		"items/flashlight1.wav"
 #define SOUND_FLASHLIGHT_OFF		"items/flashlight1.wav"
+
+#define BUFF_REVIVE					(1<<1)
+#define BUFF_AVOID_INFECT			(1<<2)
+#define BUFF_HOLYSWORD_AVOID_INFECT			(1<<3)
+#define BUFF_M32VENOM			(1<<4)
+#define BUFF_IGNORE_KNOCKBACK			(1<<5)
+#define BUFF_RUSHENTITY			(1<<6)
+#define BUFF_GHOSTHUNTER			(1<<7)
+#define BUFF_MASTERHUNTER			(1<<8)
+#define BUFF_HPBUFF			(1<<9)
+#define BUFF_SHOOTINGDOWN			(1<<10)
+#define BUFF_EMERGENCYESCAPE				(1<<11)
+
+#define COUNT_M32VENOM	0
 
 #ifndef CLIENT_DLL
 namespace sv {
@@ -226,281 +244,10 @@ struct WeaponStruct
 
 class CWeaponBox;
 
-class CBasePlayer : public CBaseMonster
+constexpr std::size_t MAX_LOCATION_LENGTH = 32;
+
+template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 {
-public:
-#ifdef CLIENT_DLL
-	CBasePlayer() = default;
-	~CBasePlayer() = default;
-#else
-	CBasePlayer();
-	~CBasePlayer() override;
-#endif
-
-	void Spawn() override;
-
-#ifdef CLIENT_DLL
-	void Precache(void) override {}
-	void Restart(void) override {}
-	int Save(CSave &save) override { return 1; }
-	int Restore(CRestore &restore) override { return 1; }
-#else
-	void Precache() override;
-	int Save(CSave &save) override;
-	int Restore(CRestore &restore) override;
-#endif
-	int ObjectCaps() override { return (CBaseMonster::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
-#ifdef CLIENT_DLL
-	int Classify() override { return 0; }
-	void
-	TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override {}
-	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage,
-	               int bitsDamageType) override { return 0; }
-	int TakeHealth(float flHealth, int bitsDamageType) override { return 0; }
-#else
-	int Classify() override;
-	void TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override;
-	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
-	int TakeHealth(float flHealth, int bitsDamageType) override;
-#endif
-	void Killed(entvars_t *pevAttacker, int iGib) override;
-#ifdef CLIENT_DLL
-	void AddPoints(int score, BOOL bAllowNegativeScore) override {}
-	void AddPointsToTeam(int score, BOOL bAllowNegativeScore) override {}
-	BOOL AddPlayerItem(CBasePlayerItem *pItem) override { return false; }
-	BOOL RemovePlayerItem(CBasePlayerItem *pItem) override { return false; }
-	int GiveAmmo(int iAmount, const char *szName, int iMax) override { return 0; }
-#else
-	void AddPoints(int score, BOOL bAllowNegativeScore) override;
-	void AddPointsToTeam(int score, BOOL bAllowNegativeScore) override;
-	BOOL AddPlayerItem(CBasePlayerItem *pItem) override;
-	BOOL RemovePlayerItem(CBasePlayerItem *pItem) override;
-	int GiveAmmo(int iAmount, const char *szName, int iMax) override;
-#endif
-	void StartSneaking() override { m_tSneaking = gpGlobals->time - 1s; }
-	void StopSneaking() override { m_tSneaking = gpGlobals->time + 30s; }
-	BOOL IsSneaking() override { return m_tSneaking <= gpGlobals->time; }
-	BOOL IsAlive() override { return (pev->deadflag == DEAD_NO && pev->health > 0.0f); }
-	BOOL IsPlayer() override { return (pev->flags & FL_SPECTATOR) != FL_SPECTATOR; }
-	BOOL IsNetClient() override { return TRUE; }
-#ifdef CLIENT_DLL
-	const char *TeamID() override { return NULL; }
-	BOOL FBecomeProne() override { return TRUE; }
-#else
-	const char *TeamID() override;
-	BOOL FBecomeProne() override;
-#endif
-	Vector BodyTarget(const Vector &posSrc) override { return Center() + pev->view_ofs * RANDOM_FLOAT(0.5, 1.1); }
-#ifdef CLIENT_DLL
-	int Illumination() override { return 0; }
-#else
-	int Illumination() override;
-#endif
-	BOOL ShouldFadeOnDeath() override { return FALSE; }
-#ifdef CLIENT_DLL
-	void ResetMaxSpeed() override {}
-	virtual void Jump() {}
-	virtual void Duck() {}
-	virtual void PreThink() {}
-	virtual void PostThink() {}
-#else
-	void ResetMaxSpeed() override;
-	virtual void Jump();
-	virtual void Duck();
-	virtual void PreThink();
-	virtual void PostThink();
-#endif
-	virtual Vector GetGunPosition();
-	virtual BOOL IsBot() { return FALSE; }
-#ifdef CLIENT_DLL
-	virtual void UpdateClientData() {}
-	virtual void ImpulseCommands() {}
-	virtual void RoundRespawn() {}
-	virtual Vector GetAutoaimVector(float flDelta) { return g_vecZero; }
-	virtual void Blind(duration_t flUntilTime, duration_t flHoldTime, duration_t flFadeTime, int iAlpha) {}
-#else
-	virtual void UpdateClientData();
-	virtual void ImpulseCommands();
-	virtual void RoundRespawn();
-	virtual Vector GetAutoaimVector(float flDelta);
-	virtual void Blind(duration_t flUntilTime, duration_t flHoldTime, duration_t flFadeTime, int iAlpha);
-#endif
-	virtual void OnTouchingWeapon(CWeaponBox *pWeapon) {}
-
-public:
-	void SpawnClientSideCorpse();
-	void Observer_FindNextPlayer(bool bReverse, const char *name = NULL);
-	CBaseEntity *Observer_IsValidTarget(int iPlayerIndex, bool bSameTeam);
-	void Observer_HandleButtons();
-	void Observer_SetMode(int iMode);
-	void Observer_CheckTarget();
-	void Observer_CheckProperties();
-	int IsObserver() { return pev->iuser1; }
-	void PlantC4();
-	void Radio(const char *msg_id, const char *msg_verbose = NULL, short pitch = 100, bool showIcon = true);
-	CBasePlayer *GetNextRadioRecipient(CBasePlayer *pStartPlayer);
-	void SmartRadio();
-	void ThrowWeapon(const char *pszItemName);
-	void ThrowPrimary();
-	void AddAccount(int amount, bool bTrackChange = true);
-	void Disappear();
-	void MakeVIP();
-	bool CanPlayerBuy(bool display = false);
-	void SwitchTeam();
-	void TabulateAmmo();
-	void Pain(int m_LastHitGroup, bool HasArmour);
-	BOOL IsBombGuy();
-	bool IsLookingAtPosition(Vector *pos, float angleTolerance = 20.0f);
-	void Reset();
-	void SetScoreboardAttributes(CBasePlayer *destination = NULL);
-	void RenewItems();
-	void PackDeadPlayerItems();
-	void GiveDefaultItems();
-	void RemoveAllItems(BOOL removeSuit);
-	void SetBombIcon(BOOL bFlash = FALSE);
-	void SetProgressBarTime(int time);
-	void SetProgressBarTime2(int time, duration_t timeElapsed);
-	void SetPlayerModel(BOOL HasC4);
-	void SetNewPlayerModel(const char *modelName);
-	BOOL SwitchWeapon(CBasePlayerItem *pWeapon);
-	void CheckPowerups(entvars_t *pev);
-	bool CanAffordPrimary();
-	bool CanAffordPrimaryAmmo();
-	bool CanAffordSecondaryAmmo();
-	bool CanAffordArmor();
-	bool CanAffordDefuseKit();
-	bool CanAffordGrenade();
-	bool NeedsPrimaryAmmo();
-	bool NeedsSecondaryAmmo();
-	bool NeedsArmor();
-	bool NeedsDefuseKit();
-	bool NeedsGrenade();
-	BOOL IsOnLadder();
-	BOOL FlashlightIsOn();
-	void FlashlightTurnOn();
-	void FlashlightTurnOff();
-	void UpdatePlayerSound();
-	void DeathSound();
-	void SetAnimation(PLAYER_ANIM playerAnim);
-	void SetWeaponAnimType(const char *szExtention)/* { Q_strcpy(m_szAnimExtention, szExtention); }*/;
-	void CheatImpulseCommands(int iImpulse);
-	void StartDeathCam();
-	void StartObserver(Vector vecPosition, Vector vecViewAngle);
-	void HandleSignals();
-	void DropPlayerItem(const char *pszItemName);
-	BOOL HasPlayerItem(CBasePlayerItem *pCheckItem);
-	BOOL HasNamedPlayerItem(const char *pszItemName);
-	BOOL HasWeapons();
-	void SelectPrevItem(int iItem);
-	void SelectNextItem(int iItem);
-	void SelectLastItem();
-	void SelectItem(const char *pstr);
-	void ItemPreFrame();
-	void ItemPostFrame();
-	void GiveNamedItem(const char *pszName);
-	void EnableControl(BOOL fControl);
-	bool HintMessage(const char *pMessage, BOOL bDisplayIfPlayerDead = FALSE, BOOL bOverride = FALSE);
-	void SendAmmoUpdate();
-	void SendFOV(int fov);
-	void WaterMove();
-	void EXPORT PlayerDeathThink();
-	void PlayerUse();
-	void HostageUsed();
-	void JoiningThink();
-	void RemoveLevelText();
-	void MenuPrint(const char *msg);
-	void ResetMenu();
-	void SyncRoundTimer();
-	void CheckSuitUpdate();
-	void SetSuitUpdate(const char *name = nullptr, int fgroup = 0, int iNoRepeatTime = 0);
-	void UpdateGeigerCounter();
-	void CheckTimeBasedDamage();
-	void BarnacleVictimBitten(entvars_t *pevBarnacle);
-	void BarnacleVictimReleased();
-	static int GetAmmoIndex(const char *psz);
-	int AmmoInventory(int iAmmoIndex);
-	void ResetAutoaim();
-	Vector AutoaimDeflection(Vector &vecSrc, float flDist, float flDelta);
-	void ForceClientDllUpdate();
-	void DeathMessage(entvars_t *pevAttacker) {};
-	void SetCustomDecalFrames(int nFrames);
-	int GetCustomDecalFrames();
-	void InitStatusBar();
-	void UpdateStatusBar();
-	void StudioEstimateGait();
-	void StudioPlayerBlend(int *pBlend, float *pPitch);
-	void CalculatePitchBlend();
-	void CalculateYawBlend();
-	void StudioProcessGait();
-	void SendHostagePos();
-	void SendHostageIcons();
-	void ResetStamina();
-	BOOL IsArmored(int nHitGroup);
-	BOOL ShouldDoLargeFlinch(int nHitGroup, int nGunType);
-	void SetPrefsFromUserinfo(char *infobuffer);
-	void SendWeatherInfo();
-	void UpdateShieldCrosshair(bool draw);
-	bool HasShield();
-	bool IsProtectedByShield() { return HasShield() && m_bShieldDrawn; }
-	void RemoveShield();
-	void DropShield(bool bDeploy = true);
-	void GiveShield(bool bDeploy = true);
-	bool IsHittingShield(Vector &vecDirection, TraceResult *ptr);
-	bool SelectSpawnSpot(const char *pEntClassName, CBaseEntity *&pSpot);
-	bool IsReloading()
-	{
-		CBasePlayerWeapon *weapon = static_cast<CBasePlayerWeapon *>(m_pActiveItem);
-
-		if (weapon != NULL && weapon->m_fInReload)
-			return true;
-
-		return false;
-	}
-	bool IsBlind() const { return (m_blindUntilTime > gpGlobals->time); }
-	bool IsAutoFollowAllowed() const { return (gpGlobals->time > m_allowAutoFollowTime); }
-	void InhibitAutoFollow(duration_t duration) { m_allowAutoFollowTime = gpGlobals->time + duration; }
-	void AllowAutoFollow() { m_allowAutoFollowTime = {}; }
-	void ClearAutoBuyData();
-	void AddAutoBuyData(const char *str);
-	void AutoBuy();
-	void ClientCommand(const char *cmd, const char *arg1 = NULL, const char *arg2 = NULL, const char *arg3 = NULL);
-	void PrioritizeAutoBuyString(char *autobuyString, const char *priorityString);
-	const char *PickPrimaryCareerTaskWeapon();
-	const char *PickSecondaryCareerTaskWeapon();
-	const char *PickFlashKillWeaponString();
-	const char *PickGrenadeKillWeaponString();
-	bool ShouldExecuteAutoBuyCommand(AutoBuyInfoStruct *commandInfo, bool boughtPrimary, bool boughtSecondary);
-	void PostAutoBuyCommandProcessing(AutoBuyInfoStruct *commandInfo, bool &boughtPrimary, bool &boughtSecondary);
-	void ParseAutoBuyString(const char *string, bool &boughtPrimary, bool &boughtSecondary);
-	AutoBuyInfoStruct *GetAutoBuyCommandInfo(const char *command);
-	void InitRebuyData(const char *str);
-	void BuildRebuyStruct();
-	void Rebuy();
-	void RebuyPrimaryWeapon();
-	void RebuyPrimaryAmmo();
-	void RebuySecondaryWeapon();
-	void RebuySecondaryAmmo();
-	void RebuyHEGrenade();
-	void RebuyFlashbang();
-	void RebuySmokeGrenade();
-	void RebuyDefuser();
-	void RebuyNightVision();
-	void RebuyArmor();
-	void UpdateLocation(bool forceUpdate = false);
-	void SetObserverAutoDirector(bool val) { m_bObserverAutoDirector = val; }
-	bool IsObservingPlayer(CBasePlayer *pPlayer);
-	bool CanSwitchObserverModes() const { return m_canSwitchObserverModes; }
-	void Intense()
-	{
-		//m_musicState = INTENSE;
-		//m_intenseTimestamp = gpGlobals->time;
-	}
-public:
-	enum
-	{
-		MaxLocationLen = 32
-	};
-
 	int random_seed;
 	unsigned short m_usPlayerBleed;
 	EHANDLE m_hObserverTarget;
@@ -518,7 +265,6 @@ public:
 	time_point_t m_flEjectBrass;
 	int m_iKevlar;
 	bool m_bNotKilled;
-	TeamName m_iTeam;
 	CPlayerAccount m_iAccount;
 	bool m_bHasPrimary;
 	time_point_t m_flDeathThrowTime;
@@ -555,7 +301,7 @@ public:
 	float m_fCamSwitch;
 	bool m_bEscaped;
 	bool m_bIsVIP;
-	EngineClock::time_point m_tmNextRadarUpdate;
+	time_point_t m_tmNextRadarUpdate;
 	Vector m_vLastOrigin;
 	int m_iCurrentKickVote;
 	time_point_t m_flNextVoteTime;
@@ -651,14 +397,9 @@ public:
 	int m_nCustomSprayFrames;
 	time_point_t m_flNextDecalTime;
 	char m_szTeamName[TEAM_NAME_LENGTH];
-
-	static TYPEDESCRIPTION m_playerSaveData[40];
-
-	/*protected:*/
 	int m_modelIndexPlayer;
 	char m_szAnimExtention[32];
 	int m_iGaitsequence;
-
 	float m_flGaitframe;
 	float m_flGaityaw;
 	Vector m_prevgaitorigin;
@@ -680,11 +421,11 @@ public:
 	int m_blindAlpha;
 	time_point_t m_allowAutoFollowTime;
 	char m_autoBuyString[MAX_AUTOBUY_LENGTH];
-	std::unique_ptr<char []> m_rebuyString;
+	std::string m_rebuyString;
 	RebuyStruct m_rebuyStruct;
 	bool m_bIsInRebuy;
 	time_point_t m_flLastUpdateTime;
-	char m_lastLocation[MaxLocationLen];
+	char m_lastLocation[MAX_LOCATION_LENGTH];
 	time_point_t m_progressStart;
 	time_point_t m_progressEnd;
 	bool m_bObserverAutoDirector;
@@ -694,30 +435,379 @@ public:
 	float m_silentTimestamp;
 	MusicState m_musicState;
 	time_point_t m_flLastCommandTime[8];
+	bool m_bIsZombie;
+	bool m_bIsFemale;
+	TeamName m_iModelTeam;
+	int m_iKnifeID;
+	int m_iGrenadeID;
+	int m_iZombieClass;
+	int m_iNewMenuKeys;
+	int m_iNewMenuID;
+	int m_iNewMenuPage;
+	time_point_t m_iNewMenuExpire;
+};
+
+class CBasePlayer : public CBaseMonster, public PrivateData<class CBasePlayer, CBaseMonster>
+{
+public:
+#ifdef CLIENT_DLL
+	CBasePlayer() = default;
+	~CBasePlayer() = default;
+#else
+	CBasePlayer();
+	~CBasePlayer() override;
+#endif
+
+	void Spawn() override;
+
+#ifdef CLIENT_DLL
+	void Precache(void) override {}
+	void Restart(void) override {}
+	int Save(CSave& save) override { return 1; }
+	int Restore(CRestore& restore) override { return 1; }
+#else
+	void Precache() override;
+	int Save(CSave& save) override;
+	int Restore(CRestore& restore) override;
+#endif
+	int ObjectCaps() override { return (CBaseMonster::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
+#ifdef CLIENT_DLL
+	int Classify() override { return 0; }
+	void
+		TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override {}
+	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage,
+		int bitsDamageType) override {
+		return 0;
+	}
+	int TakeHealth(float flHealth, int bitsDamageType) override { return 0; }
+#else
+	int Classify() override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+	int TakeHealth(float flHealth, int bitsDamageType) override;
+#endif
+	void Killed(entvars_t* pevAttacker, int iGib) override;
+#ifdef CLIENT_DLL
+	void AddPoints(int score, BOOL bAllowNegativeScore) override {}
+	void AddPointsToTeam(int score, BOOL bAllowNegativeScore) override {}
+	BOOL AddPlayerItem(CBasePlayerItem* pItem) override { return false; }
+	BOOL RemovePlayerItem(CBasePlayerItem* pItem) override { return false; }
+	int GiveAmmo(int iAmount, const char* szName, int iMax) override { return 0; }
+#else
+	void AddPoints(int score, BOOL bAllowNegativeScore) override;
+	void AddPointsToTeam(int score, BOOL bAllowNegativeScore) override;
+	BOOL AddPlayerItem(CBasePlayerItem* pItem) override;
+	BOOL RemovePlayerItem(CBasePlayerItem* pItem) override;
+	int GiveAmmo(int iAmount, const char* szName, int iMax) override;
+#endif
+	//void StartSneaking() override { m_tSneaking = gpGlobals->time - 1s; }
+	//void StopSneaking() override { m_tSneaking = gpGlobals->time + 30s; }
+	BOOL IsSneaking() override { return m_tSneaking <= gpGlobals->time; }
+	BOOL IsAlive() override { return (pev->deadflag == DEAD_NO && pev->health > 0.0f); }
+	BOOL IsPlayer() override { return (pev->flags & FL_SPECTATOR) != FL_SPECTATOR; }
+	BOOL IsNetClient() override { return TRUE; }
+#ifdef CLIENT_DLL
+	const char* TeamID() override { return NULL; }
+	BOOL FBecomeProne() override { return TRUE; }
+#else
+	const char* TeamID() override;
+	BOOL FBecomeProne() override;
+#endif
+	Vector BodyTarget(const Vector& posSrc) override { return Center() + pev->view_ofs * RANDOM_FLOAT(0.5, 1.1); }
+#ifdef CLIENT_DLL
+	int Illumination() override { return 0; }
+#else
+	int Illumination() override;
+#endif
+	BOOL ShouldFadeOnDeath() override { return FALSE; }
+#ifdef CLIENT_DLL
+	void ResetMaxSpeed() override {}
+	virtual void Jump() {}
+	virtual void Duck() {}
+	virtual void PreThink() {}
+	virtual void PostThink() {}
+#else
+	void ResetMaxSpeed() override;
+	virtual void Jump();
+	virtual void Duck();
+	virtual void PreThink();
+	virtual void PostThink();
+#endif
+	virtual Vector GetGunPosition();
+	virtual BOOL IsBot() { return FALSE; }
+#ifdef CLIENT_DLL
+	virtual void UpdateClientData() {}
+	virtual void ImpulseCommands() {}
+	virtual void RoundRespawn() {}
+	virtual Vector GetAutoaimVector(float flDelta) { return g_vecZero; }
+	virtual void Blind(duration_t flUntilTime, duration_t flHoldTime, duration_t flFadeTime, int iAlpha) {}
+#else
+	virtual void UpdateClientData();
+	virtual void ImpulseCommands();
+	virtual void RoundRespawn();
+	virtual Vector GetAutoaimVector(float flDelta);
+	virtual void Blind(duration_t flUntilTime, duration_t flHoldTime, duration_t flFadeTime, int iAlpha);
+#endif
+	virtual void OnTouchingWeapon(CWeaponBox* pWeapon) {}
+
+public:
+	void SpawnClientSideCorpse();
+	void Observer_FindNextPlayer(bool bReverse, const char* name = NULL);
+	CBaseEntity* Observer_IsValidTarget(int iPlayerIndex, bool bSameTeam);
+	void Observer_HandleButtons();
+	void Observer_SetMode(int iMode);
+	void Observer_CheckTarget();
+	void Observer_CheckProperties();
+	int IsObserver() { return pev->iuser1; }
+	void PlantC4();
+	void Radio(const char* msg_id, const char* msg_verbose = NULL, short pitch = 100, bool showIcon = true);
+	CBasePlayer* GetNextRadioRecipient(CBasePlayer* pStartPlayer);
+	void SmartRadio();
+	void ThrowWeapon(const char* pszItemName);
+	void ThrowPrimary();
+	void AddAccount(int amount, bool bTrackChange = true);
+	void Disappear();
+	void MakeVIP();
+	bool CanPlayerBuy(bool display = false);
+	void SwitchTeam();
+	void TabulateAmmo();
+	void Pain(int m_LastHitGroup, bool HasArmour);
+	BOOL IsBombGuy();
+	bool IsLookingAtPosition(Vector* pos, float angleTolerance = 20.0f);
+	void Reset();
+	void SetScoreboardAttributes(CBasePlayer* destination = NULL);
+	void RenewItems();
+	void PackDeadPlayerItems();
+	void GiveDefaultItems();
+	void RemoveAllItems(BOOL removeSuit, bool removeAmmo = true);
+	void SetBombIcon(BOOL bFlash = FALSE);
+	void SetProgressBarTime(int time);
+	void SetProgressBarTime2(int time, duration_t timeElapsed);
+	void SetPlayerModel(BOOL HasC4);
+	void SetNewPlayerModel(const char* modelName);
+	BOOL SwitchWeapon(CBasePlayerItem* pWeapon);
+	void CheckPowerups(entvars_t* pev);
+	bool CanAffordPrimary();
+	bool CanAffordPrimaryAmmo();
+	bool CanAffordSecondaryAmmo();
+	bool CanAffordArmor();
+	bool CanAffordDefuseKit();
+	bool CanAffordGrenade();
+	bool NeedsPrimaryAmmo();
+	bool NeedsSecondaryAmmo();
+	bool NeedsArmor();
+	bool NeedsDefuseKit();
+	bool NeedsGrenade();
+	BOOL IsOnLadder();
+	BOOL FlashlightIsOn();
+	void FlashlightTurnOn();
+	void FlashlightTurnOff();
+	void UpdatePlayerSound();
+	void DeathSound();
+	void SetAnimation(PLAYER_ANIM playerAnim);
+	void SetCustomAnimation(char* szAnimation, PLAYER_ANIM playerAnim);
+	void SetWeaponAnimType(const char* szExtention)/* { Q_strcpy(m_szAnimExtention, szExtention); }*/;
+	void CheatImpulseCommands(int iImpulse);
+	void StartDeathCam();
+	void StartObserver(Vector vecPosition, Vector vecViewAngle);
+	void HandleSignals();
+	void DropPlayerItem(const char* pszItemName);
+	BOOL HasPlayerItem(CBasePlayerItem* pCheckItem);
+	BOOL HasNamedPlayerItem(const char* pszItemName);
+	BOOL HasWeapons();
+	void SelectPrevItem(int iItem);
+	void SelectNextItem(int iItem);
+	void SelectLastItem();
+	void SelectItem(const char* pstr);
+	void ItemPreFrame();
+	void ItemPostFrame();
+	void GiveNamedItem(const char* pszName);
+	void EnableControl(BOOL fControl);
+	bool HintMessage(const char* pMessage, BOOL bDisplayIfPlayerDead = FALSE, BOOL bOverride = FALSE);
+	void SendAmmoUpdate();
+	void SendFOV(int fov);
+	void WaterMove();
+	void EXPORT PlayerDeathThink();
+	void PlayerUse();
+	void HostageUsed();
+	void JoiningThink();
+	void RemoveLevelText();
+	void MenuPrint(const char* msg);
+	void ResetMenu();
+	void SyncRoundTimer();
+	void CheckSuitUpdate();
+	void SetSuitUpdate(const char* name = nullptr, int fgroup = 0, int iNoRepeatTime = 0);
+	void UpdateGeigerCounter();
+	void CheckTimeBasedDamage();
+	void BarnacleVictimBitten(entvars_t* pevBarnacle);
+	void BarnacleVictimReleased();
+	static int GetAmmoIndex(const char* psz);
+	int AmmoInventory(int iAmmoIndex);
+	void ResetAutoaim();
+	Vector AutoaimDeflection(Vector& vecSrc, float flDist, float flDelta);
+	void ForceClientDllUpdate();
+	void DeathMessage(entvars_t* pevAttacker) {};
+	void SetCustomDecalFrames(int nFrames);
+	int GetCustomDecalFrames();
+	void InitStatusBar();
+	void UpdateStatusBar();
+	void StudioEstimateGait();
+	void StudioPlayerBlend(int* pBlend, float* pPitch);
+	void CalculatePitchBlend();
+	void CalculateYawBlend();
+	void StudioProcessGait();
+	void SendHostagePos();
+	void SendHostageIcons();
+	void ResetStamina();
+	BOOL IsArmored(int nHitGroup);
+	BOOL ShouldDoLargeFlinch(int nHitGroup, int nGunType);
+	void SetPrefsFromUserinfo(char* infobuffer);
+	void SendWeatherInfo();
+	void UpdateShieldCrosshair(bool draw);
+	bool HasShield();
+	bool IsProtectedByShield() { return HasShield() && m_bShieldDrawn; }
+	void RemoveShield();
+	void DropShield(bool bDeploy = true);
+	void GiveShield(bool bDeploy = true);
+	bool IsHittingShield(Vector& vecDirection, TraceResult* ptr);
+	bool SelectSpawnSpot(const char* pEntClassName, CBaseEntity*& pSpot);
+	bool IsReloading()
+	{
+		CBasePlayerWeapon* weapon = static_cast<CBasePlayerWeapon*>(m_pActiveItem);
+
+		if (weapon != NULL && weapon->m_fInReload)
+			return true;
+
+		return false;
+	}
+	bool IsBlind() const { return (m_blindUntilTime > gpGlobals->time); }
+	bool IsAutoFollowAllowed() const { return (gpGlobals->time > m_allowAutoFollowTime); }
+	void InhibitAutoFollow(duration_t duration) { m_allowAutoFollowTime = gpGlobals->time + duration; }
+	void AllowAutoFollow() { m_allowAutoFollowTime = {}; }
+	void ClearAutoBuyData();
+	void AddAutoBuyData(const char* str);
+	void AutoBuy();
+	void ClientCommand(const char* cmd, const char* arg1 = NULL, const char* arg2 = NULL, const char* arg3 = NULL);
+	void PrioritizeAutoBuyString(char* autobuyString, const char* priorityString);
+	const char* PickPrimaryCareerTaskWeapon();
+	const char* PickSecondaryCareerTaskWeapon();
+	const char* PickFlashKillWeaponString();
+	const char* PickGrenadeKillWeaponString();
+	bool ShouldExecuteAutoBuyCommand(AutoBuyInfoStruct* commandInfo, bool boughtPrimary, bool boughtSecondary);
+	void PostAutoBuyCommandProcessing(AutoBuyInfoStruct* commandInfo, bool& boughtPrimary, bool& boughtSecondary);
+	void ParseAutoBuyString(const char* string, bool& boughtPrimary, bool& boughtSecondary);
+	AutoBuyInfoStruct* GetAutoBuyCommandInfo(const char* command);
+	void InitRebuyData(const char* str);
+	void BuildRebuyStruct();
+	void Rebuy();
+	void RebuyPrimaryWeapon();
+	void RebuyPrimaryAmmo();
+	void RebuySecondaryWeapon();
+	void RebuySecondaryAmmo();
+	void RebuyHEGrenade();
+	void RebuyFlashbang();
+	void RebuySmokeGrenade();
+	void RebuyDefuser();
+	void RebuyNightVision();
+	void RebuyArmor();
+	void UpdateLocation(bool forceUpdate = false);
+	void SetObserverAutoDirector(bool val) { m_bObserverAutoDirector = val; }
+	bool IsObservingPlayer(CBasePlayer* pPlayer);
+	bool CanSwitchObserverModes() const { return m_canSwitchObserverModes; }
+	void Intense()
+	{
+		//m_musicState = INTENSE;
+		//m_intenseTimestamp = gpGlobals->time;
+	}
+public:
+
+	static TYPEDESCRIPTION m_playerSaveData[40];
 
 public:
 #ifdef CLIENT_DLL
 	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {}
-	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data) { return false; }
+	virtual bool Knockback(CBasePlayer* attacker, const KnockbackData& data) { return false; }
+	void RemoveWeapon(int iWeaponID) {
+		pev->weapons &= ~(1 << iWeaponID);
+	}
+
+	void ClearWeapon(bool removeSuit) {
+		if (removeSuit)
+			pev->weapons = 0;
+		else
+			pev->weapons &= ~WEAPON_ALLWEAPONS;
+	}
+	void EXPORT PlayerTouch(CBaseEntity* other) {}
+	bool IsUsingPC() { return true; }
 #else
 	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {} // moved to mod_zb1.cpp -> CZombie_ZB1::CZombie_ZB1()
 	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data);
+	void RemoveWeapon(int iWeaponID);
+	void ClearWeapon(bool removeSuit = false);
+	void EXPORT PlayerTouch(CBaseEntity* other);
+	bool IsUsingPC();
+	float GetArmorRatioModifier(void);
 #endif
 
 	void SpawnProtection_Check();
 	void SpawnProtection_Start(duration_t flTime);
 	void SpawnProtection_End();
 
+	void CheckZombieModeBuff(void);
+	bool ReactToDeimosTail();
+	void AddWeapon(int iWeaponID);
+	const char* GetAnimExtDualPistols() { return m_bIsFemale ? "dualpistols" : "dualpistols_2"; }
+	bool CanHolster(CBasePlayerItem* item = nullptr)
+	{
+		if (m_bHolsterDisabled)
+			return false;
+
+		if (!item) item = m_pActiveItem;
+		if (item)
+			return item->CanHolster();
+
+		return true;
+	}
 public:
-	bool m_bIsZombie;
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
 	time_point_t m_flTimeSpawnProctionExpires;
-
-public:
 #ifndef CLIENT_DLL
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
 #endif
+	int iuser1;
+	time_point_t m_tHealthDecreaseStartTime;
+	float m_flHealthDecreaseAmount;
+	time_point_t m_tHealthDecreaseInterval;
+	time_point_t m_tHealthBuffTime;
+	time_point_t m_tShootingDownBuffTime;
+	time_point_t m_tAvoidInfectBuffTime;
+	time_point_t m_tLockBuffTime;
+	float m_flLockGravity;
+	float m_flDefaultGravity;
+	float m_flLockSpeed;
+
+	float m_flBuffHealthAmount;
+	float m_flSaveArmorAmount;
+	int m_iHealthDecreaseCount;
+	int m_iHealthDamageType;
+	const char* m_ZombieClass;
+	time_point_t m_flCustomSequenceUntilTime;
+	int m_iCustomSequence;
+	char m_szCustomSequence[32];
+	int m_iZombieFlying;
+	std::set<int> m_setWeaponID;
+	int m_iRoundKill;
+	int m_iRoundAssist;
+	int m_iRoundInfect;
+	bool m_bHolsterDisabled;
+	bool m_bJumpDisabled;
+	bool m_bDuckDisabled;
+	float m_flDamageUnderTake;	//aksha zombie
+	int m_iBuff;
+	int m_bHasBuffWpn;	//revivegun buffak buffm4 and more
+	float m_flAccumulateDamage[33];	//like m32venom
+	int m_iReviveGunShotsFired;
 };
 
 }

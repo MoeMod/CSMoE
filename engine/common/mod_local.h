@@ -91,7 +91,8 @@ typedef struct
 } world_static_t;
 
 extern world_static_t	world;
-extern byte		*com_studiocache;
+extern mempool_t		*com_studiocache;
+extern mempool_t		*mempool_mdl;
 extern model_t		*loadmodel;
 extern convar_t		*mod_studiocache;
 extern int		bmodel_version;	// only actual during loading
@@ -105,7 +106,7 @@ void Mod_Shutdown( void );
 void Mod_ClearUserData( void );
 void Mod_PrintBSPFileSizes( void );
 void Mod_SetupHulls( vec3_t mins[MAX_MAP_HULLS], vec3_t maxs[MAX_MAP_HULLS] );
-void Mod_GetBounds( int handle, vec3_t mins, vec3_t maxs );
+void Mod_GetBounds( int handle, vec3_t_ref mins, vec3_t_ref maxs );
 void Mod_GetFrames( int handle, int *numFrames );
 void Mod_LoadWorld( const char *name, uint *checksum, qboolean multiplayer );
 void Mod_FreeUnused( void );
@@ -138,10 +139,10 @@ struct wadlist_s *Mod_WadList( void );
 void Mod_InitStudioAPI( void );
 void Mod_InitStudioHull( void );
 void Mod_ResetStudioAPI( void );
-qboolean Mod_GetStudioBounds( const char *name, vec3_t mins, vec3_t maxs );
-void Mod_StudioGetAttachment( const edict_t *e, int iAttachment, float *org, float *ang );
-void Mod_GetBonePosition( const edict_t *e, int iBone, float *org, float *ang );
-hull_t *Mod_HullForStudio( model_t *m, float frame, int seq, vec3_t ang, vec3_t org, vec3_t size, byte *pcnt, byte *pbl, int *hitboxes, edict_t *ed );
+qboolean Mod_GetStudioBounds( const char *name, vec3_t_ref mins, vec3_t_ref maxs );
+void Mod_StudioGetAttachment( const edict_t *e, int iAttachment, vec3_t_ref org, vec3_t_ref ang );
+void Mod_GetBonePosition( const edict_t *e, int iBone, vec3_t_ref org, vec3_t_ref ang );
+hull_t *Mod_HullForStudio( model_t *m, float frame, int seq, const vec3_t ang, const vec3_t org, const vec3_t size, byte *pcnt, byte *pbl, int *hitboxes, edict_t *ed );
 int Mod_HitgroupForStudioHull( int index );
 
 #endif//MOD_LOCAL_H

@@ -108,13 +108,24 @@ extern int gmsgBotProgress;
 extern int gmsgBrass;
 extern int gmsgFog;
 extern int gmsgShowTimer;
+extern int gmsgShowWin;
+extern int gmsgSpecialCrossHair;
+extern int gmsgHitMsg;
 
+extern int gmsgHeadIcon;
 extern int gmsgZBSTip;
 extern int gmsgZBSLevel;
 extern int gmsgBTEWeapon;
 extern int gmsgZB2Msg;
 extern int gmsgZB3Msg;
+extern int gmsgZBZMsg;
 extern int gmsgGunDeath;
+extern int gmsgWeapDrop;
+extern int gmsgOperationSystem;
+extern int gmsgZ4Msg;
+extern int gmsgMVPInfo;
+extern int gmsgMPToCL;
+extern int gmsgNewHudMsg;
 
 void LinkUserMessages();
 void WriteSigonMessages();

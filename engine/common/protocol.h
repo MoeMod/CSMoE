@@ -65,12 +65,14 @@ GNU General Public License for more details.
 #define svc_resourcelist		43	// [short][...]
 #define svc_deltamovevars		44	// [movevars_t]
 #define svc_customization		45	// <see code>
+#define svc_weaponanim2		46	// [byte]iAnim [byte]body [short]framerate
 #define svc_crosshairangle		47	// [byte][byte]
 #define svc_soundfade		48	// [float*4] sound fade parms
 
 #define svc_director		51	// <variable sized>
 #define svc_studiodecal		52	// [float*3][float*3][short][short][byte]
-
+#define svc_voiceinit		53	// <see code>
+#define svc_voicedata		54	// [byte][short][...]
 #define svc_querycvarvalue		57	// [string]
 #define svc_querycvarvalue2		58	// [string][long] (context)
 #define svc_lastmsg			64	// start user messages at this point

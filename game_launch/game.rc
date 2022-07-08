@@ -19,9 +19,9 @@
 
 #define VER_ANSICP 946
 
-#define VER_FILEDESCRIPTION_STR	"Xash3D Launcher"
+#define VER_FILEDESCRIPTION_STR	"CSMoE Launcher"
 #define VER_ORIGINALFILENAME_STR	"hl.exe"
-#define VER_INTERNALNAME_STR		"xash"
+#define VER_INTERNALNAME_STR		"csmoe"
 
 #include <common.ver>
 

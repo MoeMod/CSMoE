@@ -18,10 +18,6 @@ GNU General Public License for more details.
 
 #include "touch.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 qboolean ImGui_ImplGL_Init(void);
 void ImGui_ImplGL_Shutdown(void);
 void ImGui_ImplGL_NewFrame(void);
@@ -41,11 +37,8 @@ qboolean ImGui_ImplGL_KeyEvent( int key, int down );
 qboolean ImGui_ImplGL_CharCallback(int c);
 qboolean ImGui_ImplGL_CharCallbackUTF(const char *c);
 qboolean ImGui_ImplGL_MouseMove(int x, int y);
+qboolean ImGui_ImplGL_IsCursorVisible();
 
 qboolean ImGui_ImplGL_TouchCallback(touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

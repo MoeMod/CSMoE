@@ -13,7 +13,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-extern "C" {
 #include "common.h"
 #include "input_ime.h"
 #include "gl_vidnt.h"
@@ -26,7 +25,6 @@ extern "C" {
 #if defined(SDL_VIDEO_DRIVER_COCOA)
 #include "platform/macos/vid_macos.h"
 #endif
-}
 
 const char* IME_GetCompositionString()
 {
@@ -103,4 +101,9 @@ void IME_SetIMEEnabled(int enable, int force)
 #elif XASH_INPUT == INPUT_ANDROID
 	Android_EnableTextInput(enable, force);
 #endif
+}
+
+int IME_HandleKeyEvent(int key, int down)
+{
+	return 0;
 }

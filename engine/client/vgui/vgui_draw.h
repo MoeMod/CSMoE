@@ -16,10 +16,6 @@ GNU General Public License for more details.
 #ifndef VGUI_DRAW_H
 #define VGUI_DRAW_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "port.h"
 
 #define VGUI_MAX_TEXTURES	2048	// a half of total textures count
@@ -35,7 +31,5 @@ void VGui_KeyEvent( int key, int down );
 void VGui_MouseMove( int x, int y );
 qboolean VGui_IsActive( void );
 void *pfnVGui_GetPanel();
-#ifdef __cplusplus
-}
-#endif
+
 #endif//VGUI_DRAW_H

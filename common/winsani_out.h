@@ -2,4 +2,3 @@
 #undef HSPRITE
 #pragma pop_macro("ARRAYSIZE")
 #endif
-#pragma pop_macro("read")

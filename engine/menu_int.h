@@ -65,7 +65,7 @@ typedef struct ui_enginefuncs_s
 	// cvar handlers
 	cvar_t*	(*pfnRegisterVariable)( const char *szName, const char *szValue, int flags );
 	float	(*pfnGetCvarFloat)( const char *szName );
-	char*	(*pfnGetCvarString)( const char *szName );
+	const char*	(*pfnGetCvarString)( const char *szName );
 	void	(*pfnCvarSetString)( const char *szName, const char *szValue );
 	void	(*pfnCvarSetValue)( const char *szName, float flValue );
 
@@ -74,8 +74,8 @@ typedef struct ui_enginefuncs_s
 	void	(*pfnClientCmd)( int execute_now, const char *szCmdString );
 	void	(*pfnDelCommand)( const char *cmd_name );
 	int       (*pfnCmdArgc)( void );	
-	char*	(*pfnCmdArgv)( int argc );
-	char*	(*pfnCmd_Args)( void );
+	const char*	(*pfnCmdArgv)( int argc );
+	const char*	(*pfnCmd_Args)( void );
 
 	// debug messages (in-menu shows only notify)	
 	void	(*Con_Printf)( const char *fmt, ... );
@@ -117,7 +117,7 @@ typedef struct ui_enginefuncs_s
 	void	(*pfnClientJoin)( const struct netadr_s adr );
 	
 	// parse txt files
-	byte*	(*COM_LoadFile)( const char *filename, int *pLength );
+	char*	(*COM_LoadFile)( const char *filename, int *pLength );
 	char*	(*COM_ParseFile)( char *data, char *token );
 	void	(*COM_FreeFile)( void *buffer );
 
@@ -160,7 +160,7 @@ typedef struct ui_enginefuncs_s
 	void	(*pfnSetCursor)( void *hCursor );			// change cursor
 	int	(*pfnIsMapValid)( const char *filename );
 	void	(*pfnProcessImage)( int texnum, float gamma, int topColor, int bottomColor );
-	int	(*pfnCompareFileTime)( char *filename1, char *filename2, int *iCompare );
+	int	(*pfnCompareFileTime)( const char *filename1, const char *filename2, int *iCompare );
 
 	const char *(*pfnGetModeString)( int vid_mode );
 } ui_enginefuncs_t;
@@ -191,6 +191,7 @@ typedef struct
 	int	(*pfnCreditsActive)( void );	// unused
 	void	(*pfnFinalCredits)( void );	// show credits + game end
 	void (*pfnOnGUI)(struct ImGuiContext* context);
+	int (*pfnHandleMessageMode_f)( void );
 } UI_FUNCTIONS;
 
 typedef int (*MENUAPI)( UI_FUNCTIONS *pFunctionTable, ui_enginefuncs_t* engfuncs, ui_globalvars_t *pGlobals );

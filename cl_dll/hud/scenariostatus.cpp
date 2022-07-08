@@ -2,9 +2,9 @@
 #include "cl_util.h"
 #include "parsemsg.h"
 #include "cl_util.h"
-#include "vgui_parser.h"
 #include "draw_util.h"
-#include "triangleapi.h"
+
+namespace cl {
 DECLARE_MESSAGE(m_scenarioStatus, Scenario)
 
 int CHudScenarioStatus::Init(void)
@@ -48,7 +48,7 @@ int CHudScenarioStatus::Draw(float fTime)
 	if (m_iFlags & HUD_ACTIVE)
 	{
 		int r, g, b;
-		if (gHUD.m_csgohud->value && m_hSprite == gHUD.GetSprite(gHUD.GetSpriteIndex("bombticking")))
+		if (gHUD.m_hudstyle->value == 1 && m_hSprite == gHUD.GetSprite(gHUD.GetSpriteIndex("bombticking")))
 		{
 			int x = ScreenWidth / 2;	
 			int w = m_rect.right - m_rect.left;
@@ -64,10 +64,7 @@ int CHudScenarioStatus::Draw(float fTime)
 			}
 
 			x = ScreenWidth / 2;
-			gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 100);
-			m_pTexture_Black->Bind();
-			DrawUtils::Draw2DQuadScaled(x - 120 / 2, 5, x + 120 / 2, 75);
+			m_pTexture_Black->Draw2DQuadScaled(x - 120 / 2, 5, x + 120 / 2, 75, 0, 0, 1, 1, 255, 255, 255, 100);
 		}
 		else 
 		{
@@ -153,4 +150,6 @@ int CHudScenarioStatus::MsgFunc_Scenario(const char *pszName, int iSize, void *p
 
 	m_nextFlash += reader.ReadShort() * 0.01;
 	return 1;
+}
+
 }

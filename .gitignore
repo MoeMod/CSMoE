@@ -323,7 +323,13 @@ debug/
 .idea
 /cmake-build-*
 /cmake-build-*
+Xcode-iOS/cmake-build
 CMakeSettings.json
+/3rdparty/boost_*
 /SDL2
 msvc/BundleArtifacts/
+/enc_temp_folder
 /CSMoE-Full
+/out
+/CSMoE.rar
+Android/app/bugly/

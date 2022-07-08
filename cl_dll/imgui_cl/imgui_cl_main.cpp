@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "cl_util.h"
 #include "cl_dll.h"
 #include "imgui_cl_menu.h"
+#include "luash_cl/lua_cl.h"
 
 namespace cl {
 
@@ -25,6 +26,17 @@ extern "C"
 void DLLEXPORT HUD_OnGUI( struct ImGuiContext *context )
 {
     ImGui::SetCurrentContext(context);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImColor(255, 255, 255, 255).Value);
+	ImGui::PushStyleColor(ImGuiCol_Border, ImColor(255, 255, 255, 0).Value);
+	ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImColor(255, 255, 255, 0).Value);
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImColor(0, 0, 0, 100).Value);
+	ImGui::PushStyleColor(ImGuiCol_Button, ImColor(0.72f, 0.72f, 0.33f, 0.40f).Value);
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(0.72f, 0.72f, 0.33f, 1.00f).Value);
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor(0.74f, 0.74f, 0.18f, 1.00f).Value);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10);
+	
+	LuaCL_OnGUI();
 	/*
 	static bool show_demo_window = false;
 	static float f = 0.0f;
@@ -56,6 +68,8 @@ void DLLEXPORT HUD_OnGUI( struct ImGuiContext *context )
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
 	 */
+	ImGui::PopStyleVar(1);
+	ImGui::PopStyleColor(7);
 }
 
 }

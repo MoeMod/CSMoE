@@ -14,21 +14,21 @@ GNU General Public License for more details.
 */
 
 #include "hud.h"
-#include "followicon.h"
 #include "cl_util.h"
 #include "draw_util.h"
-#include "triangleapi.h"
 #include "eventscripts.h"
 
 #include "zb3.h"
 #include "zb3_morale.h"
 
+#include "gamemode/mods_const.h"
 #include "gamemode/zb3/zb3_const.h"
 
 
+namespace cl {
 CHudZB3Morale::CHudZB3Morale(void)
 {
-	
+
 }
 
 int CHudZB3Morale::VidInit(void)
@@ -36,18 +36,36 @@ int CHudZB3Morale::VidInit(void)
 	m_iMoraleIconSPR = gHUD.GetSpriteIndex("ZB3_MoraleIcon");
 	m_iMoraleLevelSPR = gHUD.GetSpriteIndex("ZB3_MoraleLevel");
 	m_iMoraleEffectSPR = gHUD.GetSpriteIndex("ZB3_MoraleEffect");
+	m_iHighMoraleSPR = gHUD.GetSpriteIndex("zb3_highmorale");
+	m_iJumphigherSPR = gHUD.GetSpriteIndex("zb3_jumphigher");
+	m_iAmmoupSPR = gHUD.GetSpriteIndex("zb3_ammoup");
 	return 1;
 }
 
 int CHudZB3Morale::Draw(float time)
 {
+	if (!gHUD.m_pCvarDraw->value)
+		return 0;
+
+	if (gHUD.m_iIntermission || gEngfuncs.IsSpectateOnly())
+		return 0;
+
+	if (g_iUser1)
+		return 0;
+
+	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
+		return 0;
+
+	if (!m_bEnabled && gHUD.m_iModRunning == MOD_ZBZ)
+		return 0;
+
 	int idx = IS_FIRSTPERSON_SPEC ? g_iUser2 : gEngfuncs.GetLocalPlayer()->index;
 	if (g_PlayerExtraInfo[idx].zombie)
 		return 0;
 
 	int iX = ScreenWidth / 2 - 130;
 	int iY = ScreenHeight - 100;
-	
+
 	int iMorale = m_iMoraleLevel;
 	int iMaxMorale = 10;
 	if (m_iMoraleType == ZB3_MORALE_STRENGTHEN)
@@ -55,7 +73,7 @@ int CHudZB3Morale::Draw(float time)
 		iMorale += 3;
 		iMaxMorale += 3;
 	}
-	
+
 	int r = 0, g = 0, b = 0, a = 0;
 
 	if (iMorale < 4)
@@ -71,8 +89,17 @@ int CHudZB3Morale::Draw(float time)
 	else if (iMorale > 10)
 		std::tie(r, g, b, a) = std::make_tuple(127, 40, 208, 255);
 
-	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iMoraleIconSPR), r, g, b);
+	//Human item
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iAmmoupSPR), 255, 193, 147);
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73: ScreenHeight / 2 - 164, &gHUD.GetSpriteRect(m_iAmmoupSPR));
 
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iJumphigherSPR), 255, 193, 147);
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 + 46: ScreenHeight / 2 - 120, &gHUD.GetSpriteRect(m_iJumphigherSPR));
+
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iHighMoraleSPR), 255, 193, 147);
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 + 90 : ScreenHeight / 2  + 75, &gHUD.GetSpriteRect(m_iHighMoraleSPR));
+
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iMoraleIconSPR), r, g, b);
 	gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iMoraleIconSPR));
 	if (iMorale >= 13)
 	{
@@ -95,7 +122,7 @@ int CHudZB3Morale::Draw(float time)
 		iLen = iLen * flMorale;
 		ModifyRect.right = iLen + ModifyRect.left;
 		gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iMoraleLevelSPR), 50, 50, 50);
-		gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY, &ModifyRect); 
+		gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY, &ModifyRect);
 	}
 
 	// foreground
@@ -111,7 +138,7 @@ int CHudZB3Morale::Draw(float time)
 
 	// text
 	char szBuffer[64];
-	sprintf(szBuffer, "ATT : %d %%", 100 + iMorale * 10);
+	sprintf(szBuffer, "攻击力 : %d %%", 100 + iMorale * 10);
 	DrawUtils::DrawHudString(ScreenWidth / 2 - 77, ScreenHeight - 113, ScreenWidth, szBuffer, r, g, b);
 
 	return 1;
@@ -125,4 +152,5 @@ void CHudZB3Morale::UpdateLevel(ZB3HumanMoraleType_e type, int level)
 	}
 
 	std::tie(m_iMoraleType, m_iMoraleLevel) = std::make_pair(type, level);
+}
 }

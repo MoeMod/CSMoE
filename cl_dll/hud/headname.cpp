@@ -1,10 +1,11 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "cl_entity.h"
-#include "triangleapi.h"
 #include "draw_util.h"
 #include "com_model.h"
 #include "calcscreen.h"
+
+namespace cl {
 
 int CHudHeadName::Init(void)
 {
@@ -65,4 +66,5 @@ int CHudHeadName::Draw(float flTime)
 	}
 
 	return 1;
+}
 }

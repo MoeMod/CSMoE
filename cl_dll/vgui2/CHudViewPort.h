@@ -1,11 +1,12 @@
 #ifndef GAME_CLIENT_UI_HUD_CHUDVIEWPORT_H
 #define GAME_CLIENT_UI_HUD_CHUDVIEWPORT_H
 
-#include "vgui2/CBaseViewport.h"
+#include "CBaseViewport.h"
 
 #include <string>
 
 class CClientMOTD;
+class CCSBaseBuyMenu;
 
 /**
 *	Viewport for the Hud.
@@ -32,7 +33,11 @@ public:
 
 	IViewportPanel* CreatePanelByName(const char* pszName) override;
 	IGameUIPanel* CreateGameUIPanelByName(const char* pszName) override;
-	
+
+    bool ShowVGUIMenu(int iMenu) override;
+	bool ShowVGUIMenuByName(const char* szName) override;
+    bool HideVGUIMenu(int iMenu) override;
+    void UpdateGameMode() override;
 
 	int MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf);
 
@@ -41,6 +46,7 @@ public:
 	std::string	m_szMOTD;
 	
 	CClientMOTD *m_pMOTD = nullptr;
+    CCSBaseBuyMenu *m_pBuyMenu = nullptr;
 };
 
 #endif //GAME_CLIENT_UI_HUD_CHUDVIEWPORT_H

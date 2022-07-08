@@ -26,7 +26,6 @@
 //#include "interface.h" // not used here
 #include "render_api.h"
 #include "mobility_int.h"
-#include "vgui_parser.h"
 
 #include "entity_state.h"
 #include "usercmd.h"
@@ -35,21 +34,29 @@
 #include "cdll_exp.h"
 #include "events.h"
 
+#ifdef XASH_LUASH
+#include "luash_cl/lua_cl.h"
+#endif
+
 extern "C"
 {
 #include "pmtrace.h"
 #include "pm_shared.h"
 }
 
-using namespace cl;
+#ifdef XASH_STATIC_GAMELIB
+int FS_GetAPI(fs_api_t * g_api);
+#endif
 
+namespace cl {
 cl_enginefunc_t gEngfuncs = { };
 render_api_t gRenderAPI = { };
 mobile_engfuncs_t gMobileAPI = { };
+fs_api_t gFileSystemAPI = { };
 CHud gHUD;
 int g_iXash = 0; // indicates a buildnum
+vec3_t g_velocity;
 int g_iMobileAPIVersion = 0;
-
 void InitInput (void);
 void IN_Commands( void );
 void Input_Shutdown (void);
@@ -72,6 +79,8 @@ int DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 
 	Game_HookEvents();
 
+	FS_GetAPI(&gFileSystemAPI);
+
 	return 1;
 }
 
@@ -86,7 +95,9 @@ void DLLEXPORT HUD_Shutdown( void )
 {
 	gHUD.Shutdown();
 	Input_Shutdown();
-	Localize_Free();
+#ifdef XASH_LUASH
+	LuaCL_Shutdown();
+#endif
 }
 
 
@@ -97,25 +108,25 @@ HUD_GetHullBounds
   Engine calls this to enumerate player collision hulls, for prediction.  Return 0 if the hullnumber doesn't exist.
 ================================
 */
-int DLLEXPORT HUD_GetHullBounds( int hullnumber, float *mins, float *maxs )
+int DLLEXPORT HUD_GetHullBounds( int hullnumber, vec3_t_ref mins, vec3_t_ref maxs )
 {
 	int iret = 0;
 
 	switch ( hullnumber )
 	{
 	case 0:				// Normal player
-		Vector(-16, -16, -36).CopyToArray(mins);
-		Vector(16, 16, 36).CopyToArray(maxs);
+		mins = Vector(-16, -16, -36);
+		maxs = Vector(16, 16, 36);
 		iret = 1;
 		break;
 	case 1:				// Crouched player
-		Vector(-16, -16, -18).CopyToArray(mins);
-		Vector(16, 16, 18).CopyToArray(maxs);
+		mins = Vector(-16, -16, -18);
+		maxs = Vector(16, 16, 18);
 		iret = 1;
 		break;
 	case 2:				// Point based hull
-		Vector(0, 0, 0).CopyToArray(mins);
-		Vector(0, 0, 0).CopyToArray(maxs);
+		mins = Vector(0, 0, 0);
+		maxs = Vector(0, 0, 0);
 		iret = 1;
 		break;
 	}
@@ -157,6 +168,8 @@ char DLLEXPORT HUD_PlayerMoveTexture( char *name )
 
 void DLLEXPORT HUD_PlayerMove( struct playermove_s *ppmove, int server )
 {
+	VectorCopy(ppmove->velocity, g_velocity);
+
 	PM_Move( ppmove, server );
 }
 
@@ -195,6 +208,9 @@ the hud variables.
 
 void DLLEXPORT HUD_Init( void )
 {
+#ifdef XASH_LUASH
+	LuaCL_Init();
+#endif
 	InitInput();
 	gHUD.Init();
 	//Scheme_Init();
@@ -368,6 +384,18 @@ int DLLEXPORT HUD_MobilityInterface( mobile_engfuncs_t *mobileapi )
 
 /*
 ========================
+HUD_MobilityInterface
+========================
+*/
+void DLLEXPORT CL_OnPrecache(int type, const char* name, int index)
+{
+#ifdef XASH_LUASH
+	LuaCL_OnPrecache((resourcetype_t)type, name, index);
+#endif
+}
+
+/*
+========================
 ClientFactory
 
 This function is never called, but it has to exist in order for the engine to load stuff from the client. - Solokiller
@@ -442,6 +470,7 @@ extern "C" void DLLEXPORT F(void *pv) {
 		nullptr,	// SDL Xash pfnMoveEvent
 		nullptr,	// SDL Xash pfnLookEvent
 		HUD_OnGUI,	// SDL Xash pfnOnGUI
+		CL_OnPrecache, // CSMoE ext
 	};
 
 	*pcldll_func = cldll_func;
@@ -507,11 +536,20 @@ extern "C" void DLLEXPORT F(void *pv) {
 			IN_ClientTouchEvent,	// SDL Xash pfnTouchEvent
 			nullptr,	// SDL Xash pfnMoveEvent
 			nullptr,	// SDL Xash pfnLookEvent
+#ifdef XASH_IMGUI
 			HUD_OnGUI,	// SDL Xash pfnOnGUI
+#else
+            nullptr,
+#endif
+			CL_OnPrecache, // CSMoE ext
 	};
 
 	*pcldll_func = cldll_func;
 }
+
+}
+
+using namespace cl;
 
 typedef struct dllexport_s
 {
@@ -561,11 +599,12 @@ static dllexport_t switch_client_exports[] = {
 	{ "HUD_GetStudioModelInterface", (void*)HUD_GetStudioModelInterface },
 	{ "HUD_DirectorMessage", (void*)HUD_DirectorMessage },
 	{ "HUD_VoiceStatus", (void*)HUD_VoiceStatus },
-#ifndef XASH_WINRT
 	{ "IN_ClientMoveEvent", (void*)IN_ClientMoveEvent}, // Xash3D ext
 	{ "IN_ClientLookEvent", (void*)IN_ClientLookEvent}, // Xash3D ext
-#endif
+#ifdef XASH_IMGUI
 	{ "HUD_OnGUI", (void*)HUD_OnGUI },
+#endif
+	{ "CL_OnPrecache", (void*)CL_OnPrecache },
 	{ NULL, NULL },
 };
 

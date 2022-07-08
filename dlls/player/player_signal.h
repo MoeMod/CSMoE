@@ -4,6 +4,8 @@
 #pragma once
 #endif
 
+typedef struct lua_State lua_State;
+
 #define SIGNAL_BUY			(1<<0)
 #define SIGNAL_BOMB			(1<<1)
 #define SIGNAL_RESCUE			(1<<2)
@@ -16,15 +18,8 @@ namespace cl {
 namespace sv {
 #endif
 
-class CUnifiedSignals
+struct CUnifiedSignals
 {
-public:
-	CUnifiedSignals()
-	{
-		m_flSignal = 0;
-		m_flState = 0;
-	}
-public:
 	void Update()
 	{
 		m_flState = m_flSignal;
@@ -34,9 +29,8 @@ public:
 	int GetSignal() const { return m_flSignal; }
 	int GetState() const { return m_flState; }
 
-private:
-	int m_flSignal;
-	int m_flState;
+	int m_flSignal = 0;
+	int m_flState = 0;
 };
 
 }

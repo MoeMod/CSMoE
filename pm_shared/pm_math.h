@@ -19,10 +19,7 @@ GNU General Public License for more details.
 #pragma once
 #endif
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include "basetypes.h"
-#include "angledef.h"
+#include "vector.h"
 
 #if defined(CLIENT_DLL)
 namespace cl {
@@ -37,77 +34,7 @@ constexpr int nanmask = 255 << 23;
 
 inline bool IS_NAN(float x) { return ((*reinterpret_cast<int *>(&(x)) & nanmask) == nanmask); }
 
-inline void AngleVectors(const float *angles, float *forward, float *right, float *up)
-{
-	float angle;
-	float sr, sp, sy, cr, cp, cy;
-
-	angle = angles[YAW] * ( M_PI * 2 / 360 );
-	sy = sin( angle );
-	cy = cos( angle );
-	angle = angles[PITCH] * ( M_PI*2 / 360 );
-	sp = sin( angle );
-	cp = cos( angle );
-	angle = angles[ROLL] * ( M_PI*2 / 360 );
-	sr = sin( angle );
-	cr = cos( angle );
-
-	if( forward )
-	{
-		forward[0] = cp * cy;
-		forward[1] = cp * sy;
-		forward[2] = -sp;
-	}
-	if( right )
-	{
-		right[0] = ( -1 * sr * sp * cy + -1 * cr * -sy );
-		right[1] = ( -1 * sr * sp * sy + -1 * cr * cy );
-		right[2] = -1 * sr * cp;
-	}
-	if( up )
-	{
-		up[0] = ( cr * sp * cy + -sr * -sy );
-		up[1] = ( cr * sp * sy + -sr * cy );
-		up[2] = cr * cp;
-	}
-}
-
-inline void AngleVectorsTranspose(const float *angles, float *forward, float *right, float *up)
-{
-	float angle;
-	float sr, sp, sy, cr, cp, cy;
-
-	angle = angles[YAW] * ( M_PI * 2 / 360 );
-	sy = sin( angle );
-	cy = cos( angle );
-	angle = angles[PITCH] * ( M_PI * 2 / 360 );
-	sp = sin( angle );
-	cp = cos( angle );
-	angle = angles[ROLL] * ( M_PI * 2 / 360 );
-	sr = sin( angle );
-	cr = cos( angle );
-
-	if( forward )
-	{
-		forward[0] = cp * cy;
-		forward[1] = ( sr * sp * cy + cr * -sy );
-		forward[2] = ( cr * sp * cy + -sr * -sy );
-	}
-	if( right )
-	{
-		right[0] = cp * sy;
-		right[1] = ( sr * sp * sy + cr * cy );
-		right[2] = ( cr * sp * sy + -sr * cy );
-	}
-	if( up )
-	{
-		up[0] = -sp;
-		up[1] = sr * cp;
-		up[2] = cr * cp;
-	}
-}
-
-inline void AngleMatrix(const float *angles, float (*matrix)[4])
+inline void AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
@@ -137,7 +64,7 @@ inline void AngleMatrix(const float *angles, float (*matrix)[4])
 	matrix[2][3] = 0.0;
 }
 
-inline void AngleIMatrix(const float *angles, float (*matrix)[4])
+inline void AngleIMatrix(const vec3_t angles, matrix3x4_ref matrix)
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
@@ -167,7 +94,7 @@ inline void AngleIMatrix(const float *angles, float (*matrix)[4])
 	matrix[2][3] = 0.0;
 }
 
-inline void NormalizeAngles(float *angles)
+inline void NormalizeAngles(vec3_t_ref angles)
 {
 	int i;
 	// Normalize angles
@@ -193,7 +120,7 @@ FIXME:  Use Quaternions to avoid discontinuities
 Frac is 0.0 to 1.0 ( i.e., should probably be clamped, but doesn't have to be )
 ===================
 */
-inline void InterpolateAngles( float *start, float *end, float *output, float frac )
+inline void InterpolateAngles( vec3_t start, vec3_t end, vec3_t_ref output, float frac )
 {
 	int i;
 	float ang1, ang2;
@@ -223,127 +150,18 @@ inline void InterpolateAngles( float *start, float *end, float *output, float fr
 	NormalizeAngles( output );
 }
 
-inline float DotProduct(const float *v1, const float *v2)
-{
-	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
-}
-
-inline float Length(const float *v)
-{
-	return sqrt(DotProduct(v, v));
-}
-
 /*
 ===================
 AngleBetweenVectors
 
 ===================
 */
-inline float AngleBetweenVectors( const float *v1, const float *v2 )
+
+inline void VectorTransform(const vec3_t in1, cmatrix3x4 in2, vec3_t_ref out)
 {
-	float angle;
-	float l1 = Length( v1 );
-	float l2 = Length( v2 );
-
-	if( !l1 || !l2 )
-		return 0.0f;
-
-	angle = acos( DotProduct( const_cast<float *>(v1), const_cast<float *>(v2) ) / ( l1 * l2 ) );
-	angle = ( angle  * 180.0f ) / M_PI;
-
-	return angle;
-}
-
-inline void VectorTransform(const float *in1, float (*in2)[4], float *out)
-{
-	out[0] = DotProduct( const_cast<float *>(in1), in2[0] ) + in2[0][3];
-	out[1] = DotProduct( const_cast<float *>(in1), in2[1] ) + in2[1][3];
-	out[2] = DotProduct( const_cast<float *>(in1), in2[2] ) + in2[2][3];
-}
-
-inline int VectorCompare(const float *v1, const float *v2)
-{
-	int i;
-
-	for( i = 0; i < 3; i++ )
-		if( v1[i] != v2[i] )
-			return 0;
-
-	return 1;
-}
-
-inline void  VectorMA(const float *veca, float scale, const float *vecb, float *vecc)
-{
-	vecc[0] = veca[0] + scale * vecb[0];
-	vecc[1] = veca[1] + scale * vecb[1];
-	vecc[2] = veca[2] + scale * vecb[2];
-}
-
-inline void  VectorSubtract(const float *veca, const float *vecb, float *out)
-{
-	out[0] = veca[0] - vecb[0];
-	out[1] = veca[1] - vecb[1];
-	out[2] = veca[2] - vecb[2];
-}
-
-inline void  VectorAdd(float *veca, float *vecb, float *out)
-{
-	out[0] = veca[0] + vecb[0];
-	out[1] = veca[1] + vecb[1];
-	out[2] = veca[2] + vecb[2];
-}
-
-inline void  VectorCopy(const float *in, float *out)
-{
-	out[0] = in[0];
-	out[1] = in[1];
-	out[2] = in[2];
-}
-
-inline void  CrossProduct(const float *v1, const float *v2, float *cross)
-{
-	cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
-	cross[1] = v1[2] * v2[0] - v1[0] * v2[2];
-	cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
-}
-
-inline float Distance(const float *v1, const float *v2)
-{
-	vec3_t d;
-	VectorSubtract( v2, v1, d );
-	return Length( d );
-}
-
-inline float VectorNormalize(float *v)
-{
-	float length, ilength;
-
-	length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
-	length = sqrt( length );		// FIXME
-
-	if( length )
-	{
-		ilength = 1 / length;
-		v[0] *= ilength;
-		v[1] *= ilength;
-		v[2] *= ilength;
-	}
-
-	return length;
-}
-
-inline void  VectorInverse(float *v)
-{
-	v[0] = -v[0];
-	v[1] = -v[1];
-	v[2] = -v[2];
-}
-
-inline void  VectorScale(const float *in, float scale, float *out)
-{
-	out[0] = in[0] * scale;
-	out[1] = in[1] * scale;
-	out[2] = in[2] * scale;
+	out[0] = DotProduct( in1, vec3_t(in2[0][0], in2[0][1], in2[0][2]) ) + in2[0][3];
+	out[1] = DotProduct( in1, vec3_t(in2[1][0], in2[1][1], in2[1][2]) ) + in2[1][3];
+	out[2] = DotProduct( in1, vec3_t(in2[2][0], in2[2][1], in2[2][2]) ) + in2[2][3];
 }
 
 inline int   Q_log2(int val)
@@ -354,7 +172,7 @@ inline int   Q_log2(int val)
 	return answer;
 }
 
-inline void  VectorMatrix(float *forward, float *right, float *up)
+inline void  VectorMatrix(const vec3_t forward, vec3_t_ref right, vec3_t_ref up)
 {
 	vec3_t tmp;
 
@@ -374,40 +192,6 @@ inline void  VectorMatrix(float *forward, float *right, float *up)
 	VectorNormalize( right );
 	CrossProduct( right, forward, up );
 	VectorNormalize( up );
-}
-
-inline void  VectorAngles(const float *forward, float *angles)
-{
-	float tmp, yaw, pitch;
-
-	if( forward[1] == 0 && forward[0] == 0 )
-	{
-		yaw = 0;
-		if( forward[2] > 0 )
-			pitch = 90;
-		else
-			pitch = 270;
-	}
-	else
-	{
-		yaw = ( atan2( forward[1], forward[0] ) * 180 / M_PI );
-		if( yaw < 0 )
-			yaw += 360;
-
-		tmp = sqrt( forward[0] * forward[0] + forward[1] * forward[1] );
-		pitch = ( atan2( forward[2], tmp ) * 180 / M_PI );
-		if( pitch < 0 )
-			pitch += 360;
-	}
-
-	angles[0] = pitch;
-	angles[1] = yaw;
-	angles[2] = 0;
-}
-
-inline void VectorClear(float *v)
-{
-	v[0] = v[1] =v[2] = 0.0f;
 }
 
 }

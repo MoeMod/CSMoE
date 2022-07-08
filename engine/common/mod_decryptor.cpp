@@ -1,6 +1,6 @@
 #include "mod_decryptor.h"
 #include "port.h"
-#include "IceKey.hpp"
+#include "mathlib/IceKey.H"
 #include "studio.h"
 
 static const byte g_pDecryptorKey_20[32] =
@@ -19,7 +19,15 @@ static const byte g_pDecryptorKey_21[32] =
 	0xD9, 0x91, 0x07, 0x3A, 0x14, 0x74, 0xFE, 0x22
 };
 
-CIceKey g_Decryptor(4);
+static const byte g_pDecryptorKey_22[32] =
+{
+	0x73, 0x62, 0x74, 0x69, 0x74, 0x61, 0x6E, 0xE0,
+	0x8C, 0xC6, 0xF1, 0x96, 0xFB, 0x38, 0x75, 0x68,
+	0x88, 0x7A, 0x78, 0x86, 0x78, 0x86, 0x67, 0x70,
+	0xD9, 0x91, 0x07, 0x3A, 0x14, 0x74, 0xFE, 0x22
+};
+
+IceKey g_Decryptor(4);
 
 void DecryptChunk(byte *pData, size_t uDataSize)
 {
@@ -30,7 +38,7 @@ void DecryptChunk(byte *pData, size_t uDataSize)
 
 	while (uCount)
 	{
-		g_Decryptor.Decrypt(pData, pData);
+		g_Decryptor.decrypt(pData, pData);
 		pData += 8;
 		uCount--;
 	}
@@ -57,22 +65,24 @@ void DecryptData(byte *pData, size_t uDataSize)
 	} while (uDataSize);
 }
 
-extern "C" void Mod_DecryptModel(model_t *mod, byte *buffer)
+void Mod_DecryptModel(const char *model_name, byte *buffer)
 {
 	studiohdr_t *studiohdr = reinterpret_cast<studiohdr_t *>(buffer);
 
-	if (!Q_strncmp(mod->name, "models/player", 13))
+	if (!Q_strncmp(model_name, "models/player", 13))
 	{
 		if (studiohdr->numhitboxes == 21)
 			studiohdr->numhitboxes = 20;
 	}
 
-	if (studiohdr->version == 20 || studiohdr->version == 21)
+	if (studiohdr->version == 20 || studiohdr->version == 21 || studiohdr->version == 22)
 	{
 		if (studiohdr->version == 20)
-			g_Decryptor.SetKey(g_pDecryptorKey_20);
+			g_Decryptor.set(g_pDecryptorKey_20);
 		else if (studiohdr->version == 21)
-			g_Decryptor.SetKey(g_pDecryptorKey_21);
+			g_Decryptor.set(g_pDecryptorKey_21);
+		else if (studiohdr->version == 22)
+			g_Decryptor.set(g_pDecryptorKey_22);
 
 		mstudiotexture_t *ptexture = (mstudiotexture_t *)(buffer + studiohdr->textureindex);
 
@@ -88,7 +98,7 @@ extern "C" void Mod_DecryptModel(model_t *mod, byte *buffer)
 			for (int j = 0; j < pbodypart[i].nummodels; j++)
 			{
 				if (pmodel[j].numverts > 0)
-					DecryptData(buffer + pmodel[j].vertindex, pmodel[j].numverts * sizeof(vec3_t));
+					DecryptData(buffer + pmodel[j].vertindex, pmodel[j].numverts * sizeof(vec3_c));
 			}
 		}
 

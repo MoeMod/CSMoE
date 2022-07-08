@@ -22,7 +22,8 @@
 #include "parsemsg.h"
 #include "cl_util.h"
 #include "draw_util.h"
-#include "triangleapi.h"
+
+namespace cl {
 
 DECLARE_MESSAGE( m_Battery, Battery )
 DECLARE_MESSAGE( m_Battery, ArmorType )
@@ -47,6 +48,12 @@ int CHudBattery::VidInit( void )
 	m_hFull[Vest].SetSpriteByName("suit_full");
 	m_hEmpty[VestHelm].SetSpriteByName("suithelmet_empty");
 	m_hFull[VestHelm].SetSpriteByName("suithelmet_full");
+
+	m_NEWHUD_hEmpty[Vest].SetSpriteByName("suit_empty_new");
+	m_NEWHUD_hFull[Vest].SetSpriteByName("suit_full_new");
+	m_NEWHUD_hEmpty[VestHelm].SetSpriteByName("suithelmet_empty_new");
+	m_NEWHUD_hFull[VestHelm].SetSpriteByName("suithelmet_full_new");
+
 	R_InitTexture(m_pTexture_Black, "resource/hud/csgo/blackright");
 	m_iHeight = m_hFull[Vest].rect.bottom - m_hEmpty[Vest].rect.top;
 	m_fFade = 0;
@@ -100,6 +107,13 @@ int CHudBattery::Draw( float flTime )
 	if (!(gHUD.m_iWeaponBits & (1<<(WEAPON_SUIT)) ))
 		return 1;
 
+	if (gHUD.m_hudstyle->value == 2)
+	{
+		DrawNewHudArmor(flTime);
+		return 1;
+	}
+
+
 	int r, g, b, x, y, a, x1;
 	int ArmorWidth, ArmorHeight;
 	wrect_t rc;
@@ -109,8 +123,8 @@ int CHudBattery::Draw( float flTime )
 	// battery can go from 0 to 100 so * 0.01 goes from 0 to 1
 	rc.top += m_iHeight * ((float)( 100 - ( min( 100, m_iBat ))) * 0.01f );
 
-	DrawUtils::UnpackRGB( r, g, b, gHUD.m_csgohud->value? RGB_WHITE : RGB_YELLOWISH );
-	if (gHUD.m_csgohud->value)
+	DrawUtils::UnpackRGB( r, g, b, gHUD.m_hudstyle->value == 1 ? RGB_WHITE : RGB_YELLOWISH );
+	if (gHUD.m_hudstyle->value == 1)
 		a = 255;
 	// Has health changed? Flash the health #
 	if( m_fFade )
@@ -127,13 +141,13 @@ int CHudBattery::Draw( float flTime )
 		}
 
 		// Fade the health number back to dim
-		if (!gHUD.m_csgohud->value)
+		if (gHUD.m_hudstyle->value != 1)
 			a = MIN_ALPHA +  (m_fFade / FADE_TIME) * 128;
 
 	}
 	else
 	{
-		if (!gHUD.m_csgohud->value)
+		if (gHUD.m_hudstyle->value != 1)
 			a = MIN_ALPHA;
 	}
 
@@ -144,17 +158,14 @@ int CHudBattery::Draw( float flTime )
 	y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 	x = ScreenWidth / 5;
 
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value == 1)
 	{
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(0, 0, 0, 100);
-		m_pTexture_Black->Bind();
-		DrawUtils::Draw2DQuadScaled(x - ArmorWidth, y - gHUD.m_iFontHeight / 2, x - ArmorWidth + ScreenWidth / 5 - ArmorWidth, ScreenHeight);
+		m_pTexture_Black->Draw2DQuadScaled(x - ArmorWidth, y - gHUD.m_iFontHeight / 2, x - ArmorWidth + ScreenWidth / 5 - ArmorWidth, ScreenHeight, 0, 0, 1, 1, 0, 0, 0, 100);
 	}
 
 	// make sure we have the right sprite handles
-	
-	
+
+
 	SPR_Set( m_hFull[m_enArmorType].spr, r, g, b );
 	SPR_DrawAdditive( 0, x, y, &m_hFull[m_enArmorType].rect );
 
@@ -168,12 +179,46 @@ int CHudBattery::Draw( float flTime )
 
 	x += (m_hEmpty[m_enArmorType].rect.right - m_hEmpty[m_enArmorType].rect.left);
 	x = DrawUtils::DrawHudNumber( x, y, DHN_3DIGITS|DHN_DRAWZERO, m_iBat, r, g, b );
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value == 1)
 	{
-		
+
 		float f = (float)m_iBat / (float)100;
 		x = DrawBar(x + ArmorWidth / 2, y + 2.5, ArmorWidth * 5, ArmorHeight * 0.8, f, r, g, b, a);
 	}
+
+	return 1;
+}
+
+int CHudBattery::DrawNewHudArmor(float flTime)
+{
+	int r, g, b, a;
+	r = g = b = a = 255;
+	int ArmorWidth, ArmorHeight;
+	ArmorWidth = m_NEWHUD_hEmpty[VestHelm].rect.right - m_NEWHUD_hEmpty[VestHelm].rect.left;
+	ArmorHeight = m_NEWHUD_hEmpty[VestHelm].rect.bottom - m_NEWHUD_hEmpty[VestHelm].rect.top;
+
+	int iX = 29 + gHUD.m_NEWHUD_iFontWidth * 8;	// 29 is the start of health number
+	int iY = ScreenHeight - 15 - gHUD.m_NEWHUD_iFontHeight;
+	iY += abs(gHUD.m_NEWHUD_iFontHeight - ArmorHeight) / 2;
+	wrect_t rc;
+
+	rc = m_NEWHUD_hEmpty[m_enArmorType].rect;
+
+	// battery can go from 0 to 100 so * 0.01 goes from 0 to 1
+	rc.top += m_iHeight * ((float)(100 - (min(100, m_iBat))) * 0.01f);
+
+	SPR_Set(m_NEWHUD_hFull[m_enArmorType].spr, r, g, b);
+	SPR_DrawAdditive(0, iX, iY, &m_NEWHUD_hFull[m_enArmorType].rect);
+
+	if (rc.bottom > rc.top)
+	{
+		SPR_Set(m_NEWHUD_hEmpty[m_enArmorType].spr, r, g, b);
+		SPR_DrawAdditive(0, iX, iY + (rc.top - m_NEWHUD_hEmpty[m_enArmorType].rect.top), &rc);
+	}
+
+	iX += ArmorWidth + 3;
+	iY -= abs(gHUD.m_NEWHUD_iFontHeight - ArmorHeight) / 2;
+	DrawUtils::DrawNEWHudNumber(0, iX, iY, m_iBat, r, g, b, 255, FALSE, 5);
 
 	return 1;
 }
@@ -185,4 +230,6 @@ int CHudBattery::MsgFunc_ArmorType(const char *pszName,  int iSize, void *pbuf )
 	m_enArmorType = (armortype_t)reader.ReadByte();
 
 	return 1;
+}
+
 }

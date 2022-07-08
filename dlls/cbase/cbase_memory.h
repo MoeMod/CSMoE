@@ -1,6 +1,8 @@
 #pragma once
 
 #include <type_traits>
+#include <string>
+#include <nameof.hpp>
 
 // Note: GetClassPtr should know the complete type of CBaseEntity
 // and know that there are some custom operator new/delete.
@@ -11,12 +13,13 @@
 
 #ifndef CLIENT_DLL
 namespace sv {
+void LuaNotifyCppEntityCreate(const char *cppClassName, CBaseEntity* ptr);
 //
 // Converts a entvars_t * to a class pointer
 // It will allocate the class and entity if necessary
 //
 template<class T>
-NODISCARD auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
+auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
 {
 	// call from mp to create entity ?
 	if (pev == nullptr)
@@ -31,6 +34,9 @@ NODISCARD auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<s
 		// should auto assign a->pev
 		// a->pev = pev;
 		assert(a->pev == pev);
+
+		// call lua
+		LuaNotifyCppEntityCreate(std::string(nameof::nameof_short_type<T>()).c_str(), a);
 	}
 
 	// call from mp to static_cast<CDerived *>(pCBase) ?

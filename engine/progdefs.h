@@ -16,7 +16,7 @@
 #ifndef PROGDEFS_H
 #define PROGDEFS_H
 
-typedef struct
+typedef struct globalvars_s
 {	
 	time_point_t		time;
 	duration_t		frametime;
@@ -201,6 +201,7 @@ typedef struct entvars_s
 	int		iuser2;
 	int		iuser3;
 	int		iuser4;
+
 	float		fuser1;
 	float		fuser2;
 	float		fuser3;

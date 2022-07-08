@@ -14,18 +14,16 @@ GNU General Public License for more details.
 */
 
 #include "hud.h"
-#include "followicon.h"
 #include "cl_util.h"
 #include "draw_util.h"
-#include "triangleapi.h"
-
-#include "parsemsg.h"
 
 #include "ammohistory.h"
 #include "moe_touch.h"
 
 #include <vector>
 #include <algorithm>
+
+namespace cl {
 
 constexpr float POSITION_SWITCH_ANIM = 0.25f;
 
@@ -80,6 +78,7 @@ public:
 
 int CHudMoeTouch::Init(void)
 {
+	m_TouchSwitch = CVAR_CREATE("cl_moetouchswitch", "0", FCVAR_ARCHIVE);
 	pimpl = new CHudMoeTouch::impl_t;
 
 	m_iFlags |= HUD_ACTIVE;
@@ -97,9 +96,9 @@ int CHudMoeTouch::VidInit(void)
 
 int CHudMoeTouch::Draw(float time)
 {
-	if (!pimpl->m_bActive)
+	if (!pimpl->m_bActive || !m_TouchSwitch->value)
 		return 0;
-	
+
 	const int x = ScreenWidth * pimpl->m_flX;
 	const int y = ScreenHeight * pimpl->m_flStartY;
 	const float scale = 1;
@@ -123,7 +122,7 @@ int CHudMoeTouch::Draw(float time)
 			iWidth = (p->rcActive.right - p->rcActive.left) * scale;
 			iHeight = (p->rcActive.bottom - p->rcActive.top) * scale;
 		}
-		
+
 		int x2 = x;
 
 		bool bFirstPosition = true;
@@ -205,7 +204,7 @@ int CHudMoeTouch::Draw(float time)
 
 void CHudMoeTouch::Think(void)
 {
-	if (!pimpl->m_bActive)
+	if (!pimpl->m_bActive || !m_TouchSwitch->value)
 		return;
 
 	if (pimpl->m_fingerID >= 0)
@@ -236,7 +235,7 @@ void CHudMoeTouch::Think(void)
 				pimpl->m_iActiveSlot = NewActiveSlot;
 			}
 		}
-		
+
 		if (pimpl->m_flX < (ScreenWidth - flWidth * 2) / ScreenWidth)
 		{
 			const int iSlot = pimpl->m_iActiveSlot;
@@ -283,7 +282,7 @@ void CHudMoeTouch::Think(void)
 		pimpl->m_flMinX = std::min(pimpl->m_flMinX, pimpl->m_flX);
 
 		// slow down dy
-		if (abs(pimpl->m_flDy) < 0.1)
+		if (std::abs(pimpl->m_flDy) < 0.1)
 			pimpl->m_flDy = 0.0f;
 		else if (pimpl->m_flDy > 0)
 			pimpl->m_flDy -= 0.05f;
@@ -309,7 +308,7 @@ void CHudMoeTouch::Think(void)
 				p = gWR.GetFirstPos(iSlot);
 				pimpl->m_iWeaponSlotSelectedPosition[iSlot] = 0;
 			}
-				
+
 			if (p)
 			{
 				ServerCmd(p->szName);
@@ -322,12 +321,12 @@ void CHudMoeTouch::Think(void)
 
 void CHudMoeTouch::Reset(void)
 {
-	
+
 }
 
 void CHudMoeTouch::InitHUDData(void)
 {
-	
+
 }
 
 void CHudMoeTouch::Shutdown(void)
@@ -338,6 +337,9 @@ void CHudMoeTouch::Shutdown(void)
 
 int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y, float dx, float dy)
 {
+    if(!m_TouchSwitch->value)
+        return 0;
+
 	if (pimpl->m_fingerID >= 0)
 	{
 		if (fingerID == pimpl->m_fingerID)
@@ -375,4 +377,6 @@ int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y
 	}
 
 	return 0;
+}
+
 }

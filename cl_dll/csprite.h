@@ -32,6 +32,7 @@
 #define CSPRITE_H
 
 // defined in util.cpp
+namespace cl {
 HSPRITE HUD_GetSprite( int index );
 wrect_t HUD_GetSpriteRect( int index );
 int HUD_GetSpriteIndexByName( const char *sz );
@@ -59,5 +60,5 @@ public:
 	HSPRITE spr;
 	wrect_t rect;
 };
-
+}
 #endif 

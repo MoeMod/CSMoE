@@ -1,29 +1,39 @@
+
 apply plugin: 'com.android.application'
+apply plugin: 'bugly'
+
+bugly {
+    appPackage = 'in.celest.xash3d.csbtem'
+    appVersion = '2587' // 白白：记得改这里，还有AndroidManifest.xml
+
+    appId = '39df575b0b' // 注册时分配的App ID
+    appKey = '92a523be-1f71-4228-91be-f151ef970598' // 注册时分配的App Key
+    execute = true
+    upload = true
+    uploadSymbol = true
+}
+
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "in.celest.xash3d.csbtem"
         minSdkVersion 24
-        targetSdkVersion 29
+        targetSdkVersion 30
 
         externalNativeBuild {
             cmake {
-                arguments "-DXASH_SDL=0",
+                arguments "-DXASH_SDL=1",
                         "-DXASH_NANOGL=1",
-                        "-DXASH_NANOGL_SRC=" + file('../../nanogl/'),
-                        "-DXASH_STATIC_GAMELIB=1",
-                        "-DMAINUI_USE_CUSTOM_FONT_RENDER=0",
-                        "-DXASH_PCH=0"
-                version "3.10.2"
+                        "-DXASH_STATIC_GAMELIB=1"
+                version "3.18.1"
             }
         }
         ndk {
             // Specifies the ABI configurations of your native
             // libraries Gradle should build and package with your APK.
-            abiFilters 'arm64-v8a', 'x86_64'
+            abiFilters 'arm64-v8a'
         }
     }
 
@@ -40,7 +50,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('../../CMakeLists.txt')
-            version "3.10.2"
+            version "3.18.1"
         }
     }
     sourceSets {
@@ -48,9 +58,10 @@ android {
             assets.srcDirs = ['src/main/assets', '../../CSMoE-Full']
         }
     }
+    ndkVersion '21.1.6352462'
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+    compile 'com.tencent.bugly:nativecrashreport:latest.release' //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
 }

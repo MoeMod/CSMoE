@@ -16,7 +16,8 @@ typedef enum
 	PLAYER_FLINCH,
 	PLAYER_LARGE_FLINCH,
 	PLAYER_RELOAD,
-	PLAYER_HOLDBOMB
+	PLAYER_HOLDBOMB,
+	PLAYER_ATTACK3
 
 } PLAYER_ANIM;
 
@@ -37,7 +38,8 @@ typedef enum
 	Menu_Radio2,
 	Menu_Radio3,
 	Menu_ClientBuy,
-	Menu_ZbsUpgrade
+	Menu_ZbsUpgrade,
+	Menu_CustomMenu
 
 } _Menu;
 
@@ -53,20 +55,12 @@ typedef enum
 typedef enum
 {
 	MODEL_UNASSIGNED,
-	MODEL_URBAN,
-	MODEL_TERROR,
-	MODEL_LEET,
-	MODEL_ARCTIC,
-	MODEL_GSG9,
-	MODEL_GIGN,
-	MODEL_SAS,
-	MODEL_GUERILLA,
+	MODEL_TERROR_URBAN,
+	MODEL_LEET_GSG9,
+	MODEL_ARCTIC_SAS,
+	MODEL_GUERILLA_GIGN,
+	MODEL_MILITIA_SPETSNAZ,
 	MODEL_VIP,
-	MODEL_MILITIA,
-	MODEL_SPETSNAZ,
-
-	MODEL_ZOMBIE_HOST,
-	MODEL_ZOMBIE_ORIGIN,
 
 } ModelName;
 
@@ -107,6 +101,8 @@ typedef struct
 	int m_defuser;
 	int m_nightVision;
 	int m_armor;
+	int m_knifeID;
+	int m_grenadeID;
 
 } RebuyStruct;
 
@@ -127,6 +123,7 @@ enum sbar_data
 	SBAR_ID_TARGETTYPE = 1,
 	SBAR_ID_TARGETNAME,
 	SBAR_ID_TARGETHEALTH,
+	SBAR_ID_TARGETHEALTH_PERCENT,
 	SBAR_END
 };
 
@@ -137,5 +134,11 @@ typedef enum
 	INTENSE
 
 } MusicState;
+
+
+enum PlayerClass
+{
+	
+};
 
 #endif

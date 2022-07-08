@@ -40,6 +40,7 @@
 #include "event_api.h"
 #include "pm_defs.h"
 #include "pm_math.h"
+#include "pm_shared.h"
 
 #include "com_weapons.h"
 
@@ -59,10 +60,10 @@ void CStudioModelRenderer::Init(void)
 
 	IEngineStudio.GetModelCounters(&m_pStudioModelCount, &m_pModelsDrawn);
 
-	m_pbonetransform = (float (*)[MAXSTUDIOBONES][3][4])IEngineStudio.StudioGetBoneTransform();
-	m_plighttransform = (float (*)[MAXSTUDIOBONES][3][4])IEngineStudio.StudioGetLightTransform();
-	m_paliastransform = (float (*)[3][4])IEngineStudio.StudioGetAliasTransform();
-	m_protationmatrix = (float (*)[3][4])IEngineStudio.StudioGetRotationMatrix();
+	m_pbonetransform = IEngineStudio.StudioGetBoneTransform();
+	m_plighttransform = IEngineStudio.StudioGetLightTransform();
+	m_paliastransform = IEngineStudio.StudioGetAliasTransform();
+	m_protationmatrix = IEngineStudio.StudioGetRotationMatrix();
 }
 
 CStudioModelRenderer::CStudioModelRenderer(void)
@@ -163,7 +164,7 @@ void CStudioModelRenderer::StudioCalcBoneAdj(float dadt, float *adj, const byte 
 	}
 }
 
-void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *q)
+void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec4_t_ref q)
 {
 	int j, k;
 	vec4_t q1, q2;
@@ -242,7 +243,7 @@ void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, mstudiobo
 	}
 }
 
-void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *pos)
+void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos)
 {
 	int j, k;
 	mstudioanimvalue_t *panimvalue;
@@ -289,30 +290,16 @@ void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, mstudiobon
 	}
 }
 
-void CStudioModelRenderer::StudioSlerpBones(vec4_t q1[], float pos1[][3], vec4_t q2[], float pos2[][3], float s)
+void CStudioModelRenderer::StudioSlerpBones(vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s)
 {
 	int i;
-	vec4_t q3;
-	float s1;
 
-	if (s < 0)
-		s = 0;
-	else if (s > 1.0)
-		s = 1.0;
-
-	s1 = 1.0 - s;
+    s = std::clamp( s, 0.0f, 1.0f );
 
 	for (i = 0; i < m_pStudioHeader->numbones; i++)
 	{
-		QuaternionSlerp(q1[i], q2[i], s, q3);
-
-		q1[i][0] = q3[0];
-		q1[i][1] = q3[1];
-		q1[i][2] = q3[2];
-		q1[i][3] = q3[3];
-		pos1[i][0] = pos1[i][0] * s1 + pos2[i][0] * s;
-		pos1[i][1] = pos1[i][1] * s1 + pos2[i][1] * s;
-		pos1[i][2] = pos1[i][2] * s1 + pos2[i][2] * s;
+        QuaternionSlerp( q1[i], q2[i], s, q1[i] );
+        pos1[i] = lerp(pos1[i], pos2[i], s);
 	}
 }
 
@@ -423,7 +410,7 @@ void CStudioModelRenderer::StudioSetUpTransform(int trivial_accept)
 
 	if (!IEngineStudio.IsHardware())
 	{
-		static float viewmatrix[3][4];
+		static matrix3x4 viewmatrix;
 
 		VectorCopy(m_vRight, viewmatrix[0]);
 		VectorCopy(m_vUp, viewmatrix[1]);
@@ -467,7 +454,7 @@ float CStudioModelRenderer::StudioEstimateInterpolant(void)
 	return dadt;
 }
 
-void CStudioModelRenderer::StudioCalcRotations(float pos[][3], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f)
+void CStudioModelRenderer::StudioCalcRotations(vec3_t pos[], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f)
 {
 	int i;
 	int frame;
@@ -517,7 +504,7 @@ void CStudioModelRenderer::StudioCalcRotations(float pos[][3], vec4_t *q, mstudi
 		pos[pseqdesc->motionbone][2] += s * pseqdesc->linearmovement[2];
 }
 
-void CStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, float transform[3][4])
+void CStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, matrix3x4_ref transform)
 {
 	switch (ent->curstate.renderfx)
 	{
@@ -615,15 +602,15 @@ void CStudioModelRenderer::StudioSetupBones(void)
 	mstudioseqdesc_t *pseqdesc;
 	mstudioanim_t *panim;
 
-	static float pos[MAXSTUDIOBONES][3];
+	static vec3_t pos[MAXSTUDIOBONES];
 	static vec4_t q[MAXSTUDIOBONES];
-	float bonematrix[3][4];
+	matrix3x4 bonematrix;
 
-	static float pos2[MAXSTUDIOBONES][3];
+	static vec3_t pos2[MAXSTUDIOBONES];
 	static vec4_t q2[MAXSTUDIOBONES];
-	static float pos3[MAXSTUDIOBONES][3];
+	static vec3_t pos3[MAXSTUDIOBONES];
 	static vec4_t q3[MAXSTUDIOBONES];
-	static float pos4[MAXSTUDIOBONES][3];
+	static vec3_t pos4[MAXSTUDIOBONES];
 	static vec4_t q4[MAXSTUDIOBONES];
 
 	if (m_pCurrentEntity->curstate.sequence >= m_pStudioHeader->numseq)
@@ -667,7 +654,7 @@ void CStudioModelRenderer::StudioSetupBones(void)
 
 	if (m_fDoInterp && m_pCurrentEntity->latched.sequencetime && (m_pCurrentEntity->latched.sequencetime + 0.2 > m_clTime) && (m_pCurrentEntity->latched.prevsequence < m_pStudioHeader->numseq))
 	{
-		static float pos1b[MAXSTUDIOBONES][3];
+		static vec3_t pos1b[MAXSTUDIOBONES];
 		static vec4_t q1b[MAXSTUDIOBONES];
 		float s;
 
@@ -722,8 +709,8 @@ void CStudioModelRenderer::StudioSetupBones(void)
 			if (strcmp(pbones[i].name, "Bip01 Spine") == 0)
 				break;
 
-			memcpy(pos[i], pos2[i], sizeof( pos[i]));
-			memcpy(q[i], q2[i], sizeof( q[i]));
+			pos[i] = pos2[i];
+			q[i] = q2[i];
 		}
 	}
 
@@ -800,8 +787,8 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 	mstudioseqdesc_t *pseqdesc;
 	mstudioanim_t *panim;
 
-	static float pos[MAXSTUDIOBONES][3];
-	float bonematrix[3][4];
+	static vec3_t pos[MAXSTUDIOBONES];
+	matrix3x4 bonematrix;
 	static vec4_t q[MAXSTUDIOBONES];
 
 	if( !m_pStudioHeader || !m_pCurrentEntity )
@@ -912,12 +899,25 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 	StudioSetUpTransform(0);
 
-	if(m_pCurrentEntity == gEngfuncs.GetViewModel() && (gHUD.cl_righthand->value))
+	if(m_pCurrentEntity == gEngfuncs.GetViewModel())
 	{
-		(*m_protationmatrix)[0][1] *= -1;
-		(*m_protationmatrix)[1][1] *= -1;
-		(*m_protationmatrix)[2][1] *= -1;
+		if (gHUD.cl_righthand->value)
+		{
+			(*m_protationmatrix)[0][1] *= -1;
+			(*m_protationmatrix)[1][1] *= -1;
+			(*m_protationmatrix)[2][1] *= -1;
+		}
 
+		cl_entity_t* pLocalPlayer = gEngfuncs.GetLocalPlayer();
+
+		if (g_iUser1 == OBS_IN_EYE)
+			pLocalPlayer = gEngfuncs.GetEntityByIndex(g_iUser2);
+
+		if (pLocalPlayer)
+		{
+			m_pCurrentEntity->curstate.rendermode = pLocalPlayer->curstate.rendermode;
+			m_pCurrentEntity->curstate.renderamt = max(30, pLocalPlayer->curstate.renderamt);
+		}
 		//IEngineStudio.StudioSetCullState(true);
 	}
 
@@ -948,7 +948,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 		if (m_pCurrentEntity->index > 0)
 		{
 			cl_entity_t *ent = gEngfuncs.GetEntityByIndex(m_pCurrentEntity->index);
-			memcpy(ent->attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * 4);
+			memcpy(ent->attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * MAXSTUDIOATTACHMENTS);
 		}
 	}
 
@@ -956,7 +956,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 	{
 		alight_t lighting;
 		vec3_t dir;
-		lighting.plightvec = dir;
+		lighting.plightvec = &dir;
 
 		IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting);
 
@@ -1201,7 +1201,7 @@ int CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t *pplayer)
 		if (m_pCurrentEntity->index > 0)
 		{
 			cl_entity_t *ent = gEngfuncs.GetEntityByIndex(m_pCurrentEntity->index);
-			memcpy(ent->attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * 4);
+			memcpy(ent->attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * MAXSTUDIOATTACHMENTS);
 		}
 	}
 
@@ -1215,7 +1215,7 @@ int CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t *pplayer)
 
 		alight_t lighting;
 		vec3_t dir;
-		lighting.plightvec = dir;
+		lighting.plightvec = &dir;
 
 		IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting);
 		IEngineStudio.StudioEntityLight(&lighting);
@@ -1272,7 +1272,7 @@ void CStudioModelRenderer::StudioCalcAttachments(void)
 	int i;
 	mstudioattachment_t *pattachment;
 
-	if (m_pStudioHeader->numattachments > 4)
+	if (m_pStudioHeader->numattachments > MAXSTUDIOATTACHMENTS)
 		gEngfuncs.Con_DPrintf("Too many attachments on %s\n", m_pCurrentEntity->model->name);
 
 	pattachment = (mstudioattachment_t *)((byte *)m_pStudioHeader + m_pStudioHeader->attachmentindex);
@@ -1281,7 +1281,7 @@ void CStudioModelRenderer::StudioCalcAttachments(void)
 		VectorTransform(pattachment[i].org, (*m_plighttransform)[pattachment[i].bone], m_pCurrentEntity->attachment[i]);
 }
 
-void CStudioModelRenderer::StudioRenderModel(float *lightdir)
+void CStudioModelRenderer::StudioRenderModel(const vec3_t lightdir)
 {
 	IEngineStudio.SetChromeOrigin();
 
@@ -1303,10 +1303,49 @@ void CStudioModelRenderer::StudioRenderModel(float *lightdir)
 		StudioRenderFinal();
 	}
 
+	if (iSaveRenderFx == kRenderFxWallHack)
+	{
+		m_pCurrentEntity->curstate.renderfx = kRenderFxWallHack;
+
+		IEngineStudio.SetForceFaceFlags(STUDIO_NF_FLATSHADE);
+		StudioRenderFinal();
+	}
 
 	m_pCurrentEntity->curstate.rendermode = iSaveRenderMode;
 	m_pCurrentEntity->curstate.renderfx = iSaveRenderFx;
 	m_pCurrentEntity->curstate.renderamt = iSaveRenderAmt;
+}
+
+void CStudioModelRenderer::DrawOutLineBegin(int flag)
+{
+	m_pCurrentEntity->syncbase = 1.0f;
+}
+
+void CStudioModelRenderer::DrawOutLine(int flag)
+{
+	m_pCurrentEntity->syncbase = 2.0f;
+	IEngineStudio.SetForceFaceFlags(STUDIO_NF_OUTLINE);
+	StudioRenderFinal();
+}
+
+void CStudioModelRenderer::DrawOutLinePause(int flag)
+{
+	m_pCurrentEntity->syncbase = 1.0f;
+	IEngineStudio.SetForceFaceFlags(0);
+}
+
+void CStudioModelRenderer::DrawOutLineEnd(int flag)
+{
+	IEngineStudio.SetForceFaceFlags(0);//
+}
+
+BOOL CStudioModelRenderer::DrawOutLineCheck(int flag)
+{
+	if (m_pCurrentEntity->curstate.renderfx == kRenderFxGreenOutLine) return true;
+	if (m_pCurrentEntity->curstate.renderfx == kRenderFxRedOutLine) return true;
+	if (m_pCurrentEntity->curstate.renderfx == kRenderFxBlackOutLine) return true;
+
+	return false;
 }
 
 void CStudioModelRenderer::StudioRenderFinal_Software(void)
@@ -1373,6 +1412,8 @@ void CStudioModelRenderer::StudioRenderFinal_Hardware(void)
 			IEngineStudio.GL_SetRenderMode(rendermode);
 			IEngineStudio.StudioSetRenderamt(m_pCurrentEntity->curstate.renderamt);
 			IEngineStudio.StudioDrawPoints();
+			if (gHUD.cl_shadows->value >= 2.0f)
+				IEngineStudio.GL_StudioDrawShadow();
 		}
 	}
 
@@ -1448,7 +1489,7 @@ void CStudioModelRenderer::StudioDrawShadow( Vector origin, float scale )
 	p4.y = pmtrace.endpos.y - pmtrace.plane.normal.z;
 	p4.z = pmtrace.endpos.z + 2.0f + pmtrace.plane.normal.x + pmtrace.plane.normal.y;
 
-	IEngineStudio.StudioRenderShadow( m_iShadowSprite, p1, p2, p3, p4 );
+	IEngineStudio.StudioRenderShadow( m_iShadowSprite, p1.data(), p2.data(), p3.data(), p4.data() );
 }
 
 }

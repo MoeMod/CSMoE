@@ -19,11 +19,13 @@
 // this is the max number of items in each bucket
 #define MAX_WEAPON_POSITIONS		19
 
+#include <set>
+namespace cl {
 class WeaponsResource
 {
 private:
 	// Information about weapons & ammo
-	WEAPON		rgWeapons[MAX_WEAPONS];	// Weapons Array
+	std::map<int, WEAPON> rgWeapons;	// Weapons Array
 
 	// counts of weapons * ammo
 	WEAPON*		rgSlots[MAX_WEAPON_SLOTS+1][MAX_WEAPON_POSITIONS+1];	// The slots currently in use by weapons.  The value is a pointer to the weapon;  if it's NULL, no weapon is there
@@ -32,44 +34,59 @@ private:
 public:
 	void Init( void )
 	{
-		memset( rgWeapons, 0, sizeof rgWeapons );
+		rgWeapons.clear();
 		Reset();
 	}
 
 	void Reset( void )
 	{
 		iOldWeaponBits = 0;
-		memset( rgSlots, 0, sizeof rgSlots );
+		// Fix for gmsgResetHUD
+		// memset( rgSlots, 0, sizeof rgSlots );
 		memset( riAmmo, 0, sizeof riAmmo );
 	}
 
 ///// WEAPON /////
 	int			iOldWeaponBits;
 
-	WEAPON *GetWeapon( int iId ) { return &rgWeapons[iId]; }
-	void AddWeapon( WEAPON *wp ) 
-	{ 
-		rgWeapons[ wp->iId ] = *wp;	
-		LoadWeaponSprites( &rgWeapons[ wp->iId ] );
+	WEAPON *GetWeapon( int iId ) {
+		auto iter = rgWeapons.find(iId);
+		if (iter == rgWeapons.end())
+			return nullptr;
+
+		return &iter->second;
+	}
+
+	void AddWeapon( WEAPON *wp )
+	{
+		rgWeapons[wp->iId] = *wp;
+		LoadWeaponSprites(&rgWeapons[wp->iId]);
 	}
 
 	void PickupWeapon( WEAPON *wp )
 	{
+		if (!wp)
+			return;
+
 		rgSlots[ wp->iSlot ][ wp->iSlotPos ] = wp;
 	}
 
 	void DropWeapon( WEAPON *wp )
 	{
+		if (!wp)
+			return;
+
 		rgSlots[ wp->iSlot ][ wp->iSlotPos ] = NULL;
 	}
 
 	void DropAllWeapons( void )
 	{
-		for ( int i = 0; i < MAX_WEAPONS; i++ )
+		for (auto it = rgWeapons.begin(); it != rgWeapons.end(); ++it)
 		{
-			if ( rgWeapons[i].iId )
-				DropWeapon( &rgWeapons[i] );
+			DropWeapon(&it->second);
 		}
+		rgWeapons.clear();
+		gHUD.m_Ammo.m_pWeapon = nullptr;
 	}
 
 	WEAPON* GetWeaponSlot( int slot, int pos ) { return rgSlots[slot][pos]; }
@@ -96,6 +113,7 @@ extern WeaponsResource gWR;
 
 
 #define MAX_HISTORY 12
+#define NEWHUD_MAX_HISTORY 4
 enum {
 	HISTSLOT_EMPTY,
 	HISTSLOT_AMMO,
@@ -114,6 +132,8 @@ private:
 	};
 
 	HIST_ITEM rgAmmoHistory[MAX_HISTORY];
+	HIST_ITEM rgAmmoNewHudHistory[NEWHUD_MAX_HISTORY];
+	HIST_ITEM WeaponNewHudHistory[NEWHUD_MAX_HISTORY];
 
 public:
 
@@ -129,15 +149,18 @@ public:
 
 	int iHistoryGap;
 	int iCurrentHistorySlot;
+	int iNewHudWepaonCurrentHistorySlot;
 
 	void AddToHistory( int iType, int iId, int iCount = 0 );
 	void AddToHistory( int iType, const char *szName, int iCount = 0 );
 
 	void CheckClearHistory( void );
+	void CheckClearWeaponHistory(void);
 	int DrawAmmoHistory( float flTime );
+	int DrawNEWHudAmmoHistory(float flTime);
 };
 
 extern HistoryResource gHR;
 
-
+}
 

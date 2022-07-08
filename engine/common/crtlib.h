@@ -37,7 +37,7 @@ enum
 #define CMD_CLIENTDLL	BIT( 1 )		// added by client.dll
 #define CMD_LOCALONLY   BIT( 2 )        // should be executed only from local buffers
 
-typedef void (*setpair_t)( const char *key, const char *value, void *buffer, void *numpairs );
+typedef void (*setpair_t)( const char *key, const char *value, const char *buffer, void *numpairs );
 typedef void (*xcommand_t)( void );
 
 typedef enum
@@ -104,13 +104,13 @@ void Cvar_RegisterVariable( cvar_t *variable );
 convar_t *Cvar_Get( const char *var_name, const char *value, int flags, const char *description );
 void Cvar_Set( const char *var_name, const char *value );
 convar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force );
-void Cvar_LookupVars( int checkbit, void *buffer, void *ptr, setpair_t callback );
+void Cvar_LookupVars( int checkbit, const char *buffer, void *ptr, setpair_t callback );
 void Cvar_FullSet( const char *var_name, const char *value, int flags );
 void Cvar_SetLatched( const char *var_name, const char *value );
 void Cvar_SetFloat( const char *var_name, float value );
 float Cvar_VariableValue( const char *var_name );
 int Cvar_VariableInteger( const char *var_name );
-char *Cvar_VariableString( const char *var_name );
+const char *Cvar_VariableString( const char *var_name );
 void Cvar_DirectSet( cvar_t *var, const char *value );
 void Cvar_Reset( const char *var_name );
 void Cvar_SetCheatState( qboolean force );
@@ -131,8 +131,8 @@ void Cbuf_AddFilterText( const char *text );
 void Cbuf_InsertText( const char *text );
 void Cbuf_Execute (void);
 int Cmd_Argc( void );
-char *Cmd_Args( void );
-char *Cmd_Argv( int arg );
+const char *Cmd_Args( void );
+const char *Cmd_Argv( int arg );
 void Cmd_Init( void );
 void Cmd_Shutdown( void );
 void Cmd_Unlink( int group );
@@ -153,7 +153,6 @@ void Cmd_ForwardToServer( void );
 //
 // crtlib.c
 //
-
 #define Q_strupr( in, out ) Q_strnupr( in, out, 99999 )
 void Q_strnupr( const char *in, char *out, size_t size_out );
 #define Q_strlwr( in, out ) Q_strnlwr( in, out, 99999 )
@@ -163,16 +162,10 @@ void Q_strnlwr( const char *in, char *out, size_t size_out );
 char Q_toupper( const char in );
 char Q_tolower( const char in );
 #else
-static inline int Q_strlen( const char *str )
-{
-	if( !str )
-		return 0;
-	return strlen(str);
-}
 #define Q_toupper toupper
 #define Q_tolower tolower
 #endif
-
+#ifndef XASH_SKIPCRTLIB
 #ifndef XASH_FORCEINLINE
 size_t Q_strncat( char *dst, const char *src, size_t siz );
 size_t Q_strncpy( char *dst, const char *src, size_t siz );
@@ -182,8 +175,40 @@ int Q_strlen( const char *string );
 #else
 #include "crtlib_inline.h"
 #endif
+#else
+static inline size_t Q_strncat(char* dst, const char* src, size_t size)
+{
+	if (!dst || !src || !size)
+		return 0;
+	return strlen(strncat(dst, src, size));
+}
+static inline size_t Q_strncpy(char* dst, const char* src, size_t size)
+{
+	if (!dst || !src || !size)
+		return 0;
+	return strlen(strncpy(dst, src, size));
+}
+static inline size_t Q_strcat(char* dst, const char* src)
+{
+	if (!dst || !src)
+		return 0;
+	return strlen(strcat(dst, src));
+}
+static inline size_t Q_strcpy(char* dst, const char* src)
+{
+	if (!dst || !src)
+		return 0;
+	return strlen(strcpy(dst, src));
+}
+static inline int Q_strlen(const char* str)
+{
+	if (!str)
+		return 0;
+	return (int)(strlen(str));
+}
+#endif
 #define copystring( s ) _copystring( host.mempool, s, __FILE__, __LINE__ )
-char *_copystring( byte *mempool, const char *s, const char *filename, int fileline );
+char *_copystring( mempool_t *mempool, const char *s, const char *filename, int fileline );
 qboolean Q_isdigit( const char *str );
 #ifndef XASH_SKIPCRTLIB
 int Q_atoi( const char *str );
@@ -192,7 +217,7 @@ float Q_atof( const char *str );
 #define Q_atoi atoi
 #define Q_atof atof
 #endif
-void Q_atov( float *vec, const char *str, size_t siz );
+void Q_atov( vec3_t_ref vec, const char *str );
 
 #ifndef XASH_SKIPCRTLIB
 
@@ -206,13 +231,25 @@ int Q_strcmp( const char *s1, const char *s2 );
 #endif
 
 #else // XASH_SKIPCRTLIB
-static inline char *Q_strchr( const char *s, char c )
+static inline const char *Q_strchr( const char *s, char c )
 {
 	if( !s )
 		return NULL;
 	return strchr( s, c );
 }
-static inline char *Q_strrchr( const char *s, char c )
+static inline const char *Q_strrchr( const char *s, char c )
+{
+	if( !s )
+		return NULL;
+	return strrchr( s, c );
+}
+static inline char *Q_strchr( char *s, char c )
+{
+	if( !s )
+		return NULL;
+	return strchr( s, c );
+}
+static inline char *Q_strrchr( char *s, char c )
 {
 	if( !s )
 		return NULL;
@@ -314,27 +351,6 @@ void _Q_memcpy( void *dest, const void *src, size_t count, const char *filename,
 int _Q_memcmp( const void *src0, const void *src1, size_t count, const char *filename, int fileline );
 void _Q_memmove( void *dest, const void *src, size_t count, const char *filename, int fileline );
 
-//
-// zone.c
-//
-void *_Mem_Realloc( byte *poolptr, void *memptr, size_t size, const char *filename, int fileline );
-void *_Mem_Alloc( byte *poolptr, size_t size, const char *filename, int fileline );
-byte *_Mem_AllocPool( const char *name, const char *filename, int fileline );
-void _Mem_FreePool( byte **poolptr, const char *filename, int fileline );
-void _Mem_EmptyPool( byte *poolptr, const char *filename, int fileline );
-void _Mem_Free( void *data, const char *filename, int fileline );
-void _Mem_Check( const char *filename, int fileline );
-qboolean Mem_IsAllocatedExt( byte *poolptr, void *data );
-void Mem_PrintList( size_t minallocationsize );
-void Mem_PrintStats( void );
-
-#define Mem_Alloc( pool, size ) _Mem_Alloc( pool, size, __FILE__, __LINE__ )
-#define Mem_Realloc( pool, ptr, size ) _Mem_Realloc( pool, ptr, size, __FILE__, __LINE__ )
-#define Mem_Free( mem ) _Mem_Free( mem, __FILE__, __LINE__ )
-#define Mem_AllocPool( name ) _Mem_AllocPool( name, __FILE__, __LINE__ )
-#define Mem_FreePool( pool ) _Mem_FreePool( pool, __FILE__, __LINE__ )
-#define Mem_EmptyPool( pool ) _Mem_EmptyPool( pool, __FILE__, __LINE__ )
-#define Mem_IsAllocated( mem ) Mem_IsAllocatedExt( NULL, mem )
-#define Mem_Check() _Mem_Check( __FILE__, __LINE__ )
+#include "llm.h"
 	
 #endif//STDLIB_H

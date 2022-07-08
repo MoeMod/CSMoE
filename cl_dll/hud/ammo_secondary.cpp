@@ -25,6 +25,8 @@
 #include "parsemsg.h"
 #include "draw_util.h"
 
+namespace cl {
+
 DECLARE_MESSAGE( m_AmmoSecondary, SecAmmoVal )
 DECLARE_MESSAGE( m_AmmoSecondary, SecAmmoIcon )
 
@@ -145,7 +147,7 @@ int CHudAmmoSecondary :: MsgFunc_SecAmmoVal( const char *pszName, int iSize, voi
 		count += max( 0, m_iAmmoAmounts[i] );
 	}
 
-	if ( count == 0 ) 
+	if ( count == 0 )
 	{	// the ammo fields are all empty, so turn off this hud area
 		m_iFlags &= ~HUD_DRAW;
 		return 1;
@@ -157,4 +159,4 @@ int CHudAmmoSecondary :: MsgFunc_SecAmmoVal( const char *pszName, int iSize, voi
 	return 1;
 }
 
-
+}

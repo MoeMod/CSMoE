@@ -1,0 +1,62 @@
+#pragma once
+
+/*
+	template<class T>
+	concept RelaodDefault_c requires
+	{
+		T::MaxClip;
+		T::DefaultReloadTime;
+		T::ANIM_RELOAD;
+		T::DefaultAccuracy;
+	};
+*/
+
+template<class CFinal, class CBase = CBaseTemplateWeapon>
+class TReloadDefault : public CBase
+{
+public:
+	void Reload(void) override
+	{
+		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		if (wpn.DefaultReload(
+			df::MaxClip::Get(data),
+			df::ANIM_RELOAD::Get(data),
+			df::DefaultReloadTime::Get(data)
+		))
+		{
+#ifndef CLIENT_DLL
+			CBase::m_pPlayer->SetAnimation(PLAYER_RELOAD);
+#endif
+			SetDefaultAccuracy_impl(df::AccuracyDefault::Has(wpn));
+			CBase::m_iShotsFired = 0;
+			CBase::m_bDelayFire = false;
+
+			ReloadCheckZoom(&wpn);
+		}
+		return CBase::Reload();
+	}
+private:
+
+	// fxxking sfinae
+	void ReloadCheckZoom(...) { /* default impl*/ }
+	template<class ClassToFind = CFinal>
+	auto ReloadCheckZoom(ClassToFind *) -> decltype(ClassToFind::Rec_SecondaryAttack_HasZoom, void())
+	{
+		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		if (CBase::m_pPlayer->pev->fov != 90)
+		{
+			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = wpn.Ref_GetMinZoomFOV();
+			wpn.SecondaryAttack();
+		}
+	}
+
+	void SetDefaultAccuracy_impl(std::false_type) {}
+	void SetDefaultAccuracy_impl(std::true_type)
+	{
+		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		CBase::m_flAccuracy = df::AccuracyDefault::Get(data);
+	}
+};

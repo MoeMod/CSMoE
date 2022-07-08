@@ -46,9 +46,9 @@ void RemoveLink( link_t *l );
 void ClearLink( link_t *l );
 
 // trace common
-qboolean SV_RecursiveHullCheck( hull_t *hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_t *trace );
-void World_MoveBounds( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, vec3_t boxmins, vec3_t boxmaxs );
-void World_TransformAABB( matrix4x4 transform, const vec3_t mins, const vec3_t maxs, vec3_t outmins, vec3_t outmaxs );
+qboolean SV_RecursiveHullCheck( hull_t *hull, int num, float p1f, float p2f, const vec3_t p1, const vec3_t p2, trace_t *trace );
+void World_MoveBounds( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, vec3_t_ref boxmins, vec3_t_ref boxmaxs );
+void World_TransformAABB( const matrix4x4 &transform, const vec3_t mins, const vec3_t maxs, vec3_t_ref outmins, vec3_t_ref outmaxs );
 trace_t World_CombineTraces( trace_t *cliptrace, trace_t *trace, edict_t *touch );
 int BoxOnPlaneSide( const vec3_t emins, const vec3_t emaxs, const mplane_t *p );
 int RankForContents( int contents );
@@ -103,6 +103,7 @@ typedef struct event_info_s
 typedef struct event_state_s
 {
 	event_info_t	ei[MAX_EVENT_QUEUE];
+	unsigned int cur_event;
 } event_state_t;
 	
 #endif//WORLD_H

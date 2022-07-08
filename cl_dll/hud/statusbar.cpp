@@ -27,6 +27,11 @@
 #include <stdio.h>
 #include "draw_util.h"
 
+#include "vgui_controls/controls.h"
+#include "vgui/ILocalize.h"
+
+namespace cl {
+
 DECLARE_MESSAGE( m_StatusBar, StatusText )
 DECLARE_MESSAGE( m_StatusBar, StatusValue )
 
@@ -38,8 +43,15 @@ inline void InsertTextMsg( char *szDst, size_t sLen, const char *szMsgName)
 	if( msg )
 	{
 		strncpy( szDst, msg->pMessage, sLen );
+		return;
 	}
-	else strncpy( szDst, szMsgName, sLen );
+	auto ret = vgui2::localize()->Find(szMsgName);
+	if (ret)
+	{
+		vgui2::localize()->ConvertUnicodeToANSI(ret, szDst, sLen);
+		return;
+	}
+	strncpy( szDst, szMsgName, sLen );
 }
 
 int CHudStatusBar :: Init( void )
@@ -133,7 +145,7 @@ void CHudStatusBar :: ParseStatusString( int line_num )
 					}
 
 					// move over descriptor, then get and move over the index
-					index = atoi( ++src ); 
+					index = atoi( ++src );
 					while ( *src >= '0' && *src <= '9' )
 						src++;
 
@@ -176,6 +188,11 @@ void CHudStatusBar :: ParseStatusString( int line_num )
 							else if( indexval == 3 )
 							{
 								InsertTextMsg(szRepString, MAX_PLAYER_NAME_LENGTH, "Hostage");
+							}
+							else if (indexval == 4)
+							{
+								InsertTextMsg(szRepString, MAX_PLAYER_NAME_LENGTH, "#CSO_ZBS_WallInfo");
+								m_pflNameColors[line_num] = g_ColorBlue;
 							}
 							else szRepString[0] = 0;
 							break;
@@ -286,12 +303,13 @@ int CHudStatusBar :: MsgFunc_StatusValue( const char *pszName, int iSize, void *
 	BufferReader reader( pszName, pbuf, iSize );
 
 	int index = reader.ReadByte();
-	if ( index < 1 || index >= MAX_STATUSBAR_VALUES )
+	if (index < 1 || index >= MAX_STATUSBAR_VALUES)
 		return 1; // index out of range
 
 	m_iStatusValues[index] = reader.ReadShort();
 
 	m_bReparseString = TRUE;
-	
+
 	return 1;
+}
 }

@@ -113,15 +113,15 @@
 #define MENU_KEY_9			(1<<8)
 #define MENU_KEY_0			(1<<9)
 
-#define MAX_AMMO_TYPES			32		// ???
-#define MAX_AMMO_SLOTS			32		// not really slots
+#define MAX_AMMO_TYPES			128		// ???
+#define MAX_AMMO_SLOTS			128		// not really slots
 
 #define HUD_PRINTNOTIFY			1
 #define HUD_PRINTCONSOLE		2
 #define HUD_PRINTTALK			3
 #define HUD_PRINTCENTER			4
 
-#define WEAPON_SUIT			31
+#define WEAPON_SUIT			0
 #define WEAPON_ALLWEAPONS		(~(1 << WEAPON_SUIT))
 
 // custom enum
@@ -179,5 +179,12 @@ constexpr size_t MAX_AUTOBUY_LENGTH =		256;
 constexpr size_t MAX_REBUY_LENGTH =		256;
 constexpr size_t MAX_MOTD_CHUNK = 60;
 constexpr size_t MAX_MOTD_LENGTH = 1536;
+
+enum OperationSystem : byte
+{
+	OS_Windows,
+	OS_Apple,
+	OS_Android
+};
 
 #endif // CDLL_DLL_H

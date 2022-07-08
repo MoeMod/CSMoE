@@ -23,9 +23,9 @@
 class BufferReader
 {
 public:
-	BufferReader( const char *name, void *buf, int size ) :
+	BufferReader( const char *name, const void *buf, int size ) :
 		m_szMsgName( name ), m_pBuf( (uint8_t*)buf ), m_iSize( size ), m_iRead( 0 ), m_bBad( false ) {}
-	BufferReader( void *buf, int size ) : BufferReader( "not set", buf, size ) {}
+	BufferReader( const void *buf, int size ) : BufferReader( "not set", buf, size ) {}
 
 #ifdef _DEBUG
 	inline ~BufferReader( void );
@@ -65,7 +65,7 @@ inline T BufferReader::Read( void )
 		m_bBad = true;
 
 		// may occur, but safe
-		gEngfuncs.Con_DPrintf( "BufferReader(%s): buffer overrun. Expected %i\n", m_szMsgName, m_iSize );
+		//gEngfuncs.Con_DPrintf( "BufferReader(%s): buffer overrun. Expected %i\n", m_szMsgName, m_iSize );
 		return -1;
 	}
 
@@ -191,8 +191,8 @@ inline float BufferReader::ReadHiResAngle( void )
 #ifdef _DEBUG
 BufferReader::~BufferReader()
 {
-	if( m_iRead < m_iSize )
-		gEngfuncs.Con_DPrintf( "BufferReader(%s): destroyed before reaching end. Expected %i, read %i\n", m_szMsgName, m_iSize, m_iRead );
+	//if( m_iRead < m_iSize )
+		//gEngfuncs.Con_DPrintf( "BufferReader(%s): destroyed before reaching end. Expected %i, read %i\n", m_szMsgName, m_iSize, m_iRead );
 }
 #endif
 

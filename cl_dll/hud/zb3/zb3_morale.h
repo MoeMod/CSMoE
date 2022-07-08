@@ -18,15 +18,17 @@ GNU General Public License for more details.
 #include "hud_sub.h"
 
 enum ZB3HumanMoraleType_e : byte;
-
+namespace cl {
 class CHudZB3Morale : public IBaseHudSub
 {
 public:
 	CHudZB3Morale();
 	int VidInit(void) override;
 	int Draw(float time) override;
+	void InitHUDData() override { m_bEnabled = false; }
 
 	void UpdateLevel(ZB3HumanMoraleType_e type, int level);
+	void SetEnabled(bool val) { m_bEnabled = val; }
 
 protected:
 	ZB3HumanMoraleType_e m_iMoraleType;
@@ -36,4 +38,9 @@ private:
 	int m_iMoraleIconSPR;
 	int m_iMoraleLevelSPR;
 	int m_iMoraleEffectSPR;
+	int m_iHighMoraleSPR;
+	int m_iJumphigherSPR;
+	int m_iAmmoupSPR;
+	bool m_bEnabled;
 };
+}

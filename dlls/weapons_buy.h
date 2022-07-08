@@ -106,6 +106,7 @@ enum WeaponClassType
 	WEAPONCLASS_MACHINEGUN,
 	WEAPONCLASS_RIFLE,
 	WEAPONCLASS_SNIPERRIFLE,
+	WEAPONCLASS_EQUIPMENT,
 	WEAPONCLASS_MAX,
 };
 
@@ -181,6 +182,20 @@ struct WeaponBuyAmmoConfig
 	int cost;
 };
 
+typedef struct
+{
+	const char *alias;
+	KnifeIdType id;
+}
+KnifeAliasInfo;
+
+typedef struct
+{
+	const char *alias;
+	GrenadeIdType id;
+}
+GrenadeAliasInfo;
+
 #ifndef CLIENT_DLL
 namespace sv {
 
@@ -196,6 +211,11 @@ bool IsPrimaryWeapon(int id);
 bool IsSecondaryWeapon(int id);
 WeaponInfoStruct *GetWeaponInfo(int weaponID);
 bool CanBuyWeaponByMaptype(int playerTeam, WeaponIdType weaponID, bool useAssasinationRestrictions);
+
+int AliasToKnifeType(const char* alias);
+const char* KnifeTypeToAlias(int id);
+int AliasToGrenadeType(const char* alias);
+const char* GrenadeTypeToAlias(int id);
 
 class CBasePlayer;
 bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand);

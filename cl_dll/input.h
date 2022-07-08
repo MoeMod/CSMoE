@@ -2,6 +2,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+namespace cl {
+
 extern kbutton_t	in_strafe;
 extern kbutton_t	in_mlook;
 extern kbutton_t	in_speed;
@@ -10,8 +12,6 @@ extern kbutton_t	in_forward;
 extern kbutton_t	in_back;
 extern kbutton_t	in_moveleft;
 extern kbutton_t	in_moveright;
-
-namespace cl {
 
 extern cvar_t	*m_pitch;
 extern cvar_t	*m_yaw;

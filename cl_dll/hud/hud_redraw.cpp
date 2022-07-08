@@ -18,16 +18,19 @@
 #include <math.h>
 #include "hud.h"
 #include "cl_util.h"
-#include "triangleapi.h"
+#include "vgui2/CBaseViewport.h"
 
 #include <string.h>
+
+namespace cl {
+
 #define MAX_LOGO_FRAMES 56
 
-int grgLogoFrame[MAX_LOGO_FRAMES] = 
+int grgLogoFrame[MAX_LOGO_FRAMES] =
 {
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13, 13, 13, 13, 13, 12, 11, 10, 9, 8, 14, 15,
-	16, 17, 18, 19, 20, 20, 20, 20, 20, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 
-	29, 29, 29, 29, 29, 28, 27, 26, 25, 24, 30, 31 
+	16, 17, 18, 19, 20, 20, 20, 20, 20, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+	29, 29, 29, 29, 29, 28, 27, 26, 25, 24, 30, 31
 };
 
 
@@ -53,12 +56,12 @@ void CHud::Think(void)
 
 	// Set a new sensitivity
 	if ( m_iFOV == default_fov->value )
-	{  
+	{
 		// reset to saved sensitivity
 		m_flMouseSensitivity = 0;
 	}
 	else
-	{  
+	{
 		// set a new sensitivity that is proportional to the change from the FOV default
 		m_flMouseSensitivity = sensitivity->value * ((float)newfov / (float)default_fov->value) * zoom_sens_ratio->value;
 	}
@@ -101,7 +104,7 @@ int CHud :: Redraw( float flTime, int intermission )
 		}
 	}
 #endif
-	
+
 	// Clock was reset, reset delta
 	if ( m_flTimeDelta < 0 )
 		m_flTimeDelta = 0;
@@ -110,6 +113,22 @@ int CHud :: Redraw( float flTime, int intermission )
 	{
 		gEngfuncs.pfnClientCmd("snapshot\n");
 		m_flShotTime = 0;
+	}
+
+	if (m_iIntermission && !intermission)
+	{
+		m_iIntermission = intermission;
+
+		g_pViewport->HideAllVGUIMenu();
+		//g_pViewport->UpdateSpectatorPanel();
+	}
+	else if (!m_iIntermission && intermission)
+	{
+		m_iIntermission = intermission;
+
+		g_pViewport->HideAllVGUIMenu();
+		//g_pViewport->ShowScoreBoard();
+		//g_pViewport->UpdateSpectatorPanel();
 	}
 
 	m_iIntermission = intermission;
@@ -137,7 +156,7 @@ int CHud :: Redraw( float flTime, int intermission )
 			m_hsprLogo = LoadSprite("sprites/%d_logo.spr");
 
 		SPR_Set(m_hsprLogo, 250, 250, 250 );
-		
+
 		x = SPR_Width(m_hsprLogo, 0);
 		x = ScreenWidth - x;
 		y = SPR_Height(m_hsprLogo, 0)/2;
@@ -150,4 +169,6 @@ int CHud :: Redraw( float flTime, int intermission )
 	}
 
 	return 1;
+}
+
 }

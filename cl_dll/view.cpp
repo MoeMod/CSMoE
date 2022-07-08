@@ -7,12 +7,7 @@
 
 // view/refresh setup functions
 
-#include <string.h>
-
 #include "hud.h"
-
-#include "pm_math.h"
-
 #include "cl_util.h"
 #include "cvardef.h"
 #include "usercmd.h"
@@ -23,6 +18,7 @@
 #include "ref_params.h"
 #include "in_defs.h" // PITCH YAW ROLL
 
+#include "pm_math.h"
 #include "pm_movevars.h"
 #include "pm_shared.h"
 #include "pm_defs.h"
@@ -38,26 +34,25 @@
 #include "kbutton.h"
 #include "input.h"
 
+#include "fog.h"
+
 namespace cl {
 
 int PM_GetVisEntInfo(int ent);
 int PM_GetPhysEntInfo(int ent);
-void InterpolateAngles(float *start, float *end, float *output, float frac);
+void InterpolateAngles(const vec3_t start, const vec3_t end, vec3_t_ref output, float frac);
 
-float	vJumpOrigin[3];
-float	vJumpAngles[3];
+vec3_t	vJumpOrigin;
+vec3_t	vJumpAngles;
 
 
 extern engine_studio_api_t IEngineStudio;
-}
 
 #ifdef XASH_STATIC_GAMELIB
 int DLLEXPORT CL_IsThirdPerson_CL( void );
 #else
 int DLLEXPORT CL_IsThirdPerson( void );
 #endif
-
-using namespace cl;
 
 /*
 The view is allowed to move slightly from it's true position for bobbing,
@@ -69,10 +64,8 @@ when crossing a water boudnary.
 extern cvar_t	*chase_active;
 extern cvar_t	*scr_ofsx, *scr_ofsy, *scr_ofsz;
 
-namespace cl {
 extern cvar_t    *cl_forwardspeed;
 extern cvar_t    *cl_vsmoothing;
-}
 
 #define	CAM_MODE_RELAX		1
 #define CAM_MODE_FOCUS		2
@@ -121,7 +114,7 @@ TEMPENTITY* g_pDualSwordEffect2 = nullptr;*/
 
 //=============================================================================
 /*
-void V_NormalizeAngles( float *angles )
+void V_NormalizeAngles( vec3_t_ref angles )
 {
 	int i;
 	// Normalize angles
@@ -148,7 +141,7 @@ Frac is 0.0 to 1.0 ( i.e., should probably be clamped, but doesn't have to be )
 ===================
 */
 /*
-void V_InterpolateAngles( float *start, float *end, float *output, float frac )
+void V_InterpolateAngles( const vec3_t start, const vec3_t end, vec3_t output, float frac )
 {
 	int i;
 	float ang1, ang2;
@@ -855,7 +848,7 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 
 		ofs[0] = ofs[1] = ofs[2] = 0.0;
 
-		CL_CameraOffset( (float *)&ofs );
+		CL_CameraOffset( ofs );
 
 		VectorCopy( ofs, camAngles );
 		camAngles[ ROLL ]	= 0;
@@ -942,17 +935,33 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 		V_CalcViewModelLag(pparams, view->origin, view->angles, lastAngles);
 	}
 	// Don't allow viewmodel, if we are in sniper scope
-	if( gHUD.m_iFOV <= 40 )
-		view->model = NULL;
+	if (gHUD.m_iFOV <= 40)
+	{
+		if (view->model->name)
+		{
+			if (strcmp(view->model->name, "models/z4b/v_zoom_A.mdl") && strcmp(view->model->name, "models/z4b/v_zoom_B.mdl"))
+				view->model = NULL;
+		}
+	}	
+	else if (gHUD.m_iFOV < 90)
+	{
+		if (view->model->name)
+		{
+			if (!strcmp(view->model->name, "models/v_skull5.mdl"))
+				view->model = NULL;
+			else if (!strcmp(view->model->name, "models/v_skull6.mdl"))
+				view->model = NULL;
+		}
+	}
 
 	// Add in the punchangle, if any
 	pparams->viewangles = pparams->viewangles + pparams->punchangle;
 
 #if 0
 	// Include client side punch, too
-	VectorAdd ( pparams->viewangles, (float *)&ev_punchangle, pparams->viewangles);
+	VectorAdd ( pparams->viewangles, ev_punchangle, pparams->viewangles);
 
-	V_DropPunchAngle ( pparams->frametime, (float *)&ev_punchangle );
+	V_DropPunchAngle ( pparams->frametime, ev_punchangle );
 #endif
 	// smooth out stair step ups
 #if 1
@@ -1094,7 +1103,7 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	v_origin = pparams->vieworg;
 }
 
-void V_SmoothInterpolateAngles( float * startAngle, float * endAngle, float * finalAngle, float degreesPerSec )
+void V_SmoothInterpolateAngles( vec3_t startAngle, vec3_t endAngle, vec3_t_ref finalAngle, float degreesPerSec )
 {
 	float absd,frac,d,threshold;
 
@@ -1152,7 +1161,7 @@ void V_SmoothInterpolateAngles( float * startAngle, float * endAngle, float * fi
 }
 
 // Get the origin of the Observer based around the target's position and angles
-void V_GetChaseOrigin( float * angles, float * origin, float distance, float * returnvec )
+void V_GetChaseOrigin( const vec3_t angles, const vec3_t origin, float distance, vec3_t_ref returnvec )
 {
 	Vector vecStart, vecEnd;
 	pmtrace_t *trace = nullptr;
@@ -1201,10 +1210,10 @@ void V_GetChaseOrigin( float * angles, float * origin, float distance, float * r
 	v_lastDistance = (trace->endpos - Vector(origin)).Length();	// real distance without offset
 }
 
-void V_GetDeathCam(cl_entity_t * ent1, cl_entity_t * ent2, float * angle, float * origin)
+void V_GetDeathCam(cl_entity_t * ent1, cl_entity_t * ent2, vec3_t_ref angle, vec3_t_ref origin)
 {
-	float newAngle[3];
-	float newOrigin[3];
+	vec3_t newAngle;
+	vec3_t newOrigin;
 	static vec3_t nonDestructedOrigin;
 	float distance = 168.0f;
 
@@ -1217,7 +1226,7 @@ void V_GetDeathCam(cl_entity_t * ent1, cl_entity_t * ent2, float * angle, float 
 		distance = v_lastDistance;
 
 	if (ent1->origin.x == 0 && ent1->origin.y == 0 && ent1->origin.z == 0)
-		nonDestructedOrigin.CopyToArray(newOrigin);
+		newOrigin = nonDestructedOrigin;
 	else
 	{
 		nonDestructedOrigin = ent1->origin;
@@ -1250,9 +1259,10 @@ void V_GetDeathCam(cl_entity_t * ent1, cl_entity_t * ent2, float * angle, float 
 	VectorCopy(angle, v_lastAngles);
 }
 
-void V_GetSingleTargetCam(cl_entity_t * ent1, float * angle, float * origin)
+void V_GetSingleTargetCam(cl_entity_t * ent1, vec3_t_ref angle, vec3_t_ref origin)
 {
-	float newAngle[3]; float newOrigin[3];
+	vec3_t newAngle;
+	vec3_t newOrigin;
 
 	int flags 	   = gHUD.m_Spectator.m_iObserverFlags;
 
@@ -1315,7 +1325,7 @@ void V_GetSingleTargetCam(cl_entity_t * ent1, float * angle, float * origin)
 	V_GetChaseOrigin( angle, newOrigin, distance, origin );
 }
 
-float MaxAngleBetweenAngles(  float * a1, float * a2 )
+float MaxAngleBetweenAngles( vec3_t a1, vec3_t a2 )
 {
 	float d, maxd = 0.0f;
 
@@ -1343,9 +1353,9 @@ float MaxAngleBetweenAngles(  float * a1, float * a2 )
 	return maxd;
 }
 
-void V_GetDoubleTargetsCam(cl_entity_t	 * ent1, cl_entity_t * ent2,float * angle, float * origin)
+void V_GetDoubleTargetsCam(cl_entity_t	 * ent1, cl_entity_t * ent2, vec3_t_ref angle, vec3_t_ref origin)
 {
-	float newAngle[3]; float newOrigin[3]; float tempVec[3];
+	vec3_t newAngle; vec3_t newOrigin; vec3_t tempVec;
 
 	int flags 	   = gHUD.m_Spectator.m_iObserverFlags;
 
@@ -1430,7 +1440,7 @@ void V_GetDoubleTargetsCam(cl_entity_t	 * ent1, cl_entity_t * ent2,float * angle
 
 }
 
-void V_GetDirectedChasePosition(cl_entity_t	 * ent1, cl_entity_t * ent2,float * angle, float * origin)
+void V_GetDirectedChasePosition(cl_entity_t	 * ent1, cl_entity_t * ent2, vec3_t_ref angle, vec3_t_ref origin)
 {
 
 	if ( v_resetCamera )
@@ -1454,7 +1464,7 @@ void V_GetDirectedChasePosition(cl_entity_t	 * ent1, cl_entity_t * ent2,float * 
 		// second target disappeard somehow (dead)
 
 		// keep last good viewangle
-		float newOrigin[3];
+		vec3_t newOrigin;
 
 		int flags 	   = gHUD.m_Spectator.m_iObserverFlags;
 
@@ -1485,7 +1495,7 @@ void V_GetDirectedChasePosition(cl_entity_t	 * ent1, cl_entity_t * ent2,float * 
 	VectorCopy(angle, v_lastAngles);
 }
 
-void V_GetChasePos(int target, float * cl_angles, float * origin, float * angles)
+void V_GetChasePos(int target, const vec3_t cl_angles, vec3_t_ref origin, vec3_t_ref angles)
 {
 	cl_entity_t	 *	ent = NULL;
 	cl_entity_t *local = gEngfuncs.GetLocalPlayer();
@@ -1549,7 +1559,7 @@ void V_ResetChaseCam()
 }
 
 
-void V_GetInEyePos(int target, float * origin, float * angles )
+void V_GetInEyePos(int target, vec3_t_ref origin, vec3_t_ref angles )
 {
 	if ( !target)
 	{
@@ -1583,9 +1593,9 @@ void V_GetInEyePos(int target, float * origin, float * angles )
 		origin[2]+= 28; // DEFAULT_VIEWHEIGHT
 }
 
-void V_GetMapFreePosition( float * cl_angles, float * origin, float * angles )
+void V_GetMapFreePosition( const vec3_t cl_angles, vec3_t_ref origin, vec3_t_ref angles )
 {
-	vec3_t forward;
+	vec3_t forward, right, up;
 	vec3_t zScaledTarget;
 
 	VectorCopy(cl_angles, angles);
@@ -1598,16 +1608,16 @@ void V_GetMapFreePosition( float * cl_angles, float * origin, float * angles )
 	zScaledTarget[2] = gHUD.m_Spectator.m_mapOrigin[2] * (( 90.0f - angles[0] ) / 90.0f );
 
 
-	AngleVectors(angles, forward, NULL, NULL);
+	AngleVectors(angles, forward, right, up);
 
 	VectorNormalize(forward);
 
 	VectorMA(zScaledTarget, -( 4096.0f / gHUD.m_Spectator.m_mapZoom ), forward , origin);
 }
 
-void V_GetMapChasePosition(int target, float * cl_angles, float * origin, float * angles)
+void V_GetMapChasePosition(int target, const vec3_t cl_angles, vec3_t_ref origin, vec3_t_ref angles)
 {
-	vec3_t forward;
+	vec3_t forward, right, up;
 
 	if ( target )
 	{
@@ -1641,7 +1651,7 @@ void V_GetMapChasePosition(int target, float * cl_angles, float * origin, float 
 	origin[2] *= (( 90.0f - angles[0] ) / 90.0f );
 	angles[2] = 0.0f;	// don't roll angle (if chased player is dead)
 
-	AngleVectors(angles, forward, NULL, NULL);
+	AngleVectors(angles, forward, right, up);
 
 	VectorNormalize(forward);
 
@@ -1943,6 +1953,8 @@ void DLLEXPORT V_CalcRefdef( struct ref_params_s *pparams )
 	{
 		V_CalcNormalRefdef ( pparams );
 	}
+
+	gFog.V_CalcRefdef(pparams);
 }
 
 /*
@@ -1967,4 +1979,6 @@ void V_Init (void)
 	cl_csgoviewmode		= gEngfuncs.pfnRegisterVariable("cl_csgoviewmode", "0", 0);
 	cl_waterdist		= gEngfuncs.pfnRegisterVariable( "cl_waterdist","4", 0 );
 	cl_chasedist		= gEngfuncs.pfnRegisterVariable( "cl_chasedist","112", 0 );
+}
+
 }

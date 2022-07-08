@@ -37,9 +37,7 @@ version.
 
 #include "gamemode/mods_const.h"
 
-#ifndef M_PI
-#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
-#endif
+namespace cl {
 
 static byte	r_RadarCross[8][8] =
 {
@@ -121,6 +119,10 @@ int CHudRadarLegacy::VidInit(void)
 	m_hRadarBombTarget[0].SetSpriteByName("radar_a");
 	m_hRadarBombTarget[1].SetSpriteByName("radar_b");
 	m_hRadarSupplybox.SetSpriteByName("radar_item");
+
+	if (!m_iMapTitleBG)
+		m_iMapTitleBG = R_LoadTextureUnique("resource/hud/hud_maptitle_bg");
+
 	iMaxRadius = (m_hRadar.rect.right - m_hRadar.rect.left) / 2.0f;
 	return 1;
 }
@@ -320,9 +322,10 @@ Vector CHudRadarLegacy::WorldToRadar(const Vector vPlayerOrigin, const Vector vO
 	// this magic 32.0f just scales position on radar
 	float iRadius = min(diff.Length() / RADAR_SCALE, (float)iMaxRadius);
 
+	int offset = gHUD.m_hudstyle->value == 2 ? m_iMapTitleBG->h() + 1 : 0;
 	// transform origin difference to radar source
 	Vector ret((float)(iRadius * sin(flOffset)),
-		(float)(iRadius * -cos(flOffset)),
+		(float)(iRadius * -cos(flOffset)) + float(offset),
 		(float)(vPlayerOrigin.z - vObjectOrigin.z));
 
 	return ret;
@@ -342,25 +345,43 @@ int CHudRadarLegacy::Draw(float flTime)
 		return 1;
 
 	int iTeamNumber = g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber;
-	int r, g, b;
+	int r, g, b, iY;
+	iY = 0;
 
-	if (cl_radartype->value)
+	if (gHUD.m_hudstyle->value == 2)
 	{
-		SPR_Set(m_hRadarOpaque.spr, 200, 200, 200);
-		SPR_DrawHoles(0, 0, 0, &m_hRadarOpaque.rect);
-	}
-	else
-	{
-		SPR_Set(m_hRadar.spr, 25, 75, 25);
-		SPR_DrawAdditive(0, 0, 0, &m_hRadarOpaque.rect);
-	}
+		int iX, iW, iH;
+		int iLength, iHeight;
+		iW = m_iMapTitleBG->w();
+		iH = m_iMapTitleBG->h();
+		iX = 0;
+		m_iMapTitleBG->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH);
 
-	if (strlen(g_szLocation))
+		if (strlen(g_szLocation))
+		{
+			gEngfuncs.pfnDrawSetTextColor(0.8f, 0.8f, 0.8f);
+			gEngfuncs.pfnDrawConsoleStringLen(g_szLocation, &iLength, &iHeight);
+			gEngfuncs.pfnDrawConsoleString(5, abs(iH - iHeight) / 2, g_szLocation);
+		}
+		iY += iH + 1;
+	}
+	else if (strlen(g_szLocation))
 	{
 		int iLength, iHeight;
 		gEngfuncs.pfnDrawSetTextColor(0.0f, 0.8f, 0.0f);
 		gEngfuncs.pfnDrawConsoleStringLen(g_szLocation, &iLength, &iHeight);
 		gEngfuncs.pfnDrawConsoleString(64 - iLength / 2, m_hRadarOpaque.rect.bottom + iHeight, g_szLocation);
+	}
+
+	if (cl_radartype->value)
+	{
+		SPR_Set(m_hRadarOpaque.spr, 200, 200, 200);
+		SPR_DrawHoles(0, 0, iY, &m_hRadarOpaque.rect);
+	}
+	else
+	{
+		SPR_Set(m_hRadar.spr, 25, 75, 25);
+		SPR_DrawAdditive(0, 0, iY, &m_hRadarOpaque.rect);
 	}
 
 	if (bUseRenderAPI)
@@ -425,7 +446,7 @@ int CHudRadarLegacy::Draw(float flTime)
 	else if (g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_CT)
 	{
 		// draw hostages for CT
-		if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3)
+		if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 		{
 			for (int i = 0; i < MAX_HOSTAGES; i++)
 			{
@@ -472,4 +493,6 @@ int CHudRadarLegacy::Draw(float flTime)
 	}
 
 	return 0;
+}
+
 }

@@ -35,6 +35,8 @@ version.
 #include "dlight.h"
 #include "eventscripts.h"
 
+namespace cl {
+
 DECLARE_MESSAGE(m_NVG, NVGToggle)
 DECLARE_COMMAND(m_NVG, NVGAdjustDown)
 DECLARE_COMMAND(m_NVG, NVGAdjustUp)
@@ -94,7 +96,7 @@ int CHudNVG::Draw(float flTime)
 
 	if (bNewLight)
 	{
-		
+
 	}
 	// draw a dynamic light on player's origin
 	else if (cl_fancy_nvg->value)
@@ -130,9 +132,9 @@ int CHudNVG::Draw(float flTime)
 			m_pLight->radius = Com_RandomLong(750, 800);
 		}
 	}
-	
 
-	
+
+
 	return 1;
 }
 
@@ -153,17 +155,7 @@ int CHudNVG::MsgFunc_NVGToggle(const char *pszName, int iSize, void *pbuf)
 
 	if (g_iXash)
 	{
-		if (m_LightStypeBackup < 0)
-			m_LightStypeBackup = gRenderAPI.GetLightStyle(0)->map[0];
-
-		if (bDraw)
-		{
-			gRenderAPI.GetLightStyle(0)->map[0] = 64;
-		}
-		else
-		{
-			gRenderAPI.GetLightStyle(0)->map[0] = m_LightStypeBackup;
-		}
+        gEngfuncs.Cvar_SetValue( "r_fullbright", bDraw );
 	}
 
 	return 1;
@@ -177,4 +169,6 @@ void CHudNVG::UserCmd_NVGAdjustDown()
 void CHudNVG::UserCmd_NVGAdjustUp()
 {
 	m_iAlpha = min( 30, m_iAlpha - 20 );
+}
+
 }

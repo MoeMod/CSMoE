@@ -51,15 +51,15 @@ typedef struct server_physics_api_s
 	struct triangleapi_s *pTriAPI;	// draw coliisions etc. Only for local system
 
 	// draw debug messages (must be called from DrawOrthoTriangles). Only for local system
-	int		( *pfnDrawConsoleString )( int x, int y, char *string );
+	int		( *pfnDrawConsoleString )( int x, int y, const char *string );
 	void		( *pfnDrawSetTextColor )( float r, float g, float b );
 	void		( *pfnDrawConsoleStringLen )( const char *string, int *length, int *height );
-	void		( *Con_NPrintf )( int pos, char *fmt, ... );
-	void		( *Con_NXPrintf )( struct con_nprint_s *info, char *fmt, ... );
+	void		( *Con_NPrintf )( int pos, const char *fmt, ... );
+	void		( *Con_NXPrintf )( struct con_nprint_s *info, const char *fmt, ... );
 	const char	*( *pfnGetLightStyle )( int style ); // read custom appreance for selected lightstyle
 	void		( *pfnUpdateFogSettings )( unsigned int packed_fog );
 	char		**(*pfnGetFilesList)( const char *pattern, int *numFiles, int gamedironly );
-	struct msurface_s	*(*pfnTraceSurface)( edict_t *pTextureEntity, const float *v1, const float *v2 );
+	struct msurface_s	*(*pfnTraceSurface)( edict_t *pTextureEntity, const vec3_t v1, const vec3_t v2 );
 	const byte *(*pfnGetTextureData)( unsigned int texnum );
 
 	// static allocations
@@ -93,9 +93,9 @@ typedef struct physics_interface_s
 	// used for draw debug messages (2d mode)
 	void		( *DrawOrthoTriangles )( void );
 	// tracing entities with SOLID_CUSTOM mode on a server (not used by pmove code)
-	void		( *ClipMoveToEntity)( edict_t *ent, const float *start, float *mins, float *maxs, const float *end, trace_t *trace );
+	void		( *ClipMoveToEntity)( edict_t *ent, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, trace_t *trace );
 	// tracing entities with SOLID_CUSTOM mode on a server (only used by pmove code)
-	void		( *ClipPMoveToEntity)( struct physent_s *pe, const float *start, float *mins, float *maxs, const float *end, struct pmtrace_s *tr );
+	void		( *ClipPMoveToEntity)( struct physent_s *pe, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
 	// called at end the frame of SV_Physics call
 	void		( *SV_EndFrame )( void );
 	// called through save\restore process

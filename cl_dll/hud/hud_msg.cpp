@@ -32,8 +32,9 @@
 #include "events.h"
 
 #include "gamemode/mods_const.h"
+#include "CBaseViewport.h"
 
-using namespace cl;
+namespace cl {
 
 extern float g_flRoundTime;
 
@@ -117,6 +118,8 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	// reset mod-specific settings
 	gHUD.m_ZB2.m_iFlags &= ~HUD_ACTIVE;
 	gHUD.m_ZB3.m_iFlags &= ~HUD_ACTIVE;
+	gHUD.m_ZBZ.m_iFlags &= ~HUD_ACTIVE;
+	gHUD.m_ZB4.m_iFlags &= ~HUD_ACTIVE;
 	gHUD.m_ZBS.m_iFlags &= ~HUD_ACTIVE;
 
 	switch (m_iModRunning)
@@ -138,14 +141,25 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	}
 	case MOD_TDM:
 	{
-		
+
 		break;
 	}
 	case MOD_DM:
 	{
 		break;
 	}
-	
+
+	case MOD_ZB4:
+	{
+		gHUD.m_ZB4.m_iFlags |= HUD_ACTIVE;
+		break;
+	}
+	case MOD_ZBZ:
+	{
+		gHUD.m_ZBZ.m_iFlags |= HUD_ACTIVE;
+		// dont break, continue to ZB3...
+		//[fallthrough]];
+	}
 	case MOD_ZB3:
 	{
 		gHUD.m_ZB3.m_iFlags |= HUD_ACTIVE;
@@ -172,6 +186,8 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 		break;
 	}
 
+    g_pViewport->UpdateGameMode();
+
 	return 1;
 }
 
@@ -190,7 +206,32 @@ int CHud::MsgFunc_ShadowIdx(const char *pszName, int iSize, void *pbuf)
 {
 	BufferReader reader( pszName, pbuf, iSize );
 
-	int idx = reader.ReadByte();
+	int idx = reader.ReadLong();
 	g_StudioRenderer.StudioSetShadowSprite(idx);
 	return 1;
+}
+
+int CHud::MsgFunc_OperationSystem(const char* pszName, int iSize, void* pbuf)
+{
+	BufferReader reader(pszName, pbuf, iSize);
+	int index = reader.ReadByte();
+	const char* osname = reader.ReadString();
+	if (!index)
+	{
+		for (size_t i = 0; i < MAX_CLIENTS; i++)
+		{
+			g_PlayerExtraInfo[i + 1].os = reader.ReadByte();
+		}
+	}
+	else
+	{
+		if (!strcmp(osname, "WinRT") || !strcmp(osname, "Win32") || !strcmp(osname, "Win32-MinGW"))
+			g_PlayerExtraInfo[index].os = OS_Windows;
+		else if (!strcmp(osname, "macOS") || !strcmp(osname, "iOS"))
+			g_PlayerExtraInfo[index].os = OS_Apple;
+		else if (!strcmp(osname, "Android"))
+			g_PlayerExtraInfo[index].os = OS_Android;
+	}
+	return 1;
+}
 }

@@ -28,9 +28,9 @@ extern convar_t *touch_enable;
 // touch.c
 void Touch_Draw( void );
 void IN_TouchEditClear( void );
-void Touch_SetClientOnly( qboolean state );
+void Touch_SetClientOnly( bool state );
 void Touch_RemoveButton( const char *name );
-void Touch_HideButtons( const char *name, qboolean hide );
+void Touch_HideButtons( const char *name, bool hide );
 //void IN_TouchSetCommand( const char *name, const char *command );
 //void IN_TouchSetTexture( const char *name, const char *texture );
 //void IN_TouchSetColor( const char *name, byte *color );

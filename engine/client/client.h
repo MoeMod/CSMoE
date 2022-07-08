@@ -33,6 +33,7 @@ GNU General Public License for more details.
 #include "net_api.h"
 #include "world.h"
 #include "qfont.h"
+#include "voice.h"
 
 #define MAX_DEMOS		32
 #define MAX_MOVIES		8
@@ -314,6 +315,7 @@ typedef struct
 
 	// holds text color
 	rgba_t		textColor;
+	rgba_t		picColor;
 } gameui_draw_t;
 
 typedef struct
@@ -365,7 +367,7 @@ typedef struct
 	void                 *hInstance;                 // pointer to client.dll
 	cldll_func_t         dllFuncs;                   // dll exported funcs
 	render_interface_t   drawFuncs;                  // custom renderer support
-	byte                 *mempool;                   // client edicts pool
+	mempool_t            *mempool;                   // client edicts pool
 	string               mapname;                    // map name
 	string               maptitle;                   // display map title
 	string               itemspath;                  // path to items description for auto-complete func
@@ -420,7 +422,7 @@ typedef struct
 {
 	void		*hInstance;		// pointer to client.dll
 	UI_FUNCTIONS	dllFuncs;			// dll exported funcs
-	byte		*mempool;			// client edicts pool
+	mempool_t		*mempool;			// client edicts pool
 
 	cl_entity_t	playermodel;		// uiPlayerSetup drawing model
 	player_info_t	playerinfo;		// local playerinfo
@@ -456,7 +458,7 @@ typedef struct
 
 	keydest_t		key_dest;
 
-	byte		*mempool;			// client premamnent pool: edicts etc
+	mempool_t		*mempool;			// client premamnent pool: edicts etc
 	
 	int		framecount;
 	int		quakePort;		// a 16 bit value that allows quake servers
@@ -500,7 +502,7 @@ typedef struct
 
 	scrshot_t		scrshot_request;		// request for screen shot
 	scrshot_t		scrshot_action;		// in-action
-	const float	*envshot_vieworg;		// envshot position
+	vec3_t envshot_vieworg;		// envshot position
 	int		envshot_viewsize;		// override cvar
 	qboolean		envshot_disable_vis;	// disable VIS on server while makes an envshots
 	string		shotname;
@@ -535,19 +537,10 @@ typedef struct
 extern int		downloadcount;
 extern int		downloadfileid;
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern client_t		cl;
 extern client_static_t	cls;
 extern clgame_static_t	clgame;
 extern menu_static_t	menu;
-
-#ifdef __cplusplus
-}
-#endif
 
 //
 // cvars
@@ -606,9 +599,6 @@ void CL_DecayLights( void );
 
 //=================================================
 
-void CL_PrepVideo( void );
-void CL_PrepSound( void );
-
 //
 // cl_cmds.c
 //
@@ -666,8 +656,8 @@ void CL_ParseEvent( sizebuf_t *msg );
 void CL_ParseReliableEvent( sizebuf_t *msg );
 void CL_SetEventIndex( const char *szEvName, int ev_index );
 void CL_QueueEvent( int flags, int index, float delay, event_args_t *args );
-void CL_PlaybackEvent( int flags, const edict_t *pInvoker, word eventindex, float delay, float *origin,
-	float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
+void CL_PlaybackEvent( int flags, const edict_t *pInvoker, word eventindex, float delay, const vec3_t origin,
+                       const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
 void CL_RegisterEvent( int lastnum, const char *szEvName, pfnEventHook func );
 word CL_EventIndex( const char *name );
 const char *CL_IndexEvent( word index );
@@ -701,8 +691,8 @@ void SPR_AdjustSize( float *x, float *y, float *w, float *h );
 void TextAdjustSize( int *x, int *y, int *w, int *h );
 void TextAdjustSizeReverse( int *x, int *y, int *w, int *h );
 void PicAdjustSize( float *x, float *y, float *w, float *h );
-void CL_PlayerTrace( float *start, float *end, int traceFlags, int ignore_pe, pmtrace_t *tr );
-void CL_PlayerTraceExt( float *start, float *end, int traceFlags, int (*pfnIgnore)( physent_t *pe ), pmtrace_t *tr );
+void CL_PlayerTrace( const vec3_t start, const vec3_t end, int traceFlags, int ignore_pe, pmtrace_t *tr );
+void CL_PlayerTraceExt( const vec3_t start, const vec3_t end, int traceFlags, int (*pfnIgnore)( physent_t *pe ), pmtrace_t *tr );
 void CL_SetTraceHull( int hull );
 void CL_FillRGBA( int x, int y, int width, int height, int r, int g, int b, int a );
 void CL_FillRGBABlend( int x, int y, int width, int height, int r, int g, int b, int a );
@@ -780,10 +770,10 @@ void CL_CheckPredictionError( void );
 qboolean CL_IsPredicted( void );
 int CL_TruePointContents( const vec3_t p );
 int CL_PointContents( const vec3_t p );
-int CL_WaterEntity( const float *rgflPos );
-cl_entity_t *CL_GetWaterEntity( const float *rgflPos );
+int CL_WaterEntity( const vec3_t rgflPos );
+cl_entity_t *CL_GetWaterEntity( const vec3_t rgflPos );
 void CL_SetupPMove( playermove_t *pmove, const local_state_t *from, const usercmd_t *ucmd, const qboolean runfuncs, const double time );
-pmtrace_t CL_TraceLine( vec3_t start, vec3_t end, int flags );
+pmtrace_t CL_TraceLine( const vec3_t start, const vec3_t end, int flags );
 void CL_ClearPhysEnts( void );
 void CL_PushPMStates( void );
 void CL_PopPMStates( void );
@@ -821,13 +811,14 @@ void CL_ClearAllRemaps( void );
 //
 int CL_AddEntity( int entityType, cl_entity_t *pEnt );
 void CL_WeaponAnim( int iAnim, int body );
+void CL_WeaponAnim2( int iAnim, int body, float framerate );
 void CL_ClearEffects( void );
 void CL_ClearEfrags( void );
 void CL_TestLights( void );
-void CL_DrawParticlesExternal( const float *vieworg, const float *fwd, const float *rt, const float *up, uint clipFlags );
-void CL_FireCustomDecal( int textureIndex, int entityIndex, int modelIndex, float *pos, int flags, float scale );
-void CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, float *pos, int flags );
-void CL_PlayerDecal( int textureIndex, int entityIndex, float *pos );
+void CL_DrawParticlesExternal( const vec3_t vieworg, const vec3_t fwd, const vec3_t rt, const vec3_t up, uint clipFlags );
+void CL_FireCustomDecal( int textureIndex, int entityIndex, int modelIndex, const vec3_t pos, int flags, float scale );
+void CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const vec3_t pos, int flags );
+void CL_PlayerDecal( int textureIndex, int entityIndex, const vec3_t pos );
 void CL_InitParticles( void );
 void CL_ClearParticles( void );
 void CL_FreeParticles( void );
@@ -893,7 +884,7 @@ void S_BeginRegistration( void );
 sound_t S_RegisterSound( const char *sample );
 void S_EndRegistration( void );
 void S_RestoreSound( const vec3_t pos, int ent, int chan, sound_t handle, float fvol, float attn, int pitch, int flags, double sample, double end, int wordIndex );
-void S_StartSound( const vec3_t pos, int ent, int chan, sound_t sfx, float vol, float attn, int pitch, int flags );
+void S_StartSound( vec3_t pos, int ent, int chan, sound_t sfx, float vol, float attn, int pitch, int flags );
 void S_AmbientSound( const vec3_t pos, int ent, sound_t handle, float fvol, float attn, int pitch, int flags );
 void S_FadeClientVolume( float fadePercent, float fadeOutSeconds, float holdTime, float fadeInSeconds );
 void S_FadeMusicVolume( float fadePercent );
@@ -919,6 +910,7 @@ void UI_CharEvent( int key );
 qboolean UI_MouseInRect( void );
 qboolean UI_IsVisible( void );
 void UI_AddTouchButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
+int UI_HandleMessageMode_f(void);
 void pfnPIC_Set( HIMAGE hPic, int r, int g, int b, int a );
 void pfnPIC_Draw( int x, int y, int width, int height, const wrect_t *prc );
 void pfnPIC_DrawTrans( int x, int y, int width, int height, const wrect_t *prc );

@@ -15,12 +15,12 @@ GNU General Public License for more details.
 
 #pragma once
 
+#include "meta/TypeIdentity.h"
+
 #ifndef CLIENT_DLL
 typedef struct edict_s edict_t;
 typedef struct entvars_s entvars_t;
 #endif
-
-template<class T> struct type_identity { using type = T; };
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -34,6 +34,7 @@ struct EntityMetaData
 };
 
 template<class T> int REMEMBER_TO_ADD_IN_cbase_typelist_h_() { return 1; }
+bool LuaGetClassPtr(const char* pevClassName, entvars_t* pev);
 }
 #else
 namespace sv {
@@ -47,19 +48,34 @@ struct EntityMetaData
 };
 
 template<class T> int REMEMBER_TO_ADD_IN_cbase_typelist_h_() { return 2; }
+bool LuaGetClassPtr(const char* pevClassName, entvars_t* pev);
 }
 #endif
 
+#ifndef XASH_UNITY_BUILD
+#define DECLEAR_ENTITY_CLASS_REMINDER(DLLClassName) template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>();
+#define LINK_ENTITY_TO_REMINDER(DLLClassName) extern template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>();
+#else
+#define DECLEAR_ENTITY_CLASS_REMINDER(DLLClassName)
+#define LINK_ENTITY_TO_REMINDER(DLLClassName)
+#endif
+
 #ifdef CLIENT_DLL
-#define DECLEAR_ENTITY_CLASS(DLLClassName)
-#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName)
+#include "cs_wpn/bte_weapons_register.h"
+#define DECLEAR_ENTITY_CLASS(DLLClassName) \
+	class DLLClassName; \
+	DECLEAR_ENTITY_CLASS_REMINDER(DLLClassName) \
+	extern EntityMetaData GetEntityMetaDataFor(TypeIdentity<DLLClassName>);
+#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
+	LINK_ENTITY_TO_REMINDER(DLLClassName) \
+	EntityMetaData GetEntityMetaDataFor(TypeIdentity<DLLClassName>) { return { REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(), #mapClassName, WeaponEntityPlaceHolderFactory<DLLClassName>() }; }
 #else
 #define DECLEAR_ENTITY_CLASS(DLLClassName) \
 	class DLLClassName; \
-	template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
-	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>); 
+	DECLEAR_ENTITY_CLASS_REMINDER(DLLClassName); \
+	extern EntityMetaData GetEntityMetaDataFor(TypeIdentity<DLLClassName>);
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	extern "C" EXPORT void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); } \
-	extern template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
-	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(), #mapClassName, &mapClassName }; }
+	extern "C" EXPORT void mapClassName(entvars_t *pev) { LuaGetClassPtr(#mapClassName, pev) || (GetClassPtr<DLLClassName>(pev), true); } \
+	LINK_ENTITY_TO_REMINDER(DLLClassName) \
+	EntityMetaData GetEntityMetaDataFor(TypeIdentity<DLLClassName>) { return { REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(), #mapClassName, &mapClassName }; }
 #endif

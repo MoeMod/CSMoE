@@ -13,11 +13,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-extern "C" {
 #include "common.h"
 #include "keydefs.h"
 #include "input_ime.h"
-}
+
 #include <WinUser.h>
 #include <SDL.h>
 #include <SDL_version.h>
@@ -45,6 +44,7 @@ static std::vector<std::string> current_candidates;
 static size_t page_start;
 static size_t page_size;
 static size_t selected_candicate;
+static double last_ime_candidate_change_time;
 
 const char* IME_GetCompositionString()
 {
@@ -119,6 +119,7 @@ static void ClearCandidateList()
 {
     current_candidates.clear();
     selected_candicate = 0;
+    last_ime_candidate_change_time = host.realtime;
 }
 
 static void CompositionString()
@@ -220,6 +221,7 @@ static void OnIMEChangeCandidates()
         }
         ImmReleaseContext(hwnd, hImc);
     }
+    last_ime_candidate_change_time = host.realtime;
 }
 
 static WNDPROC g_ImeWndProc;
@@ -447,4 +449,19 @@ void IME_SetIMEEnabled(int enable, int force)
         CompositionString();
         SDL_StopTextInput();
     }
+}
+
+int IME_HandleKeyEvent(int key, int down)
+{
+    if (key == K_BACKSPACE)
+    {
+        size_t candidate_count = IME_GetCandidateListCount();
+        const char* completed = IME_GetCompositionString();
+        if (candidate_count || completed[0] || (host.realtime < last_ime_candidate_change_time + 0.2))
+        {
+            // dont handle backspace when IME is enabled...
+            return -1;
+        }
+    }
+    return 0;
 }

@@ -34,6 +34,10 @@ public:
 
 	void Start() override;
 
+	void Init() override;
+
+	void VidInit() override;
+
 	void SetParent( vgui2::VPANEL parent ) override;
 
 	bool UseVGUI1() override;
@@ -115,13 +119,24 @@ public:
 	bool AddNewGameUIPanel(IGameUIPanel* pPanel);
 	IGameUIPanel* FindGameUIPanelByName(const char* pszName);
 
+	// CSMoE client
+    virtual bool ShowVGUIMenu(int iMenu) { return false; }
+	virtual bool ShowVGUIMenuByName(const char* szName) { return false; }
+	virtual bool HideVGUIMenu(int iMenu) { return false; }
+    virtual void UpdateGameMode() {}
+
+	template <class T>
+	T* FindPanel(const char* pszName) { return dynamic_cast<T*>(FindPanelByName(pszName)); }
+
+protected:
+	CUtlVector<IViewportPanel*> m_Panels;
+
 private:
 	int m_OldSize[ 2 ] = { -1, -1 };
 	int m_nRootSize[ 2 ] = { -1, -1 };
 
 	CBackGroundPanel* m_pBackGround = nullptr;
 
-	CUtlVector<IViewportPanel*> m_Panels;
 	CUtlVector<IGameUIPanel*> m_GameUIPanels;
 
 	IViewportPanel* m_pActivePanel = nullptr;

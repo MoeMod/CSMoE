@@ -20,7 +20,7 @@ ConcatTransforms
 
 ================
 */
-void ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
+void ConcatTransforms(cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out)
 {
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] +
 		in1[0][2] * in2[2][0];
@@ -56,7 +56,7 @@ AngleQuaternion
 
 ====================
 */
-void AngleQuaternion(float *angles, vec4_t quaternion)
+void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
@@ -84,34 +84,27 @@ QuaternionSlerp
 
 ====================
 */
-void QuaternionSlerp(vec4_t p, vec4_t q, float t, vec4_t qt)
+void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 {
 	int i;
 	float omega, cosom, sinom, sclp, sclq;
 
-	// decide if one of the quaternions is backwards
-	float a = 0;
-	float b = 0;
+    // decide if one of the quaternions is backwards
+    float a = (p-q).LengthSquared();
+    float b = (p+q).LengthSquared();
 
-	for (i = 0; i < 4; i++)
-	{
-		a += (p[i] - q[i]) * (p[i] - q[i]);
-		b += (p[i] + q[i]) * (p[i] + q[i]);
-	}
 	if (a > b)
 	{
-		for (i = 0; i < 4; i++)
-		{
-			q[i] = -q[i];
-		}
+        q = -q;
 	}
 
-	cosom = p[0] * q[0] + p[1] * q[1] + p[2] * q[2] + p[3] * q[3];
+	cosom = DotProduct(p, q);
 
 	if ((1.0 + cosom) > 0.000001)
 	{
 		if ((1.0 - cosom) > 0.000001)
 		{
+            // TODO(MoeMod) : SIMD opt
 			omega = acos(cosom);
 			sinom = sin(omega);
 			sclp = sin((1.0 - t) * omega) / sinom;
@@ -122,10 +115,8 @@ void QuaternionSlerp(vec4_t p, vec4_t q, float t, vec4_t qt)
 			sclp = 1.0 - t;
 			sclq = t;
 		}
-		for (i = 0; i < 4; i++)
-		{
-			qt[i] = sclp * p[i] + sclq * q[i];
-		}
+
+        qt = sclp * p + sclq * q;
 	}
 	else
 	{
@@ -133,12 +124,11 @@ void QuaternionSlerp(vec4_t p, vec4_t q, float t, vec4_t qt)
 		qt[1] = q[0];
 		qt[2] = -q[3];
 		qt[3] = q[2];
+
 		sclp = sin((1.0 - t) * (0.5 * M_PI));
 		sclq = sin(t * (0.5 * M_PI));
-		for (i = 0; i < 3; i++)
-		{
-			qt[i] = sclp * p[i] + sclq * qt[i];
-		}
+
+        qt = sclp * p + sclq * qt;
 	}
 }
 
@@ -148,7 +138,7 @@ QuaternionMatrix
 
 ====================
 */
-void QuaternionMatrix(vec4_t quaternion, float(*matrix)[4])
+void QuaternionMatrix(const vec4_t quaternion, matrix3x4_ref matrix)
 {
 	matrix[0][0] = 1.0 - 2.0 * quaternion[1] * quaternion[1] - 2.0 * quaternion[2] * quaternion[2];
 	matrix[1][0] = 2.0 * quaternion[0] * quaternion[1] + 2.0 * quaternion[3] * quaternion[2];
@@ -169,9 +159,9 @@ MatrixCopy
 
 ====================
 */
-void MatrixCopy(float in[3][4], float out[3][4])
+void MatrixCopy(cmatrix3x4 in, matrix3x4_ref out)
 {
-	memcpy(out, in, sizeof(float) * 3 * 4);
+    out = in;
 }
 
 }

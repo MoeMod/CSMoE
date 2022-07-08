@@ -6,12 +6,12 @@
 #include "hud.h"
 #include "cl_util.h"
 
+namespace cl {
+
 #define MAX_MENU_STRING	512
 
-extern char g_szMenuString[MAX_MENU_STRING];
-extern char g_szPrelocalisedMenuString[MAX_MENU_STRING];
-
-namespace cl {
+    extern char g_szMenuString[MAX_MENU_STRING];
+    extern char g_szPrelocalisedMenuString[MAX_MENU_STRING];
 	
 	void ImGuiCL_Menu_OnGUI()
 	{
@@ -35,10 +35,16 @@ namespace cl {
 			
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10);
 			ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_AlwaysAutoResize;
-			
+
 			//flags |= ImGuiWindowFlags_NoMouseInputs;
 			if(ImGui::Begin("HUD Menu", NULL, flags))
 			{
+				static cvar_t* touch_enable = gEngfuncs.pfnGetCvarPointer("touch_enable");
+				if (touch_enable && touch_enable->value > 0)
+				{
+					ImGui::CaptureMouseFromApp();
+					gEngfuncs.pfnSetMouseEnable(false);
+				}
 				ImColor text_col(255, 255, 255, 255);
 				auto sv = menu_sv;
 				int desired_option = 1;

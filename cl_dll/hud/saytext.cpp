@@ -25,12 +25,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include "vgui_parser.h"
 #include "draw_util.h"
 #include "com_weapons.h"
 //#include "vgui_TeamFortressViewport.h"
 
-using namespace cl;
+namespace cl {
 
 extern float *GetClientColor( int clientIndex );
 
@@ -161,6 +160,8 @@ enum
 {
 	CHAT_CT = 0,
 	CHAT_T,
+	CHAT_CT_LOC,
+	CHAT_T_LOC,
 	CHAT_CT_DEAD,
 	CHAT_T_DEAD,
 	CHAT_SPEC,
@@ -180,6 +181,8 @@ CSimpleMap sayTextFmt[] =
 {
 {"#Cstrike_Chat_CT",	"\x02(Counter-Terrorist) %s :  %s"},
 {"#Cstrike_Chat_T", "\x02(Terrorist) %s :  %s"},
+{"#Cstrike_Chat_CT_Loc",	"\x02(Counter-Terrorist) %s @ ^2%s^7 :  %s"},
+{"#Cstrike_Chat_T_Loc", "\x02(Terrorist) %s @ ^2%s^7 :  %s"},
 {"#Cstrike_Chat_CT_Dead", "\x02*DEAD*(Counter-Terrorist) %s :  %s"},
 {"#Cstrike_Chat_T_Dead", "\x02*DEAD*(Terrorist) %s :  %s"},
 {"#Cstrike_Chat_Spec", "\x02(Spectator) %s :  %s"},
@@ -236,9 +239,19 @@ int CHudSayText :: MsgFunc_SayText( const char *pszName, int iSize, void *pbuf )
 #endif
 
 	char dst[256];
-	snprintf(dst, sizeof(dst), fmt, szBuf[1], szBuf[2], szBuf[3], szBuf[4]);
+	if (i == CHAT_CT_LOC || i == CHAT_T_LOC)
+	{
+		char szNewBuf[256];
+		snprintf(szNewBuf, sizeof(szNewBuf), "#%s", szBuf[3]);
+		if (CHudTextMessage::LookupString2(szNewBuf, sizeof(szNewBuf)))
+			strncpy(szBuf[3], szNewBuf, sizeof(szBuf[3]));
+
+		snprintf(dst, sizeof(dst), fmt, szBuf[1], szBuf[3], szBuf[2], szBuf[4]);
+	}
+	else
+		snprintf(dst, sizeof(dst), fmt, szBuf[1], szBuf[2], szBuf[3], szBuf[4]);
 	SayTextPrint( dst, strlen(dst),  client_index );
-	
+
 	return 1;
 }
 
@@ -355,7 +368,7 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 
 				// find an empty string slot
 				int j;
-				do 
+				do
 				{
 					for ( j = 0; j < MAX_LINES; j++ )
 					{
@@ -397,4 +410,6 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 			}
 		}
 	}
+}
+
 }

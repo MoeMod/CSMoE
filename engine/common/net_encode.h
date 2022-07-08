@@ -34,12 +34,21 @@ GNU General Public License for more details.
 #define NUM_FIELDS( x )	((sizeof( x ) / sizeof( x[0] )) - 1)
 
 // helper macroses
-#define ENTS_DEF( x )	#x, offsetof( entity_state_t, x ), sizeof( ((entity_state_t *)0)->x )
-#define UCMD_DEF( x )	#x, offsetof( usercmd_t, x ), sizeof( ((usercmd_t *)0)->x )
-#define EVNT_DEF( x )	#x, offsetof( event_args_t, x ), sizeof( ((event_args_t *)0)->x )
-#define PHYS_DEF( x )	#x, offsetof( movevars_t, x ), sizeof( ((movevars_t *)0)->x )
-#define CLDT_DEF( x )	#x, offsetof( clientdata_t, x ), sizeof( ((clientdata_t *)0)->x )
-#define WPDT_DEF( x )	#x, offsetof( weapon_data_t, x ), sizeof( ((weapon_data_t *)0)->x )
+#define PP_STRINGIZE(x) #x
+#define T_DEF( T, x )   #x, offsetof( T, x ), sizeof( ((T *)0)->x )
+#define T_DEF_VEC( T, x, i )   PP_STRINGIZE(x) "[" PP_STRINGIZE(i) "]", offsetof( T, x ) + i * sizeof( ((T *)0)->x[i] ), sizeof( ((T *)0)->x[i] )
+#define ENTS_DEF( x )	T_DEF( entity_state_t, x )
+#define ENTS_DEF_VEC( x, i )	T_DEF_VEC( entity_state_t, x, i )
+#define UCMD_DEF( x )	T_DEF( usercmd_t, x )
+#define UCMD_DEF_VEC( x, i )	T_DEF_VEC( usercmd_t, x, i )
+#define EVNT_DEF( x )	T_DEF( event_args_t, x )
+#define EVNT_DEF_VEC( x, i )	T_DEF_VEC( event_args_t, x, i )
+#define PHYS_DEF( x )	T_DEF( movevars_t, x )
+#define PHYS_DEF_VEC( x, i )	T_DEF_VEC( movevars_t, x, i )
+#define CLDT_DEF( x )	T_DEF( clientdata_t, x )
+#define CLDT_DEF_VEC( x, i )	T_DEF_VEC( clientdata_t, x, i )
+#define WPDT_DEF( x )	T_DEF( weapon_data_t, x )
+#define WPDT_DEF_VEC( x, i )	T_DEF_VEC( weapon_data_t, x, i )
 
 enum
 {
@@ -52,8 +61,8 @@ enum
 typedef struct
 {
 	const char	*name;
-	const int		offset;
-	const int		size;
+	const size_t		offset;
+	const size_t		size;
 } delta_field_t;
 
 // one field
@@ -95,7 +104,7 @@ void Delta_Shutdown( void );
 void Delta_InitFields( void );
 int Delta_NumTables( void );
 delta_info_t *Delta_FindStructByIndex( int index );
-void Delta_AddEncoder( char *name, pfnDeltaEncode encodeFunc );
+void Delta_AddEncoder( const char *name, pfnDeltaEncode encodeFunc );
 int Delta_FindField( delta_t *pFields, const char *fieldname );
 void Delta_SetField( delta_t *pFields, const char *fieldname );
 void Delta_UnsetField( delta_t *pFields, const char *fieldname );

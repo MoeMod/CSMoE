@@ -41,13 +41,18 @@ public:
 	virtual void StudioMergeBones(model_t *m_pSubModel);
 	virtual float StudioEstimateInterpolant(void);
 	virtual float StudioEstimateFrame(mstudioseqdesc_t *pseqdesc);
-	virtual void StudioFxTransform(cl_entity_t *ent, float transform[3][4]);
-	virtual void StudioSlerpBones(vec4_t q1[], float pos1[][3], vec4_t q2[], float pos2[][3], float s);
+	virtual void StudioFxTransform(cl_entity_t *ent, matrix3x4_ref transform);
+	virtual void StudioSlerpBones(vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s);
 	virtual void StudioCalcBoneAdj(float dadt, float *adj, const byte *pcontroller1, const byte *pcontroller2, byte mouthopen);
-	virtual void StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *q);
-	virtual void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *pos);
-	virtual void StudioCalcRotations(float pos[][3], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f);
-	virtual void StudioRenderModel(float *lightdir);
+	virtual void StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec4_t_ref q);
+	virtual void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos);
+	virtual void StudioCalcRotations(vec3_t pos[], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f);
+	virtual void StudioRenderModel(const vec3_t lightdir);
+	virtual void DrawOutLineBegin(int flag);
+	virtual void DrawOutLine(int flag);
+	virtual void DrawOutLinePause(int flag);
+	virtual void DrawOutLineEnd(int flag);
+	virtual BOOL DrawOutLineCheck(int flag);
 	virtual void StudioRenderFinal(void);
 	virtual void StudioRenderFinal_Software(void);
 	virtual void StudioRenderFinal_Hardware(void);
@@ -81,8 +86,8 @@ public:
 	model_t *m_pChromeSprite;
 	int m_nCachedBones;
 	char m_nCachedBoneNames[MAXSTUDIOBONES][32];
-	float m_rgCachedBoneTransform[MAXSTUDIOBONES][3][4];
-	float m_rgCachedLightTransform[MAXSTUDIOBONES][3][4];
+    matrix3x4 m_rgCachedBoneTransform[MAXSTUDIOBONES];
+    matrix3x4 m_rgCachedLightTransform[MAXSTUDIOBONES];
 	float m_fSoftwareXScale, m_fSoftwareYScale;
 	float m_vUp[3];
 	float m_vRight[3];
@@ -90,10 +95,10 @@ public:
 	float m_vRenderOrigin[3];
 	int *m_pStudioModelCount;
 	int *m_pModelsDrawn;
-	float (*m_protationmatrix)[3][4];
-	float (*m_paliastransform)[3][4];
-	float (*m_pbonetransform)[MAXSTUDIOBONES][3][4];
-	float (*m_plighttransform)[MAXSTUDIOBONES][3][4];
+    matrix3x4 (*m_protationmatrix);
+    matrix3x4 (*m_paliastransform);
+    matrix3x4 (*m_pbonetransform)[MAXSTUDIOBONES];
+    matrix3x4 (*m_plighttransform)[MAXSTUDIOBONES];
 };
 
 }

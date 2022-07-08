@@ -10,6 +10,8 @@
 
 #include "r_texture.h"
 
+namespace cl {
+
 #ifndef MAX_HOSTAGES
 #define MAX_HOSTAGES 24
 #endif
@@ -28,7 +30,7 @@ public:
 
 	void BuildHostageList(void);
 	bool IsValidEntity(cl_entity_s *pEntity);
-	bool CalcPoint(float *origin, int &screenX, int &screenY, int &scale);
+	bool CalcPoint(const vec3_t origin, int &screenX, int &screenY, int &scale);
 	void DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scale, int r, int g, int b, int a);
 
 	bool Available() const { return m_MapSprite != nullptr; }
@@ -86,6 +88,10 @@ private:
 	overview_t m_OverviewData;
 	model_t *m_MapSprite;
 	void LoadMapSprites(void);
+
+	UniqueTexture m_iMapTitleBG;
 };
+
+}
 
 #endif

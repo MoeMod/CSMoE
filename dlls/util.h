@@ -61,7 +61,7 @@
 
 #define cchMapNameMost		32
 
-#define CBSENTENCENAME_MAX	16
+#define CBSENTENCENAME_MAX	20
 #define CVOXFILESENTENCEMAX	1536	// max number of sentences in game. NOTE: this must match CVOXFILESENTENCEMAX in engine\sound.h
 
 #define GROUP_OP_AND		0
@@ -105,7 +105,7 @@ typedef int BOOL;
 #define HUMAN_GIB_COUNT		6
 #define ALIEN_GIB_COUNT		4
 
-template<class T> class CUtlVector;
+#include <tier1/utlvector.h>
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -129,12 +129,14 @@ using sv::gpGlobals;
 #define LANGUAGE_FRENCH		2
 #define LANGUAGE_BRITISH	3
 
+#define SVC_STUFFTEXT 9
 #define SVC_TEMPENTITY		23
 #define SVC_INTERMISSION	30
 #define SVC_CDTRACK		32
 #define SVC_WEAPONANIM		35
 #define SVC_ROOMTYPE		37
 #define SVC_DIRECTOR		51
+#define SVC_WEAPONANIM2		46
 
 constexpr int SF_TRIG_PUSH_ONCE = 1;
 // func_rotating
@@ -253,8 +255,8 @@ namespace cl {
 namespace sv {
 #endif
 
-inline void	PLAYBACK_EVENT( int flags, const edict_t *who, unsigned short index ) { return PLAYBACK_EVENT_FULL(flags, who, index, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
-inline void	PLAYBACK_EVENT_DELAY( int flags, const edict_t *who, unsigned short index, float delay ) { return PLAYBACK_EVENT_FULL(flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
+inline void	PLAYBACK_EVENT( int flags, const edict_t *who, unsigned short index ) { return PLAYBACK_EVENT_FULL(flags, who, index, 0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
+inline void	PLAYBACK_EVENT_DELAY( int flags, const edict_t *who, unsigned short index, float delay ) { return PLAYBACK_EVENT_FULL(flags, who, index, delay, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
 
 inline void MAKE_STRING_CLASS(const char *str, entvars_t *pev)
 {
@@ -323,7 +325,7 @@ inline edict_t *INDEXENT(int iEdictNum)
 	return (*g_engfuncs.pfnPEntityOfEntIndex)(iEdictNum);
 }
 
-inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float *pOrigin, entvars_t *ent)
+inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const vec3_t pOrigin, entvars_t *ent)
 {
 	MESSAGE_BEGIN(msg_dest, msg_type, pOrigin, ENT(ent));
 }
@@ -362,7 +364,7 @@ inline BOOL FClassnameIs(edict_t *pent, const char *szClassname)
 	return FStrEq(STRING(VARS(pent)->classname), szClassname);
 }
 
-inline void UTIL_MakeVectorsPrivate(Vector vecAngles, float *p_vForward, float *p_vRight, float *p_vUp)
+inline void UTIL_MakeVectorsPrivate(Vector vecAngles, vec3_t_ref p_vForward, vec3_t_ref p_vRight, vec3_t_ref p_vUp)
 {
 	g_engfuncs.pfnAngleVectors(vecAngles, p_vForward, p_vRight, p_vUp);
 }
@@ -466,7 +468,7 @@ ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *p
             const char *param3 = NULL, const char *param4 = NULL);
 
 //NOXREF void UTIL_SayText(const char *pText, CBaseEntity *pEntity);
-void UTIL_SayTextAll(const char *pText, CBaseEntity *pEntity);
+void UTIL_SayTextAll(const char *pText, CBaseEntity *pEntity = NULL);
 char *UTIL_dtos1(int d);
 char *UTIL_dtos2(int d);
 //NOXREF char *UTIL_dtos3(int d);
@@ -483,7 +485,7 @@ UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igm
                TraceResult *ptr);
 void
 UTIL_TraceModel(const Vector &vecStart, const Vector &vecEnd, int hullNumber, edict_t *pentModel, TraceResult *ptr);
-//NOXREF TraceResult UTIL_GetGlobalTrace();
+TraceResult UTIL_GetGlobalTrace();
 void UTIL_SetSize(entvars_t *pev, const Vector &vecMin, const Vector &vecMax);
 float UTIL_VecToYaw(const Vector &vec);
 void UTIL_SetOrigin(entvars_t *pev, const Vector &vecOrigin);
@@ -516,7 +518,8 @@ void UTIL_BubbleTrail(Vector from, Vector to, int count);
 void UTIL_Remove(CBaseEntity *pEntity);
 //NOXREF BOOL UTIL_IsValidEntity(edict_t *pent);
 void UTIL_PrecacheOther(const char *szClassname);
-void UTIL_LogPrintf(const char *fmt, ...);
+void UTIL_LogPrintf(const char* fmt, ...);
+void UTIL_LogPrintfDetail(const char *fmt, ...);
 //NOXREF float UTIL_DotPoints(const Vector &vecSrc, const Vector &vecCheck, const Vector &vecDir);
 void UTIL_StripToken(const char *pKey, char *pDest);
 void EntvarsKeyvalue(entvars_t *pev, KeyValueData *pkvd);
@@ -524,7 +527,15 @@ char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd);
 //NOXREF int GetPlayerTeam(int index);
 bool UTIL_IsGame(const char *gameName);
 float UTIL_GetPlayerGaitYaw(int playerIndex);
-int UTIL_ReadFlags(const char *c);
+int UTIL_ReadFlags(const char* c);
+void UTIL_BroadcastStuffText(const char* fmt, ...);
+void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vector& vecVelocity, int iModelIndex, int life, int sequence, int framerate, bool fadeOut, int fadeSpeed, int brightness, int rendermode, CBaseEntity* pEntity, bool fadeIn, int fadeInSpeed, int scale, int frameMax, int flags, bool excludeSource = false);
+bool UTIL_AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr);
+void UTIL_AddKickRateBoost(CBaseEntity* pEntity, const Vector2D& vecDir, float flVelocityModifier, float flForce, float flBoost, bool ApplyAll = false);
+float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flBaseDamage, float flMaxRange);
+float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flRange, Vector& vecDir);
+float UTIL_CalculateDamageRate(Vector vecSrc, CBaseEntity* pOther);
+void UTIL_TE_Sprite(const short sprite, const float x, const float y, const float z, const byte scale, const byte brightness);
 
 }
 #else

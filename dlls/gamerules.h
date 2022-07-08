@@ -38,6 +38,7 @@
 
 #define MAX_RULE_BUFFER				1024
 #define MAX_VOTE_MAPS				100
+#define MAX_CUSTOM_VOTE_MAPS		5
 #define MAX_VIP_QUEUES				5
 
 #define MAX_BOMB_RADIUS				2048
@@ -391,6 +392,8 @@ public:
 	virtual void ChangeLevel();
 	virtual void GoToIntermission();
 
+	virtual BOOL TeamFull(int team_id);
+	virtual BOOL TeamStacked(int newTeam_id, int curTeam_id);
 public:
 	// Checks if it still needs players to start a round, or if it has enough players to start rounds.
 	// Starts a round and returns true if there are enough players.
@@ -433,8 +436,6 @@ public:
 	void MarkSpawnSkipped() { m_bSkipSpawn = false; }
 	//NOXREF void PlayerJoinedTeam(CBasePlayer *pPlayer) { }
 	duration_t TimeRemaining() { return duration_t(m_iRoundTimeSecs) - (gpGlobals->time - m_fRoundCount); }
-	BOOL TeamFull(int team_id);
-	BOOL TeamStacked(int newTeam_id, int curTeam_id);
 	bool IsVIPQueueEmpty();
 	bool AddToVIPQueue(CBasePlayer *toAdd);
 
@@ -460,6 +461,10 @@ public:
 	}
 	void SendMOTDToClient(edict_t *client);
 
+	void LoadRandomMaps();
+	bool CheckCanStartVoteMaps(bool bAlert = false);
+	void VoteMapThink();
+
 private:
 	bool HasRoundTimeExpired();
 	bool IsBombPlanted();
@@ -468,7 +473,7 @@ private:
 public:
 	CVoiceGameMgr m_VoiceGameMgr;
 	time_point_t m_fTeamCount;                // m_flRestartRoundTime, the global time when the round is supposed to end, if this is not 0
-	float m_flCheckWinConditions;
+	time_point_t m_flCheckWinConditions;
 	time_point_t m_fRoundCount;
 	std::chrono::duration<int, std::ratio<1>> m_iRoundTime;                // (From mp_roundtime) - How many seconds long this round is.
 	std::chrono::duration<int, std::ratio<1>> m_iRoundTimeSecs;
@@ -537,6 +542,17 @@ public:
 	float m_flFadeToBlackValue;
 	CBasePlayer *m_pVIP;
 	CBasePlayer *VIPQueue[MAX_VIP_QUEUES];
+
+	int m_iVoteMapStatus;
+	time_point_t m_flVoteNextThink;
+	time_point_t m_flVoteTipsThink;
+	std::vector<std::pair<std::string, int>> m_vecVoteMaps;
+	int m_iVoteOptionCount[2];
+
+	OperationSystem m_iPlayersOS[MAX_CLIENTS];
+	std::set<int> m_setBanWeapon;
+	std::set<int> m_setBanKnife;
+	std::set<int> m_setBanGrenade;
 
 protected:
 	time_point_t m_flIntermissionEndTime;
@@ -614,8 +630,9 @@ int GetMapCount();
 
 }
 #else // CLIENT_DLL
-
+namespace cl {
 extern void Broadcast(const char *sentence, int pitch = 100);
+}
 #endif
 
 #endif // GAMERULES_H

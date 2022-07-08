@@ -14,10 +14,7 @@ GNU General Public License for more details.
 */
 
 #include "hud.h"
-#include "followicon.h"
 #include "cl_util.h"
-#include "draw_util.h"
-#include "triangleapi.h"
 
 #include "parsemsg.h"
 
@@ -27,9 +24,11 @@ GNU General Public License for more details.
 #include "zb3_morale.h"
 #include "zb3_rage.h"
 
+#include "gamemode/mods_const.h"
 #include "gamemode/zb3/zb3_const.h"
 
 #include <vector>
+namespace cl {
 
 class CHudZB3::impl_t
 	: public THudSubDispatcher<CHudZB3Morale, CHudZB3Rage>
@@ -48,19 +47,30 @@ int CHudZB3::MsgFunc_ZB3Msg(const char *pszName, int iSize, void *pbuf)
 	{
 		auto morale_type = static_cast<ZB3HumanMoraleType_e>(buf.ReadByte());
 		int morale_level = buf.ReadByte();
-		pimpl->get<CHudZB3Morale>().UpdateLevel(morale_type, morale_level);
+		if (gHUD.m_iModRunning == MOD_ZBZ && morale_level == 255)
+			pimpl->get<CHudZB3Morale>().SetEnabled(true);
+		else
+			pimpl->get<CHudZB3Morale>().UpdateLevel(morale_type, morale_level);
+
 		break;
 	}
 	case ZB3_MESSAGE_RAGE:
 	{
 		auto zombie_level = static_cast<ZombieLevel>(buf.ReadByte());
 		int percent = buf.ReadByte();
-		pimpl->get<CHudZB3Rage>().SetZombieLevel(zombie_level);
-		pimpl->get<CHudZB3Rage>().SetPercent(percent);
+		if (gHUD.m_iModRunning == MOD_ZBZ && percent == 255)
+		{
+			pimpl->get<CHudZB3Rage>().SetEnabled(true);
+		}
+		else
+		{
+			pimpl->get<CHudZB3Rage>().SetZombieLevel(zombie_level);
+			pimpl->get<CHudZB3Rage>().SetPercent(percent);
+		}
 		break;
 	}
 	}
-	
+
 	return 1;
 }
 
@@ -107,4 +117,5 @@ void CHudZB3::Shutdown(void)
 {
 	delete pimpl;
 	pimpl = nullptr;
+}
 }

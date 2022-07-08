@@ -27,7 +27,10 @@ GNU General Public License for more details.
 #include "protocol.h"
 #include "dlight.h"
 
-extern byte	*r_temppool;
+#include <memory>
+#include <string>
+
+extern mempool_t	*r_temppool;
 
 #define BLOCK_SIZE		world.block_size	// lightmap blocksize
 #define BLOCK_SIZE_DEFAULT	128		// for keep backward compatibility
@@ -60,6 +63,9 @@ extern byte	*r_temppool;
 #define TF_IMAGE		(TF_UNCOMPRESSED|TF_NOPICMIP|TF_NOMIPMAP|TF_CLAMP)
 #define TF_DECAL		(TF_CLAMP|TF_UNCOMPRESSED)
 
+namespace xe {
+	typedef struct texlru_extdata_s texlru_extdata_t;
+}
 typedef struct gltexture_s
 {
 	char		name[256];	// game path, including extension (can be store image programs)
@@ -78,7 +84,7 @@ typedef struct gltexture_s
 
 	rgba_t		fogParams;	// some water textures
 					// contain info about underwater fog
-	rgbdata_t		*original;	// keep original image
+	image_ref		original;	// keep original image
 
 	// debug info
 	byte		texType;		// used for gl_showtextures
@@ -88,7 +94,10 @@ typedef struct gltexture_s
 	float		xscale;
 	float		yscale;
 
-	struct gltexture_s	*nextHash;
+	// reference count
+	uint		refCount; // 2021.10.01 added.
+
+	std::unique_ptr<xe::texlru_extdata_t> texlru_extdata;
 } gltexture_t;
 
 // mirror entity
@@ -200,15 +209,18 @@ typedef struct
 	cl_entity_t	*solid_entities[MAX_VISIBLE_PACKET];	// opaque moving or alpha brushes
 	cl_entity_t	*trans_entities[MAX_VISIBLE_PACKET];	// translucent brushes
 	cl_entity_t	*child_entities[MAX_VISIBLE_PACKET];	// entities with MOVETYPE_FOLLOW
+	cl_entity_t *delay_entities[MAX_VISIBLE_PACKET];	// entities draw after viewmodel
 	uint		num_static_entities;
 	uint		num_mirror_entities;
 	uint		num_solid_entities;
 	uint		num_trans_entities;
 	uint		num_child_entities;
+	uint		num_delay_entities;
          
 	// OpenGL matrix states
 	qboolean		modelviewIdentity;
 	qboolean		fResetVis;
+	qboolean		fFlipViewModel;
 	
 	int		visframecount;	// PVS frame
 	int		dlightframecount;	// dynamic light frame
@@ -250,7 +262,7 @@ extern mleaf_t		*r_viewleaf, *r_oldviewleaf;
 extern mleaf_t		*r_viewleaf2, *r_oldviewleaf2;
 extern dlight_t		cl_dlights[MAX_DLIGHTS];
 extern dlight_t		cl_elights[MAX_ELIGHTS];
-#define r_numEntities	(tr.num_solid_entities + tr.num_trans_entities + tr.num_child_entities + tr.num_static_entities)
+#define r_numEntities	(tr.num_solid_entities + tr.num_trans_entities + tr.num_child_entities + tr.num_static_entities + tr.num_delay_entities)
 #define r_numStatics	(r_stats.c_client_ents)
 
 extern struct beam_s	*cl_active_beams;
@@ -266,9 +278,9 @@ void GL_CleanUpTextureUnits( int last );
 void GL_Bind( GLint tmu, GLenum texnum );
 void GL_MultiTexCoord2f( GLenum texture, GLfloat s, GLfloat t );
 void GL_SetTexCoordArrayMode( GLenum mode );
-void GL_LoadTexMatrix(vec4_t * const m );
+void GL_LoadTexMatrix( const matrix4x4 & m );
 void GL_LoadTexMatrixExt( const float *glmatrix );
-void GL_LoadMatrix(vec4_t * const source );
+void GL_LoadMatrix( const matrix4x4 &source );
 void GL_TexGen( GLenum coord, GLenum mode );
 void GL_SelectTexture( GLint texture );
 void GL_LoadIdentityTexMatrix( void );
@@ -292,7 +304,7 @@ qboolean R_CullSurface( msurface_t *surf, uint clipflags );
 // gl_decals.c
 //
 void DrawSurfaceDecals( msurface_t *fa );
-float *R_DecalSetupVerts( decal_t *pDecal, msurface_t *surf, int texture, int *outCount );
+vertex_t *R_DecalSetupVerts( decal_t *pDecal, msurface_t *surf, int texture, int *outCount );
 void DrawSingleDecal( decal_t *pDecal, msurface_t *fa );
 void R_EntityRemoveDecals( model_t *mod );
 void R_ClearDecals( void );
@@ -308,10 +320,12 @@ void R_UploadStretchRaw( int texture, int cols, int rows, int width, int height,
 // gl_image.c
 //
 void R_SetTextureParameters( void );
+size_t R_TextureNum();
 gltexture_t *R_GetTexture( GLenum texnum );
 void GL_SetTextureType( GLenum texnum, GLenum type );
+int GL_LoadTexture_DDS(const char* name, GLvoid* data, int type, int size, int w, int h);
 int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, imgfilter_t *filter );
-int GL_LoadTextureInternal( const char *name, rgbdata_t *pic, texFlags_t flags, qboolean update );
+int GL_LoadTextureInternal( const char *name, image_ref pic, texFlags_t flags, qboolean update );
 byte *GL_ResampleTexture( const byte *source, int in_w, int in_h, int out_w, int out_h, qboolean isNormalMap );
 int GL_CreateTexture( const char *name, int width, int height, const void *buffer, texFlags_t flags );
 void GL_ProcessTexture( int texnum, float gamma, int topColor, int bottomColor );
@@ -343,9 +357,9 @@ void R_StoreEfrags( efrag_t **ppefrag, int framecount );
 //
 void R_PushDlights( void );
 void R_AnimateLight( void );
-void R_GetLightSpot( vec3_t lightspot );
+void R_GetLightSpot( vec3_t_ref lightspot );
 void R_MarkLights( dlight_t *light, int bit, mnode_t *node );
-void R_LightDir( const vec3_t origin, vec3_t lightDir, float radius );
+void R_LightDir( const vec3_t origin, vec3_t_ref lightDir, float radius );
 void R_LightForPoint( const vec3_t point, color24 *ambientLight, qboolean invLight, qboolean useAmbient, float radius );
 int R_CountSurfaceDlights( msurface_t *surf );
 int R_CountDlights( void );
@@ -365,27 +379,25 @@ void R_SetupFrustum( void );
 void R_FindViewLeaf( void );
 void R_DrawFog( void );
 
-#define cmatrix3x4 vec4_t *const
-#define cmatrix4x4 vec4_t *const
 //
 // gl_rmath.c
 //
 float V_CalcFov( float *fov_x, float width, float height );
 void V_AdjustFov( float *fov_x, float *fov_y, float width, float height, qboolean lock_x );
 void Matrix4x4_ToArrayFloatGL( cmatrix4x4 in, float out[16] );
-void Matrix4x4_FromArrayFloatGL( matrix4x4 out, const float in[16] );
-void Matrix4x4_Concat(matrix4x4 out, cmatrix4x4 in1, cmatrix4x4 in2 );
-void Matrix4x4_ConcatTranslate( matrix4x4 out, float x, float y, float z );
-void Matrix4x4_ConcatRotate( matrix4x4 out, float angle, float x, float y, float z );
-void Matrix4x4_ConcatScale( matrix4x4 out, float x );
-void Matrix4x4_ConcatScale3( matrix4x4 out, float x, float y, float z );
-void Matrix4x4_CreateTranslate( matrix4x4 out, float x, float y, float z );
-void Matrix4x4_CreateRotate( matrix4x4 out, float angle, float x, float y, float z );
-void Matrix4x4_CreateScale( matrix4x4 out, float x );
-void Matrix4x4_CreateScale3( matrix4x4 out, float x, float y, float z );
-void Matrix4x4_CreateProjection(matrix4x4 out, float xMax, float xMin, float yMax, float yMin, float zNear, float zFar);
-void Matrix4x4_CreateOrtho(matrix4x4 m, float xLeft, float xRight, float yBottom, float yTop, float zNear, float zFar);
-void Matrix4x4_CreateModelview( matrix4x4 out );
+void Matrix4x4_FromArrayFloatGL( matrix4x4_ref out, const float in[16] );
+void Matrix4x4_Concat(matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 in2 );
+void Matrix4x4_ConcatTranslate( matrix4x4_ref out, float x, float y, float z );
+void Matrix4x4_ConcatRotate( matrix4x4_ref out, float angle, float x, float y, float z );
+void Matrix4x4_ConcatScale( matrix4x4_ref out, float x );
+void Matrix4x4_ConcatScale3( matrix4x4_ref out, float x, float y, float z );
+void Matrix4x4_CreateTranslate( matrix4x4_ref out, float x, float y, float z );
+void Matrix4x4_CreateRotate( matrix4x4_ref out, float angle, float x, float y, float z );
+void Matrix4x4_CreateScale( matrix4x4_ref out, float x );
+void Matrix4x4_CreateScale3( matrix4x4_ref out, float x, float y, float z );
+void Matrix4x4_CreateProjection(matrix4x4_ref out, float xMax, float xMin, float yMax, float yMin, float zNear, float zFar);
+void Matrix4x4_CreateOrtho(matrix4x4_ref m, float xLeft, float xRight, float yBottom, float yTop, float zNear, float zFar);
+void Matrix4x4_CreateModelview( matrix4x4_ref out );
 
 //
 // gl_rmisc.
@@ -471,7 +483,7 @@ void VID_CheckChanges( void );
 int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, imgfilter_t *filter );
 void GL_FreeImage( const char *name );
 qboolean VID_ScreenShot( const char *filename, int shot_type );
-qboolean VID_CubemapShot( const char *base, uint size, const float *vieworg, qboolean skyshot );
+qboolean VID_CubemapShot( const char *base, uint size, vec3_t_ref vieworg, qboolean skyshot );
 void VID_RestoreGamma( void );
 void R_BeginFrame( qboolean clearScene );
 void R_RenderFrame( const ref_params_t *fd, qboolean drawWorld );
@@ -484,8 +496,8 @@ void R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, f
 qboolean R_SpeedsMessage( char *out, size_t size );
 void R_SetupSky( const char *skyboxname );
 qboolean R_CullBox( const vec3_t mins, const vec3_t maxs, uint clipflags );
-qboolean R_WorldToScreen( const vec3_t point, vec3_t screen );
-void R_ScreenToWorld( const vec3_t screen, vec3_t point );
+qboolean R_WorldToScreen( const vec3_t point, vec3_t_ref screen );
+void R_ScreenToWorld( const vec3_t screen, vec3_t_ref point );
 qboolean R_AddEntity( struct cl_entity_s *pRefEntity, int entityType );
 void Mod_LoadMapSprite( struct model_s *mod, const void *buffer, size_t size, qboolean *loaded );
 void Mod_UnloadSpriteModel( struct model_s *mod );
@@ -495,12 +507,12 @@ void GL_SetRenderMode( int mode );
 void R_RunViewmodelEvents( void );
 void R_DrawViewModel( void );
 int R_GetSpriteTexture( const struct model_s *m_pSpriteModel, int frame );
-void R_DecalShoot( int textureIndex, int entityIndex, int modelIndex, vec3_t pos, int flags, vec3_t saxis, float scale );
+void R_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const vec3_t pos, int flags, const vec3_t saxis, float scale );
 void R_RemoveEfrags( struct cl_entity_s *ent );
 void R_AddEfrags( struct cl_entity_s *ent );
 void R_DecalRemoveAll( int texture );
 byte *Mod_GetCurrentVis( void );
-void Mod_SetOrthoBounds( float *mins, float *maxs );
+void Mod_SetOrthoBounds( const vec2_t mins, const vec2_t maxs );
 void R_NewMap( void );
 
 /*
@@ -553,6 +565,9 @@ enum
 	GL_DEPTH_TEXTURE,
 	GL_DEBUG_OUTPUT,
 	GL_SHADOW_EXT,
+	GL_S3TC_EXT,
+	GL_ASTC_EXT,
+
 	GL_EXTCOUNT,		// must be last
 };
 
@@ -680,6 +695,7 @@ extern convar_t	*gl_test;		// cvar to testify new effects
 extern convar_t	*gl_msaa;
 extern convar_t *gl_overbright;
 extern convar_t *gl_overbright_studio;
+extern convar_t* gl_fog;
 
 
 extern convar_t	*r_ypos;
@@ -709,6 +725,7 @@ extern convar_t	*r_fastsky;
 extern convar_t	*r_vbo;
 extern convar_t	*r_vbo_dlightmode;
 extern convar_t *r_strobe;
+extern convar_t* r_texlru;
 
 extern convar_t	*r_bump;
 extern convar_t *r_underwater_distortion;

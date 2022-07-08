@@ -79,6 +79,7 @@
 #define MOVETYPE_FOLLOW		12	// track movement of aiment
 #define MOVETYPE_PUSHSTEP		13	// BSP model that needs physics/world collisions (uses nearest hull for world collision)
 #define MOVETYPE_COMPOUND		14	// glue two entities together (simple movewith)
+#define MOVETYPE_FOLLOWMOVE		15	// track movement of aiment
 
 // edict->solid values
 // NOTE: Some movetypes will cause collisions independent of SOLID_NOT/SOLID_TRIGGER when the entity moves
@@ -110,8 +111,7 @@
 #define EF_NOINTERP			32	// don't interpolate the next frame
 #define EF_LIGHT			64	// rocket flare glow sprite
 #define EF_NODRAW			128	// don't draw entity
-
-
+#define EF_NOCULL		(1<<8)	// Entity won't cull front face
 
 #define EF_NOREFLECT		(1<<24)	// Entity won't reflecting in mirrors
 #define EF_REFLECTONLY		(1<<25)	// Entity will be drawing only in mirrors
@@ -124,6 +124,8 @@
 
 // entity flags
 #define EFLAG_SLERP			1	// do studio interpolation of this entity
+#define EFLAG_DEPTH_CHANGED		(1<<1)	// prevent model from poking into walls
+#define EFLAG_AFTER_VIEWMODEL		(1<<2)	// draw after view model
 
 //
 // temp entity events
@@ -574,6 +576,87 @@
 // byte ( color ) this is an index into an array of color vectors in the engine. (0 - )
 // byte ( length * 10 )
 
+#define	TE_BEAMPOINTS_STRETCH		128	// beam effect between two points
+// coord coord coord (start position) 
+// coord coord coord (end position) 
+// short (sprite index) 
+// byte (starting frame) 
+// byte (frame rate in 0.1's) 
+// byte (life in 0.1's) 
+// byte (line width in 0.1's) 
+// byte,byte,byte (color)
+// byte (brightness)
+
+#define	TE_ARROWMODEL		129	// a client-side arrow model for weapon_bow, allows to fade out or follow a player
+// coord, coord, coord (position or offset)
+// angle, angle, angle (angles)
+// short (model index)
+// byte (life * 10)
+// byte (framerate * 10)
+// byte (mode)
+// byte (renderamt)
+// byte (rendermode)
+// short (player index)					// -1 to be a static model in certain position
+// byte (fade speed * 10)
+
+#define TE_ROTATEDMODEL			130
+// coord, coord, coord (origin)
+// angle (yaw)
+// short (model index)
+// byte (life * 10)
+// byte (framerate)
+// byte (fade out or not)
+// byte (brightness)
+// byte (rendermode)
+// short (entity index)
+
+#define TE_TEMPMODEL				131	// a customized model
+// coord, coord, coord (position)
+// angle, angle, angle (angles)
+// coord, coord, coord (velocity)
+// short (model index)
+// byte (life * 10)
+// short (sequence)
+// byte (framerate)
+// byte (fade out)
+// byte (brightness)
+// byte (rendermode)
+// short (player index)
+// byte (fade out speed)
+// byte (fade in)
+// byte (fade in speed)
+// byte (scale * 10)
+// short (frame max)
+// long (tempentity flags)
+
+#define TE_TEMPSPRITE				132
+// coord (origin)
+// coord (origin)
+// coord (origin)
+// short (sprite index)
+// byte (scale * 10)
+// byte (brightness)
+// byte (framerate)
+
+#define TE_FOLLOWINGARROW			133	// an arrow following a player
+// short (player index)
+// short (model index)
+// coord, coord, coord (position offset)
+// coord, coord, coord (angle offset)
+// byte (life)
+
+#define TE_TEMPEXPLODEMODEL		134	// spherical shower of models, picks from set
+// coord, coord, coord (origin)
+// coord (velocity)
+// short (model index)
+// short (count)
+// byte (life in 0.1's)
+// byte (anglecalc)
+
+#define TE_KILLENTITYATTACHMENTS	135	// will expire all TENTS attached to a ent.
+// short (entity index of ent)
+
+
 #define MSG_BROADCAST		0	// unreliable to all
 #define MSG_ONE			1	// reliable to one (msg_entity)
 #define MSG_ALL			2	// reliable to all
@@ -584,6 +667,7 @@
 #define MSG_PAS_R			7	// Reliable to PAS
 #define MSG_ONE_UNRELIABLE		8	// Send to one client, but don't put in reliable stream, put in unreliable datagram ( could be dropped )
 #define MSG_SPEC			9	// Sends to all spectator proxies
+#define MSG_EXCLUDESOURCE			10	// Sends to all spectator proxies
 
 // contents of a spot in the world
 #define CONTENTS_EMPTY		-1
@@ -730,7 +814,11 @@ enum
 	kRenderFxDeadPlayer,		// kRenderAmt is the player index
 	kRenderFxExplode,			// Scale up really big!
 	kRenderFxGlowShell,			// Glowing Shell
-	kRenderFxClampMinScale		// Keep this sprite from getting very small (SPRITES only!)
+	kRenderFxClampMinScale,		// Keep this sprite from getting very small (SPRITES only!)
+	kRenderFxWallHack,			//Huntbow only
+	kRenderFxGreenOutLine,		// WallHeck
+	kRenderFxRedOutLine,		// WallHeck
+	kRenderFxBlackOutLine		// No WallHeck
 };
 
 typedef int		func_t;

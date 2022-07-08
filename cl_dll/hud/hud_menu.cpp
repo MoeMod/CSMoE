@@ -25,12 +25,17 @@
 #include <stdio.h>
 #include "draw_util.h"
 
+#include "CBaseViewport.h"
+
 #include "gamemode/mods_const.h"
 #ifdef XASH_IMGUI
 #include "imgui_cl/imgui_cl_menu.h"
 #endif
+#include "luash_cl/lua_cl.h"
 
 //#include "vgui_TeamFortressViewport.h"
+
+namespace cl {
 
 #define MAX_MENU_STRING	512
 
@@ -47,6 +52,7 @@ DECLARE_MESSAGE( m_Menu, AllowSpec )
 DECLARE_COMMAND( m_Menu, OldStyleMenuOpen )
 DECLARE_COMMAND( m_Menu, OldStyleMenuClose )
 DECLARE_COMMAND( m_Menu, ShowVGUIMenu )
+DECLARE_COMMAND( m_Menu, ShowVGUIMenu2 )
 
 int CHudMenu :: Init( void )
 {
@@ -59,6 +65,7 @@ int CHudMenu :: Init( void )
 	HOOK_COMMAND( "client_buy_open", OldStyleMenuOpen );
 	HOOK_COMMAND( "client_buy_close", OldStyleMenuClose );
 	HOOK_COMMAND( "showvguimenu", ShowVGUIMenu );
+	HOOK_COMMAND( "showvguimenu2", ShowVGUIMenu2 );
 
 	_extended_menus = CVAR_CREATE("_extended_menus", "1", FCVAR_ARCHIVE);
 
@@ -102,10 +109,10 @@ int CHudMenu :: Draw( float flTime )
 
 #ifdef XASH_IMGUI
 	// we have imgui one
-	cl::ImGuiCL_Menu_OnGUI();
+	ImGuiCL_Menu_OnGUI();
 	return 1;
 #endif
-	
+
 	// don't draw the menu if the scoreboard is being shown
 	//if ( gViewPort && gViewPort->IsScoreBoardVisible() )
 		//return 1;
@@ -136,7 +143,7 @@ int CHudMenu :: Draw( float flTime )
 		if ( g_szMenuString[i] == '\n' )
 			i++;
 	}
-	
+
 	return 1;
 }
 
@@ -258,6 +265,9 @@ int CHudMenu::MsgFunc_BuyClose(const char *pszName, int iSize, void *pbuf)
 {
 	UserCmd_OldStyleMenuClose();
 	gMobileAPI.pfnTouchRemoveButton("_menu_*");
+#ifdef XASH_VGUI2
+	g_pViewport->HideVGUIMenu(MENU_BUY);
+#endif
 	return 1;
 }
 
@@ -288,7 +298,7 @@ void CHudMenu::UserCmd_OldStyleMenuClose()
 
 void CHudMenu::ShowVGUIMenu( int menuType )
 {
-	const char *szCmd;
+	const char *szCmd = nullptr;
 
 	switch(menuType)
 	{
@@ -301,17 +311,40 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 	case MENU_CLASS_CT:
 		szCmd = "exec touch/chooseteam_ct.cfg";
 		break;
+#ifdef XASH_VGUI2
+    case MENU_BUY:
+	case MENU_BUY_PISTOL:
+	case MENU_BUY_SHOTGUN:
+	case MENU_BUY_RIFLE:
+	case MENU_BUY_SUBMACHINEGUN:
+	case MENU_BUY_MACHINEGUN:
+	case MENU_BUY_ITEM:
+        if(g_pViewport->ShowVGUIMenu(menuType))
+        {
+            return;
+        }
+#else
 	case MENU_BUY:
 		switch (gHUD.m_iModRunning)
 		{
 		case MOD_ZBS:
 			szCmd = "exec touch/buy_zbs.cfg";
 			break;
+		case MOD_ZB1:
+		case MOD_ZB2:
+		case MOD_ZB3:
+		case MOD_ZE:
+		case MOD_ZB4:
+		case MOD_ZBB:
+		case MOD_ZBZ:
+			// random weapon in zb mode, no need to buy
+			szCmd = "exec touch/buy_zb.cfg";
+			break;
 		default:
 			szCmd = "exec touch/buy.cfg";
 			break;
 		}
-		
+
 		break;
 	case MENU_BUY_PISTOL:
 		if( g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_TERRORIST )
@@ -343,6 +376,7 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 			szCmd = "exec touch/buy_item_t.cfg";
 		else szCmd = "exec touch/buy_item_ct.cfg";
 		break;
+#endif
 	case MENU_RADIOA:
 		szCmd = "exec touch/radioa.cfg";
 		break;
@@ -364,8 +398,19 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 		break;
 	}
 
+#ifdef XASH_IMGUI
+	if (menuType == MENU_CLASS_T || menuType == MENU_CLASS_CT)
+		return;
+
+	if (menuType == MENU_TEAM)
+	{
+		LuaCL_Exec("imgui_jointeam_open = true");
+		return;
+	}
+#endif
 	m_fMenuDisplayed = 1;
-	ClientCmd(szCmd);
+    if(szCmd)
+	    ClientCmd(szCmd);
 }
 
 void CHudMenu::UserCmd_ShowVGUIMenu()
@@ -378,4 +423,17 @@ void CHudMenu::UserCmd_ShowVGUIMenu()
 
 	int menuType = atoi(gEngfuncs.Cmd_Argv(1));
 	ShowVGUIMenu(menuType);
+}
+
+void CHudMenu::UserCmd_ShowVGUIMenu2()
+{
+	if (gEngfuncs.Cmd_Argc() < 2)
+	{
+		ConsolePrint("usage: showvguimenu2 <name>\n");
+		return;
+	}
+
+	g_pViewport->ShowVGUIMenuByName(gEngfuncs.Cmd_Argv(1));
+}
+
 }

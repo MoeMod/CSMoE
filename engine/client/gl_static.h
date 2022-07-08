@@ -1,6 +1,7 @@
 #ifndef GL_STATIC_H
 #define GL_STATIC_H
 
+extern "C" {
 // helper opengl functions
 GLenum glGetError (void);
 const GLubyte * glGetString (GLenum name);
@@ -357,6 +358,10 @@ void glCompressedTexImage1DARB(GLenum target, GLint level, GLenum internalformat
 void glCompressedTexSubImage3DARB(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const void *data);
 void glCompressedTexSubImage2DARB(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void *data);
 void glCompressedTexSubImage1DARB(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const void *data);
+void glCompressedTexImage3D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const void *data);
+void glCompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border,  GLsizei imageSize, const void *data);
+void glCompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const void *data);
+void glCompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void *data);
 void glDeleteObjectARB(GLhandleARB obj);
 GLhandleARB glGetHandleARB(GLenum pname);
 void glDetachObjectARB(GLhandleARB containerObj, GLhandleARB attachedObj);
@@ -434,7 +439,7 @@ void glGetQueryObjectuivARB (GLuint id, GLenum pname, GLuint *params);
 void glSelectTextureSGIS ( GLenum );
 void glMTexCoord2fSGIS ( GLenum, GLfloat, GLfloat );
 void glSwapInterval ( int interval );
-
+};
 // mangle to xash3d style
 
 #define pglGetError glGetError
@@ -790,6 +795,10 @@ void glSwapInterval ( int interval );
 #define pglCompressedTexSubImage3DARB glCompressedTexSubImage3DARB
 #define pglCompressedTexSubImage2DARB glCompressedTexSubImage2DARB
 #define pglCompressedTexSubImage1DARB glCompressedTexSubImage1DARB
+#define pglCompressedTexImage3D glCompressedTexImage3D
+#define pglCompressedTexImage2D glCompressedTexImage2D
+#define pglCompressedTexSubImage3D glCompressedTexSubImage3D
+#define pglCompressedTexSubImage2D glCompressedTexSubImage2D
 #define pglDeleteObjectARB glDeleteObjectARB
 #define pglGetHandleARB glGetHandleARB
 #define pglDetachObjectARB glDetachObjectARB

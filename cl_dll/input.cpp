@@ -30,17 +30,28 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "vgui_parser.h"
 #include "com_weapons.h"
 
-using namespace cl;
+#ifdef XASH_VGUI2
+#include "IBaseUI.h"
+namespace vgui2 {
+    extern IBaseUI *staticUIFuncs;
+}
+#endif
+
+namespace cl {
 
 extern int g_weaponselect;
 extern cl_enginefunc_t gEngfuncs;
 
+#ifdef XASH_STATIC_GAMELIB
+void IN_Init_CL (void);
+void IN_Shutdown_CL( void );
+#else
 void IN_Init (void);
-void IN_Move ( float frametime, usercmd_t *cmd);
 void IN_Shutdown( void );
+#endif
+void IN_Move ( float frametime, usercmd_t *cmd);
 void V_Init( void );
 void VectorAngles( const float *forward, float *angles );
 int CL_ButtonBits( int );
@@ -51,7 +62,6 @@ extern cvar_t *in_joystick;
 int	in_impulse	= 0;
 int	in_cancel	= 0;
 
-namespace cl {
 cvar_t	*m_pitch;
 cvar_t	*m_yaw;
 cvar_t	*m_forward;
@@ -70,7 +80,7 @@ cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 cvar_t	*cl_anglespeedkey;
 cvar_t	*cl_vsmoothing;
-}
+
 /*
 ===============================================================================
 
@@ -213,7 +223,7 @@ KB_Find
 Allows the engine to get a kbutton_t directly ( so it can check +mlook state, etc ) for saving out to .cfg files
 ============
 */
-struct kbutton_s DLLEXPORT *KB_Find( const char *name )
+kbutton_t DLLEXPORT *KB_Find( const char *name )
 {
 	kblist_t *p;
 	p = g_kbkeys;
@@ -298,7 +308,7 @@ KeyDown
 void KeyDown (kbutton_t *b)
 {
 	int		k;
-	char	*c;
+	const char	*c;
 
 	c = gEngfuncs.Cmd_Argv(1);
 	if (c[0])
@@ -332,7 +342,7 @@ KeyUp
 void KeyUp (kbutton_t *b)
 {
 	int		k;
-	char	*c;
+	const char	*c;
 	
 	c = gEngfuncs.Cmd_Argv(1);
 	if (c[0])
@@ -372,6 +382,13 @@ Return 1 to allow engine to process the key, otherwise, act on it as needed
 */
 int DLLEXPORT HUD_Key_Event( int down, int keynum, const char *pszCurrentBinding )
 {
+#ifdef XASH_VGUI2
+    bool want_text_input = vgui2::staticUIFuncs->Key_Event(down, keynum, pszCurrentBinding);
+    if(want_text_input)
+    {
+        return 0;
+    }
+#endif
 	return 1;
 }
 
@@ -589,7 +606,7 @@ CL_AdjustAngles
 Moves the local angle positions
 ================
 */
-void CL_AdjustAngles ( float frametime, float *viewangles )
+void CL_AdjustAngles ( float frametime, vec3_t_ref viewangles )
 {
 	float	speed;
 	float	up, down;
@@ -655,13 +672,13 @@ void DLLEXPORT CL_CreateMove ( float frametime, struct usercmd_s *cmd, int activ
 	{
 		//memset( viewangles, 0, sizeof( vec3_t ) );
 		//viewangles[ 0 ] = viewangles[ 1 ] = viewangles[ 2 ] = 0.0;
-		gEngfuncs.GetViewAngles( (float *)viewangles );
+		gEngfuncs.GetViewAngles( viewangles );
 
 		CL_AdjustAngles ( frametime, viewangles );
 
 		memset (cmd, 0, sizeof(*cmd));
 		
-		gEngfuncs.SetViewAngles( (float *)viewangles );
+		gEngfuncs.SetViewAngles( viewangles );
 
 		if ( in_strafe.state & 1 )
 		{
@@ -740,7 +757,7 @@ void DLLEXPORT CL_CreateMove ( float frametime, struct usercmd_s *cmd, int activ
 		}
 	}
 
-	gEngfuncs.GetViewAngles( (float *)viewangles );
+	gEngfuncs.GetViewAngles( viewangles );
 	// Set current view angles.
 
 	if ( CL_IsDead() )
@@ -980,7 +997,12 @@ void InitInput (void)
 	// Initialize third person camera controls.
 	CAM_Init();
 	// Initialize inputs
+
+#ifdef XASH_STATIC_GAMELIB
+	IN_Init_CL();
+#else
 	IN_Init();
+#endif
 	// Initialize keyboard
 	KB_Init();
 	// Initialize view system
@@ -994,6 +1016,11 @@ Input_Shutdown
 */
 void Input_Shutdown (void)
 {
+#ifdef XASH_STATIC_GAMELIB
+	IN_Shutdown_CL();
+#else
 	IN_Shutdown();
+#endif
 	KB_Shutdown();
+}
 }

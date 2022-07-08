@@ -15,6 +15,9 @@
 #include "cl_entity.h"
 #include "triangleapi.h"
 #include "rain.h"
+#include "fog.h"
+
+namespace cl {
 
 /*
 =================
@@ -25,7 +28,13 @@ Non-transparent triangles-- add them here
 */
 void DLLEXPORT HUD_DrawNormalTriangles( void )
 {
+	gFog.HUD_DrawNormalTriangles();
 	gHUD.m_Spectator.DrawOverview();
+}
+
+extern "C"
+{
+	void HUD_CreateBeams(void);
 }
 
 /*
@@ -41,4 +50,7 @@ void DLLEXPORT HUD_DrawTransparentTriangles( void )
 	ProcessRain();
 	DrawRain();
 	DrawFXObjects();
+	HUD_CreateBeams();
+}
+
 }

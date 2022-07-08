@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "r_texture.h"
-
+namespace cl {
 class CHudFollowIcon : public CHudBase
 {
 public:
@@ -33,3 +33,4 @@ public:
 	UniqueTexture m_pTexture_Supplybox;
 	Vector m_vecBombTargets[2];
 };
+}

@@ -2,7 +2,7 @@
 #include <clocale>
 
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 #include <vgui/IVGui.h>
 #include <vgui/IScheme.h>
 #include <vgui_controls/Panel.h>
@@ -16,8 +16,6 @@
 
 #include "IGameUIFuncs.h"
 #include "IBaseUI.h"
-
-#include "KeyValuesCompat.h"
 
 #include "CClientVGUI.h"
 
@@ -86,12 +84,6 @@ void CClientVGUI::Initialize( CreateInterfaceFn* pFactories, int iNumFactories )
 		return;
 	}
 
-	if( !KV_InitKeyValuesSystem( m_FactoryList, NUM_FACTORIES ) )
-	{
-		Msg( "Failed to initialize IKeyValues\n" );
-		return;
-	}
-
 	g_GameUIFuncs = ( IGameUIFuncs* ) pFactories[ 0 ](ENGINE_GAMEUIFUNCS_INTERFACE_VERSION, nullptr );
 	g_pBaseUI = ( IBaseUI* ) pFactories[ 0 ](BASEUI_INTERFACE_VERSION, nullptr );
 	g_EngineVgui = (IEngineVGui* ) pFactories[ 0 ](VENGINE_VGUI_VERSION, nullptr );
@@ -125,6 +117,16 @@ void CClientVGUI::Start()
 	pFrame->Activate();
 #endif
 
+}
+
+void CClientVGUI::Init()
+{
+	g_pViewport->Init();
+}
+
+void CClientVGUI::VidInit()
+{
+	g_pViewport->VidInit();
 }
 
 void CClientVGUI::SetParent( vgui2::VPANEL parent )

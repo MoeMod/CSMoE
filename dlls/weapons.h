@@ -39,6 +39,7 @@
 #include "player/player_knockback.h"
 
 #include <cstdint>
+#include <map>
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -140,7 +141,15 @@ struct MULTIDAMAGE
 	int type;
 };
 
-class CArmoury: public CBaseEntity
+template<> struct PrivateData<class CArmoury, CBaseEntity>
+{
+	int m_iItem;
+	int m_iCount;
+	int m_iInitialCount;
+	bool m_bAlreadyCounted;
+};
+
+class CArmoury: public CBaseEntity, public PrivateData<class CArmoury, CBaseEntity>
 {
 public:
 	void Spawn() override;
@@ -150,12 +159,6 @@ public:
    
 public:
 	void EXPORT ArmouryTouch(CBaseEntity *pOther);
-
-public:
-	int m_iItem;
-	int m_iCount;
-	int m_iInitialCount;
-	bool m_bAlreadyCounted;
 };
 
 }
@@ -168,10 +171,63 @@ namespace sv {
 #endif
 
 class CBasePlayer;
+class CCSBot;
 
-class CGrenade: public CBaseMonster
+#define	DMGFLAG_CTONLY		(1<<0)
+#define	DMGFLAG_TRONLY		(1<<1)
+#define	DMGFLAG_NOBOOST	(1<<2)
+#define	DMGFLAG_DECAY		(1<<3)
+#define	DMGFLAG_NOPUNCH	(1<<4)
+#define	DMGFLAG_NOSHAKE		(1<<5)
+#define	DMGFLAG_TRACECHECK	(1<<6)
+
+template<> struct PrivateData<class CGrenade, CBaseMonster>
+{
+	bool m_bStartDefuse;
+	bool m_bIsC4;
+	EntityHandle<CBasePlayer> m_pBombDefuser;
+	time_point_t m_flDefuseCountDown;
+	time_point_t m_flC4Blow;
+	duration_t m_flNextFreqInterval;
+	time_point_t m_flNextBeep;
+	time_point_t m_flNextFreq;
+	const char *m_sBeepName;
+	float m_fAttenu;
+	time_point_t m_flNextBlink;
+	time_point_t m_fNextDefuse;
+	bool m_bJustBlew;
+	int m_iCurWave;
+	edict_t *m_pentCurBombTarget;
+	int m_SGSmoke;
+	int m_angle;
+	unsigned short m_usEvent;
+	bool m_bLightSmoke;
+	bool m_bDetonated;
+	Vector m_vSmokeDetonate;
+	int m_iBounceCount;
+	BOOL m_fRegisteredSound;
+};
+
+class CGrenade: public CBaseMonster, public PrivateData<class CGrenade, CBaseMonster>
 {
 public:
+	enum E_EXPLODE_TYPE
+	{
+		EXPTYPE_NORMAL,
+		EXPTYPE_M79ROCKET,
+		EXPTYPE_EVENTBOMB,
+		EXPTYPE_MOONCAKE,
+		EXPTYPE_CARTFRAG,
+		EXPTYPE_AT4ROCKET,
+		EXPTYPE_FIRECRACKERROCKET,
+		EXPTYPE_M32ROCKET,
+		EXPTYPE_OICWROCKET,
+		EXPTYPE_FGLAUNCHERROCKET,
+		EXPTYPE_SFGRENADE,
+		EXPTYPE_THANATOS5ROCKET,
+		EXPTYPE_VULCANUS7ROCKET,
+	};
+
 	void Spawn() override;
 	int Save(CSave &save) override;
 	int Restore(CRestore &restore) override;
@@ -180,7 +236,9 @@ public:
 	int BloodColor() override { return DONT_BLEED; }
 	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) override;
 	virtual void BounceSound();
-   
+	void KickRate(entvars_t *pevInflictor, entvars_t *pevAttacker, float flKickRate, float flRadius, float flDamage, int flags, float flBoost);
+	void ModStrategy_GrenadeExploded(Vector vecStart);
+	void CalculateFramerate(void);
 public:
 	enum SATCHELCODE
 	{
@@ -192,6 +250,7 @@ public:
 	static CGrenade *ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time);
 	static CGrenade *ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent);
 	static CGrenade* ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent);
+	static CGrenade* ShootZombiBomb2(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent, float flDamage);
 	static CGrenade *ShootContact(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity);
 	static CGrenade *ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent);
 	static CGrenade* ShootMolotov(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent);
@@ -209,9 +268,9 @@ public:
 	void Explode(Vector vecSrc, Vector vecAim);
 	void Explode(TraceResult *pTrace, int bitsDamageType);
 	void Explode2(TraceResult *pTrace, int bitsDamageType);
-	void Explode3(TraceResult *pTrace, int bitsDamageType);
+	void Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXPLODE_TYPE type, int iRadius);
 	void FB_Explode(TraceResult* pTrace, int bitsDamageType);
-	void ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker);
+	void ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flType);
 	NOXREF void SG_Explode(TraceResult *pTrace, int bitsDamageType);
 
 	void EXPORT Smoke();
@@ -232,44 +291,35 @@ public:
 	void EXPORT FB_BounceTouch(CBaseEntity* pOther);
 	void EXPORT Detonate2();
 	void EXPORT Detonate3();
+	void EXPORT DetonateCartFrag(void);
+	void EXPORT DetonateEventBomb(void);
+	void EXPORT DetonateMoonCake(void);
 	void EXPORT ZombieBombExplosion();
 	void EXPORT DetonateUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 	void EXPORT TumbleThink();
 	void EXPORT FB_TumbleThink();
 	void EXPORT ZombieBomb_TumbleThink();
+	void EXPORT ZombiBomb2Touch(CBaseEntity* pOther);
 	void EXPORT SG_TumbleThink();
 	void EXPORT C4Think();
 
 public:
 	static TYPEDESCRIPTION m_SaveData[15];
 
-	bool m_bStartDefuse;
-	bool m_bIsC4;
-	EntityHandle<CBasePlayer> m_pBombDefuser;
-	time_point_t m_flDefuseCountDown;
-	time_point_t m_flC4Blow;
-	duration_t m_flNextFreqInterval;
-	time_point_t m_flNextBeep;
-	time_point_t m_flNextFreq;
-	const char *m_sBeepName;
-	float m_fAttenu;
-	time_point_t m_flNextBlink;
-	time_point_t m_fNextDefuse;
-	bool m_bJustBlew;
-	int m_iTeam;
-	int m_iCurWave;
-	edict_t *m_pentCurBombTarget;
-	int m_SGSmoke;
-	int m_angle;
-	unsigned short m_usEvent;
-	bool m_bLightSmoke;
-	bool m_bDetonated;
-	Vector m_vSmokeDetonate;
-	int m_iBounceCount;
-	BOOL m_fRegisteredSound;
+public:
+	bool m_bStaticFramerate;
+	int m_iGrenadeID;
+	bool m_bHit;
 };
 
-class CBasePlayerItem : public CBaseAnimating
+template<> struct PrivateData<class CBasePlayerItem, CBaseAnimating>
+{
+	CBasePlayer *m_pPlayer;
+	CBasePlayerItem *m_pNext;
+	WeaponIdType m_iId;
+};
+
+class CBasePlayerItem : public CBaseAnimating, public PrivateData<class CBasePlayerItem, CBaseAnimating>
 {
 public:
 
@@ -305,6 +355,7 @@ public:
 	virtual void Drop() {}
 	virtual void Kill() {}
 	virtual void AttachToPlayer(CBasePlayer *pPlayer) {}
+	virtual void CheckWeapon(CBasePlayer* pPlayer, CBasePlayerItem* pItem) {}
 #else
 	virtual void Drop();
 	virtual void Kill();
@@ -343,13 +394,12 @@ public:
 
 public:
 	/* CSBTE Added, in weapons_data.cpp */
-	virtual KnockbackData GetKnockBackData() { return {0.0f, 0.0f, 0.0f, 0.0f, 0.5f}; }
+	//virtual KnockbackData GetKnockBackData() { return {1.0f, 1.0f, 1.0f, 1.0f, 0.0f}; }
 #ifdef CLIENT_DLL
-	virtual float GetArmorRatioModifier() { return 1.0f; }
 	virtual const char *GetCSModelName() { return ""; }
 	virtual WeaponBuyAmmoConfig GetBuyAmmoConfig() { return {}; }
 #else
-	virtual float GetArmorRatioModifier();
+	float GetArmorRatioModifier();
 	virtual const char *GetCSModelName();
 	virtual WeaponBuyAmmoConfig GetBuyAmmoConfig();
 #endif
@@ -358,7 +408,7 @@ public:
 public:
 	inline ItemInfo ItemInfoInstance() const
 	{
-		ItemInfo II;
+		ItemInfo II = {};
 		const_cast<CBasePlayerItem *>(this)->GetItemInfo(&II);
 		return II;
 	}
@@ -374,17 +424,56 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[3];
-	static ItemInfo ItemInfoArray[MAX_WEAPONS];
+	static std::map<int, ItemInfo> ItemInfoArray;
 	static AmmoInfo AmmoInfoArray[MAX_AMMO_SLOTS];
-
-	CBasePlayer *m_pPlayer;
-	CBasePlayerItem *m_pNext;
-	WeaponIdType m_iId;
 };
 
-class CBasePlayerWeapon : public CBasePlayerItem
+template<> struct PrivateData<class CBasePlayerWeapon, CBasePlayerItem>
+{
+	int m_iPlayEmptySound;
+	int m_fFireOnEmpty;
+	duration_t m_flNextPrimaryAttack;
+	duration_t m_flNextSecondaryAttack;
+	duration_t m_flTimeWeaponIdle;
+	int m_iPrimaryAmmoType;
+	int m_iSecondaryAmmoType;
+	int m_iClip;
+	int m_iClientClip;
+	int m_iClientWeaponState;
+	int m_fInReload;
+	int m_fInSpecialReload;
+	int m_iDefaultAmmo;
+	int m_iShellId;
+	float m_fMaxSpeed;
+	bool m_bDelayFire;
+	int m_iDirection;
+	bool m_bSecondarySilencerOn;
+	float m_flAccuracy;
+	time_point_t m_flLastFire;
+	int m_iShotsFired;
+	Vector m_vVecAiming;
+	string_t model_name;
+	time_point_t m_flGlock18Shoot;                // time to shoot the remaining bullets of the glock18 burst fire
+	int m_iGlock18ShotsFired;            // used to keep track of the shots fired during the Glock18 burst fire mode.
+	time_point_t m_flFamasShoot;
+	int m_iFamasShotsFired;
+	float m_fBurstSpread;
+	int m_iWeaponState;
+	duration_t m_flNextReload;
+	time_point_t m_flDecreaseShotsFired;
+	unsigned short m_usFireGlock18;
+	unsigned short m_usFireFamas;
+	duration_t m_flPrevPrimaryAttack;
+	time_point_t m_flLastFireTime;
+};
+
+class CBasePlayerWeapon : public CBasePlayerItem, public PrivateData<class CBasePlayerWeapon, CBasePlayerItem>
 {
 public:
+	CBasePlayerWeapon()
+	{
+		m_flHolsterTime = invalid_time_point;
+	}
 #ifdef CLIENT_DLL
 	int Save(CSave &save) override { return 1; }
 	int Restore(CRestore &restore) override { return 1; }
@@ -431,7 +520,7 @@ public:
 	}
 	virtual BOOL PlayEmptySound();
 	virtual void ResetEmptySound();
-	virtual void SendWeaponAnim(int iAnim, int skiplocal = 0);
+	virtual void SendWeaponAnim(int iAnim, int skiplocal = 0, float framerate = 1.0f);
 #ifdef CLIENT_DLL
 	virtual BOOL IsUseable(void) { return true; }
 #else
@@ -452,65 +541,74 @@ public:
 	BOOL AddPrimaryAmmo(int iCount, char *szName, int iMaxClip, int iMaxCarry);
 	BOOL AddSecondaryAmmo(int iCount, char *szName, int iMaxCarry);
 	BOOL DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt,
-	                   int skiplocal = 0);
+	                   int skiplocal, duration_t fDelay = 0.75s, duration_t m_flTimeWeaponIdle = 1.5s);
+	/*BOOL DefaultDeploy(const char* szViewModel, const char* szWeaponModel, int iAnim, const char* szAnimExt, int skiplocal = 0) 
+	{
+		return DefaultDeploy(szViewModel, szWeaponModel, iAnim, szAnimExt, skiplocal, 0.75s, 1.5s);
+	}*/
 	int DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body = 0);
 	void FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18);
 	void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max,
 	              float lateral_max, int direction_change);
 	void EjectBrassLate();
-	NOXREF void MakeBeam();
-	NOXREF void BeamUpdate();
+	//void MakeBeam();
+	//void BeamUpdate();
 	void ReloadSound();
 	duration_t GetNextAttackDelay(duration_t delay);
 	//float GetNextAttackDelay2(float delay);
 	virtual bool HasSecondaryAttack(); // virtualized...
 	virtual BOOL IsPistol()
 	{
-		return (m_iId == WEAPON_USP || m_iId == WEAPON_GLOCK18 || m_iId == WEAPON_P228 || m_iId == WEAPON_DEAGLE ||
-		        m_iId == WEAPON_ELITE || m_iId == WEAPON_FIVESEVEN);
+		return (
+			m_iId == WEAPON_USP
+			|| m_iId == WEAPON_GLOCK18
+			|| m_iId == WEAPON_P228
+			|| m_iId == WEAPON_DEAGLE
+			|| m_iId == WEAPON_ELITE
+			|| m_iId == WEAPON_FIVESEVEN
+			|| m_iId == WEAPON_ANACONDA
+			|| m_iId == WEAPON_CSGO_CZ75
+			|| m_iId == WEAPON_DEAGLED
+			|| m_iId == WEAPON_Z4B_DEAGLESHURA
+			|| m_iId == WEAPON_DESPERADO
+			|| m_iId == WEAPON_Z4B_FREQUENCY1
+			|| m_iId == WEAPON_GUNKATA
+			|| m_iId == WEAPON_INFINITY
+			|| m_iId == WEAPON_INFINITYEX1
+			|| m_iId == WEAPON_INFINITYEX2
+			|| m_iId == WEAPON_INFINITYSB
+			|| m_iId == WEAPON_INFINITYSR
+			|| m_iId == WEAPON_INFINITYSS
+			|| m_iId == WEAPON_Z4B_INFINITYX
+			|| m_iId == WEAPON_Z4B_FREQUENCY1
+			|| m_iId == WEAPON_CSGO_R8
+			|| m_iId == WEAPON_CSGO_TEC9
+			|| m_iId == WEAPON_VOIDPISTOL
+			|| m_iId == WEAPON_Y21S1JETGUNMD
+			|| m_iId == WEAPON_M950
+			|| m_iId == WEAPON_SKULL1
+			|| m_iId == WEAPON_M950SE
+			|| m_iId == WEAPON_SFPISTOL
+			|| m_iId == WEAPON_Y22S2SFPISTOL
+			);
 	}
 	void SetPlayerShieldAnim();
 	void ResetPlayerShieldAnim();
 	bool ShieldSecondaryFire(int iUpAnim, int iDownAnim);
+#ifdef CLIENT_DLL
+	virtual WeaponCrosshairData GetCrosshairData();
+#else
+	virtual WeaponCrosshairData GetCrosshairData(void) { return { 0, 0, 0, 0 }; }
+#endif
+
+	virtual WeaponBotStrategy GetBotStrategy() const { return BOT_STRATEGY_NONE; }
+	virtual int GetPriority() { return 1; }
+	virtual int GetPriorityByTarget(CBaseEntity* target) { return 1; }
+	virtual void WeaponCallBack(int iType = 0) {};
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];
-
-	int m_iPlayEmptySound;
-	int m_fFireOnEmpty;
-	duration_t m_flNextPrimaryAttack;
-	duration_t m_flNextSecondaryAttack;
-	duration_t m_flTimeWeaponIdle;
-	int m_iPrimaryAmmoType;
-	int m_iSecondaryAmmoType;
-	int m_iClip;
-	int m_iClientClip;
-	int m_iClientWeaponState;
-	int m_fInReload;
-	int m_fInSpecialReload;
-	int m_iDefaultAmmo;
-	int m_iShellId;
-	float m_fMaxSpeed;
-	bool m_bDelayFire;
-	int m_iDirection;
-	bool m_bSecondarySilencerOn;
-	float m_flAccuracy;
-	time_point_t m_flLastFire;
-	int m_iShotsFired;
-	Vector m_vVecAiming;
-	string_t model_name;
-	time_point_t m_flGlock18Shoot;                // time to shoot the remaining bullets of the glock18 burst fire
-	int m_iGlock18ShotsFired;            // used to keep track of the shots fired during the Glock18 burst fire mode.
-	time_point_t m_flFamasShoot;
-	int m_iFamasShotsFired;
-	float m_fBurstSpread;
-	int m_iWeaponState;
-	duration_t m_flNextReload;
-	time_point_t m_flDecreaseShotsFired;
-	unsigned short m_usFireGlock18;
-	unsigned short m_usFireFamas;
-	duration_t m_flPrevPrimaryAttack;
-	time_point_t m_flLastFireTime;
+	time_point_t m_flHolsterTime;
 };
 
 }
@@ -518,7 +616,12 @@ public:
 #ifndef CLIENT_DLL
 namespace sv {
 
-class CBasePlayerAmmo: public CBaseEntity
+template<> struct PrivateData<class CBasePlayerAmmo, CBaseEntity>
+{
+
+};
+
+class CBasePlayerAmmo: public CBaseEntity, public PrivateData<class CBasePlayerAmmo, CBaseEntity>
 {
 public:
 	void Spawn() override;
@@ -530,7 +633,16 @@ public:
 	void EXPORT Materialize();
 };
 
-class CWeaponBox: public CBaseEntity
+template<> struct PrivateData<class CWeaponBox, CBaseEntity>
+{
+	CBasePlayerItem *m_rgpPlayerItems[ MAX_ITEM_TYPES ];
+	int m_rgiszAmmo[ MAX_AMMO_SLOTS ];
+	int m_rgAmmo[ MAX_AMMO_SLOTS ];
+	int m_cAmmoTypes;
+	bool m_bIsBomb;
+};
+
+class CWeaponBox: public CBaseEntity, public PrivateData<class CWeaponBox, CBaseEntity>
 {
 public:
 	void Spawn() override;
@@ -551,17 +663,423 @@ public:
 
 	BOOL HasWeapon(CBasePlayerItem *pCheckItem);
 	BOOL PackWeapon(CBasePlayerItem *pWeapon);
-	BOOL PackAmmo(int iszName, int iCount);
+	BOOL PackAmmo(int iszName, int iCount, int iMaxAmmo = -1);
 
 public:
 	static TYPEDESCRIPTION m_SaveData[4];
-
-	CBasePlayerItem *m_rgpPlayerItems[ MAX_ITEM_TYPES ];
-	int m_rgiszAmmo[ MAX_AMMO_SLOTS ];
-	int m_rgAmmo[ MAX_AMMO_SLOTS ];
-	int m_cAmmoTypes;
-	bool m_bIsBomb;
 };
+
+class CBalrog11Cannon : public CBaseEntity
+{
+//From CS:AE
+public:
+	void Spawn();
+	void Precache();
+	void EXPORT BuckBcsTouch(CBaseEntity* pOther);
+
+	void EXPORT AnimationThink(void);
+	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList);
+	void Remove();
+private:
+	time_point_t m_tTimeRemove;
+	Vector m_vecVelocity;
+	Vector m_vecDir;
+	Vector m_vecOrigin;
+	float m_flSpeed;
+	int m_iSign;
+	float m_flDamage;
+	float m_flNumFrames;
+
+	CUtlVector<CBaseEntity*>* m_pEnemyList;
+	CUtlVector<CBaseEntity*>* m_pGroupList;
+
+	friend class CSGMissileCannon;
+};
+
+class CHolySwordCannon : public CBaseEntity
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	void EXPORT OnTouch(CBaseEntity* pOther);
+	void CreateEffect();
+	void RadiusDamage();
+	void TouchWall();
+	void PenetrateStart();
+	void PenetrateEnd();
+	void EXPORT FlyThink();
+	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage);
+	void Remove();
+	float GetArmorRatioModifier() { return ::sv::GetArmorRatioModifier(WEAPON_KNIFE); }
+	int GetWeaponsId(void) { return WEAPON_KNIFE; }
+private:
+	time_point_t m_flRemoveTime;
+	float m_flTouchDamage;
+	float RadiusDamageAmount;
+	int m_ExpIndex;
+	int m_Exp2Index;
+	Vector m_vecStartVelocity;
+};
+
+class CCannonEX;
+#ifndef CLIENT_DLL
+class CCannonEXDragon : public CBaseAnimating
+{
+public:
+	CCannonEXDragon()
+	{
+		m_pOwner = NULL;
+		m_pWeapon = NULL;
+		m_flAttackTime = invalid_time_point;
+		m_flSoundTime = invalid_time_point;
+		m_flEffectTime = invalid_time_point;
+
+		InitializeData();
+	}
+
+public:
+	void Spawn(void);
+	void Precache(void);
+	void UpdateOnRemove(void);
+
+public:
+	float GetDamageAmount(void);
+	float GetKickRateMagnitude(void);
+	void InitializeData(void);
+
+public:
+	void RemoveDragon(void);
+
+public:
+	void EXPORT CCannonEXDragonThink(void);
+
+public:
+	void DragonInit(CBasePlayer* pOwner, CCannonEX* pWeapon);
+	void Attack(void);
+	void DragonFire(Vector vecSrc, Vector vecOffset, Vector vecDir, std::set<CBaseEntity*>* pSet);
+	void ApplyDamageForce(CBaseEntity* pOther);
+	void EF_Appear(void);
+	void EF_Hide(void);
+
+public:
+	CBasePlayer* m_pOwner;
+	CCannonEX* m_pWeapon;
+
+	time_point_t m_flAttackTime;
+	time_point_t m_flSoundTime;
+	time_point_t m_flEffectTime;
+
+	int m_iEffectState;
+
+	int m_usFireCannonEx;
+	float m_flDragonHeight;
+	duration_t m_flFadeInTime;
+	duration_t m_flFadeOutTime;
+	float m_flDamage;
+	float m_flForceMagnitude;
+	duration_t m_flAttackInterval;
+	float m_flAttackRange;
+	float m_flFireOffsetStrength;
+	float m_flFlameDirectionOffset;
+	duration_t m_flFlameInterval;
+	float m_flFlameVelocity;
+	duration_t m_flSoundInterval;
+};
+
+
+#define SPEAR_MAX_CROWD_PLAYERS	20
+#define SPEAR_MAX_CROWD_MONSTERS	12
+#define SPEAR_PLAYER_PUSH_INTERVAL		0.08s
+
+class CSpear : public CBaseEntity
+{
+public:
+	float GetArmorRatioModifier() { return 1.85; }
+	int GetWeaponsId(void) { return WEAPON_SPEARGUN; }
+	static CSpear* Create(void);
+
+public:
+	void CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind);
+	void Spawn(void);
+	void Precache(void);
+
+	BOOL GetKickRate(float& flGround, float& flAir, float& flAirStrafing, float& flDucking, float& flVelocityModifier)
+	{
+		flGround = flAir = flAirStrafing = flDucking = 0.0;
+
+		flVelocityModifier = 1.0;
+
+		return TRUE;
+	}
+
+public:
+	void EXPORT IgniteThink(void);
+	void EXPORT FollowThink(void);
+	void EXPORT SpearTouch(CBaseEntity* pOther);
+
+public:
+	void Update(void);
+	void MaterialSound(void);
+
+	void HitDamage(CBaseEntity* pOther);
+	void AddPlayerToCrowd(CBasePlayer* pPlayer);
+
+public:
+	void Explode(duration_t flTimeRemove, bool bDetonate);
+
+public:
+	CBasePlayer* m_pOwner;
+	EHANDLE m_hLockingEntity;
+	EHANDLE m_rgCrowdPlayers[SPEAR_MAX_CROWD_PLAYERS];
+	int m_iNumCrowdPlayers;
+	float m_flPushVelocityModifier;
+	EHANDLE m_hEntityHit;
+	int m_LastHitGroup;
+	EHANDLE m_rgCrowdMonsters[SPEAR_MAX_CROWD_MONSTERS];
+	Vector m_rgvecCrowdPushVelocity[SPEAR_MAX_CROWD_MONSTERS];
+	time_point_t m_rgflTimeCrowdMovement[SPEAR_MAX_CROWD_MONSTERS];
+	int m_iNumCrowdMonsters;
+	time_point_t m_flTimeNextBleed;
+	BOOL m_bLockingTarget;
+	Vector m_vecLockingPos;
+	Vector m_vecVelocity;
+	Vector m_vecDirection;
+	float m_flPushForce;
+	float m_flPushBoostVel;
+	float m_flCrowdForce;
+	float m_flCrowdBoostVel;
+	int m_iArrowModel;
+	int m_iExplodeModel;
+	int m_iBeamModelIndex;
+	time_point_t m_flTimeExplode;
+	duration_t m_flPushDuration;
+	time_point_t m_flTimeStopPushing;
+	float m_flHitDamage;
+	float m_flExplodeDamage;
+	float m_flOwnerDamageModifier;
+	float m_flCrowdDamage;
+	float m_flExplodeForce;
+	int m_iExplosionCount;
+};
+
+
+class CSummonKnifeCannon : public CSpear
+{
+public:
+	float GetArmorRatioModifier() { return 1.7; }
+	int GetWeaponsId(void) { return WEAPON_KNIFE; }
+	static CSummonKnifeCannon* Create(void);
+
+public:
+	void Spawn(void);
+	void Precache(void);
+
+
+public:
+	void EXPORT IgniteThink(void);
+	void EXPORT CannonTouch(CBaseEntity* pOther);
+
+public:
+	void Update(void);
+
+	void HitDamage(CBaseEntity* pOther);
+
+public:
+	void Explode(duration_t flTimeRemove, bool bDetonate);
+
+	float m_flNumFrames;
+};
+#endif
+
+class CSGMissileCannon : public CBalrog11Cannon
+{
+	//From CS:AE
+public:
+	void Spawn();
+	void Precache();
+	void EXPORT SGMissileBcsTouch(CBaseEntity* pOther);
+
+	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList, float flExplodeDamage, float flExplodeRadius, float flDirectForce, int iType);
+	void Remove();
+	void Explode(void);
+
+private:
+	float m_flExplodeDamage;
+	float m_flExplodeRadius;
+	float m_flDirectForce;
+
+	int m_iEffectSprite;
+	int m_iExplosionSprite;
+};
+
+class CM3DragonCannon : public CGrenade
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT FlyingThink(void);
+	void EXPORT FlyingTouch(CBaseEntity* pOther);
+
+public:
+	static CM3DragonCannon* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	float GetArmorRatioModifier() { return 1.1; }
+	bool RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
+	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.3f }; }
+
+private:
+	float GetDirectDamage();
+	float GetExplodeDamage();
+	int m_iType;
+	int m_iM3DragonmExp;
+	float m_flNumFrames;
+};
+
+
+class CM3DragonCannon_Dragon : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT OnThink(void);
+	void EXPORT OnSharkThink(void);
+	bool CylinderDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, float flHeight, float flKnockBack, Vector vecDir, int bitsDamageType, bool bDistanceCheck = true);	//SME
+	
+public:
+	static CM3DragonCannon_Dragon* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	float GetArmorRatioModifier() { return 1.1; }
+	KnockbackData GetKnockBackData() override { return { -1.0f, -1.0f, -1.0f, -1.0f, 0.6f }; }
+
+private:
+	void StartFadeOut();
+	void FadeOut();
+
+	float GetAttackRange();
+	float GetDamage();
+	duration_t GetLifeTime();
+	int m_iType;
+	int m_iSharkEffect;
+	int m_iWaterEffect;
+	time_point_t m_flAttackInterval;
+	time_point_t m_flRemoveTime;
+	time_point_t m_flSplashTime;
+	time_point_t m_flCreateSharkTime;
+};
+class CY22s2SFpistolField : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT OnThink(void);
+
+public:
+	static CY22s2SFpistolField* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	float GetArmorRatioModifier() { return 1.1; }
+	KnockbackData GetKnockBackData() override { return { -1.0f, -1.0f, -1.0f, -1.0f, 0.6f }; }
+	void DoDebuff(void);
+
+private:
+	float GetAttackRange();
+	duration_t GetLifeTime();
+	int m_iType;
+	time_point_t m_flAttackInterval;
+	time_point_t m_flRemoveTime;
+};
+
+#ifndef CLIENT_DLL
+class CPianoGunWave : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT FlyingThink(void);
+	void EXPORT FlyingTouch(CBaseEntity* pOther);
+	void EXPORT AttachmentThink(void);
+
+public:
+	static CPianoGunWave* Create(int iWpnType, int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	float GetArmorRatioModifier() { return 1.1; }
+	void RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
+	//void RadiusAttack(float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer);
+	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.3f }; }
+private:
+	void StartFadeOut();
+	void FadeOut();
+private:
+	float GetDirectDamage();
+	float GetExplodeDamage();
+	//float GetRadiusDamage();
+
+	time_point_t m_flRemoveTime;
+	int m_iType;
+	int m_iWpnType;
+	int m_iPianoNoteExp[2];
+	int m_iPianoShootMuzzle;
+
+};
+
+
+class CWonderCannon;
+class CWonderCannonChain : public CBaseEntity
+{
+public:
+	enum DamageType
+	{
+		EXPTYPE_BASE,
+		EXPTYPE_SINGLE,
+		EXPTYPE_MULTI,
+		EXPTYPE_FINAL,
+	};
+
+	CWonderCannonChain()
+	{
+		m_flNextDamage = invalid_time_point;
+		m_tTimeRemove = invalid_time_point;
+		m_iExpTime = 0;
+		m_iCount = 0;
+		m_iAttachedEntCount = 0;
+		m_tTimeRemove = gpGlobals->time + 5.0s;
+	}
+
+	void Spawn();
+	void Precache();
+	
+	void EXPORT OnThink(void);
+	void Init(CBasePlayer* pOwner, CWonderCannon* pWeapon, CBaseEntity* pAttachedEnt, CUtlVector<CBaseEntity*>* pList);
+	void DoExpDamage(float flDamage, CBaseEntity* pAttachedEnt);
+	void Remove();
+	float GetArmorRatioModifier() { return 1.3; }
+	int GetWeaponsId(void) { return WEAPON_WONDERCANNON; }
+	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; }
+	int m_iAttachedEntCount;
+	int m_iExpTime;
+	int m_iCount;
+
+private:
+	float GetDamage(DamageType iType) const;
+
+	time_point_t m_flNextDamage;
+	time_point_t m_tTimeRemove;
+	
+	int m_iCache_Exp[4];
+
+	CUtlVector<CBaseEntity*>* m_pEnemyList;
+	CBasePlayer* m_pOwner;
+	CBaseEntity* m_pAttachedEnt;
+	CWonderCannon* m_pWeapon;
+};
+#endif
 
 #ifdef ENABLE_SHIELD
 class CWShield : public CBaseEntity
@@ -607,6 +1125,22 @@ extern short g_sModelIndexC4Glow;
 extern short g_sModelIndexRadio;
 extern MULTIDAMAGE gMultiDamage;
 
+extern short g_sModelIndexEventBombExp;
+extern short g_sModelIndexEventBombExp2;
+extern short g_sModelIndexMoonCakeExp;
+extern short g_sModelIndexHolyWater;
+
+extern short g_sModelIndexBoomerEffect;
+extern short g_sModelIndexBoomerSprite;
+extern short g_sModelIndexBoomerEffectEx;
+extern short g_sModelIndexPosionEffect;
+
+extern short g_sModelIndexFrostExp;
+extern short g_sModelIndexFrostGibs;
+extern short g_sModelIndexShockWave;
+extern short g_sModelIndexWind;
+extern short g_sModelIndexWindExp;
+
 void AnnounceFlashInterval(float interval, float offset = 0);
 
 int MaxAmmoCarry(int iszName);
@@ -629,6 +1163,8 @@ extern void SpawnBlood(Vector vecSpot, int bloodColor, float flDamage);
 extern int DamageDecal(CBaseEntity *pEntity, int bitsDamageType);
 extern void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage);
 extern void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
+extern void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType, bool bHasFalloff = 1, bool bDamageSelf = 1, bool DamageBsp = 1, int canheadshot = 0, bool bDamageMate = 0, int ExtraKnockBack = 0);
+extern void AddKickRate(CBaseEntity* pEntity, Vector vecSrc, float amount, float boost);
 }
 #else
 namespace cl {

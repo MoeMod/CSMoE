@@ -15,10 +15,6 @@ GNU General Public License for more details.
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "common.h"
 
 void ImGui_Console_Init();
@@ -30,8 +26,3 @@ void ImGui_ToggleConsole(qboolean x);
 int ImGui_Console_AddGenericString(int x, int y, const char* string, rgba_t setColor);
 void ImGui_Console_DrawStringLen(const char* pText, int* length, int* height);
 
-int ImGui_Console_DrawChar(int x, int y, int ch, rgba_t setColor);
-
-#ifdef __cplusplus
-}
-#endif

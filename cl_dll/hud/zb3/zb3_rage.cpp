@@ -14,27 +14,30 @@ GNU General Public License for more details.
 */
 
 #include "hud.h"
-#include "followicon.h"
 #include "cl_util.h"
-#include "draw_util.h"
-#include "triangleapi.h"
 #include "eventscripts.h"
 
 #include "zb3.h"
 #include "zb3_rage.h"
 
+#include "gamemode/mods_const.h"
 #include "gamemode/zb1/zb1_const.h"
 #include "gamemode/zb3/zb3_const.h"
 
+namespace cl {
+
 CHudZB3Rage::CHudZB3Rage(void)
 {
-	
+
 }
 
 int CHudZB3Rage::VidInit(void)
 {
 	m_iRageBG = gHUD.GetSpriteIndex("ZB3_RageBg");
 	m_iRageLevel = gHUD.GetSpriteIndex("ZB3_RageLevel");
+	m_iArUpSPR = gHUD.GetSpriteIndex("zb3_arup");
+	m_iHpUpSPR = gHUD.GetSpriteIndex("zb3_hpup");
+	m_iFastRespawnSPR = gHUD.GetSpriteIndex("zb3_fastrespawn");
 
 	for(int i = 0; i < 3; ++i)
 		for (int j = 0; j < 8; ++j)
@@ -43,20 +46,35 @@ int CHudZB3Rage::VidInit(void)
 			sprintf(szBuffer, "ZB3_RageEffect%d0%d", i, j);
 			m_iRageIndex[i][j] = gHUD.GetSpriteIndex(szBuffer);
 		}
-			
+
 	m_flRageTimer = 0;
 	return 1;
 }
 
 int CHudZB3Rage::Draw(float time)
 {
+	if (!gHUD.m_pCvarDraw->value)
+		return 0;
+
+	if (gHUD.m_iIntermission || gEngfuncs.IsSpectateOnly())
+		return 0;
+
+	if (g_iUser1)
+		return 0;
+
+	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
+		return 0;
+
+	if (!m_bEnabled && gHUD.m_iModRunning == MOD_ZBZ)
+		return 0;
+
 	int idx = IS_FIRSTPERSON_SPEC ? g_iUser2 : gEngfuncs.GetLocalPlayer()->index;
 	if (!g_PlayerExtraInfo[idx].zombie)
 		return 0;
 
 	int iX = ScreenWidth / 2 - gEngfuncs.pfnSPR_Width(gHUD.GetSprite(m_iRageBG), 0) / 2;
 	int iY = ScreenHeight * 0.97 - gEngfuncs.pfnSPR_Height(gHUD.GetSprite(m_iRageBG), 0) / 2;
-	
+
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iRageBG), 255, 255, 255);
 	gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iRageBG));
 
@@ -70,6 +88,17 @@ int CHudZB3Rage::Draw(float time)
 	int iRageIndex = m_iRageIndex[m_iZombieLevel][m_iRageFrame];
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(iRageIndex), 255, 255, 255);
 	gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY - 3, &gHUD.GetSpriteRect(iRageIndex));
+
+	//Zombie Item
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iArUpSPR), 255, 193, 147);
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 : ScreenHeight / 2 - 164, &gHUD.GetSpriteRect(m_iArUpSPR));
+
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iHpUpSPR), 255, 193, 147);
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 + 46 : ScreenHeight / 2 - 120, &gHUD.GetSpriteRect(m_iHpUpSPR));
+
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iFastRespawnSPR), 255, 193, 147);
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 + 90 : ScreenHeight / 2 + 75, &gHUD.GetSpriteRect(m_iFastRespawnSPR));
+
 
 	// background bar
 	iX += 76;
@@ -90,4 +119,6 @@ int CHudZB3Rage::Draw(float time)
 	}
 
 	return 1;
+}
+
 }

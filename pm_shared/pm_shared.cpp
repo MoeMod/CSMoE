@@ -13,11 +13,6 @@
 *
 ****/
 
-#ifdef vec3_t
-#undef vec3_t
-#endif
-
-#include "basetypes.h"
 #include "pm_math.h"
 #include "const.h"
 #include "usercmd.h"
@@ -45,8 +40,8 @@ int g_bhopcap = 1;
 #ifdef CLIENT_DLL
 	// Spectator Mode
 int iJumpSpectator;
-extern float vJumpOrigin[3];
-extern float vJumpAngles[3];
+extern vec3_t vJumpOrigin;
+extern vec3_t vJumpAngles;
 #endif
 
 static int pm_shared_initialized = 0;
@@ -141,6 +136,7 @@ static int gcTextures = 0;
 static char grgszTextureName[CTEXTURESMAX][CBTEXTURENAMEMAX];
 static char grgchTextureType[CTEXTURESMAX];
 
+static int g_doubleJump[MAX_CLIENTS];
 int g_onladder = 0;
 
 void PM_SwapTextures(int i, int j)
@@ -194,7 +190,7 @@ void PM_InitTextureTypes()
 
 	gcTextures = 0;
 
-	pMemFile = pmove->COM_LoadFile("sound/materials.txt", 5, &fileSize);
+	pMemFile = (byte *)pmove->COM_LoadFile("sound/materials.txt", 5, &fileSize);
 	if (!pMemFile)
 		return;
 
@@ -854,7 +850,7 @@ PM_AddToTouched
 Add's the trace result to touch list, if contact is not already in list.
 ================
 */
-qboolean PM_AddToTouched(pmtrace_t tr, vec3_t impactvelocity)
+qboolean PM_AddToTouched(pmtrace_t tr, const vec3_t impactvelocity)
 {
 	int i;
 
@@ -927,7 +923,7 @@ returns the blocked flags:
 0x02 == step / wall
 ==================
 */
-int PM_ClipVelocity(vec3_t in, vec3_t normal, vec3_t out, float overbounce)
+int PM_ClipVelocity(const vec3_t in, const vec3_t normal, vec3_t_ref out, float overbounce)
 {
 	float backoff;
 	float change;
@@ -1190,7 +1186,7 @@ int PM_FlyMove(void)
 PM_Accelerate
 ==============
 */
-void PM_Accelerate(vec3_t wishdir, float wishspeed, float accel)
+void PM_Accelerate(const vec3_t wishdir, float wishspeed, float accel)
 {
 	int i;
 	float addspeed, accelspeed, currentspeed;
@@ -1252,6 +1248,8 @@ void PM_WalkMove()
 	float downdist, updist;
 
 	pmtrace_t trace;
+
+	g_doubleJump[pmove->player_index] = 0;
 
 	if (pmove->fuser2 > 0.0)
 	{
@@ -1414,7 +1412,6 @@ Handles both ground friction and water friction
 */
 void PM_Friction(void)
 {
-	float *vel;
 	float speed, newspeed, control;
 	float friction;
 	float drop;
@@ -1425,7 +1422,7 @@ void PM_Friction(void)
 		return;
 
 	// Get velocity
-	vel = pmove->velocity;
+	auto vel = pmove->velocity;
 
 	// Calculate speed
 	speed = sqrt(vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
@@ -1488,7 +1485,7 @@ void PM_Friction(void)
 	VectorCopy(newvel, pmove->velocity);
 }
 
-void PM_AirAccelerate(vec3_t wishdir, float wishspeed, float accel)
+void PM_AirAccelerate(const vec3_t wishdir, float wishspeed, float accel)
 {
 	int i;
 	float addspeed, accelspeed, currentspeed, wishspd = wishspeed;
@@ -1818,7 +1815,7 @@ When a player is stuck, it's costly to try and unstick them
 Grab a test offset for the player based on a passed in index
 =================
 */
-int PM_GetRandomStuckOffsets(int nIndex, int server, vec3_t offset)
+int PM_GetRandomStuckOffsets(int nIndex, int server, vec3_t_ref offset)
 {
 	// Last time we did a full
 	int idx;
@@ -2483,6 +2480,10 @@ void PM_LadderMove(physent_t *pLadder)
 
 physent_t *PM_Ladder(void)
 {
+	bool bDropLadder = atoi(pmove->PM_Info_ValueForKey(pmove->physinfo, "drp")) == 1 ? true : false;
+	if (bDropLadder)
+		return NULL;
+
 	int i;
 	physent_t *pe;
 	hull_t *hull;
@@ -2563,7 +2564,7 @@ PM_PushEntity
 Does not change the entities velocity at all
 ============
 */
-pmtrace_t PM_PushEntity(vec3_t push)
+pmtrace_t PM_PushEntity(const vec3_t push)
 {
 	pmtrace_t trace;
 	vec3_t end;
@@ -2765,6 +2766,7 @@ void PM_Jump(void)
 	qboolean tfc = false;
 
 	qboolean cansuperjump = false;
+	qboolean doublejump = false;
 
 	if (pmove->dead)
 	{
@@ -2829,19 +2831,24 @@ void PM_Jump(void)
 		return;
 	}
 
+	doublejump = atoi(pmove->PM_Info_ValueForKey(pmove->physinfo, "dbj")) == 1 ? true : false;
 	// No more effect
 	if (pmove->onground == -1)
 	{
-		// Flag that we jumped.
-		// HACK HACK HACK
-		// Remove this when the game .dll no longer does physics code!!!!
-		pmove->oldbuttons |= IN_JUMP;	// don't jump again until released
-		return;		// in air, so no effect
+		if (!doublejump || g_doubleJump[pmove->player_index] > 1)
+		{
+			// Flag that we jumped.
+			// HACK HACK HACK
+			// Remove this when the game .dll no longer does physics code!!!!
+			pmove->oldbuttons |= IN_JUMP;	// don't jump again until released
+			return;		// in air, so no effect
+		}
 	}
 
 	if (pmove->oldbuttons & IN_JUMP)
 		return;		// don't pogo stick
 
+	g_doubleJump[pmove->player_index]++;
 	// In the air now.
 	pmove->onground = -1;
 
@@ -2890,11 +2897,12 @@ void PM_Jump(void)
 	{
 		pmove->velocity[2] = sqrt(2 * 800 * 45.0);
 	}
-
+	
 	// from cs16nd
 	if (pmove->fuser2 > 0.0)
 		pmove->velocity[2] *= (100.0 - pmove->fuser2 * 0.001 * 19.0) * 0.01;
 
+	pmove->velocity[2] += atof(pmove->PM_Info_ValueForKey(pmove->physinfo, "kgr"));
 	pmove->fuser2 = 1315.7894;
 
 	// Decay it for simulation
@@ -3051,7 +3059,7 @@ PM_CalcRoll
 
 ===============
 */
-float PM_CalcRoll(vec3_t angles, vec3_t velocity, float rollangle, float rollspeed)
+float PM_CalcRoll(const vec3_t angles, const vec3_t velocity, float rollangle, float rollspeed)
 {
 	float sign;
 	float side;
@@ -3086,7 +3094,7 @@ PM_DropPunchAngle
 
 =============
 */
-void PM_DropPunchAngle(vec3_t punchangle)
+void PM_DropPunchAngle(vec3_t_ref punchangle)
 {
 	float len;
 
@@ -3294,10 +3302,10 @@ void PM_PlayerMove(qboolean server)
 	}
 
 	// Slow down, I'm pulling it! (a box maybe) but only when I'm standing on ground
-	if ((pmove->onground != -1) && (pmove->cmd.buttons & IN_USE))
+	/*if ((pmove->onground != -1) && (pmove->cmd.buttons & IN_USE))
 	{
 		VectorScale(pmove->velocity, 0.3, pmove->velocity);
-	}
+	}*/
 
 	// Handle movement
 	switch (pmove->movetype)

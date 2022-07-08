@@ -2,7 +2,7 @@
 #pragma once
 
 #include <memory>
-
+namespace cl {
 class CHudScoreboard : public CHudBase
 {
 	friend class CHudSpectatorGui;
@@ -58,8 +58,10 @@ private:
 	bool m_bForceDraw; // if called by showscoreboard2
 	bool m_bShowscoresHeld;
 	cvar_t *cl_showpacketloss;
-	
+	SharedTexture m_pOSTexture[3];
+
 private:
 	struct impl_t;
 	std::unique_ptr<impl_t> pimpl;
 };
+}

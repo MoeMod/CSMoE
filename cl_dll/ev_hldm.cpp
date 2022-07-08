@@ -37,7 +37,7 @@
 
 extern engine_studio_api_t IEngineStudio;
 
-static int tracerCount[ 32 ];
+
 
 extern "C" char PM_FindTextureType( char *name );
 
@@ -89,7 +89,7 @@ void EV_TrainPitchAdjust( struct event_args_s *args );
 // play a strike sound based on the texture that was hit by the attack traceline.  VecSrc/VecEnd are the
 // original traceline endpoints used by the attacker, iBulletType is the type of bullet that hit the texture.
 // returns volume of strike instrument (crowbar) to play
-float EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, float *vecSrc, float *vecEnd, int iBulletType )
+float EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, const vec3_t vecSrc, const vec3_t vecEnd, int iBulletType )
 {
 	// hit the world, try to play sound based on texture material type
 	char chTextureType = CHAR_TEX_CONCRETE;
@@ -299,7 +299,7 @@ void EV_HLDM_DecalGunshot( pmtrace_t *pTrace, int iBulletType )
 	}
 }
 
-int EV_HLDM_CheckTracer( int idx, float *vecSrc, float *end, float *forward, float *right, int iBulletType, int iTracerFreq, int *tracerCount )
+int EV_HLDM_CheckTracer( int idx, const vec3_t vecSrc, const vec3_t end, const vec3_t forward, const vec3_t right, int iBulletType, int iTracerFreq, int *tracerCount )
 {
 	int tracer = 0;
 	int i;

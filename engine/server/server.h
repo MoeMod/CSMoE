@@ -240,6 +240,7 @@ typedef struct sv_client_s
 	float		latency;
 	float		ping;
 
+    qboolean		m_bLoopback;		// Does this client want to hear his own voice?
 	int		listeners;		// 32 bits == MAX_CLIENTS (voice listeners)
 
 	edict_t		*edict;			// EDICT_NUM(clientnum+1)
@@ -371,8 +372,8 @@ typedef struct
 	DLL_FUNCTIONS	dllFuncs;			// dll exported funcs
 	NEW_DLL_FUNCTIONS	dllFuncs2;		// new dll exported funcs (may be NULL)
 	physics_interface_t	physFuncs;		// physics interface functions (Xash3D extension)
-	byte		*mempool;			// server premamnent pool: edicts etc
-	byte		*stringspool;		// for engine strings
+	mempool_t		*mempool;			// server premamnent pool: edicts etc
+	mempool_t		*stringspool;		// for engine strings
 
 	SAVERESTOREDATA	SaveData;			// shared struct, used for save data
 } svgame_static_t;
@@ -478,16 +479,18 @@ extern  convar_t		*sv_userinfo_enable_penalty;
 extern  convar_t		*sv_userinfo_penalty_time;
 extern  convar_t		*sv_userinfo_penalty_multiplier;
 extern  convar_t		*sv_userinfo_penalty_attempts;
+extern  convar_t		*sv_minclver;
+extern  convar_t		*sv_allow_clos;
 
 //===========================================================
 //
 // sv_main.c
 //
-void SV_FinalMessage( char *message, qboolean reconnect );
+void SV_FinalMessage(const char* message, bool reconnect);
 void SV_DropClient( sv_client_t *drop );
 void SV_UpdateMovevars( qboolean initialize );
 int SV_CalcPacketLoss( sv_client_t *cl );
-void SV_ExecuteUserCommand (char *s);
+void SV_ExecuteUserCommand (const char *s);
 void SV_InitOperatorCommands( void );
 void SV_KillOperatorCommands( void );
 void SV_PrepWorldFrame( void );
@@ -497,7 +500,7 @@ void Master_Add( void );
 void Master_Heartbeat( void );
 void Master_Packet( void );
 void SV_AddToMaster( netadr_t from, sizebuf_t *msg );
-qboolean SV_ProcessUserAgent( netadr_t from, char *useragent );
+qboolean SV_ProcessUserAgent( netadr_t from, const char *useragent );
 
 //
 // sv_init.c
@@ -541,9 +544,9 @@ void SV_WaterMove( edict_t *ent );
 // sv_send.c
 //
 void SV_SendClientMessages( void );
-void SV_ClientPrintf( sv_client_t *cl, int level, char *fmt, ... );
-void SV_BroadcastPrintf( int level, char *fmt, ... );
-void SV_BroadcastCommand( char *fmt, ... );
+void SV_ClientPrintf( sv_client_t *cl, int level, const char *fmt, ... );
+void SV_BroadcastPrintf( int level, const char *fmt, ... );
+void SV_BroadcastCommand(const char *fmt, ... );
 
 //
 // sv_client.c
@@ -567,7 +570,7 @@ void SV_ClientThink( sv_client_t *cl, usercmd_t *cmd );
 void SV_ExecuteClientMessage( sv_client_t *cl, sizebuf_t *msg );
 void SV_ConnectionlessPacket( netadr_t from, sizebuf_t *msg );
 edict_t *SV_FakeConnect( const char *netname );
- void SV_ExecuteClientCommand( sv_client_t *cl, char *s );
+ void SV_ExecuteClientCommand( sv_client_t *cl, const char *s );
 void SV_RunCmd( sv_client_t *cl, usercmd_t *ucmd, int random_seed );
 qboolean SV_IsPlayerIndex( int idx );
 void SV_InitClientMove( void );
@@ -611,10 +614,9 @@ void SV_InitEdict( edict_t *pEdict );
 const char *SV_ClassName( const edict_t *e );
 void SV_SetModel( edict_t *ent, const char *name );
 void SV_CopyTraceToGlobal( trace_t *trace );
-void SV_SetMinMaxSize( edict_t *e, const float *min, const float *max );
+void SV_SetMinMaxSize( edict_t *e, const vec3_t min, const vec3_t max );
 edict_t* SV_FindEntityByString( edict_t *pStartEdict, const char *pszField, const char *pszValue );
-void SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, float *origin,
-	float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
+void SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, const vec3_t origin, const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
 void SV_PlaybackReliableEvent( sizebuf_t *msg, word eventindex, float delay, event_args_t *args );
 void SV_BaselineForEntity( edict_t *pEdict );
 void SV_WriteEntityPatch( const char *filename );
@@ -639,8 +641,8 @@ void SV_CreateStaticEntity( struct sizebuf_s *msg, sv_static_entity_t *ent );
 edict_t* pfnPEntityOfEntIndex( int iEntIndex );
 int pfnIndexOfEdict( const edict_t *pEdict );
 void SV_UpdateBaseVelocity( edict_t *ent );
-byte *pfnSetFatPVS( const float *org );
-byte *pfnSetFatPAS( const float *org );
+byte *pfnSetFatPVS( const vec3_t org );
+byte *pfnSetFatPAS( const vec3_t org );
 int pfnPrecacheModel( const char *s );
 int pfnNumberOfEntities( void );
 int pfnDropToFloor( edict_t* e );
@@ -669,8 +671,8 @@ void SV_InitSaveRestore( void );
 //
 // sv_pmove.c
 //
-void SV_GetTrueOrigin( sv_client_t *cl, int edictnum, vec3_t origin );
-void SV_GetTrueMinMax( sv_client_t *cl, int edictnum, vec3_t mins, vec3_t maxs );
+void SV_GetTrueOrigin( sv_client_t *cl, int edictnum, vec3_t_ref origin );
+void SV_GetTrueMinMax( sv_client_t *cl, int edictnum, vec3_t_ref mins, vec3_t_ref maxs );
 
 //
 // sv_world.c
@@ -678,9 +680,9 @@ void SV_GetTrueMinMax( sv_client_t *cl, int edictnum, vec3_t mins, vec3_t maxs )
 void SV_ClearWorld( void );
 void SV_UnlinkEdict( edict_t *ent );
 qboolean SV_HeadnodeVisible( mnode_t *node, byte *visbits, int *lastleaf );
-void SV_ClipMoveToEntity( edict_t *ent, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, trace_t *trace );
-void SV_CustomClipMoveToEntity( edict_t *ent, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, trace_t *trace );
-trace_t SV_TraceHull( edict_t *ent, int hullNum, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end );
+void SV_ClipMoveToEntity( edict_t *ent, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, trace_t *trace );
+void SV_CustomClipMoveToEntity( edict_t *ent, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, trace_t *trace );
+trace_t SV_TraceHull( edict_t *ent, int hullNum, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end );
 trace_t SV_Move( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, int type, edict_t *e );
 trace_t SV_MoveNoEnts( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, int type, edict_t *e );
 const char *SV_TraceTexture( edict_t *ent, const vec3_t start, const vec3_t end );

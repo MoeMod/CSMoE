@@ -45,9 +45,6 @@
 
 #include "angledef.h"
 
-#define DECLARE_EVENT( x ) void EV_##x( struct event_args_s *args )
-#define HOOK_EVENT( x, y ) gEngfuncs.pfnHookEvent( "events/" #x ".sc", EV_##y )
-
 #define PLAY_EVENT_SOUND( x ) gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, (x), VOL_NORM, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong( 0, 15 ) )
 
 

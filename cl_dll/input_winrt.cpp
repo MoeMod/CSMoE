@@ -34,15 +34,17 @@ using namespace ABI::Windows::Foundation;
 using namespace ABI::Windows::UI::Core;
 using namespace ABI::Windows::Devices::Input;
 
+namespace cl {
+
 #define MOUSE_BUTTON_COUNT 5
 
 // Set this to 1 to show mouse cursor.  Experimental
 int	g_iVisibleMouse = 0;
 
-extern "C" 
+extern "C"
 {
 #ifdef XASH_STATIC_GAMELIB
-	
+
 #else
 	void DLLEXPORT IN_ActivateMouse(void);
 	void DLLEXPORT IN_DeactivateMouse(void);
@@ -61,8 +63,6 @@ extern kbutton_t	in_mlook;
 extern kbutton_t	in_speed;
 extern kbutton_t	in_jlook;
 
-namespace cl {
-
 extern cvar_t	*m_pitch;
 extern cvar_t	*m_yaw;
 extern cvar_t	*m_forward;
@@ -77,8 +77,6 @@ extern cvar_t *cl_sidespeed;
 extern cvar_t *cl_forwardspeed;
 extern cvar_t *cl_pitchspeed;
 extern cvar_t *cl_movespeedkey;
-}
-using namespace cl;
 
 // mouse variables
 cvar_t		*m_filter;
@@ -157,8 +155,8 @@ IN_StartupMouse
 */
 void IN_StartupMouse (void)
 {
-	if ( gEngfuncs.CheckParm ("-nomouse", NULL ) ) 
-		return; 
+	if ( gEngfuncs.CheckParm ("-nomouse", NULL ) )
+		return;
 
 	mouseinitialized = 1;
 	g_atomicMouseDelta.store({ 0, 0 });
@@ -179,7 +177,7 @@ void IN_ResetMouse( void )
 
 	Rect bounds;
 	hr = g_pCoreWindow->get_Bounds(&bounds);
-	
+
 	g_pCoreWindow2->put_PointerPosition({ bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2 });
 }
 
@@ -211,8 +209,8 @@ void DLLEXPORT IN_MouseEvent(int mstate)
 		{
 			gEngfuncs.Key_Event (K_MOUSE1 + i, 0);
 		}
-	}	
-	
+	}
+
 	mouse_oldbuttonstate = mstate;
 }
 
@@ -227,12 +225,12 @@ void IN_MouseMove ( float frametime, usercmd_t *cmd)
 
 	gEngfuncs.GetViewAngles( (float *)viewangles );
 
-	//jjb - this disbles normal mouse control if the user is trying to 
+	//jjb - this disbles normal mouse control if the user is trying to
 	//      move the camera, or if the mouse cursor is visible or if we're in intermission
 	if ( !iMouseInUse && !g_iVisibleMouse && !gHUD.m_iIntermission )
 	{
 		MyMouseDelta dxdy = g_atomicMouseDelta.exchange({0, 0});
-		
+
 		int mouse_x = dxdy.X;
 		int mouse_y = dxdy.Y;
 
@@ -293,7 +291,7 @@ void DLLEXPORT IN_Accumulate (void)
 {
 	if (!mouseactive)
 		return;
-	
+
 	IN_ResetMouse();
 }
 
@@ -337,7 +335,7 @@ void IN_Move ( float frametime, usercmd_t *cmd)
 HRESULT WinRT_OnMouseMoved(IMouseDevice *sender, IMouseEventArgs *e)
 {
 	HRESULT hr;
-	
+
 	MouseDelta now_dxdy;
 	hr = e->get_MouseDelta(&now_dxdy);
 	MyMouseDelta acc_dxdy;
@@ -349,7 +347,7 @@ HRESULT WinRT_OnMouseMoved(IMouseDevice *sender, IMouseEventArgs *e)
 		acc_dxdy.Y = now_dxdy.Y + old_dxdy.Y;
 		// CAS in case that IN_MouseMove already handled old_dxdy
 	} while (!g_atomicMouseDelta.compare_exchange_weak(old_dxdy, acc_dxdy));
-	
+
 	return S_OK;
 }
 
@@ -358,7 +356,11 @@ HRESULT WinRT_OnMouseMoved(IMouseDevice *sender, IMouseEventArgs *e)
 IN_Init
 ===========
 */
+#ifdef XASH_STATIC_GAMELIB
+void IN_Init_CL (void)
+#else
 void IN_Init (void)
+#endif
 {
 	m_filter				= gEngfuncs.pfnRegisterVariable ( "m_filter","0", FCVAR_ARCHIVE );
 	sensitivity				= gEngfuncs.pfnRegisterVariable ( "sensitivity","3", FCVAR_ARCHIVE ); // user mouse sensitivity setting.
@@ -376,7 +378,7 @@ void IN_Init (void)
 	ComPtr<ICoreWindow> coreWindow;
 	hr = coreWindowStatic->GetForCurrentThread(&coreWindow);
 	g_pCoreWindow = coreWindow;
-	
+
 	ComPtr<ICoreWindow2> coreWindow2;
 	hr = coreWindow.As(&coreWindow2);
 	g_pCoreWindow2 = coreWindow2;
@@ -392,7 +394,7 @@ void IN_Init (void)
 
 	auto callback = Callback<__FITypedEventHandler_2_Windows__CDevices__CInput__CMouseDevice_Windows__CDevices__CInput__CMouseEventArgs>(WinRT_OnMouseMoved);
 	hr = g_pMouseDevice->add_MouseMoved(callback.Get(), &g_MouseMovedEventToken);
-	
+
 }
 
 /*
@@ -400,10 +402,16 @@ void IN_Init (void)
 IN_Shutdown
 ===========
 */
-void IN_Shutdown(void)
+#ifdef XASH_STATIC_GAMELIB
+void IN_Shutdown_CL (void)
+#else
+void IN_Shutdown (void)
+#endif
 {
 	IN_DeactivateMouse();
 
 	HRESULT hr;
 	hr = g_pMouseDevice->remove_MouseMoved(std::exchange(g_MouseMovedEventToken, {}));
+}
+
 }

@@ -28,6 +28,8 @@
 
 #pragma once
 
+typedef struct lua_State lua_State;
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -84,6 +86,9 @@ public:
 	operator T *() const { return Get<T>(); }
 
 	T *operator->() const;
+
+	void LuaPush(lua_State* L) const { PushEntity(L, Get()); }
+	void LuaGet(lua_State* L, int N) { edict_t* p = nullptr; GetEntity(L, N, p); Set(p); }
 
 private:
 	edict_t *m_edict;

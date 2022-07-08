@@ -14,10 +14,7 @@ GNU General Public License for more details.
 */
 
 #include "hud.h"
-#include "followicon.h"
 #include "cl_util.h"
-#include "draw_util.h"
-#include "triangleapi.h"
 
 #include "parsemsg.h"
 
@@ -31,6 +28,8 @@ GNU General Public License for more details.
 #include "zbs_kill.h"
 
 #include "gamemode/zbs/zbs_const.h"
+
+namespace cl {
 
 class CHudZBS::impl_t
 	: public THudSubDispatcher<CHudZBSLevel, CHudZBSScoreBoard, CHudZBSKill, CHudZBSRoundClear> {};
@@ -54,7 +53,7 @@ int CHudZBS::MsgFunc_ZBSTip(const char *pszName, int iSize, void *pbuf)
 		pimpl->get<CHudZBSRoundClear>().OnRoundFail();
 		break;
 	}
-	
+
 	return 1;
 }
 
@@ -116,3 +115,4 @@ void CHudZBS::Shutdown(void)
 	pimpl = nullptr;
 }
 
+}

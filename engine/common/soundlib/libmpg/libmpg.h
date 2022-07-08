@@ -16,10 +16,6 @@ GNU General Public License for more details.
 #ifndef LIBMPG_H
 #define LIBMPG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // error codes
 #define MP3_ERR		-1
 #define MP3_OK		0
@@ -29,27 +25,31 @@ extern "C" {
 
 typedef struct
 {
-	int	rate;		// num samples per second (e.g. 11025 - 11 khz)
+	long	rate;		// num samples per second (e.g. 11025 - 11 khz)
 	int	channels;		// num channels (1 - mono, 2 - stereo)
 	int	playtime;		// stream size in milliseconds
 } wavinfo_t;
 
 // custom stdio
-typedef long (*pfread)( void *handle, void *buf, size_t count );
-typedef long (*pfseek)( void *handle, long offset, int whence );
+/* A little hack to help MSVC not having ssize_t. */
+#ifdef _MSC_VER
+#include <stddef.h>
+typedef ptrdiff_t mpg123_ssize_t;
+#else
+typedef ssize_t mpg123_ssize_t;
+#endif
+typedef mpg123_ssize_t(*pfread)( void *handle, void *buf, size_t count );
+typedef off_t (*pfseek)( void *handle, off_t offset, int whence );
 
 extern void *create_decoder( int *error );
-extern int feed_mpeg_header( void *mpg, const char *data, long bufsize, long streamsize, wavinfo_t *sc );
-extern int feed_mpeg_stream( void *mpg, const char *data, long bufsize, char *outbuf, size_t *outsize );
+extern int feed_mpeg_header( void *mpg, const char *data, size_t bufsize, long streamsize, wavinfo_t *sc );
+extern int feed_mpeg_stream( void *mpg, const char *data, size_t bufsize, char *outbuf, size_t *outsize );
 extern int open_mpeg_stream( void *mpg, void *file, pfread f_read, pfseek f_seek, wavinfo_t *sc );
 extern int read_mpeg_stream( void *mpg, char *outbuf, size_t *outsize  );
 extern int get_stream_pos( void *mpg );
 extern int set_stream_pos( void *mpg, int curpos );
 extern void close_decoder( void *mpg );
-const char *get_error( void *mpeg );
+const char* get_error(void* mh);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif//LIBMPG_H

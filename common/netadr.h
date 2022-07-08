@@ -34,20 +34,54 @@
 
 typedef enum
 {
-	NA_UNUSED,
+	NA_UNUSED = 0,
 	NA_LOOPBACK,
 	NA_BROADCAST,
 	NA_IP,
-	NA_IPX,
-	NA_BROADCAST_IPX,
+	NA_IPX [[deprecated]],
+	NA_BROADCAST_IPX [[deprecated]],
+    NA_IP6,
+    NA_MULTICAST_IP6, // all nodes multicast
 } netadrtype_t;
 
+#define NETADR_T_SIZE 20
+
+// Original structure:
+// typedef struct netadr_s
+// {
+// 	netadrtype_t	type;
+// 	unsigned char	ip[4];
+// 	unsigned char	ipx[10];
+// 	unsigned short	port;
+// } netadr_t;
+
+#pragma pack( push, 1 )
 typedef struct netadr_s
 {
-	netadrtype_t type;
-	unsigned char ip[4];
-	unsigned char ipx[10];
-	unsigned short port;
+    union
+    {
+        struct
+        {
+            uint32_t type;
+            uint8_t  ip[4];   // or last 4 IPv6 octets
+            [[deprecated]] uint8_t  ipx[10]; // or first 10 IPv6 octets
+        };
+        struct
+        {
+#if XASH_BIG_ENDIAN
+            uint8_t ip6_0[2];
+ 			uint16_t type6;
+ 			uint8_t ip6_2[14];
+#else
+            uint16_t type6;
+            uint8_t ip6[16];
+#endif
+        };
+    };
+    uint16_t port;
 } netadr_t;
+#pragma pack( pop )
+
+static_assert(sizeof( netadr_t ) == NETADR_T_SIZE);
 
 #endif // NETADR_H

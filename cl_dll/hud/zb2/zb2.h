@@ -14,7 +14,7 @@ GNU General Public License for more details.
 */
 
 #pragma once
-
+namespace cl {
 class CHudZB2 : public CHudBase
 {
 public:
@@ -29,7 +29,11 @@ public:
 public:
 	bool ActivateSkill(int iSlot);
 	CHudMsgFunc(ZB2Msg);
+	int DrawBuffHP();
 
 public:
 	class CHudZB2_impl_t *pimpl = nullptr;
+	float m_flBuffHealth;
+	int m_BuffHealthCross;
 };
+}

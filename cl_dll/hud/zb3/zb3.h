@@ -14,7 +14,7 @@ GNU General Public License for more details.
 */
 
 #pragma once
-
+namespace cl {
 class CHudZB3 : public CHudBase
 {
 public:
@@ -32,3 +32,4 @@ protected:
 	class impl_t;
 	impl_t *pimpl;
 };
+}

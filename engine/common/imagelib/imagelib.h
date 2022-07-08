@@ -55,7 +55,7 @@ typedef struct saveformat_s
 {
 	const char *formatstring;
 	const char *ext;
-	qboolean (*savefunc)( const char *name, rgbdata_t *pix );
+	qboolean (*savefunc)( const char *name, image_ref pix );
 } savepixformat_t;
 
 typedef struct imglib_s
@@ -302,25 +302,33 @@ qboolean Image_LoadFNT( const char *name, const byte *buffer, size_t filesize );
 qboolean Image_LoadDDS( const char *name, const byte *buffer, size_t filesize );
 qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize );
 qboolean Image_LoadPAL( const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadMDL_BMP( const char *name, const byte *buffer, size_t filesize, const byte* ptexture );
+
+#ifdef XASH_ASTC
+qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize );
+#endif
 
 //
 // formats save
 //
-qboolean Image_SaveTGA( const char *name, rgbdata_t *pix );
-qboolean Image_SaveBMP( const char *name, rgbdata_t *pix );
+qboolean Image_SaveTGA( const char *name, image_ref pix );
+qboolean Image_SaveBMP( const char *name, image_ref pix );
+#ifdef XASH_ASTC
+qboolean Image_SaveASTC( const char *name, image_ref pix );
+#endif
 
 //
 // img_quant.c
 //
-rgbdata_t *Image_Quantize( rgbdata_t *pic );
+image_ref Image_Quantize( image_ref pic );
 
 //
 // img_utils.c
 //
 void Image_Reset( void );
-rgbdata_t *ImagePack( void );
+image_ref ImagePack( void );
 byte *Image_Copy( size_t size );
-void Image_CopyParms( rgbdata_t *src );
+void Image_CopyParms( image_ref src );
 qboolean Image_ValidSize( const char *name );
 qboolean Image_LumpValidSize( const char *name );
 qboolean Image_CheckFlag( int bit );

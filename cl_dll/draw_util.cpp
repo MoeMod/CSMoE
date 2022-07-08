@@ -35,10 +35,14 @@ version.
 
 #include "unicode_strtools.h"
 
+namespace cl {
+
 #define IsColorString( p )	( p && *( p ) == '^' && *(( p ) + 1) && *(( p ) + 1) >= '0' && *(( p ) + 1 ) <= '9' )
 #define IsColorStringW( p )	( p && *( p ) == L'^' && *(( p ) + 1) && *(( p ) + 1) >= L'0' && *(( p ) + 1 ) <= L'9' )
+#define IsColorStringU32( p )	( p && *( p ) == U'^' && *(( p ) + 1) && *(( p ) + 1) >= U'0' && *(( p ) + 1 ) <= U'9' )
 #define ColorIndex( c )	((( c ) - '0' ) & 7 )
 #define ColorIndexW( c )	((( c ) - L'0' ) & 7 )
+#define ColorIndexU32( c )	((( c ) - U'0' ) & 7 )
 
 // console color typeing
 static byte g_color_table[][4] =
@@ -59,11 +63,11 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 	if (!str)
 		return 1;
 
-	wchar_t wstr[1024];
-	cl::Q_UTF8ToUTF16(str, wstr, 1024, STRINGCONVERT_SKIP);
-	
-	wchar_t* szIt = wstr;
-	
+	uchar32 wstr[1024];
+	Q_UTF8ToUTF32(str, wstr, sizeof(wstr), STRINGCONVERT_SKIP);
+
+    uchar32* szIt = wstr;
+
 	// draw the string until we hit the null character or a newline character
 	for ( ; *szIt != 0 && *szIt != L'\n'; szIt++ )
 	{
@@ -89,7 +93,7 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 				continue;
 			}
 		}
-		else if( IsColorStringW( szIt ) )
+		else if( IsColorStringU32( szIt ) )
 		{
 			szIt++;
 			if( gHUD.hud_colored->value )
@@ -110,14 +114,14 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 
 int DrawUtils::DrawHudStringReverse( int xpos, int ypos, int iMinX, const char * str, int r, int g, int b, float scale, bool drawing )
 {
-	wchar_t wstr[1024];
-	cl::Q_UTF8ToUTF16(str, wstr, 1024, STRINGCONVERT_SKIP);
+    uchar32 wstr[1024];
+    auto bytes = Q_UTF8ToUTF32(str, wstr, sizeof(wstr), STRINGCONVERT_SKIP);
 
 	if (!wstr[0])
 		return 0;
-	
+
 	// iterate throug the string in reverse
-	for ( signed int i = wcslen(wstr); i > 0; i-- )
+	for ( signed int i = bytes / sizeof(uchar32); i > 0; i-- )
 	{
 		if ( i > 1 )
 		{
@@ -142,13 +146,13 @@ int DrawUtils::DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *
 				}
 				continue;
 			}
-			else if( IsColorStringW( wstr - 1 ) )
+			else if( IsColorStringU32( wstr - 1 ) )
 			{
 				if( gHUD.hud_colored->value )
 				{
-					r = g_color_table[ColorIndexW( *wstr )][0];
-					g = g_color_table[ColorIndexW( *wstr )][1];
-					b = g_color_table[ColorIndexW( *wstr )][2];
+					r = g_color_table[ColorIndexU32( *wstr )][0];
+					g = g_color_table[ColorIndexU32( *wstr )][1];
+					b = g_color_table[ColorIndexU32( *wstr )][2];
 				}
 				i--;
 				continue;
@@ -255,6 +259,90 @@ int DrawUtils::DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int 
 	return x;
 }
 
+
+int DrawUtils::GetNEWHudNumberWidth(int type, int number, int iDrawZero, int maxsize, int widthplus)
+{
+	if (maxsize <= 0)
+	{
+		maxsize = 1;
+
+		for (int num = 10; (number / num) > 0; num *= 10)
+			maxsize++;
+	}
+
+	if (maxsize > 255)
+		maxsize = 255;
+
+	int iW = 0;
+	int width = !type ? gHUD.m_NEWHUD_iFontWidth : gHUD.m_NEWHUD_iFontWidth_Dollar;
+
+	bool bShouldDraw = false;
+
+	for (int i = 0; i < maxsize; i++)
+	{
+		int div = 1;
+		for (int j = 0; j < maxsize - i; j++)
+			div *= 10;
+
+		int iNum = (number % div * 10) / div;
+
+		if (iNum)
+			bShouldDraw = true;
+
+		if (!iDrawZero && !iNum && !bShouldDraw && i != maxsize - 1)
+			continue;
+
+		iW += width + widthplus;
+	}
+	return iW;
+}
+
+int DrawUtils::DrawNEWHudNumber(int type, int iX, int iY, int number, int r, int g, int b, int a, int iDrawZero, int maxsize, int widthplus)
+{
+	if (maxsize <= 0)
+	{
+		maxsize = 1;
+
+		for (int num = 10; (number / num) > 0; num *= 10)
+			maxsize++;
+	}
+
+	if (maxsize > 255)
+		maxsize = 255;
+
+	int index = !type ? gHUD.m_NEWHUD_number_0 : gHUD.m_NEWHUD_dollar_number_0;
+	int width = !type ? gHUD.m_NEWHUD_iFontWidth : gHUD.m_NEWHUD_iFontWidth_Dollar;
+
+	int color = 100 * a / 255;
+	ScaleColors(r, g, b, a);
+
+	bool bShouldDraw = false;
+
+	for (int i = 0; i < maxsize; i++)
+	{
+		int div = 1;
+		for (int j = 0; j < maxsize - i; j++)
+			div *= 10;
+
+		int iNum = (number % div * 10) / div;
+
+		if (iNum)
+			bShouldDraw = true;
+
+		if (!iDrawZero && !iNum && !bShouldDraw && i != maxsize - 1)
+			continue;
+
+		if (!iNum && !bShouldDraw)
+			SPR_Set(gHUD.GetSprite(index), color, color, color);
+		else
+			SPR_Set(gHUD.GetSprite(index + iNum), r, g, b);
+
+		SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(index + iNum));
+		iX += width + widthplus;
+	}
+	return iX;
+}
+
 int DrawUtils::DrawHudNumber2( int x, int y, bool DrawZero, int iDigits, int iNumber, int r, int g, int b )
 {
 	int iWidth = gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).right - gHUD.GetSpriteRect( gHUD.m_HUD_number_0 ).left;
@@ -346,4 +434,6 @@ int DrawUtils::HudStringLen( const char *szIt, float scale )
 		l += gHUD.m_scrinfo.charWidths[(unsigned char)*szIt] * scale;
 	}
 	return l;
+}
+
 }

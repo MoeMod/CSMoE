@@ -9,6 +9,11 @@
 
 #include "hud.h"
 #include "parsemsg.h"
+#include "csmoe/BuyMenu/cstrikebuymenu.h"
+#include "csmoe/zsh/zshelterteamhousingdlg.h"
+
+using cl::gHUD;
+using cl::gEngfuncs;
 
 void CHudViewport::ApplySchemeSettings(vgui2::IScheme *pScheme)
 {
@@ -28,7 +33,7 @@ void CHudViewport::Start()
 
 	gEngfuncs.pfnHookUserMsg("VGUIMenu", [](const char *pszName, int iSize, void *pbuf) { return s_pHudViewPort->MsgFunc_MOTD(pszName, iSize, pbuf); });
 
-	gEngfuncs.pfnAddCommand("motd_open", []() { s_pHudViewPort->m_pMOTD->Activate(gHUD.m_szServerName, "wow"); });
+    gEngfuncs.pfnAddCommand("motd_open", []() { s_pHudViewPort->m_pMOTD->Activate(gHUD.m_szServerName, "wow"); });
 }
 
 int CHudViewport::MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf)
@@ -41,8 +46,7 @@ int CHudViewport::MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf)
 	m_bGotAllMOTD = buf.ReadByte();
 
 	m_szMOTD += buf.ReadString();
-
-	//CClientMOTD *panel = dynamic_cast<CClientMOTD *>(g_pViewport->FindPanelByName("ClientMOTD"));
+#if 0
 	CClientMOTD *panel = m_pMOTD;
 	if (panel)
 	{
@@ -50,7 +54,7 @@ int CHudViewport::MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf)
 	}
 	else
 		gEngfuncs.Con_Printf("MsgFunc_MOTD() : Error! CClientMOTD is nullptr\n");
-
+#endif
 	return 1;
 }
 
@@ -75,7 +79,8 @@ void CHudViewport::HideClientUI()
 void CHudViewport::CreateDefaultPanels()
 {
 	AddNewPanel(CreatePanelByName("ClientMOTD"));
-	//AddNewPanel(CreatePanelByName(VIEWPORT_PANEL_SCORE));
+    AddNewPanel(CreatePanelByName(PANEL_BUY));
+    //AddNewPanel(CreatePanelByName(VIEWPORT_PANEL_SCORE));
 
 	AddNewGameUIPanel(CreateGameUIPanelByName("GameUITestPanel"));
 }
@@ -90,6 +95,20 @@ IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
 			m_pMOTD = new CClientMOTD(this);
 		pPanel = m_pMOTD;
 	}
+	else if (Q_strcmp(PANEL_BUY, pszName) == 0)
+	{
+		if(!m_pBuyMenu)
+        {
+            m_pBuyMenu = new CCSBaseBuyMenu(this);
+            m_pBuyMenu->UpdateGameMode();
+        }
+		pPanel = m_pBuyMenu;
+	}
+    else if (Q_strcmp(CZSHELTERTEAMHOUSINGDLG_NAME, pszName) == 0)
+    {
+        pPanel = new ZShelterTeamHousingDialog();
+    }
+
 	/*else if (Q_strcmp(VIEWPORT_PANEL_SCORE, pszName) == 0)
 	{
 		pPanel = new CScorePanel(this);
@@ -104,9 +123,102 @@ IGameUIPanel *CHudViewport::CreateGameUIPanelByName(const char *pszName)
 	
 	if (Q_strcmp("GameUITestPanel", pszName) == 0)
 	{
-		//pPanel = new CGameUITestPanel(engineVgui()->GetPanel(PANEL_GAMEUIDLL));
-		pPanel = new CGameUITestPanel(this->GetVPanel());
+		pPanel = new CGameUITestPanel(engineVgui()->GetPanel(PANEL_GAMEUIDLL));
 	}
 	
 	return pPanel;
+}
+
+bool CHudViewport::ShowVGUIMenu(int iMenu)
+{
+    IViewportPanel *panel = NULL;
+
+    switch (iMenu)
+    {
+        case MENU_TEAM:
+        case MENU_CLASS_T:
+        case MENU_CLASS_CT:
+        {
+            break;
+        }
+        case MENU_BUY:
+        case MENU_BUY_PISTOL:
+        case MENU_BUY_SHOTGUN:
+        case MENU_BUY_RIFLE:
+        case MENU_BUY_SUBMACHINEGUN:
+        case MENU_BUY_MACHINEGUN:
+        case MENU_BUY_ITEM:
+        {
+            if (cl::g_iTeamNumber == TEAM_CT)
+                m_pBuyMenu->SetTeam(TEAM_CT);
+            else if (cl::g_iTeamNumber == TEAM_TERRORIST)
+                m_pBuyMenu->SetTeam(TEAM_TERRORIST);
+            else
+                m_pBuyMenu->SetTeam(TEAM_UNASSIGNED);
+
+            m_pBuyMenu->ActivateMenu(iMenu);
+            return true;
+        }
+    }
+
+    if (panel)
+    {
+        ShowPanel(panel, true);
+        return true;
+    }
+
+    return false;
+}
+
+bool CHudViewport::HideVGUIMenu(int iMenu)
+{
+    IViewportPanel *panel = NULL;
+
+    switch (iMenu)
+    {
+        case MENU_CLASS_T:
+        case MENU_TEAM:
+        case MENU_CLASS_CT:
+        {
+            break;
+        }
+
+        case MENU_BUY:
+        case MENU_BUY_PISTOL:
+        case MENU_BUY_SHOTGUN:
+        case MENU_BUY_RIFLE:
+        case MENU_BUY_SUBMACHINEGUN:
+        case MENU_BUY_MACHINEGUN:
+        case MENU_BUY_ITEM:
+        {
+            panel = m_pBuyMenu;
+        }
+    }
+
+    if (panel)
+    {
+        ShowPanel(panel, false);
+        return true;
+    }
+
+    return false;
+}
+
+void CHudViewport::UpdateGameMode()
+{
+    if(m_pBuyMenu)
+        m_pBuyMenu->UpdateGameMode();
+}
+
+bool CHudViewport::ShowVGUIMenuByName(const char* szName)
+{
+    auto pPanel = FindPanelByName(szName);
+    if (pPanel == nullptr)
+        pPanel = CreatePanelByName(szName);
+
+    if (pPanel == nullptr)
+        return false;
+
+    ShowPanel(pPanel, true);
+    return true;
 }

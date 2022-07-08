@@ -26,3 +26,4 @@ void IME_SetInputScreenPos(int x, int y);
 int IME_ShouldShowBuiltInCandidateWindow();
 void IME_CreateContext();
 void IME_SetIMEEnabled(int enable, int force);
+int IME_HandleKeyEvent(int key, int down);

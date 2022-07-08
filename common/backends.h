@@ -43,5 +43,6 @@ GNU General Public License for more details.
 #define TIMER_SDL 1
 #define TIMER_LINUX 2
 #define TIMER_WIN32 3
+#define TIMER_STL 4
 
 #endif /* BACKENDS_H */

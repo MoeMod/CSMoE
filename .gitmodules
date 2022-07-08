@@ -10,6 +10,66 @@
 [submodule "3rdparty/QindieGL"]
 	path = 3rdparty/QindieGL
 	url = https://github.com/MoeMod/QindieGL
-[submodule "3rdparty/QRCode"]
-	path = 3rdparty/QRCode
-	url = https://github.com/ricmoo/QRCode
+[submodule "3rdparty/openssl-cmake"]
+	path = 3rdparty/openssl-cmake
+	url = https://github.com/janbar/openssl-cmake
+[submodule "3rdparty/json"]
+	path = 3rdparty/json
+	url = https://github.com/nlohmann/json
+[submodule "3rdparty/boost-cmake"]
+	path = 3rdparty/boost-cmake
+	url = https://github.com/ITesserakt/boost-cmake
+[submodule "3rdparty/astc-encoder"]
+	path = 3rdparty/astc-encoder
+	url = https://github.com/ARM-software/astc-encoder/
+[submodule "3rdparty/freetype"]
+	path = 3rdparty/freetype
+	url = https://github.com/freetype/freetype
+[submodule "3rdparty/stb"]
+	path = 3rdparty/stb
+	url = https://github.com/nothings/stb
+[submodule "3rdparty/libexpat"]
+	path = 3rdparty/libexpat
+	url = https://github.com/libexpat/libexpat
+[submodule "3rdparty/lua-cmake"]
+	path = 3rdparty/lua-cmake
+	url = https://github.com/walterschell/lua
+[submodule "3rdparty/gl4es"]
+	path = 3rdparty/gl4es
+	url = https://github.com/ptitSeb/gl4es
+[submodule "3rdparty/tbb"]
+	path = 3rdparty/tbb
+	url = https://github.com/wjakob/tbb
+[submodule "3rdparty/opus"]
+	path = 3rdparty/opus
+	url = https://github.com/xiph/opus
+[submodule "3rdparty/libpng"]
+	path = 3rdparty/libpng
+	url = https://github.com/glennrp/libpng
+[submodule "3rdparty/zlib"]
+	path = 3rdparty/zlib
+	url = https://github.com/madler/zlib
+[submodule "3rdparty/SDL2"]
+	path = 3rdparty/SDL2
+	url = https://github.com/libsdl-org/SDL
+[submodule "3rdparty/xorstr"]
+	path = 3rdparty/xorstr
+	url = https://github.com/JustasMasiulis/xorstr
+[submodule "3rdparty/nameof"]
+	path = 3rdparty/nameof
+	url = https://github.com/Neargye/nameof
+[submodule "3rdparty/cpuinfo"]
+	path = 3rdparty/cpuinfo
+	url = https://github.com/pytorch/cpuinfo
+[submodule "3rdparty/ios-cmake"]
+	path = 3rdparty/ios-cmake
+	url = https://github.com/leetal/ios-cmake
+[submodule "3rdparty/boost-mysql"]
+	path = 3rdparty/boost-mysql
+	url = https://github.com/anarthal/mysql
+[submodule "3rdparty/bullet3"]
+	path = 3rdparty/bullet3
+	url = https://github.com/bulletphysics/bullet3
+[submodule "3rdparty/mpg123"]
+	path = 3rdparty/mpg123
+	url = https://github.com/madebr/mpg123

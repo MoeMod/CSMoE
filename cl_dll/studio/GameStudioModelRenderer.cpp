@@ -62,7 +62,7 @@ void CounterStrike_GetSequence(int *seq, int *gaitseq)
 	*gaitseq = g_gaitseq;
 }
 
-void CounterStrike_GetOrientation(float *o, float *a)
+void CounterStrike_GetOrientation(vec3_t_ref o, vec3_t_ref a)
 {
 	VectorCopy(g_clorg, o);
 	VectorCopy(g_clang, a);
@@ -100,6 +100,9 @@ mstudioanim_t *CGameStudioModelRenderer::LookupAnimation(mstudioseqdesc_t *pseqd
 
 void CGameStudioModelRenderer::StudioSetupBones(void)
 {
+	if (!IEngineStudio.StudioSetupBones_Pre(m_pCurrentEntity, m_pStudioHeader))
+		return;
+
 	int i;
 	double f;
 
@@ -107,15 +110,15 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 	mstudioseqdesc_t *pseqdesc;
 	mstudioanim_t *panim;
 
-	static float pos[MAXSTUDIOBONES][3];
+	static vec3_t pos[MAXSTUDIOBONES];
 	static vec4_t q[MAXSTUDIOBONES];
-	float bonematrix[3][4];
+    matrix3x4 bonematrix;
 
-	static float pos2[MAXSTUDIOBONES][3];
+	static vec3_t pos2[MAXSTUDIOBONES];
 	static vec4_t q2[MAXSTUDIOBONES];
-	static float pos3[MAXSTUDIOBONES][3];
+	static vec3_t pos3[MAXSTUDIOBONES];
 	static vec4_t q3[MAXSTUDIOBONES];
-	static float pos4[MAXSTUDIOBONES][3];
+	static vec3_t pos4[MAXSTUDIOBONES];
 	static vec4_t q4[MAXSTUDIOBONES];
 
 	if (!m_pCurrentEntity->player)
@@ -227,7 +230,7 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 
 	if (m_fDoInterp && m_pCurrentEntity->latched.sequencetime && (m_pCurrentEntity->latched.sequencetime + 0.2 > m_clTime) && (m_pCurrentEntity->latched.prevsequence < m_pStudioHeader->numseq))
 	{
-		static float pos1b[MAXSTUDIOBONES][3];
+		static vec3_t pos1b[MAXSTUDIOBONES];
 		static vec4_t q1b[MAXSTUDIOBONES];
 		float s = m_pCurrentEntity->latched.prevseqblending[0];
 		float t = m_pCurrentEntity->latched.prevseqblending[1];
@@ -342,8 +345,8 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 
 			if (copy)
 			{
-				memcpy(pos[i], pos2[i], sizeof(pos[i]));
-				memcpy(q[i], q2[i], sizeof(q[i]));
+				pos[i] = pos2[i];
+				q[i] = q2[i];
 			}
 		}
 	}
@@ -377,6 +380,8 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 			ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
 		}
 	}
+
+	IEngineStudio.StudioSetupBones_Post(m_pCurrentEntity, m_pStudioHeader);
 }
 
 void CGameStudioModelRenderer::StudioEstimateGait(entity_state_t *pplayer)
@@ -436,7 +441,7 @@ void CGameStudioModelRenderer::StudioEstimateGait(entity_state_t *pplayer)
 	}
 	else
 	{
-		m_pPlayerInfo->gaityaw = (atan2(est_velocity[1], est_velocity[0]) * 180 / M_PI);
+		m_pPlayerInfo->gaityaw = RAD2DEG(atan2(est_velocity[1], est_velocity[0]));
 
 		if (m_pPlayerInfo->gaityaw > 180)
 			m_pPlayerInfo->gaityaw = 180;
@@ -674,7 +679,7 @@ void CGameStudioModelRenderer::SetupClientAnimation(entity_state_t *pplayer)
 
 	int oldseq = st->sequence;
 	CounterStrike_GetSequence(&st->sequence, &st->gaitsequence);
-	CounterStrike_GetOrientation((float *)&st->origin, (float *)&st->angles);
+	CounterStrike_GetOrientation(st->origin, st->angles);
 	VectorCopy(st->angles, st->realangles);
 
 	if (st->sequence != oldseq)
@@ -778,7 +783,7 @@ int CGameStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t *pplaye
 	if (isLocalPlayer)
 		RestorePlayerState(pplayer);
 
-	if( gHUD.cl_shadows->value != 0.0f )
+	if( gHUD.cl_shadows->value == 1.0f )
 	{
 		Vector chestpos;
 
@@ -946,7 +951,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 		if (m_pCurrentEntity->index > 0)
 		{
 			cl_entity_t *ent = gEngfuncs.GetEntityByIndex(m_pCurrentEntity->index);
-			memcpy(ent->attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * 4);
+			memcpy(ent->attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * MAXSTUDIOATTACHMENTS);
 		}
 	}
 
@@ -955,7 +960,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 		alight_t lighting;
 		vec3_t dir;
 
-		lighting.plightvec = dir;
+		lighting.plightvec = &dir;
 
 		IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting);
 		IEngineStudio.StudioEntityLight(&lighting);
@@ -980,7 +985,14 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 		IEngineStudio.StudioSetRemapColors(m_nTopColor, m_nBottomColor);
 
+		//m_pCurrentEntity->curstate.renderfx = kRenderFxBlackOutLine;  //debug player outline
+
+
+		if (DrawOutLineCheck(0)) DrawOutLineBegin(0);
 		StudioRenderModel(dir);
+		if (DrawOutLineCheck(0)) DrawOutLine(0);
+		if (DrawOutLineCheck(0)) DrawOutLinePause(0);
+
 		m_pPlayerInfo = NULL;
 
 		if (pplayer->weaponmodel)
@@ -1000,7 +1012,10 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 			IEngineStudio.StudioSetupLighting(&lighting);
 
+			if (DrawOutLineCheck(0)) DrawOutLineBegin(0);
 			StudioRenderModel(dir);
+			if (DrawOutLineCheck(0))DrawOutLine(0);
+			if (DrawOutLineCheck(0))DrawOutLineEnd(0);
 
 			StudioCalcAttachments();
 
@@ -1020,7 +1035,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 }
 
 
-void CGameStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, float transform[3][4])
+void CGameStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, matrix3x4_ref transform)
 {
 	switch (ent->curstate.renderfx)
 	{
@@ -1098,8 +1113,6 @@ r_studio_interface_t studio =
 	R_StudioDrawPlayer,
 };
 
-}
-
 /*
 ====================
 HUD_GetStudioModelInterface
@@ -1112,15 +1125,17 @@ int DLLEXPORT HUD_GetStudioModelInterface( int version, struct r_studio_interfac
 		return 0;
 
 	// Point the engine to our callbacks
-	*ppinterface = &cl::studio;
+	*ppinterface = &studio;
 
 	// Copy in engine helper functions
-	cl::IEngineStudio = *pstudio;
+	IEngineStudio = *pstudio;
 
 	// Initialize local variables, etc.
-	cl::R_StudioInit();
+	R_StudioInit();
 
 	// Success
 	return 1;
 }
 
+
+}

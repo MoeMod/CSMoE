@@ -6,6 +6,8 @@
 #include "r_texture.h"
 #include "hud_sub.h"
 
+namespace cl {
+
 class CHudZBSKill : public IBaseHudSub
 {
 public:
@@ -18,7 +20,9 @@ public:
 	void OnKillMessage();
 
 protected:
-	
+
 	UniqueTexture m_iKillTexture;
 	std::vector<float> m_killTimes;
 };
+
+}

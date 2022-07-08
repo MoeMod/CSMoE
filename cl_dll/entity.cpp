@@ -20,6 +20,8 @@
 #include "r_efx.h"
 #include "event_api.h"
 
+namespace cl {
+
 extern vec3_t v_origin;
 
 int iOnTrain[MAX_PLAYERS];
@@ -50,7 +52,7 @@ int DLLEXPORT HUD_AddEntity( int type, struct cl_entity_s *ent, const char *mode
 	}
 	// each frame every entity passes this function, so the overview hooks it to filter the overview entities
 	// in spectator mode:
-	// each frame every entity passes this function, so the overview hooks 
+	// each frame every entity passes this function, so the overview hooks
 	// it to filter the overview entities
 
 	if ( g_iUser1 )
@@ -114,11 +116,11 @@ void DLLEXPORT HUD_ProcessPlayerState( struct entity_state_s *dst, const struct 
 	dst->movetype				= src->movetype;
 	dst->sequence				= src->sequence;
 	dst->animtime				= src->animtime;
-	
+
 	dst->solid					= src->solid;
-	
+
 	dst->rendermode				= src->rendermode;
-	dst->renderamt				= src->renderamt;	
+	dst->renderamt				= src->renderamt;
 	dst->rendercolor.r			= src->rendercolor.r;
 	dst->rendercolor.g			= src->rendercolor.g;
 	dst->rendercolor.b			= src->rendercolor.b;
@@ -234,29 +236,70 @@ fired during this frame, handle the event by it's tag ( e.g., muzzleflash, sound
 */
 void DLLEXPORT HUD_StudioEvent( const struct mstudioevent_s *event, const struct cl_entity_s *entity )
 {
+	int iAttachment = -1;
+
 	switch( event->event )
 	{
 	case 5001:
-		gEngfuncs.pEfxAPI->R_MuzzleFlash( (float *)&entity->attachment[0], atoi( event->options) );
+		iAttachment = 0;
 		break;
 	case 5011:
-		gEngfuncs.pEfxAPI->R_MuzzleFlash( (float *)&entity->attachment[1], atoi( event->options) );
+		iAttachment = 1;
 		break;
 	case 5021:
-		gEngfuncs.pEfxAPI->R_MuzzleFlash( (float *)&entity->attachment[2], atoi( event->options) );
+		iAttachment = 2;
 		break;
 	case 5031:
-		gEngfuncs.pEfxAPI->R_MuzzleFlash( (float *)&entity->attachment[3], atoi( event->options) );
+		iAttachment = 3;
+		break;
+	case 5041:
+		iAttachment = 4;
+		break;
+	case 5051:
+		iAttachment = 5;
+		break;
+	case 5061:
+		iAttachment = 6;
+		break;
+	case 5071:
+		iAttachment = 7;
+		break;
+	case 5081:
+		iAttachment = 8;
+		break;
+	case 5091:
+		iAttachment = 9;
+		break;
+	case 5101:
+		iAttachment = 10;
+		break;
+	case 5111:
+		iAttachment = 11;
+		break;
+	case 5121:
+		iAttachment = 12;
+		break;
+	case 5131:
+		iAttachment = 13;
+		break;
+	case 5141:
+		iAttachment = 14;
+		break;
+	case 5151:
+		iAttachment = 15;
 		break;
 	case 5002:
-		gEngfuncs.pEfxAPI->R_SparkEffect( (float *)&entity->attachment[0], atoi( event->options), -100, 100 );
+		gEngfuncs.pEfxAPI->R_SparkEffect( entity->attachment[0], atoi( event->options), -100, 100 );
 		break;
 	// Client side sound
-	case 5004:		
-		gEngfuncs.pfnPlaySoundByNameAtLocation( (char *)event->options, 1.0, (float *)&entity->attachment[0] );
+	case 5004:
+		gEngfuncs.pfnPlaySoundByNameAtLocation( (char *)event->options, 1.0, entity->attachment[0] );
 		break;
 	default:
 		break;
+	}
+	if (iAttachment > -1 && iAttachment < 16) {
+		gEngfuncs.pEfxAPI->R_MuzzleFlash(entity->index, iAttachment, event->options);
 	}
 }
 
@@ -272,7 +315,7 @@ void DLLEXPORT HUD_TempEntUpdate (
 	double client_time, // Absolute time on client
 	double cl_gravity,  // True gravity on client
 	TEMPENTITY **ppTempEntFree,   // List of freed temporary ents
-	TEMPENTITY **ppTempEntActive, // List 
+	TEMPENTITY **ppTempEntActive, // List
 	int		( *Callback_AddVisibleEntity )( cl_entity_t *pEntity ),
 	void	( *Callback_TempEntPlaySound )( TEMPENTITY *pTemp, float damp ) )
 {
@@ -282,11 +325,11 @@ void DLLEXPORT HUD_TempEntUpdate (
 	float		gravity, gravitySlow, life, fastFreq;
 
 	// Nothing to simulate
-	if ( !*ppTempEntActive )		
+	if ( !*ppTempEntActive )
 		return;
 
 	// in order to have tents collide with players, we have to run the player prediction code so
-	// that the client has the player list. We run this code once when we detect any COLLIDEALL 
+	// that the client has the player list. We run this code once when we detect any COLLIDEALL
 	// tent, then set this BOOL to true so the code doesn't get run again if there's more than
 	// one COLLIDEALL ent for this update. (often are).
 	gEngfuncs.pEventAPI->EV_SetUpPlayerPrediction( false, true );
@@ -295,7 +338,7 @@ void DLLEXPORT HUD_TempEntUpdate (
 	gEngfuncs.pEventAPI->EV_PushPMStates();
 
 	// Now add in all of the players.
-	gEngfuncs.pEventAPI->EV_SetSolidPlayers ( -1 );	
+	gEngfuncs.pEventAPI->EV_SetSolidPlayers ( -1 );
 
 	// !!!BUGBUG	-- This needs to be time based
 	gTempEntFrame = (gTempEntFrame+1) & 31;
@@ -340,7 +383,7 @@ void DLLEXPORT HUD_TempEntUpdate (
 					active = 0;
 
 			}
-			else 
+			else
 				active = 0;
 		}
 		if ( !active )		// Kill it
@@ -355,7 +398,18 @@ void DLLEXPORT HUD_TempEntUpdate (
 		else
 		{
 			pprev = pTemp;
-			
+
+			if (pTemp->entity.baseline.fuser1 && life > 0 && (pTemp->flags & FTENT_FADEIN))
+			{
+				if (pTemp->entity.curstate.rendermode == kRenderNormal)
+					pTemp->entity.curstate.rendermode = kRenderTransTexture;
+
+				pTemp->entity.curstate.renderamt = ((pTemp->entity.baseline.fuser1 - life) / pTemp->entity.baseline.fuser1) * pTemp->entity.baseline.renderamt;
+
+				if (pTemp->entity.curstate.renderamt >= 255)
+					pTemp->entity.curstate.renderamt = 255;
+			}
+
 			VectorCopy( pTemp->entity.origin, pTemp->entity.prevstate.origin );
 
 			if ( pTemp->flags & FTENT_SPARKSHOWER )
@@ -387,10 +441,20 @@ void DLLEXPORT HUD_TempEntUpdate (
 			else if ( pTemp->flags & FTENT_PLYRATTACHMENT )
 			{
 				cl_entity_t *pClient;
+				Vector vecReferencePos;
 
 				pClient = gEngfuncs.GetEntityByIndex( pTemp->clientIndex );
+				if (pTemp->clientIndex >= 1 && pTemp->clientIndex <= gEngfuncs.GetMaxClients())
+				{
+					if (pClient->curstate.messagenum < gEngfuncs.GetLocalPlayer()->curstate.messagenum)
+						vecReferencePos = g_PlayerExtraInfo[pTemp->clientIndex].origin;
+					else
+						vecReferencePos = pClient->origin;
+				}
+				else
+					vecReferencePos = pClient->origin;
 
-				VectorAdd( pClient->origin, pTemp->tentOffset, pTemp->entity.origin );
+				VectorAdd(vecReferencePos, pTemp->tentOffset, pTemp->entity.origin );
 			}
 			else if ( pTemp->flags & FTENT_SINEWAVE )
 			{
@@ -413,13 +477,13 @@ void DLLEXPORT HUD_TempEntUpdate (
 				pTemp->entity.origin[1] += pTemp->entity.baseline.origin[1] * frametime + 4 * sin( client_time * 30 + (long long)(void*)pTemp );
 				pTemp->entity.origin[2] += pTemp->entity.baseline.origin[2] * frametime;
 			}
-			
-			else 
+
+			else
 			{
-				for ( i = 0; i < 3; i++ ) 
+				for ( i = 0; i < 3; i++ )
 					pTemp->entity.origin[i] += pTemp->entity.baseline.origin[i] * frametime;
 			}
-			
+
 			if ( pTemp->flags & FTENT_SPRANIMATE )
 			{
 				pTemp->entity.curstate.frame += frametime * pTemp->entity.curstate.framerate;
@@ -459,6 +523,13 @@ void DLLEXPORT HUD_TempEntUpdate (
 				VectorCopy( pTemp->entity.angles, pTemp->entity.latched.prevangles );
 			}
 
+			if (pTemp->flags & FTENT_VELOCITYANGLES)
+			{
+				VectorAngles(pTemp->entity.baseline.origin, pTemp->entity.angles);
+
+				pTemp->entity.latched.prevangles = pTemp->entity.angles;
+			}
+
 			if ( pTemp->flags & (FTENT_COLLIDEALL | FTENT_COLLIDEWORLD) && !(pTemp->flags & FTENT_IGNOREGRAVITY))
 			{
 				vec3_t	traceNormal;
@@ -468,7 +539,7 @@ void DLLEXPORT HUD_TempEntUpdate (
 				{
 					pmtrace_t pmtrace;
 					physent_t *pe;
-				
+
 					gEngfuncs.pEventAPI->EV_SetTraceHull( 2 );
 
 					gEngfuncs.pEventAPI->EV_PlayerTrace( pTemp->entity.prevstate.origin, pTemp->entity.origin, PM_STUDIO_BOX, -1, &pmtrace );
@@ -492,10 +563,10 @@ void DLLEXPORT HUD_TempEntUpdate (
 				else if ( pTemp->flags & FTENT_COLLIDEWORLD )
 				{
 					pmtrace_t pmtrace;
-					
+
 					gEngfuncs.pEventAPI->EV_SetTraceHull( 2 );
 
-					gEngfuncs.pEventAPI->EV_PlayerTrace( pTemp->entity.prevstate.origin, pTemp->entity.origin, PM_STUDIO_BOX | PM_WORLD_ONLY, -1, &pmtrace );					
+					gEngfuncs.pEventAPI->EV_PlayerTrace( pTemp->entity.prevstate.origin, pTemp->entity.origin, PM_STUDIO_BOX | PM_WORLD_ONLY, -1, &pmtrace );
 
 					if ( pmtrace.fraction != 1 )
 					{
@@ -510,7 +581,7 @@ void DLLEXPORT HUD_TempEntUpdate (
 
 							if ( pTemp->entity.baseline.origin.Length() < 10 )
 							{
-								pTemp->entity.baseline.framerate = 0.0;								
+								pTemp->entity.baseline.framerate = 0.0;
 							}
 						}
 
@@ -520,7 +591,7 @@ void DLLEXPORT HUD_TempEntUpdate (
 						}
 					}
 				}
-				
+
 				if ( traceFraction != 1 )	// Decent collision now, and damping works
 				{
 					float  proj, damp;
@@ -552,8 +623,8 @@ void DLLEXPORT HUD_TempEntUpdate (
 					if (pTemp->flags & FTENT_COLLIDEKILL)
 					{
 						// die on impact
-						pTemp->flags &= ~FTENT_FADEOUT;	
-						pTemp->die = client_time;			
+						pTemp->flags &= ~FTENT_FADEOUT;
+						pTemp->die = client_time;
 					}
 					else
 					{
@@ -566,7 +637,7 @@ void DLLEXPORT HUD_TempEntUpdate (
 
 							pTemp->entity.angles[1] = -pTemp->entity.angles[1];
 						}
-						
+
 						if ( damp != 1 )
 						{
 
@@ -615,7 +686,7 @@ void DLLEXPORT HUD_TempEntUpdate (
 			{
 				if ( !Callback_AddVisibleEntity( &pTemp->entity ) )
 				{
-					if ( !(pTemp->flags & FTENT_PERSIST) ) 
+					if ( !(pTemp->flags & FTENT_PERSIST) )
 					{
 						pTemp->die = client_time;			// If we can't draw it this frame, just dump it.
 						pTemp->flags &= ~FTENT_FADEOUT;	// Don't fade out, just die
@@ -647,3 +718,4 @@ cl_entity_t DLLEXPORT *HUD_GetUserEntity( int index )
 	return NULL;
 }
 
+}

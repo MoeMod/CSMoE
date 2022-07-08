@@ -19,15 +19,19 @@ GNU General Public License for more details.
 
 enum ZombieLevel : int;
 
+namespace cl {
+
 class CHudZB3Rage : public IBaseHudSub
 {
 public:
 	CHudZB3Rage();
 	int VidInit(void) override;
 	int Draw(float time) override;
+	void InitHUDData() override { m_bEnabled = false; }
 
 	void SetPercent(int iPercent) { m_iPercent = iPercent; }
 	void SetZombieLevel(ZombieLevel zl) { m_iZombieLevel = zl; }
+	void SetEnabled(bool val) { m_bEnabled = val; }
 
 protected:
 	ZombieLevel m_iZombieLevel;
@@ -40,4 +44,11 @@ private:
 	int m_iRageLevel;
 
 	int m_iRageIndex[3][8];
+
+	int m_iArUpSPR;
+	int m_iHpUpSPR;
+	int m_iFastRespawnSPR;
+	bool m_bEnabled;
 };
+
+}

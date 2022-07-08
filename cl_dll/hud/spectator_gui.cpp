@@ -33,13 +33,13 @@ version.
 #include "cl_util.h"
 #include "parsemsg.h"
 
-#include "vgui_parser.h"
-#include "triangleapi.h"
 #include "draw_util.h"
 
 /*
  * We will draw all elements inside a box. It's size 16x10.
  */
+
+namespace cl {
 
 #define XPOS( x ) ( (x) / 16.0f )
 #define YPOS( y ) ( (y) / 10.0f  )
@@ -175,9 +175,7 @@ int CHudSpectatorGui::Draw( float flTime )
 		{
 			if( m_hTimerTexture )
 			{
-				m_hTimerTexture->Bind();
-				gEngfuncs.pTriAPI->RenderMode( kRenderTransAlpha );
-				DrawUtils::Draw2DQuad( (INT_XPOS(12.5) + 10) * gHUD.m_flScale,
+				m_hTimerTexture->Draw2DQuad( (INT_XPOS(12.5) + 10) * gHUD.m_flScale,
 									   (INT_YPOS(2) * 0.5) * gHUD.m_flScale,
 									   (INT_XPOS(12.5) + 10 + gHUD.GetCharHeight() * m_fTextScale) * gHUD.m_flScale,
 									   (INT_YPOS(2) * 0.5 + gHUD.GetCharHeight() * m_fTextScale) * gHUD.m_flScale );
@@ -477,4 +475,6 @@ void CHudSpectatorGui::UserCmd_ToggleSpectatorMenuSpectateOptions()
 		m_menuFlags &= ~MENU_SPEC_OPTIONS;
 		gMobileAPI.pfnTouchRemoveButton( "_spec_spec_*" );
 	}
+}
+
 }

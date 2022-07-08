@@ -18,6 +18,8 @@ GNU General Public License for more details.
 #include "hud_sub.h"
 #include <tuple>
 
+namespace cl {
+
 namespace detail
 {
 	template<class T, class...Args>
@@ -37,7 +39,7 @@ namespace detail
 	struct IsUnique<First, Second, Args...> : std::integral_constant<bool,
 		!TypeExists<First, Second, Args...>::value && IsUnique<First, Args...>::value && IsUnique<Second, Args...>::value
 	> {};
-	
+
 	template<class T, class First, class...Tail>
 	struct FindElementId : std::integral_constant<size_t, FindElementId<T, Tail...>::value + 1> {};
 	template<class T, class...Tail>
@@ -69,3 +71,5 @@ public:
 		return void(x);
 	}
 };
+
+}

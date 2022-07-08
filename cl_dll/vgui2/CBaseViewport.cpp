@@ -1,6 +1,3 @@
-//TODO: Need to merge the vector classes - Solokiller
-#define VECTOR2D_H
-
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 #include <vgui_controls/AnimationController.h>
@@ -17,6 +14,9 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "demo_api.h"
+
+using cl::gHUD;
+using cl::gEngfuncs;
 
 CBaseViewport* g_pViewport = nullptr;
 
@@ -76,6 +76,22 @@ void CBaseViewport::Start()
 	vgui2::ipanel()->MoveToBack( m_pBackGround->GetVPanel() ); // really send it to the back 
 }
 
+void CBaseViewport::Init()
+{
+	for (int i = 0; i < m_Panels.Count(); i++)
+		m_Panels[i]->Init();
+
+	HideAllVGUIMenu();
+}
+
+void CBaseViewport::VidInit()
+{
+	for (int i = 0; i < m_Panels.Count(); i++)
+		m_Panels[i]->VidInit();
+
+	HideAllVGUIMenu();
+}
+
 void CBaseViewport::SetParent( vgui2::VPANEL parent )
 {
 	const bool bIsProportional = IsProportional();
@@ -95,6 +111,9 @@ void CBaseViewport::SetParent( vgui2::VPANEL parent )
 	// restore proportionality on animation controller
 	// TODO: should all panels be restored to being proportional? 
 	m_pAnimController->SetProportional( true );
+
+	SetKeyBoardInputEnabled(false);
+	SetMouseInputEnabled(false);
 }
 
 bool CBaseViewport::UseVGUI1()
@@ -108,6 +127,14 @@ void CBaseViewport::HideScoreBoard()
 
 void CBaseViewport::HideAllVGUIMenu()
 {
+    for (int i = 0; i < m_Panels.Count(); i++)
+    {
+        if (m_Panels[i]->IsVisible())
+            ShowPanel(m_Panels[i], false);
+    }
+
+    m_pActivePanel = NULL;
+    m_pLastActivePanel = NULL;
 }
 
 void CBaseViewport::ActivateClientUI()

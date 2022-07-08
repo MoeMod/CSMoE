@@ -16,11 +16,9 @@ GNU General Public License for more details.
 #ifndef COMMON_H
 #define COMMON_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "port.h"
+
+#include <memory>
 
 #include "backends.h"
 #include "defaults.h"
@@ -126,7 +124,7 @@ _inline float LittleFloat( float f )
 #define LittleLongSW(x)
 #define LittleShort(x) (x)
 #define LittleShortSW(x)
-#define LittleFloat(x) (x)
+_inline float LittleFloat( float f ) { return f; }
 #endif
 
 typedef unsigned int	dword;
@@ -164,8 +162,8 @@ typedef enum
 #include "system.h"
 #include "ref_params.h"
 #include "com_model.h"
-#include "filesystem.h"
 #include "crtlib.h"
+#include "filesystem.h"
 #include "base_cmd.h"
 
 #define XASH_VERSION	"0.19.3"		// engine current version
@@ -177,7 +175,7 @@ typedef enum
 
 // PERFORMANCE INFO
 #define MIN_FPS         	15.0		// host minimum fps value for maxfps.
-#define MAX_FPS         	500.0		// upper limit for maxfps.
+#define MAX_FPS         	8192.0		// upper limit for maxfps.
 
 #define MAX_FRAMETIME	0.1
 #define MIN_FRAMETIME	0.000001
@@ -198,7 +196,7 @@ typedef enum
 #define CS_SIZE		64	// size of one config string
 #define CS_TIME		16	// size of time string
 
-#define MAX_DECALS		512	// touching TE_DECAL messages, etc
+#define MAX_DECALS		1024	// touching TE_DECAL messages, etc
 #define MAX_STATIC_ENTITIES	512	// static entities that moved on the client when level is spawn
 
 #define GI              SI.GameInfo
@@ -275,8 +273,8 @@ typedef struct gameinfo_s
 	char		sp_entity[32];	// e.g. info_player_start
 	char		mp_entity[32];	// e.g. info_player_deathmatch
 
-	float		client_mins[MAX_MAP_HULLS][3];	// 4 hulls allowed
-	float		client_maxs[MAX_MAP_HULLS][3];	// 4 hulls allowed
+	vec3_t		client_mins[MAX_MAP_HULLS];	// 4 hulls allowed
+	vec3_t		client_maxs[MAX_MAP_HULLS];	// 4 hulls allowed
 
 	char		ambientsound[NUM_AMBIENTS][64];	// quake ambient sounds
 	int		soundclip_dist;			// custom distance to clip sound
@@ -321,14 +319,6 @@ typedef enum
 	key_menu,
 	key_message
 } keydest_t;
-
-// MD5 Hash
-typedef struct
-{
-	uint	buf[4];
-	uint	bits[2];
-	byte	in[64];
-} MD5Context_t;
 
 typedef enum
 {
@@ -388,7 +378,7 @@ typedef struct host_parm_s
 	instance_t	type;		// running at
 	jmp_buf		abortframe;	// abort current frame
 	dword		errorframe;	// to prevent multiple host error
-	byte		*mempool;		// static mempool for misc allocations
+	mempool_t		*mempool;		// static mempool for misc allocations
 	string		finalmsg;		// server shutdown final message
 	host_redirect_t	rd;		// remote console
 
@@ -406,6 +396,8 @@ typedef struct host_parm_s
 	signed char		draw_decals[MAX_DECALS][CS_SIZE];
 #ifdef XASH_SDL
     SDL_Window*		hWnd;		// main window
+#elif defined(_WIN32)
+	HWND hWnd;
 #else
 	void *hWnd;
 #endif
@@ -430,8 +422,8 @@ typedef struct host_parm_s
 	char		gamefolder[64];	// it's a default gamefolder	
 
 
-	byte		*imagepool;	// imagelib mempool
-	byte		*soundpool;	// soundlib mempool
+	mempool_t		*imagepool;	// imagelib mempool
+	mempool_t		*soundpool;	// soundlib mempool
 
 	uint		features;		// custom features that enables by mod-maker request
 
@@ -528,7 +520,7 @@ qboolean NET_CompareAdr( const netadr_t a, const netadr_t b );
 qboolean NET_CompareBaseAdr( const netadr_t a, const netadr_t b );
 qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *length );
 void NET_SendPacket( netsrc_t sock, size_t length, const void *data, netadr_t to );
-
+void NET_Run( void );
 
 //
 // masterlist.c
@@ -561,6 +553,12 @@ typedef enum
 	PF_DXT1, // nvidia DXT1 format
 	PF_DXT3, // nvidia DXT3 format
 	PF_DXT5, // nvidia DXT5 format
+	PF_A_8,
+    PF_ASTC_4x4,
+    PF_ASTC_6x6,
+    PF_ASTC_8x8,
+    PF_ASTC_10x10,
+    PF_ASTC_12x12,
 	PF_TOTALCOUNT,	// must be last
 } pixformat_t;
 
@@ -570,6 +568,7 @@ typedef struct bpc_desc_s
 	char	name[16];	// used for debug
 	uint	glFormat;	// RGBA format
 	int	bpp;	// channels (e.g. rgb = 3, rgba = 4)
+    bool compressed;
 } bpc_desc_t;
 
 // imagelib global settings
@@ -622,6 +621,8 @@ typedef enum
 	IMAGE_QUANTIZE	= BIT(25),	// make indexed image from 24 or 32- bit image
 	IMAGE_LIGHTGAMMA	= BIT(26),	// apply gamma for image
 	IMAGE_REMAP	= BIT(27),	// interpret width and height as top and bottom color
+
+	IMAGE_TEMP = BIT(28)
 } imgFlags_t;
 
 // ordering is important!
@@ -643,8 +644,8 @@ typedef struct rgbdata_s
 	uint	flags;		// misc image flags
 	word	encode;
 	byte	numMips;	// mipmap count
-	byte	*palette;		// palette if present
-	byte	*buffer;		// image buffer
+	byte	*palette = nullptr;		// palette if present
+	byte	*buffer = nullptr;		// image buffer
 	rgba_t	fogParams;	// some water textures in hl1 has info about fog color and alpha
 	size_t	size;		// for bounds checking
 } rgbdata_t;
@@ -670,12 +671,13 @@ typedef struct imgfilter_s
 void Image_Init( void );
 void Image_Shutdown( void );
 void Image_AddCmdFlags( uint flags );
-rgbdata_t *FS_LoadImage( const char *filename, const byte *buffer, size_t size );
-qboolean FS_SaveImage( const char *filename, rgbdata_t *pix );
-rgbdata_t *FS_CopyImage( rgbdata_t *in );
-void FS_FreeImage( rgbdata_t *pack );
+using image_ref = std::shared_ptr<rgbdata_t>;
+image_ref Image_NewTemp();
+image_ref FS_LoadImage( const char *filename, const byte *buffer, size_t size );
+qboolean FS_SaveImage( const char *filename, image_ref pix );
+image_ref FS_CopyImage( image_ref in );
 extern const bpc_desc_t PFDesc[];	// image get pixelformat
-qboolean Image_Process( rgbdata_t **pix, int width, int height, float gamma, uint flags, imgfilter_t *filter );
+qboolean Image_Process( image_ref *pix, int width, int height, float gamma, uint flags, imgfilter_t *filter );
 void Image_PaletteHueReplace( byte *palSrc, int newHue, int start, int end );
 void Image_SetForceFlags( uint flags );	// set image force flags on loading
 size_t Image_DXTGetLinearSize( int type, int width, int height, int depth );
@@ -819,21 +821,21 @@ qboolean SV_Active( void );
 */
 cvar_t *pfnCvar_RegisterVariable( const char *szName, const char *szValue, int flags );
 char *COM_MemFgets( byte *pMemFile, int fileSize, int *filePos, char *pBuffer, int bufferSize );
-byte* COM_LoadFileForMe( const char *filename, int *pLength );
+char* COM_LoadFileForMe( const char *filename, int *pLength );
 cvar_t *pfnCVarGetPointer( const char *szVarName );
-int pfnDrawConsoleString( int x, int y, char *string );
+int pfnDrawConsoleString( int x, int y, const char *string );
 void pfnDrawSetTextColor( float r, float g, float b );
 void pfnDrawConsoleStringLen( const char *pText, int *length, int *height );
 int pfnAddClientCommand( const char *cmd_name, xcommand_t func );
-void *Cache_Check( byte *mempool, struct cache_user_s *c );
+void *Cache_Check( mempool_t *mempool, struct cache_user_s *c );
 edict_t* pfnPEntityOfEntIndex( int iEntIndex );
-void pfnGetModelBounds( model_t *mod, float *mins, float *maxs );
+void pfnGetModelBounds( model_t *mod, vec3_t_ref mins, vec3_t_ref maxs );
 void pfnGetGameDir( char *szGetGameDir );
 int pfnDecalIndex( const char *m );
 int pfnGetModelType( model_t *mod );
 int pfnIsMapValid( const char *filename );
-void Con_DPrintf( char *fmt, ... ) _format(1);
-void Con_Printf( char *szFmt, ... ) _format(1);
+void Con_DPrintf( const char *fmt, ... ) _format(1);
+void Con_Printf( const char *szFmt, ... ) _format(1);
 int pfnIsInGame( void );
 
 // CS:CS engfuncs (stubs)
@@ -856,6 +858,8 @@ void pfnResetTutorMessageDecayData( void );
 ==============================================================
 */
 #define Z_Malloc( size )		Mem_Alloc( host.mempool, size )
+#define Z_ZeroMalloc( size )		Mem_ZeroAlloc( host.mempool, size )
+#define Z_AlignedAlloc( size, align )	Mem_AlignedAlloc( host.mempool, size, align )
 #define Z_Realloc( ptr, size )	Mem_Realloc( host.mempool, ptr, size )
 #define Z_Free( ptr )		if( ptr ) Mem_Free( ptr )
 
@@ -869,9 +873,6 @@ void CRC32_ProcessByte( dword *pulCRC, byte ch );
 void CRC32_Final( dword *pulCRC );
 qboolean CRC32_File( dword *crcvalue, const char *filename );
 qboolean CRC32_MapFile( dword *crcvalue, const char *filename, qboolean multiplayer );
-void MD5Init( MD5Context_t *ctx );
-void MD5Update( MD5Context_t *ctx, const byte *buf, uint len );
-void MD5Final( byte digest[16], MD5Context_t *ctx );
 qboolean MD5_HashFile( byte digest[16], const char *pszFileName, uint seed[4] );
 uint Com_HashKey( const char *string, uint hashSize );
 
@@ -922,7 +923,7 @@ qboolean AVI_GetAudioInfo( movie_state_t *Avi, wavdata_t *snd_info );
 fs_offset_t AVI_GetAudioChunk( movie_state_t *Avi, char *audiodata, long offset, long length );
 void AVI_OpenVideo( movie_state_t *Avi, const char *filename, qboolean load_audio, qboolean ignore_hwgamma, int quiet );
 movie_state_t *AVI_LoadVideo( const char *filename, qboolean load_audio, qboolean ignore_hwgamma );
-movie_state_t *AVI_LoadVideoNoSound( const char *filename, qboolean ignore_hwgamma );
+movie_state_t *AVI_LoadVideoNoSound( const char *filename, bool ignore_hwgamma );
 void AVI_CloseVideo( movie_state_t *Avi );
 qboolean AVI_IsActive( movie_state_t *Avi );
 void AVI_FreeVideo( movie_state_t *Avi );
@@ -967,8 +968,8 @@ void CL_CharEventUTF( const char *str );
 void CL_CharEvent( int ch );
 qboolean CL_DisableVisibility( void );
 int CL_PointContents( const vec3_t point );
-char *COM_ParseFile( char *data, char *token );
-byte *COM_LoadFile( const char *filename, int usehunk, int *pLength );
+char* COM_ParseFile( char* data, char* token);
+char *COM_LoadFile( const char *filename, int usehunk, int *pLength );
 void CL_StudioEvent( struct mstudioevent_s *event, struct cl_entity_s *ent );
 qboolean CL_GetComment( const char *demoname, char *comment );
 void COM_AddAppDirectoryToSearchPath( const char *pszBaseDir, const char *appName );
@@ -976,8 +977,8 @@ int COM_ExpandFilename( const char *fileName, char *nameOutBuffer, int nameOutBu
 struct pmtrace_s *PM_TraceLine( float *start, float *end, int flags, int usehull, int ignore_pe );
 void SV_StartSound( edict_t *ent, int chan, const char *sample, float vol, float attn, int flags, int pitch );
 void SV_StartMusic( const char *curtrack, const char *looptrack, fs_offset_t position );
-void SV_CreateDecal( struct sizebuf_s *msg, const float *origin, int decalIndex, int entityIndex, int modelIndex, int flags, float scale );
-void SV_CreateStudioDecal( struct sizebuf_s *msg, const float *origin, const float *start, int decalIndex, int entityIndex, int modelIndex, int flags, struct modelstate_s *state );
+void SV_CreateDecal( struct sizebuf_s *msg, const vec3_t origin, int decalIndex, int entityIndex, int modelIndex, int flags, float scale );
+void SV_CreateStudioDecal( struct sizebuf_s *msg, const vec3_t origin, const vec3_t start, int decalIndex, int entityIndex, int modelIndex, int flags, struct modelstate_s *state );
 struct sizebuf_s *SV_GetReliableDatagram( void );
 qboolean SV_RestoreCustomDecal( struct decallist_s *entry, edict_t *pEdict, qboolean adjacent );
 int R_CreateDecalList( struct decallist_s *pList, qboolean changelevel );
@@ -998,8 +999,8 @@ qboolean CL_IsBackgroundMap( void );
 qboolean CL_LoadProgs( const char *name );
 qboolean SV_GetComment( const char *savename, char *comment );
 qboolean SV_NewGame( const char *mapName, qboolean loadGame );
-void SV_ClipPMoveToEntity( struct physent_s *pe, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
-void CL_ClipPMoveToEntity( struct physent_s *pe, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
+void SV_ClipPMoveToEntity( struct physent_s *pe, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
+void CL_ClipPMoveToEntity( struct physent_s *pe, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
 void SV_SysError( const char *error_string );
 void SV_InitGameProgs( void );
 void SV_FreeGameProgs( void );
@@ -1020,13 +1021,13 @@ wavdata_t *SCR_GetMovieInfo( void );
 void SCR_Shutdown( void );
 void Con_Print( const char *txt );
 void Rcon_Print( const char *pMsg );
-void Con_NPrintf( int idx, char *fmt, ... ) _format(2);
-void Con_NXPrintf( struct con_nprint_s *info, char *fmt, ... ) _format(2);
-void UI_NPrintf( int idx, char *fmt, ... ) _format(2);
-void UI_NXPrintf( struct con_nprint_s *info, char *fmt, ... ) _format(2);
-char *Info_ValueForKey( const char *s, const char *key );
+void Con_NPrintf( int idx, const char *fmt, ... ) _format(2);
+void Con_NXPrintf( struct con_nprint_s *info, const char *fmt, ... ) _format(2);
+void UI_NPrintf( int idx, const char *fmt, ... ) _format(2);
+void UI_NXPrintf( struct con_nprint_s *info, const char *fmt, ... ) _format(2);
+const char *Info_ValueForKey( const char *s, const char *key );
 void Info_RemovePrefixedKeys( char *start, char prefix );
-qboolean Info_RemoveKey( char *s, const char *key );
+bool Info_RemoveKey( char *s, const char *key );
 qboolean Info_SetValueForKey( char *s, const char *key, const char *value, size_t maxsize );
 qboolean Info_SetValueForStarKey( char *s, const char *key, const char *value, int maxsize );
 qboolean Info_Validate( const char *s );
@@ -1036,7 +1037,7 @@ char *Cvar_Serverinfo( void );
 void Cmd_WriteVariables( file_t *f );
 qboolean Cmd_CheckMapsList( qboolean fRefresh );
 void Cmd_AutoComplete( char *complete_string );
-void COM_SetRandomSeed( int lSeed );
+void COM_SetRandomSeed( long lSeed );
 int Com_RandomLong( int lMin, int lMax );
 float Com_RandomFloat( float fMin, float fMax );
 void TrimSpace( const char *source, char *dest );\
@@ -1046,7 +1047,7 @@ void UI_SetActiveMenu( qboolean fActive );
 struct cmd_s *Cmd_GetFirstFunctionHandle( void );
 struct cmd_s *Cmd_GetNextFunctionHandle( struct cmd_s *cmd );
 struct cmdalias_s *Cmd_AliasGetList( void );
-char *Cmd_GetName( struct cmd_s *cmd );
+const char *Cmd_GetName( struct cmd_s *cmd );
 cvar_t *Cvar_GetList( void );
 void Cmd_Null_f( void );
 int CSCR_LoadDefaultCVars( const char *scriptfilename );
@@ -1054,7 +1055,7 @@ int CSCR_WriteGameCVars( file_t *cfg, const char *scriptfilename );
 void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len );
 
 
-void HTTP_AddDownload( char *path, int size, qboolean process );
+void HTTP_AddDownload( const char *path, int size, bool process );
 void HTTP_ResetProcessState ( void );
 void HTTP_Init( void );
 void HTTP_Shutdown( void );
@@ -1113,7 +1114,4 @@ byte TextureToGamma( byte b );
 #include <FindDirectory.h>
 #endif
 
-#ifdef __cplusplus
-}
-#endif
 #endif//COMMON_H

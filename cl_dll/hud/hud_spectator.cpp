@@ -38,14 +38,12 @@ extern "C++"
 namespace cl
 {
 	extern int		iJumpSpectator;
-	extern float	vJumpOrigin[3];
-	extern float	vJumpAngles[3];
-}
-using namespace cl;
+	extern vec3_t	vJumpOrigin;
+	extern vec3_t	vJumpAngles;
 
-extern void V_GetInEyePos(int entity, float * origin, float * angles );
+extern void V_GetInEyePos(int entity, vec3_t_ref origin, vec3_t_ref angles );
 extern void V_ResetChaseCam();
-extern void V_GetChasePos(int target, float * cl_angles, float * origin, float * angles);
+extern void V_GetChasePos(int target, const vec3_t, vec3_t_ref origin, vec3_t_ref angles);
 extern float * GetClientColor( int clientIndex );
 
 extern vec3_t v_origin;		// last view origin
@@ -70,12 +68,12 @@ void SpectatorMode(void)
 
 void SpectatorSpray(void)
 {
-	vec3_t forward;
+	vec3_t forward, up, right;
 
 	if ( !gEngfuncs.IsSpectateOnly() )
 		return;
 
-	AngleVectors(v_angles,forward,NULL,NULL);
+	AngleVectors(v_angles,forward,up, right);
 	VectorScale(forward, 128, forward);
 	VectorAdd(forward, v_origin, forward);
 	pmtrace_t * trace = gEngfuncs.PM_TraceLine( v_origin, forward, PM_TRACELINE_PHYSENTSONLY, 2, -1 );
@@ -203,7 +201,7 @@ int CHudSpectator::Init()
 	m_autoDirector	= gEngfuncs.pfnRegisterVariable("spec_autodirector_internal","1",0);
 	m_pip			= gEngfuncs.pfnRegisterVariable("spec_pip_internal","1",0);
 	m_lastAutoDirector = 0.0f;
-	
+
 	if ( !m_drawnames || !m_drawcone || !m_drawstatus || !m_autoDirector || !m_pip || !m_specmode )
 	{
 		gEngfuncs.Con_Printf("ERROR! Couldn't register all spectator variables.\n");
@@ -218,18 +216,18 @@ int CHudSpectator::Init()
 // UTIL_StringToVector originally from ..\dlls\util.cpp, slightly changed
 //-----------------------------------------------------------------------------
 
-void UTIL_StringToVector( float * pVector, const char *pString )
+void UTIL_StringToVector( vec3_t_ref pVector, const char *pString )
 {
 	char *pstr, *pfront, tempString[128];
 	int	j;
 
 	strncpy( tempString, pString, sizeof(tempString) );
 	pstr = pfront = tempString;
-	
+
 	for ( j = 0; j < 3; j++ )
 	{
 		pVector[j] = atof( pfront );
-		
+
 		while ( *pstr && *pstr != ' ' )
 			pstr++;
 		if (!*pstr)
@@ -245,7 +243,7 @@ void UTIL_StringToVector( float * pVector, const char *pString )
 	}
 }
 
-int UTIL_FindEntityInMap( const char * name, float * origin, float * angle)
+int UTIL_FindEntityInMap( const char * name, vec3_t_ref origin, vec3_t_ref angle)
 {
 	int				n,found = 0;
 	char			keyname[256];
@@ -262,7 +260,7 @@ int UTIL_FindEntityInMap( const char * name, float * origin, float * angle)
 	while (data)
 	{
 		data = gEngfuncs.COM_ParseFile(data, token);
-		
+
 		if ( (token[0] == '}') ||  (token[0]==0) )
 			break;
 
@@ -279,7 +277,7 @@ int UTIL_FindEntityInMap( const char * name, float * origin, float * angle)
 		}
 
 		// we parse the first { now parse entities properties
-		
+
 		while ( 1 )
 		{
 			// parse key
@@ -292,7 +290,7 @@ int UTIL_FindEntityInMap( const char * name, float * origin, float * angle)
 				gEngfuncs.Con_DPrintf("UTIL_FindEntityInMap: EOF without closing brace\n");
 				return 0;
 			};
-			
+
 			strncpy (keyname, token, sizeof(keyname));
 
 			// another hack to fix keynames with trailing spaces
@@ -302,7 +300,7 @@ int UTIL_FindEntityInMap( const char * name, float * origin, float * angle)
 				keyname[n-1] = 0;
 				n--;
 			}
-			
+
 			// parse value
 			data = gEngfuncs.COM_ParseFile(data, token);
 			if (!data)
@@ -328,7 +326,7 @@ int UTIL_FindEntityInMap( const char * name, float * origin, float * angle)
 			if( !strcmp( keyname, "angle" ) )
 			{
 				float y = atof( token );
-				
+
 				if (y >= 0)
 				{
 					angle[0] = 0.0f;
@@ -352,7 +350,7 @@ int UTIL_FindEntityInMap( const char * name, float * origin, float * angle)
 			{
 				UTIL_StringToVector(angle, token);
 			}
-			
+
 			if (!strcmp(keyname,"origin"))
 			{
 				UTIL_StringToVector(origin, token);
@@ -396,7 +394,7 @@ void CHudSpectator::SetSpectatorStartPosition()
 		VectorCopy(nullvec, m_cameraOrigin);
 		VectorCopy(nullvec, m_cameraAngles);
 	}
-	
+
 	VectorCopy(m_cameraOrigin, vJumpOrigin);
 	VectorCopy(m_cameraAngles, vJumpAngles);
 
@@ -421,7 +419,7 @@ int CHudSpectator::VidInit()
 	m_hsprBackpack		= SPR_Load("sprites/ibackpack.spr");
 	m_hsprHostage		= SPR_Load("sprites/ihostage.spr");
 	m_hCrosshair		= SPR_Load("sprites/crosshairs.spr");
-	
+
 	return 1;
 }
 
@@ -476,22 +474,22 @@ int CHudSpectator::Draw(float flTime)
 	// if user moves in map mode, change map origin
 	if ( (m_moveDelta != 0.0f) && (g_iUser1 != OBS_ROAMING) )
 	{
-		vec3_t	right;
-		AngleVectors(v_angles, NULL, right, NULL);
+		vec3_t	forward, right, up;
+		AngleVectors(v_angles, forward, right, up);
 		VectorNormalize(right);
 		VectorScale(right, m_moveDelta, right );
 
 		VectorAdd( m_mapOrigin, right, m_mapOrigin );
 
 	}
-	
+
 	// Only draw the icon names only if map mode is in Main Mode
 	if ( g_iUser1 < OBS_MAP_FREE  )
 		return 1;
-	
+
 	if ( !m_drawnames->value )
 		return 1;
-	
+
 	// make sure we have player info
 	//gViewPort->GetAllPlayersInfo();
 	gHUD.m_Scoreboard.GetAllPlayersInfo();
@@ -507,7 +505,7 @@ int CHudSpectator::Draw(float flTime)
 		// can player exist without name?
 		if( !g_PlayerInfoList[i+1].name )
 			continue;
-		
+
 		// check if name would be in inset window
 		if ( m_pip->value != INSET_OFF )
 		{
@@ -522,12 +520,12 @@ int CHudSpectator::Draw(float flTime)
 
 		// draw the players name and health underneath
 		sprintf(string, "%s", g_PlayerInfoList[i+1].name );
-		
+
 		lx = strlen(string)*3; // 3 is avg. character length :)
 
 		DrawUtils::SetConsoleTextColor( color[0], color[1], color[2] );
 		DrawUtils::DrawConsoleString( m_vPlayerPos[i][0]-lx,m_vPlayerPos[i][1], string);
-		
+
 	}
 
 
@@ -696,7 +694,7 @@ void CHudSpectator::FindNextPlayer(bool bReverse)
 		gEngfuncs.pfnServerCmd(cmdstring);
 		return;
 	}
-	
+
 	if ( g_iUser2 )
 		iStart = g_iUser2;
 	else
@@ -839,7 +837,7 @@ void CHudSpectator::HandleButtonsDown( int ButtonPressed )
 
 		if ( ButtonPressed & IN_BACK )
 			m_zoomDelta = -0.01f;
-		
+
 		if ( ButtonPressed & IN_MOVELEFT )
 			m_moveDelta = -12.0f;
 
@@ -852,15 +850,15 @@ void CHudSpectator::HandleButtonsDown( int ButtonPressed )
 
 void CHudSpectator::HandleButtonsUp( int ButtonPressed )
 {
-	//if ( !gViewPort )
-	return;
+	// if ( !gViewPort )
+	// return;
 
 	//	if ( !gViewPort->m_pSpectatorPanel->isVisible() )
 	//	return; // don't do anything if not in spectator mode
 
 	if ( ButtonPressed & (IN_FORWARD | IN_BACK) )
 		m_zoomDelta = 0.0f;
-	
+
 	if ( ButtonPressed & (IN_MOVELEFT | IN_MOVERIGHT) )
 		m_moveDelta = 0.0f;
 }
@@ -876,13 +874,13 @@ void CHudSpectator::SetModes(int iNewMainMode, int iNewInsetMode)
 
 	// inset mode is handled only clients side
 	m_pip->value = iNewInsetMode;
-	
+
 	if ( iNewMainMode < OBS_CHASE_LOCKED || iNewMainMode > OBS_MAP_CHASE )
 	{
 		gEngfuncs.Con_Printf("Invalid spectator mode.\n");
 		return;
 	}
-	
+
 	// main modes ettings will override inset window settings
 	if ( iNewMainMode != g_iUser1 )
 	{
@@ -1003,7 +1001,7 @@ bool CHudSpectator::ParseOverviewFile( )
 
 	strncpy(levelname, m_OverviewData.map + 5, sizeof( levelname ));
 	levelname[strlen(levelname)-4] = 0;
-	
+
 	sprintf(filename, "overviews/%s.txt", levelname );
 
 	pfile = (char *)gEngfuncs.COM_LoadFile( filename, 5, NULL);
@@ -1013,8 +1011,8 @@ bool CHudSpectator::ParseOverviewFile( )
 		gEngfuncs.Con_Printf("Couldn't open file %s. Using default values for overiew mode.\n", filename );
 		return false;
 	}
-	
-	
+
+
 	while (true)
 	{
 		pfile = gEngfuncs.COM_ParseFile(pfile, token);
@@ -1104,8 +1102,8 @@ bool CHudSpectator::ParseOverviewFile( )
 				{
 					pfile = gEngfuncs.COM_ParseFile(pfile,token);
 					strncpy(m_OverviewData.layersImages[ m_OverviewData.layers ], token, 255);
-					
-					
+
+
 				}
 				else if ( !stricmp( token, "height" ) )
 				{
@@ -1179,7 +1177,7 @@ void CHudSpectator::DrawOverviewLayer()
 	gEngfuncs.pTriAPI->RenderMode( kRenderTransTexture );
 	gEngfuncs.pTriAPI->CullFace( TRI_NONE );
 	gEngfuncs.pTriAPI->Color4f( 1.0, 1.0, 1.0, 1.0 );
-	frame = 0;	
+	frame = 0;
 
 	// rotated view ?
 	if ( m_OverviewData.rotated )
@@ -1229,11 +1227,11 @@ void CHudSpectator::DrawOverviewLayer()
 
 		x = xs + (4096.0f / (m_OverviewData.zoom * screenaspect ));
 
-		
-		
+
+
 		for (ix = 0; ix < yTiles; ix++)
 		{
-			
+
 			y = ys + (4096.0f / (m_OverviewData.zoom));
 
 			for (iy = 0; iy < xTiles; iy++)
@@ -1258,12 +1256,12 @@ void CHudSpectator::DrawOverviewLayer()
 				gEngfuncs.pTriAPI->End();
 
 				frame++;
-				
+
 				y+=yStep;
 			}
 
 			x+= xStep;
-			
+
 		}
 	}
 }
@@ -1275,8 +1273,8 @@ void CHudSpectator::DrawOverviewEntities()
 	vec3_t			origin, angles, point, forward, right, left, up, world, screen, offset;
 	float			x,y,z, r,g,b, sizeScale = 4.0f;
 	cl_entity_t *	ent;
-	float rmatrix[3][4];	// transformation matrix
-	
+	matrix3x4 rmatrix;	// transformation matrix
+
 	float			zScale = (90.0f - v_angles[0] ) / 90.0f;
 
 
@@ -1286,7 +1284,7 @@ void CHudSpectator::DrawOverviewEntities()
 	r = (float)ir/255.0f;
 	g = (float)ig/255.0f;
 	b = (float)ib/255.0f;
-	
+
 	gEngfuncs.pTriAPI->CullFace( TRI_NONE );
 
 	for (i=0; i < MAX_PLAYERS; i++ )
@@ -1300,47 +1298,54 @@ void CHudSpectator::DrawOverviewEntities()
 
 		hSpriteModel = (struct model_s *)gEngfuncs.GetSpritePointer( m_OverviewEntities[i].hSprite );
 		ent = m_OverviewEntities[i].entity;
-		
+
 		gEngfuncs.pTriAPI->SpriteTexture( hSpriteModel, 0 );
 		gEngfuncs.pTriAPI->RenderMode( kRenderTransTexture );
+		gEngfuncs.pTriAPI->Color4f(1.0, 1.0, 1.0, 1.0);
 
 		// see R_DrawSpriteModel
 		// draws players sprite
 
-		AngleVectors(ent->angles, right, up, NULL );
-
+		vec3_t temp;
+		AngleVectors(ent->angles, right, up, temp );
 		VectorCopy(ent->origin,origin);
 
-		gEngfuncs.pTriAPI->Begin( TRI_QUADS );
+		float fScale = 16.0f * sizeScale;
+		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+		gEngfuncs.pTriAPI->Vertex3f(origin[0] + up.x * fScale + right.x * fScale, origin[1] + up.y * fScale + right.y * fScale, origin[2] * zScale);
+		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+		gEngfuncs.pTriAPI->Vertex3f(origin[0] + up.x * fScale + right.x * -fScale, origin[1] + up.y * fScale + right.y * -fScale, origin[2] * zScale);
+		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+		gEngfuncs.pTriAPI->Vertex3f(origin[0] + up.x * -fScale + right.x * -fScale, origin[1] + up.y * -fScale + right.y * -fScale, origin[2] * zScale);
+		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+		gEngfuncs.pTriAPI->Vertex3f(origin[0] + up.x * -fScale + right.x * fScale, origin[1] + up.y * -fScale + right.y * fScale, origin[2] * zScale);
+		gEngfuncs.pTriAPI->End();
 
-		gEngfuncs.pTriAPI->Color4f( 1.0, 1.0, 1.0, 1.0 );
+		//gEngfuncs.pTriAPI->TexCoord2f (1, 0);
+		//VectorMA (origin,  16.0f * sizeScale, up, point);
+		//VectorMA (point,   16.0f * sizeScale, right, point);
+		//gEngfuncs.pTriAPI->Vertex3fv (point);
 
-		gEngfuncs.pTriAPI->TexCoord2f (1, 0);
-		VectorMA (origin,  16.0f * sizeScale, up, point);
-		VectorMA (point,   16.0f * sizeScale, right, point);
-		point[2] *= zScale;
-		gEngfuncs.pTriAPI->Vertex3fv (point);
+		//gEngfuncs.pTriAPI->TexCoord2f (0, 0);
+		//VectorMA (origin,  16.0f * sizeScale, up, point);
+		//VectorMA (point,  -16.0f * sizeScale, right, point);
+		//point[2] *= zScale;
+		//gEngfuncs.pTriAPI->Vertex3fv (point);
 
-		gEngfuncs.pTriAPI->TexCoord2f (0, 0);
+		//gEngfuncs.pTriAPI->TexCoord2f (0,1);
+		//VectorMA (origin, -16.0f * sizeScale, up, point);
+		//VectorMA (point,  -16.0f * sizeScale, right, point);
+		//point[2] *= zScale;
+		//gEngfuncs.pTriAPI->Vertex3fv (point);
 
-		VectorMA (origin,  16.0f * sizeScale, up, point);
-		VectorMA (point,  -16.0f * sizeScale, right, point);
-		point[2] *= zScale;
-		gEngfuncs.pTriAPI->Vertex3fv (point);
+		//gEngfuncs.pTriAPI->TexCoord2f (1,1);
+		//VectorMA (origin, -16.0f * sizeScale, up, point);
+		//VectorMA (point,   16.0f * sizeScale, right, point);
+		//point[2] *= zScale;
+		//gEngfuncs.pTriAPI->Vertex3fv (point);
 
-		gEngfuncs.pTriAPI->TexCoord2f (0,1);
-		VectorMA (origin, -16.0f * sizeScale, up, point);
-		VectorMA (point,  -16.0f * sizeScale, right, point);
-		point[2] *= zScale;
-		gEngfuncs.pTriAPI->Vertex3fv (point);
-
-		gEngfuncs.pTriAPI->TexCoord2f (1,1);
-		VectorMA (origin, -16.0f * sizeScale, up, point);
-		VectorMA (point,   16.0f * sizeScale, right, point);
-		point[2] *= zScale;
-		gEngfuncs.pTriAPI->Vertex3fv (point);
-
-		gEngfuncs.pTriAPI->End ();
+		//gEngfuncs.pTriAPI->End ();
 
 
 		if ( !ent->player)
@@ -1425,7 +1430,7 @@ void CHudSpectator::DrawOverviewEntities()
 	else
 		V_GetChasePos( g_iUser2, NULL, origin, angles );
 
-	
+
 	// draw camera sprite
 
 	x = origin[0];
@@ -1437,13 +1442,13 @@ void CHudSpectator::DrawOverviewEntities()
 	hSpriteModel = (struct model_s *)gEngfuncs.GetSpritePointer( m_hsprCamera );
 	gEngfuncs.pTriAPI->RenderMode( kRenderTransAdd );
 	gEngfuncs.pTriAPI->SpriteTexture( hSpriteModel, 0 );
-	
-	
+
+
 	gEngfuncs.pTriAPI->Color4f( r, g, b, 1.0 );
 
-	AngleVectors(angles, forward, NULL, NULL );
+	AngleVectors(angles, forward, right, up );
 	VectorScale (forward, 512.0f, forward);
-	
+
 	offset[0] =  0.0f;
 	offset[1] = 45.0f;
 	offset[2] =  0.0f;
@@ -1594,7 +1599,7 @@ void CHudSpectator::CheckSettings()
 	// disallow same inset mode as main mode:
 
 	m_pip->value = (int)m_pip->value;
-	
+
 	if ( ( g_iUser1 < OBS_MAP_FREE ) && ( m_pip->value == INSET_CHASE_FREE || m_pip->value == INSET_IN_EYE ) )
 	{
 		// otherwise both would show in World picures
@@ -1736,4 +1741,6 @@ int CHudSpectator::MsgFunc_ADStop(const char *pszName, int iSize, void *buf)
 {
 	m_autoDirector->value = 0;
 	return 1;
+}
+
 }

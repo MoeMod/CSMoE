@@ -141,7 +141,7 @@ typedef struct clientdata_s
 
 	int					bInDuck;
 
-	int					weapons; // remove?
+	int					weapons; // knife id & grenade id & zombie id
 
 	int					flTimeStepSound;
 	int					flDuckTime;

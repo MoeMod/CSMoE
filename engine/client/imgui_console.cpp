@@ -16,10 +16,11 @@ GNU General Public License for more details.
 #include "imgui_console.h"
 #include "imgui.h"
 #include "imgui_utils.h"
+#include "imterm/terminal.hpp"
+#include "imterm/terminal_helpers.hpp"
+#include "imgui_surface.h"
 
-extern "C" {
 #include "client.h"
-}
 
 #include "minmax.h"
 #include <algorithm>
@@ -28,10 +29,7 @@ extern "C" {
 #include <sstream>
 #include <system_error>
 
-#include "imterm/terminal.hpp"
-#include "imterm/terminal_helpers.hpp"
-
-extern "C" { extern convar_t* cvar_vars; }
+extern convar_t* cvar_vars;
 typedef struct cmd_s
 {
 	char* name; // must be first, to match cvar_t
@@ -231,133 +229,19 @@ void ImGui_ToggleConsole(qboolean x)
 	enabled = x;
 }
 
-ImColor RGBAtoImColor(rgba_t setColor)
-{
-	return ImColor(setColor[0], setColor[1], setColor[2], setColor[3]);
-}
-
 int ImGui_Console_AddGenericString(int x0, int y0, const char* string, rgba_t setColor)
 {
-	if (!ImGui::GetDrawListSharedData()->Font)
-		return 0;
-
-	TextAdjustSize( &x0, &y0, NULL, NULL);
-
-	static auto print_segment = [](int x, int y, std::string_view sv, ImColor col)
-	{
-		ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
-		auto shadow_col = ImColor(col.Value.x * 0.55, col.Value.y * 0.34, col.Value.z * 0.11, col.Value.w);
-		auto shadow_col2 = ImColor(0.f, 0.f, 0.f, col.Value.w);
-		drawlist->AddText(ImVec2(x - 1, y - 1), shadow_col, sv.data(), sv.data() + sv.length());
-		drawlist->AddText(ImVec2(x - 1, y + 1), shadow_col, sv.data(), sv.data() + sv.length());
-		drawlist->AddText(ImVec2(x + 1, y - 1), shadow_col, sv.data(), sv.data() + sv.length());
-		drawlist->AddText(ImVec2(x + 1, y + 1), shadow_col, sv.data(), sv.data() + sv.length());
-		drawlist->AddText(ImVec2(x + 2, y + 2), shadow_col2, sv.data(), sv.data() + sv.length());
-		drawlist->AddText(ImVec2(x, y), col, sv.data(), sv.data() + sv.length());
-	};
-
-	static auto text_size = [](std::string_view sv) { return ImGui::CalcTextSize(sv.data(), sv.data() + sv.length()); };
-
-	extern rgba_t g_color_table[8];
-
-	std::string_view sv = string;
-	ImColor col = RGBAtoImColor(setColor);
-	ImColor last_color = col;
-	int x = x0, y = y0;
-	auto find_str = "^\n\x01\x02\x03\x04\x05\x06\x07";
-	for (auto seg = sv.find_first_of(find_str); seg != sv.npos; seg = sv.find_first_of(find_str))
-	{
-		if (sv[seg] == '^' && seg != sv.size() - 1 && sv[seg + 1] >= '1' && sv[seg + 1] <= '7')
-		{
-			print_segment(x, y, sv.substr(0, seg), last_color);
-			auto size = text_size(sv.substr(0, seg));
-			x += size.x;
-
-			if (sv[seg + 1] == '7')
-				last_color = col;
-			else
-				last_color = RGBAtoImColor(g_color_table[sv[seg + 1] - '0']);
-
-			sv = sv.substr(seg + 2);
-			continue;
-		}
-		else if (sv[seg] >= '\x01' && sv[seg] <= '\x07' && seg != sv.size() - 1)
-		{
-			print_segment(x, y, sv.substr(0, seg), last_color);
-			auto size = text_size(sv.substr(0, seg));
-			x += size.x;
-			// ignored
-			/*
-			if (sv[seg] == '\x07')
-				last_color = col;
-			else
-				last_color = RGBAtoImColor(g_color_table[sv[seg] - '\x00']);
-			*/
-			sv = sv.substr(seg + 1);
-			continue;
-		}
-		else if (sv[seg] == '\n' && seg != sv.size() - 1)
-		{
-			print_segment(x, y, sv.substr(0, seg), last_color);
-			auto size = text_size(sv.substr(0, seg));
-			y += size.y;
-			x = x0;
-			sv = sv.substr(seg + 1);
-			continue;
-		}
-		break;
-	}
-	if (!sv.empty())
-	{
-		print_segment(x, y, sv, last_color);
-		auto size = text_size(sv);
-		x += size.x;
-	}
-
-	//float xscale = scr_width->value / (float)clgame.scrInfo.iWidth;
-	return x - x0;
+	return ImGui_Surface_DrawConsoleString(x0, y0, string, setColor[0], setColor[1], setColor[2], setColor[3]);
 }
 
 void ImGui_Console_DrawStringLen(const char* pText, int* length, int* height)
 {
-	ImVec2 size = {};
-	std::string filter_str;
-	for(const char* p = pText; *p; ++p)
-	{
-		if (p[0] == '^' && p[1] >= '1' && p[1] <= '7')
-			p += 2;
-		if (p[0] >= '\x01' && p[0] <= '\x07')
-			p += 1;
-		filter_str.push_back(*p);
-	}
-	if (ImGui::GetDrawListSharedData()->Font)
-	{
-		size = ImGui::CalcTextSize(filter_str.c_str(), filter_str.c_str() + filter_str.length());
-	}
-	if (length) *length = size.x;
-	if (height) *height = size.y;
-	TextAdjustSizeReverse(NULL, NULL, length, height);
+	return ImGui_Surface_DrawStringLen(pText, length, height);
 }
 
 int ImGui_Console_DrawChar(int x, int y, int ch, rgba_t setColor)
 {
-	ImFont* font = ImGui::GetDrawListSharedData()->Font;
-	if (!font)
-		return 0;
-	TextAdjustSize(&x, &y, NULL, NULL);
-
-	ImColor col = RGBAtoImColor(setColor);
-	auto pos = ImVec2(x, y);
-	
-	ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
-	drawlist->PushTextureID(font->ContainerAtlas->TexID);
-	ImGuiIO& io = ImGui::GetIO();
-	font->RenderChar(drawlist, font->FontSize * io.FontGlobalScale, pos, col, ch);
-		
-	int w = font->GetCharAdvance(ch) * io.FontGlobalScale; // / io.FontGlobalScale;
-	TextAdjustSizeReverse(NULL, NULL, &w, NULL);
-
-	return w;
+	return ImGui_Surface_DrawChar(x, y, ch, setColor[0], setColor[1], setColor[2], setColor[3]);
 }
 
 void ImGui_Console_OnGUI(void)

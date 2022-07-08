@@ -37,7 +37,7 @@ version.
 #include "com_model.h"
 #include <string.h>
 
-using namespace cl;
+namespace cl {
 
 DECLARE_MESSAGE( m_Radio, SendAudio )
 DECLARE_MESSAGE( m_Radio, ReloadSound )
@@ -157,4 +157,5 @@ int CHudRadio::MsgFunc_BotVoice( const char *pszName, int iSize, void *buf )
 	Voice( entIndex, enable );
 
 	return 1;
+}
 }

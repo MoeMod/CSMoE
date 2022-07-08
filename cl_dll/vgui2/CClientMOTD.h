@@ -78,6 +78,16 @@ public:
 		BaseClass::SetParent( parent );
 	}
 
+	void Init() override final
+	{
+		SetVisible(false);
+	}
+
+	void VidInit() override final
+	{
+		SetVisible(false);
+	}
+
 private:
 	void RemoveTempFile();
 

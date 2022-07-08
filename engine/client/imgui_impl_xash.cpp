@@ -13,22 +13,24 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-extern "C" {
 #include "common.h"
 #include "client.h"
 #include "gl_local.h"
 #include "input.h"
 #include "input_ime.h"
-}
 #include "minmax.h"
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "imgui_impl_xash.h"
 #include "imgui_lcsm_warning.h"
 #include "imgui_console.h"
 #include "imgui_imewindow.h"
 #include "imgui_sprview.h"
-
+#include "imgui_connectprogress.h"
+#include "imgui_menu_server.h"
+#include "imgui_menu_update.h"
+#include "imgui_menu_msgbox.h"
 #include <keydefs.h>
 #include <utility>
 #include <algorithm>
@@ -46,20 +48,32 @@ extern "C" {
 // Data
 double g_Time = 0.0;
 bool g_MouseJustPressed[5] = { false, false, false, false, false };
+bool g_KeysJustPressed[512];
+
 float g_MouseLastPos[2];
 float g_MouseWheel = 0.0f;
 GLuint g_FontTexture = 0;
 
 float g_ImGUI_DPI = 1.0f;
+float g_ImGui_Font_DPI = 1.0f;
 
 ImGuiContext* g_EngineContext = nullptr;
 
 bool g_bShowDemoWindow = false;
 
-template<typename T> static inline T ImLerp(T a, T b, float t) { return (T)(a + (b - a) * t); }
-static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, float t) { return ImVec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t); }
-static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, const ImVec2& t) { return ImVec2(a.x + (b.x - a.x) * t.x, a.y + (b.y - a.y) * t.y); }
-static inline ImVec4 ImLerp(const ImVec4& a, const ImVec4& b, float t) { return ImVec4(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t, a.w + (b.w - a.w) * t); }
+int g_imguiRenderMode = 0;
+
+extern "C" mempool_t *imgui_pool = nullptr;
+
+void* ImGui_ImplGL_OperatorNew(size_t sz, void* user_data)
+{
+	return Mem_Alloc(imgui_pool, sz);
+}
+
+void ImGui_ImplGL_OperatorDelete(void* ptr, void* user_data)
+{
+	return ptr ? Mem_Free(ptr) : void();
+}
 
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
 void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
@@ -95,6 +109,9 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	pglEnable(GL_TEXTURE_2D);
 	pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	pglShadeModel(GL_SMOOTH);
+
+	g_imguiRenderMode = kRenderTransTexture;
+	GL_SetRenderMode(kRenderTransTexture);
 
 	// Setup viewport, orthographic projection matrix
 //	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
@@ -164,12 +181,10 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 //    1:down 0:up
 //=============
 
-extern "C" { extern qboolean	in_mouseactive; }
+extern qboolean	in_mouseactive;
 qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action)
 {
 	if (!g_EngineContext)
-		return false;
-	if (cls.key_dest == key_game)
 		return false;
 	ImGuiIO& io = ImGui::GetIO();
 	if (button >= 0 && button < 5)
@@ -191,9 +206,15 @@ static void KeyCallback(int key, int action)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	if (action == 1)
+	{
 		io.KeysDown[key] = true;
+		g_KeysJustPressed[key] = true;
+	}
 	if (action == 0)
-		io.KeysDown[key] = false;
+	{
+		if(!g_KeysJustPressed[key])
+			io.KeysDown[key] = false;
+	}
 
 	io.KeyCtrl = io.KeysDown[K_CTRL];
 	io.KeyShift = io.KeysDown[K_SHIFT];
@@ -210,29 +231,34 @@ qboolean ImGui_ImplGL_KeyEvent( int key, qboolean down )
 {
 	if (!g_EngineContext)
 		return false;
-	if (cls.key_dest == key_game)
-		return false;
 	ImGuiIO& io = ImGui::GetIO();
+	bool bIsMouse = false;
 	// IMGUI input
 	switch (key)
 	{
 		case K_MWHEELDOWN:
 			ScrollCallback(0, -1.0);
+			bIsMouse = true;
 			break;
 		case K_MWHEELUP:
 			ScrollCallback(0, 1.0);
+			bIsMouse = true;
 			break;
 		case K_MOUSE1:
 		case K_MOUSE2:
 		case K_MOUSE3:
 		case K_MOUSE4:
 		case K_MOUSE5:
+			bIsMouse = true;
 			//ImGui_ImplGL_MouseButtonCallback(key - K_MOUSE1, 1);
 			break;
 		default:
 			KeyCallback(key, down);
 			break;
 	}
+
+	if(bIsMouse)
+		return io.WantCaptureMouse;
 	return io.WantCaptureKeyboard;
 }
 
@@ -269,32 +295,34 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 {
 	// Build texture atlas
 	ImGuiIO& io = ImGui::GetIO();
+
+	ImGui_ImplGL_ReloadFonts();
+
 	unsigned char* pixels;
 	int width, height, bytes_per_pixel;
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
-	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytes_per_pixel);
+	io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bytes_per_pixel);
 
 	// Upload texture to graphics system
 	//GLint last_texture;
 	//pglGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
 	//pglGenTextures(1, &g_FontTexture);
 	//g_FontTexture = 888888;	// UNDONE: create texture by surface()->CreateNewTextureId()
-	rgbdata_t	r_image;
+	auto	r_image = Image_NewTemp();
 	char	texName[32];
 
 	Q_strncpy( texName, "*imgui_font", sizeof( texName ) );
-	Q_memset( &r_image, 0, sizeof( r_image ));
 
-	r_image.width = width;
-	r_image.height = height;
-	r_image.depth = bytes_per_pixel;
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * r_image.depth;
-	r_image.flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA;
-	r_image.buffer = (byte *)pixels;
+	r_image->width = width;
+	r_image->height = height;
+	r_image->depth = bytes_per_pixel;
+	r_image->type = PF_A_8;
+	r_image->size = r_image->width * r_image->height * r_image->depth;
+	r_image->flags = IMAGE_HAS_ALPHA | IMAGE_TEMP;
+	r_image->buffer = (byte *)pixels;
 
 	//pglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	auto i = GL_LoadTextureInternal( "*imgui_font", &r_image, (texFlags_t)TF_IMAGE, false );
+	auto i = GL_LoadTextureInternal( "*imgui_font", r_image, (texFlags_t)(TF_FONT | TF_FONT_ALPHA), false );
 	g_FontTexture = i;
 	//GL_Bind(XASH_TEXTURE0, i);
 	//pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -303,6 +331,9 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 
 	// Store our identifier
 	io.Fonts->TexID = (void *)(ptrdiff_t)g_FontTexture;
+
+	// free memory
+	io.Fonts->ClearTexData();
 
 	// Restore state
 	//pglBindTexture(GL_TEXTURE_2D, last_texture);
@@ -332,7 +363,7 @@ void ImGui_ImplGL_InvalidateDeviceObjects(void)
 	}
 }
 
-extern "C" int pfnGetScreenInfo( SCREENINFO *pscrinfo );
+int pfnGetScreenInfo( SCREENINFO *pscrinfo );
 
 void ImGui_ImplGL_ReloadFonts()
 {
@@ -340,7 +371,14 @@ void ImGui_ImplGL_ReloadFonts()
 	search_t		*t;
 	int		i;
 
-	float size_pixels = 14 * 2; // 14 * 2
+	if(glConfig.max_2d_texture_size <= 2048)
+		g_ImGui_Font_DPI = 0.5f;
+	else if(glConfig.max_2d_texture_size <= 4096)
+		g_ImGui_Font_DPI = 1.0f;
+	else
+		g_ImGui_Font_DPI = 2.0f;
+
+	float size_pixels = 14 * g_ImGui_Font_DPI; // 14 * 2
 
 	if (size_pixels <= 0.0f)
 		return;
@@ -415,13 +453,13 @@ static void ImGui_ImplSDL2_UpdateMouseCursor()
 	if (io.MouseDrawCursor || imgui_cursor == ImGuiMouseCursor_None)
 	{
 		// Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
-		SDL_ShowCursor(SDL_FALSE);
+		//SDL_ShowCursor(SDL_FALSE);
 	}
 	else
 	{
 		// Show OS mouse cursor
 		SDL_SetCursor(g_MouseCursors[imgui_cursor] ? g_MouseCursors[imgui_cursor] : g_MouseCursors[ImGuiMouseCursor_Arrow]);
-		SDL_ShowCursor(SDL_TRUE);
+		//SDL_ShowCursor(SDL_TRUE);
 	}
 }
 #endif
@@ -441,6 +479,8 @@ void Cmd_ImGui_f()
 
 qboolean ImGui_ImplGL_Init(void)
 {
+	imgui_pool = Mem_AllocPool("ImGui");
+	ImGui::SetAllocatorFunctions(ImGui_ImplGL_OperatorNew, ImGui_ImplGL_OperatorDelete);
     g_EngineContext = ImGui::CreateContext();
     ImGui::SetCurrentContext(g_EngineContext);
 	ImGui::StyleColorsLight();
@@ -476,18 +516,18 @@ qboolean ImGui_ImplGL_Init(void)
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
-	io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
+	//io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
 
 #ifdef XASH_SDL
 	ImGui_ImplSDL2_Init();
 #endif
-	
-	//io.Fonts->AddFontFromFileTTF("msyh.ttf", 16, NULL, io.Fonts->GetGlyphRangesChinese());
-	ImGui_ImplGL_ReloadFonts();
-	
+
 	ImGui_Console_Init();
 	ImGui_ImeWindow_Init();
 	ImGui_SprView_Init();
+	ImGui_ConnectProgress_Init();
+	ui::ImGui_Server_Init();
+    ui::Update_Initiate();
 
 	Cmd_AddCommand("imgui", Cmd_ImGui_f, "imgui demo");
 
@@ -502,7 +542,7 @@ void ImGui_ImplGL_Shutdown(void)
 #ifdef XASH_SDL
 	ImGui_ImplSDL2_Shutdown();
 #endif
-	
+
 	ImGui_ImplGL_InvalidateDeviceObjects();
     ImGui::DestroyContext(std::exchange(g_EngineContext, nullptr));
 	//ImGui::Shutdown();
@@ -512,6 +552,56 @@ void ImGui_ImplGL_SetColors(ImGuiStyle* style)
 {
 	ImVec4* colors = style->Colors;
 
+#if 1
+	colors[ImGuiCol_Text]                   = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+	colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+	colors[ImGuiCol_WindowBg]               = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
+	colors[ImGuiCol_ChildBg]                = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+	colors[ImGuiCol_PopupBg]                = ImVec4(1.00f, 1.00f, 1.00f, 0.98f);
+	colors[ImGuiCol_Border]                 = ImVec4(0.00f, 0.00f, 0.00f, 0.30f);
+	colors[ImGuiCol_BorderShadow]           = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+	colors[ImGuiCol_FrameBg]                = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+	colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.48f, 0.61f, 0.88f, 0.40f); //
+	colors[ImGuiCol_FrameBgActive]          = ImVec4(0.48f, 0.61f, 0.88f, 0.67f); //
+	colors[ImGuiCol_TitleBg]                = ImVec4(0.92f, 0.93f, 1.00f, 1.00f); // !
+	colors[ImGuiCol_TitleBgActive]          = ImVec4(0.83f, 0.87f, 0.99f, 1.00f); // !
+	colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
+	colors[ImGuiCol_MenuBarBg]              = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
+	colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
+	colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.69f, 0.69f, 0.69f, 0.80f);
+	colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.49f, 0.49f, 0.49f, 0.80f);
+	colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
+	colors[ImGuiCol_CheckMark]              = ImVec4(0.48f, 0.61f, 0.88f, 1.00f); //
+	colors[ImGuiCol_SliderGrab]             = ImVec4(0.48f, 0.61f, 0.88f, 0.78f); //
+	colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.35f, 0.47f, 0.71f, 1.00f); //
+	colors[ImGuiCol_Button]                 = ImVec4(0.48f, 0.61f, 0.88f, 0.40f); //
+	colors[ImGuiCol_ButtonHovered]          = ImVec4(0.48f, 0.61f, 0.88f, 1.00f); //
+	colors[ImGuiCol_ButtonActive]           = ImVec4(0.35f, 0.47f, 0.71f, 1.00f); //
+	colors[ImGuiCol_Header]                 = ImVec4(0.48f, 0.61f, 0.88f, 0.31f); //
+	colors[ImGuiCol_HeaderHovered]          = ImVec4(0.48f, 0.61f, 0.88f, 0.80f); //
+	colors[ImGuiCol_HeaderActive]           = ImVec4(0.48f, 0.61f, 0.88f, 1.00f); //
+	colors[ImGuiCol_Separator]              = ImVec4(0.39f, 0.39f, 0.39f, 0.62f);
+	colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.14f, 0.44f, 0.80f, 0.78f);
+	colors[ImGuiCol_SeparatorActive]        = ImVec4(0.14f, 0.44f, 0.80f, 1.00f);
+	colors[ImGuiCol_ResizeGrip]             = ImVec4(0.80f, 0.80f, 0.80f, 0.56f);
+	colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.48f, 0.61f, 0.88f, 0.67f); //
+	colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.48f, 0.61f, 0.88f, 0.95f); //
+	colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.90f);
+	colors[ImGuiCol_TabHovered]             = colors[ImGuiCol_HeaderHovered];
+	colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
+	colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
+	colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40f);
+	colors[ImGuiCol_PlotLines]              = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
+	colors[ImGuiCol_PlotLinesHovered]       = ImVec4(0.35f, 0.43f, 1.00f, 1.00f); // !!
+	colors[ImGuiCol_PlotHistogram]          = ImVec4(0.35f, 0.47f, 0.71f, 1.00f); // !!
+	colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(0.25f, 0.45f, 0.88f, 1.00f); // !!
+	colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.48f, 0.61f, 0.88f, 0.35f); //
+	colors[ImGuiCol_DragDropTarget]         = ImVec4(0.48f, 0.61f, 0.88f, 0.95f); //
+	colors[ImGuiCol_NavHighlight]           = colors[ImGuiCol_HeaderHovered];
+	colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(0.70f, 0.70f, 0.70f, 0.70f);
+	colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.20f, 0.20f, 0.20f, 0.20f);
+	colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
+#else
 	colors[ImGuiCol_Text]                   = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 	colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
 	colors[ImGuiCol_WindowBg]               = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
@@ -560,15 +650,11 @@ void ImGui_ImplGL_SetColors(ImGuiStyle* style)
 	colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(0.70f, 0.70f, 0.70f, 0.70f);
 	colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.20f, 0.20f, 0.20f, 0.20f);
 	colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
+#endif
 }
 
 void ImGui_ImplGL_NewFrame(void)
 {
-	if (!g_FontTexture)
-	{
-		ImGui_ImplGL_CreateDeviceObjects();
-	}
-
 	ImGuiIO& io = ImGui::GetIO();
 
 
@@ -596,7 +682,7 @@ void ImGui_ImplGL_NewFrame(void)
 #endif
 	nst.FramePadding = {16, 9};
 	nst.ScaleAllSizes(g_ImGUI_DPI);
-	io.FontGlobalScale = g_ImGUI_DPI / 2;
+	io.FontGlobalScale = g_ImGUI_DPI / g_ImGui_Font_DPI;
 	ImGui::GetStyle() = nst;
 
 	// Setup time step
@@ -636,6 +722,13 @@ void ImGui_ImplGL_NewFrame(void)
 
 	// Start the frame. This call will update the io.WantCaptureMouse, io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not) to your application.
 	ImGui::NewFrame();
+
+	for(int i = 0; i < 512; ++i)
+	{
+		if(g_KeysJustPressed[i])
+			io.KeysDown[i] = false;
+	}
+	std::fill(std::begin(g_KeysJustPressed), std::end(g_KeysJustPressed), false);
 }
 
 qboolean ImGui_ImplGL_MouseMove(int x, int y)
@@ -646,16 +739,22 @@ qboolean ImGui_ImplGL_MouseMove(int x, int y)
 	return io.WantCaptureMouse;
 }
 
+qboolean ImGui_ImplGL_IsCursorVisible()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	return io.WantCaptureMouse;
+}
+
 void ImGui_ImplGL_Render(void)
 {
 	ImGuiIO& io = ImGui::GetIO();
+    ImGui::Render();
 	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	//pglViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 	//pglClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 	//pglClear(GL_COLOR_BUFFER_BIT);
 	//pglUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
-	//ImGui_ImplGL_RenderDrawLists(ImGui::GetDrawData());
-	ImGui::Render();
+	ImGui_ImplGL_RenderDrawLists(ImGui::GetDrawData());
 }
 
 void Engine_OnGUI(struct ImGuiContext *context)
@@ -663,32 +762,30 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui::SetCurrentContext(context);
 	ImGui_LCSM_OnGUI();
 	ImGui_Console_OnGUI();
+	ImGui_ConnectProgress_OnGUI();
 	ImGui_ImeWindow_OnGUI();
 	ImGui_SprView_OnGUI();
+	ui::ImGui_Server_OnGui();
+    ui::Update_OnGui();
+    ui::MsgBox_OnGui();
 	if(g_bShowDemoWindow)
 		ImGui::ShowDemoWindow(&g_bShowDemoWindow);
 }
 
 void ImGui_ImplGL_Client_OnGUI(void)
 {
-	auto drawlist = ImGui::GetBackgroundDrawList();
-	drawlist->AddDrawCmd();
 	if (clgame.dllFuncs.pfnOnGUI && cls.key_dest == key_game)
 		clgame.dllFuncs.pfnOnGUI(g_EngineContext);
 }
 
 void ImGui_ImplGL_Menu_OnGUI(void)
 {
-	auto drawlist = ImGui::GetBackgroundDrawList();
-	drawlist->AddDrawCmd();
 	if (menu.dllFuncs.pfnOnGUI && cls.key_dest == key_menu)
 		menu.dllFuncs.pfnOnGUI(g_EngineContext);
 }
 
 void ImGui_ImplGL_Engine_OnGUI(void)
 {
-	auto drawlist = ImGui::GetBackgroundDrawList();
-	drawlist->AddDrawCmd();
 	Engine_OnGUI(g_EngineContext);
 }
 

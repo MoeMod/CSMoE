@@ -21,7 +21,6 @@ GNU General Public License for more details.
 #include "pm_shared.h"
 
 #include "r_efx.h"
-#include "triangleapi.h"
 #include "event_args.h"
 #include "in_defs.h"
 
@@ -32,9 +31,17 @@ GNU General Public License for more details.
 
 #include <assert.h>
 
+namespace cl {
+
 extern float g_flRoundTime;
 
-namespace cl {
+float g_flSFPistolBeamTime[33];
+BEAM* g_pSFPistolBeams[33];
+TEMPENTITY* g_pSFPistolParticles[33];
+float g_flY22s2SFPistolBeamTime[33];
+BEAM* g_pY22s2SFPistolBeams[33];
+TEMPENTITY* g_pY22s2SFPistolParticles[33];
+TEMPENTITY* g_pChainsawEXParticles[33];
 
 // play a strike sound based on the texture that was hit by the attack traceline.  VecSrc/VecEnd are the
 // original traceline endpoints used by the attacker, iBulletType is the type of bullet that hit the texture.
@@ -94,7 +101,7 @@ void EV_HLDM_NewExplode( float x, float y, float z, float ScaleExplode1 )
 
 }
 
-char EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, float *vecSrc, float *vecEnd, int iBulletType )
+char EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, const vec3_t vecSrc, const vec3_t vecEnd, int iBulletType )
 {
 	// hit the world, try to play sound based on texture material type
 	char chTextureType = CHAR_TEX_CONCRETE;
@@ -486,7 +493,7 @@ void EV_CS16Client_CreateSmoke(int type, Vector origin, Vector dir, int speed, f
 		te->entity.curstate.scale = scale;
 		te->entity.baseline.origin = speed * dir;
 
-		if( !velocity.IsNull() )
+		if( !velocity.IsZero() )
 		{
 			velocity.x *= 0.5;
 			velocity.y *= 0.5;
@@ -496,7 +503,7 @@ void EV_CS16Client_CreateSmoke(int type, Vector origin, Vector dir, int speed, f
 	}
 }
 
-void EV_HLDM_CreateSmoke(float *origin, float *dir, int speed, float scale, int r, int g, int b, int iSmokeType, float *base_velocity, bool bWind, int framerate)
+void EV_HLDM_CreateSmoke(const vec3_t origin, const vec3_t dir, int speed, float scale, int r, int g, int b, int iSmokeType, const vec3_t base_velocity, bool bWind, int framerate)
 {
 	char model[256];
 	int model_index;
@@ -657,9 +664,18 @@ void EV_HLDM_DecalGunshot(pmtrace_t *pTrace, int iBulletType, float scale, int r
 
 			switch (iBulletType)
 			{
-				default:
-					iColorIndex = 30;
-					break;
+			case BULLET_PLAYER_ETHEREAL:
+			case BULLET_PLAYER_RAILBEAM:
+			case BULLET_PLAYER_DEPLETEDALLOY:
+				iColorIndex = 12;
+				break;
+
+			case BULLET_PLAYER_556LVB:
+				iColorIndex = 2;
+				break;
+			default:
+				iColorIndex = 30;
+				break;
 			}
 
 			gEngfuncs.pEfxAPI->R_StreakSplash(pTrace->endpos, gEngfuncs.pfnRandomFloat(4.0, 10.0) * pTrace->plane.normal, iColorIndex, iStreakCount, gEngfuncs.pfnRandomFloat(4.0, 10.0) * pTrace->plane.normal[2], -75, 75);
@@ -667,9 +683,24 @@ void EV_HLDM_DecalGunshot(pmtrace_t *pTrace, int iBulletType, float scale, int r
 
 		switch (iBulletType)
 		{
-			default:
-				decalname = EV_HLDM_DamageDecal(pe);
-				break;
+		case BULLET_PLAYER_CHAINSAW:
+			decalname = NULL;
+			break;
+		case BULLET_PLAYER_RAILBEAM:
+		{
+			char cRailBeamDecal[32] = "{sfshot";
+			decalname = cRailBeamDecal;
+			break;
+		}
+		case BULLET_PLAYER_BUFFM249:
+		{
+			char cRailBeamDecal[32] = "{buffm249";
+			decalname = cRailBeamDecal;
+			break;
+		}
+		default:
+			decalname = EV_HLDM_DamageDecal(pe);
+			break;
 		}
 
 		EV_HLDM_GunshotDecalTrace(pTrace, decalname, cTextureType);
@@ -718,6 +749,7 @@ void EV_DescribeBulletTypeParameters(int iBulletType, int &iPenetrationPower, fl
 		break;
 	}
 
+	case BULLET_PLAYER_556LVB:
 	case BULLET_PLAYER_556MM:
 	{
 		iPenetrationPower = 35;
@@ -746,6 +778,27 @@ void EV_DescribeBulletTypeParameters(int iBulletType, int &iPenetrationPower, fl
 		break;
 	}
 
+	case BULLET_PLAYER_RAILBEAM:
+	{
+		iPenetrationPower = 100;
+		flPenetrationDistance = 1000;
+		break;
+	}
+
+	case BULLET_PLAYER_DESPERADO:
+	{
+		iPenetrationPower = 35;
+		flPenetrationDistance = 1200;
+		break;
+	}
+
+	case BULLET_PLAYER_ETHEREAL:
+	{
+		iPenetrationPower = 35;
+		flPenetrationDistance = 4000;
+		break;
+	}
+
 	default:
 	{
 		iPenetrationPower = 0;
@@ -755,7 +808,7 @@ void EV_DescribeBulletTypeParameters(int iBulletType, int &iPenetrationPower, fl
 	}
 }
 
-int EV_HLDM_CheckTracer(int idx, float *vecSrc, float *end, float *forward, float *right, int iBulletType, int iTracerFreq, int *tracerCount)
+int EV_HLDM_CheckTracer(int idx, const vec3_t vecSrc, const vec3_t end, const vec3_t forward, const vec3_t right, int iBulletType, int iTracerFreq, int *tracerCount)
 {
 	int tracer = 0;
 	int i;
@@ -790,7 +843,7 @@ int EV_HLDM_CheckTracer(int idx, float *vecSrc, float *end, float *forward, floa
 }
 
 
-void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int cShots, float *vecSrc, float *vecDirShooting, float *vecSpread, float flDistance, int iBulletType, int iTracerFreq, int *tracerCount, int iPenetration, int iAttachment, bool lefthand, float srcofs)
+void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, const vec3_t up, int cShots, vec3_t vecSrc, const vec3_t vecDirShooting, const vec3_t vecSpread, float flDistance, int iBulletType, int iTracerFreq, int *tracerCount, int iPenetration, int iAttachment, bool lefthand, float srcofs)
 {
 	int i;
 	pmtrace_t tr;
@@ -835,7 +888,7 @@ void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int c
 
 		while (iShots > 0)
 		{
-			if (iBulletType == BULLET_PLAYER_BUCKSHOT)
+			if (iBulletType == BULLET_PLAYER_BUCKSHOT || iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT)
 			{
 				do
 				{
@@ -973,6 +1026,17 @@ void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int c
 						break;
 					case BULLET_PLAYER_BUCKSHOT:
 						break;
+					case BULLET_PLAYER_WINGGUN_BUCKSHOT:
+					{
+						int sModelIndexParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_particle.spr");
+
+						vec3_t fwd;
+						VectorSubtract(tr.endpos, forward, fwd);
+						gEngfuncs.pEfxAPI->R_Sprite_Trail(TE_SPRITETRAIL, tr.endpos, fwd, sModelIndexParticle, 2, 0.5, 0.04, 100,
+							255, 10);
+						break;
+					}
+						
 					case BULLET_PLAYER_MP5:
 						if (!tracer)
 							chTextureType = EV_HLDM_PlayTextureSound(idx, &tr, vecStart, vecEnd, iBulletType);
@@ -1067,9 +1131,14 @@ void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int c
 	}
 }
 
-void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int cShots, float *vecSrc, float *vecDirShooting, float *vecSpread, float flDistance, int iBulletType, int iPenetration)
+void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, const vec3_t up, int cShots, vec3_t vecSrc, const vec3_t vecDirShooting, const vec3_t vecSpread, float flDistance, int iBulletType, int iPenetration)
 {
     return EV_HLDM_FireBullets(idx, forward, right, up, cShots, vecSrc, vecDirShooting, vecSpread, flDistance, iBulletType, 0, 0, iPenetration, 0, false, 0.0f);
+}
+
+void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, const vec3_t up, int cShots, vec3_t vecSrc, const vec3_t vecDirShooting, const vec3_t vecSpread, float flDistance, int iBulletType, int iTracerFreq, int* tracerCount, int iPenetration)
+{
+	return EV_HLDM_FireBullets(idx, forward, right, up, cShots, vecSrc, vecDirShooting, vecSpread, flDistance, iBulletType, iTracerFreq, tracerCount, iPenetration, 0, false, 0.0f);
 }
 
 void EV_CS16Client_KillEveryRound( TEMPENTITY *te, float frametime, float current_time )
@@ -1102,9 +1171,9 @@ void CreateCorpse(Vector *p_vOrigin, Vector *p_vAngles, const char *pModel, floa
 {
 	int modelIdx = gEngfuncs.pEventAPI->EV_FindModelIndex(pModel);
 	vec3_t null(0, 0, 0);
-	TEMPENTITY *model = gEngfuncs.pEfxAPI->R_TempModel( (float*)p_vOrigin,
+	TEMPENTITY *model = gEngfuncs.pEfxAPI->R_TempModel( *p_vOrigin,
 														null,
-														(float*)p_vAngles,
+														*p_vAngles,
 														gEngfuncs.pfnGetCvarFloat("cl_corpsestay"),
 														modelIdx,
 														0 );
@@ -1122,6 +1191,181 @@ void CreateCorpse(Vector *p_vOrigin, Vector *p_vAngles, const char *pModel, floa
 		model->hitcallback = HitBody;
 		model->callback = RemoveBody;
 	}
+}
+
+void ResetSFPistolEntities(void)
+{
+	for (int i = 0; i < 33; i++)
+	{
+		g_flSFPistolBeamTime[i] = 0;
+		g_pSFPistolBeams[i] = nullptr;
+		g_pSFPistolParticles[i] = nullptr;
+		g_flY22s2SFPistolBeamTime[i] = 0;
+		g_pY22s2SFPistolBeams[i] = nullptr;
+		g_pY22s2SFPistolParticles[i] = nullptr;
+		g_pChainsawEXParticles[i] = nullptr;
+	}
+}
+
+void CreateSFPistolBeams(void)
+{
+	for (int i = 0; i < 33; i++)
+	{
+		if (gHUD.m_flTime >= g_flSFPistolBeamTime[i])
+			continue;
+
+		if (g_pSFPistolBeams[i] == NULL)
+			continue;
+
+		cl_entity_t* pl = gEngfuncs.GetEntityByIndex(i);
+
+		Vector pos, forward, right, up;
+		pmtrace_t tr;
+
+		if (!EV_IsLocal(i))
+		{
+			AngleVectors(pl->angles, forward, right, up);
+
+			pos = pl->origin + Vector(0, 0, 16) + forward * 30;
+		}
+		else
+		{
+			cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(i);
+
+			vec3_t viewangles;
+
+			gEngfuncs.GetViewAngles(viewangles);
+
+			gEngfuncs.pfnAngleVectors(viewangles, forward, right, up);
+
+			cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+			if (!viewent || !viewent->model || stricmp(viewent->model->name, "models/v_sfpistol.mdl"))
+			{
+				g_flSFPistolBeamTime[i] = 0;
+				g_pSFPistolBeams[i]->die = 0;
+
+				if (g_pSFPistolParticles[i])
+				{
+					g_pSFPistolParticles[i]->die = gHUD.m_flTime;
+					g_pSFPistolParticles[i] = nullptr;
+				}
+
+				continue;
+			}
+
+			pos = viewent->attachment[0];
+		}
+
+		gEngfuncs.pEventAPI->EV_SetUpPlayerPrediction(false, true);
+		gEngfuncs.pEventAPI->EV_PushPMStates();
+		gEngfuncs.pEventAPI->EV_SetSolidPlayers(i - 1);
+		gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+		gEngfuncs.pEventAPI->EV_PlayerTrace(pos, pos + forward * 8192, PM_STUDIO_BOX, -1, &tr);
+		gEngfuncs.pEventAPI->EV_PopPMStates();
+
+		g_pSFPistolBeams[i]->source = pos;
+		g_pSFPistolBeams[i]->target = tr.endpos;
+		g_pSFPistolBeams[i]->delta = g_pSFPistolBeams[i]->target - pos;
+
+		if (!EV_IsLocal(i))
+		{
+			Vector dir = g_pSFPistolBeams[i]->delta.Normalize();
+			float dot = DotProduct(dir, Vector(0, 0, -1));
+
+			if (dot > 0.95 || dot < -0.95)
+			{
+				g_pSFPistolBeams[i]->brightness = 0.0;
+			}
+			else
+			{
+				g_pSFPistolBeams[i]->brightness = 1.0;
+			}
+		}
+	}
+}
+void CreateSFPistolBeams2(void)
+{
+	for (int i = 0; i < 33; i++)
+	{
+		if (gHUD.m_flTime >= g_flY22s2SFPistolBeamTime[i])
+			continue;
+
+		if (g_pY22s2SFPistolBeams[i] == NULL)
+			continue;
+
+		cl_entity_t* pl = gEngfuncs.GetEntityByIndex(i);
+
+		Vector pos, forward, right, up;
+		pmtrace_t tr;
+
+		if (!EV_IsLocal(i))
+		{
+			AngleVectors(pl->angles, forward, right, up);
+
+			pos = pl->origin + Vector(0, 0, 16) + forward * 30;
+		}
+		else
+		{
+			cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(i);
+
+			vec3_t viewangles;
+
+			gEngfuncs.GetViewAngles(viewangles);
+
+			gEngfuncs.pfnAngleVectors(viewangles, forward, right, up);
+
+			cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+			if (!viewent || !viewent->model || stricmp(viewent->model->name, "models/v_y22s2sfpistol.mdl"))
+			{
+				g_flY22s2SFPistolBeamTime[i] = 0;
+				g_pY22s2SFPistolBeams[i]->die = 0;
+
+				if (g_pY22s2SFPistolParticles[i])
+				{
+					g_pY22s2SFPistolParticles[i]->die = gHUD.m_flTime;
+					g_pY22s2SFPistolParticles[i] = nullptr;
+				}
+
+				continue;
+			}
+
+			pos = viewent->attachment[0];
+		}
+
+		gEngfuncs.pEventAPI->EV_SetUpPlayerPrediction(false, true);
+		gEngfuncs.pEventAPI->EV_PushPMStates();
+		gEngfuncs.pEventAPI->EV_SetSolidPlayers(i - 1);
+		gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+		gEngfuncs.pEventAPI->EV_PlayerTrace(pos, pos + forward * 8192, PM_STUDIO_BOX, -1, &tr);
+		gEngfuncs.pEventAPI->EV_PopPMStates();
+
+		g_pY22s2SFPistolBeams[i]->source = pos;
+		g_pY22s2SFPistolBeams[i]->target = tr.endpos;
+		g_pY22s2SFPistolBeams[i]->delta = g_pY22s2SFPistolBeams[i]->target - pos;
+
+		if (!EV_IsLocal(i))
+		{
+			Vector dir = g_pY22s2SFPistolBeams[i]->delta.Normalize();
+			float dot = DotProduct(dir, Vector(0, 0, -1));
+
+			if (dot > 0.95 || dot < -0.95)
+			{
+				g_pY22s2SFPistolBeams[i]->brightness = 0.0;
+			}
+			else
+			{
+				g_pY22s2SFPistolBeams[i]->brightness = 1.0;
+			}
+		}
+	}
+}
+
+DLL_EXPORT void HUD_CreateBeams(void)
+{
+	CreateSFPistolBeams();
+	CreateSFPistolBeams2();
 }
 
 }

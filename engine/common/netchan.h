@@ -237,12 +237,13 @@ typedef struct netchan_s
 } netchan_t;
 
 extern netadr_t		net_from;
-extern netadr_t		net_local;
+extern netadr_t		net_ipv4_local;
+extern netadr_t		net_ipv6_local;
 extern sizebuf_t		net_message;
 extern byte		net_message_buffer[NET_MAX_PAYLOAD];
 extern convar_t		*net_speeds;
 extern int		net_drop;
-extern byte 	*net_mempool;
+extern mempool_t 	*net_mempool;
 
 void Netchan_Init( void );
 void Netchan_Shutdown( void );
@@ -254,7 +255,7 @@ int Netchan_CreateFileFragments( qboolean server, netchan_t *chan, const char *f
 void Netchan_Transmit( netchan_t *chan, int lengthInBytes, byte *data );
 void Netchan_TransmitBits( netchan_t *chan, int lengthInBits, byte *data );
 void Netchan_OutOfBand( int net_socket, netadr_t adr, int length, byte *data );
-void Netchan_OutOfBandPrint( int net_socket, netadr_t adr, char *format, ... );
+void Netchan_OutOfBandPrint( int net_socket, netadr_t adr, const char *format, ... );
 qboolean Netchan_Process( netchan_t *chan, sizebuf_t *msg );
 void Netchan_UpdateProgress( netchan_t *chan );
 qboolean Netchan_IncomingReady( netchan_t *chan );

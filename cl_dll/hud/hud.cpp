@@ -33,10 +33,15 @@
 
 #include "demo.h"
 #include "demo_api.h"
-#include "vgui_parser.h"
 #include "rain.h"
+#include "fog.h"
 
 #include "camera.h"
+
+#include "cs_wpn/bte_weapons.h"
+#include "vgui2/CBaseViewport.h"
+
+namespace cl {
 
 extern client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, int iRes, int iCount);
 
@@ -68,6 +73,8 @@ GHUD_DECLARE_MESSAGE(ResetHUD)
 GHUD_DECLARE_MESSAGE(ViewMode)
 GHUD_DECLARE_MESSAGE(GameMode)
 GHUD_DECLARE_MESSAGE(ShadowIdx)
+GHUD_DECLARE_MESSAGE(OperationSystem)
+GHUD_DECLARE_MESSAGE(MPToCL)
 
 void __CmdFunc_InputCommandSpecial()
 {
@@ -91,41 +98,6 @@ static const char *date = __DATE__;
 static const char *mon[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 static char mond[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 #endif
-
-char *Q_buildnum( void )
-{
-// do not touch this! Only author of Xash3D can increase buildnumbers!
-// Xash3D SDL: HAHAHA! I TOUCHED THIS!
-	int m = 0, d = 0, y = 0;
-	static int b = 0;
-	static char buildnum[16];
-
-	if( b != 0 )
-		return buildnum;
-
-	for( m = 0; m < 11; m++ )
-	{
-		if( !strncasecmp( &date[0], mon[m], 3 ))
-			break;
-		d += mond[m];
-	}
-
-	d += atoi( &date[4] ) - 1;
-	y = atoi( &date[7] ) - 1900;
-	b = d + (int)((y - 1) * 365.25f );
-
-	if((( y % 4 ) == 0 ) && m > 1 )
-	{
-		b += 1;
-	}
-	//b -= 38752; // Feb 13 2007
-	b -= 41940; // Oct 29 2015.
-	// Happy birthday, cs16client! :)
-
-	snprintf( buildnum, sizeof(buildnum), "%i", b );
-
-	return buildnum;
-}
 
 int __MsgFunc_ADStop( const char *name, int size, void *buf ) { return 1; }
 int __MsgFunc_ItemStatus( const char *name, int size, void *buf ) { return 1; }
@@ -156,7 +128,8 @@ void CHud :: Init( void )
 	HOOK_COMMAND( "evdev_mouseopen", MouseSucksOpen );
 	HOOK_COMMAND( "evdev_mouseclose", MouseSucksClose );
 #endif
-	
+
+	HOOK_MESSAGE( MPToCL );
 	HOOK_MESSAGE( Logo );
 	HOOK_MESSAGE( ResetHUD );
 	HOOK_MESSAGE( GameMode );
@@ -174,8 +147,9 @@ void CHud :: Init( void )
 
 
 	HOOK_MESSAGE( ShadowIdx );
+	HOOK_MESSAGE( OperationSystem );
 
-	CVAR_CREATE( "_vgui_menus", "0", (1<<14) | FCVAR_USERINFO );
+	CVAR_CREATE( "_vgui_menus", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );
 	CVAR_CREATE( "_cl_autowepswitch", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );
 	CVAR_CREATE( "_ah", "0", FCVAR_ARCHIVE | FCVAR_USERINFO );
 
@@ -194,7 +168,7 @@ void CHud :: Init( void )
 	cl_shadows   = CVAR_CREATE( "cl_shadows", "1", FCVAR_ARCHIVE );
 	default_fov  = CVAR_CREATE( "default_fov", "90", 0 );
 	m_pCvarDraw  = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
-	m_csgohud  = CVAR_CREATE( "hud_csgo", "0", FCVAR_ARCHIVE );
+	m_hudstyle  = CVAR_CREATE( "hud_style", "0", FCVAR_ARCHIVE );
 	m_bMordenRadar = FALSE;
 	fastsprites  = CVAR_CREATE( "fastsprites", "0", FCVAR_ARCHIVE );
 	cl_gunsmoke  = CVAR_CREATE( "cl_gunsmoke", "0", FCVAR_ARCHIVE );
@@ -204,8 +178,6 @@ void CHud :: Init( void )
 	sv_skipshield = gEngfuncs.pfnGetCvarPointer( "sv_skipshield" );
 
 	cl_headname = CVAR_CREATE("cl_headname", "0", FCVAR_ARCHIVE); // seems lagging, disable by default.
-
-	CVAR_CREATE( "cscl_ver", Q_buildnum(), 1<<14 | FCVAR_USERINFO ); // init and userinfo
 
 	m_iLogo = 0;
 	m_iFOV = 0;
@@ -235,6 +207,8 @@ void CHud :: Init( void )
 
 
 	// Game HUD things
+	m_NewHud.Init();
+	m_Scoreboard.Init();
 	m_Ammo.Init();
 	m_Health.Init();
 	m_Radio.Init();
@@ -248,7 +222,11 @@ void CHud :: Init( void )
 	m_ZBS.Init();
 	m_ZB2.Init();
 	m_ZB3.Init();
+	m_ZBZ.Init();
+	m_ZB4.Init();
 	m_MoeTouch.Init();
+	m_MVP.Init();
+    m_CenterTips.Init();
 
 	// chat, death notice, status bars and other
 	m_SayText.Init();
@@ -257,20 +235,27 @@ void CHud :: Init( void )
 	m_Flash.Init();
 	m_Message.Init();
 	m_StatusBar.Init();
+	m_SpecialCrossHair.Init();
+	m_ShowWin.Init();
+	m_HeadIcon.Init();
 	m_DeathNotice.Init();
 	m_TextMessage.Init();
 	m_FollowIcon.Init();
 	m_MOTD.Init();
 	m_scenarioStatus.Init();
 	m_HeadName.Init();
-
+	m_HitIndicator.Init();
+	m_HudSiFiammo.Init();
 	// all things that have own background and must be drawn last
 	m_ProgressBar.Init();
 	m_Menu.Init();
-	m_Scoreboard.Init();
-	
 
 	InitRain();
+	gFog.Init();
+
+	BTEClientWeapons().Init();
+
+	//g_pViewport->Init(); // vgui viewport create after hud, so forget about this...
 
 	//ServersInit();
 
@@ -300,6 +285,8 @@ CHud :: ~CHud()
 	m_pHudList = NULL;
 }
 
+void ResetSFPistolEntities(void);
+
 void CHud :: VidInit( void )
 {
 	static bool firstinit = true;
@@ -313,29 +300,8 @@ void CHud :: VidInit( void )
 	// Load Sprites
 	// ---------
 	//	m_hsprFont = LoadSprite("sprites/%d_font.spr");
-	
-	m_hsprLogo = 0;
 
-	// assume cs16-client is launched in landscape mode
-	// must be only TrueWidth, but due to bug game may sometime rotate to portait mode
-	// calc scale depending on max side
-	float maxScale = max<float>( TrueWidth, TrueHeight ) / 640.0f;
-	
-	// REMOVE LATER
-	float currentScale = CVAR_GET_FLOAT("hud_scale");
-	float invalidScale = min<float>( TrueWidth, TrueHeight ) / 640.0f;
-	// REMOVE LATER
-	
-	if( currentScale > maxScale ||
-		( currentScale == invalidScale &&
-		  currentScale != 1.0f &&
-		  currentScale != 0.0f &&
-		  invalidScale <  1.0f ) )
-	{
-		gEngfuncs.Cvar_SetValue( "hud_scale", maxScale );
-		gEngfuncs.Con_Printf("^3Maximum scale factor reached. Reset: %f\n", maxScale );
-		GetScreenInfo( &m_scrinfo );
-	}
+	m_hsprLogo = 0;
 
 	m_flScale = CVAR_GET_FLOAT( "hud_scale" );
 
@@ -415,7 +381,11 @@ void CHud :: VidInit( void )
 
 	// assumption: number_1, number_2, etc, are all listed and loaded sequentially
 	m_HUD_number_0 = GetSpriteIndex( "number_0" );
-
+	//newhud
+	m_NEWHUD_number_0 = GetSpriteIndex("number_0_new");
+	m_NEWHUD_dollar_number_0 = GetSpriteIndex("dollarNum_0_new");
+	m_iWeaponGet = GetSpriteIndex("weapon_get_bg_new");
+	m_NEWHUD_hPlus = gHUD.GetSpriteIndex("plus_new");
 	if( m_HUD_number_0 == -1 && g_iXash )
 	{
 		gRenderAPI.Host_Error( "Failed to get number_0 sprite index. Check your game data!" );
@@ -423,6 +393,11 @@ void CHud :: VidInit( void )
 	}
 
 	m_iFontHeight = GetSpriteRect(m_HUD_number_0).bottom - GetSpriteRect(m_HUD_number_0).top;
+
+	m_NEWHUD_iFontWidth = GetSpriteRect(m_NEWHUD_number_0).right - GetSpriteRect(m_NEWHUD_number_0).left;
+	m_NEWHUD_iFontWidth_Dollar = GetSpriteRect(m_NEWHUD_dollar_number_0).right - GetSpriteRect(m_NEWHUD_dollar_number_0).left;
+	m_NEWHUD_iFontHeight = GetSpriteRect(m_NEWHUD_number_0).bottom - GetSpriteRect(m_NEWHUD_number_0).top;
+	m_NEWHUD_iFontHeight_Dollar = GetSpriteRect(m_NEWHUD_dollar_number_0).bottom - GetSpriteRect(m_NEWHUD_dollar_number_0).top;
 
 	m_hGasPuff = SPR_Load("sprites/gas_puff_01.spr");
 
@@ -452,6 +427,10 @@ void CHud :: VidInit( void )
 
 	for( HUDLIST *pList = m_pHudList; pList; pList = pList->pNext )
 		pList->p->VidInit();
+
+	g_pViewport->VidInit();
+	gFog.VidInit();
+	ResetSFPistolEntities();
 
 	if( firstinit && gEngfuncs.CheckParm( "-firsttime", NULL ) )
 	{
@@ -488,19 +467,17 @@ COM_FileBase
 ============
 */
 // Extracts the base name of a file (no path, no extension, assumes '/' as path separator)
-namespace cl
-{
 void COM_FileBase ( const char *in, char *out)
 {
 	int len, start, end;
 
 	len = strlen( in );
-	
+
 	// scan backward for '.'
 	end = len - 1;
 	while ( end && in[end] != '.' && in[end] != '/' && in[end] != '\\' )
 		end--;
-	
+
 	if ( in[end] != '.' )		// no '.', copy to end
 		end = len-1;
 	else
@@ -525,8 +502,6 @@ void COM_FileBase ( const char *in, char *out)
 	// Terminate it
 	out[len] = 0;
 }
-}
-using cl::COM_FileBase;
 
 /*
 =================
@@ -628,4 +603,11 @@ void CHud::AddHudElem(CHudBase *phudelem)
 	for( ptemp = m_pHudList; ptemp->pNext; ptemp = ptemp->pNext );
 
 	ptemp->pNext = pdl;
+}
+
+bool CHud::IsZombieMod() const
+{
+    return m_iModRunning == MOD_ZB1 || m_iModRunning == MOD_ZB2 || m_iModRunning == MOD_ZB3 || m_iModRunning == MOD_ZB4 || m_iModRunning == MOD_ZBZ;
+}
+
 }

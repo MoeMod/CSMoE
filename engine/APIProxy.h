@@ -1,7 +1,6 @@
 #ifndef __APIPROXY__
 #define __APIPROXY__
 
-#include "archtypes.h"     // DAL
 #include "netadr.h"
 #include "Sequence.h"
 
@@ -355,6 +354,7 @@ typedef void						(*pfnEngSrc_pfnFillRGBABlend_t )			( int x, int y, int width, 
 typedef int						(*pfnEngSrc_pfnGetAppID_t)			( void );
 typedef cmdalias_t*				(*pfnEngSrc_pfnGetAliases_t)		( void );
 typedef void					(*pfnEngSrc_pfnVguiWrap2_GetMouseDelta_t) ( int *x, int *y );
+typedef void						(*pfnEngSrc_pfnWeaponAnim2_t )			( int iAnim, int body, float framerate );
 
 // Pointers to the exported engine functions themselves
 #if 0
@@ -494,6 +494,7 @@ typedef struct cl_enginefuncs_s
 	pfnEngSrc_pfnGetAppID_t					pfnGetAppID;
 	pfnEngSrc_pfnGetAliases_t				pfnGetAliasList;
 	pfnEngSrc_pfnVguiWrap2_GetMouseDelta_t pfnVguiWrap2_GetMouseDelta;
+	pfnEngSrc_pfnWeaponAnim2_t	pfnWeaponAnim2;
 } cl_enginefunc_t;
 #endif
 
@@ -613,7 +614,8 @@ typedef void	(*pfnEngDst_pfnResetTutorMessageDecayData_t)();
 typedef void	(*pfnEngDst_pfnFillRGBABlend_t )				( int *, int *, int *, int *, int *, int *, int *, int * );
 typedef void	(*pfnEngDst_pfnGetAppID_t )				( void );
 typedef void	(*pfnEngDst_pfnGetAliases_t )				( void );
-typedef void	(*pfnEngDst_pfnVguiWrap2_GetMouseDelta_t) ( int *x, int *y );
+typedef void	(*pfnEngDst_pfnVguiWrap2_GetMouseDelta_t) (int* x, int* y);
+typedef void	(*pfnEngDst_pfnWeaponAnim2_t )			( int *, int *, float * );
 
 
 // Pointers to the engine destination functions
@@ -741,6 +743,7 @@ typedef struct
 	pfnEngDst_pfnGetAppID_t							pfnGetAppID;
 	pfnEngDst_pfnGetAliases_t				pfnGetAliasList;
 	pfnEngDst_pfnVguiWrap2_GetMouseDelta_t	pfnVguiWrap2_GetMouseDelta;
+	pfnEngDst_pfnWeaponAnim2_t	pfnWeaponAnim2;
 } cl_enginefunc_dst_t;
 
 

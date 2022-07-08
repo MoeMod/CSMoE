@@ -22,6 +22,8 @@
 #define FALSE 0
 #endif
 
+namespace cl {
+
 extern cvar_t *hud_textmode;
 
 #ifdef _MSC_VER
@@ -44,7 +46,7 @@ extern cvar_t *hud_textmode;
 	}
 
 inline float CVAR_GET_FLOAT( const char *x ) {	return gEngfuncs.pfnGetCvarFloat( x ); }
-inline char* CVAR_GET_STRING( const char *x ) {	return gEngfuncs.pfnGetCvarString( x ); }
+inline const char* CVAR_GET_STRING( const char *x ) {	return gEngfuncs.pfnGetCvarString( x ); }
 inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int flags ) {	return gEngfuncs.pfnRegisterVariable( cv, val, flags ); }
 
 inline HSPRITE SPR_Load( const char *szPicName ) { return (*gEngfuncs.pfnSPR_Load)(szPicName);}
@@ -91,9 +93,8 @@ inline int GetScreenInfo( SCREENINFO *pscrinfo ) { return gEngfuncs.pfnGetScreen
 inline int ServerCmd( const char *szCmdString ) { return gEngfuncs.pfnServerCmd(szCmdString); }
 inline int ClientCmd( const char *szCmdString ) { return gEngfuncs.pfnClientCmd(szCmdString); }
 inline void SetCrosshair( HSPRITE hspr, wrect_t rc, int r, int g, int b ) { return gEngfuncs.pfnSetCrosshair(hspr, rc, r, g, b); }
-inline int Com_RandomLong( int lLow, int lHigh ) { return gEngfuncs.pfnRandomLong(lLow, lHigh); }
-inline float Com_RandomFloat( float flLow, float flHigh ) { return gEngfuncs.pfnRandomFloat(flLow, flHigh); }
-
+inline int Com_RandomLong(int lLow, int lHigh) { return gEngfuncs.pfnRandomLong(lLow, lHigh); }
+inline float Com_RandomFloat(float flLow, float flHigh) { return gEngfuncs.pfnRandomFloat(flLow, flHigh); }
 extern float color[3]; // hud.cpp
 
 // Gets the height & width of a sprite,  at the specified frame
@@ -111,10 +112,6 @@ inline void PlaySound( const char *szSound, float vol ) { gEngfuncs.pfnPlaySound
 inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( iSound, vol ); }
 
 #include "minmax.h"
-#ifndef __APPLE__
-// template functions are considered after non-template functions, so it will not conflict with math.h
-template<class T> constexpr T fabs(T x) { return ((x) > 0 ? (x) : 0 - (x)); }
-#endif
 
 #ifdef VectorSubtract
 #undef VectorSubtract
@@ -138,13 +135,10 @@ template<class VectorTypeA> auto VectorLength(const VectorTypeA &a) -> decltype(
 template<class VectorTypeA, class ScaleType, class VectorTypeB, class VectorTypeC> void VectorMA(const VectorTypeA &a, ScaleType scale, const VectorTypeB &b, VectorTypeC &c) { ((c)[0] = (a)[0] + (scale) * (b)[0], (c)[1] = (a)[1] + (scale) * (b)[1], (c)[2] = (a)[2] + (scale) * (b)[2]); }
 template<class VectorTypeA, class ScaleType, class VectorTypeB> void VectorScale(const VectorTypeA &in, ScaleType scale, VectorTypeB &out) { ((out)[0] = (in)[0] * (scale), (out)[1] = (in)[1] * (scale), (out)[2] = (in)[2] * (scale)); }
 template<class VectorTypeA> void VectorInverse(VectorTypeA &x) { ((x)[0] = -(x)[0], (x)[1] = -(x)[1], (x)[2] = -(x)[2]); }
-template<class VectorTypeA> void AngleVectors( const VectorTypeA &vecAngles, float *forward, float *right, float *up ) { return gEngfuncs.pfnAngleVectors(vecAngles, forward, right, up); }
 
-namespace cl{
 	// const vec3_t ==untypedef=> float (const [3]) ==decay=> float *		NOT const float * !!!
 	float VectorNormalize(vec_t v[3]); // pm_math.h
 	//extern vec3_t vec3_origin;
-}
 
 #ifdef MSC_VER
 // disable 'possible loss of data converting float to int' warning message
@@ -162,7 +156,7 @@ inline HSPRITE LoadSprite(const char *pszName)
 	return SPR_Load(sz);
 }
 
-extern vec3_t g_ColorRed, g_ColorBlue, g_ColorYellow, g_ColorGrey;
+extern float g_ColorRed[3], g_ColorBlue[3], g_ColorYellow[3], g_ColorGrey[3];
 
 inline void GetTeamColor( int &r, int &g, int &b, int teamIndex )
 {
@@ -201,11 +195,4 @@ constexpr auto bound(MinType min, NumType num, MaxType max) -> typename std::com
 	return ((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min));
 }
 
-#ifdef M_PI
-#undef M_PI
-#endif
-constexpr auto M_PI = 3.14159265358979323846;	// matches value in gcc v2 math.h
-
-constexpr float RAD2DEG(float x) { return (x) * static_cast<float>(180.f / M_PI); }
-constexpr float DEG2RAD(float x) { return (x) * static_cast<float>(M_PI / 180.f); }
-
+}

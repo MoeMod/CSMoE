@@ -13,27 +13,23 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef VECTOR_H
-#define VECTOR_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef DotProduct
 #undef DotProduct
 #endif
 
+#include "xash3d_types.h"
 #include "util/u_vector.hpp"
+#include "util/u_vector_angle.hpp"
 
 #ifndef CLIENT_DLL
-using Vector2D = sv::moe::VectorBase<float, 2>;
-using Vector = sv::moe::VectorBase<float, 3>;
+namespace sv::moe {
 #else
-using Vector2D = cl::moe::VectorBase<float, 2>;
-using Vector = cl::moe::VectorBase<float, 3>;
+namespace cl::moe {
 #endif
 
-static_assert(sizeof(Vector2D) == sizeof(float[2]), "Vector2D should be compatible with engine");
-static_assert(sizeof(Vector) == sizeof(float[3]), "Vector should be compatible with engine");
+using Vector2D = vec2_t;
+using Vector = vec3_t;
 
-#endif // VECTOR_H
+}

@@ -30,8 +30,8 @@
 
 #include "draw_util.h"
 #include "const/const_client.h"
-#include "triangleapi.h"
 
+namespace cl {
 
 DECLARE_MESSAGE(m_Health, Health )
 DECLARE_MESSAGE(m_Health, Damage )
@@ -46,7 +46,7 @@ int giDmgHeight, giDmgWidth;
 
 float g_LocationColor[3];
 
-int giDmgFlags[NUM_DMG_TYPES] = 
+int giDmgFlags[NUM_DMG_TYPES] =
 {
 	DMG_POISON,
 	DMG_ACID,
@@ -128,6 +128,7 @@ int CHudHealth::VidInit(void)
 
 	m_HUD_dmg_bio = gHUD.GetSpriteIndex( "dmg_bio" ) + 1;
 	m_HUD_cross = gHUD.GetSpriteIndex( "cross" );
+	m_NEWHUD_cross = gHUD.GetSpriteIndex("cross_new");
 	R_InitTexture(m_pTexture_Black, "resource/hud/csgo/blackleft");
 	giDmgHeight = gHUD.GetSpriteRect(m_HUD_dmg_bio).right - gHUD.GetSpriteRect(m_HUD_dmg_bio).left;
 	giDmgWidth = gHUD.GetSpriteRect(m_HUD_dmg_bio).bottom - gHUD.GetSpriteRect(m_HUD_dmg_bio).top;
@@ -141,7 +142,7 @@ int CHudHealth:: MsgFunc_Health(const char *pszName,  int iSize, void *pbuf )
 	BufferReader reader( pszName, pbuf, iSize );
 	//int x = reader.ReadByte();
 	int x = m_iHealth;
-	
+
 	if (iSize == 4)
 	{
 		x = reader.ReadShort();
@@ -153,7 +154,7 @@ int CHudHealth:: MsgFunc_Health(const char *pszName,  int iSize, void *pbuf )
 	}
 
 	m_iFlags |= HUD_DRAW;
-	
+
 	// Only update the fade if we've changed health
 	if (x != m_iHealth)
 	{
@@ -173,7 +174,7 @@ int CHudHealth:: MsgFunc_Damage(const char *pszName,  int iSize, void *pbuf )
 	int damageTaken = reader.ReadByte();	// health
 	long bitsDamage = reader.ReadLong(); // damage bits
 
-	vec3_t vecFrom;
+	Vector vecFrom;
 
 	for ( int i = 0 ; i < 3 ; i++)
 		vecFrom[i] = reader.ReadCoord();
@@ -225,7 +226,7 @@ void CHudHealth::GetPainColor(int& r, int& g, int& b, int& a)
 #else
 	if (m_iHealth > 25)
 	{
-		DrawUtils::UnpackRGB(r, g, b, gHUD.m_csgohud->value ? RGB_WHITE : RGB_YELLOWISH);
+		DrawUtils::UnpackRGB(r, g, b, gHUD.m_hudstyle->value == 1 ? RGB_WHITE : RGB_YELLOWISH);
 	}
 	else
 	{
@@ -233,13 +234,13 @@ void CHudHealth::GetPainColor(int& r, int& g, int& b, int& a)
 		g = 0;
 		b = 0;
 	}
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value == 1)
 		a = 255;
-	if (m_iHealth <= 15 && !gHUD.m_csgohud->value)
+	if (m_iHealth <= 15 && gHUD.m_hudstyle->value != 1)
 	{
 		a = 255; // If health is getting low, make it bright red
 	}
-	else if (m_iHealth <= 25 && gHUD.m_csgohud->value)
+	else if (m_iHealth <= 25 && gHUD.m_hudstyle->value == 1)
 	{
 		a = 255;
 	}
@@ -253,12 +254,12 @@ void CHudHealth::GetPainColor(int& r, int& g, int& b, int& a)
 			if (m_fFade <= 0)
 			{
 				m_fFade = 0;
-				if (!gHUD.m_csgohud->value)
+				if (gHUD.m_hudstyle->value != 1)
 					a = MIN_ALPHA;
 			}
 			else
 			{
-				if (gHUD.m_csgohud->value)
+				if (gHUD.m_hudstyle->value == 1)
 				{
 					r = 255;
 					g = 255 - (m_fFade / FADE_TIME) * 255;
@@ -270,13 +271,13 @@ void CHudHealth::GetPainColor(int& r, int& g, int& b, int& a)
 		}
 		else
 		{
-			if (!gHUD.m_csgohud->value)
+			if (gHUD.m_hudstyle->value != 1)
 				a = MIN_ALPHA;
 		}
 	}
 
-	
-#endif 
+
+#endif
 }
 
 
@@ -284,12 +285,38 @@ int CHudHealth::Draw(float flTime)
 {
 	if( !(gHUD.m_iHideHUDDisplay & HIDEHUD_HEALTH ) && !gEngfuncs.IsSpectateOnly() )
 	{
-		DrawHealthBar( flTime );
-		DrawDamage( flTime );
-		DrawPain( flTime );
+		if (gHUD.m_hudstyle->value == 2)
+			DrawNewHudHealth(flTime);
+		else
+			DrawHealthBar(flTime);
+		DrawDamage(flTime);
+		DrawPain(flTime);
 	}
 
 	return 1;
+}
+
+void CHudHealth::DrawNewHudHealth(float flTime)
+{
+	if (gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT)))
+	{
+		int iX = 10;
+		int iY = ScreenHeight - 15 - gHUD.m_NEWHUD_iFontHeight;
+
+		int CrossWidth = gHUD.GetSpriteRect(m_NEWHUD_cross).right - gHUD.GetSpriteRect(m_NEWHUD_cross).left;
+		int CrossHeight = gHUD.GetSpriteRect(m_NEWHUD_cross).bottom - gHUD.GetSpriteRect(m_NEWHUD_cross).top;
+
+		int r = 255, g = 255, b = 255;
+		if (m_iHealth <= 25)
+			g = b = 0;
+
+		SPR_Set(gHUD.GetSprite(m_NEWHUD_cross), r, g, b);
+		SPR_DrawAdditive(0, iX, iY + abs(gHUD.m_NEWHUD_iFontHeight - CrossHeight) / 2, &gHUD.GetSpriteRect(m_NEWHUD_cross));
+
+		iX += CrossWidth + 3;
+
+		DrawUtils::DrawNEWHudNumber(0, iX, iY, m_iHealth, r, g, b, 255, FALSE, 5);
+	}
 }
 
 void CHudHealth::DrawHealthBar( float flTime )
@@ -312,15 +339,12 @@ void CHudHealth::DrawHealthBar( float flTime )
 		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 		x = CrossWidth /2;
 
-		if (gHUD.m_csgohud->value)
+		if (gHUD.m_hudstyle->value == 1)
 		{
-			gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 			if(m_iHealth <= 25)
-				gEngfuncs.pTriAPI->Color4ub(250, 0, 0, 70);
+				m_pTexture_Black->Draw2DQuadScaled(0, y - gHUD.m_iFontHeight / 2, ScreenWidth / 5 - HealthWidth, ScreenHeight, 0, 0, 1, 1, 250, 0, 0, 70);
 			else
-				gEngfuncs.pTriAPI->Color4ub(0, 0, 0, 100);
-			m_pTexture_Black->Bind();
-			DrawUtils::Draw2DQuadScaled(0, y - gHUD.m_iFontHeight / 2, ScreenWidth / 5 - HealthWidth, ScreenHeight);
+				m_pTexture_Black->Draw2DQuadScaled(0, y - gHUD.m_iFontHeight / 2, ScreenWidth / 5 - HealthWidth, ScreenHeight, 0, 0, 1, 1, 0, 0, 0, 100);
 		}
 
 		SPR_Set(gHUD.GetSprite(m_HUD_cross), r, g, b);
@@ -331,9 +355,9 @@ void CHudHealth::DrawHealthBar( float flTime )
 		x = DrawUtils::DrawHudNumber(x, y, DHN_3DIGITS | DHN_DRAWZERO, m_iHealth, r, g, b);
 		//x = DrawUtils::DrawHudNumber2(x, y, m_iHealth, r, g, b);
 
-		
 
-		if (gHUD.m_csgohud->value)
+
+		if (gHUD.m_hudstyle->value == 1)
 		{
 			float f = (float)m_iHealth / (float)m_iMaxHealth;
 			x = DrawBar(x + HealthWidth / 2, y + 2.5, HealthWidth * 5, HealthHeight * 0.8, f, r, g, b, a); //  height 20 number 25
@@ -371,7 +395,7 @@ void CHudHealth::CalcDamageDirection( Vector vecFrom )
 	Vector	forward, right, up;
 	float	side, front, flDistToTarget;
 
-	if( vecFrom.IsNull() )
+	if( vecFrom.IsZero() )
 	{
 		for( int i = 0; i < 4; i++ )
 			m_fAttack[i] = 0;
@@ -441,7 +465,7 @@ void CHudHealth::DrawDamage(float flTime)
 		return;
 
 	DrawUtils::UnpackRGB(r,g,b, RGB_YELLOWISH);
-	
+
 	a = (int)( fabs(sin(flTime*2)) * 256.0);
 
 	DrawUtils::ScaleColors(r, g, b, a);
@@ -492,12 +516,12 @@ void CHudHealth::DrawDamage(float flTime)
 
 
 void CHudHealth::UpdateTiles(float flTime, long bitsDamage)
-{	
+{
 	DAMAGE_IMAGE *pdmg;
 
 	// Which types are new?
 	long bitsOn = ~m_bitsDamage & bitsDamage;
-	
+
 	for (size_t i = 0; i < NUM_DMG_TYPES; i++)
 	{
 		pdmg = &m_dmg[i];
@@ -517,7 +541,7 @@ void CHudHealth::UpdateTiles(float flTime, long bitsDamage)
 			pdmg->x = giDmgWidth/8;
 			pdmg->y = ScreenHeight - giDmgHeight * 2;
 			pdmg->fExpire=flTime + DMG_IMAGE_LIFE;
-			
+
 			// move everyone else up
 			for (size_t j = 0; j < NUM_DMG_TYPES; j++)
 			{
@@ -603,4 +627,6 @@ bool CL_IsDead()
 	if( gHUD.m_Health.m_iHealth <= 0 )
 		return true;
 	return false;
+}
+
 }

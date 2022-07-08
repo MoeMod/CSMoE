@@ -13,13 +13,12 @@
 
 #include <string>
 
+namespace cl {
+
 #if 1
 #define USE_HOSTAGEENTITY
 #endif
 
-#ifndef M_PI
-#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
-#endif
 
 CHudRadarModern::CHudRadarModern(void) : m_OverviewData()
 {
@@ -71,6 +70,10 @@ int CHudRadarModern::VidInit(void)
 
 	m_hRadar = gHUD.GetSprite(m_HUD_radar);
 	m_hRadaropaque = gHUD.GetSprite(m_HUD_radaropaque);
+
+	if (!m_iMapTitleBG)
+		m_iMapTitleBG = R_LoadTextureUnique("resource/hud/hud_maptitle_bg");
+
 	return 1;
 }
 
@@ -226,11 +229,28 @@ int CHudRadarModern::Draw(float time)
 		m_flNextBuild = gHUD.m_flTime + 1.0;
 	}
 #endif
-
 	int sx, sy, wide, tall;
 	sx = sy = 0;
 	tall = wide = cl_newradar_size->value * ScreenWidth * gHUD.m_flScale;
-	
+
+	if (gHUD.m_hudstyle->value == 2)
+	{
+		if (strlen(g_szLocation))
+		{
+			int iLength, iHeight;
+			int iX, iW, iH, iY;
+			iW = m_iMapTitleBG->w();
+			iH = m_iMapTitleBG->h();
+			iX = iY = 0;
+			m_iMapTitleBG->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH);
+
+			gEngfuncs.pfnDrawSetTextColor(0.8f, 0.8f, 0.8f);
+			gEngfuncs.pfnDrawConsoleStringLen(g_szLocation, &iLength, &iHeight);
+			gEngfuncs.pfnDrawConsoleString(5, abs(iH - iHeight) / 2, g_szLocation);
+		}
+		sy = m_iMapTitleBG->h() + 1;
+	}
+
 	{
 		float angles, xTemp, yTemp, viewzoom;
 		float screenaspect, xs, ys, xStep, yStep, x, y, z;
@@ -329,13 +349,23 @@ int CHudRadarModern::Draw(float time)
 	DrawUtils::DrawOutlinedRect(sx / gHUD.m_flScale, sy / gHUD.m_flScale, wide / gHUD.m_flScale, tall / gHUD.m_flScale, 0, 0, 0, 255);
 
 	// TODO : localization
+	if (strlen(g_szLocation))
+	{
+		if (gHUD.m_hudstyle->value != 2)
+		{
+			int iLength, iHeight;
+			gEngfuncs.pfnDrawSetTextColor(0.0f, 0.8f, 0.0f);
+			gEngfuncs.pfnDrawConsoleStringLen(g_szLocation, &iLength, &iHeight);
+			gEngfuncs.pfnDrawConsoleString((wide - iLength) / 2 / gHUD.m_flScale, (tall + iHeight) / gHUD.m_flScale, g_szLocation);
+		}
+	}
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
 	gEngfuncs.pTriAPI->Color4f(1, 0.62745f, 0, 1.0f);
 
 	struct model_s* model = (struct model_s*)gEngfuncs.GetSpritePointer(m_hsprCamera);
 	gEngfuncs.pTriAPI->SpriteTexture(model, 0);
-	
+
 	float cameraScale = 2;
 	int cameraWide = gEngfuncs.pfnSPR_Width(m_hsprCamera, 0) * cameraScale;
 	int cameraHeight = gEngfuncs.pfnSPR_Height(m_hsprCamera, 0) * cameraScale;
@@ -494,8 +524,8 @@ int CHudRadarModern::Draw(float time)
 		}
 	}
 
-	
-	if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3)
+
+	if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 	{
 		if (g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_CT)
 		{
@@ -531,7 +561,7 @@ int CHudRadarModern::Draw(float time)
 				}
 				//DrawSprite(rx, ry, hspr, yaw, scale, 200, 200, 200, 255);
 				SPR_Set(hspr, 133, 247, 255);
-				SPR_DrawAdditive(0, rx, ry, &m_hRadarSupplybox.rect);
+				SPR_DrawAdditive(0, rx / gHUD.m_flScale, ry / gHUD.m_flScale, &m_hRadarSupplybox.rect);
 			}
 		}
 	}
@@ -594,7 +624,7 @@ int CHudRadarModern::Draw(float time)
 			}
 		}
 	}
-	
+
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
 	return 1;
@@ -647,7 +677,7 @@ bool CHudRadarModern::IsValidEntity(cl_entity_s *pEntity)
 #pragma optimize("", off)
 #endif
 
-bool CHudRadarModern::CalcPoint(float *origin, int &screenX, int &screenY, int &scale)
+bool CHudRadarModern::CalcPoint(const vec3_t origin, int &screenX, int &screenY, int &scale)
 {
 	int wide, tall;
 	tall = wide = cl_newradar_size->value * ScreenWidth * gHUD.m_flScale;
@@ -738,11 +768,11 @@ void CHudRadarModern::DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scal
 	struct model_s *model = (struct model_s *)gEngfuncs.GetSpritePointer(hspr);
 	gEngfuncs.pTriAPI->SpriteTexture(model, 0);
 
-	vec3_t forward, right, sub;
+	vec3_t forward, right, up, sub;
 	sub[0] = sub[2] = 0;
 	sub[1] = yaw - 90.0;
 
-	gEngfuncs.pfnAngleVectors(sub, forward, right, NULL);
+	gEngfuncs.pfnAngleVectors(sub, forward, right, up);
 
 	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
 	gEngfuncs.pTriAPI->TexCoord2f(1, 0);
@@ -754,4 +784,6 @@ void CHudRadarModern::DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scal
 	gEngfuncs.pTriAPI->TexCoord2f(1, 1);
 	gEngfuncs.pTriAPI->Vertex3f(x + right.x * -scale + forward.x * scale, y + right.y * -scale + forward.y * scale, 0);
 	gEngfuncs.pTriAPI->End();
+}
+
 }

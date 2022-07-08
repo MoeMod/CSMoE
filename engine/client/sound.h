@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #ifndef SOUND_H
 #define SOUND_H
 
-extern byte *sndpool;
+extern mempool_t *sndpool;
 
 #include "mathlib.h"
 
@@ -30,6 +30,7 @@ extern byte *sndpool;
 #define SOUND_22k		22050	// 22khz sample rate
 #define SOUND_32k		32000	// 32khz sample rate
 #define SOUND_44k		44100	// 44khz sample rate
+#define SOUND_48k		48000	// 48khz sample rate
 #define SOUND_DMA_SPEED	SOUND_44k	// hardware playback rate
 
 #define SND_TRACE_UPDATE_MAX  	2	// max of N channels may be checked for obscured source per frame
@@ -229,6 +230,10 @@ int SNDDMA_GetSoundtime( void );
 void SNDDMA_Shutdown( void );
 void SNDDMA_BeginPainting( void );
 void SNDDMA_Submit( void );
+
+qboolean VoiceCapture_Init( void );
+qboolean VoiceCapture_RecordStart( void );
+void VoiceCapture_RecordStop( void );
 
 //====================================================================
 

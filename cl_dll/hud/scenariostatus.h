@@ -1,6 +1,6 @@
 
 #pragma once
-
+namespace cl {
 class CHudScenarioStatus : public CHudBase
 {
 public:
@@ -8,6 +8,7 @@ public:
 	int VidInit(void);
 	void Reset(void);
 	int Draw(float fTime);
+	//int DrawNewHudScenarioStatus(float fTime);
 
 public:
 	int MsgFunc_Scenario(const char *pszName, int iSize, void *pbuf);
@@ -22,3 +23,4 @@ public:
 	int m_flashAlpha;
 	int m_iRepeatTimes;
 };
+}

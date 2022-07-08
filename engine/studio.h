@@ -46,7 +46,7 @@ Studio models are position independent, so the cache manager can move them.
 #define MAXSTUDIOPIVOTS		256	// pivot points
 #define MAXSTUDIOBLENDS		16	// max anim blends
 #define MAXSTUDIOCONTROLLERS		8	// max controllers per model
-#define MAXSTUDIOATTACHMENTS		4	// max attachments per model
+#define MAXSTUDIOATTACHMENTS		16	// max attachments per model
 
 // client-side model flags
 #define STUDIO_ROCKET		0x0001	// leave a trail
@@ -71,6 +71,7 @@ Studio models are position independent, so the cache manager can move them.
 #define STUDIO_NF_NORMALMAP		0x0080	// indexed normalmap
 #define STUDIO_NF_GLOSSMAP		0x0100	// heightmap that can be used for parallax or normalmap
 #define STUDIO_NF_GLOSSPOWER	0x0200	// glossmap
+#define STUDIO_NF_OUTLINE		0x0400  // outline
 #define STUDIO_NF_UV_COORDS		(1U<<31)	// using half-float coords instead of ST
 // motion flags
 #define STUDIO_X			0x0001
@@ -112,12 +113,12 @@ typedef struct
 	char		name[64];
 	int		length;
 
-	vec3_t		eyeposition;	// ideal eye position
-	vec3_t		min;		// ideal movement hull size
-	vec3_t		max;			
+    vec3_c		eyeposition;	// ideal eye position
+    vec3_c		min;		// ideal movement hull size
+    vec3_c		max;
 
-	vec3_t		bbmin;		// clipping bounding box
-	vec3_t		bbmax;		
+    vec3_c		bbmin;		// clipping bounding box
+    vec3_c		bbmax;
 
 	int		flags;
 
@@ -196,8 +197,8 @@ typedef struct
 {
 	int		bone;
 	int		group;		// intersection group
-	vec3_t		bbmin;		// bounding box
-	vec3_t		bbmax;		
+	vec3_c		bbmin;		// bounding box
+	vec3_c		bbmax;
 } mstudiobbox_t;
 
 #ifndef CACHE_USER
@@ -241,12 +242,12 @@ typedef struct
 
 	int		motiontype;	
 	int		motionbone;
-	vec3_t		linearmovement;
+	vec3_c		linearmovement;
 	int		automoveposindex;
 	int		automoveangleindex;
 
-	vec3_t		bbmin;		// per sequence bounding box
-	vec3_t		bbmax;		
+	vec3_c		bbmin;		// per sequence bounding box
+	vec3_c		bbmax;
 
 	int		numblends;
 	int		animindex;	// mstudioanim_t pointer relative to start of sequence group data
@@ -272,7 +273,7 @@ typedef struct
 // pivots
 typedef struct 
 {
-	vec3_t		org;		// pivot point
+	vec3_c		org;		// pivot point
 	int		start;
 	int		end;
 } mstudiopivot_t;
@@ -283,8 +284,8 @@ typedef struct
 	char		name[32];
 	int		type;
 	int		bone;
-	vec3_t		org;		// attachment point
-	vec3_t		vectors[3];
+	vec3_c		org;		// attachment point
+	vec3_c		vectors[3];
 } mstudioattachment_t;
 
 typedef struct
@@ -338,10 +339,10 @@ typedef struct
 
 	int		numverts;		// number of unique vertices
 	int		vertinfoindex;	// vertex bone info
-	int		vertindex;	// vertex vec3_t
+	int		vertindex;	// vertex vec3_c
 	int		numnorms;		// number of unique surface normals
 	int		norminfoindex;	// normal bone info
-	int		normindex;	// normal vec3_t
+	int		normindex;	// normal vec3_c
 
 	int		numgroups;	// deformation groups
 	int		groupindex;

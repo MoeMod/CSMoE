@@ -25,9 +25,13 @@
 #include <string.h>
 #include <stdio.h>
 #include "parsemsg.h"
-#include "vgui_parser.h"
 #include "ctype.h"
 #include "draw_util.h"
+
+#include "vgui_controls/controls.h"
+#include "vgui/ILocalize.h"
+
+namespace cl {
 
 DECLARE_MESSAGE( m_TextMessage, TextMsg )
 
@@ -70,7 +74,10 @@ char *CHudTextMessage::LocaliseTextString( const char *msg, char *dst_buffer, in
 				continue;
 			}
 
-			if(clmsg->pMessage[0] == '#') strncpy(dst, Localize(clmsg->pMessage+1), buffer_size);
+			if(clmsg->pMessage[0] == '#')
+            {
+                vgui2::localize()->ConvertUnicodeToANSI(vgui2::localize()->Find(clmsg->pMessage), dst, buffer_size);
+            }
 
 			// copy string into message over the msg name
 			for ( char *wsrc = (char*)clmsg->pMessage; *wsrc != 0; wsrc++, dst++ )
@@ -106,24 +113,21 @@ char *CHudTextMessage::LookupString( char *msg, int *msg_dest )
 		return (char*)"";
 
 	// '#' character indicates this is a reference to a string in titles.txt, and not the string itself
-	if ( msg[0] == '#' ) 
+	if ( msg[0] == '#' )
 	{
 		// this is a message name, so look up the real message
 		client_textmessage_t *clmsg = TextMessageGet( msg+1 );
 
 		if ( !clmsg || !(clmsg->pMessage) )
 			return (char*)msg; // lookup failed, so return the original string
-				
+
 		if ( msg_dest )
 		{
 			// check to see if titles.txt info overrides msg destination
 			// if clmsg->effect is less than 0, then clmsg->effect holds -1 * message_destination
-			if ( clmsg->effect < 0 )  // 
+			if ( clmsg->effect < 0 )  //
 				*msg_dest = -clmsg->effect;
 		}
-
-		if( clmsg->pMessage[0] == '#')
-			return (char *)Localize( clmsg->pMessage + 1);
 
 		return (char*)clmsg->pMessage;
 	}
@@ -131,6 +135,47 @@ char *CHudTextMessage::LookupString( char *msg, int *msg_dest )
 	{  // nothing special about this message, so just return the same string
 		return (char*)msg;
 	}
+}
+
+// Simplified version of LocaliseTextString;  assumes string is only one word
+bool CHudTextMessage::LookupString2( char *msg, int size )
+{
+	if ( !msg )
+		return false;
+
+	// '#' character indicates this is a reference to a string in titles.txt, and not the string itself
+	if ( msg[0] == '#' )
+	{
+		// this is a message name, so look up the real message
+		client_textmessage_t *clmsg = TextMessageGet( msg+1 );
+
+		if (!clmsg || !(clmsg->pMessage))
+		{
+			auto ret = vgui2::localize()->Find(msg);
+			if (ret)
+			{
+				vgui2::localize()->ConvertUnicodeToANSI(ret, msg, size);
+				return true;
+			}
+			return false; // lookup failed, so return the original string
+		}
+
+        strncpy(msg, clmsg->pMessage, size);
+		if (msg[0] == '#')
+		{
+			auto ret = vgui2::localize()->Find(msg);
+			if (ret)
+			{
+				vgui2::localize()->ConvertUnicodeToANSI(ret, msg, size);
+				return true;
+			}
+			return false;
+        }
+
+		return true;
+	}
+
+	return false;
 }
 
 void StripEndNewlineFromString( char *str )
@@ -168,24 +213,47 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 	BufferReader reader( pszName, pbuf, iSize );
 
 	int msg_dest = reader.ReadByte();
+	int playerIndex = -1;
+
+	if (msg_dest == HUD_PRINTRADIO)
+	{
+		char* szIndex = reader.ReadString();
+		if (szIndex)
+			playerIndex = atoi(szIndex);
+	}
 
 	static char szBuf[6][MAX_TEXTMSG_STRING];
 	char *msg_text = LookupString( reader.ReadString(), &msg_dest );
-	msg_text = strncpy( szBuf[0], msg_text, MAX_TEXTMSG_STRING );
+	if (msg_text[0] == '#')
+	{
+		StripEndNewlineFromString(msg_text);
+		auto ret = vgui2::localize()->Find(msg_text);
+		if (ret) {
+			vgui2::localize()->ConvertUnicodeToANSI(ret, szBuf[5], MAX_TEXTMSG_STRING);
+			strncpy(msg_text, szBuf[5], MAX_TEXTMSG_STRING);
+		}
+	}
+	msg_text = strncpy(szBuf[0], msg_text, MAX_TEXTMSG_STRING);
 
 	// keep reading strings and using C format strings for substituting the strings into the localised text string
-	char *sstr1 = LookupString( reader.ReadString() );
-	sstr1 = strncpy( szBuf[1], sstr1, MAX_TEXTMSG_STRING );
-	StripEndNewlineFromString( sstr1 );  // these strings are meant for subsitution into the main strings, so cull the automatic end newlines
-	char *sstr2 = LookupString( reader.ReadString() );
-	sstr2 = strncpy( szBuf[2], sstr2, MAX_TEXTMSG_STRING );
-	StripEndNewlineFromString( sstr2 );
-	char *sstr3 = LookupString( reader.ReadString() );
-	sstr3 = strncpy( szBuf[3], sstr3, MAX_TEXTMSG_STRING );
-	StripEndNewlineFromString( sstr3 );
-	char *sstr4 = LookupString( reader.ReadString() );
-	sstr4 = strncpy( szBuf[4], sstr4, MAX_TEXTMSG_STRING );
-	StripEndNewlineFromString( sstr4 );
+	for(int i = 1; i <= 4; ++i)
+	{
+		char *szText = LookupString(reader.ReadString());
+		if (szText[0] == '#')
+		{
+			StripEndNewlineFromString(szText);
+			auto ret = vgui2::localize()->Find(szText);
+			if (ret) {
+				vgui2::localize()->ConvertUnicodeToANSI(ret, szBuf[i], MAX_TEXTMSG_STRING);
+			} else {
+				strncpy(szBuf[i], szText, MAX_TEXTMSG_STRING);
+			}
+		}
+		else
+		{
+			strncpy(szBuf[i], szText, MAX_TEXTMSG_STRING);
+		}
+	}
 	char *psz = szBuf[5];
 
 	// Remove numbers after %s.
@@ -200,58 +268,53 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 				char *second = &msg_text[i + 3];
 
 				memmove( first, second, strlen( second ));
-				first[strlen(first)] = '\0';
+				first[strlen(first)-1] = '\0';
 			}
 		}
 	}
-
 
 	switch ( msg_dest )
 	{
 	case HUD_PRINTCENTER:
 	{
-		snprintf( psz, MAX_TEXTMSG_STRING, msg_text, sstr1, sstr2, sstr3, sstr4 );
-
-		/*ConvertCRtoNL( psz );
-
-		int len = DrawUtils::ConsoleStringLen( psz );
-
-		DrawUtils::DrawConsoleString( (ScreenWidth - len) / 2, ScreenHeight / 3, psz );*/
-
+		snprintf( psz, MAX_TEXTMSG_STRING, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		CenterPrint( ConvertCRtoNL( psz ) );
 		break;
 	}
 	case HUD_PRINTNOTIFY:
 		psz[0] = 1;  // mark this message to go into the notify buffer
-		snprintf( psz+1, MAX_TEXTMSG_STRING - 1, msg_text, sstr1, sstr2, sstr3, sstr4 );
+		snprintf( psz+1, MAX_TEXTMSG_STRING - 1, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		ConsolePrint( ConvertCRtoNL( psz ) );
 		break;
 
 	case HUD_PRINTTALK:
 		psz[0] = 2; // mark, so SayTextPrint will color it
-		snprintf( psz+1, MAX_TEXTMSG_STRING-1, msg_text, sstr1, sstr2, sstr3, sstr4 );
+		snprintf( psz+1, MAX_TEXTMSG_STRING-1, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		gHUD.m_SayText.SayTextPrint( ConvertCRtoNL( psz ), 128 );
 		break;
 
 	case HUD_PRINTCONSOLE:
-		snprintf( psz, MAX_TEXTMSG_STRING, msg_text, sstr1, sstr2, sstr3, sstr4 );
+		snprintf( psz, MAX_TEXTMSG_STRING, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		ConsolePrint( ConvertCRtoNL( psz ) );
 		break;
 
 	case HUD_PRINTRADIO:
 		// For some reason, HUD_PRINTRADIO always have "1" in msg_text
-		for( int i = 1; i < MAX_PLAYERS; i++ )
+		if (playerIndex != -1)
 		{
-			if( g_PlayerInfoList[i].name && !strncmp(g_PlayerInfoList[i].name, sstr2, strlen(sstr2)) )
-			{
-				psz[0] = 2;
-				snprintf( psz + 1, MAX_TEXTMSG_STRING-1, sstr1, sstr2, sstr3, sstr4 );
-				gHUD.m_SayText.SayTextPrint( ConvertCRtoNL( psz ), 128, i );
-				break;
+			// Location
+			auto ret = vgui2::localize()->Find(szBuf[2]);
+			if (ret) {
+				vgui2::localize()->ConvertUnicodeToANSI(ret, szBuf[2], MAX_TEXTMSG_STRING);
 			}
+
+			psz[0] = 2;
+			snprintf(psz + 1, MAX_TEXTMSG_STRING - 1, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4]);
+			gHUD.m_SayText.SayTextPrint(ConvertCRtoNL(psz), 128, playerIndex);
 		}
 		break;
 	}
 
 	return 1;
+}
 }

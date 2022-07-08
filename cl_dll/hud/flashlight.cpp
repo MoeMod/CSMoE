@@ -27,6 +27,7 @@
 
 #include "draw_util.h"
 
+namespace cl {
 
 DECLARE_MESSAGE(m_Flash, FlashBat)
 DECLARE_MESSAGE(m_Flash, Flashlight)
@@ -85,6 +86,55 @@ int CHudFlashlight:: MsgFunc_Flashlight(const char *pszName,  int iSize, void *p
 	return 1;
 }
 
+int CHudFlashlight::DrawNewHudFlashLight(float flTime)
+{
+	int r, g, b, a;
+	wrect_t rc;
+
+	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
+		return 1;
+
+	if (m_fOn)
+		a = 225;
+	else
+		a = MIN_ALPHA;
+
+	if (m_flBat < 0.20)
+		DrawUtils::UnpackRGB(r, g, b, RGB_REDISH);
+	else
+		DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
+
+	DrawUtils::ScaleColors(r, g, b, a);
+
+	int iY = ScreenHeight - 84;	//y1
+	int iX = ScreenWidth - 10 - m_iWidth; //x1
+
+	// Draw the flashlight casing
+	SPR_Set(m_hSprite1.spr, r, g, b);
+	SPR_DrawAdditive(0, iX, iY, &m_hSprite1.rect);
+
+	if (m_fOn)
+	{  // draw the flashlight beam
+		iX = ScreenWidth - 10;
+
+		SPR_Set(m_hBeam.spr, r, g, b);
+		SPR_DrawAdditive(0, iX, iY, &m_hBeam.rect);
+	}
+
+	// draw the flashlight energy level
+	iX = ScreenWidth - 10 - m_iWidth;
+	int iOffset = m_iWidth * (1.0 - m_flBat);
+	if (iOffset < m_iWidth)
+	{
+		rc = m_hSprite2.rect;
+		rc.left += iOffset;
+
+		SPR_Set(m_hSprite2.spr, r, g, b);
+		SPR_DrawAdditive(0, iX + iOffset, iY, &rc);
+	}
+}
+
+
 int CHudFlashlight::Draw(float flTime)
 {
 	if ( gHUD.m_iHideHUDDisplay & ( HIDEHUD_FLASHLIGHT | HIDEHUD_ALL ) )
@@ -95,6 +145,13 @@ int CHudFlashlight::Draw(float flTime)
 
 	if (!(gHUD.m_iWeaponBits & (1<<(WEAPON_SUIT)) ))
 		return 1;
+
+	if (gHUD.m_hudstyle->value == 2)
+	{
+		DrawNewHudFlashLight(flTime);
+		return 1;
+	}
+
 
 	if (m_fOn)
 		a = 225;
@@ -137,4 +194,6 @@ int CHudFlashlight::Draw(float flTime)
 
 
 	return 1;
+}
+
 }

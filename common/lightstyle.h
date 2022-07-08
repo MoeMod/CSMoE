@@ -22,7 +22,7 @@ typedef struct
 	float		map[256];
 	int		length;
 	float		value;
-	qboolean		interp;		// allow to interpolate this lightstyle
+	int		interp;		// allow to interpolate this lightstyle (duration in 0.1 secs)
 	float		time;		// local time warranties that new style begins from the start, not mid or end of the sequence
 } lightstyle_t;
 

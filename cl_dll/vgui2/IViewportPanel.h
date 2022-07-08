@@ -13,7 +13,7 @@
 #ifndef GAME_CLIENT_UI_VGUI2_IVIEWPORTPANEL_H
 #define GAME_CLIENT_UI_VGUI2_IVIEWPORTPANEL_H
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 
 class KeyValues;
 
@@ -73,6 +73,20 @@ public:
 	virtual bool IsVisible() = 0;
 
 	virtual void SetParent( vgui2::VPANEL parent ) = 0;
+
+	virtual void Init() = 0;
+
+	virtual void VidInit() = 0;
 };
+
+
+#define DECLARE_VIEWPORT_PANEL_SIMPLE() \
+	vgui2::VPANEL GetVPanel(void) { return BaseClass::GetVPanel(); } \
+	virtual bool IsVisible(void) { return BaseClass::IsVisible(); } \
+	virtual void SetParent(vgui2::VPANEL parent) { BaseClass::SetParent(parent); } \
+	virtual void SetParent(vgui2::Panel *newParent) { BaseClass::SetParent(newParent); } \
+	virtual bool IsMouseInputEnabled(void) { return BaseClass::IsMouseInputEnabled(); } \
+	virtual void SetMouseInputEnabled(bool state) { BaseClass::SetMouseInputEnabled(state); } \
+	virtual void InvalidateLayout(bool layoutNow = false, bool reloadScheme = false) { BaseClass::InvalidateLayout(layoutNow, reloadScheme); }
 
 #endif //GAME_CLIENT_UI_VGUI2_IVIEWPORTPANEL_H

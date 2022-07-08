@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "draw_util.h"
 
-#include "triangleapi.h"
+namespace cl {
 
 float color[3];
 
@@ -31,12 +31,12 @@ DECLARE_MESSAGE( m_DeathNotice, DeathMsg )
 
 enum DrawBgType
 {
-	DB_NONE, 
+	DB_NONE,
 	DB_KILL,
 	DB_DEATH
 };
 
-struct DeathNoticeItem 
+struct DeathNoticeItem
 {
 	char szKiller[MAX_PLAYER_NAME_LENGTH*2];
 	char szVictim[MAX_PLAYER_NAME_LENGTH*2];
@@ -54,8 +54,8 @@ struct DeathNoticeItem
 
 #define MAX_DEATHNOTICES	4
 static int DEATHNOTICE_DISPLAY_TIME = 6;
-static int KILLEFFECT_DISPLAY_TIME = 4;
-static int KILLICON_DISPLAY_TIME = 1;
+static int KILLEFFECT_DISPLAY_TIME = 3;
+static float KILLICON_DISPLAY_TIME = 0.75f;
 
 #define DEATHNOTICE_TOP		32
 
@@ -103,24 +103,30 @@ int CHudDeathNotice :: VidInit( void )
 	m_KM_Icon_Head = gHUD.GetSpriteIndex("KM_Icon_Head");
 	m_KM_Icon_Knife = gHUD.GetSpriteIndex("KM_Icon_knife");
 	m_KM_Icon_Frag = gHUD.GetSpriteIndex("KM_Icon_Frag");
-	if (gHUD.m_csgohud->value)
-	{
-		R_InitTexture(m_killBg[0], "resource/hud/csgo/DeathNotice/KillBg_left");
-		R_InitTexture(m_killBg[1], "resource/hud/csgo/DeathNotice/KillBg_center");
-		R_InitTexture(m_killBg[2], "resource/hud/csgo/DeathNotice/KillBg_right");
-	}
-	else
-	{
-		R_InitTexture(m_killBg[0], "resource/Hud/DeathNotice/KillBg_left");
-		R_InitTexture(m_killBg[1], "resource/Hud/DeathNotice/KillBg_center");
-		R_InitTexture(m_killBg[2], "resource/Hud/DeathNotice/KillBg_right");
-	}
+
+	R_InitTexture(m_csgo_killBg[0], "resource/hud/csgo/DeathNotice/KillBg_left");
+	R_InitTexture(m_csgo_killBg[1], "resource/hud/csgo/DeathNotice/KillBg_center");
+	R_InitTexture(m_csgo_killBg[2], "resource/hud/csgo/DeathNotice/KillBg_right");
+
+	R_InitTexture(m_NewHud_killBg[0], "resource/Hud/DeathNotice/killbg_left_new");
+	R_InitTexture(m_NewHud_killBg[1], "resource/Hud/DeathNotice/killbg_center_new");
+	R_InitTexture(m_NewHud_killBg[2], "resource/Hud/DeathNotice/killbg_right_new");
+
+	R_InitTexture(m_killBg[0], "resource/Hud/DeathNotice/KillBg_left");
+	R_InitTexture(m_killBg[1], "resource/Hud/DeathNotice/KillBg_center");
+	R_InitTexture(m_killBg[2], "resource/Hud/DeathNotice/KillBg_right");
+
+	R_InitTexture(m_NewHud_deathBg[0], "resource/Hud/DeathNotice/deathbg_left_new");
+	R_InitTexture(m_NewHud_deathBg[1], "resource/Hud/DeathNotice/deathbg_center_new");
+	R_InitTexture(m_NewHud_deathBg[2], "resource/Hud/DeathNotice/deathbg_right_new");
+
 	R_InitTexture(m_deathBg[0], "resource/Hud/DeathNotice/DeathBg_left");
 	R_InitTexture(m_deathBg[1], "resource/Hud/DeathNotice/DeathBg_center");
 	R_InitTexture(m_deathBg[2], "resource/Hud/DeathNotice/DeathBg_right");
-	R_InitTexture(m_defaultBg[0], "resource/hud/csgo/DeathNotice/DefaultBg_left");
-	R_InitTexture(m_defaultBg[1], "resource/hud/csgo/DeathNotice/DefaultBg_center");
-	R_InitTexture(m_defaultBg[2], "resource/hud/csgo/DeathNotice/DefaultBg_right");
+
+	R_InitTexture(m_csgo_defaultBg[0], "resource/hud/csgo/DeathNotice/DefaultBg_left");
+	R_InitTexture(m_csgo_defaultBg[1], "resource/hud/csgo/DeathNotice/DefaultBg_center");
+	R_InitTexture(m_csgo_defaultBg[2], "resource/hud/csgo/DeathNotice/DefaultBg_right");
 	return 1;
 }
 
@@ -172,21 +178,24 @@ int CHudDeathNotice :: Draw( float flTime )
 			if (!rgDeathNoticeList[i].bSuicide)
 				xMin -= (5 + DrawUtils::ConsoleStringLen(rgDeathNoticeList[i].szKiller));
 
-			gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-
 			SharedTexture (*DrawBg)[3] = nullptr;
 			switch (rgDeathNoticeList[i].DrawBg)
 			{
 			case DB_KILL:
-				DrawBg = &m_killBg; break;
+				if (gHUD.m_hudstyle->value == 2)
+					DrawBg = &m_NewHud_killBg;
+				else
+					DrawBg = &m_killBg; break;
 			case DB_DEATH:
-				DrawBg = &m_deathBg; break;
+				if (gHUD.m_hudstyle->value == 2)
+					DrawBg = &m_NewHud_deathBg;
+				else
+					DrawBg = &m_deathBg; break;
 			default:
 			{
-				if (gHUD.m_csgohud->value)
+				if (gHUD.m_hudstyle->value == 1)
 				{
-					DrawBg = &m_defaultBg; break;
+					DrawBg = &m_csgo_defaultBg; break;
 				}
 				else
 				{
@@ -199,21 +208,18 @@ int CHudDeathNotice :: Draw( float flTime )
 			{
 				if((*DrawBg)[0])
 				{
-					(*DrawBg)[0]->Bind();
-					DrawUtils::Draw2DQuadScaled(xMin - 3 - xOffset, y, xMin - 3 - xOffset + 3, y + 16);
+					(*DrawBg)[0]->Draw2DQuadScaled(xMin - 3 - xOffset, y, xMin - 3 - xOffset + 3, y + 16);
 				}
 
 				if ((*DrawBg)[1])
 				{
-					(*DrawBg)[1]->Bind();
-					DrawUtils::Draw2DQuadScaled(xMin - 3 - xOffset + 3, y, ScreenWidth - (YRES(5) * 3), y + 16);
+					(*DrawBg)[1]->Draw2DQuadScaled(xMin - 3 - xOffset + 3, y, ScreenWidth - (YRES(5) * 3), y + 16);
 				}
 
 
 				if ((*DrawBg)[2])
 				{
-					(*DrawBg)[2]->Bind();
-					DrawUtils::Draw2DQuadScaled(ScreenWidth - (YRES(5) * 3), y, ScreenWidth - (YRES(5) * 3) + 3, y + 16);
+					(*DrawBg)[2]->Draw2DQuadScaled(ScreenWidth - (YRES(5) * 3), y, ScreenWidth - (YRES(5) * 3) + 3, y + 16);
 				}
 			}
 
@@ -227,7 +233,7 @@ int CHudDeathNotice :: Draw( float flTime )
 
 				x = 5 + DrawUtils::DrawConsoleString( x, y, rgDeathNoticeList[i].szKiller );
 			}
-			
+
 
 			r = 255;  g = 80;	b = 0;
 			if ( rgDeathNoticeList[i].bTeamKill )
@@ -236,6 +242,12 @@ int CHudDeathNotice :: Draw( float flTime )
 			}
 
 			// Draw death weapon
+			if (gHUD.m_hudstyle->value == 2)
+			{
+				r = 255;
+				g = 255;
+				b = 255;
+			}
 			SPR_Set( gHUD.GetSprite(id), r, g, b );
 			SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect(id) );
 
@@ -265,7 +277,8 @@ int CHudDeathNotice :: Draw( float flTime )
 		if (gHUD.m_flTime < m_killEffectTime)
 		{
 			int r = 255, g = 255, b = 255;
-			float alpha = (m_killEffectTime - gHUD.m_flTime) / KILLEFFECT_DISPLAY_TIME;
+			float alpha = 3.0f * (m_killEffectTime - gHUD.m_flTime) / KILLEFFECT_DISPLAY_TIME;
+			if (alpha > 1) alpha = 1.0f;
 			int numIndex = -1;
 
 			if (alpha > 0)
@@ -314,26 +327,28 @@ int CHudDeathNotice :: Draw( float flTime )
 					iconWidth = gHUD.GetSpriteRect(m_KM_Icon_Head).right - gHUD.GetSpriteRect(m_KM_Icon_Head).left;
 					iconHeight = gHUD.GetSpriteRect(m_KM_Icon_Head).bottom - gHUD.GetSpriteRect(m_KM_Icon_Head).top;
 
+					int fix = 0;
 					if (m_multiKills == 1)
-						numWidth += 10;
+						fix = 10;
 
-					y = (25.0 * 0.01 * ScreenHeight) - (iconHeight + textHeight) * 0.5;
-					x = (50.0 * 0.01 * ScreenWidth) - (numHeight + textWidth) * 0.5;
+					x = (50.0f * 0.01f * ScreenWidth) - (numHeight + textWidth) * 0.5f;
+					y = (20.0f * 0.01f * ScreenHeight);
 
 					SPR_Set(gHUD.GetSprite(numIndex), r, g, b);
-					SPR_DrawAdditive(0, x, y - (gHUD.GetSpriteRect(numIndex).bottom + gHUD.GetSpriteRect(m_KM_KillText).top - gHUD.GetSpriteRect(m_KM_KillText).bottom - gHUD.GetSpriteRect(numIndex).top) * 0.6, &gHUD.GetSpriteRect(numIndex));
+					SPR_DrawAdditive(0, x + fix, y - numHeight / 1.8, &gHUD.GetSpriteRect(numIndex));
 
 					SPR_Set(gHUD.GetSprite(m_KM_KillText), r, g, b);
-					SPR_DrawAdditive(0, x + numWidth, y, &gHUD.GetSpriteRect(m_KM_KillText));
+					SPR_DrawAdditive(0, x + numWidth + 3 * fix, y - textHeight / 2, &gHUD.GetSpriteRect(m_KM_KillText));
 
-					x = (50.0 * 0.01 * ScreenWidth) - (iconWidth) * 0.5;
-					y = y + textHeight;
+					x = (50.0f * 0.01f * ScreenWidth) - (iconWidth) * 0.5f;
+					y = y + iconHeight / 8;
 
 					m_killIconTime = min(m_killIconTime, gHUD.m_flTime + KILLICON_DISPLAY_TIME);
 
 					if (m_showIcon)
 					{
-						alpha = (m_killIconTime - gHUD.m_flTime) / KILLICON_DISPLAY_TIME;
+						alpha = 2.0f * (m_killIconTime - gHUD.m_flTime) / KILLICON_DISPLAY_TIME;
+						if (alpha > 1) alpha = 1.0f;
 
 						if (alpha > 0)
 						{
@@ -678,6 +693,6 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 	return 1;
 }
 
-
+}
 
 

@@ -22,7 +22,7 @@ enum touchEventType : int
 	event_up,
 	event_motion
 };
-
+namespace cl {
 class CHudMoeTouch : public CHudBase
 {
 public:
@@ -36,8 +36,10 @@ public:
 
 public:
 	int TouchEvent(touchEventType type, int fingerID, float x, float y, float dx, float dy);
+	cvar_t* m_TouchSwitch;
 
 protected:
 	class impl_t;
 	impl_t *pimpl;
 };
+}

@@ -1,12 +1,10 @@
 /*
 port.h -- Portability Layer for Windows types
 Copyright (C) 2015 Alibek Omarov
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,7 +25,7 @@ GNU General Public License for more details.
 #define ARCH_SUFFIX
 #endif
 
-#if defined(__ANDROID__) || TARGET_OS_IOS || defined(__SAILFISH__)
+#if defined(__ANDROID__) || defined(TARGET_OS_IOS) || defined(__SAILFISH__)
 #define XASH_MOBILE_PLATFORM
 #endif
 
@@ -91,6 +89,7 @@ GNU General Public License for more details.
 	#endif
 
 	#define VGUI_SUPPORT_DLL "libvgui_support." OS_LIB_EXT
+	#define VGUI2_SUPPORT_DLL "libvgui2_support." OS_LIB_EXT
 
 	// Windows-specific
 #ifndef __HAIKU__
@@ -114,10 +113,10 @@ GNU General Public License for more details.
 	#define tell( a )					lseek(a, 0, SEEK_CUR)
 
 	typedef unsigned char	BYTE;
-	typedef short int	    WORD;
+	typedef unsigned short  WORD;
 	typedef unsigned int    DWORD;
 	typedef int	    LONG;
-	typedef unsigned int   ULONG;
+	typedef unsigned long   ULONG;
 	typedef int			WPARAM;
 	typedef unsigned int    LPARAM;
 
@@ -138,6 +137,7 @@ GNU General Public License for more details.
 
 	#define strcasecmp _stricmp
 	#define strncasecmp _strnicmp
+	#define strcasestr StrStrIA
 	#define open _open
 	#define read _read
 
@@ -154,15 +154,21 @@ GNU General Public License for more details.
 	#pragma warning(disable : 4054)	// type cast' : from function pointer
 	#pragma warning(disable : 4310)	// cast truncates constant value
 
+	#define WIN32_LEAN_AND_MEAN
 	#define HSPRITE WINAPI_HSPRITE
 		#include <windows.h>
 	#undef HSPRITE
 
 	#define OS_LIB_EXT "dll"
-	#define MENUDLL "menu"ARCH_SUFFIX"." OS_LIB_EXT
-	#define CLIENTDLL "client"ARCH_SUFFIX"." OS_LIB_EXT
+	#define MENUDLL "menu" ARCH_SUFFIX "." OS_LIB_EXT
+	#define CLIENTDLL "client" ARCH_SUFFIX "." OS_LIB_EXT
 	#define VGUI_SUPPORT_DLL "../vgui_support." OS_LIB_EXT
+	#define VGUI2_SUPPORT_DLL "../vgui2_support." OS_LIB_EXT
 	#include <limits.h>
+
+	#include <io.h>
+	#include <shlwapi.h>
+	#pragma comment(lib,"shlwapi.lib")
 
 #ifdef WINAPI_FAMILY
 #if (!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP))
@@ -199,5 +205,7 @@ static __inline float cbrt(float f)
 #ifndef USHRT_MAX
 #define USHRT_MAX 65535
 #endif
+
+#include "minmax.h"
 
 #endif // PORT_H

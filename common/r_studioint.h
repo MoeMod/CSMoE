@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+#include "studio.h"
+
 #define STUDIO_INTERFACE_VERSION 1
 
 typedef struct engine_studio_api_s
@@ -43,7 +45,7 @@ typedef struct engine_studio_api_s
 	void *(*Cache_Check)(struct cache_user_s *c);
 
 	// Load file into cache (can be swapped out on demand)
-	void (*LoadCacheFile)(char *path, struct cache_user_s *cu);
+	void (*LoadCacheFile)(const char *path, struct cache_user_s *cu);
 
 	// Retrieve model pointer for the named model
 	struct model_s *(*Mod_ForName)(const char *name, int crash_if_missing);
@@ -85,10 +87,10 @@ typedef struct engine_studio_api_s
 	void (*GetAliasScale)(float *x, float *y);
 
 	// Get bone, light, alias, and rotation matrices
-	float ****(*StudioGetBoneTransform) (void);
-	float ****(*StudioGetLightTransform)(void);
-	float ***(*StudioGetAliasTransform) (void);
-	float ***(*StudioGetRotationMatrix) (void);
+    matrix3x4 (*(*StudioGetBoneTransform) (void))[MAXSTUDIOBONES];
+    matrix3x4 (*(*StudioGetLightTransform)(void))[MAXSTUDIOBONES];
+    matrix3x4 *(*StudioGetAliasTransform) (void);
+    matrix3x4 *(*StudioGetRotationMatrix) (void);
 
 	// Set up body part, and get submodel pointers
 	void (*StudioSetupModel)(int bodypart, void **ppbodypart, void **ppsubmodel);
@@ -153,6 +155,9 @@ typedef struct engine_studio_api_s
 	void (*StudioSetCullState)(int iCull);
 	void (*StudioRenderShadow)(int iSprite, float *p1, float *p2, float *p3, float *p4);
 
+	bool (*StudioSetupBones_Pre)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
+	void (*StudioSetupBones_Post)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
+
 } engine_studio_api_t;
 
 typedef struct server_studio_api_s
@@ -164,7 +169,7 @@ typedef struct server_studio_api_s
 	void *(*Cache_Check)(struct cache_user_s *c);
 
 	// Load file into cache (can be swapped out on demand)
-	void (*LoadCacheFile)(char *path, struct cache_user_s *cu);
+	void (*LoadCacheFile)(const char *path, struct cache_user_s *cu);
 
 	// Retrieve pointer to studio model data block from a model
 	void *(*Mod_Extradata)(struct model_s *mod);
@@ -190,8 +195,8 @@ typedef struct sv_blending_interface_s
 	void (*SV_StudioSetupBones)(struct model_s *pModel,
 					float frame,
 					int sequence,
-					const vec_t *angles,
-					const vec_t *origin,
+					const vec3_t angles,
+					const vec3_t origin,
 					const byte *pcontroller,
 					const byte *pblending,
 					int iBone,
