@@ -176,3 +176,5 @@ HOOK_EVENT(wondercannon, FireWonderCannon);
 HOOK_EVENT(y22s2sfpistol, FireY22S2SFPistol);
 HOOK_EVENT(sfpistol, FireSFPistol);
 HOOK_EVENT(stunrifle, FireStunRifle);
+HOOK_EVENT(ragingbull, FireRagingBull);
+HOOK_EVENT(kronos12, FireKronos12);

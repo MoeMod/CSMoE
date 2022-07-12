@@ -294,7 +294,10 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfpistol.cpp
 	../dlls/wpn_shared/wpn_y22s2sfpistol.cpp
 	../dlls/wpn_shared/wpn_pianogun.cpp
+	../dlls/wpn_shared/wpn_pianogunex.cpp
 	../dlls/wpn_shared/wpn_stunrifle.cpp
+	../dlls/wpn_shared/z4b_ragingbull.cpp
+	../dlls/wpn_shared/wpn_kronos12.cpp
 	)
 
 set (HUD_SRCS

@@ -59,7 +59,7 @@ GNU General Public License for more details.
 #define nanmask		(255<<23)
 
 template <class Type>
-bool Q_rint(const Type& x)
+int Q_rint(const Type& x)
 {
     return ((x) < 0 ? ((int)((x)-0.5f)) : ((int)((x)+0.5f)));
 }

@@ -4241,6 +4241,8 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "wondercannon";
 					else if (iId == WEAPON_PIANOGUN)
 						killer_weapon_name = "pianogun";
+					else if (iId == WEAPON_PIANOGUNEX)
+						killer_weapon_name = "pianogun";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}
@@ -5269,6 +5271,30 @@ bool CHalfLifeMultiplay::CheckCanStartVoteMaps(bool bAlert)
 	return false;
 #endif
 }
+bool CHalfLifeMultiplay::CheckCanStartVotePlayer(bool bAlert)
+{
+#ifdef XASH_DEDICATED
+	if (voteplayer_enabled.value <= 0.0f) {
+		if (bAlert) ALERT(at_console, "voteplayer is disabled\n");
+		return false;
+	}
+
+	if (m_bIsVoting) {
+		if (bAlert) ALERT(at_console, "voteplayer currently in process\n");
+		return false;
+	}
+
+	if (!m_vecVotePlayer.size()) {
+		if (bAlert) ALERT(at_console, "voteplayer list is empty\n");
+		return false;
+	}
+
+
+	return true;
+#else
+	return false;
+#endif
+}
 
 void SV_Start_VoteMaps()
 {
@@ -5419,7 +5445,68 @@ void ShowMenu_VoteMap(CBasePlayer* player)
 	}
 	pMenu->Display(player, 0, votemap_tally_delay_time.value * 1s);
 }
+void KickOutPlayer(CBasePlayer* KickPlayer)
+{
+	int iUserID = GETPLAYERUSERID(ENT(KickPlayer->pev));
+	SERVER_COMMAND(UTIL_VarArgs("kick # %d\n", iUserID));
+	
+}
+void CHalfLifeMultiplay::VotePlayerThink(CBasePlayer* KickPlayer)
+{
+	if (m_bIsVoting)
+	{
+		if (m_flKickVoteThink <= gpGlobals->time)
+		{
+			if (m_bProcessing)
+			{
+				if (m_bIsVoteRequest)
+				{
+					m_iVoteTimeLimit--;
+					if (m_iVoteTimeLimit < 0)
+					{
+						m_bIsVoting = false;
+						m_bRequesting = false;
+						m_iVoterId = 0;
+						m_bProcessing = false;
+					}
+				}
+				if (m_bRequesting)
+				{
+					m_iVoteTimeLimit--;
+					if (m_iVoteTimeLimit < 0)
+					{
+						m_bRequesting = false;
+						m_bIsVoting = false;
+						m_iVoteChoice[1]++;
 
+						float flPercent = (float)m_iVoteChoice[0] / (float)(m_iVoteChoice[0]+ m_iVoteChoice[1]);
+						if (flPercent > voteplayer_kick_percent.value)
+						{
+							char szText[128];
+							Q_sprintf(szText, "%.2f%% 的玩家同意从服务器踢出 %s。", flPercent * 100, STRING(KickPlayer->pev->netname));
+							UTIL_SayTextAll(szText);
+							KickOutPlayer(KickPlayer);
+						}
+						else
+						{
+							char szText[128];
+							Q_sprintf(szText, "同意踢出 %s 的玩家人数不足，至少需要 %.2f%% 的玩家同意。", STRING(KickPlayer->pev->netname), voteplayer_kick_percent.value * 100);
+							UTIL_SayTextAll(szText);
+						}
+						m_iVoteTimeLimit = 0;
+						if (m_bProcessing)
+							m_bProcessing = 0;
+
+					}
+				}
+
+			}
+			
+			m_flKickVoteThink = gpGlobals->time + 1s;
+		}
+		
+	}
+}
 void CHalfLifeMultiplay::VoteMapThink()
 {
 	if (m_flVoteNextThink > gpGlobals->time) {
@@ -5635,5 +5722,63 @@ void CHalfLifeMultiplay::VoteMapThink()
 		break;
 	}
 }
+
+void SV_Start_VotePlayer()
+{
+	if (!g_pGameRules->CheckCanStartVotePlayer(true))
+	{
+		return;
+	}
+	
+
+	ALERT(at_console, "Start voting player\n");
+	g_pGameRules->m_bIsVoting = 1;
+}
+
+const char* g_szVotingReasons_List[] = { "堵路","使用 BUG / 作弊程序", "卖队友", "脏话", "其他理由" };
+void ShowMenu_VoteKick_Main(CBasePlayer* player)
+{
+	PlayerMenu* pMenu = g_MenuMgr.menu_create("投票提出 - 选择理由", [&](CBasePlayer* pPlayer, PlayerMenu* pCurMenu, int iItem) {
+		if (iItem == MENU_EXIT || iItem == MENU_TIMEOUT)
+		{
+			return;
+		}
+
+		if (iItem < 0 )
+		{
+			return;
+		}
+
+
+		});
+	for (int i = 0; i < 5; ++i)
+		pMenu->AddBlank();
+
+	for (size_t i = 0; i < sizeof(g_szVotingReasons_List); i++)
+	{
+		pMenu->AddItem(NumAsString(i));
+	}
+	pMenu->Display(player, 0, 1s);
+}
+void ShowMenu_VoteKick_Reason(CBasePlayer* player)
+{
+
+	PlayerMenu* pMenu = g_MenuMgr.menu_create("投票提出 - 选择理由", [&](CBasePlayer* pPlayer, PlayerMenu* pCurMenu, int iItem) {
+		if (iItem == MENU_EXIT || iItem == MENU_TIMEOUT)
+		{
+			return;
+		}
+
+		int length = g_pGameRules->m_vecVotePlayer.size();
+		if (iItem < 0 || iItem >= length)
+		{
+			return;
+		}
+
+		});
+
+}
+
+
 
 }

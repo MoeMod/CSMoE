@@ -590,6 +590,7 @@ public:
 			|| m_iId == WEAPON_M950SE
 			|| m_iId == WEAPON_SFPISTOL
 			|| m_iId == WEAPON_Y22S2SFPISTOL
+			|| m_iId == Z4B_RAGINGBULL
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -1006,6 +1007,7 @@ public:
 	void EXPORT FlyingThink(void);
 	void EXPORT FlyingTouch(CBaseEntity* pOther);
 	void EXPORT AttachmentThink(void);
+	//void EXPORT BuffThink(void);
 
 public:
 	static CPianoGunWave* Create(int iWpnType, int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
@@ -1013,19 +1015,24 @@ public:
 	void RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
 	//void RadiusAttack(float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer);
 	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.3f }; }
+
+	//float GetSkillData(int iSkill, int iType);
 private:
 	void StartFadeOut();
 	void FadeOut();
 private:
 	float GetDirectDamage();
 	float GetExplodeDamage();
+	
 	//float GetRadiusDamage();
 
 	time_point_t m_flRemoveTime;
+	time_point_t m_flSkillTime;
 	int m_iType;
 	int m_iWpnType;
-	int m_iPianoNoteExp[2];
+	int m_iPianoNoteExp[5];
 	int m_iPianoShootMuzzle;
+	int m_iActiveSkill;
 
 };
 

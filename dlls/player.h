@@ -808,6 +808,8 @@ public:
 	int m_bHasBuffWpn;	//revivegun buffak buffm4 and more
 	float m_flAccumulateDamage[33];	//like m32venom
 	int m_iReviveGunShotsFired;
+
+	float m_flPlayerBuffData;
 };
 
 }

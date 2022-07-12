@@ -1802,7 +1802,8 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 				                     DMG_BULLET);
 				TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
 				DecalGunshot(&tr, iBulletType, false, pev, false);
-				if (iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT)
+				switch (iBulletType) {
+				case BULLET_PLAYER_WINGGUN_BUCKSHOT:
 				{
 					if (pEntity->IsPlayer())
 					{
@@ -1816,8 +1817,10 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 								strategy->SetStunGravityTime(1.0s);
 							}
 						}
-					}				
+					}
 				}
+				}
+				
 			} else {
 				float flDamage;
 
@@ -1826,6 +1829,7 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 						pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP5, vecDir, &tr, DMG_BULLET);
 						break;
 					case BULLET_PLAYER_BUCKSHOT:
+					case BULLET_PLAYER_WINGGUN_BUCKSHOT:
 						flDamage = ((1 - tr.flFraction) * 20);
 						pEntity->TraceAttack(pevAttacker, (int) flDamage, vecDir, &tr, DMG_BULLET);
 						break;
@@ -1969,7 +1973,7 @@ void CBaseEntity::FireBullets2(ULONG cShots, Vector vecSrc, Vector vecDirShootin
 				case BULLET_PLAYER_MP5:
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP5, vecDir, &tr, DMG_BULLET);
 					break;
-				case BULLET_PLAYER_BUCKSHOT:
+				case BULLET_PLAYER_BUCKSHOT:			
 					flDamage = ((1 - tr.flFraction) * 20);
 					pEntity->TraceAttack(pevAttacker, (int)flDamage, vecDir, &tr, DMG_BULLET);
 					break;

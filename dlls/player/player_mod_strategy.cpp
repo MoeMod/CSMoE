@@ -192,16 +192,19 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
-		m_pPlayer->GiveNamedItem("weapon_stunrifle");
-		m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("weapon_sfpistol");
+		m_pPlayer->GiveNamedItem("knife_y22s2sfsword");
+		m_pPlayer->GiveNamedItem("weapon_pianogunex");
+		//m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
-		m_pPlayer->GiveNamedItem("weapon_pianogun");
+		m_pPlayer->GiveNamedItem("weapon_y22s2sfpistol");
+		m_pPlayer->GiveNamedItem("weapon_chainsawex");
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("weapon_glock18");
+		//m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
 		break;

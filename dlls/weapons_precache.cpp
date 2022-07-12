@@ -366,8 +366,10 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_sfpistol");
 	UTIL_PrecacheOtherWeapon("weapon_y22s2sfpistol");
 	UTIL_PrecacheOtherWeapon("weapon_pianogun");
+	UTIL_PrecacheOtherWeapon("weapon_pianogunex");
 	UTIL_PrecacheOtherWeapon("weapon_stunrifle");
-
+	UTIL_PrecacheOtherWeapon("z4b_ragingbull");
+	UTIL_PrecacheOtherWeapon("weapon_kronos12");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

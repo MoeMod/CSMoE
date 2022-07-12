@@ -153,20 +153,16 @@ void EV_FireChainsawEX(event_args_s *args)
 		}
 		g_iShotsFired++;
 	}
-
-	if (args->bparam1 == TRUE)
-	{
-		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
-	}
 	else
 	{
-		if (!args->bparam2)
+		if (args->bparam1 == TRUE)
 		{
-			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex-1_start.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
-			return;
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
 		}
-
-		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex-1.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
+		else
+		{
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/chainsawex-1.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
+		}
 	}
 	
 	

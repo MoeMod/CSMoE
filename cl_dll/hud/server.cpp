@@ -127,6 +127,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 			case WEAPON_M95TIGER:
 			case WEAPON_M3DRAGON:
 			case WEAPON_M3DRAGONM:
+			case WEAPON_KRONOS12:
 				pActiveBTEWeapon->pev->iuser1 = reader.ReadByte();
 			default:
 				break;

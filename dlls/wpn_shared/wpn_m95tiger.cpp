@@ -216,8 +216,8 @@ void CM95Tiger::Precache(void)
 
 	PRECACHE_MODEL("sprites/muzzleflash80.spr");
 	PRECACHE_MODEL("sprites/muzzleflash59.spr");
-	PRECACHE_MODEL("sprites/sprites/ef_m95tiger_eye1.spr");
-	PRECACHE_MODEL("sprites/sprites/ef_m95tiger_eye2.spr");
+	PRECACHE_MODEL("sprites/ef_m95tiger_eye1.spr");
+	PRECACHE_MODEL("sprites/ef_m95tiger_eye2.spr");
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/rshell_big.mdl");
 	m_usFireM95Tiger = PRECACHE_EVENT(1, "events/m95tiger.sc");
 }

@@ -33,7 +33,7 @@ namespace sv {
             m_flDamageTime = invalid_time_point;
         }
 
-        KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.6f }; }
+        KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
         float GetArmorRatioModifier() { return 1.8f; }
         int GetWeaponsId(void) { return WEAPON_CHAINSAWEX; }
 
@@ -56,7 +56,7 @@ namespace sv {
 
             ResetSequenceInfo();
 
-            UTIL_SetSize(pev, { -8, -8, -8 }, { 8, 8, 8 });
+            UTIL_SetSize(pev, { -6, -6, -2 }, { 6, 6, 2 });
 
             m_flRemoveTime = gpGlobals->time + 7.0s;
             m_flDamageTime = gpGlobals->time + 0.1s;
@@ -257,6 +257,9 @@ namespace sv {
         PRECACHE_SOUND("weapons/chainsawex-2.wav");
         PRECACHE_SOUND("weapons/chainsawex_charge.wav");
         PRECACHE_SOUND("weapons/chainsawex_charge_end.wav");
+        PRECACHE_SOUND("weapons/chainsawex_hit1.wav");
+        PRECACHE_SOUND("weapons/chainsawex-1_start.wav");
+        PRECACHE_SOUND("weapons/chainsawex_wall.wav");
 
         PRECACHE_MODEL("sprites/ef_chainattack.spr");
         PRECACHE_MODEL("sprites/ef_chaincharging.spr");
@@ -433,7 +436,7 @@ namespace sv {
 
             ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
-            EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsaw_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+            EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/chainsawex_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
         }
 #endif
     }
@@ -480,12 +483,7 @@ namespace sv {
             classify = pEntity->Classify();
 
             if (classify && classify != CLASS_MACHINE)
-            {
-                if (m_iClip <= 0)
-                    EMIT_SOUND_DYN(ENT(pEntity->pev), CHAN_WEAPON, "weapons/chainsawex_hit3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-                else
-                    EMIT_SOUND_DYN(ENT(pEntity->pev), CHAN_WEAPON, "weapons/chainsawex_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-            }
+                EMIT_SOUND_DYN(ENT(pEntity->pev), CHAN_WEAPON, "weapons/chainsawex_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
             ClearMultiDamage();
 
@@ -551,6 +549,8 @@ namespace sv {
         {
             SendWeaponAnim(ANIM_ATTACK1_START, UseDecrement() != FALSE);
 
+            EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsawex-1_start.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+
             m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
             m_flAttackLoop = gpGlobals->time + 0.5s;
 
@@ -572,7 +572,7 @@ namespace sv {
         m_flTimeWeaponIdle = m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.063s;
 
         Attack1();
-        PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100.0), int(m_pPlayer->pev->punchangle.y * 100.0), FALSE, TRUE);
+        PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100.0), 0, FALSE, TRUE);
 #ifndef CLIENT_DLL
         if (!m_iClip && !m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", 0, 0);
@@ -589,6 +589,12 @@ namespace sv {
 
     void SecondaryAttack(void)
     {
+        if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] && !m_iClip)
+        {
+            OnAttack2Released();
+            return;
+        }
+           
         if (m_iChargeState)
         {
             if (gpGlobals->time > m_flTimeCheckCharge)
@@ -596,6 +602,8 @@ namespace sv {
                 if (m_iChargeState > 1)
                 {
                     SendWeaponAnim(ANIM_CHARGING_LOOP);
+
+                    EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsawex_charge_end.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 
                     m_iChargeState = 3;
                     m_flTimeCheckCharge = gpGlobals->time + 999999s;
@@ -616,9 +624,6 @@ namespace sv {
         }
         else
         {
-            if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 10)
-                return;
-
             SendWeaponAnim(ANIM_SKILL_START);
 
             EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsawex_charge.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
@@ -647,8 +652,22 @@ namespace sv {
             //create entity
 
             EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsawex-2.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
-
-            m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 10;
+        
+            if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+            {
+                m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 10;
+                if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+                    m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+            }
+            else
+            {
+                if (m_iClip)
+                {
+                    m_iClip -= 10;
+                    if (m_iClip <= 0)
+                        m_iClip = 0;               
+                }
+            }
 
 #ifndef CLIENT_DLL
             if (!m_iClip && !m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
@@ -752,6 +771,8 @@ namespace sv {
         else
         {
             SendWeaponAnim(ANIM_EMPTY, UseDecrement() != FALSE);
+
+            EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/chainsawex_idle.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
             m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
         }

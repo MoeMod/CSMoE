@@ -9,9 +9,19 @@
 #endif
 #include "weapons/KnifeAttack.h"
 
+#define PIANOGUNEX_BuffTime 5.0s
+
+#define PIANOGUNEX_HealthRecovery 500.0
+#define PIANOGUNEX_RecoveryInterval 0.5s
+#define PIANOGUNEX_RecoveryTimes 3
+
+#define PIANOGUNEX_CriticalAttack 2.0
+#define PIANOGUNEX_SpeedUp 270.0
+
 
 namespace sv {
 	LINK_ENTITY_TO_CLASS(pianogun_wave, CPianoGunWave)
+
 
 	CPianoGunWave* CPianoGunWave::Create(int iWpnType, int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam)
 	{
@@ -49,10 +59,11 @@ namespace sv {
 		pev->renderamt = 255;
 
 		pev->frame = 0;
+		pev->framerate = 30.0;
 		ResetSequenceInfo();
 		switch (m_iType)
 		{
-		//PianoGun PrimaryAttack-> Notes 2
+			//PianoGun PrimaryAttack-> Notes 2
 		case 0:
 		{
 
@@ -62,7 +73,7 @@ namespace sv {
 		//PianoGun SecondaryAttack-> Waves 2
 		case 1:
 		{
-			m_flRemoveTime = gpGlobals->time + 0.6s;
+			m_flRemoveTime = gpGlobals->time + 0.6s - 0.2s;
 
 			SET_MODEL(ENT(pev), "models/ef_pianogunwave_c.mdl");
 			break;
@@ -75,40 +86,105 @@ namespace sv {
 		}
 		case 3:
 		{
-			m_flRemoveTime = gpGlobals->time + 0.6s;
+			m_flRemoveTime = gpGlobals->time + 0.6s - 0.3s;
 
 			SET_MODEL(ENT(pev), "models/ef_pianogunwave_c2.mdl");
 			break;
 		}
-		//PianoGunEx PrimaryAttack-> Notes 3
-		case 4: case 5: case 6:
+		//PianoGunEx PrimaryAttack-> Notes 4
+		case 4:
 		{
+			SET_MODEL(ENT(pev), "models/ef_pianogunex_wave_a.mdl");
+			pev->effects |= EF_NOCULL;
+			pev->scale *= 1.5;
 			break;
 		}
-		//PianoGunEx SecondaryAttack-> Waves 2
-		case 7: case 8:
+		case 5:
 		{
+			//Speed up
+			m_iActiveSkill = 5;
+			SET_MODEL(ENT(pev), "models/ef_pianogunex_wave_c1.mdl");
+			break;
+		}
+		case 6:
+		{
+			//Health Recovery
+			m_iActiveSkill = 6;
+			SET_MODEL(ENT(pev), "models/ef_pianogunex_wave_c2.mdl");
+			break;
+		}
+		case 7:
+		{
+			//Critical Attack
+			m_iActiveSkill = 7;
+			SET_MODEL(ENT(pev), "models/ef_pianogunex_wave_c3.mdl");
+			
+			break;
+		}
+		//PianoGunEx SecondaryAttack-> Waves 1
+
+		case 8:
+		{
+			m_flRemoveTime = gpGlobals->time + 0.6s - 0.3s;
+
+			SET_MODEL(ENT(pev), "models/ef_pianogunex_wave_b.mdl");
+			break;
+		}
+		case 9:
+		{
+			SET_MODEL(ENT(pev), "sprites/ef_piano_attack_c.spr");
+			break;
+		}
+		case 10:
+		{
+			m_flRemoveTime = gpGlobals->time + 3.0s;
+
+			SET_MODEL(ENT(pev), "sprites/scenariotx_hp_fx.spr");
 			break;
 		}
 		default:break;
 
 		}
-		if (m_iType == 0 || m_iType == 1)
+		if (m_iType == 0 || m_iType == 1 || m_iType == 4 || m_iType == 5 || m_iType == 6 || m_iType == 7 || m_iType == 9)
 		{
 			pev->solid = SOLID_BBOX;
 			pev->movetype = MOVETYPE_FLY;
 
-			SetTouch(&CPianoGunWave::FlyingTouch);
+			if (m_iType != 9)
+				SetTouch(&CPianoGunWave::FlyingTouch);
 			SetThink(&CPianoGunWave::FlyingThink);
 
 			UTIL_SetSize(pev, Vector(-6, -3, -3), Vector(6, 3, 3));
+
+			/*if (m_iType == 5 || m_iType == 6 || m_iType == 7)
+			{
+				m_flSkillTime = gpGlobals->time + 3.0s;
+			}*/
 		}
-		if (m_iType == 2 || m_iType == 3)
+		if (m_iType == 2 || m_iType == 3 || m_iType == 8)
 		{
 			pev->solid = SOLID_TRIGGER;
 			pev->movetype = MOVETYPE_NONE;
 
 			SetThink(&CPianoGunWave::AttachmentThink);
+
+			UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
+
+		}
+		if (m_iType == 9 || m_iType == 10)
+		{
+			if (m_iType == 9)
+			{
+				pev->movetype = MOVETYPE_FLY;
+				SetTouch(&CPianoGunWave::FlyingTouch);
+				SetThink(&CPianoGunWave::FlyingThink);
+			}
+			else
+			{
+				pev->movetype = MOVETYPE_NONE;
+				SetThink(&CPianoGunWave::AttachmentThink);
+			}
+			pev->solid = SOLID_TRIGGER;
 
 			UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
@@ -124,6 +200,12 @@ namespace sv {
 		PRECACHE_MODEL("models/ef_pianogunwave_b.mdl");
 		PRECACHE_MODEL("models/ef_pianogunwave_c.mdl");
 		PRECACHE_MODEL("models/ef_pianogunwave_c2.mdl");
+		//WEAPON_PIANOGUNEX
+		PRECACHE_MODEL("models/ef_pianogunex_wave_a.mdl");
+		PRECACHE_MODEL("models/ef_pianogunex_wave_c1.mdl");
+		PRECACHE_MODEL("models/ef_pianogunex_wave_c2.mdl");
+		PRECACHE_MODEL("models/ef_pianogunex_wave_c3.mdl");
+		PRECACHE_MODEL("models/ef_pianogunex_wave_b.mdl");
 
 		PRECACHE_SOUND("weapons/pianogun_exp1.wav");
 		PRECACHE_SOUND("weapons/pianogun_exp2.wav");
@@ -132,20 +214,21 @@ namespace sv {
 		m_iPianoNoteExp[0] = PRECACHE_MODEL("sprites/ef_pianogun_hit_a.spr");
 		m_iPianoNoteExp[1] = PRECACHE_MODEL("sprites/ef_pianogun_hit_c.spr");
 
-		m_iPianoShootMuzzle = PRECACHE_MODEL("sprites/ef_piano_attack_c.spr");
+		m_iPianoNoteExp[2] = PRECACHE_MODEL("sprites/ef_pianogunex_hit_a.spr");
+		m_iPianoNoteExp[3] = PRECACHE_MODEL("sprites/ef_pianogunex_hit_b.spr");
+		m_iPianoNoteExp[4] = PRECACHE_MODEL("sprites/muzzleflash219.spr");
+
+		PRECACHE_MODEL("sprites/ef_piano_attack_c.spr");
+		PRECACHE_MODEL("sprites/scenariotx_hp_fx.spr");
 
 	}
 
-	int CPianoGunWave::GetWeaponsId(void) { return m_iWpnType ? WEAPON_PIANOGUN : WEAPON_PIANOGUN; }
+	int CPianoGunWave::GetWeaponsId(void) { return m_iWpnType ? WEAPON_PIANOGUNEX : WEAPON_PIANOGUN; }
 
 
 	void CPianoGunWave::FlyingThink()
 	{
 		pev->nextthink = gpGlobals->time + 0.1s;
-
-		/*if (m_iWpnType)
-		{
-		}*/
 
 		if (!IsInWorld())
 		{
@@ -159,10 +242,21 @@ namespace sv {
 
 		//default frames
 		this->pev->frame = (float)(this->pev->framerate * gpGlobals->frametime / 1s) + this->pev->frame;
+
+		
 		if (pev->frame > 18)
 		{
 			pev->frame = fmod(pev->frame, 18);
 		}
+
+		if (m_flRemoveTime < gpGlobals->time)
+		{
+			SetThink(&CPianoGunWave::StartFadeOut);
+			m_flRemoveTime = invalid_time_point;
+			return;
+		}
+		if (m_iType == 10)
+			return;
 
 		CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
 		CBasePlayer* pAttackPlayer = nullptr;
@@ -185,42 +279,38 @@ namespace sv {
 		if (FBitSet(pAttackPlayer->pev->flags, FL_DUCKING))
 			vecSrc.z -= 32.0;
 
-		UTIL_SetOrigin(pev, vecSrc + vecForward * 50);
+		UTIL_SetOrigin(pev, vecSrc - vecForward * 20);
 
 		pev->angles = pAttackPlayer->pev->angles;
 		pev->angles.x = 0;
-
-		if (m_flRemoveTime < gpGlobals->time)
-		{
-			//UTIL_Remove(this);
-			SetThink(&CPianoGunWave::StartFadeOut);
-			m_flRemoveTime = invalid_time_point;
-			return;
-		}
 	}
+
 	void CPianoGunWave::StartFadeOut()
 	{
-		if (pev->rendermode == kRenderNormal) {
+		if (pev->rendermode == kRenderNormal)
+		{
 			pev->renderamt = 255.0f;
 			pev->rendermode = kRenderTransTexture;
 		}
 
 		pev->solid = SOLID_NOT;
 		pev->avelocity = g_vecZero;
-		pev->nextthink = gpGlobals->time + 0.1s;
+		pev->nextthink = gpGlobals->time + 0.001s;
 
 		SetThink(&CPianoGunWave::FadeOut);
 	}
 
 	void CPianoGunWave::FadeOut()
 	{
-		if (pev->renderamt > 15) {
-			pev->renderamt -= 35.0f;
-			pev->nextthink = gpGlobals->time + 0.1s;
+		if (pev->renderamt > 50) 
+		{
+			pev->renderamt -= 50.0f;
+			pev->nextthink = gpGlobals->time + 0.001s;
 		}
-		else {
+		else 
+		{
 			pev->renderamt = 0.0f;
-			pev->nextthink = gpGlobals->time + 0.2s;
+			pev->nextthink = gpGlobals->time + 0.001s;
 			SetThink(&CBaseEntity::SUB_Remove);
 		}
 	}
@@ -273,47 +363,20 @@ namespace sv {
 			CBasePlayer* pAttackPlayer = nullptr;
 			if (pAttacker && pAttacker->IsPlayer())
 				pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+
 			if (pEntity == pAttackPlayer)
 				continue;
 
-			if (pEntity->pev == pevAttacker)
-				flDamage *= 0.3;
 
 			vecSpot = pEntity->BodyTarget(vecSrc);
 			UTIL_TraceLine(vecSrc, vecSpot, dont_ignore_monsters, ENT(pevInflictor), &tr);
 
 			if (tr.flFraction == 1 || tr.pHit == pEntity->edict())
 			{
-				bool bDamageRate = false;
-				float flDamageRate;
 
-				if ((bitsDamageType & DMG_EXPLOSION) && false /* UTIL_IsGame("czero") */)
-				{
-					bDamageRate = true;
-					flDamageRate = UTIL_CalculateDamageRate(vecSrc, pEntity);
-				}
-				else
-				{
-					flDamageRate = 1.0;
-				}
-
-				if (bDamageRate)
-				{
-					float dis = flRadius - (vecSrc - pEntity->pev->origin).Length();
-
-					if (!flRadius)
-						flRadius = flDamage;
-
-					if (!flRadius)
-						continue;
-
-					flAdjustedDamage = (dis * dis) * 1.25 / (flRadius * flRadius) * flDamageRate * flDamage * 1.5;
-				}
-				else
-				{
-					flAdjustedDamage = (vecSrc - pEntity->pev->origin).Length() * falloff;
-					flAdjustedDamage = flDamage - flAdjustedDamage;
-				}
+				flAdjustedDamage = (vecSrc - pEntity->pev->origin).Length() * falloff;
+				flAdjustedDamage = flDamage - flAdjustedDamage;
 
 				if (flAdjustedDamage < 0.0)
 					continue;
@@ -328,7 +391,7 @@ namespace sv {
 			}
 		}
 
-	//	return bHit;
+		//	return bHit;
 	}
 
 	void CPianoGunWave::FlyingTouch(CBaseEntity* pOther)
@@ -344,6 +407,15 @@ namespace sv {
 
 		entvars_t* pevOwner = VARS(pev->owner);
 
+		if (m_iType == 9)
+		{
+			SetTouch(NULL);
+			SetThink(NULL);
+
+			UTIL_Remove(this);
+			return;
+		}
+
 		if (!pOther->IsDormant())
 		{
 			if (pOther->pev->takedamage != DAMAGE_NO)
@@ -354,6 +426,30 @@ namespace sv {
 				tr.iHitgroup = HITGROUP_CHEST;
 				pOther->TraceAttack(pevOwner, flDamage, pev->velocity, &tr, DMG_BULLET | DMG_NEVERGIB);
 				ApplyMultiDamage(pev, pevOwner);
+
+				CBaseEntity* pOwner = CBaseEntity::Instance(pev->owner);
+			CBasePlayer* pEntityOwner = nullptr;
+			if (pOwner && pOwner->IsPlayer())
+				pEntityOwner = static_cast<CBasePlayer*>(pOwner);
+
+			if (pEntityOwner)
+			{
+
+				if (pOther->IsPlayer())
+				{
+					CBasePlayer* player = (CBasePlayer*)pOther;
+
+					if (player->m_bIsZombie)
+					{
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						if (strategy)
+						{
+							strategy->SetStunSpeedTime(2.0s);
+							strategy->SetStunGravityTime(2.0s);
+						}
+					}
+				}
+			}
 			}
 		}
 
@@ -408,74 +504,145 @@ namespace sv {
 
 				EMIT_SOUND_DYN(ENT(pev), CHAN_AUTO, "weapons/pianogun_exp2.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
 
-				if (pOther->IsPlayer())
-				{
-					CBasePlayer* player = (CBasePlayer*)pOther;
+				break;
+			}
+			}
+		}
+		else
+		{
+			switch (m_iType)
+			{
+			case 4:
+			{
+				MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+				WRITE_BYTE(TE_TEMPSPRITE);
+				WRITE_COORD(pev->origin.x);
+				WRITE_COORD(pev->origin.y);
+				WRITE_COORD(pev->origin.z + 20);
+				WRITE_SHORT(m_iPianoNoteExp[3]);
+				WRITE_BYTE(5);
+				WRITE_BYTE(255);
+				WRITE_BYTE(30);
+				MESSAGE_END();
 
-					if (player->m_bIsZombie)
-					{
-						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-						if (strategy)
-						{
-							strategy->SetStunSpeedTime(2.0s, 1.0f);
-							strategy->SetStunGravityTime(2.0s, 10.0f);
-						}
-					}
-				}
 
+				EMIT_SOUND_DYN(ENT(pev), CHAN_AUTO, "weapons/pianogun_exp1.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
+				break;
+
+			}
+			default:
+			{
+				MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+				WRITE_BYTE(TE_TEMPSPRITE);
+				WRITE_COORD(pev->origin.x);
+				WRITE_COORD(pev->origin.y);
+				WRITE_COORD(pev->origin.z + 20);
+				WRITE_SHORT(m_iPianoNoteExp[2]);
+				WRITE_BYTE(8);
+				WRITE_BYTE(255);
+				WRITE_BYTE(30);
+				MESSAGE_END();
+
+				MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+				WRITE_BYTE(TE_TEMPSPRITE);
+				WRITE_COORD(pev->origin.x);
+				WRITE_COORD(pev->origin.y);
+				WRITE_COORD(pev->origin.z + 10);
+				WRITE_SHORT(m_iPianoNoteExp[4]);
+				WRITE_BYTE(8);
+				WRITE_BYTE(255);
+				WRITE_BYTE(30);
+				MESSAGE_END();
+
+
+
+				EMIT_SOUND_DYN(ENT(pev), CHAN_AUTO, "weapons/pianogun_exp2.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
 				break;
 			}
 			}
 		}
 
 
-			SetTouch(NULL);
-			SetThink(NULL);
+		SetTouch(NULL);
+		SetThink(NULL);
 
-			UTIL_Remove(this);
-		}
-
-		float CPianoGunWave::GetDirectDamage()
-		{
-			float flDamage;
-			if (!m_iType)
-			{
-				flDamage = 35;
-				if (g_pModRunning->DamageTrack() == DT_ZB)
-					flDamage = 230;
-				else if (g_pModRunning->DamageTrack() == DT_ZBS)
-					flDamage = 2500;
-			}
-			else if (m_iType == 1)
-			{
-				flDamage = 75;
-				if (g_pModRunning->DamageTrack() == DT_ZB)
-					flDamage = 1500;
-				else if (g_pModRunning->DamageTrack() == DT_ZBS)
-					flDamage = 3500;
-			}
-			return flDamage;
-		}
-
-		float CPianoGunWave::GetExplodeDamage()
-		{
-			float flDamage;
-			if (!m_iType)
-			{
-				flDamage = 60;
-				if (g_pModRunning->DamageTrack() == DT_ZB)
-					flDamage = 432;
-				else if (g_pModRunning->DamageTrack() == DT_ZBS)
-					flDamage = 600;
-			}
-			else if (m_iType == 1)
-			{
-				flDamage = 100;
-				if (g_pModRunning->DamageTrack() == DT_ZB)
-					flDamage = 700;
-				else if (g_pModRunning->DamageTrack() == DT_ZBS)
-					flDamage = 1000;
-			}
-			return flDamage;
-		}
+		UTIL_Remove(this);
 	}
+
+	float CPianoGunWave::GetDirectDamage()
+	{
+		float flDamage = 0.0;
+		if (!m_iType)
+		{
+			flDamage = 35;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 230;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 2500;
+		}
+		else if (m_iType == 1)
+		{
+			flDamage = 75;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 1500;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 3500;
+		}
+		else if (m_iType == 4)
+		{
+			flDamage = 35;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 1500;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 3500;
+		}
+		else if (m_iType == 5 || m_iType == 6 || m_iType == 7)
+		{
+			flDamage = 75;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 2500;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 5000;
+		} 
+		return flDamage;
+	}
+
+	float CPianoGunWave::GetExplodeDamage()
+	{
+		float flDamage;
+		if (!m_iType)
+		{
+			flDamage = 60;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 432;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 600;
+		}
+		else if (m_iType == 1)
+		{
+			flDamage = 100;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 700;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 1000;
+		}
+
+		else if (m_iType == 4)
+		{
+			flDamage = 60;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 432;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 600;
+		}
+		else if (m_iType == 5 || m_iType == 6 || m_iType == 7)
+		{
+			flDamage = 100;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 700;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 1000;
+		}
+		return flDamage;
+	}
+}

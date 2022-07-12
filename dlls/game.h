@@ -140,6 +140,12 @@ extern cvar_t votemap_enabled;
 extern cvar_t votemap_tally_delay_time;
 extern cvar_t votemap_type;
 
+extern cvar_t voteplayer_enabled;
+extern cvar_t voteplayer_cooldown_time;
+extern cvar_t voteplayer_last_time;
+extern cvar_t voteplayer_kick_time;
+extern cvar_t voteplayer_kick_percent;
+
 void GameDLLInit();
 
 }

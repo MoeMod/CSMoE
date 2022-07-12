@@ -83,6 +83,7 @@ namespace sv {
 			m_iWeaponState = 0;
 			m_iDefaultAmmo2 = 0;
 			m_iSaveShoots = 0;
+			pev->skin = 0;
 			Base::Spawn();
 		}
 		void Precache(void) override
@@ -94,7 +95,9 @@ namespace sv {
 			
 			PRECACHE_MODEL("sprites/ef_y22s2sfpistol_laser.spr");
 			PRECACHE_MODEL("sprites/ef_y22s2sfpistol_star.spr");
-			PRECACHE_MODEL("sprites/ef_starchasersr_star.spr");
+			//PRECACHE_MODEL("sprites/ef_starchasersr_star.spr");
+			PRECACHE_MODEL("sprites/ef_y20s3plasmaex_line.spr");
+			PRECACHE_MODEL("sprites/ef_y20s3plasmaex_star.spr");
 			
 			PRECACHE_MODEL("sprites/muzzleflash240.spr");
 			PRECACHE_MODEL("sprites/muzzleflash241.spr");
@@ -218,7 +221,7 @@ namespace sv {
 				m_pPlayer->SetSuitUpdate("!HEV_AMO0", 0, 0);
 #endif
 			if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-				KickBack(1.2f, 0.8f, 0.5f, 0.5f, 7.0f, 5.0f, 4);
+				KickBack(0.8f, 0.8f, 0.5f, 0.5f, 7.0f, 5.0f, 4);
 			else if (m_pPlayer->pev->velocity.Length2D() > 0)
 				KickBack(0.7f, 0.5f, 0.325f, 0.065f, 4.0f, 3.0f, 5);
 			else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
@@ -236,6 +239,7 @@ namespace sv {
 					m_iSaveShoots = 0;
 					++m_iWeaponState;
 					m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iWeaponState;
+					pev->skin = 1;
 #ifndef CLIENT_DLL
 
 					MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
@@ -266,6 +270,11 @@ namespace sv {
 
 				--m_iWeaponState;
 				m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iWeaponState;
+
+				if (!m_iWeaponState)
+				{
+					pev->skin = 0;
+				}
 			}
 		}
 

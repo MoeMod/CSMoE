@@ -367,9 +367,10 @@ namespace sv {
 						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
 						if (strategy)
 						{
-							strategy->SetStunSpeedTime(1.5s);
-							strategy->SetStunGravityTime(1.5s);
+							strategy->SetStunSpeedTime(1.0s);
+							strategy->SetStunGravityTime(1.0s);
 						}
+						ApplyKnockbackData(player, vecDir, { -1, -1, -1, -1, 1.0f });
 					}
 					else
 					{
@@ -469,6 +470,7 @@ namespace sv {
 		{
 		case 0:
 		{
+			//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireY22s2sfsword, 0.266, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_SLASH1, 0, FALSE, FALSE);
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/y22s2sfsword_midslash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 			m_iState = 1;
@@ -484,11 +486,65 @@ namespace sv {
 #endif
 			break;
 		}
+
 		case 1:
 		{
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/y22s2sfsword_midslash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
 			m_iState = 2;
+
+			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireY22s2sfsword, 0.266, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_STAB, 0, FALSE, FALSE);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/y22s2sfsword_stab.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+			SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
+
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.625s;
+			pev->nextthink = gpGlobals->time + 0.1s;
+
+#ifndef CLIENT_DLL	
+			float flDamage = GetSecondaryAttackDamage1();
+
+			m_pPlayer->SetAnimation(PLAYER_ATTACK2);
+			switch (KnifeAttack(flDamage, 220, 45, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, false))
+			{
+			case HIT_PLAYER:
+			{
+				if (RANDOM_LONG(0, 1))
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				else
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+
+				break;
+			}
+			case HIT_WALL:
+			{
+				if (RANDOM_LONG(0, 1))
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_wall1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				else
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_wall2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				break;
+			}
+
+			}
+#endif
+			
+			break;
+		}
+
+		case 2:
+		{
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/y22s2sfsword_midslash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireY22s2sfsword, 0.266, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_SLASH2, 0, FALSE, FALSE);
+
+
+			m_iState = 3;
 			SendWeaponAnim(ANIM_SLASH2, UseDecrement() != FALSE);
 
 			SetThink(&CKnifeY22s2SFSword::DelayPrimaryAttack);
@@ -503,8 +559,63 @@ namespace sv {
 #endif
 			break;
 		}
-		case 2:
+
+		case 3:
 		{
+
+			m_iState = 4;
+
+			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireY22s2sfsword, 0.266, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_STAB, 0, FALSE, FALSE);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/y22s2sfsword_stab.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+			SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
+
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.625s;
+			pev->nextthink = gpGlobals->time + 0.1s;
+
+#ifndef CLIENT_DLL	
+			float flDamage = GetSecondaryAttackDamage1();
+
+			m_pPlayer->SetAnimation(PLAYER_ATTACK2);
+			switch (KnifeAttack(flDamage, 220, 45, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, false))
+			{
+			case HIT_PLAYER:
+			{
+				if (RANDOM_LONG(0, 1))
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				else
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+
+				break;
+			}
+			case HIT_WALL:
+			{
+				if (RANDOM_LONG(0, 1))
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_wall1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				else
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_wall2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				break;
+			}
+
+			}
+#endif
+			break;
+		}
+
+
+		case 4:
+		{
+
+			//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireY22s2sfsword, 0.266, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_SLASH3, 0, FALSE, FALSE);
 
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/y22s2sfsword_midslash3.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			SendWeaponAnim(ANIM_SLASH3, UseDecrement() != FALSE);
@@ -513,13 +624,63 @@ namespace sv {
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 
-			m_iState = 0;
+			m_iState = 5;
 			SetThink(&CKnifeY22s2SFSword::DelayPrimaryAttack);
 			pev->nextthink = gpGlobals->time + 0.1s;
 
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5s;
 
+			break;
+		}
+		case 5:
+		{
+
+			m_iState = 0;
+
+			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireY22s2sfsword, 0.266, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_STAB, 0, FALSE, FALSE);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/y22s2sfsword_stab.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+			SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
+
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.625s;
+			pev->nextthink = gpGlobals->time + 0.1s;
+
+#ifndef CLIENT_DLL	
+			float flDamage = GetSecondaryAttackDamage1();
+
+			m_pPlayer->SetAnimation(PLAYER_ATTACK2);
+			switch (KnifeAttack(flDamage, 220, 45, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, false))
+			{
+			case HIT_PLAYER:
+			{
+				if (RANDOM_LONG(0, 1))
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				else
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+
+				break;
+			}
+			case HIT_WALL:
+			{
+				if (RANDOM_LONG(0, 1))
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_wall1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				else
+				{
+					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsword_wall2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				break;
+			}
+
+			}
+#endif
 			break;
 		}
 		}
@@ -618,7 +779,7 @@ namespace sv {
 
 
 		}
-		else
+		/*else
 		{
 			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireY22s2sfsword, 0.266, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_STAB, 0, FALSE, FALSE);
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/y22s2sfsword_stab.wav", VOL_NORM, ATTN_NORM, 0, 94);
@@ -667,7 +828,7 @@ namespace sv {
 			m_iState = 0;
 
 		}
-
+		*/
 	}
 
 

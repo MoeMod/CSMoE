@@ -465,6 +465,9 @@ public:
 	bool CheckCanStartVoteMaps(bool bAlert = false);
 	void VoteMapThink();
 
+	void VotePlayerThink(CBasePlayer* KickPlayer);
+	bool CheckCanStartVotePlayer(bool bAlert = false);
+
 private:
 	bool HasRoundTimeExpired();
 	bool IsBombPlanted();
@@ -548,6 +551,17 @@ public:
 	time_point_t m_flVoteTipsThink;
 	std::vector<std::pair<std::string, int>> m_vecVoteMaps;
 	int m_iVoteOptionCount[2];
+
+	bool m_bIsVoting;
+	int m_iVoteTimeLimit;
+	bool m_bProcessing;
+	bool m_bIsVoteRequest;
+	int m_iVoterId;
+	bool m_bRequesting;
+	int m_iVoteChoice[2];
+	time_point_t m_flKickVoteThink;
+
+	std::vector<std::pair<std::string, int>> m_vecVotePlayer;
 
 	OperationSystem m_iPlayersOS[MAX_CLIENTS];
 	std::set<int> m_setBanWeapon;

@@ -28,7 +28,7 @@ namespace sv {
 #endif
     class CCrow5 : public LinkWeaponTemplate< CCrow5,
             TGeneralData,
-            BuildTGetItemInfoFromCSW<WEAPON_M249>::template type,
+            BuildTGetItemInfoFromCSW<WEAPON_AUG>::template type,
             TPrecacheEvent,
             TDeployDefault,
             TGetDamageDefault,
@@ -41,14 +41,14 @@ namespace sv {
     {
     public:
 
-    static constexpr int ZoomFOV = 65;
+    static constexpr int ZoomFOV = 55;
     static constexpr const char *V_Model = "models/v_crow5.mdl";
     static constexpr const char *P_Model = "models/p_crow5.mdl";
     static constexpr const char *W_Model = "models/w_crow5.mdl";
     static constexpr const char *EventFile = "events/crow5.sc";
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
     static constexpr const char *ClassName = "weapon_crow5";
-    static constexpr const char *AnimExtension = "m249";
+    static constexpr const char *AnimExtension = "rifle";
     static constexpr int MaxClip = 100;
 	enum
 	{
@@ -60,22 +60,22 @@ namespace sv {
         ANIM_RELOAD_SLOW,
         ANIM_DRAW
 	};
-    static constexpr float PlayerMaxSpeed = 230;
+    static constexpr float PlayerMaxSpeed = 235;
     static constexpr float ArmorRatioModifier = 1.5f;
-	static constexpr float PrimaryAttackWalkingMiniumSpeed = 140;
-    static constexpr const auto &SpreadCalcNotOnGround = 0.05*A + 0.05;
+	static constexpr float PrimaryAttackWalkingMiniumSpeed = 130;
+    static constexpr const auto &SpreadCalcNotOnGround = 0.04*A + 0.025;
     static constexpr const auto &SpreadCalcWalking = 0.042*A + 0.02;
     static constexpr const auto &SpreadCalcDefault = 0.037*A + 0.017;
-
+    static constexpr const auto& SpreadCalcDucking = 0 * A + 0.0;
     static constexpr const auto& CycleTime1 = 0.095s;
     static constexpr const auto& CycleTime2 = 0.18s;
     duration_t CycleTime = CycleTime1;
     static constexpr int DamageDefault = 33;
-    static constexpr int DamageZB = 68;
-    static constexpr int DamageZBS = 95;
+    static constexpr int DamageZB = 70;
+    static constexpr int DamageZBS = 110;
     static constexpr const auto &AccuracyCalc = (N * N * N / 220.0) + 0.2;
     static constexpr float AccuracyDefault = 0.2;
-    static constexpr float AccuracyMax = 0.6;
+    static constexpr float AccuracyMax = 1.0;
     static constexpr float RangeModifier = 0.94;
     static constexpr auto BulletType = BULLET_PLAYER_556MM;
     /*static constexpr*/ int Penetration = 1;
@@ -94,22 +94,22 @@ namespace sv {
     int GetItemInfo(ItemInfo* p)
     {
         p->pszName = STRING(pev->classname);
-        p->pszAmmo1 = "556NatoBox";
-        p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
+        p->pszAmmo1 = "556Nato";
+        p->iMaxAmmo1 = 90;
         p->pszAmmo2 = NULL;
         p->iMaxAmmo2 = -1;
-        p->iMaxClip = M249_MAX_CLIP;
+        p->iMaxClip = 50;
         p->iSlot = 0;
         p->iPosition = 4;
         p->iId = m_iId = WEAPON_CROW5;
         p->iFlags = 0;
-        p->iWeight = M249_WEIGHT;
+        p->iWeight = AUG_WEIGHT;
 
         return 1;
     }
 
 #ifndef CLIENT_DLL
-    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M249); }
+    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AUG); }
 #endif
     float GetArmorRatioModifier() override { return 1.5; }
     WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 140 }; }
@@ -130,6 +130,14 @@ namespace sv {
         else
             CycleTime = CycleTime1;
         return Base::PrimaryAttack();
+    }
+
+    float GetMaxSpeed(void) override
+    {
+        if (m_pPlayer->m_iFOV == 90)
+            return 235;
+
+        return 150;
     }
 
     void ItemPostFrame() override

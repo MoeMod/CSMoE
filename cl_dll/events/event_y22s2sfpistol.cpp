@@ -126,16 +126,12 @@ namespace cl::event::y22s2sfpistol {
 		gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecEnd, PM_STUDIO_BOX, -1, &tr);
 		gEngfuncs.pEventAPI->EV_PopPMStates();
 
-		int sModelMuzzleflash;
-		gEngfuncs.CL_LoadModel("sprites/ef_starchasersr_star.spr", &sModelMuzzleflash);
+		int sModelMuzzleflash[2];
+		gEngfuncs.CL_LoadModel("sprites/ef_y20s3plasmaex_line.spr", &sModelMuzzleflash[0]);
+		gEngfuncs.CL_LoadModel("sprites/ef_y20s3plasmaex_star.spr", &sModelMuzzleflash[1]);
 
-		TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.5, sModelMuzzleflash, 0, 60, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.25, 15, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP);
-		if (pEnt)
-		{
-			pEnt->entity.curstate.rendercolor.r = 255;
-			pEnt->entity.curstate.rendercolor.g = 255;
-			pEnt->entity.curstate.rendercolor.b = 255;
-		}
+		TEMPENTITY* pEnt1 = gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.5, sModelMuzzleflash[0], 0, 60, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.35, 30, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP);
+		TEMPENTITY* pEnt2 = gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.5, sModelMuzzleflash[1], 0, 60, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.35, 27, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP);
 
 		if (g_flY22s2SFPistolBeamTime[idx] >= gHUD.m_flTime)
 		{

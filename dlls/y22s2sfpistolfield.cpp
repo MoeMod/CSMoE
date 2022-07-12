@@ -149,8 +149,8 @@ namespace sv {
 					auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
 					if (strategy)
 					{
-						strategy->SetStunSpeedTime(3.0s);
-						strategy->SetStunGravityTime(3.0s);
+						strategy->SetStunSpeedTime(3.0s,150.0f);
+						strategy->SetStunGravityTime(3.0s, 150.0f);
 					}
 				}
 			}

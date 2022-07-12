@@ -1190,7 +1190,7 @@ void CBuckshotAZAmmo::Precache(void)
 
 BOOL CBuckshotAZAmmo::AddAmmo(CBaseEntity* pOther)
 {
-	if (pOther->GiveAmmo(20, "sgdrill_buckshot", 40) == -1)
+	if (pOther->GiveAmmo(20, "buckshotaz", 40) == -1)
 		return FALSE;
 
 	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
@@ -1250,13 +1250,13 @@ LINK_ENTITY_TO_CLASS(ammo_winggun, CWingGunAmmo);
 void CLaserSGAmmo::Spawn(void)
 {
 	Precache();
-	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	SET_MODEL(ENT(pev), "models/w_shotbox.mdl");
 	CBasePlayerAmmo::Spawn();
 }
 
 void CLaserSGAmmo::Precache(void)
 {
-	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_MODEL("models/w_shotbox.mdl");
 	PRECACHE_SOUND("items/9mmclip1.wav");
 }
 
@@ -1320,7 +1320,6 @@ BOOL CEnergyCellAmmo::AddAmmo(CBaseEntity* pOther)
 
 LINK_ENTITY_TO_CLASS(ammo_energycell, CEnergyCellAmmo);
 
-
 void CPianoGunEnergyCellAmmo::Spawn(void)
 {
 	Precache();
@@ -1344,4 +1343,30 @@ BOOL CPianoGunEnergyCellAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_pianogun_energycell, CPianoGunEnergyCellAmmo);
+
+
+void CBuckshotKAmmo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_shotbox.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CBuckshotKAmmo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_shotbox.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CBuckshotKAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(30, "buckshotk", 60) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_buckshotk, CBuckshotKAmmo);
+
 }

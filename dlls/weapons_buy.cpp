@@ -114,6 +114,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "m950se",	WEAPON_M950SE },
 	{ "sfpistol",	WEAPON_SFPISTOL },
 	{ "y22s2sfpistol",	WEAPON_Y22S2SFPISTOL },
+	{ "ragingbull",	Z4B_RAGINGBULL },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -128,6 +129,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "csg12ss",	WEAPON_Z4B_CSG12SS },
 	{ "m3dragon",	WEAPON_M3DRAGON },
 	{ "m3dragonm",	WEAPON_M3DRAGONM },
+	{ "kronos12",	WEAPON_KRONOS12 },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -426,6 +428,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "m950se",	WEAPONCLASS_PISTOL },
 	{ "sfpistol",	WEAPONCLASS_PISTOL },
 	{ "y22s2sfpistol",	WEAPONCLASS_PISTOL },
+	{ "ragingbull",	WEAPONCLASS_PISTOL },
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -441,6 +444,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "m3dragon",	WEAPONCLASS_SHOTGUN },
 	{ "m3dragonm",	WEAPONCLASS_SHOTGUN },
 	{ "lasersg",	WEAPONCLASS_SHOTGUN },
+	{ "kronos12",	WEAPONCLASS_SHOTGUN },
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -819,6 +823,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_WONDERCANNON:
 	case WEAPON_PIANOGUN:
 	case WEAPON_STUNRIFLE:
+	case WEAPON_KRONOS12:
 		return true;
 	default:
 		break;
@@ -862,6 +867,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_M950SE:
 	case WEAPON_SFPISTOL:
 	case WEAPON_Y22S2SFPISTOL:
+	case Z4B_RAGINGBULL:
 		return true;
 	default:
 		break;

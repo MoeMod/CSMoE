@@ -58,7 +58,7 @@ int CLaserSg::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "lasersg_buckshot";
-	p->iMaxAmmo1 = 180;
+	p->iMaxAmmo1 = 80;
 	p->pszAmmo2 = "lasersgshot";
 	p->iMaxAmmo2 = 25;
 	p->iMaxClip = 40;
@@ -83,7 +83,7 @@ void CLaserSg::Precache(void)
 	PRECACHE_MODEL("sprites/muzzleflash234.spr");
 	PRECACHE_MODEL("sprites/muzzleflash235.spr");
 	PRECACHE_MODEL("sprites/muzzleflash236.spr");
-	PRECACHE_MODEL("sprites/ef_stormgianttw.spr");
+	PRECACHE_MODEL("sprites/laserminigun_hit3.spr");
 	
 
 	PRECACHE_SOUND("weapons/lasersg-1.wav");
@@ -383,7 +383,7 @@ void CLaserSg::Attack_ApplyDamage(bool bFireAttack)
 			pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, GetDamage_SecondaryAttack(), DMG_BULLET);
 #ifndef CLIENT_DLL
 			Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
-			UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 800.0, 0);
+			UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 0.4, 1000.0, 0);
 			//Normally 1200.0
 
 			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pEntity->pev->origin);
@@ -446,7 +446,7 @@ void CLaserSg::Attack_ApplyDamage(bool bFireAttack)
 
 				if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 				{
-					ApplyKnockbackData(player, vecDirection, { 0, 0, 0, 0, 0.4f });
+					ApplyKnockbackData(player, vecDirection, { -1, -1, -1, -1, 0.4f });
 				}
 			}
 
@@ -455,7 +455,7 @@ void CLaserSg::Attack_ApplyDamage(bool bFireAttack)
 			WRITE_COORD(pEntity->pev->origin.x);
 			WRITE_COORD(pEntity->pev->origin.y);
 			WRITE_COORD(pEntity->pev->origin.z);
-			WRITE_SHORT(MODEL_INDEX("sprites/ef_stormgianttw.spr"));
+			WRITE_SHORT(MODEL_INDEX("sprites/laserminigun_hit3.spr"));
 			WRITE_BYTE(3);
 			WRITE_BYTE(15);
 			WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);

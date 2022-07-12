@@ -1384,6 +1384,7 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_M950SE:
 		case WEAPON_SFPISTOL:
 		case WEAPON_Y22S2SFPISTOL:
+		case Z4B_RAGINGBULL:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

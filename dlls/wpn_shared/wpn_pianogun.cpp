@@ -89,7 +89,7 @@ struct PianoGun_WeaponData
 
 
 #ifndef CLIENT_DLL
-		WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "pianogun_energycell" , 100 }; }
+		WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_pianogun_energycell" , 100 }; }
 #endif
 		WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
 
