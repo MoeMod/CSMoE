@@ -30,13 +30,16 @@ namespace cl {
 namespace sv {
 #endif
 
-#define WPNSTATE_CROSSBOWEX_WINGON	(1<<1)
+#define WPNSTATE_CROSSBOWEX_LED		(1<<1)
+#define WPNSTATE_CROSSBOWEX_ZOOM	(1<<2)
 
     class CCrossBowEX21 : public LinkWeaponTemplate< CCrossBowEX21,
             TGeneralData,
             BuildTGetItemInfoFromCSW<WEAPON_SG552>::template type,
             TPrecacheEvent,
-            TDeployDefault
+            TDeployDefault,
+			TPrimaryAttackRifle,
+			TGetDamageDefault
     >
     {
     public:
@@ -55,19 +58,33 @@ namespace sv {
 		ANIM_SHOOT2,
 		ANIM_RELOAD,
 		ANIM_DRAW,
-		ANIM_WINGSTART,
-		ANIM_WINGLOOP,
-		ANIM_WINGEND,
-		ANIM_WINGSHOOT1,
-		ANIM_WINGSHOOT2,
-		ANIM_WINGRELOAD,//USELESS
-		ANIM_WINGSPECIALSHOT,
-		ANIM_WINGRELOAD2
-
+		ANIM_IDLE_LED,
+		ANIM_SHOOT1_LED,
+		ANIM_SHOOT2_LED,
+		ANIM_RELOAD_LED,
+		ANIM_ZOOM_IN,
+		ANIM_ZOOM_IDLE,
+		ANIM_ZOOM_SHOOT,
+		ANIM_ZOOM_OUT,
+		ANIM_ZOOM_OUT_LED,
 	};
     static constexpr float PlayerMaxSpeed = 205;
     static constexpr auto BulletType = BULLET_PLAYER_BUCKSHOT;
     static constexpr int Penetration = 1;
+	static constexpr const auto& SpreadCalcNotOnGround = 0.4 * A + 0.04;
+	static constexpr const auto& SpreadCalcWalking = 0.025 * A + 0.07;
+	static constexpr const auto& SpreadCalcDucking = 0.0 * A;
+	static constexpr const auto& SpreadCalcDefault = 0.02 * A;
+	static constexpr const auto& CycleTime = 0.165s;
+	static constexpr int DamageDefault = 37;
+	static constexpr int DamageZB = 375;
+	static constexpr int DamageZBS = 520;
+	static constexpr const auto& AccuracyCalc = (N * N * N / 210.0) + 0.3;
+	static constexpr float AccuracyDefault = 0.19;
+	static constexpr float AccuracyMax = 1.0;
+	static constexpr float RangeModifier = 1.0;
+	static constexpr auto BulletType = BULLET_PLAYER_556MM;
+	/*static constexpr*/ int Penetration = 1;
     KnockbackData KnockBack = { 1000.0f, 700.0f, 450.0f, 250.0f, 0.4f };
 
 	time_point_t m_flTimePlayIdleSound;
@@ -79,6 +96,10 @@ namespace sv {
 	int m_iExpModelIndex;
 	bool m_bChargeFinish;
 	int m_iDefaultAmmo2;
+
+#ifndef CLIENT_DLL
+	std::vector<EHANDLE> m_pEnemylist;
+#endif
 
 	KnockbackData GetKnockBackData() override
 	{
@@ -92,7 +113,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_CCrossBowEX21" , 175 }; }
 #endif
-	float GetArmorRatioModifier() override { return 1.2; }
+	float GetArmorRatioModifier() override { return 1.75; }
 	WeaponCrosshairData GetCrosshairData() override { return { 0, 9, 4, 0 }; }
 
 	void Spawn() override
@@ -138,8 +159,8 @@ namespace sv {
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "CCrossBowEX21BuckShot";
 		p->iMaxAmmo1 = 100;
-		p->pszAmmo2 = "WingEnergy";
-		p->iMaxAmmo2 = 100;
+		p->pszAmmo2 = "CrossBowEX21";
+		p->iMaxAmmo2 = 10;
 		p->iMaxClip = 50;
 		p->iSlot = 0;
 		p->iPosition = 5;
@@ -172,235 +193,175 @@ namespace sv {
 
 	BOOL Deploy(void)
 	{
-		m_iWeaponState &= ~WPNSTATE_CCrossBowEX21_WINGON;
-		m_bChargeFinish = false;
-		m_flTimePlayIdleSound = invalid_time_point;
 #ifndef CLIENT_DLL
 		if (m_flTimeHolster != invalid_time_point)
 		{
-			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += (gpGlobals->time - m_flTimeHolster) / 0.25s;
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += (gpGlobals->time - m_flTimeHolster) / 2.0s;
 		}
 		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 100)
 			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 100;
 #endif
 		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75s;
-		return DefaultDeploy("models/v_CCrossBowEX21.mdl", "models/p_CCrossBowEX21.mdl", ANIM_DRAW, "shotgun", UseDecrement() != FALSE, 0.1s, 1.0s);
+		return DefaultDeploy("models/v_crossbowex21.mdl", "models/p_crossbowex21.mdl", m_iWeaponState & WPNSTATE_CROSSBOWEX_LED ? ANIM_DRAW_LED , ANIM_DRAW, "shotgun", UseDecrement() != FALSE, 0.1s, 1.0s);
+	}
+
+	void PrimaryAttack() override
+	{
+		if (m_iWeaponState & WPNSTATE_CROSSBOWEX_ZOOM && !m_pEnemylist.empty())
+			PrimaryAttack_InstantDamage();
+		else
+			Base::PrimaryAttack();
+	}
+
+	void PrimaryAttack_InstantDamage()
+	{
+		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
+		{
+			if (m_fFireOnEmpty)
+			{
+				PlayEmptySound();
+				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
+			}
+
+#ifndef CLIENT_DLL
+			if (TheBots != NULL)
+			{
+				TheBots->OnEvent(EVENT_WEAPON_FIRED_ON_EMPTY, m_pPlayer);
+			}
+#endif
+			return;
+		}
+
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
+		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
+#ifndef CLIENT_DLL
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+
+		for (CBaseEntity* pEntity : m_pEnemylist)
+		{
+			if (!pEntity)
+				continue;
+
+			Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
+			Vector vecSrc = m_pPlayer->GetGunPosition();
+
+			TraceResult tr;
+			UTIL_TraceLine(vecSrc, vecDirection * 8192, missile, ENT(m_pPlayer->pev), &tr);
+
+			float flDamage = GetDamage_PrimaryAttack_Instant() * (1 - tr.flFraction);
+
+			ClearMultiDamage();
+			pEntity->TraceAttack(m_pPlayer->pev, flDamage, vecDirection, &tr, DMG_BULLET);
+			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, m_pPlayer->pev->origin);
+			WRITE_BYTE(TE_BEAMPOINTS);
+			WRITE_COORD(vecSrc.x);
+			WRITE_COORD(vecSrc.y);
+			WRITE_COORD(vecSrc.z);
+			WRITE_COORD(pEntity->pev->origin.x);
+			WRITE_COORD(pEntity->pev->origin.y);
+			WRITE_COORD(pEntity->pev->origin.z);
+			WRITE_SHORT(MODEL_INDEX("sprites/smoke.spr"));
+			WRITE_BYTE(0);
+			WRITE_BYTE(0);
+			WRITE_BYTE(10);//Life
+			WRITE_BYTE(7);//Width
+			WRITE_BYTE(0);//Noise
+			WRITE_BYTE(255);
+			WRITE_BYTE(255);
+			WRITE_BYTE(255);
+			WRITE_BYTE(20);
+			WRITE_BYTE(0);
+			MESSAGE_END();
+		}
+#endif
 	}
 
 	void ItemPostFrame() override
 	{
-		if (m_iWeaponState & WPNSTATE_CCrossBowEX21_WINGON)
+		if (!m_iWeaponState & WPNSTATE_CROSSBOWEX_ZOOM)
 		{
-			if (m_flTimeNextCharge <= gpGlobals->time)
-			{
-				m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
-				m_flTimeNextCharge = gpGlobals->time + 0.15s;
-
-				if (m_flTimePlayIdleSound != invalid_time_point && m_flTimePlayIdleSound < gpGlobals->time)
-				{				
-					m_flTimePlayIdleSound = invalid_time_point;
-				}
-
-				if (!m_bChargeFinish && m_iRecordAmmo - m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 20)
-				{
-					EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/CCrossBowEX21_special_on.wav", VOL_NORM, ATTN_NORM, 0, 94);
-					m_flTimePlayIdleSound = gpGlobals->time + 1.0s;
-					m_bChargeFinish = true;
-#ifndef CLIENT_DLL
-					if (m_pWing)
-					{
-						m_pWing->SendWingAnim(1);
-					}
-#endif
-					//draw charge spr
-					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFire, 0, g_vecZero, g_vecZero, 0.0, 0.0, 7, 1, FALSE, TRUE);
-				}
-
-				if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
-				{
-					m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
-					SecondaryAttack();
-				}
-			}
-		}
-		else
-		{
-			if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < 100)
+			if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < 10)
 			{
 				if (m_flTimeNextCharge <= gpGlobals->time)
 				{
 					m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
-					m_flTimeNextCharge = gpGlobals->time + 0.3s;
+					m_flTimeNextCharge = gpGlobals->time + 2.0s;
 				}
+			}
+		}
+
+		if (m_flNextThink != invalid_time_point && m_flNextThink < gpGlobals->time)
+		{
+			if (m_pPlayer->m_iFOV != 90)
+			{
+#ifndef CLIENT_DLL
+				m_pEnemylist.clear();
+#endif
+				SendWeaponAnim(ANIM_SCAN_EACTIVATE, UseDecrement() != FALSE);
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.875s;
+				m_iWeaponState = 0;
+				m_flNextThink = invalid_time_point;
+				m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+				pev->iuser1 = 0;
+			}
+			else
+			{
+				m_iWeaponState |= WPNSTATE_KRONOS12_ZOOM_ACTIVATE;
+				m_flNextThink = gpGlobals->time + 5.0s;
+				m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 65;
+			}
+		}
+
+		if (m_iWeaponState & WPNSTATE_KRONOS12_ZOOM_ACTIVATE)
+		{
+			PrimaryAttack_FindTargets();
+		}
+
+		if (!m_iWeaponState)
+		{
+			if (pev->iuser1 >= KRONOS12_CHARGE_AMMO)
+			{
+				SendWeaponAnim(ANIM_SCAN_ACTIVATE, UseDecrement() != FALSE);
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.875s;
+				m_iWeaponState |= WPNSTATE_KRONOS12_SCAN_ACTIVATE;
+				pev->iuser1 = 0;
 			}
 		}
 
 		return CBasePlayerWeapon::ItemPostFrame();
 	}
 
-	float GetMaxSpeed(void) override
-	{
-		if (m_iWeaponState & WPNSTATE_CCrossBowEX21_WINGON)
-			return 280;
-
-		return 240;
-	}
-
-	void CreateWing(void)
-	{
-#ifndef CLIENT_DLL
-		if (m_pWing != nullptr)
-			return;
-
-		m_pWing = (CCrossBowEX21Wing*)Create("CCrossBowEX21_wing", m_pPlayer->pev->origin + Vector(0, 0, 0), g_vecZero, m_pPlayer->edict());
-
-		if (m_pWing)
-		{
-			m_pWing->WingInit(m_pPlayer, this);
-			m_pWing->m_iTeam = m_pPlayer->m_iTeam;
-		}
-#endif
-		SetThink(nullptr);
-	}
-
-	void CreateWingParticle(void)
-	{
-#ifndef CLIENT_DLL
-		if (m_pWingParticle != nullptr)
-			return;
-
-		m_pWingParticle = (CCrossBowEX21WingParticle*)Create("CCrossBowEX21_wingparticle", m_pPlayer->pev->origin + Vector(0, 0, 0), g_vecZero, m_pPlayer->edict());
-
-		if (m_pWingParticle)
-		{
-			m_pWingParticle->WingParticleInit(m_pPlayer, this);
-		}
-#endif
-	}
-
 	void SecondaryAttack(void)
 	{
-		if (m_iWeaponState & WPNSTATE_CCrossBowEX21_WINGON)
+		if (m_iWeaponState & WPNSTATE_CROSSBOWEX_ZOOM)
 		{
-			if (m_bChargeFinish)
-			{
-				SendWeaponAnim(ANIM_WINGSPECIALSHOT, UseDecrement() != FALSE);
 #ifndef CLIENT_DLL
-				m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+			m_pEnemylist.clear();
 #endif
-				SpecialShoot();
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.2s;
-				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.2s;
-#ifndef CLIENT_DLL
-				if (m_pWing)
-				{
-					m_pWing->SecondaryAttack();
-				}
-#endif
-			}
+			
+			m_iWeaponState &~ = WPNSTATE_CROSSBOWEX_ZOOM;
+			if(m_iWeaponState & WPNSTATE_CROSSBOWEX_LED)
+				SendWeaponAnim(ANIM_ZOOM_OUT_LED, UseDecrement() != FALSE);
 			else
-			{
-				SendWeaponAnim(ANIM_WINGEND, UseDecrement() != FALSE);
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
-				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
-#ifndef CLIENT_DLL
-				if (m_pWing)
-				{
-					m_pWing->RemoveWing();
-				}
-#endif
-			}
+				SendWeaponAnim(ANIM_ZOOM_OUT, UseDecrement() != FALSE);
 
-			StopIdleSound();
-
-			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFire, 0, g_vecZero, g_vecZero, 0.0, 0.0, 7, 1, TRUE, TRUE);
-
-			m_iWeaponState &= ~WPNSTATE_CCrossBowEX21_WINGON;
-
-			m_bChargeFinish = false;
-			m_flTimeNextCharge = gpGlobals->time + 1.1s;
-		}
-		else
-		{
-			EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "weapons/CCrossBowEX21_loop.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			m_flTimeNextCharge = gpGlobals->time + 1.1s;
-			SendWeaponAnim(ANIM_WINGSTART, UseDecrement() != FALSE);
-			m_iWeaponState |= WPNSTATE_CCrossBowEX21_WINGON;
-			m_iRecordAmmo = m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType];
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
-			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
-#ifndef CLIENT_DLL
-			UTIL_TempModel({ 0, 0, 50 }, pev->angles, g_vecZero, m_iSummonModelIndex01, 20, 0, 255, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 5, 30, 0);
-#endif
-			SetThink(&CCrossBowEX21::CreateWing);
-			pev->nextthink = gpGlobals->time + 1.0s;
-			m_pPlayer->m_tLockBuffTime = invalid_time_point;
-		}
-
-		m_pPlayer->ResetMaxSpeed();
-	}
-
-	void PrimaryAttack(void)
-	{
-		if (m_pPlayer->pev->waterlevel == 3)
-		{
-			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
+			m_flNextThink = invalid_time_point;
+			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 			return;
 		}
 
-		if (m_iClip <= 0)
+		if (m_iWeaponState & WPNSTATE_CROSSBOWEX_LED)
 		{
-			PlayEmptySound();
-
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
-			return;
+			SendWeaponAnim(ANIM_ZOOM_IN, UseDecrement() != FALSE);
+			m_flNextThink = gpGlobals->time + 0.7s;
+			m_pPlayer->m_flNextAttack = 0.7s;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.7s;
+			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.7s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
 		}
-
-		m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
-		m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
-
-		m_iClip--;
-		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
-#ifndef CLIENT_DLL
-		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
-		float flDamage, flDistance, flSpread;
-		duration_t flCycleTime;
-		int cShots;
-
-		GetFireInfo(flDamage, flDistance, flSpread, cShots, flCycleTime);
-
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-		
-#ifndef CLIENT_DLL
-		m_pPlayer->FireBullets(cShots, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(flSpread, flSpread, 0.0), flDistance, BULLET_PLAYER_CCrossBowEX21_BUCKSHOT, 0, flDamage);
-#endif
-
-		int flags;
-#ifdef CLIENT_WEAPONS
-		flags = FEV_NOTHOST;
-#else
-		flags = 0;
-#endif
-
-		PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0, g_vecZero, g_vecZero, 0.0, flSpread, 7, m_vVecAiming.x * 100, m_iWeaponState & WPNSTATE_CCrossBowEX21_WINGON, FALSE);
-
-#ifndef CLIENT_DLL
-		if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-			m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
-#endif
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
-
-		if (m_iClip)
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.25s;
-		else
-			m_flTimeWeaponIdle = 0.75s;
-		
-		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 7, 10);
-		else
-			m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 3, 3);
 	}
 
 	void Reload(void)
@@ -408,155 +369,28 @@ namespace sv {
 		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 			return;
 
-		if (m_bChargeFinish)
-		{
-			SecondaryAttack();
+		int iClipSize = 30;
+		int j = Q_min(iClipSize - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+
+		if (!j)
 			return;
+
+		if (m_pPlayer->m_iFOV != 90)
+		{
+			m_iWeaponState = 0;
+			m_flNextThink = invalid_time_point;
+			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+			pev->iuser1 = 0;
 		}
 
-		if (DefaultReload(50, m_iWeaponState & WPNSTATE_CCrossBowEX21_WINGON ? ANIM_WINGRELOAD2 : ANIM_RELOAD, 3.0s))
+		if (DefaultReload(50, m_iWeaponState & WPNSTATE_CROSSBOWEX_LED ? ANIM_RELOAD_LED : ANIM_RELOAD, 3.23s))
 		{
+
 #ifndef CLIENT_DLL
+			m_pEnemylist.clear();
 			m_pPlayer->SetAnimation(PLAYER_RELOAD);
-			if (m_pWing)
-			{
-				m_pWing->RemoveWing();
-			}
 #endif
-			m_iWeaponState &= ~WPNSTATE_CCrossBowEX21_WINGON;
 		}
-	}
-
-	void GetFireInfo(float& flDamage, float& flFireDistance, float& flFireSpread, int& cShots, duration_t& flCycleTime)
-	{
-		flFireDistance = 6048;
-		flFireSpread = 0.055;
-		cShots = 7;
-		flCycleTime = 0.25s;
-		flDamage = 20;
-#ifndef CLIENT_DLL
-		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 112;
-		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage = 149;
-#endif
-	}
-
-	void SpecialShoot()
-	{
-		TraceResult tr;
-		Vector vecEnd, vecDir;
-
-		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/CCrossBowEX21-2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-#ifndef CLIENT_DLL
-		float flTouchDamage = GetDirectDamage();
-		float flExplodeDamage = GetExplodeDamage();
-		float flDistance = 8192.0;
-
-		Vector vecSrc = m_pPlayer->GetGunPosition();
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-		vecDir = gpGlobals->v_forward;
-		vecEnd = vecSrc + vecDir * flDistance;
-
-		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
-		if (TheBots != NULL && tr.flFraction != 1.0f) {
-			TheBots->OnEvent(EVENT_BULLET_IMPACT, this, (CBaseEntity*)&tr.vecEndPos);
-		}
-
-		CBaseEntity* pHitEntity = NULL;
-
-		if (tr.flFraction != 1.0f)
-		{
-			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-			pHitEntity = pEntity;
-			if (pEntity->pev->takedamage != DAMAGE_NO)
-			{
-				ClearMultiDamage();
-				pEntity->TraceAttack(m_pPlayer->pev, flTouchDamage, vecDir, &tr, (DMG_BULLET | DMG_NEVERGIB));
-				ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
-				if (pEntity->IsPlayer())
-				{
-					CBasePlayer* player = (CBasePlayer*)pEntity;
-
-					if (player->m_bIsZombie)
-					{
-						Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
-						vecDir.z = 0;
-
-						ApplyKnockbackData(player, vecDir, { 1500, 1500, 1500, 1500, 1.0f });
-						player->pev->velocity.z += 200.0f;
-					}
-				}
-			}
-		}
-
-		CBaseEntity* pEntity = NULL;
-		vecSrc = tr.vecEndPos;
-
-		Vector vecExpPos = vecSrc - vecDir.Normalize() * 20;
-
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_TEMPSPRITE);
-		WRITE_COORD(vecExpPos.x);
-		WRITE_COORD(vecExpPos.y);
-		WRITE_COORD(vecExpPos.z);
-		WRITE_SHORT(m_iExpIndex);
-		WRITE_BYTE(10);
-		WRITE_BYTE(255);
-		WRITE_BYTE(30);
-		MESSAGE_END();
-
-		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFire, 0, g_vecZero, g_vecZero, 0.0, 0.0, 1, m_vVecAiming.x * 100, TRUE, FALSE);
-
-#ifndef CLIENT_DLL
-		UTIL_TempModel(vecSrc, vecDir.Normalize(), g_vecZero, m_iExpModelIndex, 15, 0, 10, false, 0, 255, kRenderTransAdd, NULL, false, 0, 0, 46, 0);
-#endif
-
-		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, 118.0)) != NULL)
-		{
-			if (pEntity->pev->takedamage == DAMAGE_NO)
-				continue;
-
-			if (pEntity->edict() == m_pPlayer->edict())
-				continue;
-
-			if (pEntity->IsDormant())
-				continue;
-
-			if (pEntity->Classify() == CLASS_NONE)
-				continue;
-
-			if (pHitEntity && pEntity == pHitEntity)
-				continue;
-
-			if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) == GR_TEAMMATE)
-				continue;
-
-			vecEnd = pEntity->BodyTarget(vecSrc);
-
-			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, pev->owner, &tr);
-
-			if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
-				continue;
-
-			pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, flExplodeDamage, DMG_EXPLOSION);
-
-			if (pEntity->IsPlayer())
-			{
-				CBasePlayer* player = (CBasePlayer*)pEntity;
-
-				if (player->m_bIsZombie)
-				{
-					Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
-					vecDir.z = 0;
-
-					ApplyKnockbackData(player, vecDir, { 1500, 1500, 1500, 1500, 1.0f });
-					player->pev->velocity.z += 200.0f;
-				}
-			}
-		}
-#endif
 	}
 
 	void WeaponIdle() override
@@ -604,29 +438,18 @@ namespace sv {
 #endif
 	}
 
-	float GetDirectDamage()
+	float GetSecondaryDamage()
 	{
-		float flDamage = 110;
+		float flDamage = 37;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 4800;	//9600
+				flDamage = 2620;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 19800;
+				flDamage = 4100;
 #endif
 		return flDamage;
 	}
 
-	float GetExplodeDamage()
-	{
-		float flDamage = 30;
-#ifndef CLIENT_DLL
-		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 1700;	//3500
-		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage = 4500;
-#endif
-		return flDamage;
-	}
 
 };
 

@@ -810,15 +810,25 @@ public:
 	void FuncDrawScope(const CTextureRef& tex, int type, int x, int y, int width, int height);
 	void FuncDrawCorner(const CTextureRef& tex, int type, int width, int height, int width2 = 0, int height2 = 0);
 	void FuncDraw2DQuadScaled(const CTextureRef& tex, int x, int y, int width, int height, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
+	void FuncDrawCircle(int index, int width, int height, float gauge);
 	void Shutdown( void );
 	void DrawSpecialScope(int iId, int iType);
+	void DrawKronosScope(float flTime);
+	void SetKronosTime(float time);
+	
 private:
 	float left, right, centerx, centery;
 	UniqueTexture m_iScopeArc[4];
 	UniqueTexture m_iM95TigerScope[2];
 	UniqueTexture m_iM95TigerScopeCorner;
 	UniqueTexture m_iCheytaclrrsScope;
-	UniqueTexture m_iFreedomScope;
+
+	UniqueTexture m_iAimBG;
+	UniqueTexture m_iAimFrame;
+	UniqueTexture m_iAimGauge;
+
+	float m_flScopeTime;
+	float m_flScopeTimeEnd;
 };
 
 //

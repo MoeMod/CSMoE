@@ -77,9 +77,14 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iM95TigerScope[1], "sprites/m95tiger_scope_yellow.tga");
 	R_InitTexture(m_iM95TigerScopeCorner, "sprites/m95tiger_scope_corner.tga");
 	R_InitTexture(m_iCheytaclrrsScope, "sprites/scope_m200.tga");
-	R_InitTexture(m_iFreedomScope, "sprites/scope_freedom.astc");
-	//R_InitTexture(m_iSprifleScope, "sprites/scope_circle.tga");
+
+	R_InitTexture(m_iAimBG, "sprites/kronos_aim_bg.tga");
+	R_InitTexture(m_iAimFrame, "sprites/kronos_aim_frame.tga");
+	R_InitTexture(m_iAimGauge, "sprites/kronos_aim_gauge.tga");
 	
+	m_flScopeTime = 0.0f;
+	m_flScopeTimeEnd = 0.0f;
+
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
@@ -131,6 +136,101 @@ void CHudSniperScope::FuncDrawCorner(const CTextureRef& tex, int type, int width
 	}
 }
 
+void CHudSniperScope::FuncDrawCircle(int index, int width, int height, float gauge)
+{
+	if (!index)
+		return;
+
+	const int xx = (float)ScreenWidth / 2;
+	const int yy = (float)ScreenHeight / 2;
+
+	const int ww = width / 2;
+	const int tt = height / 2;
+
+	float amount, tan;
+	int pl;
+
+	gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
+	gRenderAPI.GL_Bind(0, index);
+
+	const float defCoords[8][2] = {
+		{0.5f, 0},
+		{1, 0},
+		{1, 0.5f},
+		{1, 1},
+		{0.5f, 1},
+		{0, 1},
+		{0, 0.5f},
+		{0, 0}
+	};
+
+	const int defVerts[8][2] = {
+		{xx, yy - tt},
+		{xx + ww, yy - tt},
+		{xx + ww, yy},
+		{xx + ww, yy + tt},
+		{xx, yy + tt},
+		{xx - ww, yy + tt},
+		{xx - ww, yy},
+		{xx - ww, yy - tt}
+	};
+
+	for (int i = 0; i < 8; i++)
+	{
+		amount = 0.125f * i;
+		if (gauge <= amount)
+			break;
+
+		if (gauge >= 0.125f + amount)
+			tan = 1;
+		else
+		{
+			if (i & 1)
+				tan = 1.0f - tanf(M_PI / 4 - M_PI * (gauge - amount) * 2);
+			else
+				tan = tanf(M_PI * (gauge - amount) * 2);
+		}
+
+		gEngfuncs.pTriAPI->Begin(TRI_TRIANGLES);
+
+		gEngfuncs.pTriAPI->TexCoord2f(defCoords[i][0], defCoords[i][1]);
+		gEngfuncs.pTriAPI->Vertex3f(defVerts[i][0], defVerts[i][1], 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0.5f, 0.5f);
+		gEngfuncs.pTriAPI->Vertex3f(xx, yy, 0);
+
+		if ((i & 1) == ((i >> 1) & 1)) // 0347
+		{
+			pl = (float)ww * tan;
+			if (!i || i == 7) // 07
+			{
+				gEngfuncs.pTriAPI->TexCoord2f(defCoords[i][0] + tan / 2, defCoords[i][1]);
+				gEngfuncs.pTriAPI->Vertex3f(defVerts[i][0] + pl, defVerts[i][1], 0);
+			}
+			else // 34
+			{
+				gEngfuncs.pTriAPI->TexCoord2f(defCoords[i][0] - tan / 2, defCoords[i][1]);
+				gEngfuncs.pTriAPI->Vertex3f(defVerts[i][0] - pl, defVerts[i][1], 0);
+			}
+		}
+		else // 1256
+		{
+			pl = (float)tt * tan;
+			if (i & 4) // 56
+			{
+				gEngfuncs.pTriAPI->TexCoord2f(defCoords[i][0], defCoords[i][1] - tan / 2);
+				gEngfuncs.pTriAPI->Vertex3f(defVerts[i][0], defVerts[i][1] - pl, 0);
+			}
+			else // 12
+			{
+				gEngfuncs.pTriAPI->TexCoord2f(defCoords[i][0], defCoords[i][1] + tan / 2);
+				gEngfuncs.pTriAPI->Vertex3f(defVerts[i][0], defVerts[i][1] + pl, 0);
+			}
+		}
+		gEngfuncs.pTriAPI->End();
+	}
+}
+
 void CHudSniperScope::FuncDrawScope(const CTextureRef& tex, int type, int x, int y, int width, int height)
 {
 	switch (type)
@@ -178,6 +278,14 @@ int CHudSniperScope::Draw(float flTime)
 		else if (pActiveBTEWeapon->m_iId == WEAPON_SFSNIPER)
 		{
 			return 1;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_KRONOS12)
+		{
+			if (gHUD.m_iFOV > 89)
+				return 1;
+
+			DrawKronosScope(flTime);
+			return 0;
 		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS || pActiveBTEWeapon->m_iId == WEAPON_M400 || pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM)
 		{
@@ -277,29 +385,32 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 	{
 
 	}
-	if (iId == WEAPON_Z4B_FREEDOM)
+
+}
+
+void CHudSniperScope::DrawKronosScope(float flTime)
+{
+	float LENGTH_MID = min(ScreenWidth, ScreenHeight) * 0.75f;
+	float x, y, w, h;
+
+	x = (ScreenWidth - LENGTH_MID) / 2;
+	y = (ScreenHeight - LENGTH_MID) / 2;
+	w = LENGTH_MID;
+	h = LENGTH_MID;
+
+	m_iAimBG->Draw2DQuadScaled(x, y, x + w, y + h);
+
+	if (m_flScopeTimeEnd > flTime && m_flScopeTime)
 	{
-		float x, y, w, h;
-
-		float scale = ScreenHeight / 0.85 / m_iFreedomScope->h();
-
-		w = m_iFreedomScope->w() * scale;
-		h = m_iFreedomScope->h() * scale;
-
-		x = ScreenWidth / 2 - w / 2;
-		y = ScreenHeight / 2 - h / 2;
-
-		m_iFreedomScope->Draw2DQuadScaled(x, y, x + w, y + h, 0, 0, 1, 1, 255, 255, 255, 255);
-
-		int LENGTH_SCOPE = w / 2;
-
-		FillRGBABlend(0, 0, ScreenWidth / 2 - LENGTH_SCOPE, ScreenHeight, 164, 246, 255, 100);
-		FillRGBABlend(ScreenWidth / 2 + LENGTH_SCOPE, 0, ScreenWidth / 2 - LENGTH_SCOPE, ScreenHeight, 164, 246, 255, 100);
-
-		FillRGBABlend(0, 0, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE, 164, 246, 255, 100);
-		FillRGBABlend(0, ScreenHeight / 2 + LENGTH_SCOPE, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE, 164, 246, 255, 100);
+		float percent = (m_flScopeTimeEnd - flTime) / m_flScopeTime;
+		FuncDrawCircle(m_iAimGauge->texnum(), LENGTH_MID * 0.36f, LENGTH_MID * 0.36f, percent);
 	}
+}
 
+void CHudSniperScope::SetKronosTime(float time)
+{
+	m_flScopeTime = time;
+	m_flScopeTimeEnd = gHUD.m_flTime + time;
 }
 
 void CHudSniperScope::Shutdown()

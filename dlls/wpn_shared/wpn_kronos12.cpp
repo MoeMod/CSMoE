@@ -240,6 +240,12 @@ void CKronos12::ItemPostFrame(void)
 		}
 		else
 		{
+#ifndef CLIENT_DLL
+			MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+			WRITE_BYTE(20);
+			WRITE_SHORT(5);
+			MESSAGE_END();
+#endif
 			m_iWeaponState |= WPNSTATE_KRONOS12_ZOOM_ACTIVATE;
 			m_flNextThink = gpGlobals->time + 5.0s;
 			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 65;

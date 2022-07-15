@@ -4135,6 +4135,64 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 				CBaseEntity* pInflictor = CBaseEntity::Instance(pevInflictor);
 				int iId = pInflictor->GetWeaponsId();
 
+				if (iId == WEAPON_KNIFE)
+				{
+					killer_weapon_name = STRING(pevInflictor->classname);
+
+					if (!Q_strcmp(killer_weapon_name, "dgaxe_summon"))
+						killer_weapon_name = "dgaxe";
+					else if (!Q_strcmp(killer_weapon_name, "dualsword_specialeffect"))
+						killer_weapon_name = "dualsword";
+					else if (!Q_strcmp(killer_weapon_name, "whipsword_stabbox"))
+						killer_weapon_name = "whipsword";
+					else if (!Q_strcmp(killer_weapon_name, "holysword_cannon"))
+						killer_weapon_name = "holysword";
+					else if (!Q_strcmp(killer_weapon_name, "summonknife_cannon"))
+						killer_weapon_name = "summonknife";
+				}
+				else
+				{
+					if (iId == WEAPON_SPEARGUN)
+						killer_weapon_name = "speargun";
+					else if (iId == WEAPON_BUFFAK)
+						killer_weapon_name = "buffak";
+					else if (iId == WEAPON_M32VENOM)
+						killer_weapon_name = "m32venom";
+					else if (iId == WEAPON_GATLINGEX)
+						killer_weapon_name = "gatlingex";
+					else if (iId == WEAPON_M95TIGER)
+						killer_weapon_name = "m95tiger";
+					else if (iId == WEAPON_HUNTBOW)
+						killer_weapon_name = "huntbow";
+					else if (iId == WEAPON_BOW)
+						killer_weapon_name = "bow";
+					else if (iId == WEAPON_PLASMAGUN)
+						killer_weapon_name = "plasmagun";
+					else if (iId == WEAPON_SVDEX)
+						killer_weapon_name = "svdex";
+					else if (iId == WEAPON_VOIDPISTOL)
+						killer_weapon_name = "voidpistol";
+					else if (iId == WEAPON_PLASMAGUN)
+						killer_weapon_name = "plasmagun";
+					else if (iId == WEAPON_M3DRAGON)
+						killer_weapon_name = "m3dragon";
+					else if (iId == WEAPON_M3DRAGONM)
+						killer_weapon_name = "m3dragonm";
+					else if (iId == WEAPON_THANATOS7)
+						killer_weapon_name = "thanatos7";
+					else if (iId == WEAPON_WINGGUN)
+						killer_weapon_name = "winggun";
+					else if (iId == WEAPON_CHAINSAWEX)
+						killer_weapon_name = "chainsawex";
+					else if (iId == WEAPON_WONDERCANNON)
+						killer_weapon_name = "wondercannon";
+					else if (iId == WEAPON_PIANOGUN)
+						killer_weapon_name = "pianogun";
+					else
+						killer_weapon_name = STRING(pevInflictor->classname);
+				}
+
+
 				CGrenade* pGrenade = dynamic_cast<CGrenade*>(pInflictor);
 
 				if (pGrenade && pGrenade->GetWeaponsId() == WEAPON_NONE)
@@ -4190,63 +4248,6 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						break;
 					}
 				}
-				else if (iId == WEAPON_KNIFE)
-				{
-					if (!Q_strcmp(killer_weapon_name, "dgaxe_summon"))
-						killer_weapon_name = "dgaxe";
-					else if (!Q_strcmp(killer_weapon_name, "dualsword_specialeffect"))
-						killer_weapon_name = "dualsword";
-					else if (!Q_strcmp(killer_weapon_name, "whipsword_stabbox"))
-						killer_weapon_name = "whipsword";
-					else if (!Q_strcmp(killer_weapon_name, "holysword_cannon"))
-						killer_weapon_name = "holysword";
-					else if (!Q_strcmp(killer_weapon_name, "summonknife_cannon"))
-						killer_weapon_name = "summonknife";
-				}
-				else
-				{
-					if (iId == WEAPON_SPEARGUN)
-						killer_weapon_name = "speargun";
-					else if (iId == WEAPON_BUFFAK)
-						killer_weapon_name = "buffak";
-					else if (iId == WEAPON_M32VENOM)
-						killer_weapon_name = "m32venom";
-					else if (iId == WEAPON_GATLINGEX)
-						killer_weapon_name = "gatlingex";
-					else if (iId == WEAPON_M95TIGER)
-						killer_weapon_name = "m95tiger";
-					else if (iId == WEAPON_HUNTBOW)
-						killer_weapon_name = "huntbow";
-					else if (iId == WEAPON_BOW)
-						killer_weapon_name = "bow";
-					else if (iId == WEAPON_PLASMAGUN)
-						killer_weapon_name = "plasmagun";
-					else if (iId == WEAPON_SVDEX)
-						killer_weapon_name = "svdex";
-					else if (iId == WEAPON_VOIDPISTOL)
-						killer_weapon_name = "voidpistol";
-					else if (iId == WEAPON_PLASMAGUN)
-						killer_weapon_name = "plasmagun";
-					else if (iId == WEAPON_M3DRAGON)
-						killer_weapon_name = "m3dragon";
-					else if (iId == WEAPON_M3DRAGONM)
-						killer_weapon_name = "m3dragonm";
-					else if (iId == WEAPON_THANATOS7)
-						killer_weapon_name = "thanatos7";
-					else if (iId == WEAPON_WINGGUN)
-						killer_weapon_name = "winggun";
-					else if (iId == WEAPON_CHAINSAWEX)
-						killer_weapon_name = "chainsawex";
-					else if (iId == WEAPON_WONDERCANNON)
-						killer_weapon_name = "wondercannon";
-					else if (iId == WEAPON_PIANOGUN)
-						killer_weapon_name = "pianogun";
-					else if (iId == WEAPON_PIANOGUNEX)
-						killer_weapon_name = "pianogun";
-					else
-						killer_weapon_name = STRING(pevInflictor->classname);
-				}
-
 			}
 		}
 	}

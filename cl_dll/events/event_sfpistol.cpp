@@ -135,7 +135,7 @@ void EV_FireSFPistol(struct event_args_s* args)
 		pEnt->entity.curstate.rendercolor.g = 250;
 		pEnt->entity.curstate.rendercolor.b = 30;
 	}
-	
+
 	if (g_flSFPistolBeamTime[idx] >= gHUD.m_flTime)
 	{
 		if (g_pSFPistolBeams[idx])

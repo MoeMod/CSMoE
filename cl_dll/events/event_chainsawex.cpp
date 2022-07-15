@@ -127,7 +127,7 @@ void EV_FireChainsawEX(event_args_s *args)
 			int iMuzzModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_chaincharging.spr");
 
 			if (!g_iChainCharging)
-				g_iChainCharging = gEngfuncs.pEfxAPI->R_AttachTentToModel(viewent->index, 1, 1.17, iMuzzModelIndex, 36, 255, kRenderTransAdd, 0.1, 41, FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP, EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL);
+				g_iChainCharging = gEngfuncs.pEfxAPI->R_AttachTentToModel(viewent->index, 1, 2, iMuzzModelIndex, 36, 255, kRenderTransAdd, 0.1, 41, FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP, EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL);
 
 			if (g_iChainCharging)
 			{

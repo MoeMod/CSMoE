@@ -278,6 +278,13 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		break;
 	}
+	case 20:
+	{
+		arg1 = reader.ReadShort();
+
+		m_SniperScope.SetKronosTime(arg1);
+		break;
+	}
 	case 79:	// stop sound
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadShort();
