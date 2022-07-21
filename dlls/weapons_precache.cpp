@@ -370,6 +370,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_stunrifle");
 	UTIL_PrecacheOtherWeapon("z4b_ragingbull");
 	UTIL_PrecacheOtherWeapon("weapon_kronos12");
+	UTIL_PrecacheOtherWeapon("weapon_crossbowex21");
+	UTIL_PrecacheOtherWeapon("weapon_buffawp");
+	UTIL_PrecacheOtherWeapon("weapon_divinetitan");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

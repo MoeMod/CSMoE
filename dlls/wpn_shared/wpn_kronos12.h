@@ -27,7 +27,7 @@ class CKronos12 : public CBasePlayerWeapon
 		ANIM_DRAW2,
 		ANIM_SCAN_ACTIVATE,
 		ANIM_ZOOM,
-		ANIM_SCAN_EACTIVATE,
+		ANIM_SCAN_DEACTIVATE,
     };
 public:
 	void Spawn() override;

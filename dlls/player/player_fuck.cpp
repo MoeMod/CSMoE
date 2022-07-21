@@ -57,6 +57,7 @@ namespace sv {
                 }
                 std::sort_heap(singleton.begin(), singleton.end());
                 std::unique(singleton.begin(), singleton.end());
+                singleton.erase(std::remove_if(singleton.begin(), singleton.end(), [](std::pair<std::wstring, std::wstring> val) {return val.first.length() <= 0 || val.second.length() <= 0; }), singleton.end());
                 engfunc::FREE_FILE(data);
             }
         }

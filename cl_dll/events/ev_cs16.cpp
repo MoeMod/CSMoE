@@ -757,6 +757,7 @@ void EV_DescribeBulletTypeParameters(int iBulletType, int &iPenetrationPower, fl
 		break;
 	}
 
+	case BULLET_PLAYER_CROSSBOWEX21:
 	case BULLET_PLAYER_338MAG:
 	{
 		iPenetrationPower = 45;
@@ -1035,6 +1036,12 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 						gEngfuncs.pEfxAPI->R_Sprite_Trail(TE_SPRITETRAIL, tr.endpos, fwd, sModelIndexParticle, 2, 0.5, 0.04, 100,
 							255, 10);
 						break;
+					}
+					case BULLET_PLAYER_CROSSBOWEX21:
+					{
+						int sModelIndexParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_crossbowex_hit_1.spr");
+
+						gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.2, sModelIndexParticle, 0, 30, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.08, 13, FTENT_SPRANIMATE);
 					}
 						
 					case BULLET_PLAYER_MP5:

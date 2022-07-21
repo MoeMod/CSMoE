@@ -333,3 +333,4 @@ msvc/BundleArtifacts/
 /out
 /CSMoE.rar
 Android/app/bugly/
+/3rdparty/mysql-8.0.29-winx64

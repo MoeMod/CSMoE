@@ -25,8 +25,23 @@ GNU General Public License for more details.
 #include "player/player_zombie.h"
 #include "player/player_mod_strategy.h"
 
+#include "zb2/zb2_zclass_tank.h"
 #include "zb2/zb2_zclass_speed.h"
+#include "zb2/zb2_zclass_deimos2.h"
+#include "zb2/zb2_zclass_deimos.h"
+#include "zb2/zb2_zclass_pc.h"
+#include "zb2/zb2_zclass_heavy.h"
+#include "zb2/zb2_zclass_heal.h"
+#include "zb2/zb2_zclass_booster.h"
+#include "zb2/zb2_zclass_china.h"
+#include "zb2/zb2_zclass_pass.h"
+#include "zb2/zb2_zclass_flying.h"
+#include "zb2/zb2_zclass_stamper.h"
 #include "zb2/zb2_zclass_resident.h"
+#include "zb2/zb2_zclass_witch.h"
+#include "zb2/zb2_zclass_boomer.h"
+#include "zb2/zb2_zclass_spider.h"
+#include "weapons_moe_buy.h"
 
 #include "util/u_range.hpp"
 
@@ -793,7 +808,7 @@ void CZB3CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 
 	if (iCurrentCount > 7)
 	{
-		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[😷]生化病毒正在寻找宿主， %s 秒后选定感染目标", UTIL_dtos1(iCurrentCount - 7));
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[感染阶段]生化病毒正在寻找宿主， %s 秒后选定感染目标", UTIL_dtos1(iCurrentCount - 7));
 
 		if (iCurrentCount - 7 <= 10)
 		{
@@ -805,7 +820,7 @@ void CZB3CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 		if (iCurrentCount == 7)
 			m_pMod->PickZombieOrigin();
 
-		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[💉]生化病毒已找到宿主，母体僵尸将在 %s 秒内出现", UTIL_dtos1(iCurrentCount));
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[变异阶段]生化病毒已找到宿主，母体僵尸将在 %s 秒内出现", UTIL_dtos1(iCurrentCount));
 	}
 }
 
@@ -894,6 +909,176 @@ std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3F2P::ZombieClassFact
 		}
 	}
 	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, name);
+}
+
+void CMod_ZB3Classic::InstallPlayerModStrategy(CBasePlayer* player)
+{
+	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB3Classic(player, this));
+}
+
+CPlayerModStrategy_ZB3Classic::CPlayerModStrategy_ZB3Classic(CBasePlayer* player, CMod_ZB3Classic* mp)
+	: CPlayerModStrategy_ZB3(player, static_cast<CMod_ZombieHero*>(mp))
+{
+	m_flNextCheckButton = invalid_time_point;
+	m_flNextTimeChangeZombie = invalid_time_point;
+}
+
+void CPlayerModStrategy_ZB3Classic::GiveDefaultItems()
+{
+	if (!m_pPlayer->m_bIsZombie)
+	{
+		if (m_pPlayer->IsBot())
+		{
+			m_pPlayer->RemoveAllItems(FALSE);
+			m_pPlayer->m_bHasPrimary = false;
+
+			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+			{
+				std::vector<MoEWeaponBuyInfo_s> candidate_list;
+				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+
+				std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+				const MoEWeaponBuyInfo_s& info = candidate_list.front();
+				if (iSlot == KNIFE_SLOT) {
+					m_pPlayer->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+				}
+				m_pPlayer->GiveNamedItem(info.pszClassName);
+				GiveSlotAmmo(m_pPlayer, iSlot);
+			}
+			m_pPlayer->GiveNamedItem("weapon_hegrenade");
+		}
+		else
+			return CPlayerModStrategy_Default::GiveDefaultItems();	
+	}
+	return CPlayerModStrategy_ZB3::GiveDefaultItems();
+}
+
+bool CPlayerModStrategy_ZB3Classic::CanPlayerBuy(bool display)
+{
+	// is the player alive?
+	if (m_pPlayer->pev->deadflag != DEAD_NO)
+		return false;
+
+	return !m_pPlayer->m_bIsZombie;
+}
+
+std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3Classic::ZombieClassFactory(ZombieLevel lv, const char* name)
+{
+	auto player = m_pPlayer;
+
+	if (!strcmp(name, "random"))
+	{
+		switch (RANDOM_LONG(0, 10))
+		{
+		case 0:
+		{
+			player->m_ZombieClass = "tank";
+			return std::make_shared<CZombieClass_Default>(m_pPlayer, lv);	
+		}
+		case 1:
+		{
+			player->m_ZombieClass = "speed";
+			return std::make_shared<CZombieClass_Speed>(m_pPlayer, lv);		
+		}
+#ifdef XASH_DEDICATED
+		case 2:
+		{
+			player->m_ZombieClass = "deimos2";
+			return std::make_shared<CZombieClass_Deimos2>(m_pPlayer, lv);
+		}
+		case 3:
+		{
+			player->m_ZombieClass = "deimos";
+			return std::make_shared<CZombieClass_Deimos>(m_pPlayer, lv);
+		}
+		case 4:
+		{
+			player->m_ZombieClass = "heal";
+			return std::make_shared<CZombieClass_Heal>(m_pPlayer, lv);
+		}
+		case 5:
+		{
+			player->m_ZombieClass = "heavy";
+			return std::make_shared<CZombieClass_Heavy>(m_pPlayer, lv);
+		}
+		case 6:
+		{
+			player->m_ZombieClass = "flying";
+			return std::make_shared<CZombieClass_Flying>(m_pPlayer, lv);
+		}
+		case 7:
+		{
+			player->m_ZombieClass = "stamper";
+			return std::make_shared<CZombieClass_Stamper>(m_pPlayer, lv);
+		}
+		case 8:
+		{
+			player->m_ZombieClass = "resident";
+			return std::make_shared<CZombieClass_Resident>(m_pPlayer, lv);
+		}
+		case 9:
+		{
+			player->m_ZombieClass = "boomer";
+			return std::make_shared<CZombieClass_Boomer>(m_pPlayer, lv);
+		}
+		case 10:
+		{
+			player->m_ZombieClass = "pc";
+			return std::make_shared<CZombieClass_Pc>(m_pPlayer, lv);
+		}
+#endif
+		default:
+		{
+			player->m_ZombieClass = "tank";
+			return std::make_shared<CZombieClass_Default>(m_pPlayer, lv);
+		}
+		}
+	}
+	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, name);
+}
+
+void CPlayerModStrategy_ZB3Classic::CmdStart(struct usercmd_s* cmd, unsigned int random_seed)
+{
+	auto& bitsCurButton = cmd->buttons;
+	auto& bitsOldButton = m_pPlayer->pev->oldbuttons;
+
+	if (bitsCurButton & ~bitsOldButton & IN_USE)
+	{
+		if (m_flNextCheckButton <= gpGlobals->time && m_pPlayer->IsAlive() && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
+		{
+			if (GetCharacter()->GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING || GetCharacter()->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
+			{
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "当前技能使用完之后再使用适应力技能");
+				return;
+			}
+
+			float flHealth = m_pPlayer->pev->health;
+			float flMaxHealth = m_pPlayer->pev->max_health;
+			m_flNextCheckButton = gpGlobals->time + 2.0s;
+			if (flHealth <= 1000 || m_flNextTimeChangeZombie > gpGlobals->time)
+			{
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "血量不足或切换冷却时间未到，无法改变僵尸种类");
+				return;
+			}
+
+			m_flNextTimeChangeZombie = gpGlobals->time + 10.0s;
+			m_pPlayer->m_ZombieClass = "random";
+			m_pPlayer->pev->sequence = 0;
+			m_pPlayer->m_iCustomSequence = -1;
+			CPlayerModStrategy_ZB3::BecomeZombie(m_pPlayer->m_iZombieLevel);
+			m_pPlayer->pev->max_health = flMaxHealth;
+			m_pPlayer->pev->health = flHealth - 1000;
+			return;
+		}
+	}
+
+	return CPlayerModStrategy_ZB2::CmdStart(cmd, random_seed);
+}
+
+int CPlayerModStrategy_ZB3Classic::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+
+	return CPlayerModStrategy_ZB3::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 }

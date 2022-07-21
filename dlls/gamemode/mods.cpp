@@ -64,6 +64,7 @@ std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "zsh", DefaultFactory<CMod_ZombieShelter> },
 	// custom
 	{ "zb3f2p", DefaultFactory<CMod_ZB3F2P> },
+	{ "zb3classic", DefaultFactory<CMod_ZB3Classic> },
 };
 
 void InstallBteMod(const char *name)

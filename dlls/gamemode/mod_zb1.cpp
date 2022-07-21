@@ -362,6 +362,8 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 		ret = 60;
 	if (!strcmp(szAmmoClassName, "pianogun_energycell"))
 		ret = 360;
+	else if (!strcmp(szAmmoClassName, "crossbowex21"))
+		ret = 500;
 	else if (!strcmp(szAmmoClassName, "CannonAmmo"))
 		ret = 20;
 	else if (!strcmp(szAmmoClassName, "CannonEXAmmo"))
@@ -400,11 +402,15 @@ void CPlayerModStrategy_ZB1::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel 
 void CPlayerModStrategy_ZB1::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
 	m_pCharacter = std::make_shared<CZombie_ZB1>(m_pPlayer, iEvolutionLevel);
+	m_pPlayer->m_iTeam = TERRORIST;
+	m_pPlayer->pev->team = TERRORIST;
 }
 
 void CPlayerModStrategy_ZB1::BecomeHuman()
 {
 	m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
+	m_pPlayer->m_iTeam = CT;
+	m_pPlayer->pev->team = CT;
 }
 
 CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp)

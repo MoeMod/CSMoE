@@ -1146,7 +1146,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_LASERSG
 					|| pWeapon->m_iId == WEAPON_WONDERCANNON
 					|| pWeapon->m_iId == WEAPON_PIANOGUN
-					|| pWeapon->m_iId == WEAPON_PIANOGUNEX)
+					|| pWeapon->m_iId == WEAPON_PIANOGUNEX
+					|| pWeapon->m_iId == WEAPON_CROSSBOWEX21
+					|| pWeapon->m_iId == WEAPON_BUFFAWP)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -5989,6 +5991,8 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/z4b/v_freedom.mdl");
 		case WEAPON_Z4B_FREEDOM:
 			pev->viewmodel = MAKE_STRING("models/z4b/v_barrettd.mdl");
+		case WEAPON_BUFFAWP:
+			pev->viewmodel = MAKE_STRING("models/v_buffawp.mdl");
 		default:
 			break;
 		}
@@ -9034,6 +9038,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_WONDERCANNON:
 		case WEAPON_CROSSBOWEX21:
 		case WEAPON_STUNRIFLE:
+		case WEAPON_BUFFAWP:
 			return TRUE;
 		}
 	}
@@ -9065,6 +9070,13 @@ void CBasePlayer::SetPrefsFromUserinfo(char *infobuffer)
 		m_bShowHints = Q_atoi(pszKeyVal) != 0;
 	else
 		m_bShowHints = true;
+
+	pszKeyVal = GET_KEY_VALUE(infobuffer, "cl_blockwdnmd");
+
+	if (Q_strcmp(pszKeyVal, ""))
+		m_bBlockWdnmd = Q_atoi(pszKeyVal) != 0;
+	else
+		m_bBlockWdnmd = true;
 }
 
 bool CBasePlayer::IsLookingAtPosition(Vector *pos, float angleTolerance)

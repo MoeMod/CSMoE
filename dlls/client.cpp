@@ -39,6 +39,7 @@
 #include "luash_sv/luash_sv.h"
 #include "newmenus.h"
 #include "client/admin.h"
+#include "client/wdnmd.h"
 
 #include <tuple>
 
@@ -3377,17 +3378,37 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (FStrEq(pcmd, "radio1"))
 			{
+				if (!player->m_bBlockWdnmd)
+				{
+					wdnmdmenu::ShowWdnmdMenu(player, 0);
+					return;
+				}
+
+
 				ShowMenu(player, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_0), -1, FALSE, "#RadioA");
 				player->m_iMenu = Menu_Radio1;
 			}
 			else if (FStrEq(pcmd, "radio2"))
 			{
+				if (!player->m_bBlockWdnmd)
+				{
+					wdnmdmenu::ShowWdnmdMenu(player, 7);
+					return;
+				}
+
 				ShowMenu(player, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_0), -1, FALSE, "#RadioB");
 				player->m_iMenu = Menu_Radio2;
 				return;
 			}
 			else if (FStrEq(pcmd, "radio3"))
 			{
+				if (!player->m_bBlockWdnmd)
+				{
+					wdnmdmenu::ShowWdnmdMenu(player, 14);
+					return;
+				}
+
+
 				ShowMenu(player, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_9 | MENU_KEY_0), -1, FALSE, "#RadioC");
 				player->m_iMenu = Menu_Radio3;
 			}
@@ -3584,6 +3605,10 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 					admin::ShowAdminMenu(player);
 			}
 #endif
+			else if (FStrEq(pcmd, "wdnmd"))
+			{
+				wdnmdmenu::ShowWdnmdMenu(player);
+			}
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))
@@ -3953,6 +3978,7 @@ void ClientPrecache()
 	PRECACHE_SOUND("player/pl_pain6.wav");
 	PRECACHE_SOUND("player/pl_pain7.wav");
 
+	wdnmdmenu::WdnmdSoundPrecache();
 	PlayerZombie_Precache();
 	PlayerModel_Precache();
 

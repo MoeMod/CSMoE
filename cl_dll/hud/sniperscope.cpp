@@ -81,9 +81,21 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iAimBG, "sprites/kronos_aim_bg.tga");
 	R_InitTexture(m_iAimFrame, "sprites/kronos_aim_frame.tga");
 	R_InitTexture(m_iAimGauge, "sprites/kronos_aim_gauge.tga");
-	
+
+	R_InitTexture(m_iCrossbowex21_AimBG, "sprites/crossbowex21_bg.tga");
+	R_InitTexture(m_iCrossbowex21_AimImage, "sprites/crossbowex21_aimimage_01.tga");
+
+	R_InitTexture(m_iBUFFAWP_BG, "sprites/buffawp_bg.tga");
+	R_InitTexture(m_iBUFFAWP_Bar, "sprites/buffawp_bar.tga");
+	R_InitTexture(m_iBUFFAWP_Light[0], "sprites/buffawp_light_1.tga");
+	R_InitTexture(m_iBUFFAWP_Light[1], "sprites/buffawp_light_2.tga");
+	R_InitTexture(m_iBUFFAWP_Light[2], "sprites/buffawp_light_3.tga");
+	R_InitTexture(m_iBUFFAWP_Outline, "sprites/buffawp_outline.tga");
+
+
 	m_flScopeTime = 0.0f;
 	m_flScopeTimeEnd = 0.0f;
+	m_flBUFFAWPStartTime = 0.0f;
 
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
@@ -287,6 +299,26 @@ int CHudSniperScope::Draw(float flTime)
 			DrawKronosScope(flTime);
 			return 0;
 		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_CROSSBOWEX21)
+		{
+			if (gHUD.m_iFOV > 89)
+				return 1;
+
+			DrawCrossbowEX21Scope(flTime);
+			return 0;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_BUFFAWP)
+		{
+			if (gHUD.m_iFOV > 40)
+			{
+				BUFFAWPEnd();
+				return 1;
+			}
+
+			BUFFAWPRun();
+			DrawBUFFAWPScope(flTime);
+			return 0;
+		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS || pActiveBTEWeapon->m_iId == WEAPON_M400 || pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM)
 		{
 			if (gHUD.m_iFOV > 40)
@@ -400,6 +432,8 @@ void CHudSniperScope::DrawKronosScope(float flTime)
 
 	m_iAimBG->Draw2DQuadScaled(x, y, x + w, y + h);
 
+	FuncDrawCorner(*m_iAimFrame, TYPE_CORNER_NW, ScreenWidth / 2, ScreenHeight / 2);
+
 	if (m_flScopeTimeEnd > flTime && m_flScopeTime)
 	{
 		float percent = (m_flScopeTimeEnd - flTime) / m_flScopeTime;
@@ -411,6 +445,78 @@ void CHudSniperScope::SetKronosTime(float time)
 {
 	m_flScopeTime = time;
 	m_flScopeTimeEnd = gHUD.m_flTime + time;
+}
+
+void CHudSniperScope::DrawCrossbowEX21Scope(float flTime)
+{
+	FuncDraw2DQuadScaled(*m_iCrossbowex21_AimBG, 0, 0, ScreenWidth, ScreenHeight / 2);
+	FuncDraw2DQuadScaled(*m_iCrossbowex21_AimBG, 0, ScreenHeight, ScreenWidth, -ScreenHeight / 2);
+
+	int x = ScreenWidth / 2;
+	int y = ScreenHeight / 2;
+	int w = ScreenWidth / 3;
+	int t = ScreenHeight / 2;
+
+	FuncDraw2DQuadScaled(*m_iCrossbowex21_AimImage, x - w, y - t / 2, w, t);
+	FuncDraw2DQuadScaled(*m_iCrossbowex21_AimImage, x + w, y - t / 2, -w, t);
+}
+
+void CHudSniperScope::DrawBUFFAWPScope(float flTime)
+{
+	if (!m_flBUFFAWPStartTime)
+		return;
+
+	int iH = ScreenHeight / 592.0f * 256.0f;
+
+	FillRGBABlend(0, 0, ScreenWidth / 2 - iH + 1, ScreenHeight, 0, 0, 0, 255);
+	FillRGBABlend(ScreenWidth / 2 + iH - 1, 0, ScreenWidth / 2 - iH + 10, ScreenHeight, 0, 0, 0, 255);
+
+	FillRGBABlend(0, 0, ScreenWidth, ScreenHeight / 2 - iH + 1, 0, 0, 0, 255);
+	FillRGBABlend(0, ScreenHeight / 2 + iH, ScreenWidth, ScreenHeight / 2 - iH + 10, 0, 0, 0, 255);
+
+	//cross
+	FillRGBABlend(0, ScreenHeight / 2, ScreenWidth / 2 - 20, 1, 0, 0, 0, 255);
+	FillRGBABlend(ScreenWidth / 2 + 20, ScreenHeight / 2, ScreenWidth, 1, 0, 0, 0, 255);
+
+	FillRGBABlend(ScreenWidth / 2, 0, 1, ScreenHeight / 2 - 20, 0, 0, 0, 255);
+	FillRGBABlend(ScreenWidth / 2, ScreenHeight / 2 + 20, 1, ScreenHeight, 0, 0, 0, 255);	
+
+	FuncDraw2DQuadScaled(*m_iBUFFAWP_Outline, ScreenWidth / 2 - iH, ScreenHeight / 2 - iH, iH, iH);
+	FuncDraw2DQuadScaled(*m_iBUFFAWP_Outline, ScreenWidth / 2 - iH, ScreenHeight / 2 + iH, iH, -iH);
+	FuncDraw2DQuadScaled(*m_iBUFFAWP_Outline, ScreenWidth / 2 + iH, ScreenHeight / 2 - iH, -iH, iH);
+	FuncDraw2DQuadScaled(*m_iBUFFAWP_Outline, ScreenWidth / 2 + iH, ScreenHeight / 2 + iH, -iH, -iH);
+
+	FuncDraw2DQuadScaled(*m_iBUFFAWP_BG, ScreenWidth / 2 - m_iBUFFAWP_BG->w() / 2, ScreenHeight / 4 * 3, m_iBUFFAWP_BG->w(), m_iBUFFAWP_BG->h());
+
+	int iCharged = (flTime - m_flBUFFAWPStartTime) / 0.8;
+	float flChargingPercent = (flTime - m_flBUFFAWPStartTime - iCharged * 0.8) / 0.8;
+	if (iCharged >= 3)
+	{
+		iCharged = 3;
+		flChargingPercent = 0;
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (iCharged > i)
+			FuncDraw2DQuadScaled(*m_iBUFFAWP_Light[i], ScreenWidth / 2 - m_iBUFFAWP_Light[i]->w() / 2, ScreenHeight / 4 * 3, m_iBUFFAWP_Light[i]->w(), m_iBUFFAWP_Light[i]->h());
+		else
+			break;
+	}
+
+	FuncDraw2DQuadScaled(*m_iBUFFAWP_Bar, ScreenWidth / 2 - m_iBUFFAWP_Bar->w() / 2, ScreenHeight / 4 * 3 + 24, m_iBUFFAWP_Bar->w() * flChargingPercent, m_iBUFFAWP_Bar->h());
+}
+
+void CHudSniperScope::BUFFAWPRun(void)
+{
+	if (m_flBUFFAWPStartTime > 0.0)
+		return;
+	m_flBUFFAWPStartTime = gHUD.m_flTime;
+}
+
+void CHudSniperScope::BUFFAWPEnd(void)
+{
+	m_flBUFFAWPStartTime = 0.0;
 }
 
 void CHudSniperScope::Shutdown()

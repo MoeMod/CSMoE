@@ -113,7 +113,7 @@ void EV_FireSFSniper( event_args_t *args )
 	);
 
 	if (pBeam)
-		pBeam->flags |= FBEAM_FADEIN;
+		pBeam->flags |= FBEAM_FADEIN | FBEAM_FADEOUT | FBEAM_SHADEOUT;
 
 	PLAY_EVENT_SOUND("weapons/sfsniper-1.wav");
 

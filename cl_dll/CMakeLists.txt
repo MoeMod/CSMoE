@@ -298,6 +298,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_stunrifle.cpp
 	../dlls/wpn_shared/z4b_ragingbull.cpp
 	../dlls/wpn_shared/wpn_kronos12.cpp
+	../dlls/wpn_shared/wpn_crossbowex21.cpp
+	../dlls/wpn_shared/wpn_buffawp.cpp
+	../dlls/wpn_shared/wpn_divinetitan.cpp
 	)
 
 set (HUD_SRCS

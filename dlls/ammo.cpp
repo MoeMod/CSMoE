@@ -1369,4 +1369,27 @@ BOOL CBuckshotKAmmo::AddAmmo(CBaseEntity* pOther)
 
 LINK_ENTITY_TO_CLASS(ammo_buckshotk, CBuckshotKAmmo);
 
+void CCrossBowEX21Ammo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CCrossBowEX21Ammo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CCrossBowEX21Ammo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(50, "crossbowex21", 500) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_crossbowex21, CCrossBowEX21Ammo);
 }

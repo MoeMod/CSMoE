@@ -46,7 +46,7 @@ private:
 	CLabeledCommandComboBox* m_pTexlru;
 	CLabeledCommandComboBox* m_pHudScale;
 	CCvarSlider* m_pGammaSlider;
-
+	CCvarToggleCheckButton* m_pQZSound;
 
 	//CMenuSpinControl gridsize;
 

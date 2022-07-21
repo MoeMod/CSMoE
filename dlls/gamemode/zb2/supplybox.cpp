@@ -136,7 +136,7 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 	}
 
 	const char *mod_str = CVAR_GET_STRING("mp_gamemode");
-	if(strcmp(mod_str, "zb3f2p"))
+	if(strcmp(mod_str, "zb3f2p") && strcmp(mod_str, "zb3classic"))
 	{
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
 		{

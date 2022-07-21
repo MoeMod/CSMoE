@@ -445,6 +445,7 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	int m_iNewMenuID;
 	int m_iNewMenuPage;
 	time_point_t m_iNewMenuExpire;
+	bool m_bBlockWdnmd;
 };
 
 class CBasePlayer : public CBaseMonster, public PrivateData<class CBasePlayer, CBaseMonster>

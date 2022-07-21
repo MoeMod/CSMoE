@@ -373,6 +373,7 @@ bool isSniperRifle(CBasePlayerItem *item)
 	case WEAPON_ZGUN:
 	case WEAPON_Z4B_BARRETTD:
 	case WEAPON_Z4B_FREEDOM:
+	case WEAPON_BUFFAWP:
 		return true;
 
 	default:
@@ -402,7 +403,8 @@ bool CCSBot::IsUsingAWP() const
 		|| weapon->m_iId == WEAPON_M95XMAS
 		|| weapon->m_iId == WEAPON_SFSNIPER
 		|| weapon->m_iId == WEAPON_Z4B_BARRETTD
-		|| weapon->m_iId == WEAPON_Z4B_FREEDOM))
+		|| weapon->m_iId == WEAPON_Z4B_FREEDOM
+		|| weapon->m_iId == WEAPON_BUFFAWP))
 		return true;
 
 	return false;

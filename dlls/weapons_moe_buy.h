@@ -99,6 +99,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_BUFFSG552EX, "weapon_buffsg552ex",         "熔火岩狼",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_QBARREL, "weapon_qbarrel",         "破碎炙燚",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_BUFFM249, "weapon_buffm249",      "朱雀",    9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+	{ WEAPON_CROSSBOWEX21, "weapon_crossbowex21",      "【歼星】十字弩",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_STUNRIFLE, "weapon_stunrifle",      "雷电风暴",    3600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_BUFFM4, "weapon_buffm4",      "邪皇",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_BUFFAK, "weapon_buffak",      "圣帝",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
@@ -114,6 +115,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_Z4B_AK47X, "z4b_ak47x",      "黑武士AK47",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_Z4B_M4A1MW, "z4b_m4a1mw",      "暗羽冥王M4A1",    3600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	
+	{ WEAPON_BUFFAWP, "weapon_buffawp",        "【傲君】AWP",                  8000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_Z4B_BARRETTD, "z4b_barrettd",        "毁灭巴菲特",                  5288, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_CHEYTACLRRS, "weapon_cheytaclrrs",         "CheytacLRRS-M200",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_Z4B_K1ASES, "z4b_k1ases",        "银蝎K1A",                  8000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
@@ -264,7 +266,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     { WEAPON_GATLING, "weapon_gatling",      "加特林",               4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
     { WEAPON_CHAINSAW, "weapon_chainsaw",         "生命收割者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_CHAINSAWM, "weapon_chainsawm",         "死神使者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
-	{ WEAPON_CHAINSAWEX, "weapon_chainsawex",         "生命收割者EX",                  4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ WEAPON_CHAINSAWEX, "weapon_chainsawex",         "光子收割者",                  4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
     { WEAPON_CANNON, "weapon_cannon",      "黑龙炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ WEAPON_ZOMBIELAW, "weapon_zombielaw",      "test",    100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_HEGRENADE, "weapon_hegrenade",     "高爆手雷",               300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -275,18 +277,20 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 1
+	{ WEAPON_BUFFAWP, "weapon_buffawp",        "【傲君】AWP",                  8000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_WONDERCANNON, "weapon_wondercannon",        "炽麟煌焱",                  6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SFPISTOL, "weapon_sfpistol",	 "死亡射线",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_Y22S2SFPISTOL, "weapon_y22s2sfpistol",	 "死亡射线EX",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ KNIFE_Y22S2SFSWORD, "knife_y22s2sfsword",      "粒子激光剑Ex",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
 	{ WEAPON_PIANOGUN, "weapon_pianogun",        "【命运】寂静之音",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_PIANOGUNEX, "weapon_pianogunex",        "【命运】寂静之音EX",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
-	{ WEAPON_CHAINSAWEX, "weapon_chainsawex",         "生命收割者EX",                  4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ WEAPON_CHAINSAWEX, "weapon_chainsawex",         "光子收割者",                  4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_LASERSG, "weapon_lasersg",         "【异噬】暗雷兽",                  4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ Z4B_RAGINGBULL, "z4b_ragingbull",         "破空枪刃",                  1200, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
 	{ GRENADE_HEGRENADE, "weapon_hegrenade",     "高爆手雷",               300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_KRONOS12, "weapon_kronos12",        "粉碎者X-12",                 3500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+	{ WEAPON_CROSSBOWEX21, "weapon_crossbowex21",      "【歼星】十字弩",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 #else
 	{ WEAPON_USP, "weapon_usp",      "USP45",    500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_GLOCK18, "weapon_glock18",      "Glock-18",    400, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },

@@ -174,6 +174,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "ethereal",	WEAPON_ETHEREAL },
 	{ "crow5",	WEAPON_CROW5 },
 	{ "stunrifle",	WEAPON_STUNRIFLE },
+	{ "crossbowex21",	WEAPON_CROSSBOWEX21 },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -202,6 +203,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "zgun",	WEAPON_ZGUN },
 	{ "barrettd",	WEAPON_Z4B_BARRETTD },
 	{ "freedom",	WEAPON_Z4B_FREEDOM },
+	{ "buffawp",	WEAPON_BUFFAWP },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -493,6 +495,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "railgun",	WEAPONCLASS_RIFLE },
 	{ "crow5",	WEAPONCLASS_RIFLE },
 	{ "stunrifle",	WEAPONCLASS_RIFLE },
+	{ "crossbowex21",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -521,6 +524,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "zgun",	WEAPONCLASS_SNIPERRIFLE },
 	{ "barrettd",	WEAPONCLASS_SNIPERRIFLE },
 	{ "freedom",	WEAPONCLASS_SNIPERRIFLE },
+	{ "buffawp",	WEAPONCLASS_SNIPERRIFLE },
 
 	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
 	{ "buffm249",	WEAPONCLASS_MACHINEGUN },
@@ -824,6 +828,8 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_PIANOGUN:
 	case WEAPON_STUNRIFLE:
 	case WEAPON_KRONOS12:
+	case WEAPON_CROSSBOWEX21:
+	case WEAPON_BUFFAWP:
 		return true;
 	default:
 		break;

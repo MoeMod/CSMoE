@@ -22,6 +22,7 @@
 #include "player/player_model.h"
 #include "weapons_moe_buy.h"
 #include "newmenus.h"
+#include "client/wdnmd.h"
 
 namespace sv {
 
@@ -576,7 +577,7 @@ void EndRoundMessage(const char* sentence, int event)
 	int teamTriggered = 1;
 #ifdef XASH_DEDICATED
 	const char* mod_str = CVAR_GET_STRING("mp_gamemode");
-	if (!strcmp(mod_str, "zb3") || !strcmp(mod_str, "z4") || !strcmp(mod_str, "zbz") || !strcmp(mod_str, "zb3f2p"))
+	if (!strcmp(mod_str, "zb3") || !strcmp(mod_str, "z4") || !strcmp(mod_str, "zbz") || !strcmp(mod_str, "zb3f2p") || !strcmp(mod_str, "zb3classic"))
 	{
 		EndRoundMVPMessage(event == ROUND_CTS_WIN ? 2 : 1);
 	}
@@ -2352,6 +2353,7 @@ void CHalfLifeMultiplay::RestartRound()
 	m_bTargetBombed = m_bBombDefused = false;
 	m_bLevelInitialized = false;
 	m_bCompleteReset = false;
+	wdnmdmenu::WdnmdResetTime();
 }
 
 BOOL CHalfLifeMultiplay::IsThereABomber()
@@ -5432,7 +5434,7 @@ void ShowMenu_VoteMap(CBasePlayer* player)
 		}
 
 		char szText[128];
-		Q_sprintf(szText, "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iItem].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iItem].second);
+		Q_snprintf(szText, ARRAYSIZE(szText), "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iItem].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iItem].second);
 		int iClientIndex = pPlayer->entindex();
 		MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
 		WRITE_BYTE(iClientIndex);

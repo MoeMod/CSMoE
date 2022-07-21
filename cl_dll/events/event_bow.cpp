@@ -94,7 +94,7 @@ void EV_FireBow(event_args_s *args)
 		pBeam = gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 1.0f, 3.0f, 0.0f, 128.0f, 0.0f, 0.0f, 0.0f, 0.78f, 0.37f, 0.29f);
 
 	if (pBeam)
-		pBeam->flags |=  FBEAM_FADEIN;
+		pBeam->flags |= FBEAM_FADEIN | FBEAM_FADEOUT | FBEAM_SHADEOUT;
 }
 
 }

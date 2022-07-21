@@ -815,6 +815,10 @@ public:
 	void DrawSpecialScope(int iId, int iType);
 	void DrawKronosScope(float flTime);
 	void SetKronosTime(float time);
+	void DrawCrossbowEX21Scope(float flTime);
+	void DrawBUFFAWPScope(float flTime);
+	void BUFFAWPRun();
+	void BUFFAWPEnd();
 	
 private:
 	float left, right, centerx, centery;
@@ -829,6 +833,17 @@ private:
 
 	float m_flScopeTime;
 	float m_flScopeTimeEnd;
+
+	UniqueTexture m_iCrossbowex21_AimBG;
+	UniqueTexture m_iCrossbowex21_AimImage;
+
+	UniqueTexture m_iBUFFAWP_BG;
+	UniqueTexture m_iBUFFAWP_Bar;
+	UniqueTexture m_iBUFFAWP_Light[3];
+	UniqueTexture m_iBUFFAWP_Outline;
+
+	float m_flBUFFAWPStartTime;
+
 };
 
 //

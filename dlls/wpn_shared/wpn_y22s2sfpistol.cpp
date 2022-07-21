@@ -95,7 +95,7 @@ namespace sv {
 			
 			PRECACHE_MODEL("sprites/ef_y22s2sfpistol_laser.spr");
 			PRECACHE_MODEL("sprites/ef_y22s2sfpistol_star.spr");
-			//PRECACHE_MODEL("sprites/ef_starchasersr_star.spr");
+			PRECACHE_MODEL("sprites/ef_starchasersr_star.spr");
 			PRECACHE_MODEL("sprites/ef_y20s3plasmaex_line.spr");
 			PRECACHE_MODEL("sprites/ef_y20s3plasmaex_star.spr");
 			

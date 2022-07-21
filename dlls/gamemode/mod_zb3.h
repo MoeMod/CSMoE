@@ -138,6 +138,30 @@ public:
 	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, const char *name) override;
 };
 
+class CMod_ZB3Classic : public CMod_ZombieHero
+{
+public:
+	void InstallPlayerModStrategy(CBasePlayer*) override;
+};
+
+class CPlayerModStrategy_ZB3Classic : public CPlayerModStrategy_ZB3
+{
+public:
+	CPlayerModStrategy_ZB3Classic(CBasePlayer* player, CMod_ZB3Classic* mp);
+
+	using CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3;
+	bool CanPlayerBuy(bool display) override;
+	void GiveDefaultItems() override;
+	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, const char* name) override;
+	void CmdStart(struct usercmd_s* cmd, unsigned int random_seed) override;
+	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+
+private:
+	time_point_t m_flNextCheckButton;
+	time_point_t m_flNextTimeChangeZombie;
+
+};
+
 }
 
 #endif //PROJECT_MOD_ZB3_H

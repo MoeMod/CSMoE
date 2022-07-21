@@ -20,6 +20,7 @@
 #include "weapons.h"
 #include "wpn_kronos12.h"
 #include "weapons/KnifeAttack.h"
+#include "shake.h"
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -85,7 +86,7 @@ void CKronos12::SecondaryAttack(void)
 #ifndef CLIENT_DLL
 		m_pEnemylist.clear();
 #endif
-		SendWeaponAnim(ANIM_SCAN_EACTIVATE, UseDecrement() != FALSE);
+		SendWeaponAnim(ANIM_SCAN_DEACTIVATE, UseDecrement() != FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.875s;
 		m_iWeaponState = 0;
 		m_flNextThink = invalid_time_point;
@@ -129,7 +130,7 @@ bool CKronos12::PrimaryAttack_CheckTargetAvailable(CBaseEntity* a2, Vector vecAn
 
 	UTIL_MakeVectors(vecAngleDirection);
 
-	if (DotProduct(gpGlobals->v_forward, vecDelta) < 0.5)
+	if (DotProduct(gpGlobals->v_forward, vecDelta) < 0.7)
 		return false;
 
 	TraceResult tr;
@@ -155,6 +156,14 @@ void CKronos12::PrimaryAttack_FindTargets()
 	m_pEnemylist.erase(std::remove_if(m_pEnemylist.begin(), m_pEnemylist.end(), [=](CBaseEntity* pEntity) {
 
 		if (!pEntity->IsAlive() || bIsWallBetweenEntity(pEntity, m_pPlayer))
+			return true;
+
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+		Vector vecDelta = (pEntity->Center() - vecSrc).Normalize();
+
+		if (DotProduct(gpGlobals->v_forward, vecDelta) < 0.7)
 			return true;
 
 		return false;
@@ -231,7 +240,7 @@ void CKronos12::ItemPostFrame(void)
 #ifndef CLIENT_DLL
 			m_pEnemylist.clear();
 #endif
-			SendWeaponAnim(ANIM_SCAN_EACTIVATE, UseDecrement() != FALSE);
+			SendWeaponAnim(ANIM_SCAN_DEACTIVATE, UseDecrement() != FALSE);
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.875s;
 			m_iWeaponState = 0;
 			m_flNextThink = invalid_time_point;
@@ -245,27 +254,21 @@ void CKronos12::ItemPostFrame(void)
 			WRITE_BYTE(20);
 			WRITE_SHORT(5);
 			MESSAGE_END();
+
+			if(!m_pPlayer->m_bNightVisionOn)
+				UTIL_ScreenFade(m_pPlayer, Vector(80, 80, 0), 5s, 5s, 80, FFADE_MODULATE);
 #endif
 			m_iWeaponState |= WPNSTATE_KRONOS12_ZOOM_ACTIVATE;
 			m_flNextThink = gpGlobals->time + 5.0s;
 			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 65;
+
+			
 		}
 	}
 
 	if (m_iWeaponState & WPNSTATE_KRONOS12_ZOOM_ACTIVATE)
 	{
 		PrimaryAttack_FindTargets();
-	}
-
-	if (!m_iWeaponState)
-	{
-		if (pev->iuser1 >= KRONOS12_CHARGE_AMMO)
-		{
-			SendWeaponAnim(ANIM_SCAN_ACTIVATE, UseDecrement() != FALSE);
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.875s;
-			m_iWeaponState |= WPNSTATE_KRONOS12_SCAN_ACTIVATE;
-			pev->iuser1 = 0;
-		}	
 	}
 
 	return CBasePlayerWeapon::ItemPostFrame();
@@ -306,16 +309,18 @@ void CKronos12::PrimaryAttack(void)
 
 		if (CBaseEntity* pEntity = gMultiDamage.pEntity)
 		{
-			if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+			if(!m_iWeaponState)
 			{
-				pev->iuser1++;
+				if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+				{
+					pev->iuser1++;
 
-				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-				WRITE_BYTE(1);
-				WRITE_BYTE(pev->iuser1);
-				MESSAGE_END();
-			}
-			
+					MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+					WRITE_BYTE(1);
+					WRITE_BYTE(pev->iuser1);
+					MESSAGE_END();
+				}
+			}		
 		}
 #endif
 	}
@@ -333,13 +338,20 @@ void CKronos12::PrimaryAttack(void)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 
+	if (!m_iWeaponState)
+	{
+		if (pev->iuser1 >= KRONOS12_CHARGE_AMMO)
+		{
+			SendWeaponAnim(ANIM_SCAN_ACTIVATE, UseDecrement() != FALSE);
+			m_iWeaponState |= WPNSTATE_KRONOS12_SCAN_ACTIVATE;
+			pev->iuser1 = 0;
+		}
+	}
+
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 
-	if (m_iClip)
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.5s;
-	else
-		m_flTimeWeaponIdle = 0.875s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 3, 3);
@@ -401,6 +413,7 @@ void CKronos12::WeaponIdle(void)
 	if (m_flTimeWeaponIdle < UTIL_WeaponTimeBase())
 	{
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0s;
+
 		if (m_iWeaponState & WPNSTATE_KRONOS12_SCAN_ACTIVATE)
 		{
 			if(m_iWeaponState & WPNSTATE_KRONOS12_ZOOM_ACTIVATE)

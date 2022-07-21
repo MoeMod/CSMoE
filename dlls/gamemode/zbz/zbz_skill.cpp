@@ -638,8 +638,15 @@ namespace sv {
 		}
 
 		void OnResetMaxSpeed() override {
-			if(m_bActivate)
+			if (!IsActivate())
+				return;
+
+			if (m_bActivate)
 				m_pPlayer->pev->maxspeed += GetBonus();
+		}
+
+		void OnGetSkill() override {
+			m_bActivate = false;
 		}
 	private:
 		float GetBonus() const { return 50.0f + 5.0f * g_pGameRules->m_iTotalRoundsPlayed; }
