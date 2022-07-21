@@ -298,7 +298,7 @@ namespace sv {
 
 	void CWonderCannonMine::Remove()
 	{
-		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY, pev->origin);
 		WRITE_BYTE(TE_KILLENTITYATTACHMENTS);
 		WRITE_SHORT(entindex());
 		MESSAGE_END();
