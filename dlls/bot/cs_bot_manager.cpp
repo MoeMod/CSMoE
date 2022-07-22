@@ -355,7 +355,7 @@ void CCSBotManager::ServerDeactivate()
 
 void CCSBotManager::ClientDisconnect(CBasePlayer *pPlayer)
 {
-	if (pPlayer != NULL && pPlayer->IsBot())
+	if (pPlayer != NULL && pPlayer->IsBot() && pPlayer->pev->flags & FL_FAKECLIENT)
 	{
 		entvars_t *temp = VARS(pPlayer->edict());
 		CCSBot *pBot = static_cast<CCSBot *>(pPlayer);
@@ -443,7 +443,7 @@ void CCSBotManager::ServerCommand(const char *pcmd)
 			if (FStrEq(name, ""))
 				continue;
 
-			if (pPlayer->IsBot())
+			if (pPlayer->IsBot() && pPlayer->pev->flags & FL_FAKECLIENT)
 			{
 				if (killThemAll || FStrEq(name, msg))
 				{
@@ -475,7 +475,7 @@ void CCSBotManager::ServerCommand(const char *pcmd)
 			if (FStrEq(name, ""))
 				continue;
 
-			if (pPlayer->IsBot())
+			if (pPlayer->IsBot() && pPlayer->pev->flags & FL_FAKECLIENT)
 			{
 				if (kickThemAll || FStrEq(name, msg))
 				{

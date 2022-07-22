@@ -158,7 +158,7 @@ int UTIL_HumansInGame(bool ignoreSpectators)
 
 		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
 
-		if (player->IsBot())
+		if (player->IsBot() && player->pev->flags & FL_FAKECLIENT)
 			continue;
 
 		if (ignoreSpectators && player->m_iTeam != TERRORIST && player->m_iTeam != CT)
