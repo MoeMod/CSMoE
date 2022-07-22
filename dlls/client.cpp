@@ -482,7 +482,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 {
 
 	entvars_t *pev = &pEntity->v;
-	CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pev);
+	CBasePlayer *pPlayer = GetClassPtr<CMoePlayer>(pev);
 	CHalfLifeMultiplay *mp = g_pGameRules;
 	
 	pPlayer->SetCustomDecalFrames(-1);
@@ -4948,10 +4948,11 @@ void EXT_FUNC UpdateClientData(const struct edict_s *ent, int sendweapons, struc
 void EXT_FUNC CmdStart(const edict_t *player, struct usercmd_s *cmd, unsigned int random_seed)
 {
 	entvars_t *pev = const_cast<entvars_t *>(&player->v);
-	CBasePlayer *pl = dynamic_cast<CBasePlayer *>(CBasePlayer::Instance(pev));
+    CMoePlayer *pl = dynamic_cast<CMoePlayer *>(CBasePlayer::Instance(pev));
 
 	if (pl != NULL)
 	{
+        pl->ApplyUC(cmd);
 		/*
 		if (pl->pev->groupinfo)
 		{

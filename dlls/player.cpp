@@ -163,7 +163,8 @@ char g_szMapBriefingText[512];
 
 entvars_t *g_pevLastInflictor;
 
-LINK_ENTITY_TO_CLASS(player, CBasePlayer);
+//LINK_ENTITY_TO_CLASS(player, CBasePlayer);
+LINK_ENTITY_TO_CLASS(player, CMoePlayer);
 
 CBasePlayer::CBasePlayer()
 {

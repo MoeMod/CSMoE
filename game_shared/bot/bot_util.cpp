@@ -68,7 +68,7 @@ bool UTIL_IsNameTaken (const char *name, bool ignoreHumans)
 			// bots can have prefixes so we need to check the name
 			// against the profile name instead.
 			CBot *bot = static_cast<CBot *>(player);
-			if (FStrEq (name, bot->GetProfile ()->GetName ()))
+			if (bot->GetProfile() && FStrEq (name, bot->GetProfile ()->GetName ()))
 			{
 				return true;
 			}
