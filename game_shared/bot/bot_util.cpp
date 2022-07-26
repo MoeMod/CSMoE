@@ -191,7 +191,7 @@ int UTIL_HumansOnTeam(int teamID, bool isAlive)
 
 		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
 
-		if (player->IsBot())
+		if (player->IsBot() && player->pev->flags & FL_FAKECLIENT)
 			continue;
 
 		if (player->m_iTeam != teamID)
@@ -223,7 +223,7 @@ int UTIL_BotsInGame()
 		if (FStrEq(STRING(pPlayer->pev->netname), ""))
 			continue;
 
-		if (!pPlayer->IsBot())
+		if (!(pPlayer->IsBot() && pPlayer->pev->flags & FL_FAKECLIENT))
 			continue;
 
 		++iCount;
@@ -251,7 +251,7 @@ bool UTIL_KickBotFromTeam(TeamName kickTeam)
 		if (FStrEq(name, ""))
 			continue;
 
-		if (!player->IsBot())
+		if (!(player->IsBot() && player->pev->flags & FL_FAKECLIENT))
 			continue;
 
 		if (!player->IsAlive() && player->m_iTeam == kickTeam)
@@ -277,7 +277,7 @@ bool UTIL_KickBotFromTeam(TeamName kickTeam)
 		if (FStrEq(name, ""))
 			continue;
 
-		if (!player->IsBot())
+		if (!(player->IsBot() && player->pev->flags & FL_FAKECLIENT))
 			continue;
 
 		if (player->m_iTeam == kickTeam)

@@ -8404,10 +8404,9 @@ void CBasePlayer::SwitchTeam()
 		szNewTeam
 	);
 
-	CCSBot *pBot = static_cast<CCSBot *>(this);
-
-	if (pBot->IsBot())
+	if (this->IsBot() && this->pev->flags & FL_FAKECLIENT)
 	{
+		CCSBot* pBot = static_cast<CCSBot*>(this);
 		const BotProfile *pProfile = pBot->GetProfile();
 
 		if (pProfile != NULL)

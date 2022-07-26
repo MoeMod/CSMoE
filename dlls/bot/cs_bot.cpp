@@ -922,6 +922,12 @@ void CMoePlayer::UpdateLookAngles()
     // handled in CmdStart -> ApplyUC
 }
 
+void CMoePlayer::Spawn()
+{
+	CCSBot::Spawn();
+	pev->flags &= ~FL_FAKECLIENT;
+}
+
 void CMoePlayer::PauseAutoMove()
 {
     m_flLastCommandTime = gpGlobals->time;

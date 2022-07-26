@@ -1563,6 +1563,7 @@ public:
     BOOL IsBot() override;
     void ExecuteCommand() override;
     void UpdateLookAngles() override;
+	void Spawn() override;
 
 public:
     void ApplyUC(usercmd_t *cmd);
