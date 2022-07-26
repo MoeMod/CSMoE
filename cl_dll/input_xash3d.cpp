@@ -19,6 +19,7 @@ cvar_t	*cl_laddermode;
 cvar_t	*sensitivity;
 cvar_t	*in_joystick;
 cvar_t	*evdev_grab;
+cvar_t	*in_autoaim;
 
 
 float ac_forwardmove;
@@ -145,25 +146,35 @@ void IN_ClientLookEvent( float relyaw, float relpitch )
 	rel_pitch += relpitch;
 }
 
-vec3_t IN_CalcAutoAimAngle(const vec3_t viewangles)
+vec3_t IN_CalcAutoAimTargetPoint(const vec3_t forward, const vec3_t right, const vec3_t up)
 {
-    gEngfuncs.pEventAPI->EV_SetTraceHull( 3 ); // g-cont. player hull for better detect moving platforms
+    constexpr int hull_sizes[] = { 0, 3, 1, 2 };
+    for(int i = 0; i < sizeof(hull_sizes) / sizeof(*hull_sizes); ++i)
+    {
+        gEngfuncs.pEventAPI->EV_SetTraceHull( hull_sizes[i] ); // g-cont. player hull for better detect moving platforms
 
-    const auto start = v_origin;
-    vec3_t forward, right, up;
-    AngleVectors(viewangles, forward, right, up);
-    const auto end = start + forward * 1024;
-    pmtrace_t tr;
-    gEngfuncs.pEventAPI->EV_PlayerTraceExt( start, end, PM_NORMAL, []( physent_t *pe ) -> int { return !pe->player; }, &tr );
+        const auto start = v_origin + forward;
+        const auto end = start + forward * 8192;
+        pmtrace_t tr = {};
+        gEngfuncs.pEventAPI->EV_PlayerTrace( start, end, PM_GLASS_IGNORE, -1, &tr );
 
-    if(tr.fraction >= 1)
-        return nullptr;
+        if(tr.ent > 0 && tr.fraction < 1)
+        {
+            auto pe = gEngfuncs.pEventAPI->EV_GetPhysent( tr.ent );
+            if(pe->player)
+            {
+                constexpr Vector VEC_DUCK_VIEW = Vector(0, 0, 12);
+                constexpr Vector VEC_VIEW = Vector(0, 0, 17);
 
-    vec3_t new_viewangles;
-    VectorAngles(tr.endpos - start, new_viewangles);
-    NormalizeAngles(new_viewangles);
-    new_viewangles[0] *= -1;
-    return new_viewangles;
+                cl_entity_t* pl = gEngfuncs.GetEntityByIndex(tr.ent);
+                if(pl->curstate.usehull == 1)
+                    return pe->origin + VEC_DUCK_VIEW;
+                else
+                    return pe->origin + VEC_VIEW;
+            }
+        }
+    }
+    return nullptr;
 }
 
 // Rotate camera and add move values to usercmd
@@ -203,6 +214,37 @@ void IN_Move( float frametime, usercmd_t *cmd )
 		{
 			gEngfuncs.GetViewAngles( viewangles );
 		}
+
+        if(in_autoaim->value && rel_yaw < m_yaw->value * 5 && rel_pitch < m_pitch->value * 5)
+        {
+            vec3_t forward, right, up;
+            AngleVectors(viewangles, forward, right, up);
+            if(auto target_pos = IN_CalcAutoAimTargetPoint(forward, right, up))
+            {
+                auto dir = (target_pos - v_origin).Normalize();
+                const float cos899 = 0.001745328366;
+
+                float cos_x = DotProduct(dir, right);
+                if(cos_x > cos899)
+                {
+                    rel_yaw -= m_yaw->value;
+                }
+                else if(cos_x < -cos899)
+                {
+                    rel_yaw += m_yaw->value;
+                }
+
+                float cos_y = DotProduct(dir, up);
+                if(cos_y > cos899)
+                {
+                    rel_pitch -= m_pitch->value;
+                }
+                else if(cos_y < -cos899)
+                {
+                    rel_pitch += m_pitch->value;
+                }
+            }
+        }
 
 		if( gHUD.GetSensitivity() != 0 )
 		{
@@ -331,6 +373,7 @@ void IN_Init (void)
 	sensitivity = gEngfuncs.pfnRegisterVariable ( "sensitivity", "3", FCVAR_ARCHIVE );
 	in_joystick = gEngfuncs.pfnRegisterVariable ( "joystick", "0", FCVAR_ARCHIVE );
 	cl_laddermode = gEngfuncs.pfnRegisterVariable ( "cl_laddermode", "2", FCVAR_ARCHIVE );
+    in_autoaim = gEngfuncs.pfnRegisterVariable("in_autoaim", "1", FCVAR_ARCHIVE);
 	evdev_grab = gEngfuncs.pfnGetCvarPointer("evdev_grab");
 
 
