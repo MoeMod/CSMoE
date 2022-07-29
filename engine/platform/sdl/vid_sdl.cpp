@@ -414,6 +414,10 @@ void R_ChangeDisplaySettingsFast( int width, int height )
 		if (success)
 			Cvar_SetFloat("hud_scale", dpi);
 	}
+
+#if defined(SDL_VIDEO_DRIVER_COCOA)
+    MacOS_InstallWindow();
+#endif
 }
 
 rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
