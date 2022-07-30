@@ -133,7 +133,7 @@ public:
 		p->iMaxClip = 14;
 		p->iSlot = 1;
 		p->iPosition = 1;
-		p->iId = m_iId = Z4B_RAGINGBULL;
+		p->iId = m_iId = WEAPON_Z4B_RAGINGBULL;
 		p->iFlags = 0;
 		p->iWeight = DEAGLE_WEIGHT;
 
@@ -284,12 +284,25 @@ public:
 		{
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/RagingBull/RagingBullKnife_KnifeSelect.WAV", VOL_NORM, ATTN_NORM, 0, 94);
 
-			return DefaultDeploy(V_Model, P_Model, ANIM_KNIFE_DRAW, "tomahawk", UseDecrement() != FALSE);
+			if (DefaultDeploy(V_Model, P_Model, ANIM_KNIFE_DRAW, "tomahawk", UseDecrement() != FALSE))
+			{
+				pev->body = m_pPlayer->m_bIsFemale ? 3 : 1;
+				return TRUE;
+			}
 			
 		}	
 		else
-			return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "onehanded", UseDecrement() != FALSE);	
+		{
+			if (DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "onehanded", UseDecrement() != FALSE))
+			{
+				pev->body = m_pPlayer->m_bIsFemale ? 3 : 1;
+				return TRUE;
+			}
+		}
+		return FALSE;
 	}
+
+
 
 	void ReloadKnifeAttack()
 	{

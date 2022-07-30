@@ -24,9 +24,9 @@ GNU General Public License for more details.
 #include "pm_local.h"
 #include "gl_local.h"
 #include "studio.h"
+#include "cl_tent.h"
 
 #define NOISE_DIVISIONS	64	// don't touch - many tripmines cause the crash when it equal 128
-
 typedef struct
 {
 	vec3_t	pos;
@@ -1467,7 +1467,90 @@ void CL_DrawBeamFollow( int spriteIndex, BEAM *pbeam, int frame, int rendermode,
 		particles = particles->next;
 	}
 }
+/*
+==============
+CL_UpdateFCtail
+Update tail vars
+==============
+*/
+void CL_UpdateFCtail(BEAM* pbeam, float frametime)
+{
+	pbeam->flags |= FBEAM_ISACTIVE;
 
+	pbeam->amplitude -= frametime;
+
+	if (pbeam->amplitude > 0.0f) {
+		return;
+	}
+	pbeam->amplitude = pbeam->t;
+
+	cl_entity_t* pEnt;
+	pEnt = CL_GetBeamEntityByIndex(pbeam->startEntity);
+	if (!pEnt) return;
+
+	if (!VectorCompare(pEnt->baseline.origin, pEnt->origin)) //is moving?
+	{
+		CL_FancySpray(pEnt->origin, pbeam->endEntity, pbeam->b, pbeam->r, pbeam->g, pbeam->brightness, pbeam->modelIndex, pbeam->frame, pbeam->frameCount, pbeam->extra, pbeam->extra2, pbeam->frameRate, frametime, pbeam->segments);
+		VectorCopy(pEnt->baseline.origin, pEnt->origin);
+	}
+	else {
+		pbeam->die = 0.0f;
+	}
+}
+/*
+==============
+CL_BeamParticle
+Create beam following with entity
+==============
+*/
+BEAM* CL_BeamParticle(int startEnt, int modelIndex1, int modelIndex2, int modelIndex3,float r, float g, float b, float scale, float freq, float fadetime, int count, int random, int speed,int iRandomColor)
+{
+	cl_entity_t* pStart;
+	BEAM* pBeam;
+
+	// need a valid model.
+	if (Mod_GetType(modelIndex1) != mod_sprite)
+		return NULL;
+	if (Mod_GetType(modelIndex2) != mod_sprite)
+		return NULL;
+	if (Mod_GetType(modelIndex3) != mod_sprite)
+		return NULL;
+
+	pStart = CL_GetBeamEntityByIndex(startEnt);
+
+	// don't start temporary beams out of the PVS
+	if (!pStart || !pStart->curstate.modelindex)
+		return NULL;
+
+	pBeam = CL_AllocBeam();
+	if (!pBeam) return NULL;
+
+	pBeam->type = TE_BEAMFOLLOW;
+	pBeam->flags = FBEAM_FANCYTAIL;
+	pBeam->modelIndex = modelIndex1;
+	pBeam->pFollowModel = Mod_Handle(modelIndex1);
+	pBeam->startEntity = startEnt;
+
+
+	pBeam->frame = modelIndex2;
+	pBeam->frameCount = modelIndex3;
+	pBeam->r = scale;
+	pBeam->g = random;
+	pBeam->b = fadetime;
+	pBeam->t = freq;
+	pBeam->endEntity = count;
+	pBeam->brightness = speed;
+
+	pBeam->extra = r;
+	pBeam->extra2 = g;
+	pBeam->frameRate = b;
+	pBeam->segments = iRandomColor;
+	pBeam->die = cl.time + 10.0; //
+	pBeam->amplitude = 0.0f;	// partilces lifetime
+
+
+	return pBeam;
+}
 /*
 ==============
 CL_DrawBeam
@@ -1684,6 +1767,14 @@ void CL_DrawBeams( int fTrans )
 			CL_FreeBeam( pBeam );
 
 			pBeam = NULL;
+			continue;
+		}
+		// update tail state
+		if (pBeam->flags & FBEAM_FANCYTAIL) {
+			r_stats.c_view_beams_count++;
+			CL_UpdateFCtail(pBeam, cl.time - cl.oldtime);
+
+			pPrev = pBeam;
 			continue;
 		}
 
@@ -2242,6 +2333,53 @@ void CL_ParseViewBeam( sizebuf_t *msg, int beamType )
 			brightness = (float)BF_ReadByte(msg);
 			CL_BeamPoints_Stretch(start, end, modelIndex, life, width, brightness, startFrame, frameRate, r, g, b);
 			break;
+
+		case TE_BEAMPARTICLE:
+		{
+			startEnt = BF_ReadShort(msg);
+			int modelIndex1 = BF_ReadShort(msg);
+			int modelIndex2 = BF_ReadShort(msg);
+			int modelIndex3 = BF_ReadShort(msg);
+			float r = (float)BF_ReadByte(msg);
+			float g = (float)BF_ReadByte(msg);
+			float b = (float)BF_ReadByte(msg);
+			int randomcolor = BF_ReadByte(msg);
+			float scale = (float)(BF_ReadByte(msg) * 0.01f);
+			float freq = (float)(BF_ReadByte(msg) * 0.01f);
+			float fadetime = (float)BF_ReadByte(msg) * 0.1;
+			int count = BF_ReadByte(msg);
+			int random = BF_ReadByte(msg);
+			int speed = (float)BF_ReadByte(msg);
+			CL_BeamParticle(startEnt, modelIndex1, modelIndex2, modelIndex3, r, g, b, scale, freq, fadetime, count, random, speed, randomcolor);
+			break;
+		}
+		case TE_CUSTOMBEAMPOINTS:
+		{
+			start[0] = BF_ReadCoord(msg);
+			start[1] = BF_ReadCoord(msg);
+			start[2] = BF_ReadCoord(msg);
+			end[0] = BF_ReadCoord(msg);
+			end[1] = BF_ReadCoord(msg);
+			end[2] = BF_ReadCoord(msg);
+			modelIndex = BF_ReadShort(msg);
+			startFrame = BF_ReadByte(msg);
+			frameRate = (float)BF_ReadByte(msg);
+			life = (float)(BF_ReadByte(msg) * 0.1f);
+			width = (float)(BF_ReadByte(msg) * 0.1f);
+			noise = (float)(BF_ReadByte(msg) * 0.1f);
+			r = (float)BF_ReadByte(msg);
+			g = (float)BF_ReadByte(msg);
+			b = (float)BF_ReadByte(msg);
+			brightness = (float)BF_ReadByte(msg);
+			speed = (float)(BF_ReadByte(msg) * 0.1f);
+			int flags = BF_ReadByte(msg);
+			BEAM* pBeam = CL_BeamPoints(start, end, modelIndex, life, width, noise, brightness, speed, startFrame,
+				frameRate, r, g, b);
+
+			if (pBeam)
+				pBeam->flags |= flags;
+			break;
+		}
 	}
 }
 
@@ -2325,4 +2463,5 @@ void CL_ReadLineFile_f( void )
 	if( count ) Msg( "%i lines read\n", count );
 	else Msg( "map %s has no leaks!\n", clgame.mapname );
 }
+
 #endif // XASH_DEDICATED

@@ -166,6 +166,7 @@ enum VGUIMenuSlot
 #define MENU_BUY_SUBMACHINEGUN 32
 #define MENU_BUY_MACHINEGUN 33
 #define MENU_BUY_ITEM 34
+#define MENU_MOE_LOGIN 35
 // -- cs16client extension start -- //
 #define MENU_RADIOA 35
 #define MENU_RADIOB 36

@@ -79,7 +79,14 @@ namespace sv {
         for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
         {
             g_iSoundTimes[iIndex] = 0;
+            g_flSoundCD[iIndex] = invalid_time_point;
         }
+    }
+
+    void WdnmdResetTime(int idx)
+    {
+        g_iSoundTimes[idx] = 0;
+        g_flSoundCD[idx] = invalid_time_point;
     }
 
     void ShowWdnmdMenu(CBasePlayer *playerid, int page)
@@ -124,7 +131,7 @@ namespace sv {
                             CLIENT_COMMAND(player->edict(), "spk %s\n", g_szSounds[i]);
                         }
 
-                        g_flSoundCD[id] = gpGlobals->time + 5.0s;
+                        g_flSoundCD[id] = gpGlobals->time + 3.0s;
                         g_iSoundTimes[id]++;
 
                         PrintToChatAll("^7[^5" + playername + "^7]" + "^2:" + g_szSoundsName[i]);
@@ -167,7 +174,7 @@ namespace sv {
                             CLIENT_COMMAND(player->edict(), "spk %s\n", g_szSounds[i]);
                         }
 
-                        g_flSoundCD[id] = gpGlobals->time + 5.0s;
+                        g_flSoundCD[id] = gpGlobals->time + 3.0s;
                         g_iSoundTimes[id]++;
 
                         PrintToChatAll("^7[^5" + playername + "^7]" + "^2:" + g_szSoundsName[i]);

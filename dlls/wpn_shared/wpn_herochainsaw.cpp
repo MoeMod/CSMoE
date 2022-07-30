@@ -86,7 +86,7 @@ namespace sv {
     {
         p->pszName = STRING(pev->classname);
         p->pszAmmo1 = "chainsawoil";
-        p->iMaxAmmo1 = 200;
+        p->iMaxAmmo1 = 1600;
         p->pszAmmo2 = NULL;
         p->iMaxAmmo2 = -1;
         p->iMaxClip = -1;
@@ -108,7 +108,7 @@ namespace sv {
     int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
     {
         m_iClip = WEAPON_NOCLIP;
-        m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 200;
+        m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 1600;
         return CBasePlayerWeapon::ExtractAmmo(pWeapon);
     }
 

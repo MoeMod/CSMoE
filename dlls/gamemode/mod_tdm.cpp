@@ -9,6 +9,7 @@
 
 #include "mod_tdm.h"
 #include "player/player_mod_strategy.h"
+#include "client/wdnmd.h"
 
 namespace sv {
 
@@ -229,6 +230,7 @@ void CMod_TeamDeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 	pPlayer->SpawnProtection_Start(3.0s);
+	wdnmdmenu::WdnmdResetTime(pPlayer->entindex());
 }
 
 ModConfigData_t CMod_TeamDeathMatch::QueryModConfig(const char *key, ModConfigData_t defaultValue, CBaseEntity *invoker)

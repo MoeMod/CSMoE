@@ -536,6 +536,8 @@ float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDam
 float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flRange, Vector& vecDir);
 float UTIL_CalculateDamageRate(Vector vecSrc, CBaseEntity* pOther);
 void UTIL_TE_Sprite(const short sprite, const float x, const float y, const float z, const byte scale, const byte brightness);
+void UTIL_AdvancedBeamPoints(Vector vecSrc, Vector vecEnd, int life, int r, int g, int b, int width, int brightness, int flags);
+void UTIL_BeamPointsStretch(Vector vecSrc, Vector vecEnd, int beamindex, int framerate, int life, int r, int g, int b, int width, int brightness, int flags);
 
 }
 #else

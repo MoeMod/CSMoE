@@ -37,6 +37,7 @@ add_library(GameUI STATIC
 	MoeSettings.cpp
 	OptionsSubButtonSettings.cpp
 	OptionsSubMoeSettings.cpp
+	MoeLogin.cpp
 )
 
 if(SE_WIN32)

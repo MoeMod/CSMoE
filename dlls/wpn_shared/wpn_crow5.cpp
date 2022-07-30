@@ -35,7 +35,6 @@ namespace sv {
             TPrimaryAttackRifle,
             TSecondaryAttackZoom,
             TFireRifle,
-			TRecoilKickBack,
             TWeaponIdleDefault
     >
     {
@@ -49,7 +48,7 @@ namespace sv {
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
     static constexpr const char *ClassName = "weapon_crow5";
     static constexpr const char *AnimExtension = "rifle";
-    static constexpr int MaxClip = 100;
+    static constexpr int MaxClip = 50;
 	enum
 	{
         ANIM_IDLE1 = 0,
@@ -63,28 +62,26 @@ namespace sv {
     static constexpr float PlayerMaxSpeed = 235;
     static constexpr float ArmorRatioModifier = 1.5f;
 	static constexpr float PrimaryAttackWalkingMiniumSpeed = 130;
-    static constexpr const auto &SpreadCalcNotOnGround = 0.04*A + 0.025;
-    static constexpr const auto &SpreadCalcWalking = 0.042*A + 0.02;
-    static constexpr const auto &SpreadCalcDefault = 0.037*A + 0.017;
+    static constexpr const auto &SpreadCalcNotOnGround = 0.4*A + 0.025;
+    static constexpr const auto &SpreadCalcWalking = 0.07*A + 0.025;
+    static constexpr const auto &SpreadCalcDefault = 0.025*A;
+    static constexpr const auto& SpreadCalcZoomed = 0.008*A;
     static constexpr const auto& SpreadCalcDucking = 0 * A + 0.0;
-    static constexpr const auto& CycleTime1 = 0.095s;
-    static constexpr const auto& CycleTime2 = 0.18s;
+
+    static constexpr const auto& CycleTime1 = 0.09s;
+    static constexpr const auto& CycleTime2 = 0.13s;
+
     duration_t CycleTime = CycleTime1;
     static constexpr int DamageDefault = 33;
     static constexpr int DamageZB = 70;
     static constexpr int DamageZBS = 110;
-    static constexpr const auto &AccuracyCalc = (N * N * N / 220.0) + 0.2;
+    static constexpr const auto &AccuracyCalc = (N * N * N / 220.0) + 0.3;
     static constexpr float AccuracyDefault = 0.2;
     static constexpr float AccuracyMax = 1.0;
-    static constexpr float RangeModifier = 0.94;
+    static constexpr float RangeModifier = 0.97;
     static constexpr auto BulletType = BULLET_PLAYER_556MM;
     /*static constexpr*/ int Penetration = 1;
-    KnockbackData KnockBack = { 450.0f, 350.0f, 400.0f, 200.0f, 0.6f };
-
-	KickBackData KickBackWalking = { 1.4, 0.3, 0.065, 0.04, 3.0, 2.0, 6 };
-	KickBackData KickBackNotOnGround = { 1.6, 0.6, 0.4, 0.125, 5.0, 3.0, 8 };
-	KickBackData KickBackDucking = { 0.5, 0.13, 0.15, 0.001, 1.5, 0.3, 15 };
-	KickBackData KickBackDefault = { 0.9, 0.2, 0.04, 0.022, 2.0, 1.5, 8 };
+    KnockbackData KnockBack = { 400.0f, 350.0f, 300.0f, 150.0f, 0.6f };
     
     bool bCheckingReload;
     bool bCheckingCharge;
@@ -111,8 +108,14 @@ namespace sv {
 #ifndef CLIENT_DLL
     WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AUG); }
 #endif
-    float GetArmorRatioModifier() override { return 1.5; }
-    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 140 }; }
+    float GetArmorRatioModifier() override { return 1.6; }
+    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 3, 3, 140 }; }
+
+    void Precache()
+    {
+        PRECACHE_MODEL("sprites/muzzleflash3.spr");
+        Base::Precache();
+    }
 
     BOOL Deploy() override
     {
@@ -170,7 +173,6 @@ namespace sv {
                     Reload();
                     bCheckingCharge = false;
                     bCheckingReload = false;
-                    
                 }
             }
         }
@@ -178,6 +180,19 @@ namespace sv {
         return CBasePlayerWeapon::ItemPostFrame();
     }
 
+    void Recoil()
+    {
+        if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+            KickBack(1.25, 0.45, 0.22, 0.18, 5.5, 3.3, 8);
+        else if (m_pPlayer->pev->velocity.Length2D() > 0)
+            KickBack(1.0, 0.425, 0.26, 0.045, 3.5, 2.5, 7);
+        else if (m_pPlayer->pev->fov != 90)
+            KickBack(0.525, 0.26, 0.15, 0.01, 3.0, 2.0, 7);
+        else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+            KickBack(0.6, 0.3, 0.2, 0.011, 3.5, 1.9, 8);
+        else
+            KickBack(0.6, 0.35, 0.15, 0.01, 3.5, 1.5, 8);
+    }
 
     void Reload() override
     {
@@ -198,10 +213,10 @@ namespace sv {
             m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
             SendWeaponAnim(ANIM_RELOAD_START, UseDecrement() != FALSE);
-            m_flNextCheckReload = gpGlobals->time + 1.36s;
+            m_flNextCheckReload = gpGlobals->time + 0.7s;
             m_pPlayer->m_flNextAttack = 0.5s;   //oldbutton is useless now need to avoid double time IN_RELOAD
-            m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.36s;
-            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.36s;
+            m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
             bCheckingReload = true;
             bCanCharge = true;
             return;
@@ -211,7 +226,7 @@ namespace sv {
         {
             bCheckingReload = false;
             m_flNextCheckReload = invalid_time_point;
-            if (DefaultReload(100, ANIM_RELOAD_FAST, 1.6s))
+            if (DefaultReload(MaxClip, ANIM_RELOAD_FAST, 1.0s))
             {
                 m_flAccuracy = 0.2;
                 m_bDelayFire = false;
@@ -222,7 +237,7 @@ namespace sv {
         {
             bCheckingReload = false;
             m_flNextCheckReload = invalid_time_point;
-            if (DefaultReload(100, ANIM_RELOAD_SLOW, 3.0s))
+            if (DefaultReload(MaxClip, ANIM_RELOAD_SLOW, 2.0s))
             {
                 m_flAccuracy = 0.2;
                 m_bDelayFire = false;

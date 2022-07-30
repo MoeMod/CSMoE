@@ -179,4 +179,18 @@ HOOK_EVENT(stunrifle, FireStunRifle);
 HOOK_EVENT(ragingbull, FireRagingBull);
 HOOK_EVENT(kronos12, FireKronos12);
 HOOK_EVENT(crossbowex21, FireCrossBowEX21);
+HOOK_EVENT(pianogun, FirePianogun);
+HOOK_EVENT(pianogunex, FirePianogunex);
 HOOK_EVENT(buffawp, FireBUFFAWP);
+HOOK_EVENT(railcannon, FireRailCannon);
+HOOK_EVENT(skull11, FireSKULL11);
+HOOK_EVENT(janus11, FireJANUS11);
+HOOK_EVENT(crow5, FireCrow5);
+HOOK_EVENT(janusmk5, FireJANUSMK5);
+HOOK_EVENT(janus3, FireJANUS3);
+HOOK_EVENT(crow3, FireCrow3);
+HOOK_EVENT(crow11, FireCrow11);
+HOOK_EVENT(m60amethyst, FireM60AmeThyst);
+HOOK_EVENT(crossbow, FireCrossbow);
+HOOK_EVENT(broad, FireBroad);
+

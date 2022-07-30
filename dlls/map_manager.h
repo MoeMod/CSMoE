@@ -12,6 +12,7 @@ namespace sv {
 	float MapMgr_GetMapDensity_r(const char* szMapName);
 	float MapMgr_GetMapDensity_g(const char* szMapName);
 	float MapMgr_GetMapDensity_b(const char* szMapName);
+	int MapMgr_GetMapRandomRespawn(const char* szMapName);
 	unsigned int MapMgr_GetRandomAreaID();
 	void MapMgr_LoadMapSafeArea();
 	void MapMgr_LoadMapList();

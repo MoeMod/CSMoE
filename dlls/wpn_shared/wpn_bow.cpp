@@ -166,7 +166,7 @@ namespace sv {
 
 		void Precache() override
 		{
-			m_iModelLight1 = PRECACHE_MODEL("sprites/smoke.spr");
+			PRECACHE_MODEL("models/arrow.mdl");
 		}
 
 		void OnThink()
@@ -176,7 +176,7 @@ namespace sv {
 			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 			WRITE_BYTE(TE_BEAMFOLLOW);
 			WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
-			WRITE_SHORT(m_iModelLight1);// short (sprite index)
+			WRITE_SHORT(g_sModelIndexSmokeBeam);// short (sprite index)
 			WRITE_BYTE(5);
 			WRITE_BYTE(1);
 			WRITE_BYTE(244);
@@ -195,7 +195,6 @@ namespace sv {
 			m_iTeam = iTeam;
 		}
 
-		int m_iModelLight1;
 		float m_ArrowDamage;
 
 	protected:
@@ -250,7 +249,6 @@ void CBow::Precache(void)
 	PRECACHE_SOUND("weapons/bow_charge_start2.wav");
 	PRECACHE_SOUND("weapons/bow_draw.wav");
 	PRECACHE_SOUND("weapons/bow-shoot1.wav");
-	PRECACHE_MODEL("models/arrow.mdl");
 	m_usFireBow = PRECACHE_EVENT(1, "events/bow.sc");
 }
 

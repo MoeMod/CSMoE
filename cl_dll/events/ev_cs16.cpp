@@ -667,6 +667,7 @@ void EV_HLDM_DecalGunshot(pmtrace_t *pTrace, int iBulletType, float scale, int r
 			case BULLET_PLAYER_ETHEREAL:
 			case BULLET_PLAYER_RAILBEAM:
 			case BULLET_PLAYER_DEPLETEDALLOY:
+			case BULLET_PLAYER_JANUS11_BEAMSHOT:
 				iColorIndex = 12;
 				break;
 
@@ -695,6 +696,12 @@ void EV_HLDM_DecalGunshot(pmtrace_t *pTrace, int iBulletType, float scale, int r
 		case BULLET_PLAYER_BUFFM249:
 		{
 			char cRailBeamDecal[32] = "{buffm249";
+			decalname = cRailBeamDecal;
+			break;
+		}
+		case BULLET_PLAYER_JANUS11_BEAMSHOT:
+		{
+			char cRailBeamDecal[32] = "{sfshot";
 			decalname = cRailBeamDecal;
 			break;
 		}
@@ -889,7 +896,7 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 
 		while (iShots > 0)
 		{
-			if (iBulletType == BULLET_PLAYER_BUCKSHOT || iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT)
+			if (iBulletType == BULLET_PLAYER_BUCKSHOT || iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT || iBulletType == BULLET_PLAYER_DEPLETEDALLOY)
 			{
 				do
 				{
@@ -1026,6 +1033,7 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 							chTextureType = EV_HLDM_PlayTextureSound(idx, &tr, vecStart, vecEnd, iBulletType);
 						break;
 					case BULLET_PLAYER_BUCKSHOT:
+					case BULLET_PLAYER_JANUS11_BEAMSHOT:
 						break;
 					case BULLET_PLAYER_WINGGUN_BUCKSHOT:
 					{

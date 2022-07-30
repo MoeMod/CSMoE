@@ -84,7 +84,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 			}
 			for (int i = 0; i < length; i++)
 			{
-				int id = reader.ReadByte();
+				int id = reader.ReadShort();
 				if(iDataType <= 1)
 					gHUD.m_setBanWeapon.insert(id);
 				else if(iDataType == 2)

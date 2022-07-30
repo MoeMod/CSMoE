@@ -899,11 +899,12 @@ void Touch_Init( void )
 	Touch_AddDefaultButton("invnext", "touch/gfx/right.tga", "invnext", 0.060000, 0.711111, 0.120000, 0.834444, color, 2, 1, TOUCH_FL_HIDE);
 	Touch_AddDefaultButton("invprev", "touch/gfx/left.tga", "invprev", 0.000000, 0.711111, 0.060000, 0.834444, color, 2, 1, TOUCH_FL_HIDE);
 	//Touch_AddDefaultButton("cmd", "touch_default/menu.tga", "exec touch/cmd/cmd", 0.800000, 0.000000, 0.860000, 0.116836, color, 2, 1, 0);
+	Touch_AddDefaultButton("main_menu", "touch_default/menu.tga", "menu_main", 0.800000, 0.000000, 0.860000, 0.116836, color, 2, 1, 0);
 	Touch_AddDefaultButton("duck", "touch/gfx/duck.tga", "+duck", 0.880000, 0.701014, 0.960000, 0.895740, color, 2, 1, TOUCH_FL_PRECISION);
 	Touch_AddDefaultButton("attack2", "touch/gfx/attack2.tga", "+attack2", 0.800000, 0.350507, 0.880000, 0.506288, color, 2, 1, 0);
 	Touch_AddDefaultButton("attack", "touch/gfx/attack.tga", "+attack", 0.680000, 0.545233, 0.760000, 0.701014, color, 2, 1, 0);
 	Touch_AddDefaultButton("flight", "touch/gfx/flaghtlight.tga", "impulse 100", 0.740000, 0.000000, 0.800000, 0.116836, color, 2, 1, 0);
-	//Touch_AddDefaultButton("light", "touch/gfx/light.tga", "toggle_light", 0.520000, 0.000000, 0.580000, 0.116836, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("light", "touch/gfx/light.tga", "toggle_light", 0.520000, 0.000000, 0.580000, 0.116836, color, 2, 1, TOUCH_FL_HIDE);
 	Touch_AddDefaultButton("radio", "touch/gfx/radio.tga", "showvguimenu 38", 0.420000, 0.000000, 0.480000, 0.116836, color, 2, 1, 0);
 	Touch_AddDefaultButton("drop", "touch/gfx/drop.tga", "drop", 0.920000, 0.506288, 0.980000, 0.623124, color, 2, 1, 0);
 	Touch_AddDefaultButton("say", "touch/gfx/chat_all.tga", "touch_show say;touch_show say2;messagemode", 0.340000, 0.000000, 0.400000, 0.116836, color, 2, 1, 0);
@@ -912,11 +913,9 @@ void Touch_Init( void )
 	Touch_AddDefaultButton("slot6", "touch_default/key_6.tga", "slot6", 0.620000, 0.155781, 0.680000, 0.272617, color, 2, 1, 0);
 	Touch_AddDefaultButton("slot7", "touch_default/key_7.tga", "slot7", 0.620000, 0.272617, 0.680000, 0.389452, color, 2, 1, 0);
 	Touch_AddDefaultButton("lastinv", "touch/gfx/left.tga", "lastinv", 0.740000, 0.233671, 0.800000, 0.350507, color, 2, 1, 0);
-	//Touch_AddDefaultButton("console", "touch/gfx/cmdmenu.tga", "toggleconsole", 0.240000, 0.000000, 0.320000, 0.116836, color, 2, 1, 0);
+	Touch_AddDefaultButton("console", "touch/gfx/cmdmenu.tga", "toggleconsole", 0.240000, 0.000000, 0.320000, 0.116836, color, 2, 1, 0);
+	Touch_AddDefaultButton("qzradio", "touch/gfx/qzradio.tga", "wdnmd", 0.100000, 0.600000, 0.20000, 0.70000, color, 2, 1, 0);
 	
-
-
-
 	Cmd_AddCommand( "touch_addbutton", Touch_AddButton_f, "add native touch button" );
 	Cmd_AddCommand( "touch_removebutton", IN_TouchRemoveButton_f, "remove native touch button" );
 	Cmd_AddCommand( "touch_enableedit", Touch_EnableEdit_f, "enable button editing mode" );

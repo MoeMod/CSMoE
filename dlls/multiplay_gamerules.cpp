@@ -24,6 +24,10 @@
 #include "newmenus.h"
 #include "client/wdnmd.h"
 
+#ifdef XASH_DEDICATED
+#include "database/db_main.h"
+#endif
+
 namespace sv {
 
 /*
@@ -231,7 +235,7 @@ void SV_AddBanWeapon()
 	WRITE_BYTE(vecTemp.size());
 	for (auto& x : vecTemp)
 	{
-		WRITE_BYTE(x);
+		WRITE_SHORT(x);
 	}
 	MESSAGE_END();
 }
@@ -255,7 +259,7 @@ void SV_RemoveBanWeapon()
 	WRITE_BYTE(vecTemp.size());
 	for (auto& x : vecTemp)
 	{
-		WRITE_BYTE(x);
+		WRITE_SHORT(x);
 	}
 	MESSAGE_END();
 }
@@ -827,6 +831,9 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 	InstallBotControl();
 #endif // CSTRIKE
 
+#ifdef XASH_DEDICATED
+	db::InstallDataBaseManager();
+#endif
 	InstallHostageManager();
 
 	m_bSkipSpawn = m_bInCareerGame;
@@ -3597,7 +3604,7 @@ void CHalfLifeMultiplay::InitHUD(CBasePlayer* pl)
 		WRITE_BYTE(m_setBanWeapon.size());
 		for (auto& x : m_setBanWeapon) // 注意别超过250个，否则会发不出msg
 		{
-			WRITE_BYTE(x);
+			WRITE_SHORT(x);
 		}
 		MESSAGE_END();
 	}
@@ -4190,6 +4197,12 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "wondercannon";
 					else if (iId == WEAPON_PIANOGUN)
 						killer_weapon_name = "pianogun";
+					else if (iId == WEAPON_PIANOGUNEX)
+						killer_weapon_name = "pianogunex";
+					else if (iId == WEAPON_DIVINETITAN)
+						killer_weapon_name = "divinetitan";
+					else if (iId == WEAPON_CROSSBOW)
+						killer_weapon_name = "crossbow";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}
@@ -5249,6 +5262,13 @@ void CHalfLifeMultiplay::ClientUserInfoChanged(CBasePlayer *pPlayer, char *infob
 {
 	pPlayer->SetPlayerModel(pPlayer->m_bHasC4);
 	pPlayer->SetPrefsFromUserinfo(infobuffer);
+
+#ifdef XASH_DEDICATED
+	if (db::g_pDataBase != NULL)
+	{
+		db::g_pDataBase->ClientUserInfoChanged(pPlayer, infobuffer);
+	}
+#endif // XASH_DEDICATED
 }
 
 bool CHalfLifeMultiplay::CheckCanStartVoteMaps(bool bAlert)

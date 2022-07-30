@@ -100,6 +100,7 @@ typedef struct tempent_s
 	float		y;
 	float		z;
 	float		fadeSpeed;
+	float       livetime;
 	float		bounceFactor;
 	int			hitSound;
 	void		( *hitcallback )	( struct tempent_s *ent, struct pmtrace_s *ptr );

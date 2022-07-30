@@ -26,7 +26,7 @@
 #include "vgui_controls/QueryBox.h"
 #include "vgui_controls/ControllerMap.h"
 #include "vgui_controls/KeyRepeat.h"
-
+#include "MoeLogin.h"
 #include "ModInfo.h"
 #include "LoadingDialog.h"
 #include "BackgroundMenuButton.h"
@@ -766,6 +766,7 @@ CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 {
 	CGameMenu *menu = new CGameMenu(this, "GameMenu");
 
+	menu->AddMenuItem("#LOGIN_TITLE", "#LOGIN_TITLE", "MoeLogin", this, nullptr);
 	menu->AddMenuItem("#GameUI_CSMoESettings", "#GameUI_CSMoESettings", "OpenMoeSettings", this, nullptr);
     menu->AddMenuItem("#GameUI_Console", "#GameUI_Console", "OpenConsole", this, nullptr);
 	
@@ -1016,6 +1017,10 @@ void CBasePanel::RunMenuCommand(const char *command)
 	{
 		OnOpenMoeSettings();
 	}
+	else if (!Q_stricmp(command, "MoeLogin"))
+	{
+		OnOpenMoeLogin();
+	}
 
 	else
 		BaseClass::OnCommand(command);
@@ -1124,6 +1129,17 @@ void CBasePanel::OnOpenMoeSettings(void)
 	}
 
 	m_hMoeSettings->Activate();
+}
+
+void CBasePanel::OnOpenMoeLogin(void)
+{
+	if (!m_hMoeLogin.Get())
+	{
+		m_hMoeLogin = new MoeLogIn();
+		PositionDialog(m_hMoeLogin);
+	}
+
+	m_hMoeLogin->Activate();
 }
 
 void CBasePanel::PositionDialog(vgui2::PHandle dlg)

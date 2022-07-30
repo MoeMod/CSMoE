@@ -282,7 +282,7 @@ int CHudSniperScope::Draw(float flTime)
 	CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
 	if (pActiveBTEWeapon)
 	{
-		if (pActiveBTEWeapon->m_iId == WEAPON_SKULL5 || pActiveBTEWeapon->m_iId == WEAPON_SKULL6)
+		if (pActiveBTEWeapon->m_iId == WEAPON_SKULL5 || pActiveBTEWeapon->m_iId == WEAPON_SKULL6 || pActiveBTEWeapon->m_iId == WEAPON_CROSSBOW)
 		{
 			if (gHUD.m_iFOV == 90)
 				return 1;

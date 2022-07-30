@@ -234,6 +234,8 @@ set(HLDLL_SRCS
 	./y22s2sfpistolfield.cpp
 	./pianogunwave.cpp
 	./client/wdnmd.cpp
+	./database/db_config.cpp
+	./database/db_main.cpp
 	)
 
 set (HLWPN_SRCS
@@ -470,6 +472,17 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_crossbowex21.cpp
 	../dlls/wpn_shared/wpn_buffawp.cpp
 	../dlls/wpn_shared/wpn_divinetitan.cpp
+	../dlls/wpn_shared/wpn_railcannon.cpp
+	../dlls/wpn_shared/wpn_skull11.cpp
+	../dlls/wpn_shared/wpn_janus11.cpp
+	../dlls/wpn_shared/wpn_crow5.cpp
+	../dlls/wpn_shared/wpn_janusmk5.cpp
+	../dlls/wpn_shared/wpn_janus3.cpp
+	../dlls/wpn_shared/wpn_crow3.cpp
+	../dlls/wpn_shared/wpn_crow11.cpp
+	../dlls/wpn_shared/z4b_m60amethyst.cpp
+	../dlls/wpn_shared/wpn_crossbow.cpp
+	../dlls/wpn_shared/wpn_broad.cpp
 	)
 
 set(PM_SRCS
@@ -607,8 +620,9 @@ endif()
 
 if(XASH_DEDICATED)
 	add_library (mysql SHARED IMPORTED)
-	set_property(TARGET mysql PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/3rdparty/mysql-8.0.29-winx64/lib/libmysql.dll)
-	set_property(TARGET mysql PROPERTY IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/3rdparty/mysql-8.0.29-winx64/lib/libmysql.lib)
-	include_directories(${CMAKE_SOURCE_DIR}/3rdparty/mysql-8.0.29-winx64/include)
+	set_property(TARGET mysql PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/3rdparty/mysql/lib/libmysql.dll)
+	set_property(TARGET mysql PROPERTY IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/3rdparty/mysql/lib/libmysql.lib)
+	include_directories(${CMAKE_SOURCE_DIR}/3rdparty/mysql/include)
 	target_link_libraries(${SERVER_LIBRARY} mysql)
+	install(FILES ${CMAKE_SOURCE_DIR}/3rdparty/mysql/lib/libmysql.dll DESTINATION ".")
 endif()

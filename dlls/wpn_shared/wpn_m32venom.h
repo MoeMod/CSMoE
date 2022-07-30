@@ -104,7 +104,6 @@ namespace sv {
 		void EXPORT RocketTouch(CBaseEntity* pOther);
 
 	private:
-		int m_iTrail;
 		time_point_t m_flIgniteTime;
 		time_point_t m_flRemoveTime;
 		time_point_t m_flVenomDamageTime;

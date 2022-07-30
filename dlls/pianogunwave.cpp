@@ -9,6 +9,7 @@
 #endif
 #include "weapons/KnifeAttack.h"
 
+
 #define PIANOGUNEX_BuffTime 5.0s
 
 #define PIANOGUNEX_HealthRecovery 500.0
@@ -49,18 +50,28 @@ namespace sv {
 		return pWave;
 	}
 
+
 	void CPianoGunWave::Spawn(void)
 	{
 		Precache();
 
+		pev->frame = 1.0;
+		pev->framerate = 1.0;
 
-		pev->nextthink = gpGlobals->time + 0.1s;
 		pev->rendermode = kRenderTransAdd;
 		pev->renderamt = 255;
+		m_maxFrame = MODEL_FRAMES(pev->modelindex);
 
-		pev->frame = 0;
-		pev->framerate = 30.0;
+
+
 		ResetSequenceInfo();
+		const int COLOR_INSIDE[7][3] =
+		{
+			{  255, 215,  0}, {  255, 97,  0}, {  0, 201,  87},
+			{  135, 206,  235}, { 153, 51,  250}, { 218, 112,  214}
+		};
+		int iRanColor = RANDOM_LONG(1, 6);
+
 		switch (m_iType)
 		{
 			//PianoGun PrimaryAttack-> Notes 2
@@ -76,6 +87,26 @@ namespace sv {
 			m_flRemoveTime = gpGlobals->time + 0.6s - 0.2s;
 
 			SET_MODEL(ENT(pev), "models/ef_pianogunwave_c.mdl");
+
+			iRanColor = RANDOM_LONG(1, 5);
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_BEAMPARTICLE); //defined as 32
+			WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
+			WRITE_SHORT(m_iPianoNote[0]);// short (sprite index)
+			WRITE_SHORT(m_iPianoNote[1]);// short (sprite index)
+			WRITE_SHORT(m_iPianoNote[2]);// short (sprite index)
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][0]); //r
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][1]); //g
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][2]); //b
+			WRITE_BYTE(1); //randomcolor
+			WRITE_BYTE(5); //scale in 0.01's
+			WRITE_BYTE(5); //freq(time of one cycle) in 0.01's
+			WRITE_BYTE(10); //fadetime in 0.1s
+			WRITE_BYTE(5);  //count
+			WRITE_BYTE(10);  //random in org
+			WRITE_BYTE(20);  //speed (if>0 do slow gravity)
+			MESSAGE_END();
+
 			break;
 		}
 		case 2:
@@ -95,29 +126,106 @@ namespace sv {
 		case 4:
 		{
 			SET_MODEL(ENT(pev), "models/ef_pianogunex_wave_a.mdl");
+			UTIL_SetSize(pev, Vector(-5, -5, 20), Vector(5, 5, 25));
 			pev->effects |= EF_NOCULL;
-			pev->scale *= 1.5;
+
 			break;
 		}
 		case 5:
 		{
 			//Speed up
 			m_iActiveSkill = 5;
+			m_maxFrame = 31.0;
 			SET_MODEL(ENT(pev), "models/ef_pianogunex_wave_c1.mdl");
+			UTIL_SetSize(pev, Vector(-60, -20, 20), Vector(60, 20, 45));
+
+			pev->angles.x = pev->angles.x - 180.0;
+			pev->effects |= EF_NOCULL;
+
+			iRanColor = RANDOM_LONG(1, 5);
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_BEAMPARTICLE); //defined as 32
+			WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
+			WRITE_SHORT(m_iPianoNote[0]);// short (sprite index)
+			WRITE_SHORT(m_iPianoNote[1]);// short (sprite index)
+			WRITE_SHORT(m_iPianoNote[2]);// short (sprite index)
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][0]); //r
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][1]); //g
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][2]); //b
+			WRITE_BYTE(1); //randomcolor
+			WRITE_BYTE(5); //scale in 0.01's
+			WRITE_BYTE(5); //freq(time of one cycle) in 0.01's
+			WRITE_BYTE(10); //fadetime in 0.1s
+			WRITE_BYTE(5);  //count
+			WRITE_BYTE(10);  //random in org
+			WRITE_BYTE(20);  //speed (if>0 do slow gravity)
+			MESSAGE_END();
+
+
 			break;
 		}
 		case 6:
 		{
 			//Health Recovery
 			m_iActiveSkill = 6;
+			m_maxFrame = 31.0;
 			SET_MODEL(ENT(pev), "models/ef_pianogunex_wave_c2.mdl");
+			UTIL_SetSize(pev, Vector(-60, -20, 20), Vector(60, 20, 45));
+			
+			pev->angles.x = pev->angles.x - 180.0;
+			pev->effects |= EF_NOCULL;
+
+			iRanColor = RANDOM_LONG(1, 5);
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_BEAMPARTICLE); //defined as 32
+			WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
+			WRITE_SHORT(m_iPianoNote[0]);// short (sprite index)
+			WRITE_SHORT(m_iPianoNote[1]);// short (sprite index)
+			WRITE_SHORT(m_iPianoNote[2]);// short (sprite index)
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][0]); //r
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][1]); //g
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][2]); //b
+			WRITE_BYTE(1); //randomcolor
+			WRITE_BYTE(5); //scale in 0.01's
+			WRITE_BYTE(5); //freq(time of one cycle) in 0.01's
+			WRITE_BYTE(10); //fadetime in 0.1s
+			WRITE_BYTE(5);  //count
+			WRITE_BYTE(10);  //random in org
+			WRITE_BYTE(20);  //speed (if>0 do slow gravity)
+			MESSAGE_END();
+			
+
 			break;
 		}
 		case 7:
 		{
 			//Critical Attack
 			m_iActiveSkill = 7;
+			m_maxFrame = 31.0;
 			SET_MODEL(ENT(pev), "models/ef_pianogunex_wave_c3.mdl");
+			UTIL_SetSize(pev, Vector(-60, -20, 20), Vector(60, 20, 45));
+
+			pev->angles.x = pev->angles.x - 180.0;
+			pev->effects |= EF_NOCULL;
+
+			iRanColor = RANDOM_LONG(1, 5);
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_BEAMPARTICLE); //defined as 32
+			WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
+			WRITE_SHORT(m_iPianoNote[0]);// short (sprite index)
+			WRITE_SHORT(m_iPianoNote[1]);// short (sprite index)
+			WRITE_SHORT(m_iPianoNote[2]);// short (sprite index)
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][0]); //r
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][1]); //g
+			WRITE_BYTE(COLOR_INSIDE[iRanColor][2]); //b
+			WRITE_BYTE(1); //randomcolor
+			WRITE_BYTE(5); //scale in 0.01's
+			WRITE_BYTE(5); //freq(time of one cycle) in 0.01's
+			WRITE_BYTE(10); //fadetime in 0.1s
+			WRITE_BYTE(5);  //count
+			WRITE_BYTE(10);  //random in org
+			WRITE_BYTE(20);  //speed (if>0 do slow gravity)
+			MESSAGE_END();
 			
 			break;
 		}
@@ -147,19 +255,14 @@ namespace sv {
 		}
 		if (m_iType == 0 || m_iType == 1 || m_iType == 4 || m_iType == 5 || m_iType == 6 || m_iType == 7 || m_iType == 9)
 		{
-			pev->solid = SOLID_BBOX;
+			pev->solid = SOLID_TRIGGER;
 			pev->movetype = MOVETYPE_FLY;
 
 			if (m_iType != 9)
 				SetTouch(&CPianoGunWave::FlyingTouch);
 			SetThink(&CPianoGunWave::FlyingThink);
 
-			UTIL_SetSize(pev, Vector(-6, -3, -3), Vector(6, 3, 3));
-
-			/*if (m_iType == 5 || m_iType == 6 || m_iType == 7)
-			{
-				m_flSkillTime = gpGlobals->time + 3.0s;
-			}*/
+			UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 		}
 		if (m_iType == 2 || m_iType == 3 || m_iType == 8)
 		{
@@ -189,6 +292,10 @@ namespace sv {
 			UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
 		}
+
+		//m_maxFrame = MODEL_FRAMES(pev->modelindex);
+		pev->animtime = gpGlobals->time;
+		pev->nextthink = gpGlobals->time + 0.1s;
 
 	}
 
@@ -221,6 +328,11 @@ namespace sv {
 		PRECACHE_MODEL("sprites/ef_piano_attack_c.spr");
 		PRECACHE_MODEL("sprites/scenariotx_hp_fx.spr");
 
+		m_iPianoNote[0] = PRECACHE_MODEL("sprites/ef_pianogun_note1.spr");
+		m_iPianoNote[1] = PRECACHE_MODEL("sprites/ef_pianogun_note2.spr");
+		m_iPianoNote[2] = PRECACHE_MODEL("sprites/ef_pianogun_note3.spr");
+		m_iPianoNote[3] = PRECACHE_MODEL("sprites/ef_pianogun_note4.spr");
+
 	}
 
 	int CPianoGunWave::GetWeaponsId(void) { return m_iWpnType ? WEAPON_PIANOGUNEX : WEAPON_PIANOGUN; }
@@ -235,6 +347,17 @@ namespace sv {
 			UTIL_Remove(this);
 			return;
 		}
+
+		//default frames
+		this->pev->frame = (float)(this->pev->framerate * gpGlobals->frametime / 1s) + this->pev->frame;
+
+
+		if (this->pev->frame > m_maxFrame)
+		{
+			this->pev->frame = fmod(this->pev->frame, m_maxFrame);
+		}
+
+
 	}
 	void CPianoGunWave::AttachmentThink()
 	{
@@ -401,6 +524,8 @@ namespace sv {
 
 		if (pOther->edict() == pev->owner)
 			return;
+		
+
 
 		float flDamage = GetDirectDamage();
 		float flExplodeDamage = GetExplodeDamage();

@@ -30,7 +30,7 @@ namespace sv {
 
     class CRailCannon : public LinkWeaponTemplate< CRailCannon,
             TGeneralData,
-            BuildTGetItemInfoFromCSW<WEAPON_SG552>::template type,
+            BuildTGetItemInfoFromCSW<WEAPON_XM1014>::template type,
             TPrecacheEvent,
             TDeployDefault
     >
@@ -60,17 +60,76 @@ namespace sv {
     static constexpr int Penetration = 1;
     KnockbackData KnockBack = { 1000.0f, 650.0f, 500.0f, 500.0f, 0.3f };
 
-	time_point_t = m_flTimeNextCharge;
+	time_point_t m_flTimeNextCharge;
 	int m_iDefaultAmmo2;
 
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_depletedalloy" , 100 }; }
 #endif
-	float GetArmorRatioModifier() override { return 1.0; }
+
 	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 8, 6, 0 }; }
+
+	float GetArmorRatioModifier() override
+	{
+		switch (m_iWeaponState)
+		{
+		case 2:
+			return 1.1;
+
+		case 3:
+			return 1.5;
+
+		case 4:
+			return 1.8;
+
+		default:
+			return 1.0;
+		}
+	}
+
+	KnockbackData GetKnockBackData() override 
+	{ 
+		float flGround, flAir, flAirStrafing, flDucking, flVelocityModifier;
+		switch (m_iWeaponState)
+		{
+		case 2:
+			flVelocityModifier = 0.8;
+			flGround = 1200;
+			flAir = 650;
+			flAirStrafing = 500;
+			flDucking = 450;
+			break;
+
+		case 3:
+			flVelocityModifier = 0.9;
+			flGround = 1500;
+			flAir = 850;
+			flAirStrafing = 550;
+			flDucking = 450;
+			break;
+
+		case 4:
+			flVelocityModifier = 0.9;
+			flGround = 3000;
+			flAir = 850;
+			flAirStrafing = 500;
+			flDucking = 700;
+			break;
+
+		default:
+			flVelocityModifier = 0.3;
+			flGround = 1000;
+			flAir = 600;
+			flAirStrafing = 500;
+			flDucking = 450;
+			break;
+		}
+		return { flGround, flAir, flAirStrafing, flDucking, flVelocityModifier };
+	}
 
 	void Precache() override
 	{
+		PRECACHE_MODEL("sprites/muzzleflash19.spr");
 		PRECACHE_SOUND("weapons/railcanon-1.wav");
 		PRECACHE_SOUND("weapons/railcanon_chage1_start.wav");
 		PRECACHE_SOUND("weapons/railcanon_chage3_loop.wav");
@@ -235,13 +294,14 @@ namespace sv {
 		if (m_iWeaponState < 2)
 			m_iClip--;
 
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-		SendWeaponAnim(RAILCANNON_SHOOT1 + m_iClip % 2);
+		SendWeaponAnim(ANIM_SHOOT1 + m_iClip % 2);
 
 #ifndef CLIENT_DLL
 		m_pPlayer->FireBullets(GetShots(), m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(GetSpread(), GetSpread(), 0.0), GetRange(),
@@ -258,7 +318,7 @@ namespace sv {
 		flags = 0;
 #endif
 
-		PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, GetSpread(), 7, int(m_vVecAiming.x * 100), m_iClip == 0, GetShots());
+		PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0, g_vecZero, g_vecZero, 0.0, GetSpread(), 7, int(m_vVecAiming.x * 100), m_iClip == 0, GetShots());
 
 #ifndef CLIENT_DLL
 		if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -299,7 +359,7 @@ namespace sv {
 		{
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
-			SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
+			SendWeaponAnim(ANIM_IDLE1, UseDecrement() != FALSE);
 		}
 	}
 
@@ -344,6 +404,94 @@ namespace sv {
 		case 4:
 			return 8;
 		}
+	}
+
+	float GetDamageAmount(void)
+	{
+		float flDamage = 20;
+#ifndef CLIENT_DLL
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+		{
+			switch (m_iWeaponState)
+			{
+			case 2:	flDamage = 25; break;
+			case 3: flDamage = 45; break;
+			case 4: flDamage = 72; break;
+			default: flDamage = 22; break;
+			}
+		}
+		else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		{
+			switch (m_iWeaponState)
+			{
+			case 2:	flDamage = 25; break;
+			case 3: flDamage = 45; break;
+			case 4: flDamage = 72; break;
+			default: flDamage = 22; break;
+			}
+		}
+		else
+		{
+			switch (m_iWeaponState)
+			{
+			case 2:	flDamage = 20; break;
+			case 3: flDamage = 20; break;
+			case 4: flDamage = 16; break;
+			default: flDamage = 20; break;
+			}
+		}
+#endif
+		return flDamage;
+	}
+
+	float GetRange(void)
+	{
+		switch (m_iWeaponState)
+		{
+		case 2:
+			return 4128;
+
+		case 3:
+			return 6096;
+
+		case 4:
+			return 8048;
+
+		default:
+			return 3048;
+		}
+	}
+
+	float GetSpread(void)
+	{
+		switch (m_iWeaponState)
+		{
+		case 2:
+			return 0.0625;
+
+		case 3:
+			return 0.045;
+
+		case 4:
+			return 0.01;
+
+		default:
+			return 0.0715;
+		}
+	}
+
+	void Holster(int skiplocal = 0)
+	{
+		StopIdleSound();
+
+		if (m_iWeaponState != 0)
+		{
+			m_iClip += m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType];
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
+			m_iWeaponState = 0;
+		}
+
+		CBasePlayerWeapon::Holster(skiplocal);
 	}
 
 

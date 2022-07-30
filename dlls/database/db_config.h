@@ -2,13 +2,17 @@
 
 #include <string>
 
-struct DatabaseConfig
+namespace db {
+
+struct DBConfig
 {
     std::string host;
-    std::string port;
+    int port;
     std::string user;
     std::string pass;
     std::string schema;
 };
 
-const DatabaseConfig &GetDatabaseConfig();
+const DBConfig &GetDBConfig();
+
+}

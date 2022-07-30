@@ -801,6 +801,35 @@ void CMonster::IdleThink()
 		m_improv = new CMonsterImprov(this);
 	}
 
+	if (m_iHealthDecreaseCount && gpGlobals->time > m_tHealthDecreaseStartTime)
+	{
+		pev->health -= m_flHealthDecreaseAmount;
+
+		if (pBuffAttacker)
+		{
+			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pBuffAttacker);
+			WRITE_LONG((long)m_flHealthDecreaseAmount);
+			WRITE_SHORT(ENTINDEX(edict()));
+			WRITE_BYTE(0);
+			MESSAGE_END();
+		}
+
+		if (pev->health > 0)
+		{
+			m_iHealthDecreaseCount--;
+
+			m_tHealthDecreaseStartTime = gpGlobals->time + 1.0s;
+		}
+		else
+		{
+			m_iHealthDecreaseCount = 0;
+			pev->health = 1;
+
+			m_tHealthDecreaseStartTime = invalid_time_point;
+			pBuffAttacker = nullptr;
+		}
+	}
+
 	pev->nextthink = gpGlobals->time + giveUpTime;
 
 	// Outer...

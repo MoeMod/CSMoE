@@ -220,6 +220,9 @@ public:
 	{
 		m_flLastBuffHit = flTime + 0.1;
 	}
+
+	int m_iInfinite;
+
 	//newhud
 	int m_iWeaponSelect;
 	UniqueTexture m_iWeaponList;
@@ -951,7 +954,7 @@ private:
 	int iStoredType;
 	int iWeapon;
 	int DisplayTime;
-	SharedTexture m_pCurTexture[15];
+	SharedTexture m_pCurTexture[16];
 };
 
 //

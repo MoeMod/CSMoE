@@ -384,6 +384,11 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 	int m_iTeam;
 	int m_LastHitGroup;
+	time_point_t m_tHealthDecreaseStartTime;
+	time_point_t m_tHealthDecreaseInterval;
+	float m_flHealthDecreaseAmount;
+	int m_iHealthDecreaseCount;
+	entvars_t* pBuffAttacker;
 };
 
 inline int FNullEnt(CBaseEntity* ent) { return (!ent) || FNullEnt(ent->edict()); }

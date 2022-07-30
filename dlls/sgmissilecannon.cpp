@@ -63,13 +63,31 @@ namespace sv {
 		m_flNumFrames = (float)(MODEL_FRAMES(pev->modelindex) - 1);
 		pev->framerate = RANDOM_FLOAT(1.0, 30.0);
 
-		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL);
+		/*MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL);
 		WRITE_BYTE(2);
 		WRITE_COORD(m_vecOrigin.x);
 		WRITE_COORD(m_vecOrigin.y);
 		WRITE_COORD(m_vecOrigin.z);
 		WRITE_SHORT(this->entindex());
 		WRITE_BYTE(iType);
+		MESSAGE_END();*/
+
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_BEAMPARTICLE); //defined as 32
+		WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
+		WRITE_SHORT(m_iSprIndex[iType - 2]);// short (sprite index)
+		WRITE_SHORT(m_iSprIndex[iType - 2]);// short (sprite index)
+		WRITE_SHORT(m_iSprIndex[iType - 2]);// short (sprite index)
+		WRITE_BYTE(255); //r
+		WRITE_BYTE(255); //g
+		WRITE_BYTE(255); //b
+		WRITE_BYTE(0); //randomcolor
+		WRITE_BYTE(100); //scale in 0.01's
+		WRITE_BYTE(6); //freq(time of one cycle) in 0.01's
+		WRITE_BYTE(3); //fadetime in 0.1s
+		WRITE_BYTE(1);  //count
+		WRITE_BYTE(0);  //random in org
+		WRITE_BYTE(0);  //speed (if>0 do slow gravity)
 		MESSAGE_END();
 	}
 
@@ -101,9 +119,9 @@ namespace sv {
 
 	void CSGMissileCannon::Precache()
 	{
-		//PRECACHE_MODEL("sprites/ef_sgmissile_line.spr");
-		//PRECACHE_MODEL("sprites/ef_sgmissilem_line.spr");
-		//PRECACHE_MODEL("sprites/ef_sgmissileex_line.spr");
+		m_iSprIndex[0] = PRECACHE_MODEL("sprites/ef_sgmissile_line.spr");
+		m_iSprIndex[1] = PRECACHE_MODEL("sprites/ef_sgmissilem_line.spr");
+		m_iSprIndex[2] = PRECACHE_MODEL("sprites/ef_sgmissileex_line.spr");
 		PRECACHE_MODEL("sprites/ef_sgmissileex.spr");
 		m_iEffectSprite = PRECACHE_MODEL("sprites/ef_sgmissile.spr");
 		m_iExplosionSprite = PRECACHE_MODEL("sprites/dart_explosion.spr");

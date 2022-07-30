@@ -59,6 +59,7 @@ short g_sModelIndexWExplosion;		// holds the index for the underwater explosion
 short g_sModelIndexBubbles;		// holds the index for the bubbles model
 short g_sModelIndexBloodDrop;		// holds the sprite index for the initial blood
 short g_sModelIndexBloodSpray;		// holds the sprite index for splattered blood
+short g_sModelIndexSmokeBeam;
 short g_sModelIndexSmokePuff;
 short g_sModelIndexFireball2;
 short g_sModelIndexFireball3;
@@ -557,7 +558,8 @@ void CBasePlayerWeapon::EjectBrassLate()
 		|| m_iId == WEAPON_Z4B_M37SE
 		|| m_iId == WEAPON_Z4B_CSG12SS
 		|| m_iId == WEAPON_CSGO_MAG7
-		|| m_iId == WEAPON_CSGO_SAWEDOFF)
+		|| m_iId == WEAPON_CSGO_SAWEDOFF
+		|| m_iId == WEAPON_JANUS11)
 		? TE_BOUNCE_SHOTSHELL : TE_BOUNCE_SHELL;
 
 	EjectBrass(pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_up * -9 + gpGlobals->v_forward * 16, gpGlobals->v_right * -9,
@@ -1384,7 +1386,7 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_M950SE:
 		case WEAPON_SFPISTOL:
 		case WEAPON_Y22S2SFPISTOL:
-		case Z4B_RAGINGBULL:
+		case WEAPON_Z4B_RAGINGBULL:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

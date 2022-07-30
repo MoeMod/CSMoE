@@ -242,6 +242,12 @@ struct WeaponStruct
 	int m_ammoPrice;
 };
 
+struct PlayerItemData
+{
+	uint32_t id;
+	uint32_t num;
+};
+
 class CWeaponBox;
 
 constexpr std::size_t MAX_LOCATION_LENGTH = 32;
@@ -445,7 +451,10 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	int m_iNewMenuID;
 	int m_iNewMenuPage;
 	time_point_t m_iNewMenuExpire;
-	bool m_bBlockWdnmd;
+	bool m_bLogin;
+	int64_t m_iQQ;
+	int32_t m_iToken;
+
 };
 
 class CBasePlayer : public CBaseMonster, public PrivateData<class CBasePlayer, CBaseMonster>
@@ -777,9 +786,6 @@ public:
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
 #endif
 	int iuser1;
-	time_point_t m_tHealthDecreaseStartTime;
-	float m_flHealthDecreaseAmount;
-	time_point_t m_tHealthDecreaseInterval;
 	time_point_t m_tHealthBuffTime;
 	time_point_t m_tShootingDownBuffTime;
 	time_point_t m_tAvoidInfectBuffTime;
@@ -790,7 +796,7 @@ public:
 
 	float m_flBuffHealthAmount;
 	float m_flSaveArmorAmount;
-	int m_iHealthDecreaseCount;
+
 	int m_iHealthDamageType;
 	const char* m_ZombieClass;
 	time_point_t m_flCustomSequenceUntilTime;
@@ -811,6 +817,8 @@ public:
 	int m_iReviveGunShotsFired;
 
 	float m_flPlayerBuffData;
+	bool m_bBlockWdnmd;
+	std::map<uint32_t, PlayerItemData> m_ItemData;
 };
 
 }

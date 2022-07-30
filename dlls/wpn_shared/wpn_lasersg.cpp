@@ -203,20 +203,19 @@ void CLaserSg::PrimaryAttack(void)
 	if(this->pev->iuser1)
 		this->pev->iuser1 = 0;
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireLaserSg, 0, g_vecZero, g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, m_iClip != 0, FALSE);
-
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 
+	EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/lasersg-1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.875s;
 
 	m_tSecondaryAttackStart = invalid_time_point;
-
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireLaserSg, 0, g_vecZero, g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, m_iClip != 0, FALSE);
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 1, 3.0, 4.0);
 	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -510,8 +509,8 @@ void CLaserSg::ItemPostFrame(void)
 	if (m_iWeaponState == 25)
 		return CBasePlayerWeapon::ItemPostFrame();
 
-	if (m_fInReload > 0)
-		return CBasePlayerWeapon::ItemPostFrame();
+	//if (m_fInReload > 0)
+	//	return CBasePlayerWeapon::ItemPostFrame();
 
 	if (m_flTimeNextCharge != invalid_time_point && m_flTimeNextCharge <= gpGlobals->time && !this->pev->iuser1)
 	{

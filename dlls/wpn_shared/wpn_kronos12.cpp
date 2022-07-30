@@ -47,7 +47,6 @@ void CKronos12::Precache(void)
 	PRECACHE_MODEL("models/v_kronos12.mdl");
 	PRECACHE_MODEL("models/w_kronos12.mdl");
 	PRECACHE_MODEL("models/p_kronos12.mdl");
-	PRECACHE_MODEL("sprites/smoke.spr");
 
 	PRECACHE_SOUND("weapons/kronos12-1.wav");
 
@@ -215,7 +214,7 @@ void CKronos12::PrimaryAttack_InstantDamage()
 		WRITE_COORD(pEntity->pev->origin.x);
 		WRITE_COORD(pEntity->pev->origin.y);
 		WRITE_COORD(pEntity->pev->origin.z);
-		WRITE_SHORT(MODEL_INDEX("sprites/smoke.spr"));
+		WRITE_SHORT(g_sModelIndexSmokeBeam);
 		WRITE_BYTE(0);
 		WRITE_BYTE(0);
 		WRITE_BYTE(10);//Life

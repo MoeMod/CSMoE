@@ -188,19 +188,27 @@ struct PianoGun_WeaponData
 				return;
 
 			m_iSaveUserButton = 0;
+
 			if (pev->iuser1)
 			{
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 18s;
-				SendWeaponAnim(ANIM_IDLE2, UseDecrement() != FALSE);
-				pev->iuser1 = 0;
+				if (m_flNextIdleThink <= gpGlobals->time)
+				{
+					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 18s;
+					SendWeaponAnim(ANIM_IDLE2, UseDecrement() != FALSE);
+					pev->iuser1 = 0;
+					m_flNextIdleThink = gpGlobals->time + 18.0s;
+
+				}
 			}
 			else
 			{
+
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 10s;
 				SendWeaponAnim(ANIM_IDLE1, UseDecrement() != FALSE);
 				pev->iuser1 = 1;
 
 			}
+
 		}
 
 		float GetMaxSpeed(void) override
@@ -212,6 +220,8 @@ struct PianoGun_WeaponData
 		{
 			pev->iuser1 = 0;
 			m_iSaveUserButton = 0;
+			m_flNextIdleThink = invalid_time_point;
+			m_flNextIdleThink = gpGlobals->time + 10.0s;
 			return Base::Deploy();
 		}
 
@@ -236,6 +246,8 @@ struct PianoGun_WeaponData
 
 				SendWeaponAnim(ANIM_SHOOTA, UseDecrement() != FALSE);
 				pev->iuser1 = 0;
+				m_flNextIdleThink = invalid_time_point;
+				m_flNextIdleThink = gpGlobals->time + 10.0s;
 
 				duration_t flCycleTime;
 				flCycleTime = PianoGunPrimaryAttackInterval1;
@@ -280,7 +292,7 @@ struct PianoGun_WeaponData
 					break;
 				}
 				}
-				ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "%s", SzMsg);
+				//ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "%s", SzMsg);
 			}
 
 		}
@@ -318,9 +330,12 @@ struct PianoGun_WeaponData
 #else
 			flags = 0;
 #endif
-			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
+			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, TRUE, FALSE);
+
 			SendWeaponAnim(ANIM_SHOOTB, UseDecrement() != FALSE);
 			pev->iuser1 = 0;
+			m_flNextIdleThink = invalid_time_point;
+			m_flNextIdleThink = gpGlobals->time + 10.0s;
 
 			char SzMsg[128]{};
 			switch (m_iSaveUserButton)
@@ -347,7 +362,7 @@ struct PianoGun_WeaponData
 				break;
 			}
 			}
-			ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "%s", SzMsg);
+			//ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "%s", SzMsg);
 
 
 		}
@@ -393,7 +408,16 @@ struct PianoGun_WeaponData
 						ShootNote(m_iSkillType, 0);
 						SendWeaponAnim(ANIM_SHOOTC1, UseDecrement() != FALSE);
 						pev->iuser1 = 0;
+
 						EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/pianogun_shootc1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+						int flags;
+#ifdef CLIENT_WEAPONS
+						flags = FEV_NOTHOST;
+#else
+						flags = 0;
+#endif
+						PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, TRUE, TRUE);
+
 					}
 					else if (m_iSkillType == 3)
 					{
@@ -405,7 +429,17 @@ struct PianoGun_WeaponData
 						SendWeaponAnim(ANIM_SHOOTC2, UseDecrement() != FALSE);
 						pev->iuser1 = 0;
 						EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/pianogun_shootc2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+						int flags;
+#ifdef CLIENT_WEAPONS
+						flags = FEV_NOTHOST;
+#else
+						flags = 0;
+#endif
+						PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 0, 0, 1, TRUE, TRUE);
+
 					}
+					m_flNextIdleThink = invalid_time_point;
+					m_flNextIdleThink = gpGlobals->time + 10.0s;
 					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + PianoGunAttackAnimTime;
 					m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 				}
@@ -444,7 +478,7 @@ struct PianoGun_WeaponData
 #endif
 
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
-			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
+			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, FALSE, TRUE);
 
 #ifndef CLIENT_DLL
 			if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -466,15 +500,39 @@ struct PianoGun_WeaponData
 		{
 #ifndef CLIENT_DLL
 			UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-			Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 20 + gpGlobals->v_right * 8 + gpGlobals->v_up * -10;
-			vecSrc.z -= iCount * 8;
+			Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 50;
+			//ÌøÆðÀ´
+			if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+			{
+				if (iCount < 2)
+					vecSrc.z -= iCount * 5;
+				else vecSrc.z -= iCount * 10;
+				vecSrc.y += iCount * 8;
+				vecSrc.x += iCount * 8;
+			}
+			else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+			{
+				if (iCount < 2)
+					vecSrc.z -= iCount * 5;
+				else vecSrc.z -= iCount * 8;
+				vecSrc.y -= iCount * 4;
+				vecSrc.x += iCount * 4;
+			}
+			else
+			{
+				if (iCount < 2)
+					vecSrc.z -= iCount * 4;
+				else vecSrc.z -= iCount * 8;
+				vecSrc.y += iCount * 4;
+				vecSrc.x += iCount * 4;
+			}
 
 
 			CPianoGunWave* pEnt = CPianoGunWave::Create(0, iType, vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev), m_pPlayer->m_iTeam);
 
 			if (pEnt)
 			{
-				pEnt->pev->velocity = gpGlobals->v_forward * 1200;
+				pEnt->pev->velocity = gpGlobals->v_forward * 500;
 			}
 #endif
 		}
@@ -678,6 +736,7 @@ struct PianoGun_WeaponData
 
 			time_point_t m_iPrimaryAttackInterval;
 			time_point_t m_flNextSkillTime;
+			time_point_t m_flNextIdleThink;
 };
 LINK_ENTITY_TO_CLASS(weapon_pianogun, CPianoGun)
 }

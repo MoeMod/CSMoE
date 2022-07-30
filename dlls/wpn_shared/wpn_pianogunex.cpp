@@ -104,10 +104,7 @@ namespace sv {
 		void Precache(void) override
 		{
 			Base::Precache();
-			PRECACHE_MODEL("sprites/ef_pianogun_note1.spr");
-			PRECACHE_MODEL("sprites/ef_pianogun_note2.spr");
-			PRECACHE_MODEL("sprites/ef_pianogun_note3.spr");
-			PRECACHE_MODEL("sprites/ef_pianogun_note4.spr");
+			
 
 			PRECACHE_MODEL("sprites/muzzleflash218.spr");
 			PRECACHE_MODEL("sprites/muzzleflash219.spr");
@@ -115,6 +112,12 @@ namespace sv {
 			PRECACHE_MODEL("sprites/muzzleflash221.spr");
 			PRECACHE_MODEL("sprites/muzzleflash222.spr");
 			PRECACHE_MODEL("sprites/muzzleflash223.spr");
+
+			PRECACHE_SOUND("weapons/pianogunex_shoot_A.wav");
+			PRECACHE_SOUND("weapons/pianogunex_shoot_B.wav");
+			PRECACHE_SOUND("weapons/pianogunex_shoot_C1.wav");
+			PRECACHE_SOUND("weapons/pianogunex_shoot_C2.wav");
+			PRECACHE_SOUND("weapons/pianogunex_shoot_C3.wav");
 		}
 
 		void Spawn(void) override
@@ -187,14 +190,21 @@ namespace sv {
 				return;
 
 			m_iSaveUserButton = 0;
+
 			if (pev->iuser1)
 			{
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 18s;
-				SendWeaponAnim(ANIM_IDLE2, UseDecrement() != FALSE);
-				pev->iuser1 = 0;
+				if (m_flNextIdleThink <= gpGlobals->time)
+				{
+					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 18s;
+					SendWeaponAnim(ANIM_IDLE2, UseDecrement() != FALSE);
+					pev->iuser1 = 0;
+					m_flNextIdleThink = gpGlobals->time + 18.0s;
+
+				}
 			}
 			else
 			{
+				
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 10s;
 				SendWeaponAnim(ANIM_IDLE1, UseDecrement() != FALSE);
 				pev->iuser1 = 1;
@@ -211,6 +221,8 @@ namespace sv {
 		BOOL Deploy(void) override
 		{
 			pev->iuser1 = 0;
+			m_flNextIdleThink = invalid_time_point;
+			m_flNextIdleThink = gpGlobals->time + 10.0s;
 			m_iSaveUserButton = 0;
 			return Base::Deploy();
 		}
@@ -236,6 +248,8 @@ namespace sv {
 
 				SendWeaponAnim(ANIM_SHOOTA, UseDecrement() != FALSE);
 				pev->iuser1 = 0;
+				m_flNextIdleThink = invalid_time_point;
+				m_flNextIdleThink = gpGlobals->time + 10.0s;
 
 				duration_t flCycleTime;
 				flCycleTime = PianoGunPrimaryAttackInterval1;
@@ -291,7 +305,7 @@ namespace sv {
 					break;
 				}
 				}
-				ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "%s", SzMsg);
+				//ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "%s", SzMsg);
 			}
 
 		}
@@ -329,9 +343,11 @@ namespace sv {
 #else
 			flags = 0;
 #endif
-			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
+			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, TRUE, FALSE);
 			SendWeaponAnim(ANIM_SHOOTB, UseDecrement() != FALSE);
 			pev->iuser1 = 0;
+			m_flNextIdleThink = invalid_time_point;
+			m_flNextIdleThink = gpGlobals->time + 10.0s;
 
 			char SzMsg[128]{};
 			switch (m_iSaveUserButton)
@@ -365,7 +381,7 @@ namespace sv {
 				break;
 			}
 			}
-			ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "%s", SzMsg);
+			//ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "%s", SzMsg);
 
 
 		}
@@ -415,6 +431,7 @@ namespace sv {
 
 						SendWeaponAnim(ANIM_SHOOTC1, UseDecrement() != FALSE);
 						pev->iuser1 = 0;
+		
 
 						m_CrossHairState = PIANOGUNEX_NULL;
 
@@ -451,8 +468,17 @@ namespace sv {
 
 						m_CrossHairState = PIANOGUNEX_CRITICAL;
 					}
+					int flags;
+#ifdef CLIENT_WEAPONS
+					flags = FEV_NOTHOST;
+#else
+					flags = 0;
+#endif
+					PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 0, 0, m_iSkillType, TRUE, TRUE);
 					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + PianoGunAttackAnimTime;
 					m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+					m_flNextIdleThink = invalid_time_point;
+					m_flNextIdleThink = gpGlobals->time + 10.0s;
 #ifndef CLIENT_DLL
 					if (m_CrossHairState != m_CrossHairStateStored)
 					{
@@ -500,7 +526,7 @@ namespace sv {
 #endif
 
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
-			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
+			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, FALSE, TRUE);
 
 #ifndef CLIENT_DLL
 			if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -521,16 +547,40 @@ namespace sv {
 		void ShootNote(int iType, int iCount)
 		{
 #ifndef CLIENT_DLL
-			UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-			Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 20 + gpGlobals->v_right * 8 + gpGlobals->v_up * -10;
-			vecSrc.z -= iCount * 8;
-
-
+			UTIL_MakeVectors(m_pPlayer->pev->v_angle  + m_pPlayer->pev->punchangle);
+			
+			Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 50;
+			//ÌøÆðÀ´
+			if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+			{
+				if (iCount < 2)
+					vecSrc.z -= iCount * 5;
+				else vecSrc.z -= iCount * 10;
+				vecSrc.y += iCount * 8;
+				vecSrc.x += iCount * 8;
+			}
+			else if(FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+			{
+				if (iCount < 2)
+					vecSrc.z -= iCount * 5;
+				else vecSrc.z -= iCount * 8;
+				vecSrc.y -= iCount * 4;
+				vecSrc.x += iCount * 4;
+			}
+			else
+			{
+				if (iCount < 2)
+					vecSrc.z -= iCount * 4;
+				else vecSrc.z -= iCount * 8;
+				vecSrc.y += iCount * 4;
+				vecSrc.x += iCount * 4;
+			}
+			
 			CPianoGunWave* pEnt = CPianoGunWave::Create(1, iType, vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev), m_pPlayer->m_iTeam);
 
 			if (pEnt)
 			{
-				pEnt->pev->velocity = gpGlobals->v_forward * 1200;
+				pEnt->pev->velocity = gpGlobals->v_forward * 500;
 			}
 #endif
 		}
@@ -747,20 +797,20 @@ namespace sv {
 				{
 					CBasePlayer* player = (CBasePlayer*)pEntity;
 
-					if (player->m_bIsZombie && player->m_ZombieClass)
+
+					if (pEntity->IsPlayer())
 					{
-						CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(pEntity);
-						if (player && player->m_bIsZombie)
+						CBasePlayer* player = (CBasePlayer*)pEntity;
+						Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
+						if (player->m_bIsZombie /* && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK)*/)
 						{
-
 							player->m_flVelocityModifier = 1.0;
-							if (!(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
-							{
-								Vector2D vecDir2D = (player->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
 
-								player->pev->velocity.x = vecDir2D.x * 800;
-								player->pev->velocity.y = vecDir2D.y * 800;
-								player->pev->velocity.z = 300;
+							auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+							if (strategy)
+							{
+								strategy->SetStunSpeedTime(1.5s);
+								strategy->SetStunGravityTime(1.5s);
 							}
 						}
 					}
@@ -826,6 +876,7 @@ namespace sv {
 		time_point_t m_iPrimaryAttackInterval;
 		time_point_t m_flNextSkillTime;
 		time_point_t m_flSkillTime;
+		time_point_t m_flNextIdleThink;
 		pianogunex_crosshairstate_e m_CrossHairState;
 		pianogunex_crosshairstate_e m_CrossHairStateStored;
 	};

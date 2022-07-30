@@ -9,6 +9,7 @@
 
 #include "mod_dm.h"
 #include "player/player_mod_strategy.h"
+#include "client/wdnmd.h"
 
 namespace sv {
 
@@ -299,6 +300,7 @@ void CMod_DeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 
 	pPlayer->SpawnProtection_Start(3.0s);
 	pPlayer->ClientCommand("buy");
+	wdnmdmenu::WdnmdResetTime(pPlayer->entindex());
 }
 
 bool CMod_DeathMatch::CheckWinLimitDM()

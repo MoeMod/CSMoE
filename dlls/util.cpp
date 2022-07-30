@@ -2672,4 +2672,54 @@ float UTIL_CalculateDamageRate(Vector vecSrc, CBaseEntity* pOther)
 	return rate;
 }
 
+
+void UTIL_AdvancedBeamPoints(Vector vecSrc, Vector vecEnd, int life, int r, int g, int b, int width, int brightness, int flags)
+{
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSrc);
+	WRITE_BYTE(TE_CUSTOMBEAMPOINTS);
+	WRITE_COORD(vecSrc.x);
+	WRITE_COORD(vecSrc.y);
+	WRITE_COORD(vecSrc.z);
+	WRITE_COORD(vecEnd.x);
+	WRITE_COORD(vecEnd.y);
+	WRITE_COORD(vecEnd.z);
+	WRITE_SHORT(g_sModelIndexSmokeBeam);
+	WRITE_BYTE(0);
+	WRITE_BYTE(0);
+	WRITE_BYTE(life);
+	WRITE_BYTE(width);
+	WRITE_BYTE(0);
+	WRITE_BYTE(r);
+	WRITE_BYTE(g);
+	WRITE_BYTE(b);
+	WRITE_BYTE(brightness);
+	WRITE_BYTE(0);
+	WRITE_BYTE(flags);
+	MESSAGE_END();
+}
+
+
+void UTIL_BeamPointsStretch(Vector vecSrc, Vector vecEnd, int beamindex, int framerate, int life, int r, int g, int b, int width, int brightness, int flags)
+{
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSrc);
+	WRITE_BYTE(TE_BEAMPOINTS_STRETCH);
+	WRITE_COORD(vecSrc.x);
+	WRITE_COORD(vecSrc.y);
+	WRITE_COORD(vecSrc.z);
+	WRITE_COORD(vecEnd.x);
+	WRITE_COORD(vecEnd.y);
+	WRITE_COORD(vecEnd.z); // coord coord coord (end position) 
+	WRITE_SHORT(beamindex); // short (sprite index) 
+	WRITE_BYTE(0); // byte (starting frame) 
+	WRITE_BYTE(framerate); // byte (frame rate in 0.1's) 
+	WRITE_BYTE(life); // byte (life in 0.1's) 
+	WRITE_BYTE(width); // byte (line width in 0.1's) 
+	WRITE_BYTE(r); // byte,byte,byte (color)
+	WRITE_BYTE(g);
+	WRITE_BYTE(b);
+	WRITE_BYTE(brightness); // byte (brightness)
+	MESSAGE_END();
+
+}
+
 }

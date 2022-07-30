@@ -59,24 +59,17 @@ namespace cl::event::lasersg {
 				++g_iShotsFired;
 				EV_MuzzleFlash();
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(3, 2);
-				if (!gHUD.cl_righthand->value)
-				{
-					EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 22.0, -9.0, -11.0, 0);
-				}
-				else
-				{
-					EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 22.0, -9.0, 11.0, 0);
-				}
+				
 			}
 			else
 			{
-				EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
+				if (Com_RandomLong(0, 1))
+					PLAY_EVENT_SOUND(SOUNDS_NAME[0]);
+				else
+					PLAY_EVENT_SOUND(SOUNDS_NAME[1]);
 			}
-
-			int shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell_sgdrill.mdl");
-			EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
-
-			PLAY_EVENT_SOUND(SOUNDS_NAME[Com_RandomLong(0, 1)]);
+			
+			
 
 			EV_GetGunPosition(args, vecSrc, origin);
 			VectorCopy(forward, vecAiming);
@@ -99,8 +92,8 @@ namespace cl::event::lasersg {
 				EV_MuzzleFlash();
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(5, 2);
 			}
-
-			PLAY_EVENT_SOUND("weapons/lasersg-2.wav");
+			else
+				PLAY_EVENT_SOUND("weapons/lasersg-2.wav");
 		}
 
 		

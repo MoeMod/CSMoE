@@ -41,6 +41,7 @@ GNU General Public License for more details.
 #include "zb2/zb2_zclass_witch.h"
 #include "zb2/zb2_zclass_boomer.h"
 #include "zb2/zb2_zclass_spider.h"
+#include "zb2/zb2_zclass_siren.h"
 #include "weapons_moe_buy.h"
 
 #include "util/u_range.hpp"
@@ -916,8 +917,21 @@ void CMod_ZB3Classic::InstallPlayerModStrategy(CBasePlayer* player)
 	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB3Classic(player, this));
 }
 
+
+float CMod_ZB3Classic::GetAdjustedEntityDamage(CBaseEntity* victim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	flDamage = CMod_ZombieMod2::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
+	CBasePlayer* pVictim = dynamic_ent_cast<CBasePlayer*>(victim);
+	CBasePlayer* pAttacker = dynamic_ent_cast<CBasePlayer*>(pevAttacker);
+	m_eventTakeDamage.dispatch(pVictim, pevInflictor, pAttacker, flDamage, bitsDamageType);
+
+	return flDamage;
+}
+
 CPlayerModStrategy_ZB3Classic::CPlayerModStrategy_ZB3Classic(CBasePlayer* player, CMod_ZB3Classic* mp)
-	: CPlayerModStrategy_ZB3(player, static_cast<CMod_ZombieHero*>(mp))
+	: CPlayerModStrategy_ZB3(player, static_cast<CMod_ZombieHero*>(mp)),
+	m_eventTakeDamageListener(mp->m_eventTakeDamage.subscribe(&CPlayerModStrategy_ZB3Classic::Event_TakeDamage, this))
 {
 	m_flNextCheckButton = invalid_time_point;
 	m_flNextTimeChangeZombie = invalid_time_point;
@@ -935,7 +949,7 @@ void CPlayerModStrategy_ZB3Classic::GiveDefaultItems()
 			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
 			{
 				std::vector<MoEWeaponBuyInfo_s> candidate_list;
-				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+				std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 
 				std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 				const MoEWeaponBuyInfo_s& info = candidate_list.front();
@@ -968,7 +982,7 @@ std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3Classic::ZombieClass
 
 	if (!strcmp(name, "random"))
 	{
-		switch (RANDOM_LONG(0, 10))
+		switch (RANDOM_LONG(0, 11))
 		{
 		case 0:
 		{
@@ -1026,6 +1040,11 @@ std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3Classic::ZombieClass
 			player->m_ZombieClass = "pc";
 			return std::make_shared<CZombieClass_Pc>(m_pPlayer, lv);
 		}
+		case 11:
+		{
+			player->m_ZombieClass = "siren";
+			return std::make_shared<CZombieClass_Siren>(m_pPlayer, lv);
+		}
 #endif
 		default:
 		{
@@ -1081,4 +1100,40 @@ int CPlayerModStrategy_ZB3Classic::TakeDamage(entvars_t* pevInflictor, entvars_t
 	return CPlayerModStrategy_ZB3::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
+int CPlayerModStrategy_ZB3Classic::AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
+{
+	int result = CPlayerModStrategy_ZB3::AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
+	if (!player || host == ent)
+		return result;
+
+	if (host->v.team != ent->v.team)
+		return result;
+	if (host->v.flags & FL_SPECTATOR)
+		return result;
+
+	state->solid = SOLID_NOT;
+	Vector vecDelta = host->v.origin - ent->v.origin;
+
+	if (vecDelta.IsLengthLessThan(70.0f))
+	{
+		state->rendermode = kRenderTransAlpha;
+		state->renderamt = int(vecDelta.Length() * 3);
+	}
+
+	return result;
 }
+
+void CPlayerModStrategy_ZB3Classic::OnSpawn()
+{
+	m_pPlayer->pev->playerclass = 2;
+	return CPlayerModStrategy_ZB3::OnSpawn();
+}
+
+void CPlayerModStrategy_ZB3Classic::Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType)
+{
+	if (victim == pevAttacker)
+		return;
+}
+
+}
+

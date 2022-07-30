@@ -38,6 +38,7 @@ namespace sv {
     >
     {
     public:
+	static constexpr const auto& DefaultReloadTime = 3.9s;
     static constexpr const char *V_Model = "models/v_skull11.mdl";
     static constexpr const char *P_Model = "models/p_skull11.mdl";
     static constexpr const char *W_Model = "models/w_skull11.mdl";
@@ -48,7 +49,7 @@ namespace sv {
     static constexpr int MaxClip = 28;
 	enum
 	{
-		ANIM_IDLE,
+		ANIM_IDLE1,
 		ANIM_SHOOT1,
 		ANIM_SHOOT2,
 		ANIM_RELOAD,
@@ -145,7 +146,7 @@ namespace sv {
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 		
 #ifndef CLIENT_DLL
-		m_pPlayer->FireBullets(cShots, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(flSpread, flSpread, 0.0), flDistance, BULLET_PLAYER_BUCKSHOTAZ, 0, flDamage);
+		m_pPlayer->FireBullets(cShots, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(flSpread, flSpread, 0.0), flDistance, BULLET_PLAYER_BUCKSHOT, 0, flDamage);
 #endif
 
 		int flags;
@@ -155,7 +156,7 @@ namespace sv {
 		flags = 0;
 #endif
 
-		PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireSkull11, 0, g_vecZero, g_vecZero, 0.0, flSpread, 7, m_vVecAiming.x * 100, m_iClip == 0, cShots);
+		PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0, g_vecZero, g_vecZero, 0.0, flSpread, 7, m_vVecAiming.x * 100, m_iClip == 0, cShots);
 
 #ifndef CLIENT_DLL
 		if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)

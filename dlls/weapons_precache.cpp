@@ -373,6 +373,17 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_crossbowex21");
 	UTIL_PrecacheOtherWeapon("weapon_buffawp");
 	UTIL_PrecacheOtherWeapon("weapon_divinetitan");
+	UTIL_PrecacheOtherWeapon("weapon_railcannon");
+	UTIL_PrecacheOtherWeapon("weapon_skull11");
+	UTIL_PrecacheOtherWeapon("weapon_janus11");
+	UTIL_PrecacheOtherWeapon("weapon_crow5");
+	UTIL_PrecacheOtherWeapon("weapon_janusmk5");
+	UTIL_PrecacheOtherWeapon("weapon_janus3");
+	UTIL_PrecacheOtherWeapon("weapon_crow3");
+	UTIL_PrecacheOtherWeapon("weapon_crow11");
+	UTIL_PrecacheOtherWeapon("z4b_m60amethyst");
+	UTIL_PrecacheOtherWeapon("weapon_crossbow");
+	UTIL_PrecacheOtherWeapon("weapon_broad");
 
 	if (g_pGameRules->IsDeathmatch())
 	{
@@ -383,6 +394,7 @@ void W_Precache()
 	g_sModelIndexFireball = PRECACHE_MODEL("sprites/zerogxplode.spr");	// fireball
 	g_sModelIndexWExplosion = PRECACHE_MODEL("sprites/WXplo1.spr");		// underwater fireball
 	g_sModelIndexSmoke = PRECACHE_MODEL("sprites/steam1.spr");		// smoke
+	g_sModelIndexSmokeBeam = PRECACHE_MODEL("sprites/smoke.spr");
 	g_sModelIndexBubbles = PRECACHE_MODEL("sprites/bubble.spr");		// bubbles
 	g_sModelIndexBloodSpray = PRECACHE_MODEL("sprites/bloodspray.spr");	// initial blood
 	g_sModelIndexBloodDrop = PRECACHE_MODEL("sprites/blood.spr");		// splattered blood

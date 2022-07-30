@@ -142,6 +142,9 @@ class CMod_ZB3Classic : public CMod_ZombieHero
 {
 public:
 	void InstallPlayerModStrategy(CBasePlayer*) override;
+	float GetAdjustedEntityDamage(CBaseEntity* victim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+
+	EventDispatcher<void(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType)> m_eventTakeDamage;
 };
 
 class CPlayerModStrategy_ZB3Classic : public CPlayerModStrategy_ZB3
@@ -155,6 +158,13 @@ public:
 	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, const char* name) override;
 	void CmdStart(struct usercmd_s* cmd, unsigned int random_seed) override;
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet);
+	void OnSpawn() override;
+
+	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);
+
+protected:
+	EventListener m_eventTakeDamageListener;
 
 private:
 	time_point_t m_flNextCheckButton;

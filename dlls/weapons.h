@@ -590,7 +590,7 @@ public:
 			|| m_iId == WEAPON_M950SE
 			|| m_iId == WEAPON_SFPISTOL
 			|| m_iId == WEAPON_Y22S2SFPISTOL
-			|| m_iId == Z4B_RAGINGBULL
+			|| m_iId == WEAPON_Z4B_RAGINGBULL
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -690,7 +690,7 @@ private:
 	int m_iSign;
 	float m_flDamage;
 	float m_flNumFrames;
-
+	int m_iSprIndex[3];
 	CUtlVector<CBaseEntity*>* m_pEnemyList;
 	CUtlVector<CBaseEntity*>* m_pGroupList;
 
@@ -1016,7 +1016,8 @@ public:
 	//void RadiusAttack(float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer);
 	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.3f }; }
 
-	//float GetSkillData(int iSkill, int iType);
+public:
+	float m_maxFrame;
 private:
 	void StartFadeOut();
 	void FadeOut();
@@ -1031,8 +1032,10 @@ private:
 	int m_iType;
 	int m_iWpnType;
 	int m_iPianoNoteExp[5];
+	int m_iPianoNote[4];
 	int m_iPianoShootMuzzle;
 	int m_iActiveSkill;
+
 
 };
 
@@ -1116,6 +1119,7 @@ extern short g_sModelIndexLaserDot;
 
 extern short g_sModelIndexFireball;
 extern short g_sModelIndexSmoke;
+extern short g_sModelIndexSmokeBeam;
 extern short g_sModelIndexWExplosion;
 extern short g_sModelIndexBubbles;
 extern short g_sModelIndexBloodDrop;

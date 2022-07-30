@@ -188,8 +188,6 @@ void CM32VenomRocket::Spawn(void)
 void CM32VenomRocket::Precache(void)
 {
 	PRECACHE_MODEL("models/s_grenade.mdl");
-
-	m_iTrail = PRECACHE_MODEL("sprites/smoke.spr");
 }
 
 void CM32VenomRocket::FollowThink(void)
@@ -207,7 +205,7 @@ void CM32VenomRocket::IgniteThink(void)
 	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 	WRITE_BYTE(TE_BEAMFOLLOW);
 	WRITE_SHORT(entindex());
-	WRITE_SHORT(m_iTrail);
+	WRITE_SHORT(g_sModelIndexSmokeBeam);
 	WRITE_BYTE(40);
 	WRITE_BYTE(5);
 	WRITE_BYTE(224);

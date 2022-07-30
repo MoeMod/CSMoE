@@ -73,10 +73,16 @@ namespace sv {
 		for (int i = 0; i < m_pEnemyList->Count(); ++i)
 		{
 			if (!m_pEnemyList->Element(i))
+			{
 				m_pEnemyList->Remove(i);
-
-			if(!m_pEnemyList->Element(i)->IsAlive())
+				continue;
+			}
+				
+			if (!m_pEnemyList->Element(i)->IsAlive())
+			{
 				m_pEnemyList->Remove(i);
+				continue;
+			}			
 		}
 
 		if (m_pOwner->m_bIsZombie || !m_pOwner->IsAlive())

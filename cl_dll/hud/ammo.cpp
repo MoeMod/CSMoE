@@ -421,6 +421,7 @@ int CHudAmmo::VidInit(void)
 
 	m_flLastBuffHit = 0.0;
 	m_hBuffHit = SPR_Load("sprites/ishot.spr");
+	m_iInfinite = gHUD.GetSpriteIndex("infinite");
 	/*m_hBuffHit = (struct model_s*)gEngfuncs.GetSpritePointer(gEngfuncs.pfnSPR_Load("sprites/ishot.spr"));
 	m_iBuffHitHeight = SPR_Height(m_hBuffHit, 0);
 	m_iBuffHitWidth = SPR_Width(m_hBuffHit, 0);*/
@@ -1188,12 +1189,12 @@ int CHudAmmo::Draw(float flTime)
 	// place it here, so pretty dynamic crosshair will work even in spectator!
 	if (gHUD.m_iHideHUDDisplay & HIDEHUD_CROSSHAIR && m_pWeapon)
 	{
-		SetCrosshair(m_pWeapon->hAutoaim, m_pWeapon->rcAutoaim, 255, 255, 255);
+		SetCrosshair(m_pWeapon->hAutoaim, m_pWeapon->rcAutoaim, 255, 255, 255);	
 		switchCrosshairType = true;
 	}
 	else if( gHUD.m_iFOV > 40 )
 	{
-		if (m_pWeapon && (m_pWeapon->iId == WEAPON_SKULL5 || m_pWeapon->iId == WEAPON_SKULL6) && gHUD.m_iFOV < 90)
+		if (m_pWeapon && (m_pWeapon->iId == WEAPON_SKULL5 || m_pWeapon->iId == WEAPON_SKULL6 || m_pWeapon->iId == WEAPON_CROSSBOW) && gHUD.m_iFOV < 90)
 		{
 			if (!switchCrosshairType)
 			{
@@ -1332,7 +1333,14 @@ int CHudAmmo::Draw(float flTime)
 
 			// GL Seems to need this
 			DrawUtils::ScaleColors(r, g, b, a );
-			x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
+
+			if (gWR.CountAmmo(pw->iAmmoType) > 1500)
+			{
+				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+				SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
+			}
+			else
+				x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
 
 
 		}
@@ -1346,8 +1354,21 @@ int CHudAmmo::Draw(float flTime)
 			}
 
 			// SPR_Draw a bullets only line
-			x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
-			x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
+			if (gWR.CountAmmo(pw->iAmmoType) > 1500)
+			{
+				x = ScreenWidth - AmmoWidth - iIconWidth;
+				int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+				x -= width;
+
+				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+				SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
+				x = ScreenWidth - AmmoWidth - iIconWidth;
+			}
+			else
+			{
+				x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+				x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
+			}
 		}
 
 		// Draw the ammo Icon
@@ -1370,7 +1391,19 @@ int CHudAmmo::Draw(float flTime)
 		{
 			y -= gHUD.m_iFontHeight + gHUD.m_iFontHeight/4;
 			x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
-			x = DrawUtils::DrawHudNumber(x, y, iFlags|DHN_3DIGITS, gWR.CountAmmo(pw->iAmmo2Type), r, g, b);
+
+			if (gWR.CountAmmo(pw->iAmmo2Type) >= 255)
+			{
+				x = ScreenWidth - AmmoWidth - iIconWidth;
+				int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+				x -= width;
+
+				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+				SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
+				x = ScreenWidth - AmmoWidth - iIconWidth;
+			}
+			else
+				x = DrawUtils::DrawHudNumber(x, y, iFlags|DHN_3DIGITS, gWR.CountAmmo(pw->iAmmo2Type), r, g, b);
 
 			// Draw the ammo Icon
 			SPR_Set(m_pWeapon->hAmmo2, r, g, b);
@@ -1526,10 +1559,19 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		FillRGBABlend(NORTH_SOUTH_XPOS, NORTH_YPOS, 1, iLength, m_R, m_G, m_B, m_iAlpha);
 		FillRGBABlend(NORTH_SOUTH_XPOS, SOUTH_YPOS, 1, iLength, m_R, m_G, m_B, m_iAlpha);
 	}*/
-	if (gHUD.m_NVG.m_iFlags)
-		DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, false, 250, 50, 50, m_iAlpha);
+	if (data.iAccuracyFlags & CROSSHAIR_COLOR_CUSTOM)
+	{
+		if(weaponid == WEAPON_JANUS11 || weaponid == WEAPON_JANUS3)
+			DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, m_bAdditive, 170, 83, 196, m_iAlpha);
+	}
 	else
-		DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, m_bAdditive, m_R, m_G, m_B, m_iAlpha);
+	{
+		if (gHUD.m_NVG.m_iFlags)
+			DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, false, 250, 50, 50, m_iAlpha);
+		else
+			DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, m_bAdditive, m_R, m_G, m_B, m_iAlpha);
+	}
+	
 	return;
 }
 
@@ -1984,7 +2026,14 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 			iX = ScreenWidth - 5 - iIconWidth;
 			// GL Seems to need this
 			iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 4, 0);
-			DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 4);
+			if (gWR.CountAmmo(pw->iAmmoType) > 1500)
+			{
+				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+				SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iInfinite));
+			}
+			else
+				DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 4);
+		
 		}
 		else
 		{
@@ -1993,8 +2042,19 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 
 			iX = ScreenWidth - 5 - iIconWidth;
 			// GL Seems to need this
-			iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
-			DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
+			if (gWR.CountAmmo(pw->iAmmoType) > 1500)
+			{
+				int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+				iX -= width;
+
+				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+				SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iInfinite));
+			}
+			else
+			{
+				iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
+				DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
+			}
 		}
 
 		// Draw the ammo Icon
@@ -2019,9 +2079,19 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 			iY = ScreenHeight - 15 - gHUD.m_NEWHUD_iFontHeight;
 			iX = ScreenWidth - 215;
 
-			iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmo2Type), FALSE, 3, 0);
-			DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmo2Type), r, g, b, 255, FALSE, 3);
+			if (gWR.CountAmmo(pw->iAmmo2Type) >= 255)
+			{
+				int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+				iX -= width;
 
+				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+				SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iInfinite));
+			}
+			else
+			{
+				iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmo2Type), FALSE, 3, 0);
+				DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmo2Type), r, g, b, 255, FALSE, 3);
+			}
 			// Draw the ammo Icon
 			iX = ScreenWidth - 215;
 			SPR_Set(m_pWeapon->hAmmo2, r, g, b);

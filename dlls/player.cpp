@@ -5515,6 +5515,15 @@ void CBasePlayer::CheckZombieModeBuff(void)
 		{
 			pev->health -= m_flHealthDecreaseAmount;
 
+			if (pBuffAttacker)
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pBuffAttacker);
+				WRITE_LONG((long)m_flHealthDecreaseAmount);
+				WRITE_SHORT(ENTINDEX(edict()));
+				WRITE_BYTE(0);
+				MESSAGE_END();
+			}
+			
 			if (pev->health > 0)
 			{
 				m_iHealthDecreaseCount--;
@@ -5527,11 +5536,13 @@ void CBasePlayer::CheckZombieModeBuff(void)
 				pev->health = 1;
 
 				m_tHealthDecreaseStartTime = invalid_time_point;
+				pBuffAttacker = nullptr;
 			}
 		}
 	}
 	else
 	{
+		pBuffAttacker = nullptr;
 		m_tHealthDecreaseStartTime = invalid_time_point;
 		m_flHealthDecreaseAmount = 0;
 		m_tHealthDecreaseInterval = invalid_time_point;
@@ -5994,6 +6005,8 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/z4b/v_barrettd.mdl");
 		case WEAPON_BUFFAWP:
 			pev->viewmodel = MAKE_STRING("models/v_buffawp.mdl");
+		case WEAPON_CROSSBOW:
+			pev->viewmodel = MAKE_STRING("models/v_crossbow.mdl");
 		default:
 			break;
 		}
@@ -9039,6 +9052,18 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_CROSSBOWEX21:
 		case WEAPON_STUNRIFLE:
 		case WEAPON_BUFFAWP:
+		case WEAPON_JANUSMK5:
+		case WEAPON_CROW5:
+		case WEAPON_JANUS11:
+		case WEAPON_CROW11:
+		case WEAPON_CHARGER5:
+		case WEAPON_CHARGER7:
+		case WEAPON_Z4B_M60AMETHYST:
+		case WEAPON_Z4B_DBARRELAMETHYST:
+		case WEAPON_Z4B_DEAGLEAMETHYST:
+		case WEAPON_Z4B_AR57AMETHYST:
+		case WEAPON_Z4B_ACRAMETHYST:
+		case WEAPON_BROAD:
 			return TRUE;
 		}
 	}

@@ -9,6 +9,7 @@
 #include "player.h"
 #include "bot_include.h"
 #include "game_shared/steam_util.h"
+#include "map_manager.h"
 
 #include <string>
 #include <algorithm>
@@ -65,13 +66,39 @@ BOOL CSDM_IsSpawnPointValid(CBaseEntity *pPlayer, const SpawnPointData &data)
 void CSDM_ApplyRandomSpawnPoint(CBaseEntity *pEntity, const SpawnPointData & data)
 {
 	pEntity->pev->origin = data.origin + Vector(0, 0, 1);
+	//pEntity->pev->velocity = g_vecZero;
+	//pEntity->pev->angles = data.angles;
+	//pEntity->pev->v_angle = data.v_angle;
+	pEntity->pev->v_angle = g_vecZero;
 	pEntity->pev->velocity = g_vecZero;
-	pEntity->pev->angles = data.angles;
-	pEntity->pev->v_angle = data.v_angle;
+	pEntity->pev->punchangle = g_vecZero;
+
 }
 
 bool CSDM_DoRandomSpawn(CBaseEntity *pEntity)
 {
+	int bDoRandomSpawn = MapMgr_GetMapRandomRespawn(STRING(gpGlobals->mapname));
+	if (bDoRandomSpawn)
+	{
+		if (g_vecSpawnCSDM.empty())
+			return false;
+
+		if (g_vecSpawnCSDM.empty())
+			return false;
+		// randomize those fucking spawn points
+		std::random_device rd;
+		std::shuffle(g_vecSpawnCSDM.begin(), g_vecSpawnCSDM.end(), rd);
+		using namespace std::placeholders;
+		// find the first availble one
+		auto iter = std::find_if(g_vecSpawnCSDM.begin(), g_vecSpawnCSDM.end(), std::bind(CSDM_IsSpawnPointValid, pEntity, _1));
+		if (iter == g_vecSpawnCSDM.end())
+			return false;
+
+		// sets these item
+		CSDM_ApplyRandomSpawnPoint(pEntity, *iter);
+		return true;
+	}
+	
 	// randomize those fucking spawn points
 	std::random_device rd;
 	std::shuffle(g_vecSpawnCSDM.begin(), g_vecSpawnCSDM.end(), rd);

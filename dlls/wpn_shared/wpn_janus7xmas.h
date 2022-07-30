@@ -53,6 +53,7 @@ public:
 	void SecondaryAttack() override;
 	void Reload() override;
 	void WeaponIdle() override;
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;

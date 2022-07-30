@@ -71,8 +71,8 @@ namespace sv {
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "556NatoBox";
 		p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
-		p->pszAmmo2 = NULL;
-		p->iMaxAmmo2 = -1;
+		p->pszAmmo2 = "InfiniteAmmo";
+		p->iMaxAmmo2 = 255;
 		p->iMaxClip = JANUS7_AMMO_GIVE;
 		p->iSlot = 0;
 		p->iPosition = 4;
@@ -83,6 +83,11 @@ namespace sv {
 		return 1;
 	}
 
+	int CJanus7xmas::ExtractAmmo(CBasePlayerWeapon* pWeapon)
+	{
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
+		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+	}
 
 	BOOL CJanus7xmas::Deploy(void)
 	{
@@ -114,6 +119,7 @@ namespace sv {
 		else if (m_iWeaponState & WPNSTATE_M4A1_SILENCED && (gpGlobals->time > m_flLastFire + 15.0s))
 		{
 			m_iShotsCount = 0;
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
 			SendWeaponAnim(ANIM_CHANGEA, UseDecrement() != FALSE);
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.5s;
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5s;
@@ -159,6 +165,7 @@ namespace sv {
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 			m_iWeaponState |= WPNSTATE_M4A1_SILENCED;
 			m_flLastFire = gpGlobals->time;
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 255;
 		}
 
 	}

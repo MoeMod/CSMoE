@@ -126,6 +126,18 @@ namespace cl::event::wondercannon {
 			}
 
 			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/wondercannon-1.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
+
+			EV_GetGunPosition(args, vecSrc, origin);
+			VectorCopy(forward, vecAiming);
+			Vector vSpread;
+
+			vSpread.x = args->fparam1;
+			vSpread.y = args->fparam2;
+			EV_HLDM_FireBullets(idx,
+				forward, right, up,
+				1, vecSrc, vecAiming,
+				vSpread, 8192.0, BULLET_PLAYER_556MM,
+				2);
 		}
 	}
 }

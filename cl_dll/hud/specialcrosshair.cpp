@@ -48,6 +48,7 @@ enum
 	WPN_WHIPSWORD,
 	WPN_Y22S2SFSWORD,
 	WPN_PIANOGUNEX,
+	WPN_DIVINETITAN,
 };
 
 enum
@@ -71,6 +72,9 @@ enum
 	PIANOGUNEX_CRITICAL,
 	PIANOGUNEX_HEAL,
 	PIANOGUNEX_NULL,
+	DIVINETITAN_ON,
+	DIVINETITAN_BMODE,
+	DIVINETITAN_FULL,
 };
 
 int CHudSpecialCrossHair::Init()
@@ -139,6 +143,9 @@ int CHudSpecialCrossHair::VidInit()
 
 	R_InitTexture(m_pCurTexture[12], "resource/hud/buffclassskill_heal.tga");
 	R_InitTexture(m_pCurTexture[13], "resource/hud/buff_critical.tga");
+
+	R_InitTexture(m_pCurTexture[14], "sprites/divinetitan_aim_on.tga");
+	//R_InitTexture(m_pCurTexture[15], "sprites/ef_divinetitan_bmode.tga");
 	return 1;
 }
 
@@ -373,6 +380,42 @@ int CHudSpecialCrossHair::Draw(float flTime)
 		}
 		}
 		break;
+	}
+	case WPN_DIVINETITAN:
+	{
+		wide = 200;
+		height = 200;
+
+		float x = ScreenWidth / 2;
+		float y = ScreenHeight / 2;
+		const float flScale = 0.0f;
+		float iX, iY;
+		float iX2, iY2;
+		iX = x - wide / 2;
+		iY = y - height / 2;
+
+		float wide2, height2;
+		wide2 = 752;
+		height2 = 752;
+		iX2 = x - wide2 / 2;
+		iY2 = y - height2 / 2;
+
+		switch (iType)
+		{
+		case DIVINETITAN_ON:m_pCurTexture[14]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		//case DIVINETITAN_BMODE:m_pCurTexture[15]->Draw2DQuadScaled(iX2, iY2, iX + wide2, iY + height2); break;
+		case DIVINETITAN_FULL :
+		{
+			m_pCurTexture[14]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+			//m_pCurTexture[15]->Draw2DQuadScaled(iX2, iY2, iX + wide2, iY + height2); break;
+		}
+		case AIM_NO:return 1;
+		default:
+			break;
+		}
+
+
+
 	}
 	}
 

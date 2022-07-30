@@ -6,6 +6,81 @@ namespace cl {
 namespace sv {
 #endif
 
+	class CDivineTitan;
+	class CDivineTitanBase : public CBaseAnimating
+	{
+	public:
+		void Spawn() override;
+		void Precache() override;
+		void ClearEnt(int iClear);
+		int GetWeaponsId(void) override { return WEAPON_DIVINETITAN; }
+
+	public:
+		static CDivineTitanBase* CreateBeam(int iType, const Vector& vecStart, const Vector& vecOrigin, edict_t* pentOwner);
+		static CDivineTitanBase* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam, int iData, CDivineTitan* pWeapon);
+
+		void EXPORT OnThink(void);
+		void EXPORT OnTouch(CBaseEntity* pOther);
+
+	public:
+		void MakeLoopGenerator();
+		void CheckDistanceBetweenEnemies();
+		void LoopInstantDamage(CBasePlayer* pAttackPlayer);
+		float GetDamage_Missile(int IsTouch) const;
+		float GetRange_Missile() const;
+		float GetDamage_Instance() const;
+		float GetRange_Instance() const;
+
+	public:
+		CBasePlayer* m_pOwner;
+		CDivineTitan* m_pWeapon;
+
+		int m_iType;
+		int m_iSaveWpnState;
+		Vector m_cStartEntity;
+		CBaseEntity* m_pFirstEnemy;
+		CBaseEntity* m_iSaveEnemies[3];
+		Vector m_vEndPosition;
+
+		time_point_t m_flTimeNextCharge;
+		std::vector<EHANDLE> phs9_10_11;
+		std::vector<EHANDLE> m_pGroupList;
+
+
+
+
+	};
+
+	class CDivineTitanSummon : public CBaseAnimating
+	{
+	public:
+		void Spawn() override;
+		void Precache() override;
+		int GetWeaponsId(void) override { return WEAPON_DIVINETITAN; }
+
+	public:
+		static CDivineTitanSummon* Create(int iType, bool iIsEffect, int iEffectType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+		void EXPORT OnThink(void);
+		void EXPORT OnTouch(CBaseEntity* pOther);
+
+	public:
+		float GetDamage_SummonerAttack(int IsAttraction) const;
+		float GetRange_SummonerAttack() const;
+	public:
+
+		int m_iType;
+		int m_iEffectType;
+		int m_iEffect[3];
+
+		//Used For Summoner Effects
+		time_point_t m_flNextThinkPoint[2];
+		//Used For Damage taking and attraction.
+		time_point_t m_flNextDamagePoint[2];
+		//Unused
+		time_point_t m_flEffRemoveTime;
+		Vector m_vSaveOrigin;
+	};
+
 	class CDivineTitan : public CBasePlayerWeapon
 	{
 		// From model: Frames/FPS
@@ -65,10 +140,13 @@ namespace sv {
 		int iItemSlot() override { return GRENADE_SLOT; }
 		void PrimaryAttack() override;
 		void SecondaryAttack() override;
-		void WeaponIdle() override;
 		void ItemPostFrame() override;
-		void ResetChargeTimer();
-		void InitChargeState();
+		void WeaponIdle() override;
+		void UpdateOnRemove(void);
+		void RemoveEntity(void);
+
+		BOOL IsSignal();
+		
 		BOOL UseDecrement() override
 		{
 #ifdef CLIENT_WEAPONS
@@ -78,77 +156,27 @@ namespace sv {
 #endif
 		}
 	public:
+
+#ifndef CLIENT_DLL
+		CDivineTitanBase* m_pTitan;
+#endif
 		int m_iButton;
+		int m_iWpnState;
+		int m_iFade;
+		int m_iSaveSpecialAmmo;
+
+		int m_CrossHairState;
+		int m_CrossHairStateStored;
+		time_point_t m_flTimeNextMessage;
 		time_point_t m_flTimeNextCharge;
 		time_point_t m_flPlayerThink;
+		time_point_t m_flTimeholster;
 
 	private:
-		int m_iWpnState;
+		
+		int m_iSaveShoots;
 		int m_iAutoAttackStage;
 		bool m_bCanThrow;
-	};
-	class CDivineTitanBase : public CBaseAnimating
-	{
-	public:
-		void Spawn() override;
-		void Precache() override;
-		void ClearEnt(int iClear);
-
-	public:
-		static CDivineTitanBase* CreateBeam(int iType, const Vector& vecStart, const Vector& vecOrigin, edict_t* pentOwner);
-		static CDivineTitanBase* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam, int iData);
-		
-		void EXPORT OnThink(void);
-		void EXPORT OnTouch(CBaseEntity* pOther);
-
-	public:
-		void MakeLoopGenerator();
-		void LoopInstantDamage(CBasePlayer* pAttackPlayer);
-		float GetDamage_Missile(int IsTouch) const;
-		float GetRange_Missile() const;
-		float GetDamage_Instance() const;
-		float GetRange_Instance() const;
-
-	public:
-
-		int m_iType;
-		int m_iSaveWpnState;
-		Vector m_cStartEntity;
-		CBaseEntity* m_pFirstEnemy;
-		Vector m_vEndPosition;
-
-		std::vector<EHANDLE> phs9_10_11;
-
-		
-	};
-
-	class CDivineTitanSummon : public CBaseAnimating
-	{
-	public:
-		void Spawn() override;
-		void Precache() override;
-
-	public:
-		static CDivineTitanSummon* Create(int iType, bool iIsEffect, int iEffectType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
-		void EXPORT OnThink(void);
-		void EXPORT OnTouch(CBaseEntity* pOther);
-
-	public:
-		float GetDamage_SummonerAttack(int IsAttraction) const;
-		float GetRange_SummonerAttack() const;
-	public:
-
-		int m_iType;
-		int m_iEffectType;
-		int m_iEffect[3];
-
-		//Used For Summoner Effects
-		time_point_t m_flNextThinkPoint[2];
-		//Used For Damage taking and attraction.
-		time_point_t m_flNextDamagePoint[2];
-		//Unused
-		time_point_t m_flEffRemoveTime;
-		Vector m_vSaveOrigin;
 	};
 
 }

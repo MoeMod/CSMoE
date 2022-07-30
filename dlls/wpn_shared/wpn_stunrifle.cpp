@@ -320,6 +320,9 @@ namespace sv {
         if (!a2->IsPlayer() && a2->Classify() != CLASS_PLAYER_ALLY)
             return false;
 
+        if (!a2->IsAlive())
+            return false;
+
 #ifndef CLIENT_DLL
         if (g_pGameRules->PlayerRelationship(m_pPlayer, a2) == GR_TEAMMATE)
             return false;
