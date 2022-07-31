@@ -1,4 +1,4 @@
-#ifdef XASH_DEDICATED
+#ifdef XASH_MYSQL
 
 #include "db_main.h"
 

@@ -34,6 +34,9 @@
 #include "wpn_shared/wpn_cannonex.h"
 #ifdef XASH_DEDICATED
 #include "player/player_fuck.h"
+#endif
+
+#ifdef XASH_MYSQL
 #include "database/db_main.h"
 #endif
 
@@ -494,12 +497,12 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 		return;
 	}
 
-#ifdef XASH_DEDICATED
+#ifdef XASH_MYSQL
 	if (db::g_pDataBase != NULL)
 	{
 		db::g_pDataBase->ClientPutInServer(pPlayer);
 	}
-#endif // XASH_DEDICATED
+#endif // XASH_MYSQL
 	pPlayer->m_bNotKilled = true;
 	pPlayer->m_iIgnoreGlobalChat = IGNOREMSG_NONE;
 	pPlayer->m_iTeamKills = 0;
@@ -2541,7 +2544,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			Host_Say(pEntity, 0);
 		}
 	}
-#ifdef XASH_DEDICATED
+#ifdef XASH_MYSQL
 	else if (db::g_pDataBase != NULL && FStrEq(pcmd, "get_token"))
 	{
 		db::g_pDataBase->ClientToken(player);
@@ -2550,7 +2553,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		db::g_pDataBase->ClientLogin(player);
 	}
-#endif // XASH_DEDICATED
+#endif // XASH_MYSQL
 	else if (FStrEq(pcmd, "inspect"))
 	{
 		if ((int)CVAR_GET_FLOAT("mp_csgoinspect"))
@@ -3749,12 +3752,12 @@ void EXT_FUNC ServerDeactivate()
 		g_pHostages->ServerDeactivate();
 	}
 
-#ifdef XASH_DEDICATED
+#ifdef XASH_MYSQL
 	if (db::g_pDataBase != NULL)
 	{
 		db::g_pDataBase->ServerDeactivate();
 	}
-#endif // XASH_DEDICATED
+#endif // XASH_MYSQL
 }
 
 void EXT_FUNC ServerActivate(edict_t *pEdictList, int edictCount, int clientMax)
@@ -3809,12 +3812,12 @@ void EXT_FUNC ServerActivate(edict_t *pEdictList, int edictCount, int clientMax)
 		g_pHostages->ServerActivate();
 	}
 
-#ifdef XASH_DEDICATED
+#ifdef XASH_MYSQL
 	if (db::g_pDataBase != NULL)
 	{
 		db::g_pDataBase->ServerActivate();
 	}
-#endif // XASH_DEDICATED
+#endif // XASH_MYSQL
 }
 
 void EXT_FUNC PlayerPreThink(edict_t *pEntity)
@@ -3891,12 +3894,12 @@ void EXT_FUNC StartFrame()
 		TheTutor->StartFrame(gpGlobals->time);
 	}
 
-#ifdef XASH_DEDICATED
+#ifdef XASH_MYSQL
 	if (db::g_pDataBase != NULL)
 	{
 		db::g_pDataBase->StartFrame();
 	}
-#endif // XASH_DEDICATED
+#endif // XASH_MYSQL
 }
 
 void ClientPrecache()

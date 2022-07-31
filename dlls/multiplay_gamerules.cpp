@@ -24,7 +24,7 @@
 #include "newmenus.h"
 #include "client/wdnmd.h"
 
-#ifdef XASH_DEDICATED
+#ifdef XASH_MYSQL
 #include "database/db_main.h"
 #endif
 
@@ -831,7 +831,7 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 	InstallBotControl();
 #endif // CSTRIKE
 
-#ifdef XASH_DEDICATED
+#ifdef XASH_MYSQL
 	db::InstallDataBaseManager();
 #endif
 	InstallHostageManager();
@@ -5263,12 +5263,12 @@ void CHalfLifeMultiplay::ClientUserInfoChanged(CBasePlayer *pPlayer, char *infob
 	pPlayer->SetPlayerModel(pPlayer->m_bHasC4);
 	pPlayer->SetPrefsFromUserinfo(infobuffer);
 
-#ifdef XASH_DEDICATED
+#ifdef XASH_MYSQL
 	if (db::g_pDataBase != NULL)
 	{
 		db::g_pDataBase->ClientUserInfoChanged(pPlayer, infobuffer);
 	}
-#endif // XASH_DEDICATED
+#endif // XASH_MYSQL
 }
 
 bool CHalfLifeMultiplay::CheckCanStartVoteMaps(bool bAlert)
