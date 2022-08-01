@@ -268,13 +268,8 @@ static void listdirectory( stringlist_t *list, const char *path, qboolean lowerc
 	signed char *c;
 #ifdef _WIN32
 	char pattern[4096];
-#ifdef _WIN64
-	struct _finddatai64_t	n_file;
-	intptr_t		hFile;
-#else
-	struct _finddata_t	n_file;
-	int		hFile;
-#endif
+	WIN32_FIND_DATAW	n_file;
+	HANDLE		hFile;
 #else
 	DIR *dir;
 	struct dirent *entry;
@@ -282,18 +277,18 @@ static void listdirectory( stringlist_t *list, const char *path, qboolean lowerc
 
 #if defined(__ANDROID__)
 	// handle android asset
-	if(!strcmp(path, "/android_asset"))
+	if (!strcmp(path, "/android_asset"))
 	{
 		Android_AssetList(list, "", stringlistappend);
 	}
-	if(!strncmp(path, "/android_asset/", 15))
+	if (!strncmp(path, "/android_asset/", 15))
 	{
 #if 0
-		AAssetManager *mgr = Android_GetAssetManager();
-		AAssetDir *assetDir = AAssetManager_openDir(mgr, path + 14);
-		const char *d_name = NULL;
-		while( ( d_name = AAssetDir_getNextFileName( assetDir ) ))
-			stringlistappend( list, d_name );
+		AAssetManager* mgr = Android_GetAssetManager();
+		AAssetDir* assetDir = AAssetManager_openDir(mgr, path + 14);
+		const char* d_name = NULL;
+		while ((d_name = AAssetDir_getNextFileName(assetDir)))
+			stringlistappend(list, d_name);
 		AAssetDir_close(assetDir);
 #else
 		Android_AssetList(list, path + 15, stringlistappend);
@@ -303,27 +298,27 @@ static void listdirectory( stringlist_t *list, const char *path, qboolean lowerc
 #endif
 
 #ifdef _WIN32
-	Q_snprintf( pattern, sizeof( pattern ), "%s*", path );
+	// MoeMod : fix Chinese path
+	Q_snprintf(pattern, sizeof(pattern), "%s*", path);
+	wchar_t wpattern[4096];
+	MultiByteToWideChar(CP_UTF8, 0, pattern, 4096, wpattern, 4096);
 
 	// ask for the directory listing handle
-#ifdef _WIN64
-	hFile = _findfirsti64( pattern, &n_file );
-	if (hFile < 0) return;
-#else
-	hFile = _findfirst(pattern, &n_file);
-	if (hFile == -1) return;
-#endif
+	hFile = FindFirstFileW(wpattern, &n_file);
+	if (hFile == INVALID_HANDLE_VALUE) return;
 
 	// start a new chain with the the first name
-	stringlistappend( list, n_file.name );
+	char filename[MAX_PATH];
+	WideCharToMultiByte(CP_UTF8, 0, n_file.cFileName, MAX_PATH, filename, MAX_PATH, nullptr, nullptr);
+	stringlistappend(list, filename);
+
 	// iterate through the directory
-#ifdef _WIN64
-	while (_findnexti64( hFile, &n_file ) == 0 )
-#else
-	while (_findnext(hFile, &n_file) == 0)
-#endif
-		stringlistappend( list, n_file.name );
-	_findclose( hFile );
+	while (FindNextFileW(hFile, &n_file))
+	{
+		WideCharToMultiByte(CP_UTF8, 0, n_file.cFileName, MAX_PATH, filename, MAX_PATH, nullptr, nullptr);
+		stringlistappend(list, filename);
+	}
+	FindClose(hFile);
 #else
 	if( !( dir = opendir( path ) ) )
 		return;
@@ -2390,7 +2385,10 @@ qboolean FS_SysFolderExists( const char *path )
 	_findclose(hFile);
 	return 1;
 #elif defined( _WIN32 )
-	DWORD	dwFlags = GetFileAttributes( path );
+	// MoeMod : fix Chinese path
+	wchar_t wpath[MAX_PATH];
+	MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, MAX_PATH);
+	DWORD	dwFlags = GetFileAttributesW(wpath);
 
 	return ( dwFlags != -1 ) && ( dwFlags & FILE_ATTRIBUTE_DIRECTORY );
 #else
