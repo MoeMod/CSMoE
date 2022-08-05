@@ -13,7 +13,7 @@ private:
 	DECLARE_CLASS_SIMPLE(CCSTeamMenu, CTeamMenu);
 
 public:
-	CCSTeamMenu(void);
+	CCSTeamMenu(IViewport* pViewPort);
 	~CCSTeamMenu(void);
 
 public:
@@ -21,6 +21,7 @@ public:
 	bool NeedsUpdate(void) { return true; }
 	void ShowPanel(bool bShow);
 	void SetVisible(bool state);
+	void UpdateGameMode();
 
 private:
 	enum { NUM_TEAMS = 3 };
@@ -36,9 +37,10 @@ public:
 	virtual void PaintBackground(void);
 	virtual void PerformLayout(void);
 	virtual void ApplySchemeSettings(vgui2::IScheme *pScheme);
+	virtual vgui2::Panel* CreateControlByName(const char* controlName);
 
 protected:
-	virtual MouseOverPanelButton *CreateNewMouseOverPanelButton(vgui2::EditablePanel *panel);
+	void SetupControlSettings();
 };
 
 #endif

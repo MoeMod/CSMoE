@@ -124,6 +124,7 @@ public:
 	virtual bool ShowVGUIMenuByName(const char* szName) { return false; }
 	virtual bool HideVGUIMenu(int iMenu) { return false; }
     virtual void UpdateGameMode() {}
+	virtual int GetAllowSpectators() { return true; }
 
 	template <class T>
 	T* FindPanel(const char* pszName) { return dynamic_cast<T*>(FindPanelByName(pszName)); }

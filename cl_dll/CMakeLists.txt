@@ -436,8 +436,12 @@ if(XASH_VGUI2)
 		vgui2/CGameUITestPanel.cpp
 		vgui2/game_controls/buymenu.cpp
 		vgui2/game_controls/buysubmenu.cpp
+		vgui2/game_controls/teammenu.cpp
+		vgui2/game_controls/classmenu.cpp
 		vgui2/csmoe/CSBackGroundPanel.cpp
 		vgui2/csmoe/vgui_int.cpp
+		vgui2/csmoe/cstriketeammenu.cpp
+		vgui2/csmoe/cstrikeclassmenu.cpp
 		vgui2/csmoe/BuyMenu/buypresetbutton.cpp
 		vgui2/csmoe/BuyMenu/cstrikebuymenu.cpp
 		vgui2/csmoe/BuyMenu/cstrikebuymouseoverpanel.cpp

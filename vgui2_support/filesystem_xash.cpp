@@ -243,10 +243,14 @@ bool CXashFileSystem::FileExists(const char *pFileName)
 
 bool CXashFileSystem::IsDirectory(const char *pFileName)
 {
+#if 0
     struct stat buf;
     if( stat( pFileName, &buf ) != -1 )
         return S_ISDIR( buf.st_mode );
-    return false;
+#else
+    qboolean FS_SysFolderExists(const char* path);
+    return FS_SysFolderExists(pFileName);
+#endif
 }
 
 FileHandle_t CXashFileSystem::Open(const char *pFileName, const char *pOptions, const char *pathID)
@@ -548,11 +552,14 @@ bool CXashFileSystem::FullPathToRelativePath(const char *pFullpath, char *pRelat
 bool CXashFileSystem::GetCurrentDirectory(char *pDirectory, int maxlen)
 {
 #ifdef _WIN32
-    if ( !::GetCurrentDirectoryA( maxlen, pDirectory ) )
-#elif __linux__
+    wchar_t wbuf[MAX_PATH];
+    if ( !::GetCurrentDirectoryW(MAX_PATH, wbuf) )
+        return false;
+    WideCharToMultiByte(CP_UTF8, 0, wbuf, MAX_PATH, pDirectory, maxlen, nullptr, nullptr);
+#else
     if ( !getcwd( pDirectory, maxlen ) )
+        return false;
 #endif
-    return false;
 
     FixSlashes(pDirectory);
 

@@ -10,6 +10,8 @@
 #include "hud.h"
 #include "parsemsg.h"
 #include "csmoe/BuyMenu/cstrikebuymenu.h"
+#include "csmoe/cstriketeammenu.h"
+#include "csmoe/cstrikeclassmenu.h"
 #include "csmoe/zsh/zshelterteamhousingdlg.h"
 
 using cl::gHUD;
@@ -79,6 +81,8 @@ void CHudViewport::HideClientUI()
 void CHudViewport::CreateDefaultPanels()
 {
 	AddNewPanel(CreatePanelByName("ClientMOTD"));
+    AddNewPanel(CreatePanelByName(PANEL_TEAM));
+    AddNewPanel(CreatePanelByName(PANEL_CLASS));
     AddNewPanel(CreatePanelByName(PANEL_BUY));
     //AddNewPanel(CreatePanelByName(VIEWPORT_PANEL_SCORE));
 
@@ -95,6 +99,24 @@ IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
 			m_pMOTD = new CClientMOTD(this);
 		pPanel = m_pMOTD;
 	}
+    else if (Q_strcmp(PANEL_TEAM, pszName) == 0)
+    {
+        if (!m_pTeamMenu)
+        {
+            m_pTeamMenu = new CCSTeamMenu(this);
+            m_pTeamMenu->UpdateGameMode();
+        }
+        pPanel = m_pTeamMenu;
+    }
+    else if (Q_strcmp(PANEL_CLASS, pszName) == 0)
+    {
+        if (!m_pClassMenu)
+        {
+            m_pClassMenu = new CCSClassMenu(this);
+            m_pClassMenu->UpdateGameMode();
+        }
+        pPanel = m_pClassMenu;
+    }
 	else if (Q_strcmp(PANEL_BUY, pszName) == 0)
 	{
 		if(!m_pBuyMenu)
@@ -136,9 +158,20 @@ bool CHudViewport::ShowVGUIMenu(int iMenu)
     switch (iMenu)
     {
         case MENU_TEAM:
+        {
+            panel = m_pTeamMenu;
+            break;
+        }
         case MENU_CLASS_T:
+        {
+            panel = m_pClassMenu;
+            m_pClassMenu->SetTeam(TERRORIST);
+            break;
+        }
         case MENU_CLASS_CT:
         {
+            panel = m_pClassMenu;
+            m_pClassMenu->SetTeam(CT);
             break;
         }
         case MENU_BUY:
@@ -176,10 +209,15 @@ bool CHudViewport::HideVGUIMenu(int iMenu)
 
     switch (iMenu)
     {
-        case MENU_CLASS_T:
         case MENU_TEAM:
+        {
+            panel = m_pTeamMenu;
+            break;
+        }
+        case MENU_CLASS_T:
         case MENU_CLASS_CT:
         {
+            panel = m_pClassMenu;
             break;
         }
 
@@ -208,6 +246,10 @@ void CHudViewport::UpdateGameMode()
 {
     if(m_pBuyMenu)
         m_pBuyMenu->UpdateGameMode();
+    if (m_pTeamMenu)
+        m_pTeamMenu->UpdateGameMode();
+    if (m_pClassMenu)
+        m_pClassMenu->UpdateGameMode();
 }
 
 bool CHudViewport::ShowVGUIMenuByName(const char* szName)
