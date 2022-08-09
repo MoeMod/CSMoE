@@ -30,6 +30,19 @@ GNU General Public License for more details.
 #include "physics.h"
 #endif
 
+// TBB and <execution> is only supported on win32
+#ifdef _WIN32
+#define XASH_RENDER_PAR 1
+#endif
+
+#ifdef XASH_RENDER_PAR
+#ifdef XASH_TBBMALLOC
+#include "tbb/parallel_for_each.h"
+#else
+#include <execution>
+#endif
+#endif
+
 // NOTE: enable this if you want merge both 'model' and 'modelT' files into one model slot.
 // otherwise it's uses two slots in models[] array for models with external textures
 #define STUDIO_MERGE_TEXTURES
@@ -63,6 +76,12 @@ const char *legs_bones[] =
  "Bip01 R Foot" ,
 };
 
+typedef struct studiolight_item_s
+{
+	vec3_t vec[MAXSTUDIOBONES];
+	vec3_t color;	// ambient light colors
+} studiolight_item_t;
+
 typedef struct studiolight_s
 {
 	vec3_t		lightvec;			// light vector
@@ -70,10 +89,8 @@ typedef struct studiolight_s
 	vec3_t		lightspot;		// potential coords where placed lightsource
 
 	vec3_t		blightvec[MAXSTUDIOBONES];	// ambient lightvectors per bone
-	vec3_t		dlightvec[MAX_DLIGHTS][MAXSTUDIOBONES];
-	vec3_t		dlightcolor[MAX_DLIGHTS];	// ambient dynamic light colors
-	vec3_t		elightvec[MAX_ELIGHTS][MAXSTUDIOBONES];
-	vec3_t		elightcolor[MAX_ELIGHTS];	// ambient entity light colors
+	studiolight_item_t	dlight[MAX_DLIGHTS];
+	studiolight_item_t	elight[MAX_ELIGHTS];
 	int		numdlights;
 	int		numelights;
 } studiolight_t;
@@ -1575,13 +1592,13 @@ void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
 				lightinfo->shadelight += atten;
 			}
 
-			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->dlightvec[plight->numdlights][i] );
-			VectorScale( plight->dlightvec[plight->numdlights][i], atten, plight->dlightvec[plight->numdlights][i] );
+			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->dlight[plight->numdlights].vec[i] );
+			VectorScale( plight->dlight[plight->numdlights].vec[i], atten, plight->dlight[plight->numdlights].vec[i] );
 		}
 
-		plight->dlightcolor[plight->numdlights][0] = dl->color.r * (1.0f / 255.0f);
-		plight->dlightcolor[plight->numdlights][1] = dl->color.g * (1.0f / 255.0f);
-		plight->dlightcolor[plight->numdlights][2] = dl->color.b * (1.0f / 255.0f);
+		plight->dlight[plight->numdlights].color[0] = dl->color.r * (1.0f / 255.0f);
+		plight->dlight[plight->numdlights].color[1] = dl->color.g * (1.0f / 255.0f);
+		plight->dlight[plight->numdlights].color[2] = dl->color.b * (1.0f / 255.0f);
 		plight->numdlights++;
 	}
 
@@ -1661,13 +1678,13 @@ void GAME_EXPORT R_StudioEntityLight( alight_t *lightinfo )
 				lightinfo->shadelight += atten;
 			}
 
-			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->elightvec[plight->numelights][i] );
-			VectorScale( plight->elightvec[plight->numelights][i], atten, plight->elightvec[plight->numelights][i] );
+			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->elight[plight->numelights].vec[i] );
+			VectorScale( plight->elight[plight->numelights].vec[i], atten, plight->elight[plight->numelights].vec[i] );
 		}
 
-		plight->elightcolor[plight->numelights][0] = el->color.r * (1.0f / 255.0f);
-		plight->elightcolor[plight->numelights][1] = el->color.g * (1.0f / 255.0f);
-		plight->elightcolor[plight->numelights][2] = el->color.b * (1.0f / 255.0f);
+		plight->elight[plight->numelights].color[0] = el->color.r * (1.0f / 255.0f);
+		plight->elight[plight->numelights].color[1] = el->color.g * (1.0f / 255.0f);
+		plight->elight[plight->numelights].color[2] = el->color.b * (1.0f / 255.0f);
 		plight->numelights++;
 	}
 
@@ -1742,29 +1759,26 @@ void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 		if( lightcos > 1.0f ) lightcos = 1;
 		VectorAdd( illum, plight->lightcolor, illum );
 
-		r = r_studio_lambert->value;
-		if( r < 1.0f ) r = 1.0f;
+		r = max(r_studio_lambert->value, 1.0f);
 		lightcos = (lightcos + ( r - 1.0f )) / r; // do modified hemispherical lighting
 		if( lightcos > 0.0f ) VectorMA( illum, -lightcos, plight->lightcolor, illum );
 		
-		if( illum[0] <= 0.0f ) illum[0] = 0.0f;
-		if( illum[1] <= 0.0f ) illum[1] = 0.0f;
-		if( illum[2] <= 0.0f ) illum[2] = 0.0f;
+		illum = maxs(illum, {});
 
 		// now add all dynamic lights
 	//	#pragma omp parallel for
 		for( i = 0; i < plight->numdlights; i++)
 		{
-			lightcos = -DotProduct( normal, plight->dlightvec[i][bone] );
-			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->dlightcolor[i], illum );
+			lightcos = -DotProduct( normal, plight->dlight[i].vec[bone] );
+			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->dlight[i].color, illum );
 		}
 
 		// now add all entity lights
 		//#pragma omp parallel for
 		for( i = 0; i < plight->numelights; i++)
 		{
-			lightcos = -DotProduct( normal, plight->elightvec[i][bone] );
-			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->elightcolor[i], illum );
+			lightcos = -DotProduct( normal, plight->elight[i].vec[bone] );
+			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->elight[i].color, illum );
 		}
 	}
 	
@@ -2615,8 +2629,9 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 #ifdef STUDIO_SKINNING_OMP_MIN
 #pragma omp parallel for private(i) if(m_pSubModel->numverts > STUDIO_SKINNING_OMP_MIN)
 #endif
-	for (i = 0; i < m_pSubModel->numverts; i++)
+	auto vert_calc_fn = [pvertbone, pstudioverts](vec3_t &v)
 	{
+		int i = &v - g_xformverts;
 		Matrix3x4_VectorTransform(g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i]);
 		//scale multi by Rentro
 		if (RI.currententity->curstate.scale != 1.0f) {
@@ -2630,7 +2645,17 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 			VectorAdd(g_xformverts[i], temp2, g_xformverts[i]);
 			g_xformverts[i][2] += scale_offset * (RI.currententity->curstate.scale - 1.0f);
 		}
-	}
+	};
+#ifdef XASH_RENDER_PAR
+#ifdef XASH_TBBMALLOC
+	tbb::parallel_for_each(g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
+#else
+	std::for_each(std::execution::par_unseq, g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
+#endif
+#else
+	std::for_each(g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
+#endif
+
 	if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 	{
 		scale = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
@@ -2646,16 +2671,34 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 		// fill in sortedmesh info
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
-
-		for( i = 0; i < pmesh[j].numnorms; i++, pstudionorms++, pnormbone++ )
+		auto norm_calc_fn = [pnormbone, pstudionorms](vec3_t& v)
 		{
-			R_StudioLighting( g_lightvalues[i], *pnormbone, g_nFaceFlags, *pstudionorms );
+			int i = &v - g_lightvalues;
+			R_StudioLighting(g_lightvalues[i], pnormbone[i], g_nFaceFlags, pstudionorms[i]);
+		};
 
+		auto chrome_calc_fn = [pnormbone, pstudionorms](vec2_t& v)
+		{
+			int i = &v - g_chrome;
+			
 			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 			{
-				R_StudioSetupChrome( g_chrome[i], *pnormbone, *pstudionorms );
+				R_StudioSetupChrome(g_chrome[i], pnormbone[i], pstudionorms[i]);
 			}
-		}
+		};
+
+#ifdef XASH_RENDER_PAR
+#ifdef XASH_TBBMALLOC
+		tbb::parallel_for_each(g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
+		tbb::parallel_for_each(g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
+#else
+		std::for_each(std::execution::par_unseq, g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
+		std::for_each(std::execution::par_unseq, g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
+#endif
+#else
+		std::for_each(g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
+		std::for_each(g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
+#endif
 	}
 
 	if( r_studio_sort_textures->integer )
@@ -3084,6 +3127,9 @@ int GameStudioRenderer_StudioDrawPlayer(int flags, struct entity_state_s* pplaye
 
 		auto model = R_StudioSetupPlayerModel(playerindex - 1);
 
+		if (!model)
+			return pStudioDraw->StudioDrawPlayer(flags, pplayer);
+
 		int iActivityType = GetSequenceActivityType(model, pplayer);
 
 		auto ragdoll = gPhysicsManager.FindRagdoll(playerindex);
@@ -3385,19 +3431,26 @@ Deform vertices by specified lightdir
 void R_StudioDeformShadow( void )
 {
 	float		*verts, dist, dist2;
-	int		numVerts;
 
 	dist = g_shadowTrace.plane.dist + 1.0f;
 	dist2 = -1.0f / DotProduct( g_mvShadowVec, g_shadowTrace.plane.normal );
 	VectorScale( g_mvShadowVec, dist2, g_mvShadowVec );
 
-	for( numVerts = 0;
-		 numVerts < g_nNumArrayVerts;
-		 numVerts++ )
+	auto vert_calc_fn = [dist](vec3_t& v)
 	{
-		dist2 = DotProduct( g_xarrayverts[numVerts], g_shadowTrace.plane.normal ) - dist;
-		if( dist2 > 0.0f ) VectorMA( g_xarrayverts[numVerts], dist2, g_mvShadowVec, g_xarrayverts[numVerts] );
-	}
+		float dist3 = DotProduct(v, g_shadowTrace.plane.normal) - dist;
+		if (dist3 > 0.0f) VectorMA(v, dist3, g_mvShadowVec, v);
+	};
+
+#ifdef XASH_RENDER_PAR
+#ifdef XASH_TBBMALLOC
+	tbb::parallel_for_each(g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
+#else
+	std::for_each(std::execution::par_unseq, g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
+#endif
+#else
+	std::for_each(g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
+#endif
 }
 
 static void R_StudioDrawPlanarShadow( void )
