@@ -20,22 +20,12 @@ GNU General Public License for more details.
 #include "library.h"
 #include "mathlib.h"
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <stdarg.h> // va
 #ifdef XASH_SDL
 #include <SDL_system.h> // Android External storage
 #include <SDL_filesystem.h> // Android External storage
 #endif
-#ifdef _WIN32
-#include <io.h>
-#include <direct.h>
-#else
-#include <dirent.h>
-#include <errno.h>
-#include <unistd.h>
-#endif
+#include "fs_io.h"
+#include "fs_impl.h"
 
 #if defined __ANDROID__
 #include <android/asset_manager.h>
@@ -45,7 +35,6 @@ GNU General Public License for more details.
 #include "platform/winrt/winrt_interop.h"
 #endif
 
-#define FILE_BUFF_SIZE		2048
 #define PAK_LOAD_OK			0
 #define PAK_LOAD_COULDNT_OPEN		1
 #define PAK_LOAD_BAD_HEADER		2
@@ -67,22 +56,6 @@ typedef struct wadtype_s
 	const char		*ext;
 	signed char		type;
 } wadtype_t;
-
-struct file_s
-{
-	int		handle;			// file descriptor
-	fs_offset_t	real_length;		// uncompressed file size (for files opened in "read" mode)
-	fs_offset_t	position;			// current position in the file
-	fs_offset_t	offset;			// offset into the package (0 if external file)
-	int		ungetc;			// single stored character from ungetc, cleared to EOF when read
-	time_t		filetime;			// pak, wad or real filetime
-						// Contents buffer
-	fs_offset_t	buff_ind, buff_len;		// buffer current index and length
-	byte		buff[FILE_BUFF_SIZE];	// intermediate buffer
-#if defined __ANDROID__
-	AAsset *asset;
-#endif
-};
 
 mempool_t		*fs_mempool;
 searchpath_t	*fs_searchpaths = NULL;
@@ -684,32 +657,32 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 {
 	dpackheader_t	header;
 	int		i, numpackfiles;
-	int		packhandle;
+	xe::fs::fd_t		packhandle;
 	pack_t		*pack;
 	dpackfile_t	*info;
 
-	packhandle = open( packfile, O_RDONLY|O_BINARY, 0 );
+	packhandle = xe::fs::fopen( packfile, "rb" );
 
 #ifndef _WIN32
-	if( packhandle < 0 )
+	if( packhandle == xe::fs::invalid_file )
 	{
 		const char *fpackfile = FS_FixFileCase( packfile );
 		if( fpackfile!= packfile )
         {
-            packhandle = open( fpackfile, O_RDONLY|O_BINARY );
+            packhandle = xe::fs::fopen(packfile, "rb");
             packfile = fpackfile;
         }
 	}
 #endif
 
-	if( packhandle < 0 )
+	if( packhandle == xe::fs::invalid_file )
 	{
 		MsgDev( D_NOTE, "%s couldn't open\n", packfile );
 		if( error ) *error = PAK_LOAD_COULDNT_OPEN;
 		return NULL;
 	}
 
-	read( packhandle, (void *)&header, sizeof( header ));
+	xe::fs::fread( packhandle, (void *)&header, sizeof( header ));
 
 	LittleLongSW(header.ident);
 	LittleLongSW(header.dirlen);
@@ -719,7 +692,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_NOTE, "%s is not a packfile. Ignored.\n", packfile );
 		if( error ) *error = PAK_LOAD_BAD_HEADER;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		return NULL;
 	}
 
@@ -727,7 +700,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_ERROR, "%s has an invalid directory size. Ignored.\n", packfile );
 		if( error ) *error = PAK_LOAD_BAD_FOLDERS;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		return NULL;
 	}
 
@@ -737,7 +710,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_ERROR, "%s has too many files ( %i ). Ignored.\n", packfile, numpackfiles );
 		if( error ) *error = PAK_LOAD_TOO_MANY_FILES;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		return NULL;
 	}
 
@@ -745,18 +718,18 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_NOTE, "%s has no files. Ignored.\n", packfile );
 		if( error ) *error = PAK_LOAD_NO_FILES;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		return NULL;
 	}
 
 	info = (dpackfile_t *)Mem_ZeroAlloc( fs_mempool, sizeof( *info ) * numpackfiles );
-	lseek( packhandle, header.dirofs, SEEK_SET );
+	xe::fs::fseek( packhandle, header.dirofs, SEEK_SET );
 
-	if( header.dirlen != read( packhandle, (void *)info, header.dirlen ))
+	if( header.dirlen != xe::fs::fread( packhandle, (void *)info, header.dirlen ))
 	{
 		MsgDev( D_NOTE, "%s is an incomplete PAK, not loading\n", packfile );
 		if( error ) *error = PAK_LOAD_CORRUPTED;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		Mem_Free( info );
 		return NULL;
 	}
@@ -2115,44 +2088,6 @@ Internal function used to create a file_t and open the relevant non-packed file 
 static file_t* FS_SysOpen( const char* filepath, const char* mode )
 {
 	file_t	*file;
-	int	mod, opt;
-	uint	ind;
-
-	// Parse the mode string
-	switch( mode[0] )
-	{
-	case 'r':
-		mod = O_RDONLY;
-		opt = 0;
-		break;
-	case 'w':
-		mod = O_WRONLY;
-		opt = O_CREAT | O_TRUNC;
-		break;
-	case 'a':
-		mod = O_WRONLY;
-		opt = O_CREAT | O_APPEND;
-		break;
-	default:
-		MsgDev( D_ERROR, "FS_SysOpen(%s, %s): invalid mode\n", filepath, mode );
-		return NULL;
-	}
-
-	for( ind = 1; mode[ind] != '\0'; ind++ )
-	{
-		switch( mode[ind] )
-		{
-		case '+':
-			mod = O_RDWR;
-			break;
-		case 'b':
-			opt |= O_BINARY;
-			break;
-		default:
-			MsgDev( D_ERROR, "FS_SysOpen: %s: unknown char in mode %s (%c)\n", filepath, mode, mode[ind] );
-			break;
-		}
-	}
 
 #if defined __ANDROID__
 	// handle android assets
@@ -2193,7 +2128,7 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 
 
 		// For files opened in append mode, we start at the end of the file
-		if( mod & O_APPEND )
+		if( mod & xe::fs::XE_FS_O_A )
 		{
 			file->position = file->real_length;
 		}
@@ -2219,28 +2154,28 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	file->asset = NULL;
 #endif
 
-	file->handle = open( filepath, mod|opt, 0666 );
+	file->handle = xe::fs::fopen( filepath, mode );
 
 #ifndef _WIN32
-	if( file->handle < 0 )
+	if( file->handle == xe::fs::invalid_file )
 	{
 		const char *ffilepath = FS_FixFileCase( filepath );
 		if( ffilepath != filepath )
         {
-            file->handle = open( ffilepath, mod|opt, 0666 );
+            file->handle = xe::fs::fopen( ffilepath, mode );
             filepath = ffilepath;
         }
 	}
 #endif
 
-	if( file->handle < 0 )
+	if( file->handle == xe::fs::invalid_file )
 	{
 		Mem_Free( file );
 		return NULL;
 	}
 
 
-	file->real_length = lseek( file->handle, 0, SEEK_END );
+	file->real_length = xe::fs::fseek( file->handle, 0, SEEK_END );
 	if( file->real_length == -1 )
 	{
 		MsgDev( D_ERROR, "FS_SysOpen: Cannot lseek file: %s\n", strerror(errno));
@@ -2248,8 +2183,8 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	}
 
 	// For files opened in append mode, we start at the end of the file
-	if( mod & O_APPEND ) file->position = file->real_length;
-	else lseek( file->handle, 0, SEEK_SET );
+	if( strchr(mode, 'a') ) file->position = file->real_length;
+	else xe::fs::fseek( file->handle, 0, SEEK_SET );
 
 	return file;
 }
@@ -2265,17 +2200,17 @@ Open a packed file using its package file descriptor
 file_t *FS_OpenPackedFile( pack_t *pack, int pack_ind )
 {
 	packfile_t	*pfile;
-	int		dup_handle;
+	xe::fs::fd_t		dup_handle;
 	file_t		*file;
 
 	pfile = &pack->files[pack_ind];
 
-	if( lseek( pack->handle, pfile->offset, SEEK_SET ) == -1 )
+	if( xe::fs::fseek( pack->handle, pfile->offset, SEEK_SET ) == -1 )
 		return NULL;
 
-	dup_handle = dup( pack->handle );
+	dup_handle = xe::fs::fdup( pack->handle );
 
-	if( dup_handle < 0 )
+	if( dup_handle == xe::fs::invalid_file )
 		return NULL;
 
 	file = (file_t *)Mem_ZeroAlloc( fs_mempool, sizeof( *file ));
@@ -2324,11 +2259,11 @@ qboolean FS_SysFileExists( const char *path, qboolean caseinsensitive )
 #endif
 
 #ifdef _WIN32
-	int desc;
+	xe::fs::fd_t desc;
 
-	desc = open( path, O_RDONLY|O_BINARY, 0 );
-	if( desc < 0 ) return false;
-	close( desc );
+	desc = xe::fs::fopen( path, "rb" );
+	if( desc == xe::fs::invalid_file ) return false;
+	xe::fs::fclose( desc );
 	return true;
 #else
 	int ret;
@@ -2686,7 +2621,7 @@ int FS_Close( file_t *file )
 		file->asset = NULL;
 	}
 #endif
-	if( file->handle && close( file->handle ))
+	if( file->handle && xe::fs::fclose( file->handle ))
 		return EOF;
 
 	Mem_Free( file );
@@ -2714,14 +2649,14 @@ fs_offset_t FS_Write( file_t *file, const void *data, size_t datasize )
 
 	// if necessary, seek to the exact file position we're supposed to be
 	if( file->buff_ind != file->buff_len )
-		lseek( file->handle, file->buff_ind - file->buff_len, SEEK_CUR );
+		xe::fs::fseek( file->handle, file->buff_ind - file->buff_len, SEEK_CUR );
 
 	// purge cached data
 	FS_Purge( file );
 
 	// write the buffer and update the position
-	result = write( file->handle, data, (fs_offset_t)datasize );
-	file->position = lseek( file->handle, 0, SEEK_CUR );
+	result = xe::fs::fwrite( file->handle, data, (fs_offset_t)datasize );
+	file->position = xe::fs::fseek( file->handle, 0, SEEK_CUR );
 	if( file->real_length < file->position )
 		file->real_length = file->position;
 
@@ -2792,8 +2727,8 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 		else
 #endif
 		{
-			lseek( file->handle, file->offset + file->position, SEEK_SET );
-			nb = read (file->handle, &((byte *)buffer)[done], count );
+			xe::fs::fseek( file->handle, file->offset + file->position, SEEK_SET );
+			nb = xe::fs::fread (file->handle, &((byte *)buffer)[done], count );
 		}
 
 		if( nb > 0 )
@@ -2825,8 +2760,8 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 		else
 #endif
 		{
-			lseek( file->handle, file->offset + file->position, SEEK_SET );
-			nb = read( file->handle, file->buff, count );
+			xe::fs::fseek( file->handle, file->offset + file->position, SEEK_SET );
+			nb = xe::fs::fread( file->handle, file->buff, count );
 		}
 
 		if( nb > 0 )
@@ -2905,7 +2840,7 @@ int FS_VPrintf( file_t *file, const char* format, va_list ap )
 		buff_size *= 2;
 	}
 
-	len = write( file->handle, tempbuff, len );
+	len = xe::fs::fwrite( file->handle, tempbuff, len );
 	Mem_Free( tempbuff );
 
 	return len;
@@ -2993,7 +2928,7 @@ int FS_Seek( file_t *file, fs_offset_t offset, int whence )
 	}
 	else
 #endif
-	if( lseek( file->handle, file->offset + offset, SEEK_SET ) == -1 )
+	if( xe::fs::fseek( file->handle, file->offset + offset, SEEK_SET ) == -1 )
 		return -1;
 	file->position = offset;
 
@@ -4082,7 +4017,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 
 		wad->numlumps = 0;		// blank wad
 		wad->lumps = NULL;		//
-		wad->mode = O_WRONLY;
+		wad->mode = 'w';
 
 		// save space for header
 		hdr.ident = LittleLong(IDWAD3HEADER);
@@ -4097,7 +4032,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		if( mode[0] == 'a' )
 		{
 			FS_Seek( wad->wadfile, 0, SEEK_SET );
-			wad->mode = O_APPEND;
+			wad->mode = 'a';
 		}
 
 		if( FS_Read( wad->wadfile, &header, sizeof( dwadinfo_t )) != sizeof( dwadinfo_t ))
@@ -4123,10 +4058,10 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		}
 
 		wad->numlumps = header.numlumps;
-		if( wad->numlumps >= MAX_FILES_IN_WAD && wad->mode == O_APPEND )
+		if( wad->numlumps >= MAX_FILES_IN_WAD && wad->mode == 'a' )
 		{
 			MsgDev( D_WARN, "W_Open: %s is full (%i lumps)\n", filename, wad->numlumps );
-			wad->mode = O_RDONLY; // set read-only mode
+			wad->mode = 'r'; // set read-only mode
 		}
 		wad->infotableofs = header.infotableofs; // save infotableofs position
 		if( FS_Seek( wad->wadfile, wad->infotableofs, SEEK_SET ) == -1 )
@@ -4139,7 +4074,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		// NOTE: lumps table can be reallocated for O_APPEND mode
 		wad->lumps = (dlumpinfo_t*)Mem_Alloc( wad->mempool, wad->numlumps * sizeof( dlumpinfo_t ));
 
-		if( wad->mode == O_APPEND )
+		if( wad->mode == 'a')
 		{
 			size_t	lat_size = wad->numlumps * sizeof( dlumpinfo_t );
 
@@ -4177,7 +4112,7 @@ void W_Close( wfile_t *wad )
 
 	if( !wad ) return;
 
-	if( wad->wadfile && ( wad->mode == O_APPEND || wad->mode == O_WRONLY ))
+	if( wad->wadfile && ( wad->mode == 'a' || wad->mode == 'w'))
 	{
 		dwadinfo_t	hdr;
 

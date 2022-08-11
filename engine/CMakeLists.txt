@@ -132,6 +132,7 @@ set(XASH_ENGINE_SOURCES
 	common/textconsole.cpp
 	common/cook.cpp
 	common/model_encrypt.cpp
+	common/fs_mmap.cpp
 	server/sv_client.cpp
 	server/sv_cmds.cpp
 	server/sv_custom.cpp
