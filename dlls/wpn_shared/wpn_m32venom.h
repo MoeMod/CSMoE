@@ -43,6 +43,7 @@ namespace sv {
 	class CM32VenomRocket : public CGrenade
 	{
 	public:
+		KnockbackData GetKnockBackData() override { return { 1100.0f, 450.0f, 600.0f, 450.0f, 0.8f }; }
 		float GetArmorRatioModifier() { return 1.5; }
 		int GetWeaponsId(void) { return WEAPON_M32VENOM; }
 		void Spawn(void);
@@ -55,7 +56,10 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
-				flDamage = 300;
+				if (enhancedzombie.value)
+					flDamage = 500;
+				else
+					flDamage = 300;
 			}
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			{
@@ -87,7 +91,10 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
-				flDamage = 500;
+				if (enhancedzombie.value)
+					flDamage = 500;
+				else
+					flDamage = 250;
 			}
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			{
@@ -156,7 +163,6 @@ public:
 
 public:
 	duration_t m_flPumpTime;
-	float GetDamage() const;
 
 private:
 	unsigned short m_usFireM32Venom;

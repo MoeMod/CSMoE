@@ -2838,6 +2838,10 @@ namespace sv {
 				{
 					m_pPlayer->pev->gravity = 0.6;
 				}
+				if (!stricmp(m_pPlayer->m_ZombieClass, "alien_infected"))
+				{
+					m_pPlayer->pev->gravity = 0.5;
+				}
 			}
 		}
 	}
@@ -5043,4 +5047,243 @@ namespace sv {
 		return 1.0f;
 	}
 
+	CZombieSkill_ZombieAlienBoss::CZombieSkill_ZombieAlienBoss(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombieAlienBoss::Think()
+	{
+		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
+		{
+			if (m_SkillStatus == DASH_START)
+				FireZombieSkill();
+
+			if (m_SkillStatus == DASH_LOOP)
+			{
+				DashAttack();
+				m_flTimeTriggerZombieSkill = gpGlobals->time + 0.2s;
+			}
+		}
+
+		//if (m_SkillStatus == DASH_LOOP)
+		//{
+		//	m_pPlayer->pev->velocity.z = -200.0;	//avoid jump
+		//}
+
+		CZombieSkill_Base::Think();
+	}
+
+	void CZombieSkill_ZombieAlienBoss::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_WaitSkillCoolTime", buf);
+				break;
+			case SKILL_STATUS_USED:
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "You can no longer use [Bloody Blade]. It can only be used once per round."); // #CSO_CantSprintUsed
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+
+		if (FBitSet(m_pPlayer->pev->flags, FL_ONGROUND) && !FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+		{
+			if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId == WEAPON_KNIFE)
+			{
+				m_iZombieSkillStatus = SKILL_STATUS_USING;
+				m_SkillStatus = DASH_START;
+				m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+				m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+				if (pWeapon)
+				{
+					pWeapon->SendWeaponAnim(2, TRUE);
+					pWeapon->m_flTimeWeaponIdle = 1.0s;
+				}
+
+				m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 94;
+				m_pPlayer->m_flNextAttack = 2.0s;
+
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_VOICE, "zombi/boss_dash.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
+
+				m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("zbs_skill_dash");
+				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.9s;
+
+				m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+				m_flTimeTriggerZombieSkill = gpGlobals->time + 0.65s;
+
+				m_pPlayer->ResetMaxSpeed();
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+				WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+				WRITE_BYTE(ZOMBIE_SKILL_DASH);
+				WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+				WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+				MESSAGE_END();
+			}
+		}
+		else
+		{
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "无法在空中或者下蹲状态冲刺"); // 
+			return;
+		}
+	}
+
+	void CZombieSkill_ZombieAlienBoss::DashAttack()
+	{
+		Vector vecSrc, vecEnd;
+		TraceResult tr;
+		CBaseEntity* pEntity = NULL;
+
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+
+		vecSrc = m_pPlayer->GetGunPosition();
+
+		Vector vecForward = gpGlobals->v_forward;
+		Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+		float c = cos(180.0 * 0.5 * M_PI / 180.0);
+
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, m_pPlayer->pev->origin, 95.0)) != NULL)
+		{
+			if (pEntity == m_pPlayer)
+				continue;
+
+			if (pEntity->IsDormant())
+				continue;
+
+			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
+
+			if (!AngleCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 95, c, &tr))
+				continue;
+			
+			((CBasePlayer*)pEntity)->ReactToDeimosTail();
+
+		}
+	}
+
+	bool CZombieSkill_ZombieAlienBoss::AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr)
+	{
+		if (pEntity->IsBSPModel())
+		{
+			UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, ignore_monsters, pAttacker->edict(), ptr);
+
+			if (ptr->flFraction < 1.0)
+			{
+				if (ptr->pHit)
+				{
+					CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+					if (pHit && pHit == pEntity)
+						return true;
+				}
+			}
+		}
+		else
+		{
+			UTIL_TraceHull(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, head_hull, pAttacker->edict(), ptr);
+
+			if (ptr->flFraction < 1.0 && ptr->pHit != NULL && CBaseEntity::Instance(ptr->pHit) == pEntity)
+			{
+				UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, pAttacker->edict(), ptr);
+
+				return true;
+			}
+			else
+			{
+				Vector vecEnd = pEntity->BodyTarget(vecSrc);
+
+				if (DotProduct(vecAngleCheckDir, (vecEnd.Make2D() - vecSrc.Make2D()).Normalize()) > flMinimumCosine)
+				{
+					edict_t* peAttacker = pAttacker->edict();
+
+					for (int i = 5; i > 0; i--)
+					{
+						UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, peAttacker, ptr);
+
+						if (!ptr->pHit || !GET_PRIVATE(ptr->pHit))
+							return false;
+
+						CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+						if (ptr->flFraction < 1.0 || pHit == pEntity)
+							return true;
+
+						if (pHit->IsBSPModel())
+							return false;
+
+						vecSrc = ptr->vecEndPos + vecDir * 5.0;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	void CZombieSkill_ZombieAlienBoss::OnSkillEnd()
+	{
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+		m_SkillStatus = DASH_END;
+		m_pPlayer->ResetMaxSpeed();
+	}
+
+	void CZombieSkill_ZombieAlienBoss::ResetMaxSpeed()
+	{
+		if (m_SkillStatus == DASH_START)
+		{
+			m_pPlayer->pev->gravity = 10.0;
+			m_pPlayer->pev->maxspeed = 1;
+		}
+
+		if (m_SkillStatus == DASH_LOOP)
+		{
+			m_pPlayer->pev->maxspeed = 415;
+		}
+	}
+
+	duration_t CZombieSkill_ZombieAlienBoss::GetDurationTime() const
+	{
+		return 1.5s;
+	}
+
+	void CZombieSkill_ZombieAlienBoss::FireZombieSkill()
+	{
+		m_SkillStatus = DASH_LOOP;
+		m_pPlayer->ResetMaxSpeed();
+
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+
+		Vector2D vecDir = gpGlobals->v_forward.Make2D();
+
+		m_pPlayer->pev->velocity.x = vecDir.x * 2500;
+		m_pPlayer->pev->velocity.y = vecDir.y * 2500;
+		m_pPlayer->m_flVelocityModifier = 1.0;
+
+		m_flTimeTriggerZombieSkill = gpGlobals->time + 0.35s;
+	}
+
+	duration_t CZombieSkill_ZombieAlienBoss::GetCooldownTime() const
+	{
+		switch (m_pPlayer->m_iZombieLevel)
+		{
+		case ZOMBIE_LEVEL_HOST: return 15.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN: return 10.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN_LV2: return 10.0s; break;
+		}
+	}
 }

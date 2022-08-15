@@ -64,7 +64,10 @@ float CM32VenomMark::GetVenomDamage() const
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
 	{
-		flDamage = 300;	//600
+		if (enhancedzombie.value)
+			flDamage = 500;
+		else
+			flDamage = 250;
 	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 	{
@@ -578,16 +581,5 @@ void CM32Venom::WeaponIdle(void)
 	}
 }
 
-float CM32Venom::GetDamage() const
-{
-	float flDamage = 20.0f;
-#ifndef CLIENT_DLL
-	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 20.0f;
-	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 42.0f;
-#endif
-	return flDamage;
-}
 
 }

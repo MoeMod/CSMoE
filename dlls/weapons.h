@@ -591,6 +591,8 @@ public:
 			|| m_iId == WEAPON_SFPISTOL
 			|| m_iId == WEAPON_Y22S2SFPISTOL
 			|| m_iId == WEAPON_Z4B_RAGINGBULL
+			|| m_iId == WEAPON_BALROG1
+			|| m_iId == WEAPON_SAPIENTIA
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -1088,6 +1090,40 @@ private:
 	CBasePlayer* m_pOwner;
 	CBaseEntity* m_pAttachedEnt;
 	CWonderCannon* m_pWeapon;
+};
+
+
+class CLockOnGunMissile : public CGrenade
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT MissileThink(void);
+	void EXPORT MissileTouch(CBaseEntity* pOther);
+
+public:
+	static CLockOnGunMissile* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, CBaseEntity* pEntity, int iHitGroup, int iTeam);
+	float GetArmorRatioModifier() { return 1.75; }
+	bool RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
+	KnockbackData GetKnockBackData() override 
+	{ 
+		if(m_pEntity != nullptr)
+			return { 0.0f, 0.0f, 0.0f, 0.0f, 0.2f };
+		return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; 
+	}
+
+private:
+	float GetDirectDamage();
+	float GetExplodeDamage();
+	int m_iType;
+	int m_iM3DragonmExp;
+	int m_iHitGroup;
+	CBaseEntity* m_pEntity;
+	int m_iTail;
+	int m_iExp[3];
 };
 #endif
 

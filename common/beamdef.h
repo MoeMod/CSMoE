@@ -33,6 +33,7 @@
 #define FBEAM_ENDVISIBLE		0x20000000		// Has this client actually seen this beam's end entity yet?
 #define FBEAM_ISACTIVE			0x40000000
 #define FBEAM_FOREVER			0x80000000
+#define FBEAM_CURVEDBEAM  		0x00000200
 
 
 typedef struct beam_s BEAM;

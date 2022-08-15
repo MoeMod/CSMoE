@@ -152,22 +152,26 @@ void CLaserFist::ItemPostFrame(void)
 
 void CLaserFist::FireRemaining(int& shotsFired, time_point_t& shootTime, BOOL bIsGlock)
 {
-	auto nexttime = 0.1s;
-
-	m_iClip--;
-
-	if (m_iClip < 0)
+	if (!m_iClip || shotsFired >= 1)
 	{
-		m_iClip = 0;
-		shotsFired = 3;
+		shotsFired = 1;
 		shootTime = invalid_time_point;
+
 		return;
 	}
+
+	m_iClip--;
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDir;
+
+	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.05, 8192, 1, BULLET_PLAYER_9MM, 18, 0.9, m_pPlayer->pev, true, m_pPlayer->random_seed);
+	--m_pPlayer->ammo_9mm;
+
+	PLAYBACK_EVENT_FULL(flag, m_pPlayer->edict(), m_usFireGlock18, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y,
+		(int)(m_pPlayer->pev->punchangle.x * 10000), (int)(m_pPlayer->pev->punchangle.y * 10000), m_iClip == 0, FALSE);
 
 	int flag;
 #ifdef CLIENT_WEAPONS
@@ -176,35 +180,17 @@ void CLaserFist::FireRemaining(int& shotsFired, time_point_t& shootTime, BOOL bI
 	flag = 0;
 #endif // CLIENT_WEAPONS
 
-	if (bIsGlock)
-	{
-		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.05, 8192, 1, BULLET_PLAYER_9MM, 18, 0.9, m_pPlayer->pev, true, m_pPlayer->random_seed);
-		--m_pPlayer->ammo_9mm;
-
-		PLAYBACK_EVENT_FULL(flag, m_pPlayer->edict(), m_usFireGlock18, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y,
-			(int)(m_pPlayer->pev->punchangle.x * 10000), (int)(m_pPlayer->pev->punchangle.y * 10000), m_iClip == 0, FALSE);
-	}
-	else
-	{
-
-		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, m_fBurstSpread, 8192, 2, BULLET_PLAYER_556MM, 30, 0.96, m_pPlayer->pev, false, m_pPlayer->random_seed);
-		--m_pPlayer->ammo_556nato;
-
-		PLAYBACK_EVENT_FULL(flag, m_pPlayer->edict(), m_usFireFamas, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y,
-			(int)(m_pPlayer->pev->punchangle.x * 10000000), (int)(m_pPlayer->pev->punchangle.y * 10000000), FALSE, FALSE);
-	}
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecEnd.x, vecEnd.y, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
-	shotsFired++;
-
-	if (shotsFired != 3)
-	{
-		shootTime = gpGlobals->time + nexttime;
-	}
-	else
+	if (++shotsFired >= 1)
 		shootTime = invalid_time_point;
+	else
+		shootTime = gpGlobals->time + 0.06s;
+
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 }
 
 void CLaserFist::LaserFistFire(float flSpread, BOOL fUseAutoAim)

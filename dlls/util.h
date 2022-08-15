@@ -193,6 +193,13 @@ enum
 
 typedef enum
 {
+	HIT_NONE = 0,
+	HIT_WALL = 1,
+	HIT_PLAYER = 2,
+} HIT_RESULT;
+
+typedef enum
+{
 	MONSTERSTATE_NONE = 0,
 	MONSTERSTATE_IDLE,
 	MONSTERSTATE_COMBAT,
@@ -538,7 +545,8 @@ float UTIL_CalculateDamageRate(Vector vecSrc, CBaseEntity* pOther);
 void UTIL_TE_Sprite(const short sprite, const float x, const float y, const float z, const byte scale, const byte brightness);
 void UTIL_AdvancedBeamPoints(Vector vecSrc, Vector vecEnd, int life, int r, int g, int b, int width, int brightness, int flags);
 void UTIL_BeamPointsStretch(Vector vecSrc, Vector vecEnd, int beamindex, int framerate, int life, int r, int g, int b, int width, int brightness, int flags);
-
+int UTIL_GetLineTarget(Vector vecSrc, Vector vecDirShooting, Vector vecRight, Vector vevUp, Vector vecSpread, float flDistance, CBaseEntity* pEntity, bool CheckTeamMate);
+Vector UTIL_GetSpeedVector(Vector vecSrc, Vector vecEnd, float flSpeed);
 }
 #else
 namespace cl {

@@ -91,12 +91,26 @@ void CPlayerModStrategy_ZBZ::Evolution(ZombieLevel iEvolutionLevel)
 
 	if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN)
 	{
-		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f + g_pGameRules->m_iTotalRoundsPlayed * 500;
+		if (enhancedzombie.value)
+		{
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 20000.0f;
+		}
+		else
+		{
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f + g_pGameRules->m_iTotalRoundsPlayed * 500;
+		}
 		m_pPlayer->pev->armorvalue = 500.0f + g_pGameRules->m_iTotalRoundsPlayed * 100;
 	}
 	else if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
 	{
-		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f + g_pGameRules->m_iTotalRoundsPlayed * 500;
+		if (enhancedzombie.value)
+		{
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 25000.0f;
+		}
+		else
+		{
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f + g_pGameRules->m_iTotalRoundsPlayed * 500;
+		}
 		m_pPlayer->pev->armorvalue = 1000.0f + g_pGameRules->m_iTotalRoundsPlayed * 100;
 	}
 
@@ -179,6 +193,12 @@ int CPlayerModStrategy_ZBZ::AdjustDefaultReloadClip(CBasePlayerWeapon* weapon, i
 {
 	SKILL_FUNCTION(m_vecSkill, OnAdjustDefaultReloadClip, weapon, iClip);
 	return iClip;
+}
+
+BOOL CPlayerModStrategy_ZBZ::OnReactToDeimosTail()
+{
+	SKILL_FUNCTION(m_vecSkill, OnReactToDeimosTail);
+	return false;
 }
 
 void CPlayerModStrategy_ZBZ::UpdatePlayerEvolutionHUD()

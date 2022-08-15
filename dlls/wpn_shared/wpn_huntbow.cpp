@@ -401,7 +401,12 @@ namespace sv {
 			float flDamage = 30.0f;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1100.0f;
+			{
+				if (enhancedzombie.value)
+					flDamage = 2200.0f;
+				else
+					flDamage = 1100.0f;
+			}			
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1100.0f;
 #endif
@@ -1095,7 +1100,12 @@ float CHuntbow::GetPrimaryAttackDamage() const
 	float flDamage = 38;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 72;
+	{
+		if (enhancedzombie.value)
+			flDamage = 275;
+		else
+			flDamage = 72;
+	}	
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 72;
 #endif
@@ -1107,9 +1117,14 @@ float CHuntbow::GetSecondaryAttackDamage() const
 	float flDamage = 152.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 1300.0f;
+	{
+		if (enhancedzombie.value)
+			flDamage = 2700.0f;
+		else
+			flDamage = 1300.0f;
+	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 1300.0f;
+		flDamage = 4100.0f;
 #endif
 	return flDamage;
 }

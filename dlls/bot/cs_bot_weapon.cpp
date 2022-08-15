@@ -500,7 +500,13 @@ bool CCSBot::IsUsingMachinegun() const
 	if (weapon != NULL && WeaponIDToWeaponClass(weapon->m_iId) == WEAPONCLASS_MACHINEGUN)
 		return true;
 
-	if(weapon->m_iId == WEAPON_WONDERCANNON || weapon->m_iId == WEAPON_PIANOGUN || weapon->m_iId == WEAPON_PIANOGUNEX)
+	if(weapon->m_iId == WEAPON_WONDERCANNON || 
+		weapon->m_iId == WEAPON_PIANOGUN || 
+		weapon->m_iId == WEAPON_PIANOGUNEX || 
+		weapon->m_iId == WEAPON_AIRBURSTER ||
+		weapon->m_iId == WEAPON_FLAMETHROWER ||
+		weapon->m_iId == WEAPON_POISONGUN ||
+		weapon->m_iId == WEAPON_WATERCANNON)
 		return true;
 
 	return false;
@@ -757,7 +763,9 @@ bool CCSBot::IsUsingGrenade() const
 
 	if (weapon->m_iId == WEAPON_SMOKEGRENADE
 		|| weapon->m_iId == WEAPON_FLASHBANG
-		|| weapon->m_iId == WEAPON_HEGRENADE)
+		|| weapon->m_iId == WEAPON_HEGRENADE
+		|| weapon->m_iId == WEAPON_PATROLDRONE
+		|| weapon->m_iId == WEAPON_DIVINETITAN)
 		return true;
 
 	return false;
@@ -767,7 +775,7 @@ bool CCSBot::IsUsingHEGrenade() const
 {
 	CBasePlayerWeapon *weapon = GetActiveWeapon();
 
-	if (weapon != NULL && weapon->m_iId == WEAPON_HEGRENADE)
+	if (weapon != NULL && (weapon->m_iId == WEAPON_HEGRENADE || weapon->m_iId == WEAPON_PATROLDRONE || weapon->m_iId == WEAPON_DIVINETITAN))
 		return true;
 
 	return false;

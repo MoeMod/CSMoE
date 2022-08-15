@@ -56,6 +56,8 @@ fs_api_t gFileSystemAPI = { };
 CHud gHUD;
 int g_iXash = 0; // indicates a buildnum
 vec3_t g_velocity;
+long g_iDamage[MAX_CLIENTS + 1];
+long g_iDamageTotal[MAX_CLIENTS + 1];
 int g_iMobileAPIVersion = 0;
 void InitInput (void);
 void IN_Commands( void );

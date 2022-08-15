@@ -26,14 +26,12 @@
 *
 */
 #include "events.h"
-#include <view.cpp>
+
+namespace cl {
+	void V_PunchAxis(int axis, float punch);
+}
 
 namespace cl::event::crossbow {
-
-void V_PunchAxis(int axis, float punch)
-{
-	ev_punchangle[axis] = punch;
-}
 
 enum crossbow_e
 {

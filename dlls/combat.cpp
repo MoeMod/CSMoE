@@ -2165,7 +2165,7 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		if (pPlayer) {
 			vecDir = pPlayer->m_pModStrategy->AdjustFireBullets3Dir(vecDir);
 		}
-		if (!pPlayer->IsUsingPC() && !pPlayer->IsBot() && (int)CVAR_GET_FLOAT("mp_assistaim"))
+		if (!pPlayer->IsUsingPC() && !pPlayer->IsBot() && assistaim.value)
 		{
 			FireBulletsForMobile(vecSrc, vecDir, flDistance, flPenetrationDistance, iPenetration, iBulletType, iDamage, flRangeModifier, pevAttacker, bPistol, this);
 			return Vector(x * vecSpread, y * vecSpread, 0);
@@ -2624,9 +2624,11 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 							WRITE_BYTE(8);
 							MESSAGE_END();
 
-							pInflictorPlayer->pBuffAttacker = pevAttacker;
+							pInflictorPlayer->m_pBuffAttacker = pevAttacker;
 							pInflictorPlayer->m_iHealthDecreaseCount = 5;
 							pInflictorPlayer->m_flHealthDecreaseAmount = 20;
+							pInflictorPlayer->m_flHealthDecreaseInterval = 1.0s;
+							pInflictorPlayer->m_flHealthDecreaseStartTime = gpGlobals->time + 1.0s;
 						}
 					}				
 				}

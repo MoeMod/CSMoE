@@ -31,6 +31,7 @@ public:
 	virtual void OnWeaponDeploy(CBasePlayerItem *item) = 0;
 	virtual int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) = 0;
 	virtual void Evolution(ZombieLevel iEvolutionLevel) = 0;
+	virtual float GetZombiMaxHealth(ZombieLevel iEvolutionLevel) = 0;
 };
 
 class CHuman_ZB2 : public CHuman_ZB1, virtual public IZombieModeCharacter_ZB2
@@ -49,6 +50,8 @@ public:
 	void OnWeaponDeploy(CBasePlayerItem *item) override {}
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override { return 1; }
 	void Evolution(ZombieLevel iEvolutionLevel) override {}
+	float GetZombiMaxHealth(ZombieLevel iEvolutionLevel) override { return 0.0f; }
+
 
 protected:
 	class impl_t;
@@ -76,6 +79,15 @@ public:
 	ZombieSkillStatus GetSkillStatus(ZombieSkillSlot which) const override;
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override { return 1; }
 	void Evolution(ZombieLevel iEvolutionLevel);
+	float GetZombiMaxHealth(ZombieLevel iEvolutionLevel) override
+	{
+		if (iEvolutionLevel == 0)
+			return 4000.0f;
+		else if (iEvolutionLevel == 1)
+			return 7000.0f;
+		else
+			return 14000.0f;
+	}
 
 protected:
 	std::unique_ptr<IZombieSkill> m_pZombieSkill;

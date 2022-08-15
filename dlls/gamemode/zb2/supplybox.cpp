@@ -136,7 +136,7 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 	}
 
 	const char *mod_str = CVAR_GET_STRING("mp_gamemode");
-	if(strcmp(mod_str, "zb3f2p") && strcmp(mod_str, "zb3classic"))
+	if(strcmp(mod_str, "zb3f2p") && strcmp(mod_str, "zb3zp"))
 	{
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
 		{
@@ -163,7 +163,31 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 			if (iSlot == KNIFE_SLOT) {
 				p->m_iKnifeID = info.iID;
 			} else if (iSlot == GRENADE_SLOT) {
-				p->m_iGrenadeID = info.iID;
+
+				CBasePlayerItem* pItem = p->m_rgpPlayerItems[GRENADE_SLOT];
+
+				// have at least one weapon in this slot
+				while (pItem != NULL)
+				{
+					if (p->m_rgpPlayerItems[GRENADE_SLOT]->IsWeapon() && p->m_rgpPlayerItems[GRENADE_SLOT])
+					{
+						CBasePlayerWeapon* pGrenade = static_cast<CBasePlayerWeapon*>(pItem);
+						if (pGrenade->m_iId == WEAPON_DIVINETITAN || pGrenade->m_iId == WEAPON_HEGRENADE || pGrenade->m_iId == WEAPON_PATROLDRONE)
+						{
+							p->RemovePlayerItem(pGrenade);
+							break;
+						}
+					}
+				}
+				if (info.iID == WEAPON_DIVINETITAN || info.iID == WEAPON_PATROLDRONE)
+				{
+					//bad way
+					p->GiveNamedItem(info.pszClassName);
+					weapon_names_view[iSlot] = info.pszDisplayName;
+					continue;
+				}
+				else
+					p->m_iGrenadeID = info.iID;
 			}
 			p->GiveNamedItem(info.pszClassName);
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);

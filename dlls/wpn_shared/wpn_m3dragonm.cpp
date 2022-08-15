@@ -323,7 +323,12 @@ int CM3Dragonm::GetDamage()
 	int flDamage = 14;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 120;
+	{
+		if (enhancedzombie.value)
+			flDamage = 90;
+		else
+			flDamage = 120;
+	}	
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 200;
 #endif

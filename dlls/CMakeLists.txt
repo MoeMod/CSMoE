@@ -236,6 +236,19 @@ set(HLDLL_SRCS
 	./client/wdnmd.cpp
 	./database/db_config.cpp
 	./database/db_main.cpp
+	./gamemode/mod_zb3zp.cpp
+	./lockongun_missile.cpp
+	./gamemode/zb3zp/zp_zclass_alien_boss.cpp
+	./gamemode/zb3zp/zp_zclass_source.cpp
+	./gamemode/zb3zp/zp_zclass_tank.cpp
+	./gamemode/zb3zp/zp_zclass_alien_infected.cpp
+	./gamemode/zb3zp/zp_zclass_ap.cpp
+	./gamemode/zb3zp/zp_zclass_hostex.cpp
+	./gamemode/zb3zp/zp_zclass_licker.cpp
+	./gamemode/zb3zp/zp_zclass_nohead.cpp
+	./gamemode/zb3zp/zp_zclass_pyrammid.cpp
+	./gamemode/zb3zp/zp_zclass_tf.cpp
+	./gamemode/zb3zp/zp_zclass_human.cpp
 	)
 
 set (HLWPN_SRCS
@@ -481,8 +494,28 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_crow3.cpp
 	../dlls/wpn_shared/wpn_crow11.cpp
 	../dlls/wpn_shared/z4b_m60amethyst.cpp
+	../dlls/wpn_shared/z4b_ar57amethyst.cpp
+	../dlls/wpn_shared/z4b_acramethyst.cpp
+	../dlls/wpn_shared/z4b_dbarrelamethyst.cpp
+	../dlls/wpn_shared/z4b_deagleamethyst.cpp
 	../dlls/wpn_shared/wpn_crossbow.cpp
 	../dlls/wpn_shared/wpn_broad.cpp
+	../dlls/wpn_shared/wpn_sgdrillex.cpp
+	../dlls/wpn_shared/wpn_balrog1.cpp
+	../dlls/wpn_shared/wpn_sapientia.cpp
+	../dlls/wpn_shared/wpn_balrog3.cpp
+	../dlls/wpn_shared/wpn_coilmg.cpp
+	../dlls/wpn_shared/wpn_charger7.cpp
+	../dlls/wpn_shared/wpn_charger5.cpp
+	../dlls/wpn_shared/wpn_airburster.cpp
+	../dlls/wpn_shared/wpn_poisongun.cpp
+	../dlls/wpn_shared/wpn_flamethrower.cpp
+	../dlls/wpn_shared/wpn_watercannon.cpp
+	../dlls/wpn_shared/wpn_spmg.cpp
+	../dlls/wpn_shared/wpn_lockongun.cpp
+	../dlls/wpn_shared/wpn_patroldrone.cpp
+	../dlls/wpn_shared/z4b_aquariusplasmagun.cpp
+	../dlls/wpn_shared/wpn_fglauncher.cpp
 	)
 
 set(PM_SRCS
@@ -619,7 +652,7 @@ if(XASH_UNITY_BUILD)
 endif()
 
 if(XASH_DEDICATED)
-	option(XASH_MYSQL "MYSQL support for CSMoE." OFF)
+	option(XASH_MYSQL "MYSQL support for CSMoE." ON)
 else()
 	option(XASH_MYSQL "MYSQL support for CSMoE." OFF)
 endif()

@@ -26,6 +26,7 @@ GNU General Public License for more details.
 #include "studio.h"
 #include "cl_tent.h"
 
+#define CURVEDBEAM 0
 #define NOISE_DIVISIONS	64	// don't touch - many tripmines cause the crash when it equal 128
 typedef struct
 {
@@ -337,7 +338,35 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
 	pglBegin( GL_TRIANGLE_STRIP );
+#if CURVEDBEAM
+	//	CurvedBeam Begin 1 of 3
+	vec3_t end, mid, ang;
+	vec3_t v_forward, v_right, v_up;
 
+	VectorCopy(source, mid);
+	VectorAdd(source, delta, end);
+	if (RI.currentbeam) { //server beam
+		if (RI.currentbeam->baseline.renderfx & FBEAM_CURVEDBEAM) {
+			cl_entity_t* pEnt;
+			pEnt = CL_GetBeamEntityByIndex(RI.currentbeam->curstate.owner);
+			if (pEnt) {
+				AngleVectors(pEnt->angles, v_forward, v_right, v_up);
+				VectorMA(pEnt->origin, 120.0f, v_forward, mid);
+			}
+		}
+	}
+	else if (cl_active_beams) {  // client beam
+		if (cl_active_beams->flags & FBEAM_CURVEDBEAM) {
+			cl_entity_t* pEnt;
+			pEnt = CL_GetBeamEntityByIndex(cl_active_beams->startEntity);
+			if (pEnt) {
+				AngleVectors(pEnt->angles, v_forward, v_right, v_up);
+				VectorMA(pEnt->origin, 120.0f, v_forward, mid);
+			}
+		}
+	}
+	// CurvedBeam End 1 of 3
+#endif // CURVEDBEAM
 	// specify all the segments.
 	for( i = 0; i < segments; i++ )
 	{
@@ -374,7 +403,32 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 		VectorScale( color, brightness, nextSeg.color );
 
 		VectorMA( source, fraction, delta, nextSeg.pos );
-
+#if CURVEDBEAM
+		// CurvedBeam Begin 2 of 3
+		if (RI.currentbeam) { //server beam
+			if (RI.currentbeam->baseline.renderfx & FBEAM_CURVEDBEAM) {
+				vec3_t p1, p2, p3, v1, v2, v3;
+				VectorSubtract(mid, source, v1);
+				VectorMA(source, fraction, v1, p1);
+				VectorSubtract(end, mid, v2);
+				VectorMA(mid, fraction, v2, p2);
+				VectorSubtract(p2, p1, v3);
+				VectorMA(p1, fraction, v3, nextSeg.pos);
+			}
+		}
+		else if (cl_active_beams) { //client beam
+			if (cl_active_beams->flags & FBEAM_CURVEDBEAM) {
+				vec3_t p1, p2, p3, v1, v2, v3;
+				VectorSubtract(mid, source, v1);
+				VectorMA(source, fraction, v1, p1);
+				VectorSubtract(end, mid, v2);
+				VectorMA(mid, fraction, v2, p2);
+				VectorSubtract(p2, p1, v3);
+				VectorMA(p1, fraction, v3, nextSeg.pos);
+			}
+		}
+		//CurvedBeam End 2 of 3
+#endif
 		// distort using noise
 		if( scale != 0 )
 		{
@@ -1234,6 +1288,22 @@ qboolean CL_RecomputeBeamEndpoints( BEAM *pbeam )
 		if( ComputeBeamEntPosition( pbeam->startEntity, pbeam->source ))
 		{
 			pbeam->flags |= FBEAM_STARTVISIBLE;
+#if CURVEDBEAM	
+			//CurvedBeam Begin 3 of 3 by rentro
+			if (RI.currentbeam) {   //server beam
+				if (pbeam->flags & FBEAM_ENDENTITY) {
+					RI.currentbeam->curstate.owner = pbeam->startEntity;
+					RI.currentbeam->baseline.renderfx |= FBEAM_CURVEDBEAM;  //#defined as 0x00000200
+				}
+			}
+			else {  // client beam
+				if (pbeam->flags & FBEAM_ENDENTITY) {
+					if(BEAMENT_ATTACHMENT(pbeam->startEntity))
+						pbeam->flags |= FBEAM_CURVEDBEAM;
+				}
+			}
+			//CurvedBeam End 3 of 3
+#endif
 		}
 		else if( !( pbeam->flags & FBEAM_FOREVER ))
 		{

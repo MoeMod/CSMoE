@@ -54,6 +54,8 @@ namespace sv {
 		void Reload() override;
 		void Holster(int skiplocal) override;
 		void WeaponIdle() override;
+
+		void ConstructCharging();
 		
 		int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 #ifndef CLIENT_DLL
@@ -77,7 +79,7 @@ namespace sv {
 
 		void InitChargeState(void);
 		void ResetChargeTimer(void);
-		void SetChargeSkin(void);
+
 		void SendChargeState(void);
 
 		double GetDamage_SecondaryAttack();

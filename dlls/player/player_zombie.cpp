@@ -204,6 +204,12 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_knife_zombideathknight.mdl");
 	PRECACHE_MODEL("models/v_knife_zombimeatwall.mdl");
 	PRECACHE_MODEL("models/v_knife_zombisiren.mdl");
+	PRECACHE_MODEL("models/zombie_plague/v_knife_alien_boss.mdl");
+	PRECACHE_MODEL("models/zombie_plague/v_zombie_Alien_infected1.mdl");
+	PRECACHE_MODEL("models/zombie_plague/v_knife_tank_zombi.mdl");
+	PRECACHE_MODEL("models/zombie_plague/v_zombie_pyrammid.mdl");
+	PRECACHE_MODEL("models/zombie_plague/zm_knife.mdl");
+	PRECACHE_MODEL("models/zombie_plague/v_zombie_licker.mdl");
 
 	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-deimos.mdl");
@@ -308,6 +314,25 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/zombi_deathknight/zombi_deathknight.mdl");
 	PRECACHE_MODEL("models/player/zombi_meatwall/zombi_meatwall.mdl");
 	PRECACHE_MODEL("models/player/zombi_siren/zombi_siren.mdl");
+	PRECACHE_MODEL("models/player/zombie_alien_boss_1/zombie_alien_boss_1.mdl");
+	PRECACHE_MODEL("models/player/zombie_alien_boss_2/zombie_alien_boss_2.mdl");
+	PRECACHE_MODEL("models/player/zombie_Alien_infected1/zombie_Alien_infected1.mdl");
+	PRECACHE_MODEL("models/player/zombie_Alien_infected2/zombie_Alien_infected2.mdl");
+	PRECACHE_MODEL("models/player/zombie_hostex1/zombie_hostex1.mdl");
+	PRECACHE_MODEL("models/player/zombie_hostex2/zombie_hostex2.mdl");
+	PRECACHE_MODEL("models/player/zombie_ap1/zombie_ap1.mdl");
+	PRECACHE_MODEL("models/player/zombie_ap2/zombie_ap2.mdl");
+	PRECACHE_MODEL("models/player/zombie_pyrammid1/zombie_pyrammid1.mdl");
+	PRECACHE_MODEL("models/player/zombie_pyrammid2/zombie_pyrammid2.mdl");
+	PRECACHE_MODEL("models/player/zombie_Nohead1/zombie_Nohead1.mdl");
+	PRECACHE_MODEL("models/player/zombie_Nohead2/zombie_Nohead2.mdl");
+	PRECACHE_MODEL("models/player/zombie_source1/zombie_source1.mdl");
+	PRECACHE_MODEL("models/player/zombie_source2/zombie_source2.mdl");
+	PRECACHE_MODEL("models/player/zombie_parter1/zombie_parter1.mdl");
+	PRECACHE_MODEL("models/player/zombie_parter2/zombie_parter2.mdl");
+	PRECACHE_MODEL("models/player/zombie_tf1/zombie_tf1.mdl");
+	PRECACHE_MODEL("models/player/zombie_tf2/zombie_tf2.mdl");
+
 }
 
 }

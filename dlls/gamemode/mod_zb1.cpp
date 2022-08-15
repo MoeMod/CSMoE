@@ -364,6 +364,8 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 		ret = 360;
 	else if (!strcmp(szAmmoClassName, "crossbowex21"))
 		ret = 500;
+	else if (!strcmp(szAmmoClassName, "lockongun"))
+		ret = 500;
 	else if (!strcmp(szAmmoClassName, "CannonAmmo"))
 		ret = 20;
 	else if (!strcmp(szAmmoClassName, "CannonEXAmmo"))
@@ -499,7 +501,10 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 	player->m_flLockGravity = 0.0;
 	player->m_iCustomSequence = -1;
 	MakeZombie(player, ZOMBIE_LEVEL_HOST);
-	player->pev->health = player->pev->max_health = std::max(3000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
+	if (enhancedzombie.value)
+		player->pev->health = player->pev->max_health = 15000.0f;
+	else
+		player->pev->health = player->pev->max_health = std::max(3000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
 	player->m_iKevlar = ARMOR_TYPE_HELMET;
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + 100.0f;
 

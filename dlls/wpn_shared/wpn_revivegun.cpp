@@ -844,7 +844,12 @@ float CReviveGun::GetDamage() const
 	float flDamage = 34.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 90.0f;
+	{
+		if (enhancedzombie.value)
+			flDamage = 551.0f;
+		else
+			flDamage = 90.0f;
+	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 146.0f;
 #endif
@@ -856,7 +861,12 @@ float CReviveGun::GetExpDamage() const
 	float flDamage = 10.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 150.0f;
+	{
+		if (enhancedzombie.value)
+			flDamage = 417.0f;
+		else
+			flDamage = 150.0f;
+	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 1500.0f;
 #endif
@@ -868,7 +878,12 @@ float CReviveGun::GetSecondaryAttackDamage() const
 	float flDamage = 5.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 265.0f;
+	{
+		if (enhancedzombie.value)
+			flDamage = 1100.0f;
+		else
+			flDamage = 265.0f;
+	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 146.0f;
 #endif

@@ -30,7 +30,7 @@ namespace cl::event::m60amethyst {
 
 	//extern engine_studio_api_t IEngineStudio;
 
-	static const char* SOUND_NAME = "weapons/mg3-1";
+	static const char* SOUND_NAME = "weapons/m60e4-1";
 
 	void EV_FireM60AmeThyst(event_args_s* args)
 	{

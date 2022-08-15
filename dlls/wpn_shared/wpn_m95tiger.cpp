@@ -50,8 +50,12 @@ public:
 	{
 		float flDamage = 150.0f;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 7450.0f;
-			//flDamage = 3725.0f;
+		{
+			if (enhancedzombie.value)
+				flDamage = 7450;
+			else
+				flDamage = 5000;
+		}
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = 14900.0f;
 		return flDamage;
@@ -501,8 +505,12 @@ float CM95Tiger::GetDamage() const
 	float flDamage = 150.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		//flDamage = 3100.0f;
-		flDamage = 1100.0f;
+	{
+		if (enhancedzombie.value)
+			flDamage = 3100;
+		else
+			flDamage = 1100;
+	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 6200.0f;
 #endif

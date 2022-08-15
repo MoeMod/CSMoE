@@ -163,7 +163,23 @@ void CHudScoreBoardLegacy::BuildNumberRC(wrect_t(&rgrc)[10], int w, int h)
 
 unsigned CHudScoreBoardLegacy::math_log10(unsigned v, int iflags)
 {
-	if (v >= 10000)
+	if (v > 100000000)
+		return 9;
+	else if (iflags & (DHN_9DIGITS))
+		return 9;
+	else if (v > 10000000)
+		return 8;
+	else if (iflags & (DHN_8DIGITS))
+		return 8;
+	else if (v > 1000000)
+		return 7;
+	else if (iflags & (DHN_7DIGITS))
+		return 7;
+	else if (v > 100000)
+		return 6;
+	else if(iflags & (DHN_6DIGITS))
+		return 6;
+	else if (v >= 10000)
 		return 5;
 	else if (iflags & (DHN_5DIGITS))
 		return 5;
@@ -186,6 +202,23 @@ unsigned CHudScoreBoardLegacy::math_log10(unsigned v, int iflags)
 	return (v >= 1000000000) ? 9 : (v >= 100000000) ? 8 : (v >= 10000000) ? 7 :
 		(v >= 1000000) ? 6 : (v >= 100000) ? 5 : (v >= 10000) ? 4 :
 		(v >= 1000) ? 3 : (v >= 100) ? 2 : (v >= 10) ? 1 : 0;
+}
+
+unsigned CHudScoreBoardLegacy::math_div(unsigned v, int iflags)
+{
+	int maxsize = 0;
+	if (maxsize <= 0)
+	{
+		maxsize = 1;
+
+		for (int num = 10; (v / num) > 0; num *= 10)
+			maxsize++;
+	}
+
+	if (maxsize > 255)
+		maxsize = 255;
+
+	return maxsize;
 }
 
 int CHudScoreBoardLegacy::DrawTexturedNumbersTopRightAligned(const CTextureRef& tex, const wrect_t(&rect)[10], int iNumber, int x, int y, int iflags, int igaps, float scale, byte r, byte g, byte b, byte a)
@@ -220,7 +253,7 @@ void CHudScoreBoardLegacy::DrawTexturePart(const CTextureRef& tex, const wrect_t
 	tex.Draw2DQuadScaled(x1, y1, x2, y2, rect.left / w, rect.top / h, rect.right / w, rect.bottom / h, r, g, b, a);
 }
 
-int CHudScoreBoardLegacy::DrawTexturedNumbers(const CTextureRef& tex, const wrect_t(&rect)[10], int iNumber, int x, int y, int iflags, int igaps, float scale, byte r, byte g, byte b, byte a)
+int CHudScoreBoardLegacy::DrawTexturedNumbers(const CTextureRef& tex, const wrect_t(&rect)[10], int iNumber, int x, int y, int iflags, int igaps, float scale, byte r, byte g, byte b, byte a,int iLong)
 {
 	int n = CHudScoreBoardLegacy::math_log10(iNumber, iflags);
 
@@ -230,6 +263,49 @@ int CHudScoreBoardLegacy::DrawTexturedNumbers(const CTextureRef& tex, const wrec
 		x += (rect[0].right - rect[0].left + igaps) * (n - 1) * scale;
 
 	return CHudScoreBoardLegacy::DrawTexturedNumbersTopRightAligned(tex, rect, iNumber, x, y, iflags, igaps, scale, r, g, b, a);
+}
+
+int CHudScoreBoardLegacy::DrawTexturedNumbersLong(const CTextureRef& tex, const wrect_t(&rect)[10], int iNumber, int x, int y, int iflags, int igaps, float scale, byte r, byte g, byte b, byte a)
+{
+
+	int maxsize = 0;
+	if (maxsize <= 0)
+	{
+		maxsize = 1;
+
+		for (int num = 10; (iNumber / num) > 0; num *= 10)
+			maxsize++;
+	}
+
+	if (maxsize > 255)
+		maxsize = 255;
+	bool bShouldDraw = false;
+
+
+
+	for (int i = 0; i < maxsize; i++)
+	{
+		int div = 1;
+		for (int j = 0; j < maxsize - i; j++)
+			div *= 10;
+
+		int iNum = (iNumber % div * 10) / div;
+
+		if (iNum)
+			bShouldDraw = true;
+
+		if (!iNum && !bShouldDraw && i != maxsize - 1)
+			continue;
+
+
+		if ((iflags & DHN_CENTERALIGNED))
+			x += (rect[0].right - rect[0].left + igaps) * (maxsize - 2) * scale;	//0.5?
+		else
+			x += (rect[0].right - rect[0].left + igaps) * (maxsize - 1) * scale;
+
+		CHudScoreBoardLegacy::DrawTexturedNumbersTopRightAligned(tex, rect, iNumber, x, y, iflags, igaps, scale, r, g, b, a);
+	}
+	return x;
 }
 
 int CHudScoreBoardLegacy::Draw(float flTime)

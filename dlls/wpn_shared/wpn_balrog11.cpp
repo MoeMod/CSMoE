@@ -50,7 +50,6 @@ void CBalrog11::Precache(void)
 
 	PRECACHE_SOUND("weapons/balrog11-1.wav");
 	PRECACHE_SOUND("weapons/balrog11-2.wav");
-	PRECACHE_SOUND("weapons/balrog11_insert.wav");
 	PRECACHE_SOUND("weapons/balrog9_charge_finish1.wav");
 
 	m_usFireBalrog11 = PRECACHE_EVENT(1, "events/balrog11.sc");

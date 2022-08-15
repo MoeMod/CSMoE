@@ -229,7 +229,7 @@ namespace sv {
 					if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
 					{
 						pev->iuser1++;
-						if (pev->iuser1 >= 2)
+						if (pev->iuser1 >= 15)
 						{
 							m_iWeaponState = WPNSTATE_JANUS11_SIGNAL;
 							m_flNextReset = gpGlobals->time + 9.0s;

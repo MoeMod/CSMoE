@@ -16,6 +16,8 @@
 #include "hud_sub.h"
 namespace cl {
 extern vec3_t g_velocity;
+extern long g_iDamage[MAX_CLIENTS + 1];
+extern long g_iDamageTotal[MAX_CLIENTS + 1];
 
 class CHudNewHud : public CHudBase
 {

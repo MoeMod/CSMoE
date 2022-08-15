@@ -119,6 +119,7 @@ const std::map<ZombieZSkillSkillId, std::pair<ZombieZSkillType, const char*>> g_
 	{Skill_Knife2X, {TYPE_HUMAN, "屠戮之刃"}},
 	{Skill_GoldClip, {TYPE_HUMAN, "金色弹夹"}},
 	{Skill_Penetration, {TYPE_GENERAL, "逃杀本能"}},
+	{Skill_StableGrip, {TYPE_HUMAN, "稳定握把"}},
 
 };
 

@@ -205,17 +205,33 @@ namespace sv {
 #endif
         UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
         Vector vecSrc = m_pPlayer->GetGunPosition();
-        Vector vecDir;
+        Vector vecDir, vecUp, vecRight, vecForward;
+        vecForward = gpGlobals->v_forward;
+        vecUp = gpGlobals->v_up;
+        vecRight = gpGlobals->v_right;
 
         if(m_iWeaponState != WPNSTATE_JANUS3_USING)
             m_iClip--;
         
-        vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 1, BULLET_PLAYER_45ACP, GetDamage(), 0.85, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
-         
-        vecDir = gpGlobals->v_forward + vecDir[0] * gpGlobals->v_right + vecDir[1] * gpGlobals->v_up;
-        ChargeToLineTargets(vecSrc, vecDir);
-
+        vecDir = m_pPlayer->FireBullets3(vecSrc, vecForward, flSpread, 8192, 1, BULLET_PLAYER_45ACP, GetDamage(), 0.85, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+   
 #ifndef CLIENT_DLL 
+        int HitResult = UTIL_GetLineTarget(vecSrc, vecForward, vecRight, vecUp, vecDir, 8192, m_pPlayer, true);
+        if (HitResult == HIT_PLAYER)
+        {
+            if (!m_iWeaponState)
+            {
+                pev->iuser1++;
+                if (pev->iuser1 >= m_iShotsRequired)
+                {
+                    m_iWeaponState = WPNSTATE_JANUS3_SIGNAL;
+                    m_flNextReset = gpGlobals->time + 9.0s;
+
+                    EMIT_SOUND_DYN(edict(), CHAN_ITEM, "weapons/change1_ready.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
+                }
+            }
+        }
+
         PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), m_iWeaponState, FALSE);
 #endif
  
@@ -290,34 +306,6 @@ namespace sv {
             m_flNextReset = gpGlobals->time + 8.0s;
         }
     }
-
-    void ChargeToLineTargets(Vector vecSrc, Vector vecDir)
-    {
-        TraceResult tr;
-
-        UTIL_TraceLine(vecSrc, vecSrc + vecDir * 8192.0, dont_ignore_monsters, m_pPlayer->edict(), &tr);
-
-        if (tr.flFraction < 1.0 && !FNullEnt(tr.pHit))
-        {
-            CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-
-            if (pEntity && (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY))
-            {
-                if (!m_iWeaponState)
-                {
-                    pev->iuser1++;
-                    if (pev->iuser1 >= m_iShotsRequired)
-                    {
-                        m_iWeaponState = WPNSTATE_JANUS3_SIGNAL;
-                        m_flNextReset = gpGlobals->time + 9.0s;
-
-                        EMIT_SOUND_DYN(edict(), CHAN_ITEM, "weapons/change1_ready.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
-                    }
-                }
-            }
-        }
-    }
-
 
     void Reload() override
     {

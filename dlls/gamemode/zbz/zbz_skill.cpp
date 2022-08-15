@@ -230,8 +230,11 @@ namespace sv {
 		}
 
 		void OnGetSkill() override {
-			
+
 			m_pPlayer->pev->max_health = m_pPlayer->pev->health += m_pPlayer->m_bIsZombie ? GetZombieBonus() : GetBonus();
+			if (m_pPlayer->pev->max_health >= 32000)
+				m_pPlayer->pev->max_health = m_pPlayer->pev->health = 30000;
+			
 		}
 	private:
 		float GetBonus() const { return 400.0f + 200.0f * g_pGameRules->m_iTotalRoundsPlayed; }
@@ -265,6 +268,27 @@ namespace sv {
 				return;
 
 			int amount = m_pPlayer->AmmoInventory(i);
+
+			CBasePlayerItem* pWeapon = m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+
+			if (pWeapon)
+			{
+				if (pWeapon->m_iId == WEAPON_DIVINETITAN || pWeapon->m_iId == WEAPON_PATROLDRONE)
+					return;
+
+				if (amount && pWeapon && pWeapon->m_iId != WEAPON_HEGRENADE)
+				{
+					return;
+				}
+
+				while (pWeapon != NULL)
+				{
+					if (pWeapon->m_iId == WEAPON_DIVINETITAN || pWeapon->m_iId == WEAPON_PATROLDRONE)
+						return;
+					pWeapon = pWeapon->m_pNext;
+				}
+			}
+
 			if (amount >= GetAmountBonus())
 				return;
 
@@ -2126,6 +2150,26 @@ namespace sv {
 		}
 	};
 
+	class ZSkill_StableGrip : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_StableGrip(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "稳定握把"; }
+		const char* GetDesc() const override { return "一定几率免疫恶魔猎手的震荡效果(50% + 回合数 * 3%)"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+
+		BOOL OnReactToDeimosTail()
+		{
+			bool bAvoidDebuff = false;
+			if (RANDOM_FLOAT(0, 1) > GetChance())
+				bAvoidDebuff = true;
+			return bAvoidDebuff;
+		}
+	private:
+		float GetChance() const { return 0.5f + 0.03f * g_pGameRules->m_iTotalRoundsPlayed; }
+	
+	};
+
 	//class ZSkill_HuntierInstinct : public CZombieZSkill_Base
 	//{bug
 	//public:
@@ -2369,6 +2413,8 @@ namespace sv {
 		{ Skill_NetRound, 50, MakeSkill<ZSkill_NetRound> },
 		{ Skill_EmergencyEscape, 25, MakeSkill<ZSkill_EmergencyEscape> },
 		{ Skill_GhostHunter, 50, MakeSkill<ZSkill_GhostHunter> },
+
+		{ Skill_StableGrip, 50, MakeSkill<ZSkill_StableGrip> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

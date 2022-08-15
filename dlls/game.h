@@ -146,6 +146,11 @@ extern cvar_t voteplayer_last_time;
 extern cvar_t voteplayer_kick_time;
 extern cvar_t voteplayer_kick_percent;
 
+extern cvar_t assistaim;
+extern cvar_t randomwpn;
+extern cvar_t enhancedzombie;
+
+
 void GameDLLInit();
 
 }

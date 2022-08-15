@@ -70,8 +70,25 @@ void MoeLogIn::OnClose(void)
 
 void MoeLogIn::OnCommand(const char* command)
 {
-	char cmd[48];
+	char cmd[64];
 	
+	if (!stricmp(command, "get_token"))
+	{
+		char szAccount[16];
+		m_pAccount->GetText(szAccount, 16);
+		snprintf(m_szAccount, sizeof(m_szAccount), szAccount);
+		snprintf(cmd, sizeof(cmd), "setinfo qq %s;get_token %s", szAccount, szAccount);
+		engine->pfnClientCmd(cmd);
+		return;
+	}
+
+	if (!stricmp(command, "userlogin"))
+	{
+		engine->pfnClientCmd("login");
+		BaseClass::Close();
+		return;
+	}
+
 	if (!stricmp(command, "Validation"))
 	{ 
 		if (!m_pAccount->GetTextLength())
@@ -94,12 +111,6 @@ void MoeLogIn::OnCommand(const char* command)
 		}
 		else
 		{
-			char szAccount[16];
-			m_pAccount->GetText(szAccount, 16);
-			snprintf(m_szAccount, sizeof(m_szAccount), szAccount);
-			snprintf(cmd, sizeof(cmd), "setinfo qq %s", szAccount);
-			engine->pfnClientCmd(cmd);
-
 			auto msgbox = new vgui2::MessageBox("#CSMoE_Tips", "#CSMoE_VarifyWarning_3", this);
 			msgbox->SetOKButtonText("#CSO_OKl_Btn");
 			msgbox->SetBounds(GetWide() / 2 - 150, GetTall() / 2 - 100, 300, 200);
@@ -130,8 +141,16 @@ void MoeLogIn::OnCommand(const char* command)
 				{
 					char szPassword[6];
 					m_pPassword->GetText(szPassword, 6);
-					snprintf(cmd, sizeof(cmd), "setinfo token %s", szPassword);
+					//snprintf(cmd, sizeof(cmd), "setinfo token %s", szPassword);
+					snprintf(cmd, sizeof(cmd), "login %s %s", m_szAccount, szPassword);
 					engine->pfnClientCmd(cmd);
+
+					/*auto msgbox = new vgui2::MessageBox("#CSMoE_Tips", "#CSMoE_Login", this);
+					msgbox->SetOKButtonText("#CSO_OKl_Btn");
+					msgbox->SetBounds(GetWide() / 2 - 150, GetTall() / 2 - 100, 300, 200);
+					msgbox->DoModal();
+					msgbox->Activate();
+					msgbox->SetCommand("userlogin");*/
 					return;
 				}
 			}

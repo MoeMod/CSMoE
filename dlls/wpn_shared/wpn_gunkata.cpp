@@ -111,7 +111,7 @@ public:
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "44magnum";
-		p->iMaxAmmo1 = 180;
+		p->iMaxAmmo1 = 200;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = 36;

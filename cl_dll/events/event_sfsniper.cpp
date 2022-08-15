@@ -123,11 +123,6 @@ void EV_FireSFSniper( event_args_t *args )
 	
 	vSpread.x = args->fparam1;
 	vSpread.y = args->fparam2;
-	EV_HLDM_FireBullets( idx,
-		forward, right,	up,
-		1, vecSrc, vecAiming,
-		vSpread, 8192.0, BULLET_PLAYER_338MAG,
-		0 );
 
 	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, vSpread, 8192, BULLET_PLAYER_RAILBEAM, 0, &tracerCount[idx - 1], 5);
 }

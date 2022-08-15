@@ -24,6 +24,7 @@ namespace sv {
 
 	public:
 		void MakeLoopGenerator();
+		void MakeLoopGeneratorAdvanced();
 		void CheckDistanceBetweenEnemies();
 		void LoopInstantDamage(CBasePlayer* pAttackPlayer);
 		float GetDamage_Missile(int IsTouch) const;
@@ -43,6 +44,8 @@ namespace sv {
 		Vector m_vEndPosition;
 
 		time_point_t m_flTimeNextCharge;
+		time_point_t m_flNextFadeTime;
+		time_point_t m_flNextSoundTime;
 		std::vector<EHANDLE> phs9_10_11;
 		std::vector<EHANDLE> m_pGroupList;
 
@@ -78,6 +81,8 @@ namespace sv {
 		time_point_t m_flNextDamagePoint[2];
 		//Unused
 		time_point_t m_flEffRemoveTime;
+
+		
 		Vector m_vSaveOrigin;
 	};
 
@@ -144,6 +149,9 @@ namespace sv {
 		void WeaponIdle() override;
 		void UpdateOnRemove(void);
 		void RemoveEntity(void);
+		int GetClip();
+		void ChangeClip(int clip, bool bSecond);
+		void ResetSequence();
 
 		BOOL IsSignal();
 		
@@ -163,18 +171,20 @@ namespace sv {
 		int m_iButton;
 		int m_iWpnState;
 		int m_iFade;
-		int m_iSaveSpecialAmmo;
+		int m_iSaveShoots;
 
 		int m_CrossHairState;
 		int m_CrossHairStateStored;
+
+		int m_iBlockIdle;
+		time_point_t m_flBlockTime;
 		time_point_t m_flTimeNextMessage;
 		time_point_t m_flTimeNextCharge;
 		time_point_t m_flPlayerThink;
 		time_point_t m_flTimeholster;
 
 	private:
-		
-		int m_iSaveShoots;
+	
 		int m_iAutoAttackStage;
 		bool m_bCanThrow;
 	};

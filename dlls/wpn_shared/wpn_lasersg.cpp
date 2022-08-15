@@ -27,6 +27,11 @@
 #include "customentity.h"
 
 #endif
+#include "r_studioint.h"
+#include "studio.h"
+#include <cdll_int.h>
+
+extern engine_studio_api_t IEngineStudio;
 
 
 #ifdef CLIENT_DLL
@@ -37,6 +42,28 @@ namespace sv {
 	class CBeam;
 	std::array<CBeam*, 20> phs17b; // EHANDLE ?
 	static constexpr const char* Beam_SPR = "sprites/laserbeam.spr"; //
+
+	class CLaserSgFakeEffect : public CBaseAnimating
+	{
+	public:
+		void Spawn(void);
+		void Precache(void);
+		//void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override ;
+
+	public:
+		void EXPORT OnThink(void);
+
+	public:
+		
+		static CLaserSgFakeEffect* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	private:
+
+		duration_t GetLifeTime();
+		int m_iType;
+		time_point_t m_flAttackInterval;
+		time_point_t m_flRemoveTime;
+	};
+
 LINK_ENTITY_TO_CLASS(weapon_lasersg, CLaserSg)
 
 void CLaserSg::Spawn(void)
@@ -100,7 +127,8 @@ BOOL CLaserSg::Deploy(void)
 	ResetChargeTimer();
 
 #ifndef CLIENT_DLL
-	ItemPreFrame();
+	ConstructCharging();
+	//ItemPreFrame();
 #endif
 
 	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iWeaponState;
@@ -108,6 +136,7 @@ BOOL CLaserSg::Deploy(void)
 
 	return DefaultDeploy("models/v_lasersg.mdl", "models/p_lasersg.mdl", 2, "shotgun", UseDecrement() != FALSE);
 }
+
 
 void CLaserSg::InitChargeState(void)
 {
@@ -129,6 +158,7 @@ void CLaserSg::SendChargeState(void)
 	if (!m_pPlayer)
 		return;
 }
+
 int CLaserSg::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 {
 	if (m_iDefaultAmmo2)
@@ -228,6 +258,9 @@ void CLaserSg::PrimaryAttack(void)
 	Attack_FindTargets(LaserSgPrimaryAttack);
 	Attack_ApplyDamage(LaserSgPrimaryAttack);
 
+#ifndef CLIENT_DLL
+	CLaserSgFakeEffect::Create(0, m_pPlayer->pev->origin, m_pPlayer->pev->angles, ENT(m_pPlayer->pev), m_pPlayer->m_iTeam);
+#endif
 
 }
 void CLaserSg::SecondaryAttack(void)
@@ -414,24 +447,28 @@ void CLaserSg::Attack_ApplyDamage(bool bFireAttack)
 			UTIL_TraceLine(m_pPlayer->pev->origin, pEntity->pev->origin, missile, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
-			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, m_pPlayer->pev->origin);
-			WRITE_BYTE(TE_BEAMENTPOINT);
-			WRITE_SHORT(m_pPlayer->entindex() | 0x1000);
-			WRITE_COORD(pEntity->pev->origin.x);
-			WRITE_COORD(pEntity->pev->origin.y);
-			WRITE_COORD(pEntity->pev->origin.z);
-			WRITE_SHORT(MODEL_INDEX("sprites/ef_winggun_laserbeam.spr"));
-			WRITE_BYTE(1);
-			WRITE_BYTE(30);
-			WRITE_BYTE(3);//Life
-			WRITE_BYTE(10);//Width
-			WRITE_BYTE(15);//Noise
-			WRITE_BYTE(240);
-			WRITE_BYTE(65);
-			WRITE_BYTE(85);
-			WRITE_BYTE(230);
-			WRITE_BYTE(10);
-			MESSAGE_END();
+			if (v8 <= 3)
+			{
+				MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, m_pPlayer->pev->origin);
+				WRITE_BYTE(TE_BEAMENTPOINT);
+				WRITE_SHORT(m_pPlayer->entindex() | 0x1000);
+				WRITE_COORD(pEntity->pev->origin.x);
+				WRITE_COORD(pEntity->pev->origin.y);
+				WRITE_COORD(pEntity->pev->origin.z);
+				WRITE_SHORT(MODEL_INDEX("sprites/ef_winggun_laserbeam.spr"));
+				WRITE_BYTE(1);
+				WRITE_BYTE(30);
+				WRITE_BYTE(3);//Life
+				WRITE_BYTE(10);//Width
+				WRITE_BYTE(15);//Noise
+				WRITE_BYTE(240);
+				WRITE_BYTE(65);
+				WRITE_BYTE(85);
+				WRITE_BYTE(230);
+				WRITE_BYTE(10);
+				MESSAGE_END();
+			}
+			
 #endif
 			++v8;
 
@@ -492,6 +529,10 @@ void CLaserSg::ItemPostFrame(void)
 				this->SendWeaponAnim(5, UseDecrement() != FALSE);
 				EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/lasersg-2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
+#ifndef CLIENT_DLL
+				CLaserSgFakeEffect::Create(1, m_pPlayer->pev->origin, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev), m_pPlayer->m_iTeam);
+#endif
+
 				return CBasePlayerWeapon::ItemPostFrame();
 			}
 		}
@@ -506,11 +547,19 @@ void CLaserSg::ItemPostFrame(void)
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
 		}
 	}
+	ConstructCharging();
+	
+
+	return CBasePlayerWeapon::ItemPostFrame();
+}
+#endif
+
+void CLaserSg::ConstructCharging(void)
+{
+#ifndef CLIENT_DLL
 	if (m_iWeaponState == 25)
 		return CBasePlayerWeapon::ItemPostFrame();
 
-	//if (m_fInReload > 0)
-	//	return CBasePlayerWeapon::ItemPostFrame();
 
 	if (m_flTimeNextCharge != invalid_time_point && m_flTimeNextCharge <= gpGlobals->time && !this->pev->iuser1)
 	{
@@ -527,10 +576,9 @@ void CLaserSg::ItemPostFrame(void)
 		if (m_iWeaponState == 25)
 			m_flTimeNextCharge = invalid_time_point;
 	}
-
-	return CBasePlayerWeapon::ItemPostFrame();
-}
 #endif
+
+}
 void CLaserSg::WeaponIdle(void)
 {
 	ResetEmptySound();
@@ -548,13 +596,16 @@ void CLaserSg::Reload(void)
 {
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
-	m_flTimeNextCharge = invalid_time_point;
+
+	ResetChargeTimer();
+	
 
 	if (DefaultReload(40, 1, 2.03s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
+
 	}
 }
 
@@ -586,4 +637,136 @@ double CLaserSg::GetDamage_PrimaryAttack()
 #endif
 	return 6.0;
 }
+
+#ifndef CLIENT_DLL
+LINK_ENTITY_TO_CLASS(lasersgfakeeffect, CLaserSgFakeEffect)
+CLaserSgFakeEffect* CLaserSgFakeEffect::Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam)
+{
+
+	edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("lasersgfakeeffect"));
+
+	if (FNullEnt(pent))
+	{
+		ALERT(at_console, "NULL Ent in Create!\n");
+		return NULL;
+	}
+
+	CLaserSgFakeEffect* pDragon = (CLaserSgFakeEffect*)Instance(pent);
+
+	if (pDragon)
+	{
+		pDragon->m_iType = iType;
+		pDragon->pev->owner = pentOwner;
+
+		if (!pDragon->m_iType)
+		{
+			pDragon->pev->origin.x = vecOrigin[0];
+			pDragon->pev->origin.y = vecOrigin[1];
+			pDragon->pev->origin.z = vecOrigin[2] + 20.0;
+			pDragon->pev->angles = g_vecZero;
+		}
+		else
+		{
+			pDragon->pev->origin.x = vecOrigin[0];
+			pDragon->pev->origin.y = vecOrigin[1];
+			pDragon->pev->origin.z = vecOrigin[2];
+			pDragon->pev->angles = vecAngles;
+		}
+		
+
+		pDragon->m_iTeam = iTeam;
+		pDragon->Spawn();
+
+	}
+
+	return pDragon;
+}
+
+void CLaserSgFakeEffect::Spawn(void)
+{
+	Precache();
+
+	pev->nextthink = gpGlobals->time + 0.01s;
+
+	pev->solid = SOLID_NOT;
+	pev->movetype = MOVETYPE_FLY;
+
+	pev->frame = 0;
+	pev->sequence = 0;
+	pev->rendermode = kRenderTransTexture;
+	pev->renderamt = 255;
+
+	//DROP_TO_FLOOR(ENT(pev));
+
+	ResetSequenceInfo();
+
+	m_flRemoveTime = gpGlobals->time + GetLifeTime();
+
+
+
+	if (!m_iType)
+	{
+		pev->rendermode = kRenderTransAdd;
+		pev->renderamt = 255;
+		SET_MODEL(ENT(pev), "models/p_lasersg.mdl");
+		SetThink(&CLaserSgFakeEffect::OnThink);
+		pev->body = 1;
+
+	}
+	else
+	{
+		pev->rendermode = kRenderTransTexture;
+		pev->renderamt = 255;
+		SET_MODEL(ENT(pev), "models/p_lasersg.mdl");
+		SetThink(&CLaserSgFakeEffect::OnThink);
+		pev->body = 2;
+	}
+
+}
+void CLaserSgFakeEffect::Precache(void)
+{
+	PRECACHE_MODEL("models/p_lasersg.mdl");	//ground
+
+}
+void CLaserSgFakeEffect::OnThink()
+{
+	pev->nextthink = gpGlobals->time + 0.01s;
+
+	if (m_flRemoveTime < gpGlobals->time)
+	{
+		m_flRemoveTime = invalid_time_point;
+		pev->renderamt = 0.0f;
+		pev->nextthink = gpGlobals->time + 0.01s;
+
+		pev->solid = SOLID_NOT;
+		pev->avelocity = g_vecZero;
+		SetThink(&CBaseEntity::SUB_Remove);
+		pev->nextthink = gpGlobals->time + 0.01s;
+		return;
+	}
+	CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+	CBasePlayer* pAttackPlayer = nullptr;
+	if (pAttacker && pAttacker->IsPlayer())
+		pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+
+	if (pAttackPlayer)
+	{
+
+		UTIL_SetOrigin(pev, pAttackPlayer->pev->origin + Vector(0, 0, !m_iType ? 10 : 5));
+
+		if (m_iType)
+		{
+			pev->angles = pAttackPlayer->pev->v_angle;
+			pev->angles.x = 0;
+		}
+
+
+	}
+}
+duration_t CLaserSgFakeEffect::GetLifeTime()
+{
+	return 0.36s;
+}
+#endif
 }

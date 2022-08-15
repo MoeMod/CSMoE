@@ -2722,4 +2722,66 @@ void UTIL_BeamPointsStretch(Vector vecSrc, Vector vecEnd, int beamindex, int fra
 
 }
 
+int UTIL_GetLineTarget(Vector vecSrc, Vector vecDirShooting, Vector vecRight, Vector vecUp, Vector vecSpread, float flDistance, CBaseEntity* pEntity, bool CheckTeamMate)
+{
+	CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+	if (!pPlayer)
+		return 0;
+
+	int HitResult = HIT_NONE;
+
+	TraceResult tr;
+
+	Vector vecDir, vecEnd;
+
+	vecDir = vecDirShooting + vecSpread[0] * vecRight + vecSpread[1] * vecUp;
+	vecEnd = vecSrc + vecDir * flDistance;
+	/*for (int i = 0; i < 3; i++)
+	{
+		vecDir[i] = vecDirShooting[i] + vecSpread[0] * vecRight[i] + vecSpread[1] * vecUp[i];
+		vecEnd[i] = vecSrc[i] + flDistance * vecDir[i];
+	}*/
+
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pPlayer->pev), &tr);
+
+	if (tr.flFraction < 1.0)
+	{
+		HitResult = HIT_WALL;
+		CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+
+		if (pEntity && (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY))
+		{
+			if (pEntity->IsPlayer())
+			{
+				if (CheckTeamMate)
+				{
+					if (g_pGameRules->PlayerRelationship(pPlayer, pEntity) != GR_TEAMMATE)
+						HitResult = HIT_PLAYER;
+				}
+				else
+					HitResult = HIT_PLAYER;
+			}
+			else
+			{
+				if (CheckTeamMate)
+				{
+					if (pEntity->m_iTeam != pPlayer->m_iTeam)
+						HitResult = HIT_PLAYER;
+				}
+				else
+					HitResult = HIT_PLAYER;
+			}
+		}
+	}
+	return HitResult;
+}
+
+Vector UTIL_GetSpeedVector(Vector vecSrc, Vector vecEnd, float flSpeed)
+{
+	Vector vecVelocity = vecEnd - vecSrc;
+	float num = flSpeed / vecVelocity.Length();
+	return vecVelocity * num;
+
+}
+
 }

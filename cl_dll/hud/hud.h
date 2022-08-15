@@ -822,8 +822,21 @@ public:
 	void DrawBUFFAWPScope(float flTime);
 	void BUFFAWPRun();
 	void BUFFAWPEnd();
-	
+	void DrawLockOnGunScope(float flTime);
+	void SetLockOnData(float time, int slot, int hitgroup);
+	void ClearAllLockOnData();
+	void DrawPatrolDroneScope(float flTime);
+	void SetPatrolDroneDeployTime();
+	void InsertPatrolDroneData(int iSlot, int iClip, int iState);
+
 private:
+
+	struct LockOnData
+	{
+		float dietime;
+		int hitgroup;
+	};
+
 	float left, right, centerx, centery;
 	UniqueTexture m_iScopeArc[4];
 	UniqueTexture m_iM95TigerScope[2];
@@ -846,6 +859,44 @@ private:
 	UniqueTexture m_iBUFFAWP_Outline;
 
 	float m_flBUFFAWPStartTime;
+
+	UniqueTexture m_iLockOnGun_BG;
+	UniqueTexture m_iLockOnGun_Top;
+	UniqueTexture m_iLockOnGun_Center;
+	UniqueTexture m_iLockOnGun_Bottom_BG;
+	UniqueTexture m_iLockOnGun_Bottom[6];
+
+	LockOnData m_iLockOnData[10];
+
+	UniqueTexture m_iPatrolDrone_Top_BG;
+	UniqueTexture m_iPatrolDrone_Bottom_BG;
+	UniqueTexture m_iPatrolDrone_Center_Default;
+	UniqueTexture m_iPatrolDrone_Icon_Disabled;
+	UniqueTexture m_iPatrolDrone_Icon_Warning01;
+	UniqueTexture m_iPatrolDrone_Icon_Warning02;
+	UniqueTexture m_iPatrolDrone_Icon_Activation;
+	UniqueTexture m_iPatrolDrone_Icon_Blasting;
+	UniqueTexture m_iPatrolDrone_Center_Red;
+
+	struct patroldronedata
+	{
+		int state;
+		int ammo;
+		float nextcheckammo;
+	};
+
+	enum patroldronestate_e
+	{
+		PATROLDRONE_OFF,
+		PATROLDRONE_WANDER,
+		PATROLDRONE_RETURN,
+		PATROLDRONE_ATTACK,
+	};
+
+	float m_flPatrolDroneDeployTime;
+	int m_iPatrolDroneState;
+
+	std::map<int, patroldronedata> m_vecPatrolDroneData;
 
 };
 

@@ -26,9 +26,35 @@
 *
 */
 #include "events.h"
+#include "r_studioint.h"
+#include "studio.h"
 
+namespace cl {
+	extern engine_studio_api_t IEngineStudio;
+}
 
 namespace cl::event::lasersg {
+	void SetUpWeaponModelSkin(int idx, int iSkinIndex)
+	{
+
+		studiohdr_t* modelheader = NULL;
+		model_t* pweaponmodel;
+
+		cl_entity_t* parent = gEngfuncs.GetEntityByIndex(idx);
+		if (!parent)
+			return;
+
+		pweaponmodel = IEngineStudio.GetModelByIndex(parent->curstate.weaponmodel);
+		if(!pweaponmodel)
+			return;
+
+		modelheader = (studiohdr_t*)IEngineStudio.Mod_Extradata(pweaponmodel);
+		if (!modelheader)
+			return;
+
+		//modelheader->bodypartindex = iSkinIndex;
+
+	}
 	void EV_FireLaserSg(event_args_t* args)
 	{
 		static const char* SOUNDS_NAME[] =
@@ -54,10 +80,11 @@ namespace cl::event::lasersg {
 		//primaryattack
 		if (!args->bparam2)
 		{
+			SetUpWeaponModelSkin(idx,1);
 			if (EV_IsLocal(idx))
 			{
 				++g_iShotsFired;
-				EV_MuzzleFlash();
+				//EV_MuzzleFlash();
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(3, 2);
 				
 			}
@@ -86,20 +113,18 @@ namespace cl::event::lasersg {
 		}
 		else//secondaryattack
 		{
+			SetUpWeaponModelSkin(idx, 2);
 			if (EV_IsLocal(idx))
 			{
 				++g_iShotsFired;
-				EV_MuzzleFlash();
+				//EV_MuzzleFlash();
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(5, 2);
 			}
 			else
 				PLAY_EVENT_SOUND("weapons/lasersg-2.wav");
 		}
-
-		
-
-		
 	}
+	
 
 }
 

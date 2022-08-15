@@ -93,6 +93,7 @@ enum ZombieZSkillSkillId : byte
 	Skill_Knife2X, //Knife2X
 	Skill_GoldClip, //GoldClip
 	Skill_Penetration, //go through teamates
+	Skill_StableGrip, //avoid deimos zombie
 };
 
 enum ZBZMessageType : byte

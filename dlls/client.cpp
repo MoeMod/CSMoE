@@ -2547,11 +2547,15 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 #ifdef XASH_MYSQL
 	else if (db::g_pDataBase != NULL && FStrEq(pcmd, "get_token"))
 	{
-		db::g_pDataBase->ClientToken(player);
+		if (CMD_ARGC_() == 2) {
+			db::g_pDataBase->ClientToken(player, CMD_ARGV_(1));
+		}
 	}
 	else if (db::g_pDataBase != NULL && FStrEq(pcmd, "login"))
 	{
-		db::g_pDataBase->ClientLogin(player);
+		if (CMD_ARGC_() == 3) {
+			db::g_pDataBase->ClientLogin(player, CMD_ARGV_(1), CMD_ARGV_(2));
+		}
 	}
 #endif // XASH_MYSQL
 	else if (FStrEq(pcmd, "inspect"))
@@ -4528,6 +4532,11 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
 			   }
 		   }
 	   }
+   }
+   if (!Q_strcmp(STRING(ent->v.classname), "lasersgfakeeffect") && ent->v.body != 0)
+   {
+	   if (ent->v.owner == host)
+		   state->effects = EF_NODRAW;
    }
 
    if (ent != host)

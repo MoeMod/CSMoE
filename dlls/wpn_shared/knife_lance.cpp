@@ -614,7 +614,7 @@ namespace sv {
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				flDamage = 900.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage *= 3600.0f;
+				flDamage = 3600.0f;
 #endif
 			return flDamage;
 		}

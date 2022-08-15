@@ -483,6 +483,16 @@ void V_DropPunchAngle ( float frametime, vec3_t &ev_punchangle )
 	VectorScale ( ev_punchangle, len, ev_punchangle );
 }
 
+/*
+=============
+V_PunchAxis
+Client side punch effect
+=============
+*/
+void V_PunchAxis(int axis, float punch)
+{
+	ev_punchangle[axis] = punch;
+}
 
 /*
 ==================

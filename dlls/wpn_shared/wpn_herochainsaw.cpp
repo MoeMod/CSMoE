@@ -310,7 +310,7 @@ namespace sv {
 
             if (((CBasePlayer*)pEntity)->m_bIsZombie)
             {
-                AddKickRate(((CBasePlayer*)pEntity), m_pPlayer->pev->origin, 4000, 180);
+                AddKickRate(((CBasePlayer*)pEntity), m_pPlayer->pev->origin, 3200, 140);
             }
         }
 #endif

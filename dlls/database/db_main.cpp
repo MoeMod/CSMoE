@@ -1,4 +1,4 @@
-#ifdef XASH_MYSQL
+ #ifdef XASH_MYSQL
 
 #include "db_main.h"
 
@@ -16,15 +16,15 @@ namespace db {
 
 CDataBaseManager* g_pDataBase;
 
-static QQTokenData UserQQTokenDataFromSqlResult(MYSQL_RES* result)
+static std::optional<QQTokenData> UserQQTokenDataFromSqlResult(MYSQL_RES* result)
 {
     if (!result)
-        return {};
+        return std::nullopt;
 
     MYSQL_ROW row = mysql_fetch_row(result);
     mysql_free_result(result);
     if (!row)
-        return {};
+        return std::nullopt;
 
     std::stringstream ss;
     ss << row[0];
@@ -45,25 +45,25 @@ static QQTokenData UserQQTokenDataFromSqlResult(MYSQL_RES* result)
     return QQTokenData{ r0, r1, r2 };
 }
 
-static AccountData UserAccountDataFromSqlResult(MYSQL_RES* result)
+static std::optional<AccountData> UserAccountDataFromSqlResult(MYSQL_RES* result)
 {
     if (!result)
-        return {};
+        return std::nullopt;
 
     MYSQL_ROW row = mysql_fetch_row(result);
     mysql_free_result(result);
-    if(!row)
-        return {};
+    if (!row)
+        return std::nullopt;
 
     std::stringstream ss;
     ss << row[0];
-    int64_t r0; // uid
+    uint32_t r0; // uid
     ss >> r0;
     ss.clear();
     ss.str("");
 
     ss << row[1]; // qq
-    int32_t r1;
+    int64_t r1;
     ss >> r1;
 
     ss << row[2];
@@ -73,10 +73,37 @@ static AccountData UserAccountDataFromSqlResult(MYSQL_RES* result)
     ss.str("");
 
     ss << row[5];
-    uint32_t r5;
+    uint32_t r5; // bantime
     ss >> r5;
 
     return AccountData{ r0, r1, r2, std::string(row[3]), std::string(row[4]), r5};
+}
+
+static std::optional<std::unordered_map<uint32_t, PlayerItemData>> UserItemDataFromSqlResult(MYSQL_RES* result)
+{
+    if (!result)
+        return std::nullopt;
+
+    std::stringstream ss;
+    std::unordered_map<uint32_t, PlayerItemData> container;
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(result)))
+    {
+        // itemid, num, custom
+        ss << row[0];
+        uint32_t r0; // itemid
+        ss >> r0;
+        ss.clear();
+        ss.str("");
+
+        ss << row[1];
+        uint32_t r1; // num
+        ss >> r1;
+
+        container[r0] = {r0, r1, row[2]};
+    }
+    mysql_free_result(result);
+    return std::move(container);
 }
 
 boost::asio::io_context ioc_database;
@@ -190,76 +217,102 @@ void CDataBaseManager::AsyncQuery(std::string sql, std::function<void(MYSQL_RES*
     });
 }
 
-std::string CDataBaseManager::QueryQQTokenDataSQL(int64_t qq, int32_t token)
+std::string CDataBaseManager::QueryQQTokenDataSQL(std::string qq, std::string token)
 {
-    return std::string("SELECT * FROM qqtoken WHERE `qq` = '" + std::to_string(qq) + "' AND `token` = '" + std::to_string(token) + "';");
+    return std::string("SELECT * FROM qqtoken WHERE `qq` = '" + qq + "' AND `token` = '" + token + "';");
 }
 
-QQTokenData CDataBaseManager::QueryQQTokenData(int64_t qq, int32_t token)
+std::optional<QQTokenData> CDataBaseManager::QueryQQTokenData(std::string qq, std::string token)
 {
     return UserQQTokenDataFromSqlResult(Query(QueryQQTokenDataSQL(qq, token)));
 }
 
-void CDataBaseManager::QueryQQTokenDataAsync(int64_t qq, int32_t token, std::function<void(QQTokenData)> callback)
+void CDataBaseManager::QueryQQTokenDataAsync(std::string qq, std::string token, std::function<void(std::optional<QQTokenData>)> callback)
 {
     AsyncQuery(QueryQQTokenDataSQL(qq, token), [callback](auto result) {
         callback(UserQQTokenDataFromSqlResult(result));
     });
 }
 
-std::string CDataBaseManager::InsertQQTokenDataSQL(int64_t qq, int32_t token)
+std::string CDataBaseManager::InsertQQTokenDataSQL(std::string qq, std::string token)
 {
-    return std::string("REPLACE INTO qqtoken (qq, token, timestamp) VALUES ('" + std::to_string(qq) + "','" + std::to_string(token) + "',unix_timestamp(now()));");
+    return std::string("INSERT INTO qqtoken (qq, token, timestamp) VALUES ('" + qq + "','" + token + "',unix_timestamp(now())) ON DUPLICATE KEY UPDATE token = '" + token + "';");
 }
 
-void CDataBaseManager::InsertQQTokenData(int64_t qq, int32_t token)
+void CDataBaseManager::InsertQQTokenData(std::string qq, std::string token)
 {
     Query(InsertQQTokenDataSQL(qq, token));
 }
 
-void CDataBaseManager::InsertQQTokenDataAsync(int64_t qq, int32_t token, std::optional<std::function<void(void)>> callback)
+void CDataBaseManager::InsertQQTokenDataAsync(std::string qq, std::string token, std::optional<std::function<void(void)>> callback)
 {
     AsyncQuery(InsertQQTokenDataSQL(qq, token), [callback](auto result) {
         if (callback) callback.value();
     });
 }
 
-std::string CDataBaseManager::QueryAccountDataSQL(int64_t qq)
+std::string CDataBaseManager::QueryAccountDataSQL(std::string qq)
 {
-	return std::string("SELECT uid, qq, logintime, loginauth, loginip, bantime FROM account WHERE `qq` = '" + std::to_string(qq) + "';");
+    return std::string("SELECT uid, qq, logintime, loginauth, loginip, bantime FROM account WHERE `qq` = '" + qq + "';");
 }
 
-AccountData CDataBaseManager::QueryAccountData(int64_t qq)
+std::optional<AccountData> CDataBaseManager::QueryAccountData(std::string qq)
 {
     return UserAccountDataFromSqlResult(Query(QueryAccountDataSQL(qq)));
 }
 
-void CDataBaseManager::QueryAccountDataAsync(int64_t qq, std::function<void(AccountData)> callback)
+void CDataBaseManager::QueryAccountDataAsync(std::string qq, std::function<void(std::optional<AccountData>)> callback)
 {
     AsyncQuery(QueryAccountDataSQL(qq), [callback](auto result){
         callback(UserAccountDataFromSqlResult(result));
     });
 }
 
-std::string CDataBaseManager::InsertAccountDataSQL(int64_t qq, std::string loginauth, std::string loginip)
+std::string CDataBaseManager::InsertAccountDataSQL(std::string qq, std::string loginauth, std::string loginip)
 {
-    return std::string("INSERT IGNORE INTO account (qq, logintime, loginauth, loginip) VALUES ('" + std::to_string(qq) + "',unix_timestamp(now()),'" + loginauth + "','" + loginip + "');");
+    return std::string("INSERT IGNORE INTO account (qq, logintime, loginauth, loginip) VALUES ('" + qq + "',unix_timestamp(now()),'" + loginauth + "','" + loginip + "');");
 }
 
-void CDataBaseManager::InsertAccountData(int64_t qq, std::string loginauth, std::string loginip)
+void CDataBaseManager::InsertAccountData(std::string qq, std::string loginauth, std::string loginip)
 {
     Query(InsertAccountDataSQL(qq, loginauth, loginip));
 }
 
-void CDataBaseManager::InsertAccountDataAsync(int64_t qq, std::string loginauth, std::string loginip, std::optional<std::function<void(void)>> callback)
+void CDataBaseManager::InsertAccountDataAsync(std::string qq, std::string loginauth, std::string loginip, std::optional<std::function<void(void)>> callback)
 {
     AsyncQuery(InsertAccountDataSQL(qq, loginauth, loginip), [callback](auto result){
         if (callback) callback.value();
     });
 }
 
+std::string CDataBaseManager::QueryItemDataSQL(uint32_t uid)
+{
+	return std::string("SELECT itemid, num, custom FROM playeritem WHERE `uid` = '" + std::to_string(uid) + "';");
+}
+
+void CDataBaseManager::QueryItemDataAsync(uint32_t uid, std::function<void(std::optional<std::unordered_map<uint32_t, PlayerItemData>>)> callback)
+{
+    AsyncQuery(QueryItemDataSQL(uid), [callback](auto result){
+        callback(UserItemDataFromSqlResult(result));
+    });
+}
+
+std::string CDataBaseManager::InsertItemDataSQL(uint32_t uid, uint32_t num)
+{
+    return std::string("INSERT INTO playeritem (uid, itemid, num) VALUES ('" + std::to_string(uid) + "','" + std::to_string(num) + "') ON DUPLICATE KEY UPDATE num = '" + std::to_string(num) + "';");
+}
+
+void CDataBaseManager::InsertItemDataAsync(uint32_t uid, uint32_t num, std::optional<std::function<void(void)>> callback)
+{
+    AsyncQuery(InsertItemDataSQL(uid, num), [callback](auto result){
+        if (callback) callback.value();
+    });
+}
+
 void CDataBaseManager::ClientPutInServer(sv::CBasePlayer* pPlayer)
 {
+    pPlayer->m_iUID = 0;
+
     char* infobuffer = sv::GET_INFO_BUFFER(pPlayer->edict());
     const char* pszQQ = sv::GET_KEY_VALUE(infobuffer, "qq");
     const char* pszToken = sv::GET_KEY_VALUE(infobuffer, "token");
@@ -301,91 +354,121 @@ void CDataBaseManager::ClientUserInfoChanged(sv::CBasePlayer* pPlayer, char* inf
 
     if ((oldQQ != pPlayer->m_iQQ || oldToken != pPlayer->m_iToken))
     {
-        if(pPlayer->m_bLogin)
-            pPlayer->m_bLogin = false;
+        if(pPlayer->m_iUID)
+            pPlayer->m_iUID = 0;
     }
 }
 
-void CDataBaseManager::ClientToken(sv::CBasePlayer* pPlayer)
+void CDataBaseManager::ClientToken(sv::CBasePlayer* pPlayer, const char* qq)
 {
-    if (pPlayer->m_iQQ <= 0 || pPlayer->m_iQQ >= 10000000000)
+    auto len = Q_strlen(qq);
+    if (len < 5 || len > 12)
     {
-        sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* please enter qq");
+        sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* please enter valid qq");
         return;
     }
 
-    if (pPlayer->m_bLogin)
+    if (pPlayer->m_iUID)
     {
         sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* already login");
         return;
     }
 
     std::random_device rd;
-    InsertQQTokenDataAsync(pPlayer->m_iQQ, std::uniform_int_distribution<int32_t>(100000, 999999)(rd));
+    InsertQQTokenDataAsync(qq, std::to_string(std::uniform_int_distribution<int32_t>(100000, 999999)(rd)));
     sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* go to chat to qqbot and send 'login'");
 }
 
-void CDataBaseManager::ClientLogin(sv::CBasePlayer* pPlayer)
+void CDataBaseManager::ClientLogin(sv::CBasePlayer* pPlayer, const char* qq, const char* token)
 {
-    if (pPlayer->m_iToken <= 0 || pPlayer->m_iQQ <= 0)
+    auto len = Q_strlen(qq);
+    if (len < 5 || len > 12)
     {
-        sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* please enter qq or token");
+        sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* please enter valid qq");
         return;
     }
 
-    if (pPlayer->m_bLogin)
+    len = Q_strlen(token);
+    if (len != 6)
+    {
+        sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* please enter valid token");
+        return;
+    }
+
+    if (pPlayer->m_iUID)
     {
         sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* already login");
         return;
     }
 
-    auto index = pPlayer->entindex();
-    auto qq = pPlayer->m_iQQ;
-    auto token = pPlayer->m_iToken;
-    QueryQQTokenDataAsync(qq, token, [this, qq, index](auto data) {
-        sv::CBasePlayer* pPlayer = static_cast<sv::CBasePlayer*>(sv::UTIL_PlayerByIndex(index));
-        if (!pPlayer)
+    //auto index = pPlayer->entindex();
+    sv::EntityHandle<sv::CBasePlayer> hPlayer(pPlayer);
+    QueryQQTokenDataAsync(qq, token, [this, qq, hPlayer](auto data) mutable {
+        //sv::CBasePlayer* pPlayer = static_cast<sv::CBasePlayer*>(sv::UTIL_PlayerByIndex(index));
+        if (!hPlayer)
         {
-            sv::UTIL_DPrintf("player disconnected\n");
+            sv::UTIL_DPrintf("#1 player disconnected\n");
             return;
         }
 
-        if (pPlayer->m_iQQ != qq)
+        if (!data)
         {
-            sv::UTIL_DPrintf("qq changed\n");
-            return;
-        }
-
-        if (!data.qq)
-        {
-            sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* token error");
+            sv::ClientPrint(hPlayer->pev, HUD_PRINTTALK, "* token error");
             return;
         }
         
-        QueryAccountDataAsync(qq, [this, index, qq](auto data) {
-
-            // registered
-            if (IsDataValid(data))
-                return;
-
-            sv::CBasePlayer* pPlayer = static_cast<sv::CBasePlayer*>(sv::UTIL_PlayerByIndex(index));
-            if (!pPlayer)
+        QueryAccountDataAsync(qq, [this, hPlayer, qq](std::optional<AccountData> data) mutable {
+            if (!hPlayer)
             {
-                sv::UTIL_DPrintf("player disconnected\n");
+                sv::UTIL_DPrintf("#2 player disconnected\n");
                 return;
             }
 
-            if (pPlayer->m_iQQ != qq)
-            {
-                sv::UTIL_DPrintf("qq changed\n");
+            // registered
+            if (data) {
+                ClientLogined(hPlayer, data.value().uid);
                 return;
             }
 
             // TODO get player ip
-            InsertAccountDataAsync(qq, sv::GETPLAYERAUTHID(pPlayer->edict()), "");
+            InsertAccountDataAsync(qq, sv::GETPLAYERAUTHID(hPlayer->edict()), "", [this, hPlayer, qq]() mutable {
+                if (!hPlayer)
+                {
+                    sv::UTIL_DPrintf("#3 player disconnected\n");
+                    return;
+                }
+
+                if(!mysql_query(mysql_local, "SELECT LAST_INSERT_ID();"))
+                {
+                    ClientLogined(hPlayer, mysql_insert_id(mysql_local));
+                }
+            });
         });
-        pPlayer->m_bLogin = true;
-        sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* login successful");
+    });
+}
+
+void CDataBaseManager::ClientLogined(sv::CBasePlayer* pPlayer, uint32_t uid)
+{
+    pPlayer->m_iUID = uid;
+    sv::ClientPrint(pPlayer->pev, HUD_PRINTTALK, "* login successful");
+
+    sv::EntityHandle<sv::CBasePlayer> hPlayer(pPlayer);
+    QueryItemDataAsync(uid, [this, hPlayer, uid](std::optional<std::unordered_map<uint32_t, PlayerItemData>> data) {
+        if (!hPlayer.IsValid()) return;
+        if (hPlayer->m_iUID != uid) return;
+
+        hPlayer->m_bItemLoaded = true;
+        if (!data.has_value()) return;
+        auto map = data.value();
+        if (map.empty()) return;
+
+        auto iter = m_playeritems.find(hPlayer->m_iUID);
+        if (iter != m_playeritems.end()) {
+            iter->second.clear();
+            iter->second.insert(map.begin(), map.end());
+        } else {
+            m_playeritems[hPlayer->m_iUID] = std::move(map);
+        }
     });
 }
 
@@ -400,4 +483,4 @@ void InstallDataBaseManager()
     g_pDataBase = new CDataBaseManager;
 }
 }
-#endif
+ #endif

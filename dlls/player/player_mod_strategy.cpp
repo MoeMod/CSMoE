@@ -194,7 +194,7 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	case CT:
 		//m_pPlayer->GiveNamedItem("weapon_divinetitan");
 		//m_pPlayer->GiveNamedItem("knife_y22s2sfsword");
-	//	m_pPlayer->GiveNamedItem("weapon_pianogunex");
+		m_pPlayer->GiveNamedItem("weapon_sgdrillex");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
@@ -375,7 +375,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 		m_pPlayer->RemoveAllItems(FALSE);
 		m_pPlayer->m_bHasPrimary = false;
 #if XASH_DEDICATED
-		if ((int)CVAR_GET_FLOAT("mp_randomwpn"))
+		if (randomwpn.value)
 		{
 			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
 			{
@@ -500,7 +500,7 @@ bool CPlayerModStrategy_Zombie::CanPlayerBuy(bool display)
 	//return !m_pPlayer->m_bIsZombie;
 	// random weapon now, DONT BUY!!!
 #if XASH_DEDICATED
-	if((int)CVAR_GET_FLOAT("mp_randomwpn"))
+	if(randomwpn.value)
 		return false;
 	else
 		return !m_pPlayer->m_bIsZombie;

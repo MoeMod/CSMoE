@@ -382,8 +382,28 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_crow3");
 	UTIL_PrecacheOtherWeapon("weapon_crow11");
 	UTIL_PrecacheOtherWeapon("z4b_m60amethyst");
+	UTIL_PrecacheOtherWeapon("z4b_ar57amethyst");
+	UTIL_PrecacheOtherWeapon("z4b_acramethyst");
+	UTIL_PrecacheOtherWeapon("z4b_dbarrelamethyst");
+	UTIL_PrecacheOtherWeapon("z4b_deagleamethyst");
 	UTIL_PrecacheOtherWeapon("weapon_crossbow");
 	UTIL_PrecacheOtherWeapon("weapon_broad");
+	UTIL_PrecacheOtherWeapon("weapon_sgdrillex");
+	UTIL_PrecacheOtherWeapon("weapon_balrog1");
+	UTIL_PrecacheOtherWeapon("weapon_sapientia");
+	UTIL_PrecacheOtherWeapon("weapon_balrog3");
+	UTIL_PrecacheOtherWeapon("weapon_coilmg");
+	UTIL_PrecacheOtherWeapon("weapon_charger7");
+	UTIL_PrecacheOtherWeapon("weapon_charger5");
+	UTIL_PrecacheOtherWeapon("weapon_airburster");
+	UTIL_PrecacheOtherWeapon("weapon_poisongun");
+	UTIL_PrecacheOtherWeapon("weapon_flamethrower");
+	UTIL_PrecacheOtherWeapon("weapon_watercannon");
+	UTIL_PrecacheOtherWeapon("weapon_spmg");
+	UTIL_PrecacheOtherWeapon("weapon_lockongun");
+	UTIL_PrecacheOtherWeapon("weapon_patroldrone");
+	UTIL_PrecacheOtherWeapon("z4b_aquariusplasmagun");
+	UTIL_PrecacheOtherWeapon("weapon_fglauncher");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

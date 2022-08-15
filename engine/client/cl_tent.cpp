@@ -137,6 +137,7 @@ void CL_PrepareTEnt( TEMPENTITY *pTemp, model_t *pmodel )
 	pTemp->entity.trivial_accept = modelHandle; // keep unchanged
 	pTemp->flags = FTENT_NONE;		
 	pTemp->die = cl.time + 0.75f;
+	pTemp->entity.curstate.eflags = 0;
 
 	if( pmodel )
 	{
@@ -1031,6 +1032,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	pTemp->entity.curstate.renderamt = 255;
 	pTemp->entity.curstate.framerate = framerate;
 	pTemp->entity.curstate.renderfx = 0;
+	pTemp->entity.curstate.eflags = 0;
 	pTemp->die = cl.time + life;
 	pTemp->entity.curstate.frame = frame;
 	pTemp->entity.curstate.movetype = MOVETYPE_FOLLOW;
@@ -1047,8 +1049,8 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	if (RP_LOCALCLIENT(RI.currententity) && !RI.thirdPerson && (RI.params & RP_MIRRORVIEW))
 		pTemp->entity.curstate.effects |= EF_REFLECTONLY;
 
-	if (RP_LOCALCLIENT(parent))
-		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+	/*if (RP_LOCALCLIENT(parent))
+		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;*/
 
 	CL_TEntAddEntity(&pTemp->entity);
 }
@@ -1167,8 +1169,8 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 	if (RP_LOCALCLIENT(RI.currententity) && !RI.thirdPerson && (RI.params & RP_MIRRORVIEW))
 		pTemp->entity.curstate.effects |= EF_REFLECTONLY;
 
-	if (RP_LOCALCLIENT(parent))
-		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+	/*if (RP_LOCALCLIENT(parent))
+		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;*/
 
 	CL_TEntAddEntity( &pTemp->entity );
 }

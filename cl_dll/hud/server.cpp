@@ -50,10 +50,12 @@ enum
 	HOLYFIST_GLITCH,
 	HOLYFIST_GLITCH_RING,
 	WINGGUN_WING,
+	DIVINETITAN_PARTICLE,
 };
 
 TEMPENTITY *iHolyFistRingEffect[33];
 TEMPENTITY *iWingGunEffect[33];
+TEMPENTITY* iDivinetitanParticle[33];
 
 void CreateAttachedEntitiesToPlayer(int entity, int type);
 void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
@@ -178,6 +180,9 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		case 44:
 			gEngfuncs.pfnPlaySoundByNameAtLocation("weapons/sgmissile_reload.wav", VOL_NORM, gHUD.m_vecOrigin);
 			break;
+		case 80:
+			gEngfuncs.pfnPlaySoundByNameAtLocation("weapons/divinetitan_charge.wav", VOL_NORM, gHUD.m_vecOrigin);
+			break;
 		}
 
 		break;
@@ -187,6 +192,20 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		switch (arg2)
 		{
+		case DIVINETITAN_PARTICLE:
+		{
+			if (iDivinetitanParticle[arg1])
+			{
+				iDivinetitanParticle[arg1]->die = gHUD.m_flTime;
+				iDivinetitanParticle[arg1] = nullptr;
+				break;
+			}
+
+			if (!iDivinetitanParticle[arg1])
+				iDivinetitanParticle[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_particle.spr"),
+					Vector(0.0, 0.0, 5.0), 15.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.8, kRenderTransAdd, 30.0);
+			break;
+		}
 		case WINGGUN_WING:
 		{
 			if (iWingGunEffect[arg1])
@@ -283,6 +302,53 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		arg1 = reader.ReadShort();
 
 		m_SniperScope.SetKronosTime(arg1);
+		break;
+	}
+	case 21:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		int arg3 = reader.ReadByte();
+		m_SniperScope.SetLockOnData(arg1, arg2, arg3);
+		break;
+	}
+	case 22:
+	{
+		m_SniperScope.ClearAllLockOnData();
+		break;
+	}
+	case 23:
+	{
+		int length = reader.ReadByte();
+
+		for (int i = 0; i < length; i++)
+		{
+			arg1 = reader.ReadShort();
+			arg2 = reader.ReadByte();
+			m_SniperScope.InsertPatrolDroneData(i, arg1, arg2);
+		}
+		
+		m_SniperScope.SetPatrolDroneDeployTime();
+		break;
+	}
+	case 24:
+	{
+		int Slot = reader.ReadByte();
+		arg1 = reader.ReadShort();
+		arg2 = reader.ReadByte();
+		m_SniperScope.InsertPatrolDroneData(Slot, arg1, arg2);
+		break;
+	}
+	case 42:
+	{
+		arg1 = reader.ReadShort();
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+
+		R_AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_burn01.spr"),
+			pos, reader.ReadShort() * 0.1, TRUE, FTENT_FADEOUT | FTENT_SPRANIMATE | FTENT_PERSIST | FTENT_PLYRATTACHMENT | FTENT_SPRANIMATELOOP, 0.3, kRenderTransAdd, 1.0);
+
 		break;
 	}
 	case 79:	// stop sound

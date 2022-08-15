@@ -310,8 +310,28 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_crow3.cpp
 	../dlls/wpn_shared/wpn_crow11.cpp
 	../dlls/wpn_shared/z4b_m60amethyst.cpp
+	../dlls/wpn_shared/z4b_ar57amethyst.cpp
+	../dlls/wpn_shared/z4b_acramethyst.cpp
+	../dlls/wpn_shared/z4b_dbarrelamethyst.cpp
+	../dlls/wpn_shared/z4b_deagleamethyst.cpp
 	../dlls/wpn_shared/wpn_crossbow.cpp
 	../dlls/wpn_shared/wpn_broad.cpp
+	../dlls/wpn_shared/wpn_sgdrillex.cpp
+	../dlls/wpn_shared/wpn_balrog1.cpp
+	../dlls/wpn_shared/wpn_sapientia.cpp
+	../dlls/wpn_shared/wpn_balrog3.cpp
+	../dlls/wpn_shared/wpn_coilmg.cpp
+	../dlls/wpn_shared/wpn_charger7.cpp
+	../dlls/wpn_shared/wpn_charger5.cpp
+	../dlls/wpn_shared/wpn_airburster.cpp
+	../dlls/wpn_shared/wpn_poisongun.cpp
+	../dlls/wpn_shared/wpn_flamethrower.cpp
+	../dlls/wpn_shared/wpn_watercannon.cpp
+	../dlls/wpn_shared/wpn_spmg.cpp
+	../dlls/wpn_shared/wpn_lockongun.cpp
+	../dlls/wpn_shared/wpn_patroldrone.cpp
+	../dlls/wpn_shared/z4b_aquariusplasmagun.cpp
+	../dlls/wpn_shared/wpn_fglauncher.cpp
 	)
 
 set (HUD_SRCS
@@ -484,6 +504,7 @@ set (CLDLL_SOURCES
 	./calcscreen.cpp
 	./input_touch.cpp
 	./fog.cpp
+
 
 	${LUASH_SRCS}
 	${INPUT_SRCS}

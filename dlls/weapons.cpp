@@ -1341,7 +1341,10 @@ int CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, duration_t fDelay
 	}
 
 	duration_t fNewDelay = m_pPlayer->m_pModStrategy->OnDefaultReload_Pre(this, fDelay);
-	m_pPlayer->m_flNextAttack = fNewDelay;
+	if (body)
+		this->m_flNextPrimaryAttack = m_flNextSecondaryAttack = fNewDelay;
+	else
+		m_pPlayer->m_flNextAttack = fNewDelay;
 	ReloadSound();
 	SendWeaponAnim(iAnim, UseDecrement() ? 1 : 0, fDelay / fNewDelay);
 
@@ -1387,6 +1390,8 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_SFPISTOL:
 		case WEAPON_Y22S2SFPISTOL:
 		case WEAPON_Z4B_RAGINGBULL:
+		case WEAPON_BALROG1:
+		case WEAPON_SAPIENTIA:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:
@@ -1816,6 +1821,8 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 
 					switch (pGrenade->m_iId)
 					{
+					case WEAPON_DIVINETITAN:
+					case WEAPON_PATROLDRONE:
 					case WEAPON_HEGRENADE:
 						grenadeName = "weapon_hegrenade";
 						maxGrenades = 1;

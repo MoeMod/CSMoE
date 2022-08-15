@@ -581,7 +581,7 @@ void EndRoundMessage(const char* sentence, int event)
 	int teamTriggered = 1;
 #ifdef XASH_DEDICATED
 	const char* mod_str = CVAR_GET_STRING("mp_gamemode");
-	if (!strcmp(mod_str, "zb3") || !strcmp(mod_str, "z4") || !strcmp(mod_str, "zbz") || !strcmp(mod_str, "zb3f2p") || !strcmp(mod_str, "zb3classic"))
+	if (!strcmp(mod_str, "zb3") || !strcmp(mod_str, "z4") || !strcmp(mod_str, "zbz") || !strcmp(mod_str, "zb3f2p") || !strcmp(mod_str, "zb3zp"))
 	{
 		EndRoundMVPMessage(event == ROUND_CTS_WIN ? 2 : 1);
 	}
@@ -4127,6 +4127,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							killer_weapon_name = "chaingren";
 							break;
 
+						case GRENADE_PATROLDRONE:
+							killer_weapon_name = "patroldrone";
+							break;
+
 						default:
 							killer_weapon_name = "grenade";
 							break;
@@ -4203,6 +4207,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "divinetitan";
 					else if (iId == WEAPON_CROSSBOW)
 						killer_weapon_name = "crossbow";
+					else if (iId == WEAPON_LOCKONGUN)
+						killer_weapon_name = "lockongun";
+					else if (iId == WEAPON_PATROLDRONE)
+						killer_weapon_name = "patroldrone";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}
@@ -4256,6 +4264,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 
 					case GRENADE_CHAINGRENADE:
 						killer_weapon_name = "chaingren";
+						break;
+
+					case GRENADE_PATROLDRONE:
+						killer_weapon_name = "patroldrone";
 						break;
 
 					default:

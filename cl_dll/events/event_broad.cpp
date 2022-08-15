@@ -83,7 +83,10 @@ void EV_FireBroad(event_args_s *args)
 
 	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iRShell, TE_BOUNCE_SHELL);
 
-	PLAY_EVENT_SOUND("weapons/broad-1.wav");
+	if (args->bparam1)
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/broad-2.wav", 1.0, 0.52, 0, 94 + Com_RandomLong(0, 15));
+	else
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/broad-1.wav", 1.0, 0.52, 0, 94 + Com_RandomLong(0, 15));
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );

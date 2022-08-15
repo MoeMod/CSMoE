@@ -82,6 +82,8 @@ public:
 	void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) override;
 	void Holster_Post(CBasePlayerWeapon* weapon) override;
 	BOOL DeployWeapon(CBasePlayerItem* item) override;
+	BOOL OnReactToDeimosTail() override;
+
 
 	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);
 	virtual void Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType);

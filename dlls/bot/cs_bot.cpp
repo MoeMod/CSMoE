@@ -909,7 +909,7 @@ CMoePlayer::CMoePlayer() {
 
 BOOL CMoePlayer::IsBot()
 {
-    return gpGlobals->time - m_flLastCommandTime > 5s;
+    return IsAlive() && gpGlobals->time - m_flLastCommandTime > 20s;
 }
 
 void CMoePlayer::ExecuteCommand()
@@ -945,7 +945,7 @@ void CMoePlayer::ApplyUC(usercmd_t *cmd)
         return;
     }
 
-    byte adjustedMSec = ThrottledMsec();
+    //byte adjustedMSec = ThrottledMsec();
 
     CCSBot::UpdateLookAngles();
     pev->fixangle = 1;
@@ -968,6 +968,6 @@ void CMoePlayer::ApplyUC(usercmd_t *cmd)
     cmd->upmove = m_verticalSpeed;
     cmd->buttons = m_buttonFlags;
     cmd->impulse = 0;
-    cmd->msec = adjustedMSec;
+    //cmd->msec = adjustedMSec;
 }
 }

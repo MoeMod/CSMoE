@@ -53,12 +53,9 @@ namespace sv {
 		PRECACHE_MODEL("models/p_m60_amethyst.mdl");
 		PRECACHE_MODEL("models/w_m60_amethyst.mdl");
 		PRECACHE_MODEL("sprites/muzzleflash5.spr");
-		PRECACHE_SOUND("weapons/mg3-1.wav");
-		//PRECACHE_SOUND("weapons/mg3_clipout.wav");
-		//PRECACHE_SOUND("weapons/mg3_clipin.wav");
-		//PRECACHE_SOUND("weapons/mg3_cliplock.wav");
-		//PRECACHE_SOUND("weapons/mg3_open.wav");
-		//PRECACHE_SOUND("weapons/mg3_close.wav");
+		PRECACHE_MODEL("sprites/ame5stack.spr");
+		PRECACHE_SOUND("weapons/m60e4-1.wav");
+
 
 		m_iShell = PRECACHE_MODEL("models/pshell.mdl");
 		m_usFireM60AMETHYST = PRECACHE_EVENT(1, "events/m60amethyst.sc");
@@ -210,9 +207,9 @@ namespace sv {
 		WRITE_COORD(tr.vecEndPos[0]);
 		WRITE_COORD(tr.vecEndPos[1]);
 		WRITE_COORD(tr.vecEndPos[2]);
-		WRITE_SHORT(MODEL_INDEX("sprites/dart_explosion.spr"));
-		WRITE_BYTE(8);
-		WRITE_BYTE(25);
+		WRITE_SHORT(MODEL_INDEX("sprites/ame5stack.spr"));
+		WRITE_BYTE(10);
+		WRITE_BYTE(0.3f);
 		WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
 		MESSAGE_END();
 

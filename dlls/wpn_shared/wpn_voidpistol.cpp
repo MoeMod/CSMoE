@@ -982,8 +982,12 @@ float CVoidpistol::GetDamage() const
 	float flDamage = 24.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 56.0f;
-		//flDamage = 225.0f;
+	{
+		if (enhancedzombie.value)
+			flDamage = 225.0f;
+		else
+			flDamage = 56.0f;
+	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 390.0f;
 #endif

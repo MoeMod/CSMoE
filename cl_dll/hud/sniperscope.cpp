@@ -92,10 +92,35 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iBUFFAWP_Light[2], "sprites/buffawp_light_3.tga");
 	R_InitTexture(m_iBUFFAWP_Outline, "sprites/buffawp_outline.tga");
 
-
 	m_flScopeTime = 0.0f;
 	m_flScopeTimeEnd = 0.0f;
 	m_flBUFFAWPStartTime = 0.0f;
+
+	R_InitTexture(m_iLockOnGun_BG, "sprites/lockongun_bg.tga");
+	R_InitTexture(m_iLockOnGun_Top, "sprites/lockongun_top.tga");
+	R_InitTexture(m_iLockOnGun_Center, "sprites/lockongun_center.tga");
+	R_InitTexture(m_iLockOnGun_Bottom_BG, "sprites/lockongun_bottom_bg.tga");
+	R_InitTexture(m_iLockOnGun_Bottom[0], "sprites/lockongun_bottom_etc.tga");
+	R_InitTexture(m_iLockOnGun_Bottom[1], "sprites/lockongun_bottom_head.tga");
+	R_InitTexture(m_iLockOnGun_Bottom[2], "sprites/lockongun_bottom_chest.tga");
+	R_InitTexture(m_iLockOnGun_Bottom[3], "sprites/lockongun_bottom_stomach.tga");
+	R_InitTexture(m_iLockOnGun_Bottom[4], "sprites/lockongun_bottom_arms.tga");
+	R_InitTexture(m_iLockOnGun_Bottom[5], "sprites/lockongun_bottom_leg.tga");
+
+	ClearAllLockOnData();
+
+	R_InitTexture(m_iPatrolDrone_Top_BG, "sprites/patroldrone_top_bg.tga");
+	R_InitTexture(m_iPatrolDrone_Bottom_BG, "sprites/patroldrone_bottom_bg.tga");
+	R_InitTexture(m_iPatrolDrone_Center_Default, "sprites/patroldrone_center_default.tga");
+	R_InitTexture(m_iPatrolDrone_Icon_Disabled, "sprites/patroldrone_icon_disabled.tga");
+	R_InitTexture(m_iPatrolDrone_Icon_Warning01, "sprites/patroldrone_icon_warning01.tga");
+	R_InitTexture(m_iPatrolDrone_Icon_Warning02, "sprites/patroldrone_icon_warning02.tga");
+	R_InitTexture(m_iPatrolDrone_Icon_Activation, "sprites/patroldrone_icon_activation.tga");
+	R_InitTexture(m_iPatrolDrone_Icon_Blasting, "sprites/patroldrone_icon_blasting.tga");
+	R_InitTexture(m_iPatrolDrone_Center_Red, "sprites/patroldrone_center_ani_red.tga");
+
+	m_flPatrolDroneDeployTime = 0.0f;
+	m_iPatrolDroneState = PATROLDRONE_OFF;
 
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
@@ -319,6 +344,19 @@ int CHudSniperScope::Draw(float flTime)
 			DrawBUFFAWPScope(flTime);
 			return 0;
 		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_LOCKONGUN)
+		{
+			if (gHUD.m_iFOV > 89)
+				return 1;
+
+			DrawLockOnGunScope(flTime);
+			return 0;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_PATROLDRONE)
+		{
+			DrawPatrolDroneScope(flTime);
+			return 1;
+		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS || pActiveBTEWeapon->m_iId == WEAPON_M400 || pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM)
 		{
 			if (gHUD.m_iFOV > 40)
@@ -517,6 +555,263 @@ void CHudSniperScope::BUFFAWPRun(void)
 void CHudSniperScope::BUFFAWPEnd(void)
 {
 	m_flBUFFAWPStartTime = 0.0;
+}
+
+void CHudSniperScope::DrawLockOnGunScope(float flTime)
+{
+	FuncDraw2DQuadScaled(*m_iLockOnGun_BG, 0, 0, ScreenWidth, ScreenHeight);
+
+	int iW, iH;
+	iW = ScreenWidth * 0.3;
+	iH = iW * m_iLockOnGun_Top->h() / m_iLockOnGun_Top->w();
+	FuncDraw2DQuadScaled(*m_iLockOnGun_Top, 0, 0, iW, iH);
+	FuncDraw2DQuadScaled(*m_iLockOnGun_Top, ScreenWidth, 0, -iW, iH);
+
+	iH = ScreenHeight / 5;
+	iW = iH * m_iLockOnGun_Center->w() / m_iLockOnGun_Center->h();
+	FuncDraw2DQuadScaled(*m_iLockOnGun_Center, (ScreenWidth - iW) / 2, (ScreenHeight - iH) / 2, iW, iH);
+
+	iH = ScreenHeight / 8;
+	iW = iH * m_iLockOnGun_Bottom_BG->w() / m_iLockOnGun_Bottom_BG->h();
+	FuncDraw2DQuadScaled(*m_iLockOnGun_Bottom_BG, ScreenWidth / 2 - iW * 1.5, ScreenHeight - iH * 2, iW, iH);
+	FuncDraw2DQuadScaled(*m_iLockOnGun_Bottom_BG, ScreenWidth / 2 + iW * 0.5, ScreenHeight - iH * 2, iW, iH);
+
+	int iX, iY;
+	int iW2 = iW / 3, iH2 = iH / 2, remain;
+	for (int i = 0; i < 10; i++)
+	{
+		if (m_iLockOnData[i].hitgroup == -1)
+			continue;
+
+		if (m_iLockOnData[i].dietime <= flTime)
+		{
+			m_iLockOnData[i].hitgroup = -1;
+			continue;
+		}
+
+		iX = ScreenWidth / 2 - iW * 1.5;
+		iY = ScreenHeight - iH * 2;
+
+		remain = (i + 1) % 5;
+		//1234012340
+		if (remain == 4 || !remain) // downstair position
+		{
+			iX += iW / 2 + (remain == 4 ? -iW2 : 0);
+			iY += iH * 0.5;
+		}
+		else
+		{
+			iX += iW2 * (remain - 1);
+		}
+
+		if (i > 4)
+			iX += iW * 2.0;
+
+		int a = 255;
+		if (m_iLockOnData[i].dietime - flTime < 4.5)
+		{
+			float flife = m_iLockOnData[i].dietime - flTime;
+			float fround = round(flife);
+
+			if (flife < fround) // more than 0.5
+				a = 255.0 * (fround - flife) / 0.5f;
+			else
+				a = 255.0 * (flife - fround) / 0.5f;
+		}
+
+		FuncDraw2DQuadScaled(*m_iLockOnGun_Bottom[m_iLockOnData[i].hitgroup], iX, iY, iW2, iH2, 0, 0, 1, 1, 255, 255, 255, a);
+	}
+}
+
+void CHudSniperScope::SetLockOnData(float dietime, int slot, int hitgroup)
+{
+	m_iLockOnData[slot].dietime = gHUD.m_flTime + dietime;
+	m_iLockOnData[slot].hitgroup = hitgroup;
+}
+
+void CHudSniperScope::ClearAllLockOnData()
+{
+	for (int i = 0; i < 10; i++)
+	{
+		m_iLockOnData[i].dietime = gHUD.m_flTime;
+		m_iLockOnData[i].hitgroup = -1;
+	}
+}
+
+void CHudSniperScope::DrawPatrolDroneScope(float flTime)
+{
+	float scale = 1.0;
+
+	if (m_flPatrolDroneDeployTime && m_flPatrolDroneDeployTime + 0.25 > flTime)
+		scale = (flTime - m_flPatrolDroneDeployTime) / 0.25;
+
+	int wide, tall;
+
+	wide = ScreenWidth * 0.48 * scale;
+	tall = ScreenHeight * 0.48 * scale;
+
+	FuncDrawScope(*m_iPatrolDrone_Top_BG, TYPE_DOUBLE_SQUARE_NOTCENTER, ScreenWidth / 2, ScreenHeight / 2 - tall, wide, tall);
+	FuncDrawScope(*m_iPatrolDrone_Bottom_BG, TYPE_DOUBLE_SQUARE_NOTCENTER, ScreenWidth / 2, ScreenHeight / 2, wide, tall);
+
+	wide = tall = ScreenHeight * scale / 2;
+
+	switch (m_iPatrolDroneState)
+	{
+	case PATROLDRONE_OFF:
+	{
+		FuncDraw2DQuadScaled(*m_iPatrolDrone_Center_Default, (ScreenWidth - wide) / 2, (ScreenHeight - tall) / 2, wide, tall);
+		break;
+	}
+	case PATROLDRONE_ATTACK:
+	{
+		FuncDraw2DQuadScaled(*m_iPatrolDrone_Center_Default, (ScreenWidth - wide) / 2, (ScreenHeight - tall) / 2, wide, tall);
+		//FuncDraw2DQuadScaled(*m_iPatrolDrone_Center_Red, (ScreenWidth - wide) / 2, (ScreenHeight - tall) / 2, wide, tall);
+		break;
+	}
+	}
+
+	if (const int num = m_vecPatrolDroneData.size())
+	{
+		wide = ScreenHeight / 15;
+		tall = wide;
+
+		const int maxclip = 90;
+		const int offset = 8;
+		const float imageoffset = 0.073; // 4 / 55
+		const float fmax = 1.0 - imageoffset * 2;
+
+		int iX = ScreenWidth / 2, iY = ScreenHeight * (0.5 + (0.2 * scale));
+
+		iX -= (wide * num + offset * (num - 1)) / 2;
+
+		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+
+		int wide2 = ScreenHeight / 8;
+
+		for (auto iter = m_vecPatrolDroneData.begin(); iter != m_vecPatrolDroneData.end(); ++iter)
+		{
+			if (iter->second.ammo == -1)
+			{
+				FuncDraw2DQuadScaled(*m_iPatrolDrone_Icon_Blasting, iX, iY, wide, tall);
+				iX += wide + offset;
+				continue;
+			}
+
+			int texid = 0;
+			float percent = (float)iter->second.ammo / (float)maxclip;
+
+			if (iter->second.state == PATROLDRONE_OFF)
+			{
+				m_iPatrolDroneState = PATROLDRONE_OFF;
+
+				if (percent < 0.3)
+					texid = m_iPatrolDrone_Icon_Warning02->texnum();
+				else
+					texid = m_iPatrolDrone_Icon_Activation->texnum();
+			}
+			else
+			{
+				if (iter->second.state == PATROLDRONE_ATTACK)
+					m_iPatrolDroneState = PATROLDRONE_ATTACK;
+				else
+					m_iPatrolDroneState = PATROLDRONE_OFF;
+
+				if (percent < 0.3)
+				{
+					if (iter->second.state == PATROLDRONE_WANDER)
+						texid = m_iPatrolDrone_Icon_Warning01->texnum();
+					else
+						texid = m_iPatrolDrone_Icon_Activation->texnum();
+				}
+				else
+					texid = m_iPatrolDrone_Icon_Activation->texnum();
+			}
+
+			if (iter->second.ammo >= 0 && iter->second.ammo <= 90)
+			{
+				if (iter->second.nextcheckammo < gHUD.m_flTime)
+				{
+					if (iter->second.state == PATROLDRONE_OFF)
+					{
+						iter->second.ammo++;
+						iter->second.nextcheckammo = gHUD.m_flTime + 0.3;
+					}
+					else
+					{
+						iter->second.ammo--;
+						iter->second.nextcheckammo = gHUD.m_flTime + 0.3;
+					}
+				}
+			}
+
+			percent *= fmax;
+
+			if (!texid)
+				continue;
+
+			if (percent)
+			{
+				float drawoffset = imageoffset + fmax - percent;
+
+				gRenderAPI.GL_Bind(0, texid);
+
+				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+				gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+				gEngfuncs.pTriAPI->Vertex3f(iX, iY + tall, 0);
+
+				gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+				gEngfuncs.pTriAPI->Vertex3f(iX + wide, iY + tall, 0);
+
+				gEngfuncs.pTriAPI->TexCoord2f(1, drawoffset);
+				gEngfuncs.pTriAPI->Vertex3f(iX + wide, iY + tall * drawoffset, 0);
+
+				gEngfuncs.pTriAPI->TexCoord2f(0, drawoffset);
+				gEngfuncs.pTriAPI->Vertex3f(iX, iY + tall * drawoffset, 0);
+
+				gEngfuncs.pTriAPI->End();
+			}
+
+			if (percent < 1.0)
+			{
+				float drawoffset = imageoffset + fmax - percent;
+
+				gRenderAPI.GL_Bind(0, m_iPatrolDrone_Icon_Disabled->texnum());
+
+				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+				gEngfuncs.pTriAPI->TexCoord2f(0, drawoffset);
+				gEngfuncs.pTriAPI->Vertex3f(iX, iY + tall * drawoffset, 0);
+
+				gEngfuncs.pTriAPI->TexCoord2f(1, drawoffset);
+				gEngfuncs.pTriAPI->Vertex3f(iX + wide, iY + tall * drawoffset, 0);
+
+				gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+				gEngfuncs.pTriAPI->Vertex3f(iX + wide, iY, 0);
+
+				gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+				gEngfuncs.pTriAPI->Vertex3f(iX, iY, 0);
+
+				gEngfuncs.pTriAPI->End();
+			}
+
+			iX += wide + offset;
+		}
+
+	
+	}
+}
+
+void CHudSniperScope::InsertPatrolDroneData(int iSlot, int iClip, int iState)
+{
+	m_vecPatrolDroneData[iSlot].ammo = iClip;
+	m_vecPatrolDroneData[iSlot].state = iState;
+	m_vecPatrolDroneData[iSlot].nextcheckammo = gHUD.m_flTime + 0.3;
+}
+
+void CHudSniperScope::SetPatrolDroneDeployTime()
+{
+	m_flPatrolDroneDeployTime = gHUD.m_flTime;
 }
 
 void CHudSniperScope::Shutdown()

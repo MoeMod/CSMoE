@@ -801,13 +801,13 @@ void CMonster::IdleThink()
 		m_improv = new CMonsterImprov(this);
 	}
 
-	if (m_iHealthDecreaseCount && gpGlobals->time > m_tHealthDecreaseStartTime)
+	if (m_iHealthDecreaseCount && gpGlobals->time > m_flHealthDecreaseStartTime)
 	{
 		pev->health -= m_flHealthDecreaseAmount;
 
-		if (pBuffAttacker)
+		if (m_pBuffAttacker)
 		{
-			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pBuffAttacker);
+			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, m_pBuffAttacker);
 			WRITE_LONG((long)m_flHealthDecreaseAmount);
 			WRITE_SHORT(ENTINDEX(edict()));
 			WRITE_BYTE(0);
@@ -817,16 +817,25 @@ void CMonster::IdleThink()
 		if (pev->health > 0)
 		{
 			m_iHealthDecreaseCount--;
+			m_flHealthDecreaseStartTime = gpGlobals->time + m_flHealthDecreaseInterval;
 
-			m_tHealthDecreaseStartTime = gpGlobals->time + 1.0s;
+			if (!m_iHealthDecreaseCount)
+			{
+				m_flHealthDecreaseStartTime = invalid_time_point;
+				m_flHealthDecreaseAmount = 0;
+				m_flHealthDecreaseInterval = 0.0s;
+				m_pBuffAttacker = nullptr;
+			}
 		}
 		else
 		{
 			m_iHealthDecreaseCount = 0;
 			pev->health = 1;
 
-			m_tHealthDecreaseStartTime = invalid_time_point;
-			pBuffAttacker = nullptr;
+			m_flHealthDecreaseStartTime = invalid_time_point;
+			m_flHealthDecreaseAmount = 0;
+			m_flHealthDecreaseInterval = 0.0s;
+			m_pBuffAttacker = nullptr;
 		}
 	}
 

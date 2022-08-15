@@ -578,7 +578,9 @@ float BotSIN(float angle)
 {
 	angle = NormalizeAnglePositive(angle - 90);
 	int i = angle * ((COS_TABLE_SIZE - 1) / 360.0f);
-	return cosTable[ i ];
+	if (cosTable[i])
+		return cosTable[i];
+	else return angle;
 }
 
 // Determine if this event is audible, and if so, return its audible range and priority

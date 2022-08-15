@@ -814,6 +814,33 @@ protected:
 
 };
 
+
+class CZombieSkill_ZombieAlienBoss : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieAlienBoss(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	void ResetMaxSpeed() override;
+	void FireZombieSkill();
+	void DashAttack();
+	bool AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr);
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	void Reset() override
+	{
+		m_SkillStatus = DASH_END;
+	}
+
+	ZombieDashSkillStatus m_SkillStatus = DASH_END;
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
 }
 
 

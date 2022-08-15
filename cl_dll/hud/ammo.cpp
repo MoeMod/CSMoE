@@ -1338,6 +1338,7 @@ int CHudAmmo::Draw(float flTime)
 			{
 				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
 				SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
+				x = ScreenWidth - AmmoWidth - iIconWidth;
 			}
 			else
 				x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
@@ -1353,7 +1354,11 @@ int CHudAmmo::Draw(float flTime)
 				//DrawUtils::ScaleColors(r, g, b, a);
 			}
 
+
 			// SPR_Draw a bullets only line
+
+		
+
 			if (gWR.CountAmmo(pw->iAmmoType) > 1500)
 			{
 				x = ScreenWidth - AmmoWidth - iIconWidth;
@@ -1366,15 +1371,21 @@ int CHudAmmo::Draw(float flTime)
 			}
 			else
 			{
-				x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
-				x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
+				if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+				{
+					x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+					x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
+				}
 			}
 		}
 
 		// Draw the ammo Icon
-		int iOffset = (m_pWeapon->rcAmmo.bottom - m_pWeapon->rcAmmo.top)/8;
-		SPR_Set(m_pWeapon->hAmmo, r, g, b);
-		SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo);
+		if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+		{
+			int iOffset = (m_pWeapon->rcAmmo.bottom - m_pWeapon->rcAmmo.top) / 8;
+			SPR_Set(m_pWeapon->hAmmo, r, g, b);
+			SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo);
+		}
 	}
 
 	// Does weapon have seconday ammo?
@@ -2052,16 +2063,22 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 			}
 			else
 			{
-				iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
-				DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
+				if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+				{
+					iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
+					DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
+				}
 			}
 		}
 
 		// Draw the ammo Icon
-		iY = ScreenHeight - 15 - gHUD.m_NEWHUD_iFontHeight;
-		iX = ScreenWidth - 5;
-		SPR_Set(m_pWeapon->hAmmo, r, g, b);
-		SPR_DrawAdditive(0, iX - iIconWidth, iY, &m_pWeapon->rcAmmo);
+		if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+		{
+			iY = ScreenHeight - 15 - gHUD.m_NEWHUD_iFontHeight;
+			iX = ScreenWidth - 5;
+			SPR_Set(m_pWeapon->hAmmo, r, g, b);
+			SPR_DrawAdditive(0, iX - iIconWidth, iY, &m_pWeapon->rcAmmo);
+		}
 	}
 
 	// Does weapon have seconday ammo?

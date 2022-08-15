@@ -45,7 +45,7 @@ namespace sv {
 #endif
 
 		m_iClip = -1;
-		m_iDefaultAmmo = 20;
+		m_iDefaultAmmo = 50;
 
 		m_bDelayFire = false;
 
@@ -108,10 +108,23 @@ namespace sv {
 		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
 	}
 
+	int CDivineTitan::GetClip(void)
+	{
+		return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+	}
+
+	void CDivineTitan::ChangeClip(int clip ,bool bSecond)
+	{
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= clip;
+		if(bSecond)
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = clip;
+
+	}
+
 	BOOL CDivineTitan::Deploy(void)
 	{
 
-		m_fMaxSpeed = 250;
+		m_fMaxSpeed = 260;
 		int m_iDeployAnim = WEAPON_ANIM_DRAW1;
 		switch (m_iWpnState)
 		{
@@ -133,21 +146,30 @@ namespace sv {
 		}
 		m_bCanThrow = true;
 
-		
-		
-
 #ifndef CLIENT_DLL
 		if (m_flTimeholster != invalid_time_point)
 		{
 			if (!m_iWpnState)
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 0.25s;
+			{
+				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 0.20s;
+			}
+				
 			else
 			{
 				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= (gpGlobals->time - m_flTimeholster) / 0.25s;
 			}
 		}
 		else
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iSaveSpecialAmmo;
+		{
+			//warning?! Invalid at all!!
+			//m_iSaveShoots += MIN((gpGlobals->time - m_flTimeholster) / 0.25s,1);
+		}
+
+		if (m_iSaveShoots >= 70)
+		{
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 1;
+			m_iSaveShoots = 0;
+		}
 
 			
 		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
@@ -200,7 +222,6 @@ namespace sv {
 		WRITE_BYTE(3);
 		MESSAGE_END();
 #endif
-		m_iSaveSpecialAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
 		return CBasePlayerWeapon::Holster(skiplocal);
 	}
 	BOOL CDivineTitan::IsSignal()
@@ -308,7 +329,6 @@ namespace sv {
 		SendWeaponAnim(m_iPrimaryAnim, UseDecrement() != FALSE);
 
 		m_pPlayer->m_flPlayerBuffData = m_iWpnState;
-		m_iSaveSpecialAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
 
 	}
 
@@ -395,19 +415,26 @@ namespace sv {
 		SendWeaponAnim(m_iSecondaryAnim, UseDecrement() != FALSE);
 
 		m_pPlayer->m_flPlayerBuffData = m_iWpnState;
-		m_iSaveSpecialAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
 	}
-	
 	void CDivineTitan::ItemPostFrame()
 	{
 		m_iButton = m_pPlayer->pev->button;
 
+		//if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]||!m_iSaveSpecialAmmo)
+		//{
+		//	ResetSequence();
+		//	return CBasePlayerWeapon::ItemPostFrame();
+		//}
+
 		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		{
 			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
-
-			m_iWpnState = 0;
 			m_pPlayer->m_flPlayerBuffData = 0;
+		}
+		if (m_flBlockTime <= gpGlobals->time)
+		{
+			m_iBlockIdle = 0;
+			m_flBlockTime = invalid_time_point;
 		}
 		if (m_flTimeNextMessage < gpGlobals->time)
 		{
@@ -433,44 +460,42 @@ namespace sv {
 				if (m_flTimeNextCharge <= gpGlobals->time)
 				{
 					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
-					m_flTimeNextCharge = gpGlobals->time + 0.25s;
-					m_iSaveSpecialAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];				
+					m_flTimeNextCharge = gpGlobals->time + 0.20s;			
 				}
 			}
 		}
 		else
 		{
-			if (m_flTimeNextCharge <= gpGlobals->time)
-			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-				m_flTimeNextCharge = gpGlobals->time + 0.13s;
-				m_iSaveSpecialAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
-
-				if (m_iSaveShoots < 70)
-				{
-					if (!m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType])
-						m_iSaveShoots++;
-				}
-				else
-				{
-					m_iSaveShoots = 0;
-					m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 1;
-
-#ifndef CLIENT_DLL
-					if (IsSignal())
-					{
-						//m_CrossHairStateStored = m_CrossHairState = 19;
-
-						MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
-						WRITE_BYTE(6);
-						WRITE_BYTE(m_CrossHairState);
-						MESSAGE_END();
-						m_CrossHairStateStored = m_CrossHairState;
-					}
-					EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/divinetitan_charge.wav", VOL_NORM, ATTN_NORM, 0, 94);
-#endif
-				}
-			}
+//			if (m_flTimeNextCharge <= gpGlobals->time)
+//			{
+//				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+//				m_flTimeNextCharge = gpGlobals->time + 0.25s;
+//
+//				if (m_iSaveShoots < 70)
+//				{
+//					if (!m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType])
+//						m_iSaveShoots++;
+//				}
+//				else
+//				{
+//					m_iSaveShoots = 0;
+//					m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 1;
+//
+//#ifndef CLIENT_DLL
+//					if (IsSignal())
+//					{
+//						//m_CrossHairStateStored = m_CrossHairState = 19;
+//
+//						MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
+//						WRITE_BYTE(6);
+//						WRITE_BYTE(m_CrossHairState);
+//						MESSAGE_END();
+//						m_CrossHairStateStored = m_CrossHairState;
+//					}
+//					EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/divinetitan_charge.wav", VOL_NORM, ATTN_NORM, 0, 94);
+//#endif
+//				}
+//			}
 		}
 
 #endif
@@ -544,6 +569,9 @@ namespace sv {
 	{
 		if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 			return;
+		if(m_iBlockIdle)
+			return;
+
 		int m_iIdleAnim = WEAPON_ANIM_IDLE1;
 		duration_t m_flIdleTime = WEAPON_ANIM_IDLE1_TIME;
 
@@ -580,7 +608,7 @@ namespace sv {
 		{
 			if (m_pTitan->m_pWeapon)
 			{
-				if (!m_iSaveSpecialAmmo ||!m_iWpnState)
+				if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] || !m_iWpnState)
 				{
 					m_pTitan->m_pWeapon = NULL;
 					//RemoveEntity();
@@ -603,6 +631,38 @@ namespace sv {
 				
 		}
 #endif
+	}
+	void CDivineTitan::ResetSequence()
+	{
+		int m_iAnim;
+		duration_t m_iNextAttackTime;
+		duration_t m_iNextAnimTime;
+
+
+		if (this->pev->sequence == 6 || m_iWpnState == 1)
+		{
+			m_iNextAttackTime = WEAPON_TIMEA_OFF;
+			m_iNextAnimTime = WEAPON_ANIM_ATODEFAULT_TIME;
+			m_iAnim = WEAPON_ANIM_ATODEFAULT;
+		}
+		if (this->pev->sequence == 10 || m_iWpnState == 2)
+		{
+			m_iNextAttackTime = WEAPON_TIMEB_OFF;
+			m_iNextAnimTime = WEAPON_ANIM_BTODEFAULT_TIME;
+			m_iAnim = WEAPON_ANIM_BTODEFAULT;
+		}
+
+
+		m_iBlockIdle = 1;
+		m_flBlockTime = gpGlobals->time + m_iNextAnimTime;
+
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + m_iNextAnimTime;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + m_iNextAttackTime;
+
+		SendWeaponAnim(m_iAnim, UseDecrement() != FALSE);
+
+		m_iWpnState = 0;
+
 	}
 
 
@@ -665,6 +725,21 @@ namespace sv {
 			pev->solid = SOLID_BBOX;
 			pev->body = 0;
 			pev->frame = 0.0;
+
+			pev->rendermode = kRenderTransAdd;
+			pev->renderfx = kRenderFxGlowShell;
+
+			MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, this->pev);
+			WRITE_BYTE(16);
+			WRITE_SHORT(this->entindex());
+			WRITE_BYTE(17);
+			MESSAGE_END();
+
+			pev->rendercolor.x = 255;
+			pev->rendercolor.y = 215;
+			pev->rendercolor.z = 0;
+
+			
 
 			SET_MODEL(ENT(pev), "models/w_divinetitan.mdl");
 			UTIL_SetSize(pev, Vector(-3, -4, 47), Vector(3, 4, 55));
@@ -749,7 +824,6 @@ namespace sv {
 			{
 				if (m_flNextDamagePoint[0] >= gpGlobals->time)
 				{
-					pev->nextthink = gpGlobals->time + 0.25s;
 
 					//ForceStage
 					CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
@@ -798,13 +872,8 @@ namespace sv {
 								vecDelta = pEntity->pev->origin - pev->origin;
 
 								Vector vecPullVelocity, vecOrigin;
-								const float power = 600;
+								const float power = 800;
 								vecOrigin = pev->origin;
-
-								vecOrigin[0] += RANDOM_LONG(-35, 35);
-								vecOrigin[1] += RANDOM_LONG(-20, 20);
-								vecOrigin[2] += RANDOM_LONG(-10, 10);
-
 
 								vecPullVelocity = (vecOrigin - player->pev->origin).Normalize() * power;
 								player->pev->velocity = vecPullVelocity;
@@ -832,25 +901,26 @@ namespace sv {
 							}
 						}
 					}
+					pev->nextthink = gpGlobals->time + 0.2s;
 				}
 				else
 				{
-					pev->nextthink = gpGlobals->time;
+
+					pev->iuser1 = 2;
 					m_flNextDamagePoint[0] = invalid_time_point;
 					//fps 51 - 33 - 10???
-					m_flNextDamagePoint[1] = gpGlobals->time + 0.2s;
-					
-					pev->iuser1 = 2;
-					
+					m_flNextDamagePoint[1] = gpGlobals->time;
+					m_flNextDamagePoint[1] = gpGlobals->time + 0.125s;
 
+					pev->nextthink = gpGlobals->time + 0.001s;
 				}
 			}
 			if (pev->iuser1 == 2 && m_flNextDamagePoint[1] != invalid_time_point)
 			{
-				pev->nextthink = gpGlobals->time + 0.01s;
-
+				
 				if (m_flNextDamagePoint[1] <= gpGlobals->time)
 				{
+
 					CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
 					CBasePlayer* pAttackPlayer = nullptr;
 					if (pAttacker && pAttacker->IsPlayer())
@@ -921,7 +991,7 @@ namespace sv {
 								if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
 									continue;
 
-								pEntity->TakeDamage(this->pev, pAttackPlayer->pev, GetDamage_SummonerAttack(0), DMG_EXPLOSION | DMG_NEVERGIB);
+								pEntity->TakeDamage(this->pev, pAttackPlayer->pev, GetDamage_SummonerAttack(0), DMG_BULLET | DMG_NEVERGIB);
 							}
 						}
 					}
@@ -929,9 +999,8 @@ namespace sv {
 					SetThink(NULL);
 					UTIL_Remove(this);
 				}
-
+				pev->nextthink = gpGlobals->time + 0.001s;
 			}
-
 		}
 		//Check it
 		if (m_iType == 1)
@@ -1029,14 +1098,20 @@ namespace sv {
 			WRITE_BYTE(TE_TEMPSPRITE);
 			WRITE_COORD(pev->origin.x);
 			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z + 45.0f);
+			WRITE_COORD(pev->origin.z + 65.0f);
 			WRITE_SHORT(m_iEffect[0]);
-			WRITE_BYTE(10);
+			WRITE_BYTE(15);
 			WRITE_BYTE(255);
-			WRITE_BYTE(60);
+			WRITE_BYTE(45);
 			MESSAGE_END();
 		}
 		EMIT_SOUND_DYN(ENT(pev), CHAN_AUTO, "weapons/divinetitan_exp.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
+
+		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, this->pev);
+		WRITE_BYTE(16);
+		WRITE_SHORT(this->entindex());
+		WRITE_BYTE(17);
+		MESSAGE_END();
 
 		//Fps 51/30.0
 		pev->nextthink = gpGlobals->time + 0.1s;
@@ -1049,7 +1124,7 @@ namespace sv {
 	}
 	float CDivineTitanSummon::GetRange_SummonerAttack() const
 	{
-		return 300.0f;
+		return 244.0f;
 	}
 	float CDivineTitanSummon::GetDamage_SummonerAttack(int IsAttraction) const
 	{
@@ -1057,7 +1132,7 @@ namespace sv {
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
 			return IsAttraction ? 500.0f : 50000.0f;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return IsAttraction ? 250.0f : 15000.0f;
+			return IsAttraction ? 450.0f : 31600.0f;
 #endif
 		return IsAttraction ? 5.0f : 75.0f;
 	}
@@ -1135,13 +1210,17 @@ namespace sv {
 		PRECACHE_MODEL("sprites/ef_divinetitan_amode.spr");
 		PRECACHE_MODEL("sprites/ef_divinetitan_amode_hit.spr");
 		PRECACHE_MODEL("sprites/ef_divinetitan_bmode_explo.spr");
+		PRECACHE_MODEL("sprites/smoke_thanatos9.spr");
+		
 
 
 		
 		PRECACHE_MODEL("models/ef_divinetitan_amode.mdl");
 		PRECACHE_MODEL("models/w_divinetitan.mdl");
 
+		PRECACHE_SOUND("weapons/divinetitan_A_mode-1_loop.wav");
 		PRECACHE_SOUND("weapons/divinetitan_B_mode-2_exp.wav");
+
 		PRECACHE_SOUND("weapons/divinetitan_B_mode-2.wav");
 
 
@@ -1217,8 +1296,8 @@ namespace sv {
 			pev->skin = ((pev->skin) & 0x0FFF) | ((0 & 0xF) << 12);
 			pev->body = 0;
 			pev->framerate = 1.0;
-			pev->animtime = gpGlobals->time + 0.375s;
-			pev->nextthink = gpGlobals->time + 0.3s;
+			pev->animtime = gpGlobals->time + 20.0s;
+			pev->nextthink = gpGlobals->time + 0.12048s ;
 			
 			SetThink(&CDivineTitanBase::OnThink);
 		}
@@ -1264,12 +1343,13 @@ namespace sv {
 			pev->takedamage = DAMAGE_NO;
 			SET_MODEL(ENT(pev), "models/ef_divinetitan_amode.mdl");
 
-			pev->rendermode = kRenderTransAdd;
+			pev->rendermode = kRenderTransTexture;
 			pev->renderamt = 255.0;
 
 			pev->frame = 0;
-			pev->scale = 2.5;
+			pev->scale = 5.0;
 			pev->sequence = 0;
+			pev->fuser3 = 0.0;
 
 			ResetSequenceInfo();
 
@@ -1364,6 +1444,181 @@ namespace sv {
 		}
 #endif
 	}
+
+	void CDivineTitanBase::MakeLoopGeneratorAdvanced()
+	{
+		const float flRadius = GetRange_Instance();
+
+		CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+		CBasePlayer* pAttackPlayer = nullptr;
+		if (pAttacker && pAttacker->IsPlayer())
+			pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+		if (!pAttackPlayer)
+			return;
+
+		CBaseEntity* m_iTarget[3]{};
+		float m_flDist[3]{};
+
+
+		//First Enemy not alive.
+		if (m_pFirstEnemy && !m_pFirstEnemy->IsAlive())
+		{
+			m_pFirstEnemy = nullptr;
+
+			MakeLoopGeneratorAdvanced();
+			return;
+		}
+
+		//First Enemy is alive but out of range.->Research the first enemy.
+		if (m_pFirstEnemy && m_pFirstEnemy->IsAlive())
+		{
+			float pEntityDistance = (m_pFirstEnemy->pev->origin - pAttackPlayer->pev->origin).Length();
+			if (pEntityDistance > flRadius)
+			{
+				m_pFirstEnemy = nullptr;
+
+				MakeLoopGeneratorAdvanced();
+				return;
+			}
+		}
+
+#ifndef CLIENT_DLL
+		CBaseEntity* pEntity = NULL;
+		CBaseEntity* pStartEntity = NULL;
+		pStartEntity = m_pFirstEnemy ? m_pFirstEnemy : pAttackPlayer;
+
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, pStartEntity->pev->origin, m_pFirstEnemy?263.39f:flRadius)) != nullptr)
+		{
+			if (!pAttackPlayer->IsAlive())
+				continue;
+#ifndef CLIENT_DLL
+			if (g_pGameRules->PlayerRelationship(pAttackPlayer, pEntity) == GR_TEAMMATE)
+				continue;
+#endif
+			if (pEntity->pev == pAttackPlayer->pev)
+				continue;
+
+			if (!pEntity->IsAlive())
+				continue;
+
+			Vector vecTarget;
+			vecTarget = pEntity->pev->origin;
+
+			for (int i = 0; i < 3; i++)
+			{
+				float flDistance = (pStartEntity->pev->origin - pEntity->pev->origin).Length();
+				if (!m_iTarget[i] || m_flDist[i] > flDistance)
+				{
+					if (i < 2)
+					{
+						for (int j = 1; j >= i; j--)
+						{
+							m_iTarget[j + 1] = m_iTarget[j];
+							m_flDist[j + 1] = m_flDist[j];
+						}
+					}
+					m_iTarget[i] = pEntity;
+					m_flDist[i] = flDistance;
+					m_pFirstEnemy = m_iTarget[0];
+					break;
+				}
+			}
+		}
+
+		Vector pOrigin;
+		if (m_pFirstEnemy)
+			pOrigin = m_pFirstEnemy->pev->origin;
+		Vector mOrigin, mAngles;
+
+		GET_ATTACHMENT(ENT(pAttackPlayer->pev), 0, mOrigin, mAngles);
+		mOrigin.z += 35;
+		if (m_pFirstEnemy && m_pFirstEnemy->IsAlive())
+			CreateBeam(0, mOrigin, pOrigin, ENT(pAttackPlayer->pev));
+
+		for (int i = 0; i < 3; i++)
+		{
+
+			if (!m_iTarget[i])
+				continue;
+			if (!m_iTarget[i]->IsAlive())
+				continue;
+
+			Vector vecDirection = (m_iTarget[i]->pev->origin - pAttackPlayer->pev->origin).Normalize();
+
+			TraceResult tr;
+			UTIL_TraceLine(pAttackPlayer->pev->origin, m_iTarget[i]->pev->origin, missile, ENT(pAttackPlayer->pev), &tr);
+
+			float flDamageAdjust = 1.0;
+			if (i == 0)
+				flDamageAdjust = 1.0;
+			else if (i == 1)
+				flDamageAdjust = 0.5;
+			else flDamageAdjust = 0.25;
+
+#ifndef CLIENT_DLL
+			CreateBeam(0, m_iTarget[i - 1 < 0 ? 0 : i - 1]->pev->origin, m_iTarget[i]->pev->origin, ENT(pAttackPlayer->pev));
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, m_iTarget[i]->pev->origin);
+			WRITE_BYTE(TE_EXPLOSION);
+			WRITE_COORD(m_iTarget[i]->pev->origin.x);
+			WRITE_COORD(m_iTarget[i]->pev->origin.y);
+			WRITE_COORD(m_iTarget[i]->pev->origin.z);
+			WRITE_SHORT(MODEL_INDEX("sprites/ef_divinetitan_amode_hit.spr"));
+			WRITE_BYTE(8);
+			WRITE_BYTE(20);
+			WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
+			MESSAGE_END();
+
+			if (m_iTarget[i]->IsPlayer())
+			{
+				CBasePlayer* player = (CBasePlayer*)m_iTarget[i];
+
+				if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
+				{
+					player->m_flVelocityModifier = 0.3;
+
+					auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+					if (strategy)
+					{
+						strategy->SetStunSpeedTime(0.5s, 90.0f);
+						strategy->SetStunGravityTime(0.5s);
+					}
+				}
+			}
+			/*
+			ClearMultiDamage();
+			m_iTarget[i]->TraceAttack(pAttackPlayer->pev, GetDamage_Instance() * flDamageAdjust, vecDirection, &tr, DMG_BULLET);
+			ApplyMultiDamage(pAttackPlayer->pev, pAttackPlayer->pev);
+			*/
+			m_iTarget[i]->TakeDamage(pev, pAttackPlayer->pev, GetDamage_Instance()* flDamageAdjust, DMG_BULLET);
+#endif
+		}
+		if (m_iTarget[0]|| m_iTarget[1]|| m_iTarget[2])
+		{
+			if (m_flNextSoundTime < gpGlobals->time)
+			{
+				EMIT_SOUND_DYN(ENT(this->pev), CHAN_ITEM, "weapons/divinetitan_A_mode-1_loop.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				m_flNextSoundTime = gpGlobals->time + 2.0s;
+			}
+
+		}
+		else
+		{
+#ifndef CLIENT_DLL
+			int player = pAttackPlayer->entindex();
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pAttackPlayer->edict());
+			WRITE_BYTE(79);
+			WRITE_SHORT(player);
+			WRITE_SHORT(CHAN_ITEM);
+			WRITE_STRING("weapons/divinetitan_A_mode-1_loop.wav");
+			MESSAGE_END();
+#endif
+			m_flNextSoundTime = invalid_time_point;
+		}
+#endif
+	}
+
 	void CDivineTitanBase::MakeLoopGenerator()
 	{
 		const float flRadius = GetRange_Instance();
@@ -1544,30 +1799,65 @@ namespace sv {
 		{
 			if (pAttack->m_flPlayerBuffData)
 			{
-				if (m_iType == 1 && this->m_pWeapon)
+				if (!this->m_pWeapon)
 				{
-#ifndef CLIENT_DLL
+					pAttack->m_flPlayerBuffData = 0;
+					ClearEnt(1);
+				}
+				if (m_iType == 1  && this->m_pWeapon)
+				{
 					//Redirect timepoint
 
 					if (m_flTimeNextCharge <= gpGlobals->time)
 					{
 						this->m_pWeapon->m_flTimeholster = gpGlobals->time;
 						this->m_pWeapon->m_flTimeholster = invalid_time_point;
-						m_flTimeNextCharge = gpGlobals->time + 0.13s;
-						this->m_pWeapon->m_iSaveSpecialAmmo--;
+
+						m_flTimeNextCharge = gpGlobals->time + 0.25s;
+
+						this->m_pWeapon->ChangeClip(1,false);
+						this->m_pWeapon->m_iSaveShoots++;
+
+						if (this->m_pWeapon->m_iSaveShoots == 70)
+						{
+							MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pAttack->pev);
+							WRITE_BYTE(15);
+							WRITE_BYTE(80);
+							MESSAGE_END();
+						}
+
+						if (this->m_pWeapon->m_iSaveShoots >= 70)
+						{
+							
+							this->m_pWeapon->m_iSaveShoots = 0;
+							this->m_pWeapon->ChangeClip(1, true);
+							
+							#ifndef CLIENT_DLL
+							if (this->m_pWeapon->IsSignal())
+							{
+							
+								MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, pAttack->pev);
+								WRITE_BYTE(6);
+								WRITE_BYTE(this->m_pWeapon->m_CrossHairState);
+								MESSAGE_END();
+								this->m_pWeapon->m_CrossHairStateStored = this->m_pWeapon->m_CrossHairState;
+							}
+							#endif
+						}
+
 					}
-					if (!this->m_pWeapon->m_iSaveSpecialAmmo)
+					if (!this->m_pWeapon->GetClip())
 					{
 						pAttack->m_flPlayerBuffData = 0;
-						this->m_pWeapon->m_iWpnState = 0;
+						this->m_pWeapon->m_iFade = 0;			
 						//ReStart charging only if the ammos run out.
 						this->m_pWeapon->m_flTimeholster = gpGlobals->time;
+						this->m_pWeapon->ResetSequence();
 						ClearEnt(1);
-
+						
 					}
 				}
 			}
-#endif	
 		}
 
 		if (m_iType == -1)
@@ -1603,7 +1893,7 @@ namespace sv {
 		}
 		if (m_iType == 0)
 		{
-			pev->nextthink = gpGlobals->time + 0.025s;
+			pev->nextthink = gpGlobals->time + 0.005s;
 			if (pev->frame < 15.0)
 			{
 				pev->frame += 1.0;
@@ -1642,13 +1932,14 @@ namespace sv {
 				
 				if (pAttackPlayer->m_flPlayerBuffData == 1)
 				{
-					pev->nextthink = gpGlobals->time + 0.2s;
-					MakeLoopGenerator();
-					//CheckDistanceBetweenEnemies();
+					//0.2s 
+					pev->nextthink = gpGlobals->time + 0.12048s;
+					//MakeLoopGenerator();
+					MakeLoopGeneratorAdvanced();
 				}
 				else if (pAttackPlayer->m_flPlayerBuffData == 2)
 				{
-					pev->nextthink = gpGlobals->time + 0.625s;
+					pev->nextthink = gpGlobals->time + 0.6993s;
 #ifndef CLIENT_DLL
 					UTIL_MakeVectors(pAttackPlayer->pev->v_angle + pAttackPlayer->pev->punchangle);
 					Vector vecSrc = pAttackPlayer->GetGunPosition() + gpGlobals->v_forward * 10;
@@ -1679,10 +1970,40 @@ namespace sv {
 			if (pAttacker && pAttacker->IsPlayer())
 				pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
 
+			if (this->m_pWeapon && this->m_pWeapon->GetClip() <= 20)
+			{
+				this->m_pWeapon->m_iFade = 1;
+				if (m_iType == 3)
+				{
+					if (this->m_pWeapon)
+					{
+						if (this->m_pWeapon->GetClip() <= 20)
+						{
+							if (m_flNextFadeTime <= gpGlobals->time)
+							{
+								float flAmt; flAmt = pev->renderamt;
+								if (flAmt <= 0)
+								{
+									flAmt += 255.0f;
+								}
+								else
+								{
+									if (flAmt)
+										flAmt -= 255.0f;
+								}
+								pev->renderamt = flAmt;
+
+								m_flNextFadeTime = gpGlobals->time + 0.25s;
+							}
+						}
+					}
+				}
+			}
+
 
 			if (pAttackPlayer)
 			{
-				UTIL_SetOrigin(pev, pAttackPlayer->pev->origin + Vector(0, 0, (FBitSet(pAttackPlayer->pev->flags, FL_DUCKING))?-10:-25));
+				UTIL_SetOrigin(pev, pAttackPlayer->pev->origin + Vector(0, 0, (FBitSet(pAttackPlayer->pev->flags, FL_DUCKING))?-13:-28));
 
 				pev->angles = pAttackPlayer->pev->angles;
 				pev->angles.x = 0;
@@ -1729,7 +2050,7 @@ namespace sv {
 
 			if (pOther->IsPlayer())
 			{
-				CBasePlayer* player = (CBasePlayer*)pEntity;
+				CBasePlayer* player = (CBasePlayer*)pOther;
 
 				if (player->m_bIsZombie && ~(player->m_iBuff) & BUFF_IGNORE_KNOCKBACK)
 				{
@@ -1833,6 +2154,18 @@ namespace sv {
 		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
 		MESSAGE_END();
 
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_SHORT(MODEL_INDEX("sprites/smoke_thanatos9.spr"));
+		WRITE_BYTE(10);
+		WRITE_BYTE(15);
+		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
+		MESSAGE_END();
+
+
 		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/divinetitan_B_mode-2_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 		SetTouch(NULL);
@@ -1844,15 +2177,15 @@ namespace sv {
 	{
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
-			return IsTouch ? 500.0f : 1000.0f;
+			return IsTouch ? 2500.0f : 3000.0f;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return IsTouch ? 250.0f : 500.0f;
+			return IsTouch ? 2000.0f : 500.0f;
 #endif
 		return IsTouch ? 25.0f : 50.0f;
 	}
 	float CDivineTitanBase::GetRange_Missile() const
 	{
-		return 200.0f;
+		return 100.0f;
 	}
 
 	float CDivineTitanBase::GetDamage_Instance() const
@@ -1861,13 +2194,13 @@ namespace sv {
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
 			return 500.0f;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return 150.0f;
+			return 300.0f;
 #endif
 		return 10.0f;
 	}
 	float CDivineTitanBase::GetRange_Instance() const
 	{
-		return 300.0f;
+		return 326.8f;
 	}
 
 	

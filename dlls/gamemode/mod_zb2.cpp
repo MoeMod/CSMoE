@@ -380,6 +380,26 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	m_pCharacter_ZB2 = sp;
 	m_pCharacter = sp;
 	
+	if (enhancedzombie.value)
+	{
+		switch (iEvolutionLevel)
+		{
+		case ZOMBIE_LEVEL_HOST:
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 15000;
+			break;
+		case ZOMBIE_LEVEL_ORIGIN:
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 20000;
+			break;
+		case ZOMBIE_LEVEL_ORIGIN_LV2:
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 25000;
+			break;
+		default:
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 4000;
+			break;
+		}
+		
+	}
+
 	// fix crash
 	if (m_pPlayer->m_pActiveItem)
 	{

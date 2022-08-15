@@ -249,9 +249,11 @@ namespace sv {
 					WRITE_BYTE(8);
 					MESSAGE_END();
 
-					pEntity->pBuffAttacker = m_pPlayer->pev;
+					pEntity->m_pBuffAttacker = m_pPlayer->pev;
 					pEntity->m_iHealthDecreaseCount = 5;
 					pEntity->m_flHealthDecreaseAmount = 20;
+					pEntity->m_flHealthDecreaseInterval = 1.0s;
+					pEntity->m_flHealthDecreaseStartTime = gpGlobals->time + 1.0s;
 				}
 				else
 				{
@@ -265,9 +267,11 @@ namespace sv {
 						WRITE_BYTE(8);
 						MESSAGE_END();
 
-						pEntity->pBuffAttacker = m_pPlayer->pev;
+						pEntity->m_pBuffAttacker = m_pPlayer->pev;
 						pEntity->m_iHealthDecreaseCount = 5;
 						pEntity->m_flHealthDecreaseAmount = 20;
+						pEntity->m_flHealthDecreaseInterval = 1.0s;
+						pEntity->m_flHealthDecreaseStartTime = gpGlobals->time + 1.0s;
 					}
 				}
 			}
@@ -362,9 +366,11 @@ namespace sv {
 					WRITE_BYTE(8);
 					MESSAGE_END();
 
-					pEntity->pBuffAttacker = m_pPlayer->pev;
+					pEntity->m_pBuffAttacker = m_pPlayer->pev;
 					pEntity->m_iHealthDecreaseCount = 5;
 					pEntity->m_flHealthDecreaseAmount = 20;
+					pEntity->m_flHealthDecreaseInterval = 1.0s;
+					pEntity->m_flHealthDecreaseStartTime = gpGlobals->time + 1.0s;
 				}
 				else
 				{
@@ -378,9 +384,11 @@ namespace sv {
 						WRITE_BYTE(8);
 						MESSAGE_END();
 
-						pEntity->pBuffAttacker = m_pPlayer->pev;
+						pEntity->m_pBuffAttacker = m_pPlayer->pev;
 						pEntity->m_iHealthDecreaseCount = 5;
 						pEntity->m_flHealthDecreaseAmount = 20;
+						pEntity->m_flHealthDecreaseInterval = 1.0s;
+						pEntity->m_flHealthDecreaseStartTime = gpGlobals->time + 1.0s;
 					}
 				}
 			}
@@ -413,7 +421,7 @@ namespace sv {
 #endif
 
 #ifndef CLIENT_DLL
-    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762natobox" , 60 }; }
+    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762natobox" , 100 }; }
 #endif
     float GetArmorRatioModifier() override { return 1.5; }
     WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 140 }; }

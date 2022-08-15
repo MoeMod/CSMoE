@@ -35,6 +35,7 @@ GNU General Public License for more details.
 #include "mod_z4.h"
 #include "mod_z4e.h"
 #include "mod_zsh.h"
+#include "mod_zb3zp.h"
 
 namespace sv {
 
@@ -64,7 +65,7 @@ std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "zsh", DefaultFactory<CMod_ZombieShelter> },
 	// custom
 	{ "zb3f2p", DefaultFactory<CMod_ZB3F2P> },
-	{ "zb3classic", DefaultFactory<CMod_ZB3Classic> },
+	{ "zb3zp", DefaultFactory<CMod_ZB3ZP> },
 };
 
 void InstallBteMod(const char *name)
