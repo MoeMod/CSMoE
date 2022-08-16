@@ -7,7 +7,11 @@
 #ifdef _WIN32
 #include <io.h>
 #include <direct.h>
+#ifdef XASH_FS_WIN32
 #include <fileapi.h>
+#else
+#include "mman.h"
+#endif
 #else
 #include <dirent.h>
 #include <errno.h>
@@ -66,6 +70,11 @@ namespace xe {
         {
             return ::munmap(addr, len);
         }
+
+		static int mkdir(const char* path)
+		{
+			return ::_mkdir(path);
+		}
 
         static off_t get_fd_size(fd_t fd)
         {
@@ -143,7 +152,7 @@ namespace xe {
 
 		static fd_t fdup(fd_t fd) = delete; // unsupported
 	};
-#if 0 // TODO : buggy
+#ifdef _WIN32 // TODO : buggy
 	struct fs_win32
 	{
 		using fd_t = ::HANDLE;
@@ -263,8 +272,21 @@ namespace xe {
 			::DuplicateHandle(::GetCurrentProcess(), fd, ::GetCurrentProcess(), &result, 0, FALSE, DUPLICATE_SAME_ACCESS);
 			return result;
 		}
+
+		static int mkdir(const char* path)
+		{
+			// MoeMod : fix Chinese path
+			wchar_t wpath[MAX_PATH];
+			MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, MAX_PATH);
+
+			return ::CreateDirectoryW(wpath, NULL);
+		}
 	};
 #endif
 
+#ifdef XASH_FS_WIN32
+	using fs = fs_win32;
+#else
 	using fs = fs_posix;
+#endif
 }

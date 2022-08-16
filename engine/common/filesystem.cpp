@@ -481,7 +481,7 @@ void FS_CreatePath( char *path )
 			// create the directory
 			save = *ofs;
 			*ofs = 0;
-			_mkdir( path );
+			xe::fs::mkdir( path );
 			*ofs = save;
 		}
 	}
@@ -1937,7 +1937,7 @@ void FS_Init( void )
 				// magic here is that dirs.strings don't contain full path
 				// so code below checks and creates folders in current directory(host.rootdir)
 				if( !FS_SysFolderExists( dirs.strings[i] ) )
-					_mkdir( dirs.strings[i] );
+					xe::fs::mkdir( dirs.strings[i] );
 			}
 
 			stringlistfreecontents( &dirs );

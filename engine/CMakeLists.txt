@@ -519,6 +519,10 @@ endif()
 
 target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus 3rdparty-mpg123)
 
+if(WIN32)
+	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-mman-win32)
+endif()
+
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)
 endif()
