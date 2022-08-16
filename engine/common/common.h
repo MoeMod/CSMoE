@@ -473,6 +473,12 @@ file_t *FS_OpenFile( const char *path, fs_offset_t *filesizeptr, qboolean gamedi
 byte *FS_LoadFile( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly );
 byte *FS_LoadDirectFile( const char *path, fs_offset_t *filesizeptr );
 qboolean FS_WriteFile( const char *filename, const void *data, fs_offset_t len );
+
+// CSMoE  extension : replacement for FS_LoadFile
+const byte *FS_MapFile( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly );
+void FS_UnmapFile(const byte *data, fs_offset_t filesize);
+void *FS_MapAlloc(fs_offset_t filesize);
+
 int COM_FileSize( const char *filename );
 void COM_FixSlashes( char *pname );
 void COM_FreeFile( void *buffer );

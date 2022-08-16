@@ -32,7 +32,7 @@ public:
 	~CLinuxFont();
 
 	// creates the font from windows.  returns false if font does not exist in the OS.
-	virtual bool CreateFromMemory(const char *windowsFontName, void *data, int size, int tall, int weight, int blur, int scanlines, int flags);
+	virtual bool CreateFromMemory(const char *windowsFontName, const void *data, int size, int tall, int weight, int blur, int scanlines, int flags);
 
 	// writes the char into the specified 32bpp texture
 	virtual void GetCharRGBA( uchar32 ch, int rgbaWide, int rgbaTall, unsigned char *rgba);

@@ -4193,7 +4193,7 @@ R_StudioLoadTexture
 load model texture with unique name
 ====================
 */
-static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture_t *ptexture )
+static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, mstudiotexture_t *ptexture )
 {
 	size_t		size;
 	int		flags = 0;
@@ -4215,7 +4215,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 	{
 		int	i;
 		char	val[6];
-		byte	*pixels;
+		const byte	*pixels;
 
 		i = mod->numtextures;
 		mod->textures = (texture_t **)Mem_Realloc( mod->mempool, mod->textures, ( i + 1 ) * sizeof( texture_t* ));
@@ -4249,7 +4249,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		tx->height = ptexture->height;
 
 		// the pixels immediately follow the structures
-		pixels = (byte *)phdr + ptexture->index;
+		pixels = (const byte *)phdr + ptexture->index;
         Mem_VirtualCopy( tx+1, pixels, size );
 
 		ptexture->flags |= STUDIO_NF_COLORMAP;	// yes, this is colormap image
@@ -4398,7 +4398,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 R_StudioLoadHeader
 =================
 */
-studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
+studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
 {
 	byte		*pin;
 	studiohdr_t	*phdr;
@@ -4439,7 +4439,7 @@ studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
 Mod_LoadStudioModel
 =================
 */
-void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
+void Mod_LoadStudioModel( model_t *mod, void *buffer, qboolean *loaded )
 {
 	studiohdr_t	*phdr;
 

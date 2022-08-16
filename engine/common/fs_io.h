@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/mman.h>
 #endif
 
 namespace xe {
@@ -50,6 +51,29 @@ namespace xe {
 		{
 			return ::dup(fd);
 		}
+
+        static void *mmap_file(fd_t fd, size_t len, off_t offset = 0, void *map_hint = nullptr)
+        {
+            return ::mmap(map_hint, len, PROT_READ, MAP_FILE | MAP_SHARED, fd, offset);
+        }
+
+        static void *mmap_anon(size_t len, void *map_hint = nullptr)
+        {
+            return ::mmap(map_hint, len, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+        }
+
+        static int munmap(void *addr, size_t len)
+        {
+            return ::munmap(addr, len);
+        }
+
+        static off_t get_fd_size(fd_t fd)
+        {
+            off_t cur = ::lseek(fd, 0, SEEK_CUR);
+            off_t end = ::lseek(fd, 0, SEEK_END);
+            ::lseek(fd, cur, SEEK_SET);
+            return end;
+        }
 
 		static int mode_to_flag(const char* mode)
 		{

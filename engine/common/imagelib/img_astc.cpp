@@ -203,7 +203,7 @@ qboolean Image_LoadASTC_SW( const char *name, const byte *buffer, size_t filesiz
 	image.type = PF_RGBA_32;
 	image.size = image.width * image.height * 4;
 	image.rgba = (byte *)Mem_Alloc( host.imagepool, image.size );
-	Q_memcpy(image.rgba, image_decomp_out->data[0], image.size);
+    Mem_VirtualCopy(image.rgba, image_decomp_out->data[0], image.size);
 	image.flags |= IMAGE_HAS_ALPHA;
 	image.flags |= IMAGE_HAS_COLOR;
 
@@ -278,7 +278,7 @@ qboolean Image_LoadASTC_HW( const char *name, const byte *buffer, size_t filesiz
     image.type = format;
     image.size = data_size;
     image.rgba = (byte *)Mem_Alloc( host.imagepool, image.size );
-    Q_memcpy(image.rgba, buffer + sizeof(astc_header), image.size);
+    Mem_VirtualCopy(image.rgba, buffer + sizeof(astc_header), image.size);
     image.flags |= IMAGE_HAS_ALPHA;
     image.flags |= IMAGE_HAS_COLOR;
 

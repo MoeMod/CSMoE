@@ -470,7 +470,7 @@ image_ref Image_Quantize( image_ref pic )
 	}
 
 	pic->buffer = (byte*)Mem_Realloc( host.imagepool, pic->buffer, image.size );
-	Q_memcpy( pic->buffer, image.tempbuffer, image.size );
+    Mem_VirtualCopy( pic->buffer, image.tempbuffer, image.size );
 	pic->type = PF_INDEXED_24;
 	pic->size = image.size;
 

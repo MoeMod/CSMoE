@@ -65,6 +65,17 @@ void DecryptData(byte *pData, size_t uDataSize)
 	} while (uDataSize);
 }
 
+bool Mod_IsModelEncrypted(const char *model_name, const byte *buffer)
+{
+    const studiohdr_t *studiohdr = reinterpret_cast<const studiohdr_t *>(buffer);
+    if (!Q_strncmp(model_name, "models/player", 13))
+    {
+        if (studiohdr->numhitboxes == 21)
+            return true;
+    }
+    return studiohdr->version == 20 || studiohdr->version == 21 || studiohdr->version == 22;
+}
+
 void Mod_DecryptModel(const char *model_name, byte *buffer)
 {
 	studiohdr_t *studiohdr = reinterpret_cast<studiohdr_t *>(buffer);

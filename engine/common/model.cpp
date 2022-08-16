@@ -2793,7 +2793,7 @@ void Mod_UnloadBrushModel( model_t *mod )
 Mod_LoadBrushModel
 =================
 */
-static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *loaded )
+static void Mod_LoadBrushModel( model_t *mod, void *buffer, qboolean *loaded )
 {
 	int	i, j;
 	int	sample_size;
@@ -3075,7 +3075,8 @@ Loads a model into the cache
 */
 model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 {
-	byte	*buf;
+	const byte	*buf;
+    fs_offset_t filesize;
 	char	tempname[64];
 	qboolean	loaded;
 
@@ -3094,7 +3095,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	Q_strncpy( tempname, mod->name, sizeof( tempname ));
 	COM_FixSlashes( tempname );
 
-	buf = FS_LoadFile( tempname, NULL, false );
+	buf = FS_MapFile( tempname, &filesize, false );
 
 	if( !buf )
 	{
@@ -3117,19 +3118,34 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	switch( LittleLong(*(uint *)buf) )
 	{
 	case IDSTUDIOHEADER:
-		Mod_DecryptModel(mod->name, buf);
-		Mod_LoadStudioModel( mod, Mod_LoadExtendSeq(mod->name, buf), &loaded );
-		break;
+        {
+            // make writable
+            byte *buf2 = (byte *)FS_MapAlloc(filesize);
+            Mem_VirtualCopy(buf2, buf, filesize);
+            FS_UnmapFile(buf, filesize);
+            buf = buf2;
+            // replace model
+            Mod_DecryptModel(mod->name, buf2);
+            Mod_LoadStudioModel( mod, Mod_LoadExtendSeq(mod->name, buf2), &loaded );
+            break;
+        }
 	case IDSPRITEHEADER:
 		Mod_LoadSpriteModel( mod, buf, &loaded, 0 );
 		break;
 	case Q1BSP_VERSION:
 	case HLBSP_VERSION:
 	case XTBSP_VERSION:
-		Mod_LoadBrushModel( mod, buf, &loaded );
+    {
+        // make writable
+        byte *buf2 = (byte *)FS_MapAlloc(filesize);
+        Mem_VirtualCopy(buf2, buf, filesize);
+        FS_UnmapFile(buf, filesize);
+        buf = buf2;
+        Mod_LoadBrushModel( mod, buf2, &loaded );
+    }
 		break;
 	default:
-		Mem_Free( buf );
+		FS_UnmapFile( buf, filesize );
 		if( crash ) Host_MapDesignError( "Mod_ForName: %s unknown format\n", tempname );
 		else MsgDev( D_ERROR, "Mod_ForName: %s unknown format\n", tempname );
 		return NULL;
@@ -3138,7 +3154,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	if( !loaded )
 	{
 		Mod_FreeModel( mod );
-		Mem_Free( buf );
+        FS_UnmapFile( buf, filesize );
 
 		if( crash ) Host_MapDesignError( "Mod_ForName: %s couldn't load\n", tempname );
 		else MsgDev( D_ERROR, "Mod_ForName: %s couldn't load\n", tempname );
@@ -3152,7 +3168,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 		clgame.drawFuncs.Mod_ProcessUserData( mod, true, buf );
 	}
 #endif
-	Mem_Free( buf );
+    FS_UnmapFile( buf, filesize );
 
 	return mod;
 }
@@ -3350,7 +3366,7 @@ Mod_LoadCacheFile
 */
 void GAME_EXPORT Mod_LoadCacheFile( const char *filename, cache_user_t *cu )
 {
-	byte	*buf;
+	const byte	*buf;
 	string	name;
 	size_t	i, j;
 	fs_offset_t size;
@@ -3369,15 +3385,15 @@ void GAME_EXPORT Mod_LoadCacheFile( const char *filename, cache_user_t *cu )
 	}
 	name[j] = '\0';
 
-	buf = FS_LoadFile( name, &size, false );
+	buf = FS_MapFile( name, &size, false );
 	if( !buf || !size )
 	{
 		Host_MapDesignError( "LoadCacheFile: ^1can't load %s^7\n", filename );
 		return;
 	}
 	cu->data = Mem_Alloc( com_studiocache, size );
-	Q_memcpy( cu->data, buf, size );
-	Mem_Free( buf );
+	Mem_VirtualCopy( cu->data, buf, size );
+	FS_UnmapFile( buf, size );
 }
 
 /*

@@ -3023,6 +3023,72 @@ byte *FS_LoadFile( const char *path, fs_offset_t *filesizeptr, qboolean gamediro
 	return buf;
 }
 
+const byte *FS_MapFile( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly )
+{
+    auto file = FS_Open( path, "rb", gamedironly );
+
+#ifndef _WIN32
+    if( !file )
+    {
+        // Try to open this file with lowered path
+        file = FS_Open( FS_ToLowerCase( path ), "rb", gamedironly );
+    }
+#endif // _WIN32
+    if( !file )
+    {
+        // file not found
+        return nullptr;
+    }
+
+    if( file->handle == xe::fs::invalid_file )
+    {
+#if __ANDROID__ && 0 // TODO : test
+        off_t offset, filesize;
+#ifdef XASH_64BIT
+        auto fd = AAsset_openFileDescriptor64(asset, &offset, &filesize);
+#else
+        auto fd = AAsset_openFileDescriptor(asset, &offset, &filesize);
+#endif
+        if(fd > 0)
+        {
+            const byte *buf = (const byte *)xe::fs::mmap_file( fd, filesize, offset );
+
+            if( filesizeptr )
+                *filesizeptr = filesize;
+            ::close(fd);
+            return buf;
+        }
+#endif
+        // plain copy
+        auto filesize = file->real_length;
+        auto buf = (byte *)xe::fs::mmap_anon(filesize);
+        FS_Read( file, buf, filesize );
+        FS_Close( file );
+        if( filesizeptr )
+            *filesizeptr = filesize;
+        return buf;
+    }
+    // use swappable memory
+    auto filesize = file->real_length;
+    auto fd = file->handle;
+    const byte *buf = (const byte *)xe::fs::mmap_file( fd, filesize );
+    FS_Close( file );
+    if( filesizeptr )
+        *filesizeptr = filesize;
+    return buf;
+}
+
+void FS_UnmapFile(const byte *data, fs_offset_t filesize)
+{
+    if(data)
+        xe::fs::munmap((void *)data, filesize);
+}
+
+void *FS_MapAlloc(fs_offset_t filesize)
+{
+    return xe::fs::mmap_anon(filesize);
+}
+
 /*
 ============
 FS_LoadFile
@@ -4162,6 +4228,23 @@ FILESYSTEM PUBLIC API
 void *FSAPI_MemAlloc( size_t size, const char *filename, int fileline );
 void FSAPI_MemFree( void *data, const char *filename, int fileline );
 
+const void *FSAPI_MapFile( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly )
+{
+    return FS_MapFile(path, filesizeptr, gamedironly);
+}
+void FSAPI_UnmapFile( const void *data, fs_offset_t filesize )
+{
+    return FS_UnmapFile((const byte *)data, filesize);
+}
+void *FSAPI_MapAlloc( fs_offset_t filesize )
+{
+    return FS_MapAlloc(filesize);
+}
+void *FSAPI_MapCopy( void *dest, const void *src, fs_offset_t filesize )
+{
+    return Mem_VirtualCopy(dest, src, filesize);
+}
+
 fs_api_t g_fsapi =
 {
 	FS_API_VERSION,
@@ -4185,7 +4268,11 @@ fs_api_t g_fsapi =
 	FS_AddPack_Fullpath,
 	Msg,
 	FSAPI_MemAlloc,
-    FSAPI_MemFree
+    FSAPI_MemFree,
+    FSAPI_MapFile,
+    FSAPI_UnmapFile,
+    FSAPI_MapAlloc,
+    FSAPI_MapCopy
 };
 
 void *FSAPI_MemAlloc( size_t size, const char *filename, int fileline )

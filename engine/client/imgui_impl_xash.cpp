@@ -365,6 +365,18 @@ void ImGui_ImplGL_InvalidateDeviceObjects(void)
 
 int pfnGetScreenInfo( SCREENINFO *pscrinfo );
 
+void ImGui_ImplGL_ClearFontCache()
+{
+    // clear font
+    ImGuiIO& io = ImGui::GetIO();
+    for(auto *font : io.Fonts->Fonts)
+    {
+        if(!font->ConfigData->FontDataOwnedByAtlas)
+            FS_UnmapFile((const byte *)font->ConfigData->FontData, font->ConfigData->FontDataSize);
+    }
+    io.Fonts->ClearFonts();
+}
+
 void ImGui_ImplGL_ReloadFonts()
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -382,6 +394,8 @@ void ImGui_ImplGL_ReloadFonts()
 
 	if (size_pixels <= 0.0f)
 		return;
+
+    ImGui_ImplGL_ClearFontCache();
 	
 	t = FS_Search( "resource/font/*.ttf", true, false );
 	if (t)
@@ -390,11 +404,10 @@ void ImGui_ImplGL_ReloadFonts()
 		{
 			const char* filename = t->filenames[i];
 			fs_offset_t length = 0;
-			auto file = FS_LoadFile(filename, &length, false);
-			std::unique_ptr<void, decltype(&ImGui::MemFree)> new_ptr(ImGui::MemAlloc(length + 1), ImGui::MemFree);
-			memcpy(new_ptr.get(), file, length);
-			Mem_Free(std::exchange(file, nullptr));
-			auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, size_pixels, NULL, io.Fonts->GetGlyphRangesChineseFull());
+			auto file = FS_MapFile(filename, &length, false);
+            ImFontConfig cfg = {};
+            cfg.FontDataOwnedByAtlas = false;
+			auto font = io.Fonts->AddFontFromMemoryTTF((void *)file, length, size_pixels, &cfg, io.Fonts->GetGlyphRangesChineseFull());
 		}
 		Mem_Free(t);
 	}

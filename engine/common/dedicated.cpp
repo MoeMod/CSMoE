@@ -505,7 +505,7 @@ void pfnDrawConsoleStringLen( const char *pText, int *length, int *height )
 R_StudioLoadHeader
 =================
 */
-studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
+studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
 {
 	byte		*pin;
 	studiohdr_t	*phdr;
@@ -563,9 +563,9 @@ static int R_StudioBodyVariations( model_t *mod )
 Mod_LoadStudioModel
 =================
 */
-void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
+void Mod_LoadStudioModel( model_t *mod, void *buffer, qboolean *loaded )
 {
-	studiohdr_t	*phdr;
+    const studiohdr_t	*phdr;
 
 	if( loaded ) *loaded = false;
 	loadmodel->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", loadmodel->name ));
@@ -578,7 +578,7 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	loadmodel->cache.data = Mem_Alloc( loadmodel->mempool, phdr->length );
 	Q_memcpy( loadmodel->cache.data, buffer, phdr->length );
 
-	phdr = (studiohdr_t *)loadmodel->cache.data;
+	phdr = (const studiohdr_t *)loadmodel->cache.data;
 
 	// setup bounding box
 	VectorCopy( phdr->bbmin, loadmodel->mins );
@@ -635,7 +635,7 @@ Mod_LoadSpriteModel
 load sprite model
 ====================
 */
-void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint texFlags )
+void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, uint texFlags )
 {
 	dsprite_t		pin;
 	short		numi;
