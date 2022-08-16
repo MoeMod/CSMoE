@@ -103,22 +103,6 @@ struct wfile_s
 	time_t		filetime;
 };
 
-typedef struct packfile_s
-{
-	char		name[56];
-	fs_offset_t	offset;
-	fs_offset_t	realsize;	// real file size (uncompressed)
-} packfile_t;
-
-typedef struct pack_s
-{
-	char		filename[MAX_SYSPATH];
-	int		handle;
-	int		numfiles;
-	time_t		filetime;	// common for all packed files
-	packfile_t	*files;
-} pack_t;
-
 #include "fs_int.h"
 
 #include "custom.h"

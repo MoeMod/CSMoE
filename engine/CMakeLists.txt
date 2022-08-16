@@ -132,6 +132,7 @@ set(XASH_ENGINE_SOURCES
 	common/textconsole.cpp
 	common/cook.cpp
 	common/model_encrypt.cpp
+	common/fs_mmap.cpp
 	server/sv_client.cpp
 	server/sv_cmds.cpp
 	server/sv_custom.cpp
@@ -517,6 +518,10 @@ if(XASH_TBBMALLOC)
 endif()
 
 target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus 3rdparty-mpg123)
+
+if(WIN32)
+	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-mman-win32)
+endif()
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)

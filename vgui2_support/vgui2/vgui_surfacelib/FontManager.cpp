@@ -273,7 +273,7 @@ font_t *CFontManager::CreateOrFindWin32Font(const char *windowsFontName, int tal
 
 #if defined(LINUX) || defined(OSX) || defined(_WIN32)
 		int memSize = 0;
-		void *pchFontData = m_pFontDataHelper( windowsFontName, memSize, NULL );
+		auto pchFontData = m_pFontDataHelper( windowsFontName, memSize, NULL );
 
 		if( !pchFontData )
 		{

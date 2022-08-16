@@ -827,24 +827,11 @@ template<class T, std::size_t Align> constexpr VectorBase<T, 3, Align> CrossProd
 inline VectorBase<float, 3, 16> CrossProduct(VectorBase<float, 3, 16> a, VectorBase<float, 3, 16> b)
 {
 #if U_VECTOR_NEON
-    float32x4_t vec_a = { a.y, a.z, a.x, a.y }; //Q register = [aj, ai, ak, aj]
-    float32x4_t vec_b = { b.y, b.z, b.x, b.y }; //Q register = [bj, bi, bk, bj]
-    float32x4_t vec_a_rot = vextq_f32(vec_a, vec_a, 1);
-    float32x4_t vec_b_rot = vextq_f32(vec_b, vec_b, 1);
-
-    // vec_a     = [ aj, ai, ak, aj ]
-    // vec_b_rot = [ bj, bj, bi, bk ]
-    // vec_a_rot = [ aj, aj, ai, ak ]
-    // vec_b     = [ bj, bi, bk, bj ]
-
-    float32x4_t prod = vmulq_f32(vec_a, vec_b_rot);
-
-    // prod = [ ajbj, aibj, akbi, ajbk ]
-
-    prod = vmlsq_f32(prod, vec_a_rot, vec_b);
-    // prod = [ ajbj-ajbj, aibj-ajbi, akbi-aibk, ajbk-akbj ]
-
-    return prod;
+    float32x4_t yzxy_a = vextq_f32(vextq_f32(a, a, 3), a, 2); // [aj, ak, ai, aj]
+    float32x4_t yzxy_b = vextq_f32(vextq_f32(b, b, 3), b, 2); // [bj, bk, bi, bj]
+    float32x4_t zxyy_a = vextq_f32(yzxy_a, yzxy_a, 1); // [ak, ai, aj, aj]
+    float32x4_t zxyy_b = vextq_f32(yzxy_b, yzxy_b, 1); // [bk, ai, bj, bj]
+    return vfmsq_f32(vmulq_f32(yzxy_a, zxyy_b), zxyy_a, yzxy_b); // [ajbk-akbj, akbi-aibk, aibj-ajbi, 0]
 #elif U_VECTOR_SSE
     __m128 result = _mm_sub_ps(
             _mm_mul_ps(b.m_xmm, _mm_shuffle_ps(a.m_xmm, a.m_xmm, _MM_SHUFFLE(3, 0, 2, 1))),

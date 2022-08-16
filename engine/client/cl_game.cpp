@@ -1277,13 +1277,13 @@ void CL_ClearEdicts( void )
 */
 static qboolean CL_LoadHudSprite( const char *szSpriteName, model_t *m_pSprite, qboolean mapSprite, uint texFlags )
 {
-	byte	*buf;
+	const byte	*buf;
 	fs_offset_t	size;
 	qboolean	loaded;
 
 	ASSERT( m_pSprite != NULL );
 
-	buf = FS_LoadFile( szSpriteName, &size, false );
+	buf = FS_MapFile( szSpriteName, &size, false );
 	if( !buf ) return false;
 
 	Q_strncpy( m_pSprite->name, szSpriteName, sizeof( m_pSprite->name ));
@@ -1292,7 +1292,7 @@ static qboolean CL_LoadHudSprite( const char *szSpriteName, model_t *m_pSprite, 
 	if( mapSprite ) Mod_LoadMapSprite( m_pSprite, buf, (size_t)size, &loaded );
 	else Mod_LoadSpriteModel( m_pSprite, buf, &loaded, texFlags );		
 
-	Mem_Free( buf );
+	FS_UnmapFile( buf, size );
 
 	if( !loaded )
 	{

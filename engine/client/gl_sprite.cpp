@@ -54,7 +54,7 @@ R_SpriteLoadFrame_DDS
 upload a single frame
 ====================
 */
-static byte *R_SpriteLoadFrame_DDS( model_t *mod, byte *pin, mspriteframe_t **ppframe, int num )
+static const byte *R_SpriteLoadFrame_DDS( model_t *mod, const byte *pin, mspriteframe_t **ppframe, int num )
 {
 #define DDPF_ALPHAPIXELS    0x000001
 #define DDPF_ALPHA            0x000002
@@ -212,7 +212,7 @@ static byte *R_SpriteLoadFrame_DDS( model_t *mod, byte *pin, mspriteframe_t **pp
 	return ( pin + sizeof(DDS_FILEHEADER) + imageSize);
 }
 
-static byte* R_SpriteLoadFrame(model_t* mod, byte* pin, mspriteframe_t** ppframe, int num)
+static const byte* R_SpriteLoadFrame(model_t* mod, const byte* pin, mspriteframe_t** ppframe, int num)
 {
 	dspriteframe_t	pinframe;
 	mspriteframe_t* pspriteframe;
@@ -282,7 +282,7 @@ R_SpriteLoadGroup
 upload a group frames
 ====================
 */
-static byte *R_SpriteLoadGroup( model_t *mod, byte *pin, mspriteframe_t **ppframe, int framenum )
+static const byte *R_SpriteLoadGroup( model_t *mod, const byte *pin, mspriteframe_t **ppframe, int framenum )
 {
 	dspritegroup_t	pingroup;
 	mspritegroup_t	*pspritegroup;
@@ -328,7 +328,7 @@ Mod_LoadSpriteModel
 load sprite model
 ====================
 */
-void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint texFlags )
+void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, uint texFlags )
 {
 	dsprite_t		pin;  //spr 头文件
 	short		numi;      //record colors

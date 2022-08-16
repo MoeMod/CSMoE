@@ -1873,17 +1873,23 @@ namespace xe {
 		}
 		std::shared_ptr<gltexture_t> operator()(texlru_src_internal_s &src) const
 		{
-			byte *buf = FS_LoadFile( src.model_name.c_str(), NULL, false );
+            fs_offset_t filesize;
+			const byte *buf = FS_MapFile( src.model_name.c_str(), &filesize, false );
 			if(!buf)
 			{
 				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
 				return {}; // couldn't loading image
 			}
 
-			Mod_DecryptModel(src.model_name.c_str(), buf);
-			byte *buf2 = Mod_LoadExtendSeq(src.model_name.c_str(), buf);
-			studiohdr_t *phdr = (studiohdr_t *)buf2;
+            // make writable
+            byte *buf2 = (byte *)FS_MapAlloc(filesize);
+            Mem_VirtualCopy(buf2, buf, filesize);
+            FS_UnmapFile(buf, filesize);
+            buf = buf2;
 
+            // replace model
+            Mod_DecryptModel(src.model_name.c_str(), buf2);
+            studiohdr_t *phdr = reinterpret_cast<studiohdr_t *>(Mod_LoadExtendSeq(src.model_name.c_str(), buf2));
 			Image_SetMDLPointer((byte *)phdr + src.texture.index);
 
 			int flags = tex->flags;
@@ -1891,7 +1897,7 @@ namespace xe {
 			auto pic = FS_LoadImage( src.texture_name.c_str(), (byte *)&src.texture, src.size );
 			if( !pic )
 			{
-				Mem_Free( buf );
+				FS_UnmapFile( buf, filesize );
 				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
 				return {}; // couldn't loading image
 			}
@@ -1905,7 +1911,7 @@ namespace xe {
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 				pic = nullptr; // release source texture
 
-			Mem_Free( buf );
+            FS_UnmapFile( buf, filesize );
 
 			MsgDev(D_INFO, "TexLru : load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
