@@ -61,6 +61,20 @@ namespace xe {
             return ::mmap(map_hint, len, PROT_READ, MAP_FILE | MAP_SHARED, fd, offset);
         }
 
+		static void* mmap_file_cow(fd_t fd, size_t len, off_t offset = 0, void* map_hint = nullptr)
+		{
+#ifdef _WIN32
+			// plain impl in win32
+			auto p = mmap_file(fd, len, offset, nullptr);
+			auto p2 = mmap_anon(len, map_hint);
+			memcpy(p2, p, len);
+			munmap(p, len);
+			return p2;
+#else
+			return ::mmap(map_hint, len, PROT_READ | PROT_WRITE, MAP_FILE | MAP_PRIVATE, fd, offset);
+#endif
+		}
+
         static void *mmap_anon(size_t len, void *map_hint = nullptr)
         {
             return ::mmap(map_hint, len, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
