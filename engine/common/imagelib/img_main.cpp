@@ -283,10 +283,10 @@ search_fs:
 			{
 				if( format->loadfunc( path, f, (size_t)filesize ))
 				{
-					FS_UnmapFile( f, filesize ); // release buffer
+					FS_MapFree( f, filesize ); // release buffer
 					return ImagePack(); // loaded
 				}
-				else FS_UnmapFile( f, filesize ); // release buffer
+				else FS_MapFree( f, filesize ); // release buffer
 			}
 		}
 	}
@@ -320,11 +320,11 @@ search_fs:
 							Q_snprintf( sidename, sizeof( sidename ), "%s%s.%s", loadname, cmap->type[i].suf, format->ext );
 							if( FS_AddSideToPack( sidename, cmap->type[i].flags )) // process flags to flip some sides
 							{
-								FS_UnmapFile( f, filesize );
+								FS_MapFree( f, filesize );
 								break; // loaded
 							}
 						}
-                        FS_UnmapFile( f, filesize );
+                        FS_MapFree( f, filesize );
 					}
 				}
 			}
@@ -381,10 +381,10 @@ load_internal_ext:
 		{
 			if (Image_LoadMDL_BMP(path, f, (size_t)filesize, buffer))
 			{
-				FS_UnmapFile(f, filesize); // release buffer
+				FS_MapFree(f, filesize); // release buffer
 				return ImagePack(); // loaded
 			}
-			else FS_UnmapFile(f, filesize); // release buffer
+			else FS_MapFree(f, filesize); // release buffer
 		}
 	}
 

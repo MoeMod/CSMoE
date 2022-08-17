@@ -3133,7 +3133,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
         Mod_LoadBrushModel( mod, buf, &loaded );
 		break;
 	default:
-		FS_UnmapFile( buf, filesize );
+		FS_MapFree( buf, filesize );
 		if( crash ) Host_MapDesignError( "Mod_ForName: %s unknown format\n", tempname );
 		else MsgDev( D_ERROR, "Mod_ForName: %s unknown format\n", tempname );
 		return NULL;
@@ -3142,7 +3142,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	if( !loaded )
 	{
 		Mod_FreeModel( mod );
-        FS_UnmapFile( buf, filesize );
+        FS_MapFree( buf, filesize );
 
 		if( crash ) Host_MapDesignError( "Mod_ForName: %s couldn't load\n", tempname );
 		else MsgDev( D_ERROR, "Mod_ForName: %s couldn't load\n", tempname );
@@ -3156,7 +3156,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 		clgame.drawFuncs.Mod_ProcessUserData( mod, true, buf );
 	}
 #endif
-    FS_UnmapFile( buf, filesize );
+    FS_MapFree( buf, filesize );
 
 	return mod;
 }
@@ -3381,7 +3381,7 @@ void GAME_EXPORT Mod_LoadCacheFile( const char *filename, cache_user_t *cu )
 	}
 	cu->data = Mem_Alloc( com_studiocache, size );
 	Mem_VirtualCopy( cu->data, buf, size );
-	FS_UnmapFile( buf, size );
+	FS_MapFree( buf, size );
 }
 
 /*

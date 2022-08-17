@@ -372,7 +372,7 @@ void ImGui_ImplGL_ClearFontCache()
     for(auto *font : io.Fonts->Fonts)
     {
         if(!font->ConfigData->FontDataOwnedByAtlas)
-            FS_UnmapFile((const byte *)font->ConfigData->FontData, font->ConfigData->FontDataSize);
+            FS_MapFree((const byte *)font->ConfigData->FontData, font->ConfigData->FontDataSize);
     }
     io.Fonts->ClearFonts();
 }

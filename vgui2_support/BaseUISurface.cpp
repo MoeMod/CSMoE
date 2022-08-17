@@ -1494,7 +1494,7 @@ const void *BaseUISurface::FontDataHelper( const char *pchFontName, int &size, c
             // FT_Err_Unknown_File_Format, etc.
             Msg( "ERROR %d: UNABLE TO LOAD FONT FILE %s\n", error, fontFileName );
 
-            gFileSystemAPI.FS_UnmapFile(buffer, fileSize);
+            gFileSystemAPI.FS_MapFree(buffer, fileSize);
 
             return NULL;
         }

@@ -74,6 +74,10 @@ static void FS_InitMemory( void );
 static dlumpinfo_t *W_FindLump( wfile_t *wad, const char *name, const signed char matchtype );
 static packfile_t* FS_AddFileToPack( const char* name, pack_t *pack, fs_offset_t offset, fs_offset_t size );
 static byte *W_LoadFile( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly );
+
+template<class ResultType = void *, void *(*pmmap)(xe::fs::fd_t, size_t, off_t, void*) = xe::fs::mmap_file>
+static ResultType W_MapFileImpl( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly );
+
 extern qboolean FS_SysFolderExists( const char *path );
 static int FS_SysFileTime( const char *filename );
 static signed char W_TypeFromExt( const char *lumpname );
@@ -3035,50 +3039,65 @@ static ResultType FS_MapFileImpl(const char* path, fs_offset_t* filesizeptr, qbo
 		file = FS_Open(FS_ToLowerCase(path), "rb", gamedironly);
 	}
 #endif // _WIN32
-	if (!file)
-	{
-		// file not found
-		if (filesizeptr)
-			*filesizeptr = 0;
-		return nullptr;
-	}
 
-	if (file->handle == xe::fs::invalid_file)
-	{
+    if( !file )
+    {
+        fs_offset_t	filesize = 0;
+        // Now it truly doesn't exist in file system
+        ResultType buf = (ResultType)W_MapFileImpl<ResultType, pmmap>( path, &filesize, gamedironly );
+
+        if( filesizeptr )
+            *filesizeptr = filesize;
+
+        if(buf)
+            return buf;
+        return nullptr;
+    }
+
+    // try to use swappable memory
+    auto filesize = file->real_length;
+    if(auto fd = file->handle; fd != xe::fs::invalid_file)
+    {
+        if(auto buf = (ResultType)(pmmap(fd, filesize, 0, nullptr)))
+        {
+            FS_Close(file);
+            if (filesizeptr)
+                *filesizeptr = filesize;
+            return buf;
+        }
+    }
+
 #if __ANDROID__ && 0 // TODO : test
-		off_t offset, filesize;
-#ifdef XASH_64BIT
-		auto fd = AAsset_openFileDescriptor64(asset, &offset, &filesize);
-#else
-		auto fd = AAsset_openFileDescriptor(asset, &offset, &filesize);
-#endif
-		if (fd > 0)
-		{
-			auto buf = (ResultType)(pmmap(fd, filesize, offset, nullptr));
-
-			if (filesizeptr)
-				*filesizeptr = filesize;
-			::close(fd);
-			return buf;
-		}
-#endif
-		// plain copy
-		auto filesize = file->real_length;
-		void *buf = xe::fs::mmap_anon(filesize);
-		FS_Read(file, buf, filesize);
-		FS_Close(file);
-		if (filesizeptr)
-			*filesizeptr = filesize;
-		return (ResultType)buf;
-	}
-	// use swappable memory
-	auto filesize = file->real_length;
-	auto fd = file->handle;
-	ResultType buf = (ResultType)(pmmap(fd, filesize, 0, nullptr));
-	FS_Close(file);
-	if (filesizeptr)
-		*filesizeptr = filesize;
-	return buf;
+    if(auto asset = file->asset)
+    {
+        off_t offset, filesize;
+    #ifdef XASH_64BIT
+        auto fd = AAsset_openFileDescriptor64(asset, &offset, &filesize);
+    #else
+        auto fd = AAsset_openFileDescriptor(asset, &offset, &filesize);
+    #endif
+        if (fd > 0)
+        {
+            auto buf = (ResultType)(pmmap(fd, filesize, offset, nullptr));
+            if (filesizeptr)
+                *filesizeptr = filesize;
+            ::close(fd);
+            FS_Close(file);
+            return buf;
+        }
+    }
+    #endif
+    // plain copy
+    if(void *buf = xe::fs::mmap_anon(filesize))
+    {
+        FS_Read(file, buf, filesize);
+        FS_Close(file);
+        if (filesizeptr)
+            *filesizeptr = filesize;
+        return (ResultType)buf;
+    }
+    FS_Close(file);
+    return nullptr;
 }
 
 const byte* FS_MapFile(const char* path, fs_offset_t* filesizeptr, qboolean gamedironly)
@@ -3091,7 +3110,7 @@ byte* FS_MapFileCOW(const char* path, fs_offset_t* filesizeptr, qboolean gamedir
 	return FS_MapFileImpl<byte*, xe::fs::mmap_file_cow>(path, filesizeptr, gamedironly);
 }
 
-void FS_UnmapFile(const byte *data, fs_offset_t filesize)
+void FS_MapFree(const byte *data, fs_offset_t filesize)
 {
     if(data)
         xe::fs::munmap((void *)data, filesize);
@@ -4050,6 +4069,63 @@ byte *W_ReadLump( wfile_t *wad, dlumpinfo_t *lump, fs_offset_t *lumpsizeptr )
 	return buf;
 }
 
+template<class ResultType = void *, void *(*pmmap)(xe::fs::fd_t, size_t, off_t, void*) = xe::fs::mmap_file>
+ResultType W_MapLump( wfile_t *wad, dlumpinfo_t *lump, fs_offset_t *lumpsizeptr )
+{
+	// assume error
+	if( lumpsizeptr ) *lumpsizeptr = 0;
+
+	// no wads loaded
+	if( !wad || !lump ) return NULL;
+
+    if(auto fd = wad->wadfile->handle; fd != xe::fs::invalid_file)
+    {
+        if(auto buf = (ResultType)pmmap(fd, lump->disksize, lump->filepos, nullptr))
+        {
+            if( lumpsizeptr ) *lumpsizeptr = lump->size;
+            return buf;
+        }
+    }
+
+#if __ANDROID__ && 0 // TODO : test
+    if(auto asset = wad->wadfile->asset)
+    {
+        off_t offset, filesize;
+#ifdef XASH_64BIT
+        auto fd = AAsset_openFileDescriptor64(asset, &offset, &filesize);
+#else
+        auto fd = AAsset_openFileDescriptor(asset, &offset, &filesize);
+#endif
+        if (fd > 0)
+        {
+            auto buf = (ResultType)(xe::fs::mmap_file(fd, lump->disksize, offset + lump->filepos));
+
+            if( lumpsizeptr ) *lumpsizeptr = lump->size;
+            ::close(fd);
+            return buf;
+        }
+    }
+#endif
+
+    if( FS_Seek( wad->wadfile, lump->filepos, SEEK_SET ) == -1 )
+    {
+        MsgDev( D_ERROR, "W_ReadLump: %s is corrupted\n", lump->name );
+        return NULL;
+    }
+
+    void *buf = xe::fs::mmap_anon( lump->disksize );
+    size_t size = FS_Read( wad->wadfile, buf, lump->disksize );
+    if( size < lump->disksize )
+    {
+        MsgDev( D_WARN, "W_ReadLump: %s is probably corrupted\n", lump->name );
+        xe::fs::munmap( buf, lump->disksize );
+        return NULL;
+    }
+
+    if( lumpsizeptr ) *lumpsizeptr = lump->size;
+    return (ResultType)buf;
+}
+
 /*
 =============================================================================
 
@@ -4231,6 +4307,18 @@ static byte *W_LoadFile( const char *path, fs_offset_t *lumpsizeptr, qboolean ga
 	return NULL;
 }
 
+template<class ResultType, void *(*pmmap)(xe::fs::fd_t, size_t, off_t, void*)>
+static ResultType W_MapFileImpl( const char *path, fs_offset_t *lumpsizeptr, qboolean gamedironly )
+{
+    searchpath_t	*search;
+    int		index;
+
+    search = FS_FindFile( path, &index, gamedironly );
+    if( search && search->wad )
+        return W_MapLump<ResultType, pmmap>( search->wad, &search->wad->lumps[index], lumpsizeptr );
+    return NULL;
+}
+
 /*
 =============================================================================
 
@@ -4249,9 +4337,9 @@ void* FSAPI_MapFileCOW(const char* path, fs_offset_t* filesizeptr, qboolean game
 {
 	return FS_MapFileCOW(path, filesizeptr, gamedironly);
 }
-void FSAPI_UnmapFile( const void *data, fs_offset_t filesize )
+void FSAPI_MapFree( const void *data, fs_offset_t filesize )
 {
-    return FS_UnmapFile((const byte *)data, filesize);
+    return FS_MapFree((const byte *)data, filesize);
 }
 void *FSAPI_MapAlloc( fs_offset_t filesize )
 {
@@ -4288,7 +4376,7 @@ fs_api_t g_fsapi =
     FSAPI_MemFree,
     FSAPI_MapFile,
 	FSAPI_MapFileCOW,
-    FSAPI_UnmapFile,
+    FSAPI_MapFree,
     FSAPI_MapAlloc,
     FSAPI_MapCopy
 };
