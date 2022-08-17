@@ -132,6 +132,7 @@ typedef struct fs_api_s
 
     // CSMoE ext
     const void *(*FS_MapFile)( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly );
+	void* (*FS_MapFileCOW)(const char* path, fs_offset_t* filesizeptr, qboolean gamedironly);
     void (*FS_UnmapFile)( const void *data, fs_offset_t filesize );
     void *(*FS_MapAlloc)( fs_offset_t filesize );
     void *(*FS_MapCopy)( void *dest, const void *src, fs_offset_t filesize );

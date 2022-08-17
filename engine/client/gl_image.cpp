@@ -1874,22 +1874,16 @@ namespace xe {
 		std::shared_ptr<gltexture_t> operator()(texlru_src_internal_s &src) const
 		{
             fs_offset_t filesize;
-			const byte *buf = FS_MapFile( src.model_name.c_str(), &filesize, false );
+			byte *buf = FS_MapFileCOW( src.model_name.c_str(), &filesize, false );
 			if(!buf)
 			{
 				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
 				return {}; // couldn't loading image
 			}
 
-            // make writable
-            byte *buf2 = (byte *)FS_MapAlloc(filesize);
-            Mem_VirtualCopy(buf2, buf, filesize);
-            FS_UnmapFile(buf, filesize);
-            buf = buf2;
-
             // replace model
-            Mod_DecryptModel(src.model_name.c_str(), buf2);
-            studiohdr_t *phdr = reinterpret_cast<studiohdr_t *>(Mod_LoadExtendSeq(src.model_name.c_str(), buf2));
+            Mod_DecryptModel(src.model_name.c_str(), buf);
+            studiohdr_t *phdr = reinterpret_cast<studiohdr_t *>(Mod_LoadExtendSeq(src.model_name.c_str(), buf));
 			Image_SetMDLPointer((byte *)phdr + src.texture.index);
 
 			int flags = tex->flags;

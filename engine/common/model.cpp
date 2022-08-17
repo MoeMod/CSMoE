@@ -3075,7 +3075,7 @@ Loads a model into the cache
 */
 model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 {
-	const byte	*buf;
+	byte	*buf;
     fs_offset_t filesize;
 	char	tempname[64];
 	qboolean	loaded;
@@ -3095,7 +3095,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	Q_strncpy( tempname, mod->name, sizeof( tempname ));
 	COM_FixSlashes( tempname );
 
-	buf = FS_MapFile( tempname, &filesize, false );
+	buf = FS_MapFileCOW( tempname, &filesize, false );
 
 	if( !buf )
 	{
@@ -3119,14 +3119,9 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	{
 	case IDSTUDIOHEADER:
         {
-            // make writable
-            byte *buf2 = (byte *)FS_MapAlloc(filesize);
-            Mem_VirtualCopy(buf2, buf, filesize);
-            FS_UnmapFile(buf, filesize);
-            buf = buf2;
             // replace model
-            Mod_DecryptModel(mod->name, buf2);
-            Mod_LoadStudioModel( mod, Mod_LoadExtendSeq(mod->name, buf2), &loaded );
+            Mod_DecryptModel(mod->name, buf);
+            Mod_LoadStudioModel( mod, Mod_LoadExtendSeq(mod->name, buf), &loaded );
             break;
         }
 	case IDSPRITEHEADER:
@@ -3135,14 +3130,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	case Q1BSP_VERSION:
 	case HLBSP_VERSION:
 	case XTBSP_VERSION:
-    {
-        // make writable
-        byte *buf2 = (byte *)FS_MapAlloc(filesize);
-        Mem_VirtualCopy(buf2, buf, filesize);
-        FS_UnmapFile(buf, filesize);
-        buf = buf2;
-        Mod_LoadBrushModel( mod, buf2, &loaded );
-    }
+        Mod_LoadBrushModel( mod, buf, &loaded );
 		break;
 	default:
 		FS_UnmapFile( buf, filesize );
