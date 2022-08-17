@@ -1891,7 +1891,7 @@ namespace xe {
 			auto pic = FS_LoadImage( src.texture_name.c_str(), (byte *)&src.texture, src.size );
 			if( !pic )
 			{
-				FS_UnmapFile( buf, filesize );
+				FS_MapFree( buf, filesize );
 				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
 				return {}; // couldn't loading image
 			}
@@ -1905,7 +1905,7 @@ namespace xe {
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 				pic = nullptr; // release source texture
 
-            FS_UnmapFile( buf, filesize );
+            FS_MapFree( buf, filesize );
 
 			MsgDev(D_INFO, "TexLru : load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };

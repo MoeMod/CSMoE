@@ -1292,7 +1292,7 @@ static qboolean CL_LoadHudSprite( const char *szSpriteName, model_t *m_pSprite, 
 	if( mapSprite ) Mod_LoadMapSprite( m_pSprite, buf, (size_t)size, &loaded );
 	else Mod_LoadSpriteModel( m_pSprite, buf, &loaded, texFlags );		
 
-	FS_UnmapFile( buf, size );
+	FS_MapFree( buf, size );
 
 	if( !loaded )
 	{

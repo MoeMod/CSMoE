@@ -95,10 +95,10 @@ wavdata_t *FS_LoadSound( const char *filename, const byte *buffer, size_t size )
 			{
 				if( format->loadfunc( path, f, (size_t)filesize ))
 				{
-                    FS_UnmapFile(f, filesize); // release buffer
+                    FS_MapFree(f, filesize); // release buffer
 					return SoundPack(); // loaded
 				}
-				else FS_UnmapFile(f, filesize); // release buffer
+				else FS_MapFree(f, filesize); // release buffer
 			}
 		}
 	}

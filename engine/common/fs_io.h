@@ -58,7 +58,7 @@ namespace xe {
 
         static void *mmap_file(fd_t fd, size_t len, off_t offset = 0, void *map_hint = nullptr)
         {
-            return ::mmap(map_hint, len, PROT_READ, MAP_FILE | MAP_SHARED, fd, offset);
+            return check_ptr(::mmap(map_hint, len, PROT_READ, MAP_FILE | MAP_SHARED, fd, offset));
         }
 
 		static void* mmap_file_cow(fd_t fd, size_t len, off_t offset = 0, void* map_hint = nullptr)
@@ -69,20 +69,27 @@ namespace xe {
 			auto p2 = mmap_anon(len, map_hint);
 			memcpy(p2, p, len);
 			munmap(p, len);
-			return p2;
+			return check_ptr(p2);
 #else
-			return ::mmap(map_hint, len, PROT_READ | PROT_WRITE, MAP_FILE | MAP_PRIVATE, fd, offset);
+			return check_ptr(::mmap(map_hint, len, PROT_READ | PROT_WRITE, MAP_FILE | MAP_PRIVATE, fd, offset));
 #endif
 		}
 
         static void *mmap_anon(size_t len, void *map_hint = nullptr)
         {
-            return ::mmap(map_hint, len, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+            return check_ptr(::mmap(map_hint, len, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0));
+        }
+
+        static void *check_ptr(void *p)
+        {
+            if(p == MAP_FAILED)
+                return nullptr;
+            return p;
         }
 
         static int munmap(void *addr, size_t len)
         {
-            return ::munmap(addr, len);
+            return addr ? ::munmap(addr, len) : 0;
         }
 
 		static int mkdir(const char* path)
