@@ -202,3 +202,8 @@ target_include_directories(3rdparty-mpg123 INTERFACE
 		${CMAKE_BINARY_DIR}/3rdparty/mpg123/ports/cmake/src
 		)
 target_compile_definitions(3rdparty-mpg123 INTERFACE -DREAL_IS_FLOAT=1)
+
+if(WIN32)
+	add_library(3rdparty-mman-win32 STATIC ${CMAKE_SOURCE_DIR}/3rdparty/mman-win32/mman.c)
+	target_include_directories(3rdparty-mman-win32 PUBLIC ${CMAKE_SOURCE_DIR}/3rdparty/mman-win32)
+endif()
