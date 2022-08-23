@@ -99,7 +99,7 @@ namespace https {
 				const char *body) {
 			req.set(http::field::content_type, content_type);
 			req.body() = body;
-			req.set(http::field::content_length, req.body().length());
+			req.set(http::field::content_length, std::to_string(req.body().length()));
 
 			return run(host, port, target, verb);
 		}

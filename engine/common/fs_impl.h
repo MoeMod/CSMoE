@@ -1,5 +1,9 @@
 #pragma once
 
+#if defined __ANDROID__
+#include <android/asset_manager.h>
+#endif
+
 #define FILE_BUFF_SIZE		2048
 
 typedef struct file_s

@@ -27,10 +27,6 @@ GNU General Public License for more details.
 #include "fs_io.h"
 #include "fs_impl.h"
 
-#if defined __ANDROID__
-#include <android/asset_manager.h>
-#endif
-
 #ifdef XASH_WINRT
 #include "platform/winrt/winrt_interop.h"
 #endif
@@ -2132,7 +2128,7 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 
 
 		// For files opened in append mode, we start at the end of the file
-		if( mod & xe::fs::XE_FS_O_A )
+		if( strchr(mode, 'a') )
 		{
 			file->position = file->real_length;
 		}

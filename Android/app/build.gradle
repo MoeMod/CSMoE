@@ -58,7 +58,7 @@ android {
             assets.srcDirs = ['src/main/assets', '../../CSMoE-Full']
         }
     }
-    ndkVersion '21.1.6352462'
+    ndkVersion '23.2.8568313'
 }
 
 dependencies {
