@@ -72,7 +72,7 @@
 	url = https://github.com/bulletphysics/bullet3
 [submodule "3rdparty/mpg123"]
 	path = 3rdparty/mpg123
-	url = https://github.com/madebr/mpg123
+	url = https://github.com/libsdl-org/mpg123
 [submodule "3rdparty/mman-win32"]
 	path = 3rdparty/mman-win32
 	url = https://github.com/mcgarrah/mman-win32
