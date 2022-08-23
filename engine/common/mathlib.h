@@ -317,22 +317,25 @@ auto PlaneDiff(const VectorTypeA& point, const VectorTypeB& plane) -> decltype((
     return (((plane)->type < 3 ? (point)[(plane)->type] : DotProduct((point), (plane)->normal)) - (plane)->dist);
 }
 
-template <class VectorTypeA, class VectorTypeB>
-auto boundmax(const VectorTypeA& num, const VectorTypeB& high) -> decltype((num) < (high) ? (num) : (high))
+template <class T>
+auto boundmax(T num, std::type_identity_t<T> high)
 {
-    return ((num) < (high) ? (num) : (high));
+    using std::min;
+    return min(num, high);
 }
 
-template <class VectorTypeA, class VectorTypeB>
-auto boundmin(const VectorTypeA& num, const VectorTypeB& low) -> decltype((num) >= (low) ? (num) : (low))
+template <class T>
+auto boundmin(T num, std::type_identity_t<T> low)
 {
-    return ((num) >= (low) ? (num) : (low));
+    using std::max;
+    return max(num, low);
 }
 
-template <class VectorTypeA, class VectorTypeB, class VectorTypeC>
-auto bound(const VectorTypeA& low, const VectorTypeB& num, const VectorTypeC& high) -> decltype(boundmin(boundmax(num, high), low))
+template <class T>
+auto bound(std::type_identity_t<T> low, T num, std::type_identity_t<T> high)
 {
-    return (boundmin(boundmax(num, high), low));
+    using std::clamp;
+    return clamp(num, low, high);
 }
 
 #define VectorUnpack(v) (v)[0], (v)[1], (v)[2]
