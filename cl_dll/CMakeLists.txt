@@ -332,6 +332,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_patroldrone.cpp
 	../dlls/wpn_shared/z4b_aquariusplasmagun.cpp
 	../dlls/wpn_shared/wpn_fglauncher.cpp
+	../dlls/wpn_shared/wpn_bloodhunter.cpp
+	../dlls/wpn_shared/wpn_buffaug.cpp
+	../dlls/wpn_shared/wpn_buffsg552.cpp
 	)
 
 set (HUD_SRCS

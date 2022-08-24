@@ -119,6 +119,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "ragingbull",	WEAPON_Z4B_RAGINGBULL },
 	{ "balrog1",	WEAPON_BALROG1},
 	{ "sapientia",	WEAPON_SAPIENTIA },
+	{ "bloodhunter", WEAPON_BLOODHUNTER },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -191,6 +192,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "charger5",	WEAPON_CHARGER5 },
 	{ "lockongun",	WEAPON_LOCKONGUN },
+	{ "buffaug",	WEAPON_BUFFAUG },
+	{ "buffsg552",	WEAPON_BUFFSG552 },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -469,6 +472,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "balrog1",	WEAPONCLASS_PISTOL},
 	{ "sapientia",	WEAPONCLASS_PISTOL },
 	{ "z4b_deagleamethyst",	WEAPONCLASS_PISTOL },
+	{ "bloodhunter", WEAPONCLASS_PISTOL },
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -551,6 +555,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "z4b_acramethyst",	WEAPONCLASS_RIFLE },
 	{ "z4b_ar57amethyst",	WEAPONCLASS_RIFLE },
 	{ "lockongun",	WEAPONCLASS_RIFLE },
+	{ "buffaug",	WEAPONCLASS_RIFLE },
+	{ "buffsg552",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -972,6 +978,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_BALROG1:
 	case WEAPON_SAPIENTIA:
 	case WEAPON_Z4B_DEAGLEAMETHYST:
+	case WEAPON_BLOODHUNTER:
 		return true;
 	default:
 		break;

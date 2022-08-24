@@ -1392,6 +1392,7 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_Z4B_RAGINGBULL:
 		case WEAPON_BALROG1:
 		case WEAPON_SAPIENTIA:
+		case WEAPON_BLOODHUNTER:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

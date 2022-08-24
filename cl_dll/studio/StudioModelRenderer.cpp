@@ -50,6 +50,10 @@ extern CGameStudioModelRenderer g_StudioRenderer;
 extern engine_studio_api_t IEngineStudio;
 typedef struct pmtrace_s pmtrace_t;
 
+struct model_s* CStudioModelRenderer::s_pBuffAugViewModel;
+struct model_s* CStudioModelRenderer::s_pBuffAugSmokeModel;
+struct model_s* CStudioModelRenderer::s_pBloodHunterViewModel;
+
 void CStudioModelRenderer::Init(void)
 {
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");

@@ -110,7 +110,7 @@ void CMod_Zombi::UpdateGameMode(CBasePlayer *pPlayer)
 
 BOOL CMod_Zombi::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason)
 {
-	CLIENT_COMMAND(pEntity, "mp3 loop sound/Zombi_Ambience.mp3\n");
+	CLIENT_COMMAND(pEntity, "mp3 loop sound/\"win_human%d\"\n", RANDOM_LONG(1, 2));
 
 	return CHalfLifeMultiplay::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
 }
@@ -215,7 +215,7 @@ void CMod_Zombi::HumanWin()
 	//for(CBasePlayer *player : moe::range::PlayersList())
 		//CLIENT_COMMAND(player->edict(), "spk win_human\n");
 
-	UTIL_BroadcastStuffText("mp3 stop;spk \"win_human\"\n");
+	UTIL_BroadcastStuffText("mp3 stop;spk \"win_human%d\"\n", RANDOM_LONG(1, 2));
 
 	/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
 	WRITE_BYTE(2);
@@ -236,7 +236,7 @@ void CMod_Zombi::ZombieWin()
 	//for(CBasePlayer *player : moe::range::PlayersList())
 		//CLIENT_COMMAND(player->edict(), "spk win_zombi\n");
 
-	UTIL_BroadcastStuffText("mp3 stop;spk \"win_zombi\"\n");
+	UTIL_BroadcastStuffText("mp3 stop;spk \"win_zombie%d\"\n", RANDOM_LONG(1, 3));
 
 	/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
 	WRITE_BYTE(3);
@@ -488,7 +488,7 @@ void CMod_Zombi::PickZombieOrigin()
 	TeamCheck();
 
 	// sound effect
-	InfectionSound();
+	UTIL_BroadcastStuffText("mp3 stop;spk \"r_start\"\n");
 	CheckWinConditions();
 }
 
@@ -654,7 +654,7 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 
 void CZB1CountdownDelegate::OnCountdownStart()
 {
-	UTIL_BroadcastStuffText("spk \"zombi_start\"\n");
+	UTIL_BroadcastStuffText("spk \"zombi_start%d\"\n", RANDOM_LONG(1, 2));
 }
 
 inline void CZB1CountdownDelegate::OnCountdownChanged(int iCurrentCount)

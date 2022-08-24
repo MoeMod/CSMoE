@@ -33,7 +33,8 @@
 #include "cl_entity.h"
 #include "cdll_exp.h"
 #include "events.h"
-
+#include "StudioModelRenderer.h"
+#include "GameStudioModelRenderer.h"
 #ifdef XASH_LUASH
 #include "luash_cl/lua_cl.h"
 #endif
@@ -62,7 +63,7 @@ int g_iMobileAPIVersion = 0;
 void InitInput (void);
 void IN_Commands( void );
 void Input_Shutdown (void);
-
+extern engine_studio_api_t IEngineStudio;
 /*
 ==========================
 	Initialize
@@ -192,6 +193,11 @@ int DLLEXPORT HUD_VidInit( void )
 	gHUD.VidInit();
 
 	isLoaded = true;
+
+	CStudioModelRenderer::s_pBuffAugViewModel = IEngineStudio.Mod_ForName("models/v_buffaug.mdl", FALSE);
+	CStudioModelRenderer::s_pBuffAugSmokeModel = IEngineStudio.Mod_ForName("sprites/ef_buffaugsmoke.spr", FALSE);
+
+	CStudioModelRenderer::s_pBloodHunterViewModel = IEngineStudio.Mod_ForName("models/v_bloodhunter.mdl", FALSE);
 
 	//VGui_Startup();
 

@@ -74,6 +74,9 @@ protected:
 	bool m_bHasAnswered = false;
 	CZB3CountdownDelegate m_CountDownDelegate;
 	time_point_t m_flForceRespawnEnd;
+	time_point_t m_flNextThink;
+	int g_iTimeStage; 
+	bool g_bCheckTime;
 };
 
 class CPlayerModStrategy_ZB3 : public CPlayerModStrategy_ZB2
@@ -105,7 +108,7 @@ public:
 	void SetRagePercent(float value) { m_flRagePercent = value; }
 	bool IsPickAsZombie() const { return m_bPickAsZombie; }
 	void SetPickAsZombie(bool value) { m_bPickAsZombie = value; }
-
+	
 private:
 	CMod_ZombieHero * const m_pModZB3;
 	const EventListener m_eventBecomeHeroListener;

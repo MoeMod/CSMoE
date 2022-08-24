@@ -210,4 +210,7 @@ HOOK_EVENT(watercannon, FireWaterCannon);
 HOOK_EVENT(spmg, FireSPMG);
 HOOK_EVENT(lockongun, FireLockOnGun);
 HOOK_EVENT(fglauncher, FireFgLauncher);
+HOOK_EVENT(bloodhunter, FireBloodHunter);
+HOOK_EVENT(buffaug, FireBuffAug);
+HOOK_EVENT(buffsg552, FireBuffSG552);
 

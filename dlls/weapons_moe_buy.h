@@ -179,6 +179,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_CHARGER5, "weapon_charger5",      "追电Charger-5",    5500, PRIMARY_WEAPON_SLOT, UNASSIGNED,  BUY_RIFLE },
 	{ WEAPON_JANUSMK5, "weapon_janusmk5",      "幻影Janus-5",    6000, PRIMARY_WEAPON_SLOT, UNASSIGNED,  BUY_RIFLE },
 	{ WEAPON_SPRIFLE, "weapon_sprifle",         "狂暴蒸汽",           5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_BLOODHUNTER, "weapon_bloodhunter",	 "【血契】D.Eagle",			  1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_Z4B_RAGINGBULL, "z4b_ragingbull",         "破空枪刃",                  1200, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_INFINITY, "weapon_infinity",    "恒宇双星", 1500, PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
     { WEAPON_INFINITYEX1, "weapon_infinityex1", "星红双子",   1500, PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
@@ -231,6 +232,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_BALROG11WC, "weapon_balrog11wc",        "黄金龙炎",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
     { WEAPON_SFSMG, "weapon_sfsmg",         "疾风之翼",           1900, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 	{ WEAPON_TMPDRAGON, "weapon_tmpdragon",	 "Tmp金龙",			  1250,  PRIMARY_WEAPON_SLOT,         UNASSIGNED, BUY_SMG },
+	{ WEAPON_BUFFAUG, "weapon_buffaug",         "【无双】AUG",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_BUFFSG552, "weapon_buffsg552",         "【狼魂】SG552",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+
 	{ WEAPON_SFGUN, "weapon_sfgun",         "星际重炮",           3500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_ETHEREAL, "weapon_ethereal",         "尘埃之光",           3900, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_RAILGUN, "weapon_railgun",         "爆能磁轨炮",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -312,7 +316,10 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 };
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
-#if 0
+#if 1
+	{ WEAPON_BUFFSG552, "weapon_buffsg552",         "【狼魂】SG552",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_BUFFAUG, "weapon_buffaug",         "【无双】AUG",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_BLOODHUNTER, "weapon_bloodhunter",	 "【血契】D.Eagle",			  1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_LOCKONGUN, "weapon_lockongun",      "【暮光】F2000",    5500, PRIMARY_WEAPON_SLOT, UNASSIGNED,  BUY_RIFLE },
 		{ WEAPON_PATROLDRONE, "weapon_patroldrone",      "【幽浮】控制核心",    3000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SPMG, "weapon_spmg",        "炙热蒸汽",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },

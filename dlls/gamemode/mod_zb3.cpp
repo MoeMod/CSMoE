@@ -763,6 +763,60 @@ void CMod_ZombieHero::Think()
 		m_flCheckWinConditions = gpGlobals->time + 5s;
 		CheckWinConditions();
 	}*/
+
+	auto flTimeLeft = (m_bFreezePeriod ? TimeRemaining() + m_iRoundTime : TimeRemaining()) /* + 2s*/;
+	char SzTimer[64]; sprintf(SzTimer, " time left : %d s \n secs:%d s  min: %d min",(int)(flTimeLeft.count()),(int)(flTimeLeft.count()) % 60, (int)(flTimeLeft.count()) / 60);
+	//UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s", SzTimer);
+	if (m_flNextThink <= gpGlobals->time)
+	{
+		switch ((int)(flTimeLeft.count()))
+		{
+		case 120:
+			g_iTimeStage = 120; g_bCheckTime = true; 
+			break;
+		case 60:
+			g_iTimeStage = 60; g_bCheckTime = true; 
+			break;
+		case 30:
+			g_iTimeStage = 30; g_bCheckTime = true; 
+			break;
+		case 20:
+			g_iTimeStage = 20; g_bCheckTime = true; 
+			break;
+		case 10:
+			g_iTimeStage = 10; g_bCheckTime = true; 
+			break;
+		default:
+			break;
+		}
+		int TimeClock = (int)(flTimeLeft.count());
+		if (TimeClock == 30 || TimeClock == 20 || TimeClock == 10 || TimeClock == 9 ||
+			TimeClock == 7 || TimeClock == 5 || TimeClock == 3)
+			UTIL_BroadcastStuffText("spk announcer/zombi/clock.wav\n");
+		if (TimeClock > 9)
+		{
+			if (g_bCheckTime)
+			{
+				UTIL_BroadcastStuffText("spk announcer/zombi/zbz_timeremaintoend%ds_%d.wav\n", g_iTimeStage, RANDOM_LONG(1,3));
+				g_iTimeStage = 0;
+				g_bCheckTime = false;
+			}
+		}
+		else
+		{
+			if (TimeClock)
+			{
+				UTIL_BroadcastStuffText("spk announcer/zombi/count_%d.wav\n", TimeClock);
+			}
+			else
+			{
+				g_iTimeStage = 0;
+				g_bCheckTime = false;
+			}
+		}
+		m_flNextThink = gpGlobals->time + 1.0s;
+	}
+
 	if (m_flForceRespawnEnd != invalid_time_point && m_flForceRespawnEnd <= gpGlobals->time)
 	{
 		m_flForceRespawnEnd = invalid_time_point;

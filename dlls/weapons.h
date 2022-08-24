@@ -593,6 +593,7 @@ public:
 			|| m_iId == WEAPON_Z4B_RAGINGBULL
 			|| m_iId == WEAPON_BALROG1
 			|| m_iId == WEAPON_SAPIENTIA
+			|| m_iId == WEAPON_BLOODHUNTER
 			);
 	}
 	void SetPlayerShieldAnim();

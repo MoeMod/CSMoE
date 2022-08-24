@@ -31,6 +31,10 @@
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
 
+	extern float g_flBloodhunterAnimTime;
+	extern int g_iBloodhunterSecAnim;
+	extern int g_iBloodhunterState;
+
 enum
 {
 	HUMAN_SKILL_KNIFE2X,
@@ -337,6 +341,43 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadByte();
 		m_SniperScope.InsertPatrolDroneData(Slot, arg1, arg2);
+		break;
+	}
+	case 25:
+	{
+		//bloodhunter
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
+		if (pActiveBTEWeapon)
+		{
+			if (pActiveBTEWeapon->m_iId == WEAPON_BLOODHUNTER)
+			{
+				if (arg1 < 3)	//iAnim
+				{
+					if (!g_flBloodhunterAnimTime)
+						g_flBloodhunterAnimTime = gHUD.m_flTime;
+					g_iBloodhunterSecAnim = 19 + arg2;
+				}
+				else
+				{
+					g_flBloodhunterAnimTime = 0.0;
+					g_iBloodhunterSecAnim = 0;
+				}
+			}
+			else
+			{
+				g_flBloodhunterAnimTime = 0.0;
+				g_iBloodhunterSecAnim = 0;
+			}
+		}
+		break;
+	}
+	case 26:
+	{
+		//bloodhunter
+		arg1 = reader.ReadByte();
+		g_iBloodhunterState = arg1;
 		break;
 	}
 	case 42:

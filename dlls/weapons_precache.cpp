@@ -404,6 +404,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_patroldrone");
 	UTIL_PrecacheOtherWeapon("z4b_aquariusplasmagun");
 	UTIL_PrecacheOtherWeapon("weapon_fglauncher");
+	UTIL_PrecacheOtherWeapon("weapon_bloodhunter");
+	UTIL_PrecacheOtherWeapon("weapon_buffaug");
+	UTIL_PrecacheOtherWeapon("weapon_buffsg552");
 
 	if (g_pGameRules->IsDeathmatch())
 	{
