@@ -122,6 +122,13 @@ int CHudSniperScope::VidInit()
 	m_flPatrolDroneDeployTime = 0.0f;
 	m_iPatrolDroneState = PATROLDRONE_OFF;
 
+	R_InitTexture(m_iMGSM_Aim_BG, "sprites/mgsm_aim_bg.tga");
+	R_InitTexture(m_iMGSM_Aim_Gauge, "sprites/mgsm_aim_gauge.tga");
+
+	m_iMGSMAmmo = 0;
+	m_flMGSMNextChargeTime = 0.0;
+	m_flMGSMNextCharge = 0.0;
+
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
@@ -355,6 +362,11 @@ int CHudSniperScope::Draw(float flTime)
 		else if (pActiveBTEWeapon->m_iId == WEAPON_PATROLDRONE)
 		{
 			DrawPatrolDroneScope(flTime);
+			return 1;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_MGSM)
+		{
+			DrawMGSMScope(flTime);
 			return 1;
 		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS || pActiveBTEWeapon->m_iId == WEAPON_M400 || pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM)
@@ -812,6 +824,41 @@ void CHudSniperScope::InsertPatrolDroneData(int iSlot, int iClip, int iState)
 void CHudSniperScope::SetPatrolDroneDeployTime()
 {
 	m_flPatrolDroneDeployTime = gHUD.m_flTime;
+}
+
+void CHudSniperScope::DrawMGSMScope(float flTime)
+{
+	int iX = ScreenWidth / 2;
+	int iY = ScreenHeight / 2;
+
+	int len = iY / 4 * 3;
+
+	FuncDraw2DQuadScaled(*m_iMGSM_Aim_BG, iX - len / 2, iY - len / 2, len, len);
+
+	if (m_flMGSMNextChargeTime)
+	{
+		float timepassed = (float(m_iMGSMAmmo) / 100.0);
+
+		if (m_flMGSMNextCharge < gHUD.m_flTime)
+		{
+			m_iMGSMAmmo++;
+			m_flMGSMNextCharge = gHUD.m_flTime + m_flMGSMNextChargeTime;
+		}
+
+		if (timepassed > 1.0)
+			timepassed = 1;
+		else if (timepassed <= 0)
+			return;
+
+		FuncDrawCircle(m_iMGSM_Aim_Gauge->texnum(), len, len, 0.625f + timepassed / 4);
+	}
+
+}
+
+void CHudSniperScope::SetMGSMAmmo(int iAmmo, float flNextTime)
+{
+	m_iMGSMAmmo = iAmmo;
+	m_flMGSMNextChargeTime = flNextTime;
 }
 
 void CHudSniperScope::Shutdown()

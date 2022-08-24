@@ -204,6 +204,7 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 		//m_pPlayer->GiveNamedItem("weapon_y22s2sfpistol");
 		//m_pPlayer->GiveNamedItem("z4b_m60amethyst");
 		m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("weapon_mgsm");
 		//m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 

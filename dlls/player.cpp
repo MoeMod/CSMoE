@@ -1169,7 +1169,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_CROSSBOWEX21
 					|| pWeapon->m_iId == WEAPON_BUFFAWP
 					|| pWeapon->m_iId == WEAPON_LOCKONGUN
-					|| pWeapon->m_iId == WEAPON_BLOODHUNTER)
+					|| pWeapon->m_iId == WEAPON_BLOODHUNTER
+					|| pWeapon->m_iId == WEAPON_MGSM)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}

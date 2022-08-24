@@ -521,6 +521,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_buffsg552.cpp
 	../dlls/wpn_shared/wpn_m1887g.cpp
 	../dlls/wpn_shared/wpn_cameragun.cpp
+	../dlls/wpn_shared/wpn_mgsm.cpp
 	)
 
 set(PM_SRCS

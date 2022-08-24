@@ -828,7 +828,8 @@ public:
 	void DrawPatrolDroneScope(float flTime);
 	void SetPatrolDroneDeployTime();
 	void InsertPatrolDroneData(int iSlot, int iClip, int iState);
-
+	void DrawMGSMScope(float flTime);
+	void SetMGSMAmmo(int iAmmo, float flNextTime);
 private:
 
 	struct LockOnData
@@ -897,6 +898,13 @@ private:
 	int m_iPatrolDroneState;
 
 	std::map<int, patroldronedata> m_vecPatrolDroneData;
+
+	UniqueTexture m_iMGSM_Aim_BG;
+	UniqueTexture m_iMGSM_Aim_Gauge;
+
+	int m_iMGSMAmmo;
+	float m_flMGSMNextCharge;
+	float m_flMGSMNextChargeTime;
 
 };
 

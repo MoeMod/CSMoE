@@ -53,6 +53,8 @@ typedef struct pmtrace_s pmtrace_t;
 struct model_s* CStudioModelRenderer::s_pBuffAugViewModel;
 struct model_s* CStudioModelRenderer::s_pBuffAugSmokeModel;
 struct model_s* CStudioModelRenderer::s_pBloodHunterViewModel;
+struct model_s* CStudioModelRenderer::s_pMGSMViewModel;
+struct model_s* CStudioModelRenderer::s_pMGSMLauncherModel;
 
 void CStudioModelRenderer::Init(void)
 {

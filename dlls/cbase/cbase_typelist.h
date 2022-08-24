@@ -294,6 +294,7 @@ TL_ADD(CBuffAug)
 TL_ADD(CBuffSG552)
 TL_ADD(CCameraGun)
 TL_ADD(CM1887G)
+TL_ADD(CMGSM)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)

@@ -83,6 +83,10 @@ float g_flBloodhunterAnimTime = 0.0;
 int g_iBloodhunterSecAnim = 0;
 int g_iBloodhunterState = 0;
 
+float g_flMGSMAnimTime = 0.0;
+int g_iMGSMSecAnim = 0;
+int g_iMGSMState = 0;
+
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {
 	m_bLocal = false;
@@ -1125,6 +1129,20 @@ int R_StudioDrawModel(int flags)
 			curent->curstate.animtime = g_flBloodhunterAnimTime;
 			curent->curstate.framerate = 1.0;
 			curent->curstate.sequence = g_iBloodhunterSecAnim;
+
+			g_StudioRenderer.StudioDrawModel(flags);
+			*curent = saveent;
+		}
+
+		if (CStudioModelRenderer::s_pMGSMViewModel && curent->model == CStudioModelRenderer::s_pMGSMViewModel && g_iMGSMSecAnim)
+		{
+			static cl_entity_t saveent;
+			saveent = *curent;
+			curent->model = CStudioModelRenderer::s_pMGSMLauncherModel;
+
+			curent->curstate.animtime = g_flBloodhunterAnimTime;
+			curent->curstate.framerate = 1.0;
+			curent->curstate.sequence = g_iMGSMSecAnim;
 
 			g_StudioRenderer.StudioDrawModel(flags);
 			*curent = saveent;

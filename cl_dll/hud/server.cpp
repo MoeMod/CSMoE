@@ -380,6 +380,14 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		g_iBloodhunterState = arg1;
 		break;
 	}
+	case 27:
+	{
+		//mgsm
+		arg1 = reader.ReadByte();
+		float arg3 = reader.ReadByte() * 0.01;
+		m_SniperScope.SetMGSMAmmo(arg1, arg3);
+		break;
+	}
 	case 42:
 	{
 		arg1 = reader.ReadShort();

@@ -103,6 +103,8 @@ public:
 	static struct model_s* s_pBuffAugViewModel;
 	static struct model_s* s_pBuffAugSmokeModel;
 	static struct model_s* s_pBloodHunterViewModel;
+	static struct model_s* s_pMGSMViewModel;
+	static struct model_s* s_pMGSMLauncherModel;
 };
 
 }
