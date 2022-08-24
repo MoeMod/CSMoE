@@ -233,7 +233,7 @@ if(MSVC AND MACHINE MATCHES "x86|amd64")
         add_custom_command(
             OUTPUT ${FILENAME}.asm
             COMMAND ${CMAKE_C_COMPILER} /DASMALIGN_BALIGN ${PLATFORM_DEFINITIONS}
-            /I"${PROJECT_SOURCE_DIR}/../../src" /I"${PROJECT_BINARY_DIR}/src" /P /Fi${FILENAME}.asm /Tc "${FILE}"
+            /I"${MPG123_SOURCE_DIR}/src" /I"${PROJECT_BINARY_DIR}/src" /P /Fi${FILENAME}.asm /Tc "${FILE}"
             DEPENDS ${FILE}
             WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
         add_custom_command(

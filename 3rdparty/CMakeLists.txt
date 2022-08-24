@@ -194,14 +194,14 @@ add_library(3rdparty-mpg123 INTERFACE)
 set(BUILD_LIBOUT123 OFF CACHE BOOL "" FORCE)
 set(BUILD_PROGRAMS OFF CACHE BOOL "" FORCE)
 set(HAVE_FPU ON CACHE BOOL "" FORCE)
-set(MPG123_SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/mpg123)
+set(MPG123_SOURCE_DIR "${CMAKE_SOURCE_DIR}/3rdparty/mpg123" CACHE PATH "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/mpg123-cmake EXCLUDE_FROM_ALL)
 target_link_libraries(3rdparty-mpg123 INTERFACE libmpg123)
 target_include_directories(3rdparty-mpg123 INTERFACE
 		${CMAKE_SOURCE_DIR}/3rdparty/mpg123/src/libmpg123
 		${CMAKE_SOURCE_DIR}/3rdparty/mpg123/src/compat
 		${CMAKE_SOURCE_DIR}/3rdparty/mpg123/src
-		${CMAKE_BINARY_DIR}/3rdparty/mpg123/ports/cmake/src
+		${CMAKE_BINARY_DIR}/3rdparty/mpg123-cmake/src/libmpg123
 		)
 target_compile_definitions(3rdparty-mpg123 INTERFACE -DREAL_IS_FLOAT=1)
 
