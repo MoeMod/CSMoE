@@ -71,7 +71,7 @@ private:
 	vgui2::ComboBox *m_pMode;
 	vgui2::ComboBox *m_pRenderer;
 	vgui2::ComboBox *m_pColorDepth;
-	vgui2::CheckButton *m_pWindowed;
+	CCvarToggleCheckButton *m_pWindowed;
 	vgui2::ComboBox *m_pAspectRatio;
 	CCvarToggleCheckButton *m_pDetailTextures;
 	CCvarToggleCheckButton *m_pVsync;

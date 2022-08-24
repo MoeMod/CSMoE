@@ -43,6 +43,12 @@ COptionsSubMoeSettings::COptionsSubMoeSettings(vgui2::Panel *parent) : PropertyP
 		"#CSMoE_QZSound",
 		"cl_blockwdnmd");
 
+	m_pAutoAim = new  CCvarToggleCheckButton(
+		this,
+		"CCvarToggleCheckButton1",
+		"#CSMoE_AutoAim",
+		"in_autoaim");
+
 	LoadControlSettings("Resource/optionssubmoesettings.res");
 }
 
@@ -229,6 +235,7 @@ void COptionsSubMoeSettings::OnResetData()
 	m_pHudScale->Reset();
 	m_pGammaSlider->Reset();
 	m_pQZSound->Reset();
+	m_pAutoAim->Reset();
 }
 
 void COptionsSubMoeSettings::OnApplyChanges()
@@ -253,6 +260,9 @@ void COptionsSubMoeSettings::OnApplyChanges()
 
 	if (m_pQZSound)
 		m_pQZSound->ApplyChanges();
+
+	if (m_pAutoAim)
+		m_pAutoAim->ApplyChanges();
 	
 }
 
