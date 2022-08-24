@@ -199,7 +199,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     { WEAPON_XM8CARBINE, "weapon_xm8c",        "XM8",                   3250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
     { WEAPON_SCARLIGHT, "weapon_scarl",       "Scar",                  3250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
     { WEAPON_M1887, "weapon_m1887",       "退魔圣焰",                 2800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
-    { WEAPON_KRISS, "weapon_kriss",       "致命蝎刺",                 1700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
+	{ WEAPON_M1887G, "weapon_m1887g",       "退魔金焰(攻击强化)",                 2800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+	{ WEAPON_KRISS, "weapon_kriss",       "致命蝎刺",                 1700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
     { WEAPON_K1A, "weapon_k1a",         "K1A",                   1850, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
     { WEAPON_THOMPSON, "weapon_thompson",    "汤姆逊",              2000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
     { WEAPON_M14EBR, "weapon_m14ebr",      "咆哮怒焰",               3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
@@ -274,6 +275,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_M60, "weapon_m60",        "掠食者M60E4",                  4700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_MK48, "weapon_mk48",        "劫掠者MK48",                  5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_K3, "weapon_k3",        "k3",                  4750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+	{ WEAPON_CAMERAGUN, "weapon_cameragun",        "偶像大师",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_SFMG, "weapon_sfmg",         "赤色彗星",           5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_BISON, "weapon_bison",         "野牛PP-Bison",                  1400, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 	{ WEAPON_M4A1DRAGON, "weapon_m4a1dragon",         "青龙M4A1",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
@@ -317,6 +319,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 1
+	{ WEAPON_CAMERAGUN, "weapon_cameragun",        "偶像大师",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+	{ WEAPON_M1887G, "weapon_m1887g",       "退魔金焰(攻击强化)",                 2800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_BUFFSG552, "weapon_buffsg552",         "【狼魂】SG552",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_BUFFAUG, "weapon_buffaug",         "【无双】AUG",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_BLOODHUNTER, "weapon_bloodhunter",	 "【血契】D.Eagle",			  1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
@@ -426,6 +430,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_XM8CARBINE, "weapon_xm8c",        "XM8",                   3250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_SCARLIGHT, "weapon_scarl",       "Scar",                  3250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_M1887, "weapon_m1887",       "退魔圣焰",                 2800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+	{ WEAPON_M1887G, "weapon_m1887g",       "退魔金焰(攻击强化)",                 2800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_KRISS, "weapon_kriss",       "致命蝎刺",                 1700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 	{ WEAPON_K1A, "weapon_k1a",         "K1A",                   1850, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 	{ WEAPON_THOMPSON, "weapon_thompson",    "汤姆逊",              2000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
@@ -480,6 +485,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_M60, "weapon_m60",        "掠食者M60E4",                  4700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_MK48, "weapon_mk48",        "劫掠者MK48",                  5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_K3, "weapon_k3",        "k3",                  4750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+	{ WEAPON_CAMERAGUN, "weapon_cameragun",        "偶像大师",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_SFMG, "weapon_sfmg",         "赤色彗星",           5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_BISON, "weapon_bison",         "野牛PP-Bison",                  1400, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 	{ WEAPON_M4A1DRAGON, "weapon_m4a1dragon",         "青龙M4A1",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },

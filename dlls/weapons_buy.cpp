@@ -139,6 +139,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "skull11",	WEAPON_SKULL11 },
 	{ "janus11",	WEAPON_JANUS11 },
 	{ "crow3",	WEAPON_CROW3 },
+	{ "m1887",	WEAPON_M1887G },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -256,6 +257,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "broad",	WEAPON_BROAD },
 	{ "coilmg",	WEAPON_COILMG },
 	{ "spmg",	WEAPON_SPMG },
+	{ "cameragun",	WEAPON_CAMERAGUN },
+	{ "mgsm",	WEAPON_MGSM },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -494,6 +497,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "janus11",	WEAPONCLASS_SHOTGUN },
 	{ "crow3",	WEAPONCLASS_SHOTGUN },
 	{ "z4b_dbarrelamethyst",	WEAPONCLASS_SHOTGUN },
+	{ "m1887g",	WEAPONCLASS_SHOTGUN },
 
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
@@ -612,6 +616,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "broad",	WEAPONCLASS_MACHINEGUN },
 	{ "coilmg",	WEAPONCLASS_MACHINEGUN },
 	{ "spmg",	WEAPONCLASS_MACHINEGUN },
+	{ "cameragun",	WEAPONCLASS_MACHINEGUN },
+	{ "mgsm",	WEAPONCLASS_MACHINEGUN },
 
 	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
@@ -931,6 +937,11 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_WATERCANNON:
 	case WEAPON_LOCKONGUN:
 	case WEAPON_FGLAUNCHER:
+	case WEAPON_BUFFAUG:
+	case WEAPON_BUFFSG552:
+	case WEAPON_CAMERAGUN:
+	case WEAPON_M1887G:
+	case WEAPON_MGSM:
 		return true;
 	default:
 		break;

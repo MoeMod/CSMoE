@@ -407,6 +407,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_bloodhunter");
 	UTIL_PrecacheOtherWeapon("weapon_buffaug");
 	UTIL_PrecacheOtherWeapon("weapon_buffsg552");
+	UTIL_PrecacheOtherWeapon("weapon_cameragun");
+	UTIL_PrecacheOtherWeapon("weapon_m1887g");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

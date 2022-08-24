@@ -213,4 +213,6 @@ HOOK_EVENT(fglauncher, FireFgLauncher);
 HOOK_EVENT(bloodhunter, FireBloodHunter);
 HOOK_EVENT(buffaug, FireBuffAug);
 HOOK_EVENT(buffsg552, FireBuffSG552);
+HOOK_EVENT(cameragun, FireCameraGun);
+HOOK_EVENT(m1887g, FireM1887G);
 

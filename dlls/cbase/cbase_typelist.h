@@ -292,6 +292,8 @@ TL_ADD(CFgLauncher)
 TL_ADD(CBloodHunter)
 TL_ADD(CBuffAug)
 TL_ADD(CBuffSG552)
+TL_ADD(CCameraGun)
+TL_ADD(CM1887G)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
