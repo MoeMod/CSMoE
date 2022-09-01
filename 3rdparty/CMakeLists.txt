@@ -10,6 +10,10 @@ add_library(3rdparty-sdl2 INTERFACE)
 if(MSVC)
 	add_definitions(-D_ftol2_sse=SDL_ftol2_sse) # fix x86 compile
 endif()
+if(XASH_ANGLE)
+	set(VIDEO_OPENGL OFF CACHE BOOL "" FORCE) # use opengl es2 instead
+	set(VIDEO_OPENGLES OFF CACHE BOOL "" FORCE) # use opengl es2 instead
+endif()
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
 set(LIBC ON CACHE BOOL "" FORCE) # win10 arm dont have dx8
@@ -166,9 +170,15 @@ if (NOT CMAKE_CROSSCOMPILING)
 	target_link_libraries(3rdparty-tbbmalloc INTERFACE tbb_static tbbmalloc_static)
 endif()
 
-add_library(3rdparty-gl4es INTERFACE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/gl4es EXCLUDE_FROM_ALL)
-target_link_libraries(3rdparty-gl4es INTERFACE GL)
+#add_library(3rdparty-gl4es INTERFACE)
+#set(STATICLIB ON)
+#add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/gl4es EXCLUDE_FROM_ALL)
+#target_link_libraries(3rdparty-gl4es INTERFACE GL)
+file(GLOB GL4ES_GLESWRAP_SOURCES ${CMAKE_SOURCE_DIR}/3rdparty/gl4es/src/gl/*.c ${CMAKE_SOURCE_DIR}/3rdparty/gl4es/src/gl/*/*.c ${CMAKE_SOURCE_DIR}/3rdparty/gl4es/src/glx/hardext.c)
+add_library(3rdparty-gl4es STATIC ${GL4ES_GLESWRAP_SOURCES})
+target_include_directories(3rdparty-gl4es PRIVATE ${CMAKE_SOURCE_DIR}/3rdparty/gl4es/src ${CMAKE_SOURCE_DIR}/3rdparty/gl4es/src/gl ${CMAKE_SOURCE_DIR}/3rdparty/gl4es/src/glx)
+target_include_directories(3rdparty-gl4es PUBLIC ${CMAKE_SOURCE_DIR}/3rdparty/gl4es/include)
+target_compile_definitions(3rdparty-gl4es PRIVATE -DNOX11 -DNO_GBM -DNO_INIT_CONSTRUCTOR -DDEFAULT_ES=2 -DNOEGL -DEXTERNAL_GETPROCADDRESS=GL4ES_GetProcAddress -DNO_LOADER -DSTATICLIB)
 
 add_library(3rdparty-opus INTERFACE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/opus EXCLUDE_FROM_ALL)
@@ -208,4 +218,48 @@ target_compile_definitions(3rdparty-mpg123 INTERFACE -DREAL_IS_FLOAT=1)
 if(WIN32)
 	add_library(3rdparty-mman-win32 STATIC ${CMAKE_SOURCE_DIR}/3rdparty/mman-win32/mman.c)
 	target_include_directories(3rdparty-mman-win32 PUBLIC ${CMAKE_SOURCE_DIR}/3rdparty/mman-win32)
+endif()
+
+if(XASH_ANGLE)
+	set(ANGLE_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/angle)
+	set(CHROMIUM_ZLIB_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/chromium-zlib)
+	set(ANGLE_SPIRV_HEADERS_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/SPIRV-Headers)
+	set(ANGLE_SPIRV_TOOLS_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/SPIRV-Tools)
+	set(ANGLE_SPIRV_CROSS_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/SPIRV-Cross)
+	set(ANGLE_GLSLANG_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/glslang)
+	set(ANGLE_WORKAROUND_FAKEOBJCSOURCE ON)
+	if(APPLE)
+		set(ANGLE_BACKEND Metal)
+	else()
+		set(ANGLE_BACKEND Vulkan)
+	endif()
+
+	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/angle-static-cmake EXCLUDE_FROM_ALL)
+	add_library(3rdparty-angle INTERFACE)
+	target_link_libraries(3rdparty-angle INTERFACE angle_static)
+	target_include_directories(3rdparty-angle INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/angle/include)
+
+	set(SPIRV_CROSS_CLI OFF CACHE BOOL "" FORCE)
+	set(SPIRV_CROSS_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/SPIRV-Cross EXCLUDE_FROM_ALL)
+	add_library(3rdparty-spirv_cross INTERFACE)
+	target_link_libraries(3rdparty-spirv_cross INTERFACE
+			spirv-cross-glsl
+			spirv-cross-hlsl
+			spirv-cross-cpp
+			spirv-cross-reflect
+			spirv-cross-msl
+			spirv-cross-util
+			spirv-cross-core)
+
+	set(SPIRV_TOOLS_BUILD_STATIC ON)
+	set(SPIRV-Headers_SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/SPIRV-Headers)
+	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/SPIRV-Tools EXCLUDE_FROM_ALL)
+	add_library(3rdparty-spirv_tools INTERFACE)
+	target_link_libraries(3rdparty-spirv_tools INTERFACE SPIRV-Tools-static)
+
+	set(BUILD_SHARED_LIBS OFF)
+	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/glslang EXCLUDE_FROM_ALL)
+	add_library(3rdparty-glslang INTERFACE)
+	target_link_libraries(3rdparty-glslang INTERFACE glslang SPIRV glslang-default-resource-limits)
 endif()

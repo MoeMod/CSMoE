@@ -25,6 +25,7 @@ xcuserdata
 *.moved-aside
 DerivedData
 *.xcuserstate
+WorkspaceSettings.xcsettings
 
 
 ### OSX ###

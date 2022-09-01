@@ -70,3 +70,10 @@ void MacOS_ToggleWindowButtons(bool bShow)
     [miniaturizeBtn setHidden:!bShow];
     [zoomBtn setHidden:!bShow];
 }
+
+void MacOS_HiDPI_Scale(int *w, int *h)
+{
+    auto nsw = MacOS_GetNSWindow();
+    if(w) *w *= nsw.backingScaleFactor;
+    if(h) *h *= nsw.backingScaleFactor;
+}

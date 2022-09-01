@@ -29,6 +29,10 @@ GNU General Public License for more details.
 #include "physics.h"
 #endif
 
+#ifdef XASH_ANGLE
+#include <EGL/egl.h>
+#endif
+
 #include <type_traits>
 
 #define IsLiquidContents( cnt )	( cnt == CONTENTS_WATER || cnt == CONTENTS_SLIME || cnt == CONTENTS_LAVA )
@@ -1390,7 +1394,9 @@ void R_EndFrame( void )
 	else
 		R_Set2DMode( false );
 
-#ifdef XASH_QINDIEGL
+#if defined(XASH_ANGLE)
+    eglSwapBuffers(eglGetCurrentDisplay(), glw_state.surface);
+#elif defined(XASH_QINDIEGL)
 	BOOL wrap_wglSwapBuffers(HDC);
 	wrap_wglSwapBuffers(NULL);
 #elif defined(XASH_SDL)
