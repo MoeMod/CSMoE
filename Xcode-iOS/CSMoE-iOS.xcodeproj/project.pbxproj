@@ -109,13 +109,6 @@
 			remoteGlobalIDString = FC6C00806FD443639641F078;
 			remoteInfo = libmpg123;
 		};
-		3D691BCE2843CF2600D5221C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 0EDEC216C1ED456887BE8E58;
-			remoteInfo = GL;
-		};
 		3D691BD42843CF2600D5221C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
@@ -634,6 +627,13 @@
 			remoteGlobalIDString = AB980332CB1C4FDD9D81D36C;
 			remoteInfo = xash;
 		};
+		3DFDDBBA28C2279E00351ACE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 065FBDED999B461CB2FC1EA5;
+			remoteInfo = "3rdparty-gl4es";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -706,6 +706,7 @@
 		3DF9828F27F9AF820030D0B5 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libSDL2.a"; sourceTree = "<group>"; };
 		3DF9829027F9AF820030D0B5 /* libSDL2main.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2main.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libSDL2main.a"; sourceTree = "<group>"; };
 		3DF9829127F9AF820030D0B5 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libfreetype.a"; sourceTree = "<group>"; };
+		3DFDDB6328C2279E00351ACE /* CSMoE-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CSMoE-iOS.entitlements"; sourceTree = "<group>"; };
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B646751B253FE21E00F557B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
@@ -935,6 +936,7 @@
 		3DF981D927F9AE940030D0B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				3DFDDBBB28C2279E00351ACE /* lib3rdparty-gl4es.a */,
 				3DF9821E27F9AE940030D0B5 /* libboost_atomic.a */,
 				3DF9822027F9AE940030D0B5 /* libboost_chrono.a */,
 				3DF9822227F9AE940030D0B5 /* libboost_container.a */,
@@ -970,7 +972,6 @@
 				3DC76FDC28AA9DEA0021B4F6 /* libBulletDynamics.a */,
 				3DC76FDE28AA9DEA0021B4F6 /* libBulletInverseDynamics.a */,
 				3DC76FE028AA9DEA0021B4F6 /* libBulletSoftBody.a */,
-				3D691BCF2843CF2600D5221C /* libGL.dylib */,
 				3DF9825027F9AE940030D0B5 /* libGameUI.a */,
 				3DC76FE228AA9DEA0021B4F6 /* libLinearMath.a */,
 				3DF9825227F9AE940030D0B5 /* libSDL2.a */,
@@ -1018,6 +1019,7 @@
 		FD77A0040E26BC0500F39101 /* CSMoE-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				3DFDDB6328C2279E00351ACE /* CSMoE-iOS.entitlements */,
 				3D3EE8A9228F1C6300A695FE /* controller */,
 				3D3EE8A7228F19A900A695FE /* model */,
 				3D3EE8A6228F197200A695FE /* view */,
@@ -1092,13 +1094,6 @@
 			fileType = archive.ar;
 			path = libmpg123.a;
 			remoteRef = 3D006E7D28AEA1BD004C1F67 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3D691BCF2843CF2600D5221C /* libGL.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libGL.dylib;
-			remoteRef = 3D691BCE2843CF2600D5221C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		3D691BD52843CF2600D5221C /* libopus.a */ = {
@@ -1624,6 +1619,13 @@
 			remoteRef = 3DF9828D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		3DFDDBBB28C2279E00351ACE /* lib3rdparty-gl4es.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "lib3rdparty-gl4es.a";
+			remoteRef = 3DFDDBBA28C2279E00351ACE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -1672,7 +1674,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cmake -G \"Xcode\" -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../3rdparty/ios-cmake/ios.toolchain.cmake\" -DPLATFORM=OS64  -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_GLES=1 -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
+			shellScript = "cmake -G \"Xcode\" -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../3rdparty/ios-cmake/ios.toolchain.cmake\" -DPLATFORM=OS64  -DXASH_STATIC_GAMELIB=1 -DXASH_WES=1 -DXASH_GLES=1  -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1695,6 +1697,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "CSMoE-iOS/CSMoE-iOS.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
@@ -1740,6 +1743,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "CSMoE-iOS/CSMoE-iOS.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;

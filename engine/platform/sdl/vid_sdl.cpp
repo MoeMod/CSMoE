@@ -231,10 +231,14 @@ static void WIN_SetWindowIcon( HICON ico )
 qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 {
 	static string	wndname;
+#ifdef XASH_ANGLE
 #ifdef __APPLE__
     Uint32 wndFlags = SDL_WINDOW_METAL;
 #else
 	Uint32 wndFlags = SDL_WINDOW_VULKAN;
+#endif
+#else
+    Uint32 wndFlags = SDL_WINDOW_OPENGL;
 #endif
 	char iconpath[MAX_STRING];
 
