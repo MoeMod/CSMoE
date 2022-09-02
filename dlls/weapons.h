@@ -547,7 +547,7 @@ public:
 		return DefaultDeploy(szViewModel, szWeaponModel, iAnim, szAnimExt, skiplocal, 0.75s, 1.5s);
 	}*/
 	int DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body = 0);
-	void FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18);
+	virtual void FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18);
 	void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max,
 	              float lateral_max, int direction_change);
 	void EjectBrassLate();
@@ -594,6 +594,7 @@ public:
 			|| m_iId == WEAPON_BALROG1
 			|| m_iId == WEAPON_SAPIENTIA
 			|| m_iId == WEAPON_BLOODHUNTER
+			|| m_iId == WEAPON_KRONOS1
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -609,10 +610,12 @@ public:
 	virtual int GetPriority() { return 1; }
 	virtual int GetPriorityByTarget(CBaseEntity* target) { return 1; }
 	virtual void WeaponCallBack(int iType = 0) {};
+	virtual void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace) {};
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];
 	time_point_t m_flHolsterTime;
+	time_point_t m_flBunkerBusterCoolDown;
 };
 
 }
@@ -724,6 +727,53 @@ private:
 	int m_Exp2Index;
 	Vector m_vecStartVelocity;
 };
+#ifndef CLIENT_DLL
+class CBunkerBusterBase : public CBaseEntity
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	void EXPORT OnThink();
+	void EXPORT SoundAfterThink();
+	void EXPORT OnTouch(CBaseEntity* pOther);
+
+
+	// 1 ->b52   2->missile  3->fire
+	static CBunkerBusterBase* CreateBaseEnt(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	void InitB52(Vector vecVelocity, Vector vecStart, Vector vecEnd);
+	void InitB52Missile(Vector vecVelocity, Vector vecStart);
+
+
+	float GetMaxHeight(Vector vecStart);
+	void GetSpeedVector(Vector vecStart, Vector vecEnd, float flSpeed, Vector vecVelocity);
+	float GetDamageMissile();
+	float GetDamageFire();
+	float GetRangeFire();
+	float GetRangeMissile();
+
+	void CreateExplosion(Vector vecOrigin);
+	void CreateRandomFire(Vector vecOrigin);
+
+public:
+	int m_iType;
+	int m_iTouchCounts;
+	int m_iMissileCounts;
+	int m_iSoundCounts;
+	bool m_bFireEnabled;
+	bool m_bNoInit;
+	time_point_t m_flArriveTime;
+	time_point_t m_flFlySoundTime;
+	time_point_t m_flCanThrowTime;
+	time_point_t m_flFireTime;
+	Vector m_vecEnd;
+	Vector m_vecStart;
+	Vector m_vecVelocity;
+
+private:
+	time_point_t m_flRemoveTime;
+	unsigned short m_usFireBunkerBuster;
+};
+#endif
 
 class CCannonEX;
 #ifndef CLIENT_DLL

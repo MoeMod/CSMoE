@@ -184,8 +184,9 @@ namespace sv {
 		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecEnd.x, vecEnd.y, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
+#ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-
+#endif
 		if (++shotsFired >= 1)
 			shootTime = invalid_time_point;
 		else

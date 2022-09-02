@@ -2520,6 +2520,7 @@ TEMPENTITY* R_TempSprite2(vec3_t pos, vec3_t dir, float scale, int modelIndex, i
 		pTemp->entity.curstate.framerate = framerate;
 		pTemp->entity.curstate.renderamt = pTemp->entity.baseline.renderamt = brightness * 255.0;
 		pTemp->flags |= flags;
+		pTemp->entity.curstate.eflags |= EF_NOCULL;
 		pTemp->entity.curstate.scale = scale;
 		pTemp->entity.baseline.origin = dir;
 		pTemp->entity.origin = pos;

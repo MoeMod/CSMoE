@@ -623,7 +623,8 @@ void CL_WritePacket( void )
 		int	outgoing_sequence;
 
 		if( cl_cmdrate->integer > 0 )
-			cls.nextcmdtime = host.realtime + bound( 0.1f, ( 1.0f / cl_cmdrate->value ), 0.01f );
+			cls.nextcmdtime = host.realtime + (1.0f / cl_cmdrate->value);
+			//cls.nextcmdtime = host.realtime + bound( 0.1f, ( 1.0f / cl_cmdrate->value ), 0.01f );
 		else cls.nextcmdtime = host.realtime; // always able to send right away
 
 		if( cls.lastoutgoingcommand == -1 )

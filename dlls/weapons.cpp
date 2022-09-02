@@ -559,7 +559,8 @@ void CBasePlayerWeapon::EjectBrassLate()
 		|| m_iId == WEAPON_Z4B_CSG12SS
 		|| m_iId == WEAPON_CSGO_MAG7
 		|| m_iId == WEAPON_CSGO_SAWEDOFF
-		|| m_iId == WEAPON_JANUS11)
+		|| m_iId == WEAPON_JANUS11
+		|| m_iId == WEAPON_THANATOS11)
 		? TE_BOUNCE_SHOTSHELL : TE_BOUNCE_SHELL;
 
 	EjectBrass(pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_up * -9 + gpGlobals->v_forward * 16, gpGlobals->v_right * -9,
@@ -1393,6 +1394,10 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_BALROG1:
 		case WEAPON_SAPIENTIA:
 		case WEAPON_BLOODHUNTER:
+		case WEAPON_THUNDERPISTOL:
+		case WEAPON_KRONOS1:
+		case WEAPON_KINGCOBRA:
+		case WEAPON_KINGCOBRAG:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:
@@ -1824,6 +1829,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					{
 					case WEAPON_DIVINETITAN:
 					case WEAPON_PATROLDRONE:
+					case WEAPON_BUNKERBUSTER:
 					case WEAPON_HEGRENADE:
 						grenadeName = "weapon_hegrenade";
 						maxGrenades = 1;

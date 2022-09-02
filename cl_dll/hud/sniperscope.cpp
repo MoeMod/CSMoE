@@ -122,12 +122,40 @@ int CHudSniperScope::VidInit()
 	m_flPatrolDroneDeployTime = 0.0f;
 	m_iPatrolDroneState = PATROLDRONE_OFF;
 
+	//bunkerbuster
+
+	R_InitTexture(m_iBunkerBusterTgaBG_Blue, "sprites/bunkerbuster_aim_bg_blue.tga");
+	R_InitTexture(m_iBunkerBusterTgaBG_Red, "sprites/bunkerbuster_aim_bg_red.tga");
+	R_InitTexture(m_iBunkerBusterTgaFrame_Blue, "sprites/bunkerbuster_aim_frame_blue.tga");
+	R_InitTexture(m_iBunkerBusterTgaFrame_Red, "sprites/bunkerbuster_aim_frame_red.tga");
+	R_InitTexture(m_iBunkerBusterTgaGauge, "sprites/bunkerbuster_aim_gauge.tga");
+	R_InitTexture(m_iBunkerBusterTgaCoolTimeLeft, "sprites/bunkerbuster_cooltime_number_left_bg.tga");
+	R_InitTexture(m_iBunkerBusterTgaCoolTimeRight, "sprites/bunkerbuster_cooltime_number_right_bg.tga");
+
+	m_flBunkerBusterCoolDown = 0.0f;
+	m_flBunkerBusterCoolDownGlobal = 0.0f;
+	m_flLastFrameTime = 0.0f;
+
+	m_flBunkerBusterShoot = 0.0f;
+	m_flBunkerBusterShootEnd = 0.0f;
+	m_iGauge = 0;
+
+	m_iBunkerSprite = SPR_Load("sprites/bunkerbuster_scope.spr");
+	m_pModelBunkerSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iBunkerSprite);
+	m_iBunkerSpriteFrame = 0;
+
+	for (int i = 0; i < 10; i++)
+	{
+		char str[32];
+		sprintf_s(str, "bunkerbuster_cooltime%d", i);
+		iBunkerSpriteNumber[i] = gHUD.GetSpriteIndex(str);
+	}
+
 	R_InitTexture(m_iMGSM_Aim_BG, "sprites/mgsm_aim_bg.tga");
 	R_InitTexture(m_iMGSM_Aim_Gauge, "sprites/mgsm_aim_gauge.tga");
 
-	m_iMGSMAmmo = 0;
-	m_flMGSMNextChargeTime = 0.0;
-	m_flMGSMNextCharge = 0.0;
+
+	m_flMGSMTimeChargeStart = gHUD.m_flTime + 9999.0;
 
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
@@ -163,7 +191,7 @@ void CHudSniperScope::FuncDrawCorner(const CTextureRef& tex, int type, int width
 	}
 	case 2:
 	{
-		FuncDraw2DQuadScaled(tex, width2, height2, width, height, height);
+		FuncDraw2DQuadScaled(tex, width2, height2, width, height);
 		FuncDraw2DQuadScaled(tex, width2, ScreenHeight - height2, width, -height);
 		FuncDraw2DQuadScaled(tex, ScreenWidth - width2, height2, -width, height);
 		FuncDraw2DQuadScaled(tex, ScreenWidth - width2, ScreenHeight - height2, -width, -height);
@@ -185,11 +213,13 @@ void CHudSniperScope::FuncDrawCircle(int index, int width, int height, float gau
 	if (!index)
 		return;
 
-	const int xx = (float)ScreenWidth / 2;
-	const int yy = (float)ScreenHeight / 2;
+	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
 
-	const int ww = width / 2;
-	const int tt = height / 2;
+	const int xx = (float)ScreenWidth / 2 * flScale;
+	const int yy = (float)ScreenHeight / 2 * flScale;
+
+	const int ww = width / 2 * flScale;
+	const int tt = height / 2 * flScale;
 
 	float amount, tan;
 	int pl;
@@ -323,7 +353,11 @@ int CHudSniperScope::Draw(float flTime)
 		{
 			return 1;
 		}
-		else if (pActiveBTEWeapon->m_iId == WEAPON_KRONOS12)
+		else if (pActiveBTEWeapon->m_iId == WEAPON_KRONOS12 || 
+			pActiveBTEWeapon->m_iId == WEAPON_KRONOS5 ||
+			pActiveBTEWeapon->m_iId == WEAPON_KRONOS7 || 
+			pActiveBTEWeapon->m_iId == WEAPON_KRONOS3 || 
+			pActiveBTEWeapon->m_iId == WEAPON_KRONOS1)
 		{
 			if (gHUD.m_iFOV > 89)
 				return 1;
@@ -368,6 +402,16 @@ int CHudSniperScope::Draw(float flTime)
 		{
 			DrawMGSMScope(flTime);
 			return 1;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_BUNKERBUSTER)
+		{
+
+			if (gHUD.m_iFOV > 89)
+				return 1;
+
+			DrawBunkerBusterScope(flTime);
+			return 0;
+
 		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS || pActiveBTEWeapon->m_iId == WEAPON_M400 || pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM)
 		{
@@ -650,9 +694,154 @@ void CHudSniperScope::ClearAllLockOnData()
 	}
 }
 
+
+void CHudSniperScope::InsertBunkerBusterData(int iGauge, float iCoolDown, float gCoolDown)
+{
+	if (iCoolDown != -1.0 && gCoolDown != -1.0)
+	{
+		m_flBunkerBusterCoolDown = gHUD.m_flTime + iCoolDown;
+		m_flBunkerBusterCoolDownGlobal = gHUD.m_flTime + gCoolDown;
+	}
+
+
+	m_iGauge = iGauge;
+
+}
+
+void CHudSniperScope::InsertBunkerBusterData2(float ShootTime)
+{
+	m_flBunkerBusterShoot = ShootTime;
+	m_flBunkerBusterShootEnd = gHUD.m_flTime + ShootTime;
+}
+
+void CHudSniperScope::DrawBunkerBusterScope(float flTime)
+{
+	float scale = 1.0;
+	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
+	;
+
+	float LENGTH_SCOPE_BB = ScreenHeight / 2 * 0.75f;
+	bool IsRed = false;
+
+
+	if (m_iGauge)
+	{
+		if (m_flBunkerBusterCoolDown <= flTime && m_flBunkerBusterCoolDownGlobal <= flTime)
+			IsRed = true;
+	}
+	if (!IsRed)
+	{
+		if (m_pModelBunkerSprite)
+		{
+			int iWidth = 512;
+			int iHeight = 413;
+
+			//iWidth = (int)(MAX(gEngfuncs.pfnSPR_Width(m_iBunkerSprite, m_iBunkerSpriteFrame), 0) * 1.5);
+			//iHeight = MAX(gEngfuncs.pfnSPR_Height(m_iBunkerSprite, 0), 0);
+
+			int iX = (ScreenWidth - iWidth) / 2;
+			int iY = (ScreenHeight - iHeight) / 2;
+
+			gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+
+			gEngfuncs.pTriAPI->SpriteTexture(m_pModelBunkerSprite, m_iBunkerSpriteFrame);
+			gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+			gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+			gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + iHeight) * flScale, 0);
+
+			gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+			gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, (iY + iHeight) * flScale, 0);
+
+			gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+			gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, iY * flScale, 0);
+
+			gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+			gEngfuncs.pTriAPI->Vertex3f(iX * flScale, iY * flScale, 0);
+
+			gEngfuncs.pTriAPI->End();
+
+
+			if (1.0 / (30.0 * 1.0) <= gHUD.m_flTime - m_flLastFrameTime)
+			{
+				m_iBunkerSpriteFrame++;
+				m_flLastFrameTime = gHUD.m_flTime;
+			}
+
+			if (m_iBunkerSpriteFrame > 25)
+			{
+				m_iBunkerSpriteFrame = 0;
+			}
+
+		}
+	}
+
+
+	FuncDrawCorner(IsRed ? *m_iBunkerBusterTgaFrame_Red : *m_iBunkerBusterTgaFrame_Blue, TYPE_CORNER_NW, LENGTH_SCOPE_BB, LENGTH_SCOPE_BB, 10, 10);
+
+	//mid
+	float HEIGHT_MID = ScreenHeight / 2;
+	float WIDTH_MID = HEIGHT_MID * 1.24f;
+
+	FuncDraw2DQuadScaled(IsRed ? *m_iBunkerBusterTgaBG_Red : *m_iBunkerBusterTgaBG_Blue, ScreenWidth / 2 - WIDTH_MID / 2, ScreenHeight / 2 - HEIGHT_MID / 2, WIDTH_MID, HEIGHT_MID);
+
+	//129 : 56 = 512 : 413
+	float HEIGHT_TIMER = HEIGHT_MID / 7.0f;
+	float WIDTH_TIMER = WIDTH_MID / 4.0f;
+
+	FuncDraw2DQuadScaled(*m_iBunkerBusterTgaCoolTimeLeft, (ScreenWidth - WIDTH_MID - WIDTH_TIMER) / 2, (ScreenHeight - HEIGHT_TIMER) / 2, WIDTH_TIMER, HEIGHT_TIMER);
+	FuncDraw2DQuadScaled(*m_iBunkerBusterTgaCoolTimeLeft, (ScreenWidth + WIDTH_MID - WIDTH_TIMER) / 2, (ScreenHeight - HEIGHT_TIMER) / 2, WIDTH_TIMER, HEIGHT_TIMER);
+
+	char sTime[10];
+	if (m_flBunkerBusterCoolDownGlobal < flTime)
+		sprintf_s(sTime, "0");
+	else
+		sprintf_s(sTime, "%d", (int)(m_flBunkerBusterCoolDownGlobal - flTime));
+
+	int number = strlen(sTime);
+	while (number > 0)
+	{
+		char temp[2];
+		sprintf_s(temp, "%c", sTime[number - 1]);
+		int iNum = atoi(temp);
+		if (0 <= iNum && iNum < 10)
+		{
+			gEngfuncs.pfnSPR_Set(gHUD.GetSprite(iBunkerSpriteNumber[iNum]), 170, 240, 0);
+			gEngfuncs.pfnSPR_DrawAdditive(0, (ScreenWidth - WIDTH_MID) / 2 - (strlen(sTime) - number) * 23.0f, (ScreenHeight - HEIGHT_TIMER / 2) / 2, &gHUD.GetSpriteRect(iBunkerSpriteNumber[iNum]));
+		}
+		number--;
+	}
+	char sTime2[10];
+	if (m_flBunkerBusterCoolDown < flTime)
+		sprintf_s(sTime2, "0");
+	else
+		sprintf_s(sTime2, "%d", (int)(m_flBunkerBusterCoolDown - flTime));
+
+	int number2 = strlen(sTime2);
+	while (number2 > 0)
+	{
+		char temp[2];
+		sprintf_s(temp, "%c", sTime2[number2 - 1]);
+		int iNum = atoi(temp);
+		if (0 <= iNum && iNum < 10)
+		{
+			gEngfuncs.pfnSPR_Set(gHUD.GetSprite(iBunkerSpriteNumber[iNum]), 170, 240, 0);
+			gEngfuncs.pfnSPR_DrawAdditive(0, (ScreenWidth + WIDTH_MID) / 2 - (strlen(sTime2) - number2) * 23.0f, (ScreenHeight - HEIGHT_TIMER / 2) / 2, &gHUD.GetSpriteRect(iBunkerSpriteNumber[iNum]));
+		}
+		number2--;
+	}
+
+
+	if (IsRed)
+	{
+		float percent = 1.0f - (m_flBunkerBusterShootEnd - flTime) / m_flBunkerBusterShoot;
+		FuncDrawCircle(m_iBunkerBusterTgaGauge->texnum(), WIDTH_MID, HEIGHT_MID, percent);
+	}
+}
 void CHudSniperScope::DrawPatrolDroneScope(float flTime)
 {
 	float scale = 1.0;
+	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
 
 	if (m_flPatrolDroneDeployTime && m_flPatrolDroneDeployTime + 0.25 > flTime)
 		scale = (flTime - m_flPatrolDroneDeployTime) / 0.25;
@@ -684,8 +873,8 @@ void CHudSniperScope::DrawPatrolDroneScope(float flTime)
 
 	if (const int num = m_vecPatrolDroneData.size())
 	{
-		wide = ScreenHeight / 15;
-		tall = wide;
+		wide = ScreenHeight / 15 * flScale;
+		tall = wide * flScale;
 
 		const int maxclip = 90;
 		const int offset = 8;
@@ -814,6 +1003,7 @@ void CHudSniperScope::DrawPatrolDroneScope(float flTime)
 	}
 }
 
+
 void CHudSniperScope::InsertPatrolDroneData(int iSlot, int iClip, int iState)
 {
 	m_vecPatrolDroneData[iSlot].ammo = iClip;
@@ -834,31 +1024,30 @@ void CHudSniperScope::DrawMGSMScope(float flTime)
 	int len = iY / 4 * 3;
 
 	FuncDraw2DQuadScaled(*m_iMGSM_Aim_BG, iX - len / 2, iY - len / 2, len, len);
+	float delta = gHUD.m_flTime - m_flMGSMTimeChargeStart;
+	float timepassed = (delta / m_flMGSMFinishTime);
 
-	if (m_flMGSMNextChargeTime)
+	if (delta >= m_flMGSMFinishTime)
 	{
-		float timepassed = (float(m_iMGSMAmmo) / 100.0);
-
-		if (m_flMGSMNextCharge < gHUD.m_flTime)
-		{
-			m_iMGSMAmmo++;
-			m_flMGSMNextCharge = gHUD.m_flTime + m_flMGSMNextChargeTime;
-		}
-
-		if (timepassed > 1.0)
-			timepassed = 1;
-		else if (timepassed <= 0)
-			return;
-
-		FuncDrawCircle(m_iMGSM_Aim_Gauge->texnum(), len, len, 0.625f + timepassed / 4);
+		m_flMGSMTimeChargeStart = gHUD.m_flTime + 9999;
 	}
+
+	if (timepassed > 1.0 || timepassed < 0)
+		timepassed = 1;
+
+	FuncDrawCircle(m_iMGSM_Aim_Gauge->texnum(), len, len, 0.625f + timepassed / 4);
+	
 
 }
 
-void CHudSniperScope::SetMGSMAmmo(int iAmmo, float flNextTime)
+void CHudSniperScope::SetMGSMAmmo(float flDelta, float flFinishTime)
 {
-	m_iMGSMAmmo = iAmmo;
-	m_flMGSMNextChargeTime = flNextTime;
+	if(flDelta)
+		m_flMGSMTimeChargeStart = gHUD.m_flTime - flDelta;
+	else
+		m_flMGSMTimeChargeStart = gHUD.m_flTime;
+	m_flMGSMFinishTime = flFinishTime;
+
 }
 
 void CHudSniperScope::Shutdown()

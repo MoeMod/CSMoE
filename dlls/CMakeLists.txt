@@ -193,6 +193,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_flying.cpp
 	./gamemode/zb2/zb2_zclass_nemesis.cpp
 	./balrog11cannon.cpp
+	./bunkerbuster.cpp
 	./gamemode/mod_zbz.cpp
 	./gamemode/zbz/zbz_skill.cpp
 	./map_manager.cpp
@@ -522,6 +523,17 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m1887g.cpp
 	../dlls/wpn_shared/wpn_cameragun.cpp
 	../dlls/wpn_shared/wpn_mgsm.cpp
+	../dlls/wpn_shared/wpn_bunkerbuster.cpp
+	../dlls/wpn_shared/wpn_thunderpistol.cpp
+	../dlls/wpn_shared/wpn_balrog5.cpp
+	../dlls/wpn_shared/wpn_thanatos11.cpp
+	../dlls/wpn_shared/wpn_m1887xmas.cpp
+	../dlls/wpn_shared/wpn_kronos5.cpp
+	../dlls/wpn_shared/wpn_an94.cpp
+	../dlls/wpn_shared/wpn_m16a4.cpp
+	../dlls/wpn_shared/wpn_kronos7.cpp
+	../dlls/wpn_shared/wpn_kronos3.cpp
+	../dlls/wpn_shared/wpn_kronos1.cpp
 	)
 
 set(PM_SRCS

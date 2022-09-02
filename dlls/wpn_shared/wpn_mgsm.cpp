@@ -18,27 +18,251 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-
+//#include "gamemode/mod_zb1.h"
+#include "weapons/KnifeAttack.h"
 #include "weapons/WeaponTemplate.hpp"
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
 #endif
+
+
+#ifndef CLIENT_DLL
+	class CMGSMMissile : public CGrenade
+	{
+	public:
+		int GetWeaponsId(void) { return WEAPON_MGSM; }
+		void Spawn() override
+		{
+			Precache();
+
+			pev->movetype = MOVETYPE_FLY;
+			pev->solid = SOLID_TRIGGER;
+
+			SET_MODEL(ENT(pev), "models/mgsm_missile.mdl");
+
+			UTIL_SetSize(pev, g_vecZero, g_vecZero);
+			UTIL_SetOrigin(pev, pev->origin);
+
+			SetThink(&CMGSMMissile::MissileThink);
+			SetTouch(&CMGSMMissile::MissileTouch);
+
+			pev->nextthink = gpGlobals->time + 0.1s;
+
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_BEAMPARTICLE); //defined as 32
+			WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
+			WRITE_SHORT(m_iSmoke);// short (sprite index)
+			WRITE_SHORT(m_iSmoke);// short (sprite index)
+			WRITE_SHORT(m_iSmoke);// short (sprite index)
+			WRITE_BYTE(255); //r
+			WRITE_BYTE(255); //g
+			WRITE_BYTE(255); //b
+			WRITE_BYTE(0); //randomcolor
+			WRITE_BYTE(100); //scale in 0.01's
+			WRITE_BYTE(6); //freq(time of one cycle) in 0.01's
+			WRITE_BYTE(3); //fadetime in 0.1s
+			WRITE_BYTE(1);  //count
+			WRITE_BYTE(0);  //random in org
+			WRITE_BYTE(0);  //speed (if>0 do slow gravity)
+			MESSAGE_END();
+		}
+
+		void Precache() override
+		{
+			PRECACHE_SOUND("weapons/mgsm_exp.wav");
+			
+			PRECACHE_MODEL("models/mgsm_missile.mdl");
+			m_iExpEffect = PRECACHE_MODEL("sprites/ef_mgsmexplo.spr");
+			m_iSmoke = PRECACHE_MODEL("sprites/smoke_ia.spr");
+		}
+
+		KnockbackData GetKnockBackData() override
+		{
+			return { 2000.0f, 1250.0f, 1000.0f, 1750.0f, 1.0f };
+		}
+
+		float GetDirectDamage() const
+		{
+			float flDamage = 60;
+#ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 6400;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 22450;
+#endif
+			return flDamage;
+		}
+
+		float GetExplodeDamage() const
+		{
+			float flDamage = 20;
+#ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 2000;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 2860;
+#endif
+			return flDamage;
+		}
+
+		void EXPORT MissileThink(void)
+		{
+			if (!IsInWorld())
+			{
+				SetThink(NULL);
+				SetTouch(NULL);
+
+				UTIL_Remove(this);
+				return;
+			}
+
+			pev->velocity = m_vecVelocity;
+
+			if (m_bLockingTarget)
+			{
+				pev->origin = m_vecLockingPos;
+
+				m_bLockingTarget = FALSE;
+			}
+
+			CBaseEntity* pEntity = NULL;
+			while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 2.5 * 39.37)) != NULL)
+			{
+				if (std::find(m_iTouchID.begin(), m_iTouchID.end(), pEntity->entindex()) != m_iTouchID.end())
+					continue;
+
+				if (pEntity->IsDormant())
+					continue;
+
+				if (pEntity->pev->takedamage == DAMAGE_NO)
+					continue;
+
+				if (pEntity->pev == VARS(pev->owner))
+					continue;
+
+				if (pEntity->IsPlayer())
+				{
+					Vector vecDelta = pev->origin - pEntity->pev->origin;
+					float yaw = g_engfuncs.pfnVecToYaw(vecDelta);
+					g_engfuncs.pfnWalkMove(pEntity->edict(), yaw, vecDelta.Length(), WALKMOVE_NORMAL);
+					break;
+				}
+			}
+
+			pev->nextthink = gpGlobals->time + 0.1s;
+		}
+
+		void EXPORT MissileTouch(CBaseEntity* pOther)
+		{
+			if (!pOther)
+				return;
+
+			if (pOther->edict() == pev->owner)
+				return;
+
+			float flDamage = GetDirectDamage();
+			float flExplodeDamage = GetExplodeDamage();
+
+			entvars_t* pevOwner = VARS(pev->owner);
+
+			m_vecOrigin = pev->origin;
+
+			if (!pOther->IsDormant())
+			{	
+				if (pOther->pev->takedamage != DAMAGE_NO)
+				{
+					if (std::find(m_iTouchID.begin(), m_iTouchID.end(), pOther->entindex()) == m_iTouchID.end())
+					{
+						TraceResult tr = UTIL_GetGlobalTrace();
+
+						ClearMultiDamage();
+
+						pOther->TraceAttack(pevOwner, flDamage, m_vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
+
+						ApplyMultiDamage(pev, pevOwner);
+
+						pOther->pev->origin = m_vecOrigin;
+
+						m_iTouchID.push_back(pOther->entindex());
+					}				
+				}
+
+				pev->origin += m_vecDirection * 0.5 * 39.37;
+
+				m_vecLockingPos = pev->origin;
+				m_bLockingTarget = TRUE;
+
+				pev->nextthink = gpGlobals->time;
+
+				if (pOther->IsPlayer())
+					return;
+			}
+
+			CBaseEntity* pEntity = NULL;
+
+			while ((pEntity = UTIL_FindEntityInSphere(pEntity, m_vecOrigin, 1.75 * 39.37)) != NULL)
+			{
+				if (pEntity->IsDormant())
+					continue;
+
+				if (pEntity->pev->takedamage == DAMAGE_NO)
+					continue;
+
+				if (pEntity == pOther)
+					continue;
+
+				if (pEntity->pev == pevOwner)
+					continue;
+
+				float flNewDamage = UTIL_CalcDamage(pev->origin, pEntity->pev->origin, flDamage, flExplodeDamage, 1.75 * 39.37);
+
+				if (flNewDamage != 0.0f)
+					pEntity->TakeDamage(pev, pevOwner, flNewDamage, DMG_GENERIC | DMG_EXPLOSION);
+			}
+
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_TEMPSPRITE);
+			WRITE_COORD(m_vecOrigin.x);
+			WRITE_COORD(m_vecOrigin.y);
+			WRITE_COORD(m_vecOrigin.z + 50.0);
+			WRITE_SHORT(m_iExpEffect);
+			WRITE_BYTE(15);
+			WRITE_BYTE(255);
+			WRITE_BYTE(30);
+			MESSAGE_END();
+
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/mgsm_exp.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
+		}
+
+		std::vector<int> m_iTouchID;
+		BOOL m_bLockingTarget;
+		Vector m_vecVelocity;
+		Vector m_vecDirection;
+		Vector m_vecLockingPos;
+		Vector m_vecOrigin;
+		int m_iSmoke;
+		int m_iExpEffect;
+	};
+	LINK_ENTITY_TO_CLASS(mgsm_missile, CMGSMMissile)
+#endif
+
+
     class CMGSM : public LinkWeaponTemplate< CMGSM,
             TGeneralData,
             BuildTGetItemInfoFromCSW<WEAPON_M249>::template type,
             TPrecacheEvent,
-            TReloadDefault,
             TGetDamageDefault,
             TPrimaryAttackRifle,
-            TFireRifle,
-            TWeaponIdleDefault
+            TFireRifle
     >
     {
     public:
-    static constexpr const auto &DefaultReloadTime = 3.0s;
     static constexpr const char *V_Model = "models/v_mgsm.mdl";
     static constexpr const char *P_Model = "models/p_mgsm.mdl";
     static constexpr const char *W_Model = "models/w_mgsm.mdl";
@@ -63,13 +287,13 @@ namespace sv {
     static constexpr const auto &SpreadCalcDefault = 0.03*A;
 
 	static constexpr const auto& CycleTime = 0.1s;
-    static constexpr int DamageDefault = 34;
-    static constexpr int DamageZB = 60;
-    static constexpr int DamageZBS = 70;
+    static constexpr int DamageDefault = 25;
+    static constexpr int DamageZB = 250;
+    static constexpr int DamageZBS = 500;
     static constexpr const auto &AccuracyCalc = (N * N * N / 190.0) + 0.385;
     static constexpr float AccuracyDefault = 0.2;
     static constexpr float AccuracyMax = 0.92;
-    static constexpr float RangeModifier = 0.97;
+    static constexpr float RangeModifier = 0.99;
     static constexpr auto BulletType = BULLET_PLAYER_556MM;
     /*static constexpr*/ int Penetration = 2;
     KnockbackData KnockBack = { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f };
@@ -78,26 +302,38 @@ namespace sv {
 	KickBackData KickBackNotOnGround = { 1.8f, 0.65f, 0.45f, 0.125f, 5.0f, 3.5f, 8 };
 	KickBackData KickBackDucking = { 0.75f, 0.325f, 0.25f, 0.025f, 3.5f, 2.5f, 9 };
 	KickBackData KickBackDefault = { 0.8f, 0.35f, 0.3f, 0.03f, 3.85f, 2.72f, 7 };
-#define MGSM_CHARGE_TIME	20	//0.2s
-	time_point_t m_flTimeHostler;
-	time_point_t m_flTimeNextCharge;
-	int m_iAmmo2;
+
+#define WPNSTATE_MGSM_MISSILE_ON	1
+
+	enum mgsm_launcher_e
+	{
+		ANIM_IDLE_A,
+		ANIM_IDLE_B,
+		ANIM_LAUNCHER_ON,
+		ANIM_LAUNCHER_SHOOT,
+	};
+
+	int m_iEfHit;
+	duration_t m_flChargeTime;
+	time_point_t m_flTimeChargeStart;
+	time_point_t m_flNextReload;
 
 	void Spawn()
 	{
-		m_iAmmo2 = 0;
-		m_flTimeNextCharge = gpGlobals->time;
+		m_flNextReload = invalid_time_point;
+		m_flTimeChargeStart = gpGlobals->time;
+		m_flChargeTime = GetChargeTime();
 		Base::Spawn();
 	}
 
     int GetItemInfo(ItemInfo* p)
     {
         p->pszName = STRING(pev->classname);
-        p->pszAmmo1 = "556NatoBox";
-        p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
+        p->pszAmmo1 = "mgsm";
+        p->iMaxAmmo1 = 350;
         p->pszAmmo2 = NULL;
         p->iMaxAmmo2 = -1;
-        p->iMaxClip = 150;
+        p->iMaxClip = 350;
         p->iSlot = 0;
         p->iPosition = 4;
         p->iId = m_iId = WEAPON_MGSM;
@@ -111,57 +347,201 @@ namespace sv {
 	{
 		PRECACHE_MODEL("sprites/muzzleflash192.spr");
 		PRECACHE_MODEL("sprites/muzzleflash193.spr");
+		PRECACHE_MODEL("sprites/muzzleflash194.spr");
+		m_iEfHit = PRECACHE_MODEL("sprites/ef_mgsm_hit.spr");
 		PRECACHE_MODEL("models/ef_mgsm_launcher.mdl");
+	
+		PRECACHE_SOUND("weapons/mgsm_gauge.wav");
+		PRECACHE_SOUND("weapons/mgsm-2.wav");
+		PRECACHE_SOUND("weapons/mgsm-1_exp1.wav");
+		PRECACHE_SOUND("weapons/mgsm-1_exp2.wav");
+		PRECACHE_SOUND("weapons/mgsm-1_exp3.wav");
 
 		Base::Precache();
 	}
 
-	void Holster(int skiplocal)
+	void PlayWeaponAnim(int iAnim, int iAnim2)
 	{
-		m_flTimeHostler = gpGlobals->time;
-		return CBasePlayerWeapon::Holster();
+		SendWeaponAnim(iAnim, UseDecrement() != FALSE);
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+		WRITE_BYTE(28);
+		WRITE_BYTE(m_iWeaponState);
+		WRITE_BYTE(iAnim2);
+		MESSAGE_END();
+#endif
+	}
+
+	void UpdateItemInfo()
+	{
+		CBasePlayerWeapon::UpdateItemInfo();
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+		WRITE_BYTE(28);
+		WRITE_BYTE(m_iWeaponState);
+		WRITE_BYTE(ANIM_LAUNCHER_ON);
+		MESSAGE_END();
+#endif
 	}
 
 	BOOL Deploy()
 	{
+		m_flNextReload = invalid_time_point;
 		m_flAccuracy = 0.24;
 		m_iShotsFired = 0;
 
-		if (m_flTimeHostler != invalid_time_point)
+		if (!m_iWeaponState && gpGlobals->time - m_flTimeChargeStart >= m_flChargeTime)
 		{
-			m_iAmmo2 += (gpGlobals->time - m_flTimeHostler) / 0.2s;
+			m_flTimeChargeStart = gpGlobals->time + 9999s;
+			m_iWeaponState = WPNSTATE_MGSM_MISSILE_ON;
 		}
-		if (m_iAmmo2 >= 100)
-			m_iAmmo2 = 100;
-
+		else
+		{
+			float delta = (gpGlobals->time - m_flTimeChargeStart) / 1s;
 #ifndef CLIENT_DLL
-		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
-		WRITE_BYTE(27);
-		WRITE_BYTE(m_iAmmo2);
-		WRITE_BYTE(MGSM_CHARGE_TIME);
-		MESSAGE_END();
+			MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+			WRITE_BYTE(27);
+			WRITE_COORD(delta);
+			WRITE_SHORT(m_flChargeTime / 1s);
+			MESSAGE_END();
 #endif
+		}
 
-		return DefaultDeploy("models/v_mgsm.mdl", "models/p_mgsm.mdl", ANIM_DRAW, "m134", UseDecrement() != FALSE);
+		if(m_iWeaponState == WPNSTATE_MGSM_MISSILE_ON)
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/mgsm_gauge.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
+			
+		if (DefaultDeploy("models/v_mgsm.mdl", "models/p_mgsm.mdl", ANIM_DRAW, "m134", UseDecrement() != FALSE))
+		{
+
+			return TRUE;
+		}
+		return FALSE;
 	}
 
 	void ItemPostFrame()
 	{
-		if (!m_iAmmo2)
+		if (m_fInReload && m_flNextReload != invalid_time_point && m_flNextReload < gpGlobals->time)
 		{
+			// complete the reload.
+			int j = Q_min(350 - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+#ifndef CLIENT_DLL
+			j = m_pPlayer->m_pModStrategy->AdjustDefaultReloadClip(this, j);
+#endif
+
+			// Add them to the clip
+			m_iClip += j;
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+#ifndef CLIENT_DLL
+			m_pPlayer->TabulateAmmo();
+#endif
+			m_fInReload = FALSE;
+			m_flNextReload = invalid_time_point;
+		}
+
+		if (!m_iWeaponState && gpGlobals->time - m_flTimeChargeStart >= m_flChargeTime)
+		{
+			m_flTimeChargeStart = gpGlobals->time + 9999s;
+			m_iWeaponState = WPNSTATE_MGSM_MISSILE_ON;
+
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/mgsm_gauge.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
+
+#ifndef CLIENT_DLL
+			MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+			WRITE_BYTE(28);
+			WRITE_BYTE(m_iWeaponState);
+			WRITE_BYTE(ANIM_LAUNCHER_ON);
+			MESSAGE_END();
+#endif
 
 		}
 
-		if (m_iAmmo2 < 100)
-		{
-			if (m_flTimeNextCharge <= gpGlobals->time)
-			{
-				m_iAmmo2++;
-				m_flTimeNextCharge = gpGlobals->time + 0.2s;
-			}
-		}
+		if (m_fInReload)
+			return;
+
 		return CBasePlayerWeapon::ItemPostFrame();
 	}
+
+
+#ifndef CLIENT_DLL
+	void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace)
+	{
+		int iOriginalPenetration = 2;
+
+		if (iOriginalPenetration == iPenetration)
+		{
+			if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+			{
+				if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+				{
+					float flBuffDamage = GetBuffDamage();
+					float flExplodeDamage = GetExplodeDamage();
+					switch (pEntity->m_LastHitGroup) {
+					case HITGROUP_GENERIC:
+						break;
+					case HITGROUP_HEAD:
+						flBuffDamage *= 3;
+						break;
+					case HITGROUP_CHEST:
+					case HITGROUP_STOMACH:
+						flBuffDamage *= 1.5;
+						break;
+					case HITGROUP_LEFTARM:
+					case HITGROUP_RIGHTARM:
+						flBuffDamage *= 1.0;
+						break;
+					case HITGROUP_LEFTLEG:
+					case HITGROUP_RIGHTLEG:
+						flBuffDamage *= 0.75;
+						break;
+					case HITGROUP_SHIELD:
+						flBuffDamage = 0;
+						break;
+					default:
+						break;
+					}
+
+					if (pEntity->IsPlayer())
+					{
+						if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
+						{
+							pEntity->m_pBuffAttacker = m_pPlayer->pev;
+							pEntity->m_flHealthDecreaseAmount = flBuffDamage;
+							pEntity->m_iHealthDecreaseCount = 6;
+							pEntity->m_flHealthDecreaseInterval = 1.0s;
+						}
+					}
+					else
+					{
+						pEntity->m_pBuffAttacker = m_pPlayer->pev;
+						pEntity->m_flHealthDecreaseAmount = flBuffDamage;
+						pEntity->m_iHealthDecreaseCount = 6;
+						pEntity->m_flHealthDecreaseInterval = 1.0s;
+					}
+
+					MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, pEntity->pev);
+					WRITE_BYTE(4);
+					WRITE_SHORT(pEntity->entindex());
+					WRITE_BYTE(4);
+					MESSAGE_END();
+
+					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pEntity->pev->origin);
+					WRITE_BYTE(TE_TEMPSPRITE);
+					WRITE_COORD(pEntity->pev->origin.x);
+					WRITE_COORD(pEntity->pev->origin.y);
+					WRITE_COORD(pEntity->pev->origin.z);
+					WRITE_SHORT(m_iEfHit);
+					WRITE_BYTE(6);
+					WRITE_BYTE(255);
+					WRITE_BYTE(30);
+					MESSAGE_END();
+
+					pEntity->TakeDamage(this->pev, m_pPlayer->pev, flExplodeDamage, DMG_EXPLOSION);
+				}
+			}
+		}
+
+	}
+#endif
 
 	void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	{
@@ -215,7 +595,7 @@ namespace sv {
 		if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 			m_pPlayer->SetSuitUpdate("!HEV_AMO0", 0, 0);
 #endif
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 			KickBack(1.8f, 0.65f, 0.45f, 0.125f, 5.0f, 3.5f, 8);
@@ -229,17 +609,45 @@ namespace sv {
 
 	void SecondaryAttack(void) override
 	{
-		m_iAmmo2 = 0;
+		if (m_iWeaponState != WPNSTATE_MGSM_MISSILE_ON)
+			return;
+
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+		WRITE_BYTE(28);
+		WRITE_BYTE(m_iWeaponState);
+		WRITE_BYTE(ANIM_LAUNCHER_SHOOT);
+		MESSAGE_END();
+#endif
+
+		m_iWeaponState = 0;
+		m_flTimeChargeStart = gpGlobals->time;
 
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
 		WRITE_BYTE(27);
-		WRITE_BYTE(m_iAmmo2);
-		WRITE_BYTE(MGSM_CHARGE_TIME);
+		WRITE_COORD(0.0);
+		WRITE_SHORT(m_flChargeTime / 1s);
 		MESSAGE_END();
 #endif
 
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
+		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/mgsm-2.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
+
+
+#ifndef CLIENT_DLL
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+		Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 15;
+		Vector vecAngles = UTIL_VecToAngles(gpGlobals->v_forward);
+		CMGSMMissile* pMissile = static_cast<CMGSMMissile*>(CBaseEntity::Create("mgsm_missile", vecSrc, vecAngles, ENT(m_pPlayer->pev)));
+		if (pMissile)
+		{
+			pMissile->m_vecVelocity = pMissile->pev->velocity = gpGlobals->v_forward * 1000;
+			pMissile->m_iTeam = m_pPlayer->m_iTeam;
+			pMissile->m_vecDirection = pMissile->pev->velocity.Normalize();
+		}
+#endif
+
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 			KickBack(0.2, 0.0, 0.05, 0.0, 0.5, 0.0, 0);
@@ -251,33 +659,71 @@ namespace sv {
 			KickBack(0.1, 0.0, 0.05, 0.0, 0.5, 0.0, 0);
 	}
 
-	float GetDamageB() const
+	void Reload(void)
 	{
-		float flDamage = 35;
-#ifndef CLIENT_DLL
-		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 65;
-		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage = 153;
+		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+			return;
+
+		if (DefaultReload(350, ANIM_RELOAD, 2.5s, 1))
+		{
+#ifndef CLIENT_DLL         
+			m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
-		return flDamage;
+			m_flNextReload = gpGlobals->time + 2.5s;
+		}
 	}
 
-	float GetDamageC() const
+	void WeaponIdle(void)
 	{
-		float flDamage = 5;
+		ResetEmptySound();
+		m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+
+		if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
+			return;
+
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
+
+		PlayWeaponAnim(ANIM_IDLE1, ANIM_IDLE_B);
+	}
+
+	float GetBuffDamage() const
+	{
+		float flDamage = 1;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 			flDamage = 25;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage = 75;
+			flDamage = 50;
 #endif
 		return flDamage;
 	}
 
+	float GetExplodeDamage() const
+	{
+		float flDamage = 4;
+#ifndef CLIENT_DLL
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage = 90;
+		else if (g_pModRunning->DamageTrack() == DT_ZBS)
+			flDamage = 180;
+#endif
+		return flDamage;
+	}
+
+	duration_t GetChargeTime()
+	{
+		duration_t time = 5s;
+#ifndef CLIENT_DLL
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			time = 10s;
+		else if (g_pModRunning->DamageTrack() == DT_ZBS)
+			time = 10s;
+#endif
+		return time;
+	}
 
 #ifndef CLIENT_DLL
-    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M249); }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_mgsm" , 200 }; }
 #endif
     float GetArmorRatioModifier() override { return 1.5; }
     WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 140 }; }

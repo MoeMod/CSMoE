@@ -199,6 +199,9 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pBloodHunterViewModel = IEngineStudio.Mod_ForName("models/v_bloodhunter.mdl", FALSE);
 	CStudioModelRenderer::s_pMGSMViewModel = IEngineStudio.Mod_ForName("models/v_mgsm.mdl", FALSE);
 	CStudioModelRenderer::s_pMGSMLauncherModel = IEngineStudio.Mod_ForName("models/ef_mgsm_launcher.mdl", FALSE);
+	CStudioModelRenderer::s_pM1887xmasViewModel = IEngineStudio.Mod_ForName("models/v_m1887xmas.mdl", FALSE);
+	CStudioModelRenderer::s_pXmasEmptyModel = IEngineStudio.Mod_ForName("models/xmas_empty.mdl", FALSE);
+
 	//VGui_Startup();
 
 	return 1;

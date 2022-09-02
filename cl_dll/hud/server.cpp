@@ -35,6 +35,13 @@ namespace cl {
 	extern int g_iBloodhunterSecAnim;
 	extern int g_iBloodhunterState;
 
+	extern float g_flMGSMAnimTime;
+	extern int g_iMGSMSecAnim;
+	extern int g_iMGSMState;
+
+	extern float g_flM1887xmasAnimTime;
+	extern int g_iM1887xmasAnim;
+
 enum
 {
 	HUMAN_SKILL_KNIFE2X,
@@ -187,6 +194,9 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		case 80:
 			gEngfuncs.pfnPlaySoundByNameAtLocation("weapons/divinetitan_charge.wav", VOL_NORM, gHUD.m_vecOrigin);
 			break;
+		case 81:
+			gEngfuncs.pfnPlaySoundByNameAtLocation("weapons/bunkerbuster_gauge.wav", VOL_NORM, gHUD.m_vecOrigin);
+			break;
 		}
 
 		break;
@@ -207,7 +217,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 			if (!iDivinetitanParticle[arg1])
 				iDivinetitanParticle[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_particle.spr"),
-					Vector(0.0, 0.0, 5.0), 15.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.8, kRenderTransAdd, 30.0);
+					Vector(0.0, 0.0, 5.0), 5.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.8, kRenderTransAdd, 30.0);
 			break;
 		}
 		case WINGGUN_WING:
@@ -383,9 +393,63 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	case 27:
 	{
 		//mgsm
+		float arg3 = reader.ReadCoord();
+		float arg4 = reader.ReadShort();
+		m_SniperScope.SetMGSMAmmo(arg3, arg4);
+		break;
+	}
+	case 28:
+	{
 		arg1 = reader.ReadByte();
-		float arg3 = reader.ReadByte() * 0.01;
-		m_SniperScope.SetMGSMAmmo(arg1, arg3);
+		arg2 = reader.ReadByte();
+		CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
+		if (pActiveBTEWeapon)
+		{
+			if (pActiveBTEWeapon->m_iId == WEAPON_MGSM)
+			{
+				if (arg1)	//iWpnState
+				{
+					//if (!g_flMGSMAnimTime)
+					g_flMGSMAnimTime = gHUD.m_flTime;
+					g_iMGSMSecAnim = arg2;
+				}
+				else
+				{
+					g_flMGSMAnimTime = 0.0;
+					g_iMGSMSecAnim = 0;
+				}
+			}
+			else
+			{
+				g_flMGSMAnimTime = 0.0;
+				g_iMGSMSecAnim = 0;
+			}
+		}
+		break;
+	}
+	case 29:
+	{
+		//bunkerbuster
+		arg2 = reader.ReadByte();
+		float arg3 = reader.ReadCoord();
+		float arg4 = reader.ReadCoord();
+
+		m_SniperScope.InsertBunkerBusterData(arg2,arg3, arg4);
+		break;
+	}
+	case 30:
+	{
+		float arg3 = reader.ReadCoord();
+
+		m_SniperScope.InsertBunkerBusterData2(arg3);
+		break;
+
+
+	}
+	case 31:
+	{
+		g_iM1887xmasAnim = -1;
+		g_flM1887xmasAnimTime = 0.0;
 		break;
 	}
 	case 42:

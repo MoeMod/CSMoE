@@ -595,6 +595,70 @@ public:
 	virtual void Precache();
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
+
+class CMGSMAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class CThunderPistolAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class C556AHEAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class C556KAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class C545NatoAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class C762KBoxAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class C57MMKAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class C45ACPKAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
 }
 
 #endif // AMMO_H

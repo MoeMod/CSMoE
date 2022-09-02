@@ -410,6 +410,17 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_cameragun");
 	UTIL_PrecacheOtherWeapon("weapon_m1887g");
 	UTIL_PrecacheOtherWeapon("weapon_mgsm");
+	UTIL_PrecacheOtherWeapon("weapon_bunkerbuster");
+	UTIL_PrecacheOtherWeapon("weapon_thunderpistol");
+	UTIL_PrecacheOtherWeapon("weapon_balrog5");
+	UTIL_PrecacheOtherWeapon("weapon_thanatos11");
+	UTIL_PrecacheOtherWeapon("weapon_m1887xmas");
+	UTIL_PrecacheOtherWeapon("weapon_kronos5");
+	UTIL_PrecacheOtherWeapon("weapon_an94");
+	UTIL_PrecacheOtherWeapon("weapon_m16a4");
+	UTIL_PrecacheOtherWeapon("weapon_kronos7");
+	UTIL_PrecacheOtherWeapon("weapon_kronos3");
+	UTIL_PrecacheOtherWeapon("weapon_kronos1");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

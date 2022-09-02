@@ -105,6 +105,8 @@ public:
 	static struct model_s* s_pBloodHunterViewModel;
 	static struct model_s* s_pMGSMViewModel;
 	static struct model_s* s_pMGSMLauncherModel;
+	static struct model_s* s_pM1887xmasViewModel;
+	static struct model_s* s_pXmasEmptyModel;
 };
 
 }

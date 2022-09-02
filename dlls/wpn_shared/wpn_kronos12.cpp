@@ -299,11 +299,14 @@ void CKronos12::PrimaryAttack(void)
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
 	if (m_iWeaponState & WPNSTATE_KRONOS12_ZOOM_ACTIVATE && !m_pEnemylist.empty())
+	{
 		PrimaryAttack_InstantDamage();
+		SendWeaponAnim(ANIM_SHOOT3, UseDecrement() != FALSE);
+		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/kronos12-1.wav", VOL_NORM, ATTN_NORM, 0, 94 + RANDOM_LONG(0, 15));
+	}	
 	else
 	{
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-#ifndef CLIENT_DLL
 		m_pPlayer->FireBullets(6, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0, GetDamage());
 
 		if (CBaseEntity* pEntity = gMultiDamage.pEntity)
@@ -312,26 +315,21 @@ void CKronos12::PrimaryAttack(void)
 			{
 				if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
 				{
-					pev->iuser1++;
+					if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
+					{
+						pev->iuser1++;
 
-					MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-					WRITE_BYTE(1);
-					WRITE_BYTE(pev->iuser1);
-					MESSAGE_END();
+						MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+						WRITE_BYTE(1);
+						WRITE_BYTE(pev->iuser1);
+						MESSAGE_END();
+					}
 				}
 			}		
 		}
-#endif
+
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFireKronos12, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, m_iWeaponState & WPNSTATE_KRONOS12_ZOOM_ACTIVATE, m_iWeaponState & WPNSTATE_KRONOS12_SCAN_ACTIVATE);
 	}
-
-	int flags;
-#ifdef CLIENT_WEAPONS
-	flags = FEV_NOTHOST;
-#else
-	flags = 0;
-#endif
-
-	PLAYBACK_EVENT_FULL(0, ENT(m_pPlayer->pev), m_usFireKronos12, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, m_iWeaponState & WPNSTATE_KRONOS12_ZOOM_ACTIVATE, m_iWeaponState & WPNSTATE_KRONOS12_SCAN_ACTIVATE);
 
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);

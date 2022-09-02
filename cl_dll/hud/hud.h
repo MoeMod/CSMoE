@@ -829,7 +829,10 @@ public:
 	void SetPatrolDroneDeployTime();
 	void InsertPatrolDroneData(int iSlot, int iClip, int iState);
 	void DrawMGSMScope(float flTime);
-	void SetMGSMAmmo(int iAmmo, float flNextTime);
+	void SetMGSMAmmo(float flDelta, float flFinishTime);
+	void DrawBunkerBusterScope(float flTime);
+	void InsertBunkerBusterData(int iGauge, float iCoolDown, float gCoolDown);
+	void InsertBunkerBusterData2(float ShootTime);
 private:
 
 	struct LockOnData
@@ -899,12 +902,36 @@ private:
 
 	std::map<int, patroldronedata> m_vecPatrolDroneData;
 
+	//bunkerbuster
+	UniqueTexture m_iBunkerBusterTgaBG_Blue;
+	UniqueTexture m_iBunkerBusterTgaBG_Red;
+	UniqueTexture m_iBunkerBusterTgaFrame_Blue;
+	UniqueTexture m_iBunkerBusterTgaFrame_Red;
+	
+	UniqueTexture m_iBunkerBusterTgaGauge;
+	UniqueTexture m_iBunkerBusterTgaCoolTimeLeft;
+	UniqueTexture m_iBunkerBusterTgaCoolTimeRight;
+
+	float m_flBunkerBusterCoolDown;
+	float m_flBunkerBusterCoolDownGlobal;
+
+	float m_flBunkerBusterShoot;
+	float m_flBunkerBusterShootEnd;
+
+	float m_flLastFrameTime;
+
+	int m_iGauge;
+	int iBunkerSpriteNumber[10];
+	int m_iBunkerSpriteFrame;
+
+	HSPRITE m_iBunkerSprite;
+	model_t* m_pModelBunkerSprite;
+
 	UniqueTexture m_iMGSM_Aim_BG;
 	UniqueTexture m_iMGSM_Aim_Gauge;
 
-	int m_iMGSMAmmo;
-	float m_flMGSMNextCharge;
-	float m_flMGSMNextChargeTime;
+	float m_flMGSMTimeChargeStart;
+	float m_flMGSMFinishTime;
 
 };
 

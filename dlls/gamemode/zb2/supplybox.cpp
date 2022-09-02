@@ -172,14 +172,19 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 					if (p->m_rgpPlayerItems[GRENADE_SLOT]->IsWeapon() && p->m_rgpPlayerItems[GRENADE_SLOT])
 					{
 						CBasePlayerWeapon* pGrenade = static_cast<CBasePlayerWeapon*>(pItem);
-						if (pGrenade->m_iId == WEAPON_DIVINETITAN || pGrenade->m_iId == WEAPON_HEGRENADE || pGrenade->m_iId == WEAPON_PATROLDRONE)
+						if (pGrenade->m_iId == WEAPON_DIVINETITAN || 
+							pGrenade->m_iId == WEAPON_HEGRENADE ||
+							pGrenade->m_iId == WEAPON_PATROLDRONE || 
+							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
 						{
 							p->RemovePlayerItem(pGrenade);
 							break;
 						}
 					}
 				}
-				if (info.iID == WEAPON_DIVINETITAN || info.iID == WEAPON_PATROLDRONE)
+				if (info.iID == WEAPON_DIVINETITAN || 
+					info.iID == WEAPON_PATROLDRONE || 
+					info.iID == WEAPON_BUNKERBUSTER)
 				{
 					//bad way
 					p->GiveNamedItem(info.pszClassName);

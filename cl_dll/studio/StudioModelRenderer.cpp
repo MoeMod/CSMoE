@@ -55,6 +55,8 @@ struct model_s* CStudioModelRenderer::s_pBuffAugSmokeModel;
 struct model_s* CStudioModelRenderer::s_pBloodHunterViewModel;
 struct model_s* CStudioModelRenderer::s_pMGSMViewModel;
 struct model_s* CStudioModelRenderer::s_pMGSMLauncherModel;
+struct model_s* CStudioModelRenderer::s_pM1887xmasViewModel;
+struct model_s* CStudioModelRenderer::s_pXmasEmptyModel;
 
 void CStudioModelRenderer::Init(void)
 {

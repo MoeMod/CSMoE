@@ -216,4 +216,14 @@ HOOK_EVENT(buffsg552, FireBuffSG552);
 HOOK_EVENT(cameragun, FireCameraGun);
 HOOK_EVENT(m1887g, FireM1887G);
 HOOK_EVENT(mgsm, FireMGSM);
-
+HOOK_EVENT(bunkerbuster, FireBunkerBuster);
+HOOK_EVENT(thunderpistol, FireThunderPistol);
+HOOK_EVENT(balrog5, FireBalrog5);
+HOOK_EVENT(thanatos11, FireThanatos11);
+HOOK_EVENT(m1887xmas, FireM1887xmas);
+HOOK_EVENT(kronos5, FireKronos5);
+HOOK_EVENT(an94, FireAN94);
+HOOK_EVENT(m16a4, FireM16A4);
+HOOK_EVENT(kronos7, FireKronos7);
+HOOK_EVENT(kronos3, FireKronos3);
+HOOK_EVENT(kronos1, FireKronos1);

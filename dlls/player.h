@@ -163,6 +163,7 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_HPBUFF			(1<<9)
 #define BUFF_SHOOTINGDOWN			(1<<10)
 #define BUFF_EMERGENCYESCAPE				(1<<11)
+#define BUFF_CLOAKING			(1<<12)
 
 #define COUNT_M32VENOM	0
 
@@ -819,6 +820,7 @@ public:
 	float m_flPlayerBuffData;
 	bool m_bBlockWdnmd;
 	std::map<uint32_t, PlayerItemData> m_ItemData;
+	time_point_t m_flCloaking;
 };
 
 }

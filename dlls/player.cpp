@@ -9156,6 +9156,14 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_M1887G:
 		case WEAPON_CAMERAGUN:
 		case WEAPON_MGSM:
+		case WEAPON_THANATOS11:
+		case WEAPON_M1887XMAS:
+		case WEAPON_KRONOS5:
+		case WEAPON_AN94:
+		case WEAPON_M16A4:
+		case WEAPON_KRONOS7:
+		case WEAPON_KINGCOBRA:
+		case WEAPON_KINGCOBRAG:
 			return TRUE;
 		}
 	}

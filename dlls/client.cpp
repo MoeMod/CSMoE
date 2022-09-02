@@ -4519,9 +4519,12 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
 
    if (pPlayer && pPlayer->IsPlayer())
    {
+	   float flInvisibleAlpha = 0.0;
+	   float flAlpha = 0.0;
+
 	   if (pPlayer->m_pActiveItem)
 	   {
-		   if (!Q_strcmp(STRING(pPlayer->m_pActiveItem->pev->classname), "weapon_cannonex"))
+		   if (pPlayer->m_pActiveItem->m_iId == WEAPON_CANNONEX)
 		   {
 			   CCannonEX* pWeapon = (CCannonEX*)pPlayer->m_pActiveItem;
 
@@ -4533,6 +4536,7 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
 		   }
 	   }
    }
+
    if (!Q_strcmp(STRING(ent->v.classname), "lasersgfakeeffect") && ent->v.body != 0)
    {
 	   if (ent->v.owner == host)

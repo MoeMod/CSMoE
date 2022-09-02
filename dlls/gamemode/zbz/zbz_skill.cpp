@@ -273,7 +273,9 @@ namespace sv {
 
 			if (pWeapon)
 			{
-				if (pWeapon->m_iId == WEAPON_DIVINETITAN || pWeapon->m_iId == WEAPON_PATROLDRONE)
+				if (pWeapon->m_iId == WEAPON_DIVINETITAN || 
+					pWeapon->m_iId == WEAPON_PATROLDRONE || 
+					pWeapon->m_iId == WEAPON_BUNKERBUSTER)
 					return;
 
 				if (amount && pWeapon && pWeapon->m_iId != WEAPON_HEGRENADE)
@@ -283,7 +285,9 @@ namespace sv {
 
 				while (pWeapon != NULL)
 				{
-					if (pWeapon->m_iId == WEAPON_DIVINETITAN || pWeapon->m_iId == WEAPON_PATROLDRONE)
+					if (pWeapon->m_iId == WEAPON_DIVINETITAN || 
+						pWeapon->m_iId == WEAPON_PATROLDRONE ||
+						pWeapon->m_iId == WEAPON_BUNKERBUSTER)
 						return;
 					pWeapon = pWeapon->m_pNext;
 				}

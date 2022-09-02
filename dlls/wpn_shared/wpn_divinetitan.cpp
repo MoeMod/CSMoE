@@ -57,6 +57,8 @@ namespace sv {
 		PRECACHE_MODEL("models/v_divinetitan.mdl");
 		PRECACHE_MODEL("models/p_divinetitan.mdl");
 		PRECACHE_MODEL("models/w_divinetitan.mdl");
+		//PRECACHE_MODEL("sprites/bunkerbuster_fire.spr");
+		
 
 		PRECACHE_SOUND("weapons/divinetitan_A_mode-1_start.wav");
 		PRECACHE_SOUND("weapons/divinetitan_A_mode-1_end.wav");
@@ -206,6 +208,7 @@ namespace sv {
 			WRITE_BYTE(m_CrossHairState);
 			MESSAGE_END();
 		}
+		m_flTimeholster = gpGlobals->time;
 		
 #endif
 		return DefaultDeploy("models/v_divinetitan.mdl", "models/p_divinetitan.mdl", m_iDeployAnim, "grenade", UseDecrement() != FALSE);
@@ -599,6 +602,8 @@ namespace sv {
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + m_flIdleTime;
 		SendWeaponAnim(m_iIdleAnim, UseDecrement() != FALSE);
 
+
+
 	}
 	void CDivineTitan::UpdateOnRemove(void)
 	{
@@ -611,10 +616,11 @@ namespace sv {
 				if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] || !m_iWpnState)
 				{
 					m_pTitan->m_pWeapon = NULL;
-					//RemoveEntity();
 				}
 			}
+			//RemoveEntity();
 		}
+
 		CBaseEntity::UpdateOnRemove();
 #endif
 	}
@@ -1585,11 +1591,11 @@ namespace sv {
 					}
 				}
 			}
-			/*
-			ClearMultiDamage();
-			m_iTarget[i]->TraceAttack(pAttackPlayer->pev, GetDamage_Instance() * flDamageAdjust, vecDirection, &tr, DMG_BULLET);
-			ApplyMultiDamage(pAttackPlayer->pev, pAttackPlayer->pev);
-			*/
+			
+			//ClearMultiDamage();
+			//m_iTarget[i]->TraceAttack(pAttackPlayer->pev, GetDamage_Instance() * flDamageAdjust, vecDirection, &tr, DMG_BULLET);
+			//ApplyMultiDamage(pAttackPlayer->pev, pAttackPlayer->pev);
+			
 			m_iTarget[i]->TakeDamage(pev, pAttackPlayer->pev, GetDamage_Instance()* flDamageAdjust, DMG_BULLET);
 #endif
 		}
@@ -1799,11 +1805,24 @@ namespace sv {
 		{
 			if (pAttack->m_flPlayerBuffData)
 			{
-				if (!this->m_pWeapon)
-				{
-					pAttack->m_flPlayerBuffData = 0;
-					ClearEnt(1);
-				}
+
+					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_rgpPlayerItems[GRENADE_SLOT];
+					if (!pWeapon)
+					{
+						pAttack->m_flPlayerBuffData = 0;
+						this->m_pWeapon->m_flTimeholster = gpGlobals->time;
+						UTIL_Remove(this);
+						return;
+					}
+
+					if (pWeapon->m_iId != WEAPON_DIVINETITAN)
+					{
+						pAttack->m_flPlayerBuffData = 0;
+						this->m_pWeapon->m_flTimeholster = gpGlobals->time;
+						UTIL_Remove(this);
+						return;
+					}
+				
 				if (m_iType == 1  && this->m_pWeapon)
 				{
 					//Redirect timepoint
@@ -1813,7 +1832,7 @@ namespace sv {
 						this->m_pWeapon->m_flTimeholster = gpGlobals->time;
 						this->m_pWeapon->m_flTimeholster = invalid_time_point;
 
-						m_flTimeNextCharge = gpGlobals->time + 0.25s;
+						m_flTimeNextCharge = gpGlobals->time + 0.20s;
 
 						this->m_pWeapon->ChangeClip(1,false);
 						this->m_pWeapon->m_iSaveShoots++;
