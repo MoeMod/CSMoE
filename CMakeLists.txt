@@ -23,6 +23,9 @@ endif()
 
 set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(XASH_LIBDL true)
+if(NOT ANDROID AND NOT IOS)
+	option(XASH_ANGLE "Use OpenGL ES on desktop platforms" OFF) # use angle on desktop platforms
+endif()
 
 set(CMAKE_CXX_STANDARD 20)
 

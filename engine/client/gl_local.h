@@ -645,7 +645,10 @@ typedef struct
 
 typedef struct
 {
-#ifdef XASH_SDL
+#ifdef XASH_ANGLE
+    void *context;
+    void *surface;
+#elif defined XASH_SDL
 	SDL_GLContext		context;		// SDL GL Context
 #else
 	void *context;

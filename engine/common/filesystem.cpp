@@ -3063,7 +3063,7 @@ static ResultType FS_MapFileImpl(const char* path, fs_offset_t* filesizeptr, qbo
         }
     }
 
-#if __ANDROID__ && 0 // TODO : test
+#if __ANDROID__
     if(auto asset = file->asset)
     {
         off_t offset, filesize;
@@ -4083,7 +4083,7 @@ ResultType W_MapLump( wfile_t *wad, dlumpinfo_t *lump, fs_offset_t *lumpsizeptr 
         }
     }
 
-#if __ANDROID__ && 0 // TODO : test
+#if __ANDROID__
     if(auto asset = wad->wadfile->asset)
     {
         off_t offset, filesize;
