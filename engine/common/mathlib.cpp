@@ -479,10 +479,15 @@ void AngleQuaternion( const vec3_t angles, vec4_t_ref q )
 {
 	float	sr, sp, sy, cr, cp, cy;
 
-#ifdef XASH_VECTORIZE_SINCOS
-	SinCosFastVector3( angles[2] * 0.5f, angles[1] * 0.5f, angles[0] * 0.5f,
-		&sy, &sp, &sr,
-		&cy, &cp, &cr);
+#ifdef U_VECTOR_SIMD
+	vec3_t sina, cosa;
+	sincos_ps(angles * 0.5, &sina.m_xmm, &cosa.m_xmm);
+	sy = sina[2];
+	cy = cosa[2];
+	sp = sina[1];
+	cp = cosa[1];
+	sr = sina[0];
+	cr = cosa[0];
 #else
 	float	angle;
 	
