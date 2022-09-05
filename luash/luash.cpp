@@ -9,12 +9,12 @@ namespace moe {
 #ifdef U_VECTOR_SIMD
     void VectorBase<float, 3, 16>::LuaPush(lua_State* L) const
     {
-        return LuaPush_impl(L, *this, std::make_index_sequence<N>());
+        return LuaPush_impl(L, *this, std::make_index_sequence<3>());
     }
 
     void VectorBase<float, 3, 16>::LuaGet(lua_State* L, int idx)
     {
-        return LuaGet_impl(L, idx, *this, std::make_index_sequence<N>());
+        return LuaGet_impl(L, idx, *this, std::make_index_sequence<3>());
     }
 #else
     template void VectorBase<float, 3, 16>::LuaPush(lua_State* L) const;
