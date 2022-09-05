@@ -35,10 +35,10 @@ Image_LoadMDL_BMP
 */
 qboolean Image_LoadMDL_BMP(const char* name, const byte* buffer, size_t filesize, const byte* ptexture)
 {
-	mstudiotexture_t* pin;
+	const mstudiotexture_t* pin;
 	int		flags;
 
-	pin = (mstudiotexture_t*)ptexture;
+	pin = (const mstudiotexture_t*)ptexture;
 	flags = pin->flags;
 
 	byte* buf_p, * pixbuf, magic[2];

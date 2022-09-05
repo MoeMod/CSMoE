@@ -505,17 +505,16 @@ void pfnDrawConsoleStringLen( const char *pText, int *length, int *height )
 R_StudioLoadHeader
 =================
 */
-studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
+const studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
 {
-	byte		*pin;
-	studiohdr_t	*phdr;
-	mstudiotexture_t	*ptexture;
+	const byte		*pin;
+	const studiohdr_t	*phdr;
 	int		i;
 
 	if( !buffer ) return NULL;
 
-	pin = (byte *)buffer;
-	phdr = (studiohdr_t *)pin;
+	pin = (const byte *)buffer;
+	phdr = (const studiohdr_t *)pin;
 	i = LittleLong(phdr->version);
 
 	if( i != STUDIO_VERSION )
@@ -528,7 +527,7 @@ studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
 	Mod_StudioBigEndian( mod, phdr );
 #endif
 
-	return (studiohdr_t *)buffer;
+	return (const studiohdr_t *)buffer;
 }
 
 /*
@@ -563,7 +562,7 @@ static int R_StudioBodyVariations( model_t *mod )
 Mod_LoadStudioModel
 =================
 */
-void Mod_LoadStudioModel( model_t *mod, void *buffer, qboolean *loaded )
+void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 {
     const studiohdr_t	*phdr;
 
@@ -611,7 +610,6 @@ Mod_UnloadStudioModel
 void Mod_UnloadStudioModel( model_t *mod )
 {
 	studiohdr_t	*pstudio;
-	mstudiotexture_t	*ptexture;
 	int		i;
 
 	ASSERT( mod != NULL );

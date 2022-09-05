@@ -156,10 +156,10 @@ qboolean Image_LoadMDL( const char *name, const byte *buffer, size_t filesize )
 {
 	byte		*fin;
 	size_t		pixels;
-	mstudiotexture_t	*pin;
+	const mstudiotexture_t	*pin;
 	int		flags;
 
-	pin = (mstudiotexture_t *)buffer;
+	pin = (const mstudiotexture_t *)buffer;
 	flags = pin->flags;
 
 	image.width = pin->width;

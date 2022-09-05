@@ -41,6 +41,26 @@ file_t* g_hSequencePack[MAX_SEQUENCEPACKS];
 fs_offset_t g_nSequenceSize[MAX_SEQUENCEPACKS];
 int g_iSequenceNums = 0;
 
+int Mod_NumExtendSeq(const char *mod_name)
+{
+    int result = 0;
+    char newname[PATH_MAX];
+    strcpy(newname, mod_name);
+    newname[strlen(newname) - 4] = 0;
+    for (int i = 0; i < MAX_SEQUENCEPACKS; i++)
+    {
+        char filename[PATH_MAX];
+        sprintf(filename, "%s%d.seq", newname, i + 1);
+        auto f = FS_Open(filename, "rb", false);
+        if (!f)
+            break;
+
+        FS_Close(f);
+        ++result;
+    }
+    return result;
+}
+
 byte *Mod_LoadExtendSeq(const char *mod_name, byte *buffer)
 {
 	// flip to native endian

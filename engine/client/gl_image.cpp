@@ -29,6 +29,7 @@ GNU General Public License for more details.
 #include <memory>
 #include "mod_decryptor.h"
 #include "mod_extend_seq.h"
+#include "gl_texlru.h"
 
 #define TEXTURES_HASH_SIZE	64
 
@@ -1698,12 +1699,12 @@ int GL_LoadTextureInternal( const char *name, image_ref pic, texFlags_t flags, q
 namespace xe {
 	struct texlru_src_external_s {
 		std::string path;
-		mstudiotexture_t texture;
+		const mstudiotexture_t *texture;
 	};
 	struct texlru_src_internal_s {
 		std::string texture_name;
 		std::string model_name;
-		mstudiotexture_t texture;
+        const mstudiotexture_t *texture;
 		size_t size;
 	};
 	struct texlru_extdata_s {
@@ -1712,7 +1713,55 @@ namespace xe {
 		std::variant<texlru_src_external_s, texlru_src_internal_s> src;
 	};
 
-	int TexLru_LoadTextureExternal(const char *name, mstudiotexture_t *ptexture, int flags, imgfilter_t *filter)
+    std::unordered_map<const mstudiotexture_t *, TextureAttr> g_textureAttrMap;
+
+    void UpdateAttr(const mstudiotexture_t *ptexture)
+    {
+        TextureAttr &attr = g_textureAttrMap.at(ptexture);
+
+        if ( ptexture->name[0] == '$' )
+        {
+            if ( ptexture->name[1] == '0' && ptexture->name[2] == 'b' )
+            {
+                attr.flags |= STUDIO_NF_ADDITIVE;
+                attr.flags |= STUDIO_NF_FULLBRIGHT;
+            }
+        }
+
+        gltexture_t *gltex = R_GetTexture(attr.index);
+        if (gltex)
+        {
+            attr.width = gltex->width;
+            attr.height = gltex->height;
+        }
+    }
+
+    void TexLru_CreateAttr(const mstudiotexture_t *ptexture, int gl_texturenum)
+    {
+        TextureAttr attr = {ptexture, ptexture->flags, ptexture->width, ptexture->height, gl_texturenum };
+
+        if ( ptexture->name[0] == '$' )
+        {
+            if ( ptexture->name[1] == '0' && ptexture->name[2] == 'b' )
+            {
+                attr.flags |= STUDIO_NF_ADDITIVE;
+                attr.flags |= STUDIO_NF_FULLBRIGHT;
+            }
+        }
+
+        gltexture_t *gltex = R_GetTexture(gl_texturenum);
+        if (gltex)
+        {
+            attr.index = gl_texturenum;
+            attr.width = gltex->width;
+            attr.height = gltex->height;
+        }
+
+        auto [iter, succ] = g_textureAttrMap.emplace(ptexture, TextureAttr{ ptexture, ptexture->flags, ptexture->width, ptexture->height, gl_texturenum });
+        return UpdateAttr(ptexture);
+    }
+
+	int TexLru_LoadTextureExternal(const char *name, const mstudiotexture_t *ptexture, int flags, imgfilter_t *filter)
 	{
 		uint		picFlags = 0;
 
@@ -1760,13 +1809,13 @@ namespace xe {
 		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
 
 		// add to lru
-		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_external_s{ name, *ptexture } });
+		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_external_s{ name, ptexture } });
 
 		// NOTE: always return texnum as index in array or engine will stop work !!!
 		return i;
 	}
 
-	int TexLru_LoadTextureInternal(const char *name, const char *model_name, mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter)
+	int TexLru_LoadTextureInternal(const char *name, const char *model_name, const mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter)
 	{
 		uint		picFlags = 0;
 
@@ -1813,7 +1862,7 @@ namespace xe {
 		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
 
 		// add to lru
-		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_internal_s{ name, model_name, *ptexture, size } });
+		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_internal_s{ name, model_name, ptexture, size } });
 
 		// NOTE: always return texnum as index in array or engine will stop work !!!
 		return i;
@@ -1844,11 +1893,11 @@ namespace xe {
 	struct TexLru_Uploader{
 		gltexture_t	*tex;
 		imgfilter_t *filter;
-		mstudiotexture_t *ptexture;
+		const mstudiotexture_t *ptexture;
 		std::shared_ptr<gltexture_t> operator()(texlru_src_external_s &src) const
 		{
 			int flags = tex->flags;
-			auto pic = FS_LoadImage( src.path.c_str(), (byte*)&src.texture, 0 );
+			auto pic = FS_LoadImage( src.path.c_str(), (byte*)src.texture, 0 );
 			if( !pic )
 			{
 				MsgDev(D_ERROR, "TexLru : fail to load load external texture %s\n", src.path.c_str());
@@ -1862,8 +1911,7 @@ namespace xe {
 			GL_TexFilter( tex, false ); // update texture filter, wrap etc
 
 			// set size for external texture
-			ptexture->width = tex->width;
-			ptexture->height = tex->height;
+            UpdateAttr(ptexture);
 
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 				pic = nullptr; // release source texture
@@ -1877,22 +1925,22 @@ namespace xe {
 			byte *buf = FS_MapFileCOW( src.model_name.c_str(), &filesize, false );
 			if(!buf)
 			{
-				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
+				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
 				return {}; // couldn't loading image
 			}
 
             // replace model
             Mod_DecryptModel(src.model_name.c_str(), buf);
             studiohdr_t *phdr = reinterpret_cast<studiohdr_t *>(Mod_LoadExtendSeq(src.model_name.c_str(), buf));
-			Image_SetMDLPointer((byte *)phdr + src.texture.index);
+			Image_SetMDLPointer((byte *)phdr + src.texture->index);
 
 			int flags = tex->flags;
 			// hack : expected mstudiotexture_t* as buffer
-			auto pic = FS_LoadImage( src.texture_name.c_str(), (byte *)&src.texture, src.size );
+			auto pic = FS_LoadImage( src.texture_name.c_str(), (byte *)src.texture, src.size );
 			if( !pic )
 			{
 				FS_MapFree( buf, filesize );
-				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
+				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
 				return {}; // couldn't loading image
 			}
 
@@ -1902,12 +1950,14 @@ namespace xe {
 			GL_UploadTexture( pic, tex, false, filter );
 			GL_TexFilter( tex, false ); // update texture filter, wrap etc
 
+            UpdateAttr(ptexture);
+
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 				pic = nullptr; // release source texture
 
             FS_MapFree( buf, filesize );
 
-			MsgDev(D_INFO, "TexLru : load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
+			MsgDev(D_INFO, "TexLru : load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
 		}
 	};
@@ -2036,28 +2086,49 @@ namespace xe {
 
 	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(0);
 
-	void TexLru_Upload( mstudiotexture_t *ptexture )
+	int TexLru_Upload( const TextureAttr &attr )
 	{
-		int texnum = ptexture->index;
+		int texnum = attr.index;
 		gltexture_t	*tex = &r_textures[texnum];
 		if(!tex->texlru_extdata)
-			return; // unknown texture
+			return 0; // unknown texture
 
 		if (textureCache.contains((GLuint)texnum)) {
 			// ptexture with same texnum which is from differet model, so it need to update size
-			if (ptexture->width != tex->width) {
-				ptexture->width = tex->width;
-				ptexture->height = tex->height;
+			if (attr.width != tex->width) {
+                UpdateAttr(attr.ptexture);
 			}
-			return; // already present
+			return texnum; // already present
 		}
 
 		textureCache.set_capacity(r_texlru->integer);
 
 		auto &lrudata = *tex->texlru_extdata;
-		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter, ptexture }, lrudata.src);
+		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter, attr.ptexture }, lrudata.src);
 		textureCache.insert((GLuint)texnum, std::move(deleter));
+        return texnum;
 	}
+
+    void TexLru_Bind( const TextureAttr &attr )
+    {
+        GL_Bind( XASH_TEXTURE0, TexLru_Upload(attr) );
+    }
+
+    const TextureAttr &TexLru_GetAttr(const mstudiotexture_t *ptexture)
+    {
+        return g_textureAttrMap.at(ptexture);
+    }
+
+    void TexLru_FreeTexture(const mstudiotexture_t *ptexture)
+    {
+        // TODO : prevent crash ?
+        auto iter = g_textureAttrMap.find(ptexture);
+        if(iter != g_textureAttrMap.end())
+        {
+            GL_FreeTexture(iter->second.index);
+            g_textureAttrMap.erase(iter);
+        }
+    }
 
 	void TexLru_Free( int texnum )
 	{
