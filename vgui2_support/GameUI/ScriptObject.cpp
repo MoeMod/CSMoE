@@ -942,5 +942,7 @@ void CDescription::setDescription(const char *pszDesc)
 
 void CDescription::setHint(const char *pszHint)
 {
+    if (m_pszHintText)
+        free(m_pszHintText);
 	m_pszHintText = strdup(pszHint);
 }
