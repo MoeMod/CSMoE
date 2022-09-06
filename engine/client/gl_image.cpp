@@ -1929,21 +1929,18 @@ namespace xe {
 				return {}; // couldn't loading image
 			}
 
-			const studiohdr_t* phdr = reinterpret_cast<const studiohdr_t*>(buf);
+            if(Mod_IsModelEncrypted(src.model_name.c_str(), buf) || Mod_NumExtendSeq(src.model_name.c_str()) > 0)
+            {
+                // switch to COW mode
+                FS_MapFree(buf, filesize);
+                auto buf2 = FS_MapFileCOW( src.model_name.c_str(), &filesize, false );
+                buf = buf2;
+                Mod_DecryptModel(src.model_name.c_str(), buf2);
 
-			// replace model
-			bool bIsReplace = false;
-			if (Mod_IsModelEncrypted(src.model_name.c_str(), buf) || Mod_NumExtendSeq(src.model_name.c_str()) > 0)
-			{
-				// switch to COW mode
-				FS_MapFree(buf, filesize);
-				auto buf2 = FS_MapFileCOW(src.model_name.c_str(), &filesize, false);
-				buf = buf2;
-
-				// replace model
-				Mod_DecryptModel(src.model_name.c_str(), buf2);
-				phdr = reinterpret_cast<const studiohdr_t*>(Mod_LoadExtendSeq(src.model_name.c_str(), buf2));
-			}
+                buf2 = Mod_LoadExtendSeq(src.model_name.c_str(), buf2, &filesize);
+                buf = buf2;
+            }
+            const studiohdr_t *phdr = reinterpret_cast<const studiohdr_t *>(buf);
 
 			Image_SetMDLPointer((const byte *)phdr + src.texture->index);
 

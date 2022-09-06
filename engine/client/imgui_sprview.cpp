@@ -82,10 +82,10 @@ public:
 			if (!texture)
 			{
 				fs_offset_t size;
-				byte* buf = FS_LoadFile(pSprite->name, &size, false);
+				const byte* buf = FS_MapFile(pSprite->name, &size, false);
 
 				qboolean loaded;
-				Mod_LoadSpriteModel(pSprite, buf, &loaded, 0);
+				Mod_LoadSpriteModel(pSprite, buf, size, &loaded, 0);
 			}
 		}
 

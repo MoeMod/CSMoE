@@ -2797,7 +2797,7 @@ void Mod_UnloadBrushModel( model_t *mod )
 Mod_LoadBrushModel
 =================
 */
-static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *loaded )
+static void Mod_LoadBrushModel( model_t *mod, const byte *buffer, size_t filesize, qboolean *loaded )
 {
 	int	i, j;
 	int	sample_size;
@@ -2826,6 +2826,7 @@ static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *load
 		break;
 	default:
 		MsgDev( D_ERROR, "%s has wrong version number (%i should be %i)\n", loadmodel->name, i, HLBSP_VERSION );
+        FS_MapFree( buffer, filesize );
 		return;
 	}
 
@@ -2839,6 +2840,7 @@ static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *load
 	{
 		// can't mix world and bmodels with different sample sizes!
 		MsgDev( D_ERROR, "%s has wrong version number (%i should be %i)\n", loadmodel->name, i, world.version );
+        FS_MapFree( buffer, filesize );
 		return;		
 	}
 	bmodel_version = i;	// share it
@@ -2967,6 +2969,7 @@ static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *load
 	}
 
 	if( loaded ) *loaded = true;	// all done
+    FS_MapFree( buffer, filesize );
 }
 
 /*
@@ -3132,20 +3135,21 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
                 auto buf2 = FS_MapFileCOW( tempname, &filesize, false );
                 buf = buf2;
                 Mod_DecryptModel(mod->name, buf2);
-                Mod_LoadStudioModel( mod, Mod_LoadExtendSeq(mod->name, buf2), &loaded );
-                break;
+
+                buf2 = Mod_LoadExtendSeq(mod->name, buf2, &filesize);
+                buf = buf2;
             }
             // normal mode
-            Mod_LoadStudioModel( mod, buf, &loaded );
+            Mod_LoadStudioModel( mod, buf, filesize, &loaded );
             break;
         }
 	case IDSPRITEHEADER:
-		Mod_LoadSpriteModel( mod, buf, &loaded, 0 );
+		Mod_LoadSpriteModel( mod, buf, filesize, &loaded, 0 );
 		break;
 	case Q1BSP_VERSION:
 	case HLBSP_VERSION:
 	case XTBSP_VERSION:
-        Mod_LoadBrushModel( mod, buf, &loaded );
+        Mod_LoadBrushModel( mod, buf, filesize, &loaded );
 		break;
 	default:
 		FS_MapFree( buf, filesize );
@@ -3157,21 +3161,19 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	if( !loaded )
 	{
 		Mod_FreeModel( mod );
-        FS_MapFree( buf, filesize );
 
 		if( crash ) Host_MapDesignError( "Mod_ForName: %s couldn't load\n", tempname );
 		else MsgDev( D_ERROR, "Mod_ForName: %s couldn't load\n", tempname );
 
 		return NULL;
 	}
-#ifndef XASH_DEDICATED
+#if 0 // MoeMod : CSMoE removed this feature
 	else if( clgame.drawFuncs.Mod_ProcessUserData != NULL )
 	{
 		// let the client.dll load custom data
 		clgame.drawFuncs.Mod_ProcessUserData( mod, true, buf );
 	}
 #endif
-    FS_MapFree( buf, filesize );
 
 	return mod;
 }

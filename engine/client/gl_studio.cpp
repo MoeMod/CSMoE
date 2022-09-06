@@ -4413,7 +4413,7 @@ const studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
 Mod_LoadStudioModel
 =================
 */
-void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
+void Mod_LoadStudioModel( model_t *mod, const void *buffer, size_t filesize, qboolean *loaded )
 {
     const studiohdr_t	*phdr;
 
@@ -4470,8 +4470,8 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	}
 #else
 	// just copy model into memory
-	loadmodel->cache.data = Mem_Alloc( loadmodel->mempool, phdr->length );
-	Mem_VirtualCopy( loadmodel->cache.data, buffer, phdr->length );
+	loadmodel->cache.data = (void *)buffer; // Mem_Alloc( loadmodel->mempool, phdr->length );
+    loadmodel->cache_size = filesize;
     phdr = (const studiohdr_t *)loadmodel->cache.data;
 #endif
 
@@ -4540,6 +4540,7 @@ void Mod_UnloadStudioModel( model_t *mod )
 	}
 
 	Mem_FreePool( &mod->mempool );
+    FS_MapFree((const byte *)mod->cache.data, mod->cache_size);
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 		

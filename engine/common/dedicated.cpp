@@ -574,9 +574,8 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	if( !phdr ) return;	// bad model
 
 	// just copy model into memory
-	loadmodel->cache.data = Mem_Alloc( loadmodel->mempool, phdr->length );
-	Q_memcpy( loadmodel->cache.data, buffer, phdr->length );
-
+	loadmodel->cache.data = (void *)buffer; // Mem_Alloc( loadmodel->mempool, phdr->length );
+    loadmodel->cache_size = filesize;
 	phdr = (const studiohdr_t *)loadmodel->cache.data;
 
 	// setup bounding box
@@ -621,6 +620,7 @@ void Mod_UnloadStudioModel( model_t *mod )
 	if( !pstudio ) return; // already freed
 
 	Mem_FreePool( &mod->mempool );
+    FS_MapFree((const byte *)mod->cache.data, mod->cache_size);
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 

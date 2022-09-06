@@ -1289,10 +1289,8 @@ static qboolean CL_LoadHudSprite( const char *szSpriteName, model_t *m_pSprite, 
 	Q_strncpy( m_pSprite->name, szSpriteName, sizeof( m_pSprite->name ));
 	m_pSprite->flags = 256; // it's hud sprite, make difference names to prevent free shared textures
 
-	if( mapSprite ) Mod_LoadMapSprite( m_pSprite, buf, (size_t)size, &loaded );
-	else Mod_LoadSpriteModel( m_pSprite, buf, &loaded, texFlags );		
-
-	FS_MapFree( buf, size );
+	if( mapSprite ) Mod_LoadMapSprite( m_pSprite, buf, size, &loaded );
+	else Mod_LoadSpriteModel( m_pSprite, buf, size, &loaded, texFlags );
 
 	if( !loaded )
 	{
