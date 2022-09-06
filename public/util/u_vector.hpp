@@ -68,6 +68,7 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align, Base> : Base
 		std::copy_n(arr, N, this->m_data);
 	}
 
+    // TODO : no more unaligned please!
     template<class T2, std::size_t Align2, class Base2>
     constexpr VectorBase_Gen(const VectorBase_Gen<T2, N, std::index_sequence<I...>, Align2, Base2> &other) : VectorBase_Gen{ other[I]... } {}
 
@@ -206,6 +207,8 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
     using Base = VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 16, VectorBase3f_SIMD_Data>;
     using Base::Base;
 
+    constexpr VectorBase_Storage() = default;
+
     constexpr VectorBase_Storage(float x1, float y1, float z1) : Base{ x1, y1, z1 }
     {
     }
@@ -218,6 +221,14 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
     operator xmm_t() const
     {
         return this->m_xmm;
+    }
+
+    // TODO : no more unaligned please!
+    constexpr VectorBase_Storage(const VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 4, VectorBase3_Data<float, 4>>& other)
+    {
+        x = other.x;
+        y = other.y;
+        z = other.z;
     }
 };
 
@@ -574,7 +585,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #if U_VECTOR_NEON
         return vnegq_f32(*this);
 #elif U_VECTOR_SSE
-        return VectorBase(_mm_setzero_ps()) - *this;
+        return ThisClass(_mm_setzero_ps()) - (const ThisClass &)*this;
 #endif
     }
     ThisClass operator*(float fl) const

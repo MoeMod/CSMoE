@@ -1922,16 +1922,29 @@ namespace xe {
 		std::shared_ptr<gltexture_t> operator()(texlru_src_internal_s &src) const
 		{
             fs_offset_t filesize;
-			byte *buf = FS_MapFileCOW( src.model_name.c_str(), &filesize, false );
+			const byte *buf = FS_MapFile( src.model_name.c_str(), &filesize, false );
 			if(!buf)
 			{
 				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
 				return {}; // couldn't loading image
 			}
 
-            // replace model
-            Mod_DecryptModel(src.model_name.c_str(), buf);
-            studiohdr_t *phdr = reinterpret_cast<studiohdr_t *>(Mod_LoadExtendSeq(src.model_name.c_str(), buf));
+			const studiohdr_t* phdr = reinterpret_cast<const studiohdr_t*>(buf);
+
+			// replace model
+			bool bIsReplace = false;
+			if (Mod_IsModelEncrypted(src.model_name.c_str(), buf) || Mod_NumExtendSeq(src.model_name.c_str()) > 0)
+			{
+				// switch to COW mode
+				FS_MapFree(buf, filesize);
+				auto buf2 = FS_MapFileCOW(src.model_name.c_str(), &filesize, false);
+				buf = buf2;
+
+				// replace model
+				Mod_DecryptModel(src.model_name.c_str(), buf2);
+				phdr = reinterpret_cast<const studiohdr_t*>(Mod_LoadExtendSeq(src.model_name.c_str(), buf2));
+			}
+
 			Image_SetMDLPointer((const byte *)phdr + src.texture->index);
 
 			int flags = tex->flags;

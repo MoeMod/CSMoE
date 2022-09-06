@@ -652,6 +652,9 @@ CDescription::CDescription(CPanelListPanel *panel)
 	pObjList = NULL;
 
 	m_pListPanel = panel;
+
+	m_pszHintText = NULL;
+	m_pszDescriptionType = NULL;
 }
 
 CDescription::~CDescription(void)
