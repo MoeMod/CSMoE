@@ -4349,7 +4349,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 	{
 		// NOTE: replace index with pointer to start of imagebuffer, ImageLib expected it
 		//ptexture->index = (int)((byte *)phdr) + ptexture->index;
-		Image_SetMDLPointer((byte *)phdr + ptexture->index);
+		Image_SetMDLPointer((const byte *)phdr + ptexture->index);
 		size = sizeof( mstudiotexture_t ) + ptexture->width * ptexture->height + 768;
 
 		if( host.features & ENGINE_DISABLE_HDTEXTURES && ptexture->flags & STUDIO_NF_TRANSPARENT )

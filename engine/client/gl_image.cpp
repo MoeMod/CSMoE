@@ -1932,7 +1932,7 @@ namespace xe {
             // replace model
             Mod_DecryptModel(src.model_name.c_str(), buf);
             studiohdr_t *phdr = reinterpret_cast<studiohdr_t *>(Mod_LoadExtendSeq(src.model_name.c_str(), buf));
-			Image_SetMDLPointer((byte *)phdr + src.texture->index);
+			Image_SetMDLPointer((const byte *)phdr + src.texture->index);
 
 			int flags = tex->flags;
 			// hack : expected mstudiotexture_t* as buffer

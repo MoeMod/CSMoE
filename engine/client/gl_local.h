@@ -444,7 +444,8 @@ void R_DrawStudioModel( cl_entity_t *e );
 //
 // gl_warp.c
 //
-void R_InitSky( struct mip_s *mt, const byte *buf, struct texture_s *tx );
+typedef struct mip_s mip_t;
+void R_InitSky( const mip_t *mt, const byte *buf, struct texture_s *tx );
 void R_AddSkyBoxSurface( msurface_t *fa );
 void R_ClearSkyBox( void );
 void R_DrawSkyBox( void );

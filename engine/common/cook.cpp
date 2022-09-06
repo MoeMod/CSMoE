@@ -113,7 +113,7 @@ namespace xe {
                     char texname[128];
                     Q_snprintf( texname, sizeof( texname ), "#%s/%s.mdl", mdlname, name );
                     auto size = sizeof( mstudiotexture_t ) + ptexture[i].width * ptexture[i].height + 768;
-                    Image_SetMDLPointer((byte *)phdr + ptexture[i].index);
+                    Image_SetMDLPointer((const byte *)phdr + ptexture[i].index);
                     auto pic = FS_LoadImage( texname, (byte *)&ptexture[i], size );
                     if(!pic)
                     {
