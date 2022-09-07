@@ -109,9 +109,8 @@ namespace sv {
 
     void Precache(void) override
     {
-        PRECACHE_SOUND("weapons/sfpistol_shoot1.wav");
-        PRECACHE_SOUND("weapons/sfpistol_clipin.wav");
-        PRECACHE_SOUND("weapons/sfpistol_clipout.wav");
+        PRECACHE_SOUND("weapons/laserfist_shootb_exp.wav");
+        PRECACHE_SOUND("weapons/laserfist_idle.wav");
 
         PRECACHE_MODEL("sprites/ef_laserfist_laserbeam.spr");
         PRECACHE_MODEL("sprites/ef_laserfist_charge_left.spr");
@@ -297,6 +296,8 @@ namespace sv {
         WRITE_BYTE(30);
         MESSAGE_END();
 
+        EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/laserfist_shootb_exp.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+
         CBaseEntity* pEntity = NULL;
         while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecEnd, 3 * 39.37)) != NULL)
         {
@@ -309,13 +310,14 @@ namespace sv {
             if (pEntity->pev == m_pPlayer->pev)
                 continue;
 
-            Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
-            UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 6000.0, 500);
-
-            if (pEntity->edict() == tr.pHit)
+            if (UTIL_IsWallBetweenEntity(pEntity, m_pPlayer))
                 continue;
 
-            pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, GetSecondaryAttackDamage(), DMG_NEVERGIB | DMG_BULLET);
+            if (pEntity->edict() != tr.pHit)
+                pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, GetSecondaryAttackDamage(), DMG_NEVERGIB | DMG_BULLET);
+
+            Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
+            UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 6000.0, 500);
         }
 
         PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 0.0, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, TRUE);

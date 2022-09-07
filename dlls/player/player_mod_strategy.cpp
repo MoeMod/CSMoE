@@ -194,7 +194,6 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	case CT:
 		//m_pPlayer->GiveNamedItem("weapon_divinetitan");
 		//m_pPlayer->GiveNamedItem("knife_y22s2sfsword");
-		m_pPlayer->GiveNamedItem("weapon_m1887xmas");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
@@ -205,7 +204,6 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 		//m_pPlayer->GiveNamedItem("z4b_m60amethyst");
 		//m_pPlayer->GiveNamedItem("weapon_bunkerbuster");
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("weapon_laserfist");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 

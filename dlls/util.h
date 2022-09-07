@@ -547,6 +547,7 @@ void UTIL_AdvancedBeamPoints(Vector vecSrc, Vector vecEnd, int life, int r, int 
 void UTIL_BeamPointsStretch(Vector vecSrc, Vector vecEnd, int beamindex, int framerate, int life, int r, int g, int b, int width, int brightness, int flags);
 int UTIL_GetLineTarget(Vector vecSrc, Vector vecDirShooting, Vector vecRight, Vector vevUp, Vector vecSpread, float flDistance, CBaseEntity* pEntity, bool CheckTeamMate);
 Vector UTIL_GetSpeedVector(Vector vecSrc, Vector vecEnd, float flSpeed);
+bool UTIL_IsWallBetweenEntity(CBaseEntity* pEntity, CBaseEntity* pAttackPlayer);
 }
 #else
 namespace cl {

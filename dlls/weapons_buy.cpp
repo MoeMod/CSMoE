@@ -165,6 +165,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "balrog3",	WEAPON_BALROG3 },
 	{ "kronos3",	WEAPON_KRONOS3 },
 	{ "laserfist",	WEAPON_LASERFIST },
+	{ "laserfistex",	WEAPON_LASERFISTEX },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -538,6 +539,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "balrog3", WEAPONCLASS_SUBMACHINEGUN },
 	{ "kronos3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "laserfist",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "laserfistex",	WEAPONCLASS_SUBMACHINEGUN },
+
 	
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
@@ -975,6 +978,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_M16A4:
 	case WEAPON_KRONOS3:
 	case WEAPON_KRONOS7:
+	case WEAPON_LASERFISTEX:
 		return true;
 	default:
 		break;

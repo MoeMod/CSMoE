@@ -535,6 +535,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_kronos3.cpp
 	../dlls/wpn_shared/wpn_kronos1.cpp
 	../dlls/wpn_shared/wpn_laserfist.cpp
+	../dlls/wpn_shared/wpn_laserfistex.cpp
 	)
 
 set(PM_SRCS

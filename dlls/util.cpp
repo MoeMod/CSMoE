@@ -2784,4 +2784,33 @@ Vector UTIL_GetSpeedVector(Vector vecSrc, Vector vecEnd, float flSpeed)
 
 }
 
+bool UTIL_IsWallBetweenEntity(CBaseEntity* pEntity, CBaseEntity* pAttackPlayer)
+{
+	TraceResult tr;
+	Vector vecSrc = pAttackPlayer->pev->origin;
+	Vector vecEnd = pEntity->pev->origin;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, pAttackPlayer->edict(), &tr);
+
+	if (tr.flFraction < 1.0)
+	{
+		if (!tr.pHit)
+			return false;
+
+		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+		if (pHit)
+		{
+			if (pHit == pEntity)
+				return false;
+
+			if (!Q_strcmp(STRING(pHit->pev->classname), "holysword_parray") || !Q_strcmp(STRING(pHit->pev->classname), "y22s1holyswordmb_parray"))
+				return false;
+		}
+
+
+		return true;
+	}
+	return false;
+}
+
 }

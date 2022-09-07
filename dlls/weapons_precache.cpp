@@ -422,6 +422,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_kronos3");
 	UTIL_PrecacheOtherWeapon("weapon_kronos1");
 	UTIL_PrecacheOtherWeapon("weapon_laserfist");
+	UTIL_PrecacheOtherWeapon("weapon_laserfistex");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

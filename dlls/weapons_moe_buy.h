@@ -219,6 +219,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 	{ WEAPON_MG36, "weapon_mg36",         "开拓者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_LASERFIST, "weapon_laserfist",         "【无限】机械臂铠",           10000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
+	{ WEAPON_LASERFISTEX, "weapon_laserfistex",         "【无限】机械臂铠MK2",           10000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 
 	{ WEAPON_KRONOS3, "weapon_kronos3",        "追踪者X-90",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 	{ WEAPON_JANUS3, "weapon_janus3",      "裂空Janus-3",    2000, PRIMARY_WEAPON_SLOT, UNASSIGNED,  BUY_SMG },
@@ -334,6 +335,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+	{ WEAPON_LASERFISTEX, "weapon_laserfistex",         "【无限】机械臂铠MK2",           10000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
+
 		{ WEAPON_LASERFIST, "weapon_laserfist",         "【无限】机械臂铠",           10000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 	{ WEAPON_KRONOS3, "weapon_kronos3",        "追踪者X-90",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 	{ WEAPON_KRONOS1, "weapon_kronos1",        "制御者X-45",                  550, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_PISTOL },

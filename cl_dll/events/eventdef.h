@@ -228,3 +228,4 @@ HOOK_EVENT(kronos7, FireKronos7);
 HOOK_EVENT(kronos3, FireKronos3);
 HOOK_EVENT(kronos1, FireKronos1);
 HOOK_EVENT(laserfist, FireLaserFist);
+HOOK_EVENT(laserfistex, FireLaserFistEX);
