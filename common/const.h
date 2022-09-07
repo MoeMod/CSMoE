@@ -674,6 +674,20 @@
 // byte (scroll speed in 0.1's)
 // byte (flags)
 
+#define	TE_BEAMPOINTS_TRACER		137	// flying beam
+// coord coord coord (start position) 
+// coord coord coord (end position)
+// short (sprite index) 
+// byte (starting frame) 
+// byte (frame rate in 0.1's) 
+// byte (life in 0.1's) 
+// byte (line width in 0.1's) 
+// byte (noise amplitude in 0.01's) 
+// byte,byte,byte (color)
+// byte (brightness)
+// byte (scroll speed in 0.1's)
+// byte (flags)
+
 
 
 #define MSG_BROADCAST		0	// unreliable to all

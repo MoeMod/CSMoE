@@ -2642,6 +2642,7 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 	case TE_KILLBEAM:
 	case TE_BEAMPOINTS_STRETCH:
 	case TE_CUSTOMBEAMPOINTS:
+	case TE_BEAMPOINTS_TRACER:
 		CL_ParseViewBeam( &buf, type );
 		break;
 	case TE_GUNSHOT:

@@ -1439,6 +1439,15 @@ void CL_UpdateBeam( BEAM *pbeam, float frametime )
 				return;
 			}
 			break;
+		case TE_BEAMPOINTS_TRACER:
+		{
+			float timepassd = (1.0 - ((pbeam->die - float(cl.time)) / pbeam->extra));
+			vec3_t vecSrc = pbeam->source + timepassd * pbeam->delta;
+			vec3_t vecEnd = vecSrc + pbeam->delta.Normalize() * pbeam->extra2;
+
+			VectorCopy(vecSrc, pbeam->source);
+			VectorCopy(vecEnd, pbeam->target);
+		}
 	}
 
 	if( pbeam->flags & ( FBEAM_FADEIN|FBEAM_FADEOUT ))
@@ -1690,6 +1699,7 @@ void CL_DrawBeam( BEAM *pbeam )
 			CL_DrawCylinder( pbeam->modelIndex, frame, rendermode, pbeam->source, pbeam->delta, pbeam->width,
 							 pbeam->amplitude, pbeam->freq, pbeam->speed, pbeam->segments, color );
 			break;
+		case TE_BEAMPOINTS_TRACER:
 		case TE_BEAMPOINTS:
 			CL_DrawSegs( pbeam->modelIndex, frame, rendermode, pbeam->source, pbeam->delta, pbeam->width,
 						 pbeam->amplitude, pbeam->freq, pbeam->speed, pbeam->segments, pbeam->flags, color );
@@ -2009,6 +2019,59 @@ BEAM* GAME_EXPORT CL_BeamPoints_Stretch(const vec3_t start, const vec3_t end, in
 
 	return pBeam;
 }
+
+
+/*
+==============
+CL_BeamPoints_Tracer
+Create beam between two points
+==============
+*/
+BEAM* GAME_EXPORT CL_BeamPoints_Tracer(const vec3_t start, const vec3_t end, int modelIndex, float life, float width, float length, float amplitude,
+	float brightness, float speed, int startFrame, float framerate, float r, float g, float b)
+{
+	BEAM* pBeam;
+
+	// need a valid model.
+	if (Mod_GetType(modelIndex) != mod_sprite)
+		return NULL;
+
+	// don't start temporary beams out of the PVS
+	if (life != 0.0f && CL_CullBeam(start, end, true))
+		return NULL;
+
+	pBeam = CL_AllocBeam();
+	if (!pBeam) return NULL;
+
+	pBeam->type = TE_BEAMPOINTS_TRACER;
+	pBeam->modelIndex = modelIndex;
+	VectorCopy(start, pBeam->source);
+	VectorCopy(end, pBeam->target);
+	pBeam->frame = startFrame;
+	pBeam->frameRate = framerate;
+	Mod_GetFrames(modelIndex, &pBeam->frameCount);
+	pBeam->freq = cl.time * speed;
+	pBeam->extra = life;
+	pBeam->extra2 = length;
+	if (life == 0.0f) pBeam->flags |= FBEAM_FOREVER;
+
+	pBeam->die += life;
+	pBeam->width = width;
+	pBeam->amplitude = amplitude;
+	pBeam->speed = speed;
+	BeamNormalizeColor(pBeam, r, g, b, brightness);
+
+	VectorSubtract(pBeam->target, pBeam->source, pBeam->delta);
+
+	if (pBeam->amplitude >= 0.50f)
+		pBeam->segments = VectorLength(pBeam->delta) * 0.25f + 3; // one per 4 pixels
+	else pBeam->segments = VectorLength(pBeam->delta) * 0.075f + 3; // one per 16 pixels
+
+	CL_UpdateBeam(pBeam, 0.0f);
+
+	return pBeam;
+}
+
 
 /*
 ==============
@@ -2444,6 +2507,34 @@ void CL_ParseViewBeam( sizebuf_t *msg, int beamType )
 			speed = (float)(BF_ReadByte(msg) * 0.1f);
 			int flags = BF_ReadByte(msg);
 			BEAM* pBeam = CL_BeamPoints(start, end, modelIndex, life, width, noise, brightness, speed, startFrame,
+				frameRate, r, g, b);
+
+			if (pBeam)
+				pBeam->flags |= flags;
+			break;
+		}
+		case TE_BEAMPOINTS_TRACER:
+		{
+			start[0] = BF_ReadCoord(msg);
+			start[1] = BF_ReadCoord(msg);
+			start[2] = BF_ReadCoord(msg);
+			end[0] = BF_ReadCoord(msg);
+			end[1] = BF_ReadCoord(msg);
+			end[2] = BF_ReadCoord(msg);
+			modelIndex = BF_ReadShort(msg);
+			startFrame = BF_ReadByte(msg);
+			frameRate = (float)BF_ReadByte(msg);
+			life = (float)(BF_ReadByte(msg) * 0.1f);
+			width = (float)(BF_ReadByte(msg) * 0.1f);
+			noise = (float)(BF_ReadByte(msg) * 0.1f);
+			r = (float)BF_ReadByte(msg);
+			g = (float)BF_ReadByte(msg);
+			b = (float)BF_ReadByte(msg);
+			brightness = (float)BF_ReadByte(msg);
+			speed = (float)(BF_ReadByte(msg) * 0.1f);
+			int flags = BF_ReadByte(msg);
+			float length = BF_ReadShort(msg);
+			BEAM* pBeam = CL_BeamPoints_Tracer(start, end, modelIndex, life, width, length, noise, brightness, speed, startFrame,
 				frameRate, r, g, b);
 
 			if (pBeam)

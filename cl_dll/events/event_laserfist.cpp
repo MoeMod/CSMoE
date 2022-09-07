@@ -29,8 +29,6 @@
 
 namespace cl::event::laserfist {
 
-	BEAM* g_pBeam[33];
-
 void ResetMuzz(struct tempent_s* ent, float frametime, float currenttime)
 {
 	cl_entity_t* parent = gEngfuncs.GetEntityByIndex(ent->entity.curstate.aiment);
@@ -39,32 +37,6 @@ void ResetMuzz(struct tempent_s* ent, float frametime, float currenttime)
 	{
 		ent->entity.curstate.renderamt = 0;
 		ent->die = currenttime;
-	}
-}
-
-void EV_LaserFistCallBack(struct tempent_s* ent, float frametime, float currenttime)
-{
-	if (g_pBeam[ent->entity.curstate.iuser1])
-	{
-		Vector vecDir = ent->entity.curstate.vuser1;
-		Vector vecSrc = ent->entity.origin;
-		Vector vecEnd = vecSrc + vecDir * ent->entity.curstate.fuser2 * 90;
-
-		VectorCopy(vecSrc, g_pBeam[ent->entity.curstate.iuser1]->source);
-		VectorCopy(vecSrc, g_pBeam[ent->entity.curstate.iuser1]->target);
-	}
-}
-
-void EV_LaserFistHitCallBack(struct tempent_s* ent, struct pmtrace_s* ptr)
-{
-	if (ptr->ent != ent->clientIndex)
-	{
-		if (g_pBeam[ent->entity.curstate.iuser1])
-		{
-			g_pBeam[ent->entity.curstate.iuser1]->die = gHUD.m_flTime;
-			g_pBeam[ent->entity.curstate.iuser1] = nullptr;
-		}
-		ent->die = gHUD.m_flTime;
 	}
 }
 
@@ -97,7 +69,7 @@ void EV_FireLaserFist(event_args_s *args)
 	Vector forward, right, up;
 	cl_entity_t* ent;
 	Vector vecBeamStartL, vecBeamStartR;
-	Vector vecBeamEndL, vecBeamEndR;
+	Vector vecBeamEnd;
 
 	int righthand = gHUD.cl_righthand->value;
 
@@ -105,7 +77,10 @@ void EV_FireLaserFist(event_args_s *args)
 
 	AngleVectors( angles, forward, right, up );
 
-	if (args->bparam2)
+	EV_GetGunPosition(args, vecSrc, origin);
+	VectorCopy(forward, vecAiming);
+
+	if (args->fparam2 == 2.0)
 	{
 		if (EV_IsLocal(args->entindex))
 		{
@@ -126,26 +101,38 @@ void EV_FireLaserFist(event_args_s *args)
 		return;
 	}
 
+	if (args->bparam2)
+	{
+		pmtrace_t tr;
+
+		vecBeamEnd = vecSrc + (forward + right * args->fparam1 + up * args->fparam2) * 8192;
+
+		gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+		gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecBeamEnd, PM_NORMAL, -1, &tr);
+
+		vecBeamEnd = tr.endpos;
+	}
+	else
+	{
+		vecBeamEnd = vecSrc + (forward + right * args->fparam1 + up * args->fparam2) * 50;
+	}
+	
 	if ( EV_IsLocal( args->entindex ) )
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
 
-		if (args->fparam2 == 2.0)
+		if (args->bparam2)
 		{
 			vecBeamStartL = ent->attachment[3];
-			vecBeamEndL = vecBeamStartL + forward * 8192;
 
 			vecBeamStartR = ent->attachment[2];
-			vecBeamEndR = vecBeamStartR + forward * 8192;
 		}
 		else
 		{
 			vecBeamStartL = ent->attachment[Com_RandomLong(11, 13)];
-			vecBeamEndL = vecBeamStartL + forward * 8192;
 
 			vecBeamStartR = ent->attachment[Com_RandomLong(7, 9)];
-			vecBeamEndR = vecBeamStartR + forward * 8192;
 		}
 	}
 	else
@@ -161,11 +148,9 @@ void EV_FireLaserFist(event_args_s *args)
 			vecBeamStartL = vecSrc + forward * 40 - up * 3;
 		}
 
-		vecBeamEndR = vecBeamStartR + forward * 8192;
-		vecBeamEndL = vecBeamStartL + forward * 8192;
 	}
 
-	if (args->fparam2 == 2.0)
+	if (args->bparam2)
 	{
 		int iModel;
 
@@ -173,7 +158,7 @@ void EV_FireLaserFist(event_args_s *args)
 
 		BEAM* pBeamR;
 
-		pBeamR = gEngfuncs.pEfxAPI->R_BeamPoints_Stretch(vecBeamStartR, vecBeamEndR, iModel, 1.0, 10.0, 600, 0, 15.0, 255, 255, 255);
+		pBeamR = gEngfuncs.pEfxAPI->R_BeamPoints_Stretch(vecBeamStartR, vecBeamEnd, iModel, 1.0, 10.0, 600, 0, 15.0, 255, 255, 255);
 
 
 		if (pBeamR)
@@ -181,7 +166,7 @@ void EV_FireLaserFist(event_args_s *args)
 
 		BEAM* pBeamL;
 
-		pBeamL = gEngfuncs.pEfxAPI->R_BeamPoints_Stretch(vecBeamStartL, vecBeamEndL, iModel, 1.0, 10.0, 600, 0, 15.0, 255, 255, 255);
+		pBeamL = gEngfuncs.pEfxAPI->R_BeamPoints_Stretch(vecBeamStartL, vecBeamEnd, iModel, 1.0, 10.0, 600, 0, 15.0, 255, 255, 255);
 
 
 		if (pBeamL)
@@ -195,36 +180,12 @@ void EV_FireLaserFist(event_args_s *args)
 
 		iModelLaser = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_laserfist_laser.spr");
 
-		Vector vecStart, vecEnd;
+		Vector vecStart;
 		vecStart = args->bparam1 ? vecBeamStartL : vecBeamStartR;
-		vecEnd = vecStart + forward * 90;
 
-		//BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints(vecStart, vecEnd, iModelLaser, 0.1, 1, 0.0f, 255.0f, 360.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+		vecBeamEnd = vecStart + (forward + right * args->fparam1 + up * args->fparam2) * 50;
 
-		TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocNoModel(vecStart);
-		if (pEnt)
-		{
-			g_pBeam[idx] = gEngfuncs.pEfxAPI->R_BeamPoints(vecStart, vecEnd, iModelLaser, 0.1, 4, 0.0f, 255.0f, 360.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-
-			Vector vVel = forward * 2400;
-			if (g_pBeam[idx])
-			{
-				pEnt->die = gHUD.m_flTime + 0.1;
-				pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEALL;
-				pEnt->callback = EV_LaserFistCallBack;
-				pEnt->hitcallback = EV_LaserFistHitCallBack;
-				pEnt->entity.curstate.iuser1 = idx;
-				pEnt->entity.curstate.fuser2 = 1.0;
-				pEnt->clientIndex = idx;
-				VectorCopy(forward, pEnt->entity.curstate.vuser1);
-				VectorCopy(vVel, pEnt->entity.baseline.origin);
-			}
-			else
-				pEnt->die = gHUD.m_flTime + 0.1;
-		}
-
-		EV_GetGunPosition(args, vecSrc, origin);
-		VectorCopy(forward, vecAiming);
+		BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Tracer(vecStart, vecBeamEnd, iModelLaser, 0.2, 3, 50.0f, 0.0f, 255.0f, 360.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 
 		Vector vSpread(args->fparam1, args->fparam2, 0.0f);
 		EV_HLDM_FireBullets(idx,

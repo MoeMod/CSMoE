@@ -227,7 +227,7 @@ namespace sv {
             m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.3s;
             m_iChargeState = 1;
 
-            PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.833, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, TRUE);
+            PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.833, g_vecZero, g_vecZero, 0.0, 2.0, 0, 0, FALSE, FALSE);
 
         }
         else if (gpGlobals->time > m_flFinishTime && m_iChargeState != 2)
@@ -266,7 +266,7 @@ namespace sv {
         {
             CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
 
-          /*  MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecEnd);
+            MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecEnd);
             WRITE_BYTE(TE_TEMPSPRITE);
             WRITE_COORD(vecEnd.x);
             WRITE_COORD(vecEnd.y);
@@ -275,21 +275,8 @@ namespace sv {
             WRITE_BYTE(4);
             WRITE_BYTE(255);
             WRITE_BYTE(30);
-            MESSAGE_END();*/
-
-            MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, tr.vecEndPos);
-            WRITE_BYTE(TE_STREAK_SPLASH);
-            WRITE_COORD(tr.vecEndPos.x);
-            WRITE_COORD(tr.vecEndPos.y);
-            WRITE_COORD(tr.vecEndPos.z);
-            WRITE_COORD(tr.vecPlaneNormal.x);
-            WRITE_COORD(tr.vecPlaneNormal.y);
-            WRITE_COORD(tr.vecPlaneNormal.z);
-            WRITE_BYTE(5); // color
-            WRITE_SHORT(22); // count
-            WRITE_SHORT(25); // base speed
-            WRITE_SHORT(65); // ramdon velocity
             MESSAGE_END();
+
 
             ClearMultiDamage();
 
@@ -299,7 +286,7 @@ namespace sv {
         }
 
         Vector vecPos = vecEnd - gpGlobals->v_forward * 10;
-      /*  MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecPos);
+        MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecPos);
         WRITE_BYTE(TE_TEMPSPRITE);
         WRITE_COORD(vecPos.x);
         WRITE_COORD(vecPos.y);
@@ -308,7 +295,7 @@ namespace sv {
         WRITE_BYTE(8);
         WRITE_BYTE(255);
         WRITE_BYTE(30);
-        MESSAGE_END();*/
+        MESSAGE_END();
 
         CBaseEntity* pEntity = NULL;
         while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecEnd, 3 * 39.37)) != NULL)
@@ -331,7 +318,7 @@ namespace sv {
             pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, GetSecondaryAttackDamage(), DMG_NEVERGIB | DMG_BULLET);
         }
 
-        PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 2.0, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+        PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 0.0, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, TRUE);
 #endif
         m_iChargeState = 0;
         m_iWeaponState = pev->skin = 0;
