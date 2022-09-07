@@ -124,6 +124,7 @@ void BuyPresetButton::ApplySettings(KeyValues *resourceData)
 	m_pBlankSlot = scheme()->GetImage(resourceData->GetString("image_blankslot", ""), true);
 	m_pSelect = scheme()->GetImage(resourceData->GetString("image_select", ""), true);
 
+    delete [] m_pSetCommand;
 	m_pSetCommand = CloneString(resourceData->GetString("command_set", ""));
 
 	if (m_pSetCommand[0])

@@ -96,7 +96,7 @@ QuaternionSlerp
 void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 {
 	int i;
-	float omega, cosom, sinom, sclp, sclq;
+	float cosom, sclp, sclq;
 
     // decide if one of the quaternions is backwards
     float a = (p-q).LengthSquared();
@@ -113,11 +113,19 @@ void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 	{
 		if ((1.0 - cosom) > 0.000001)
 		{
-            // TODO(MoeMod) : SIMD opt
-			omega = acos(cosom);
-			sinom = sin(omega);
+			float omega = acos(cosom);
+#ifdef U_VECTOR_SIMD
+            vec3_t x = { omega, (1.0f - t) * omega, t * omega };
+            vec3_t sinx = sin_ps(x);
+            float sinom = sinx[0];
+            sclp = sinx[1] / sinom;
+            sclq = sinx[2] / sinom;
+#else
+            float sinom = sin(omega);
+
 			sclp = sin((1.0 - t) * omega) / sinom;
 			sclq = sin(t * omega) / sinom;
+#endif
 		}
 		else
 		{

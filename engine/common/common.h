@@ -99,26 +99,7 @@ GNU General Public License for more details.
 #endif
 
 #ifdef XASH_BIG_ENDIAN
-#define LittleLong(x) (((int)(((x)&255)<<24)) + ((int)((((x)>>8)&255)<<16)) + ((int)(((x)>>16)&255)<<8) + (((x) >> 24)&255))
-#define LittleLongSW(x) (x = LittleLong(x) )
-#define LittleShort(x) ((short)( (((short)(x) >> 8) & 255) + (((short)(x) & 255) << 8)))
-#define LittleShortSW(x) (x = LittleShort(x) )
-_inline float LittleFloat( float f )
-{
-	union
-	{
-		float f;
-		unsigned char b[4];
-	} dat1, dat2;
-
-	dat1.f = f;
-	dat2.b[0] = dat1.b[3];
-	dat2.b[1] = dat1.b[2];
-	dat2.b[2] = dat1.b[1];
-	dat2.b[3] = dat1.b[0];
-
-	return dat2.f;
-}
+#error "CSMoE won't support big-endian any further for better performance."
 #else
 #define LittleLong(x) (x)
 #define LittleLongSW(x)
@@ -688,7 +669,7 @@ qboolean Image_Process( image_ref *pix, int width, int height, float gamma, uint
 void Image_PaletteHueReplace( byte *palSrc, int newHue, int start, int end );
 void Image_SetForceFlags( uint flags );	// set image force flags on loading
 size_t Image_DXTGetLinearSize( int type, int width, int height, int depth );
-void Image_SetMDLPointer(byte *p);
+void Image_SetMDLPointer(const byte *p);
 
 /*
 ========================================================================

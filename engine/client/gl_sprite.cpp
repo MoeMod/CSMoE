@@ -328,7 +328,7 @@ Mod_LoadSpriteModel
 load sprite model
 ====================
 */
-void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, uint texFlags )
+void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, size_t filesize, qboolean *loaded, uint texFlags )
 {
 	dsprite_t		pin;  //spr 头文件
 	short		numi;      //record colors
@@ -336,7 +336,7 @@ void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, ui
 	int		i, size;
 	qboolean is_dds_mode = false;
 
-#if TARGET_OS_IPHONE
+#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
 	// dont build mipmap on iOS to reduce memory usage
 	texFlags |= TF_NOPICMIP|TF_NOMIPMAP;
 #endif
@@ -350,12 +350,14 @@ void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, ui
 	if( LittleLong(pin.ident) != IDSPRITEHEADER )
 	{
 		MsgDev( D_ERROR, "%s has wrong id (%x should be %x)\n", mod->name, pin.ident, IDSPRITEHEADER );
+        FS_MapFree( buffer, filesize );
 		return;
 	}
 
 	if( i != SPRITE_VERSION  && i != SPRITE_VERSION_DDS)
 	{
 		MsgDev( D_ERROR, "%s has wrong version number (%i should be %i)\n", mod->name, i, SPRITE_VERSION );
+        FS_MapFree( buffer, filesize );
 		return;
 	}
 
@@ -384,6 +386,7 @@ void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, ui
 		// skip frames loading
 		if( loaded ) *loaded = true;	// done
 		psprite->numframes = 0;
+        FS_MapFree( buffer, filesize );
 		return;
 	}
 	if (i == SPRITE_VERSION_DDS) {
@@ -422,6 +425,7 @@ void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, ui
 		else
 		{
 			MsgDev(D_ERROR, "%s has wrong number of palette colors %i (should be 256)\n", mod->name, numi);
+            FS_MapFree( buffer, filesize );
 			return;
 		}
 	}
@@ -429,6 +433,7 @@ void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, ui
 	if( psprite->numframes < 1 )
 	{
 		MsgDev( D_ERROR, "%s has invalid # of frames: %d\n", mod->name, pin.numframes );
+        FS_MapFree( buffer, filesize );
 		return;
 	}
 
@@ -462,6 +467,7 @@ void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, ui
 	}
 
 	if( loaded ) *loaded = true;	// done
+    FS_MapFree( buffer, filesize );
 }
 
 /*
@@ -472,7 +478,7 @@ Loading a bitmap image as sprite with multiple frames
 as pieces of input image
 ====================
 */
-void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean *loaded )
+void Mod_LoadMapSprite( model_t *mod, const byte *buffer, size_t size, qboolean *loaded )
 {
 	byte		*src, *dst;
 	char		texname[128];
@@ -491,7 +497,11 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 	host.overview_loading = true;
 	auto pix = FS_LoadImage( texname, (byte*)buffer, size );
 	host.overview_loading = false;
-	if( !pix ) return;	// bad image or something else
+	if( !pix )
+    {
+        FS_MapFree( buffer, size );
+        return;	// bad image or something else
+    }
 
 	mod->type = mod_sprite;
 	r_texFlags = 0; // no custom flags for map sprites
@@ -584,6 +594,7 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 	}
 
 	if( loaded ) *loaded = true;
+    FS_MapFree( buffer, size );
 }
 
 /*

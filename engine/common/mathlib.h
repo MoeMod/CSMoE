@@ -401,23 +401,10 @@ void Matrix4x4_Transpose( matrix4x4_ref out, cmatrix4x4 in1 );
 qboolean Matrix4x4_Invert_Full( matrix4x4_ref out, cmatrix4x4 in1 );
 
 constexpr vec3_t		vec3_origin = { 0, 0, 0 };
-constexpr matrix3x4	matrix3x4_identity =
-{
-        { 1, 0, 0, 0 },	// PITCH	[forward], org[0]
-        { 0, 1, 0, 0 },	// YAW	[right]  , org[1]
-        { 0, 0, 1, 0 },	// ROLL	[up]     , org[2]
-};
-constexpr matrix4x4	matrix4x4_identity =
-{
-        { 1, 0, 0, 0 },	// PITCH
-        { 0, 1, 0, 0 },	// YAW
-        { 0, 0, 1, 0 },	// ROLL
-        { 0, 0, 0, 1 },	// ORIGIN
-};
 
 inline void Matrix3x4_Copy( matrix3x4_ref out, cmatrix3x4 in ) { out = in; }
-inline void Matrix3x4_LoadIdentity( matrix3x4_ref mat ) { Matrix3x4_Copy( mat, matrix3x4_identity ); }
+void Matrix3x4_LoadIdentity( matrix3x4_ref mat );
 inline void Matrix4x4_Copy( matrix4x4_ref out, cmatrix4x4 in ) { out = in; }
-inline void Matrix4x4_LoadIdentity( matrix4x4_ref mat ) { Matrix4x4_Copy( mat, matrix4x4_identity ); }
+void Matrix4x4_LoadIdentity( matrix4x4_ref mat );
 
 #endif//MATHLIB_H

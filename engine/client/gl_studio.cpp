@@ -45,7 +45,8 @@ GNU General Public License for more details.
 
 // NOTE: enable this if you want merge both 'model' and 'modelT' files into one model slot.
 // otherwise it's uses two slots in models[] array for models with external textures
-#define STUDIO_MERGE_TEXTURES
+// MoeMod : disabled due to crash in CSMoE win32
+// #define STUDIO_MERGE_TEXTURES
 
 #define EVENT_CLIENT	5000	// less than this value it's a server-side studio events
 #define MAXARRAYVERTS	20000	// used for draw shadows
@@ -1710,7 +1711,7 @@ void GAME_EXPORT R_StudioSetupLighting( alight_t *lightinfo )
 	if( !m_pStudioHeader || !lightinfo )
 		return;
 
-	plight = &g_studiolight; 
+	plight = &g_studiolight;
 
 	for( i = 0; i < m_pStudioHeader->numbones; i++ )
 		Matrix3x4_VectorIRotate( g_lighttransform[i], *lightinfo->plightvec, plight->blightvec[i] );
@@ -1741,7 +1742,7 @@ void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 		return;
 	}
 
-	plight = &g_studiolight; 
+	plight = &g_studiolight;
 	ambient = max( 0.1f, r_lighting_ambient->value ); // to avoid divison by zero
 	VectorScale( plight->lightcolor, ambient, illum );
 
@@ -1762,7 +1763,7 @@ void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 		r = max(r_studio_lambert->value, 1.0f);
 		lightcos = (lightcos + ( r - 1.0f )) / r; // do modified hemispherical lighting
 		if( lightcos > 0.0f ) VectorMA( illum, -lightcos, plight->lightcolor, illum );
-		
+
 		illum = maxs(illum, {});
 
 		// now add all dynamic lights
@@ -1781,12 +1782,12 @@ void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->elight[i].color, illum );
 		}
 	}
-	
+
 	_max = VectorMaxElement( illum );
 
 	if( _max > 1.0f )
 		VectorScale( illum, ( 1.0f / _max ), lv );
-	else VectorCopy( illum, lv ); 
+	else VectorCopy( illum, lv );
 
 }
 
@@ -1849,8 +1850,7 @@ static void GAME_EXPORT R_StudioSetupSkin( mstudiotexture_t *ptexture, int index
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
 		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
 
-    xe::TexLru_Upload(&ptexture[pskinref[index]]);
-	GL_Bind( XASH_TEXTURE0, ptexture[pskinref[index]].index );
+    xe::TexLru_Bind(xe::TexLru_GetAttr(&ptexture[pskinref[index]]));
 }
 
 /*
@@ -2055,17 +2055,14 @@ static void R_StudioDrawPoints_legacy( void )
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
 
-		g_nFaceFlags = ptexture[pskinref[pmesh->skinref]].flags;
-		s = 1.0f / (float)ptexture[pskinref[pmesh->skinref]].width;
-		t = 1.0f / (float)ptexture[pskinref[pmesh->skinref]].height;
+        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		g_nFaceFlags = attr.flags;
+		s = 1.0f / (float)attr.width;
+		t = 1.0f / (float)attr.height;
 
 		if( g_iRenderMode != kRenderTransAdd )
 			pglDepthMask( GL_TRUE );
 		else pglDepthMask( GL_FALSE );
-
-		// check bounds
-		if( ptexture[pskinref[pmesh->skinref]].index < 0 || ptexture[pskinref[pmesh->skinref]].index > R_TextureNum() )
-			ptexture[pskinref[pmesh->skinref]].index = tr.defaultTexture;
 
 		if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 		{
@@ -2120,8 +2117,7 @@ static void R_StudioDrawPoints_legacy( void )
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
-            xe::TexLru_Upload(&ptexture[pskinref[pmesh->skinref]]);
-			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
+            xe::TexLru_Bind(attr);
 		}
 
 		while( ( i = *( ptricmds++ ) ) )
@@ -2431,17 +2427,14 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
 
-		g_nFaceFlags = ptexture[pskinref[pmesh->skinref]].flags;
-		s = 1.0f / (float)ptexture[pskinref[pmesh->skinref]].width;
-		t = 1.0f / (float)ptexture[pskinref[pmesh->skinref]].height;
+        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		g_nFaceFlags = attr.flags;
+		s = 1.0f / (float)attr.width;
+		t = 1.0f / (float)attr.height;
 
 		if( g_iRenderMode != kRenderTransAdd )
 			pglDepthMask( GL_TRUE );
 		else pglDepthMask( GL_FALSE );
-
-		// check bounds
-		if( ptexture[pskinref[pmesh->skinref]].index < 0 || ptexture[pskinref[pmesh->skinref]].index > R_TextureNum() )
-			ptexture[pskinref[pmesh->skinref]].index = tr.defaultTexture;
 
 		if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 		{
@@ -2538,8 +2531,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
-            xe::TexLru_Upload(&ptexture[pskinref[pmesh->skinref]]);
-			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
+            xe::TexLru_Bind(attr);
 		}
 
 		if (RI.currententity->curstate.renderfx == kRenderFxWallHack) {
@@ -2666,7 +2658,8 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 
 	for( j = 0; j < m_pSubModel->nummesh; j++ )
 	{
-		g_nFaceFlags = ptexture[pskinref[pmesh[j].skinref]].flags;
+        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		g_nFaceFlags = attr.flags;
 
 		// fill in sortedmesh info
 		g_sortedMeshes[j].mesh = &pmesh[j];
@@ -4193,7 +4186,7 @@ R_StudioLoadTexture
 load model texture with unique name
 ====================
 */
-static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, mstudiotexture_t *ptexture )
+static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const mstudiotexture_t *ptexture )
 {
 	size_t		size;
 	int		flags = 0;
@@ -4201,15 +4194,17 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, mstudiot
 	char		texname[128], name[128], mdlname[128];
 	imgfilter_t	*filter = NULL;
 	texture_t		*tx = NULL;
+    int	gl_texturenum = 0;
 	
 	if( ptexture->flags & STUDIO_NF_NORMALMAP )
 		flags |= (TF_NORMALMAP);
 
-#if TARGET_OS_IPHONE
+#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
 	// dont build mipmap on iOS to reduce memory usage
 	flags |= TF_NOPICMIP|TF_NOMIPMAP;
 #endif
 
+#if 0 // Useless feature in CSMoE, removed for optimization
 	// store some textures for remapping
 	if( !Q_strnicmp( ptexture->name, "DM_Base", 7 ) || !Q_strnicmp( ptexture->name, "remap", 5 ))
 	{
@@ -4257,6 +4252,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, mstudiot
 
 		mod->numtextures++;	// done
 	}
+#endif
 
 	Q_strncpy( mdlname, mod->name, sizeof( mdlname ));
 	FS_FileBase( ptexture->name, name );
@@ -4269,7 +4265,6 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, mstudiot
 	// NOTE: colormaps must have the palette for properly work. Ignore it.
 	if( Mod_AllowMaterials( ) && !( ptexture->flags & STUDIO_NF_COLORMAP ))
 	{
-		int	gl_texturenum = 0;
 
 		Q_snprintf( texname, sizeof( texname ), "materials/%s/%s.tga", mdlname, name );
 
@@ -4280,12 +4275,11 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, mstudiot
 
 		if( gl_texturenum )
 		{
-			ptexture->index = gl_texturenum;
+            xe::TexLru_CreateAttr(ptexture, gl_texturenum);
 			load_external = true; // sucessfully loaded
 		}
 	}
 
-    int gl_texturenum = 0;
     do {
         // CSO Texture Load
         if (name[0] == '#' || name[0] == '@')
@@ -4346,27 +4340,16 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, mstudiot
         gltexture_t *gltex = R_GetTexture(gl_texturenum);
         if (gltex)
         {
-            ptexture->index = gl_texturenum;
-            ptexture->width = gltex->width;
-            ptexture->height = gltex->height;
+            xe::TexLru_CreateAttr(ptexture, gl_texturenum);
             load_external = true; // sucessfully loaded
         }
     }
-
-    if ( name[0] == '$' )
-	{
-		if ( name[1] == '0' && name[2] == 'b' )
-		{
-			ptexture->flags |= STUDIO_NF_ADDITIVE;
-			ptexture->flags |= STUDIO_NF_FULLBRIGHT;
-		}
-	}
 
 	if( !load_external )
 	{
 		// NOTE: replace index with pointer to start of imagebuffer, ImageLib expected it
 		//ptexture->index = (int)((byte *)phdr) + ptexture->index;
-		Image_SetMDLPointer((byte *)phdr + ptexture->index);
+		Image_SetMDLPointer((const byte *)phdr + ptexture->index);
 		size = sizeof( mstudiotexture_t ) + ptexture->width * ptexture->height + 768;
 
 		if( host.features & ENGINE_DISABLE_HDTEXTURES && ptexture->flags & STUDIO_NF_TRANSPARENT )
@@ -4374,20 +4357,22 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, mstudiot
 
 		// build the texname
 		Q_snprintf( texname, sizeof( texname ), "#%s/%s.mdl", mdlname, name );
-        ptexture->index = xe::TexLru_LoadTextureInternal(texname, mod->name, ptexture, size, flags, filter);
+        gl_texturenum = xe::TexLru_LoadTextureInternal(texname, mod->name, ptexture, size, flags, filter);
+        xe::TexLru_CreateAttr(ptexture, gl_texturenum);
 	}
 	else MsgDev( D_NOTE, "Loading HQ: %s\n", texname );
 
-	if( !ptexture->index )
+	if( !gl_texturenum )
 	{
 		MsgDev( D_WARN, "%s has null texture %s\n", mod->name, ptexture->name );
-		ptexture->index = tr.defaultTexture;
+        gl_texturenum = tr.defaultTexture;
+        xe::TexLru_CreateAttr(ptexture, gl_texturenum);
 	}
 	else
 	{
 		// duplicate texnum for easy acess 
-		if( tx ) tx->gl_texturenum = ptexture->index;
-		GL_SetTextureType( ptexture->index, TEX_STUDIO );
+		if( tx ) tx->gl_texturenum = gl_texturenum;
+		GL_SetTextureType( gl_texturenum, TEX_STUDIO );
         // upload immediately
        // xe::TexLru_Upload(ptexture);
 	}
@@ -4398,17 +4383,16 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, mstudiot
 R_StudioLoadHeader
 =================
 */
-studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
+const studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
 {
-	byte		*pin;
-	studiohdr_t	*phdr;
-	mstudiotexture_t	*ptexture;
+    const byte		*pin;
+    const studiohdr_t	*phdr;
 	int		i;
 
 	if( !buffer ) return NULL;
 
-	pin = (byte *)buffer;
-	phdr = (studiohdr_t *)pin;
+	pin = (const byte *)buffer;
+	phdr = (const studiohdr_t *)pin;
 	i = LittleLong(phdr->version);
 
 	if( i != STUDIO_VERSION )
@@ -4421,17 +4405,7 @@ studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
 	Mod_StudioBigEndian( mod, phdr );
 #endif
 
-	if( !Host_IsDedicated() )
-	{
-		ptexture = (mstudiotexture_t *)(((byte *)phdr) + phdr->textureindex);
-		if( phdr->textureindex > 0 && phdr->numtextures <= MAXSTUDIOSKINS )
-		{
-			for( i = 0; i < phdr->numtextures; i++ )
-				R_StudioLoadTexture( mod, phdr, &ptexture[i] );
-		}
-	}
-
-	return (studiohdr_t *)buffer;
+	return (const studiohdr_t *)buffer;
 }
 
 /*
@@ -4439,9 +4413,9 @@ studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
 Mod_LoadStudioModel
 =================
 */
-void Mod_LoadStudioModel( model_t *mod, void *buffer, qboolean *loaded )
+void Mod_LoadStudioModel( model_t *mod, const void *buffer, size_t filesize, qboolean *loaded )
 {
-	studiohdr_t	*phdr;
+    const studiohdr_t	*phdr;
 
 	if( loaded ) *loaded = false;
 	loadmodel->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", loadmodel->name ));
@@ -4453,7 +4427,7 @@ void Mod_LoadStudioModel( model_t *mod, void *buffer, qboolean *loaded )
 #ifdef STUDIO_MERGE_TEXTURES
 	if( phdr->numtextures == 0 )
 	{
-		studiohdr_t	*thdr;
+        const studiohdr_t	*thdr;
 		byte		*in, *out;
 		void		*buffer2 = NULL;
 		size_t		size1, size2;
@@ -4496,9 +4470,22 @@ void Mod_LoadStudioModel( model_t *mod, void *buffer, qboolean *loaded )
 	}
 #else
 	// just copy model into memory
-	loadmodel->cache.data = Mem_Alloc( loadmodel->mempool, phdr->length );
-	Mem_VirtualCopy( loadmodel->cache.data, buffer, phdr->length );
+	loadmodel->cache.data = (void *)buffer; // Mem_Alloc( loadmodel->mempool, phdr->length );
+    loadmodel->cache_size = filesize;
+    phdr = (const studiohdr_t *)loadmodel->cache.data;
 #endif
+
+    // load model
+    if( !Host_IsDedicated() )
+    {
+        const mstudiotexture_t	*ptexture = (const mstudiotexture_t *)(((const byte *)phdr) + phdr->textureindex);
+        if( phdr->textureindex > 0 && phdr->numtextures <= MAXSTUDIOSKINS )
+        {
+            for( int i = 0; i < phdr->numtextures; i++ )
+                R_StudioLoadTexture( mod, phdr, &ptexture[i] );
+        }
+    }
+
 	// setup bounding box
 	VectorCopy( phdr->bbmin, loadmodel->mins );
 	VectorCopy( phdr->bbmax, loadmodel->maxs );
@@ -4508,6 +4495,7 @@ void Mod_LoadStudioModel( model_t *mod, void *buffer, qboolean *loaded )
 	loadmodel->flags = phdr->flags; // copy header flags
 
 	// check for static model
+#if 0
 	if( phdr->numseqgroups == 1 && phdr->numseq == 1 && phdr->numbones == 1 )
 	{
 		mstudioseqdesc_t	*pseqdesc = (mstudioseqdesc_t *)((byte *)phdr + phdr->seqindex);
@@ -4518,7 +4506,7 @@ void Mod_LoadStudioModel( model_t *mod, void *buffer, qboolean *loaded )
 		if( pseqdesc->numframes == 1 || pseqdesc->numframes == 30 )
 			pseqdesc->flags |= STUDIO_STATIC;
 	}
-
+#endif
 	if( loaded ) *loaded = true;
 }
 
@@ -4548,10 +4536,11 @@ void Mod_UnloadStudioModel( model_t *mod )
 	{
 		if( ptexture[i].index == tr.defaultTexture )
 			continue;
-		GL_FreeTexture( ptexture[i].index );
+		xe::TexLru_FreeTexture( &ptexture[i] );
 	}
 
 	Mem_FreePool( &mod->mempool );
+    FS_MapFree((const byte *)mod->cache.data, mod->cache_size);
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 		
