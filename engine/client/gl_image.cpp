@@ -3157,8 +3157,6 @@ void R_ShutdownImages( void )
 			pglBindTexture( GL_TEXTURE_CUBE_MAP_ARB, 0 );
 	}
 
-    xe::TexLru_Clear();
-
 	for( auto &image : r_textures )
 	{
 		if( !image.texnum ) continue;

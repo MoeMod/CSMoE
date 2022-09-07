@@ -360,6 +360,10 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 	}
 
 	Q_memcpy( &mip, buffer, sizeof( mip ));
+
+    // MoeMod : reproduce strlwr modification for sky
+    Q_strnlwr( mip.name, mip.name, sizeof( mip.name ));
+
 	image.width = LittleLong(mip.width);
 	image.height = LittleLong(mip.height);
 

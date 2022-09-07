@@ -762,6 +762,10 @@ static void Mod_LoadTextures( const dlump_t *l )
 		tx = (texture_t*)Mem_ZeroAlloc( loadmodel->mempool, sizeof( *tx ));
 		loadmodel->textures[i] = tx;
 
+        // convert to lowercase
+        Q_strnlwr( mt.name, mt.name, sizeof( mt.name ));
+        Q_strncpy( tx->name, mt.name, sizeof( tx->name ));
+        //Q_memcpy( buf, mt.name, sizeof(mt.name));
 		filter = R_FindTexFilter( tx->name ); // grab texture filter
 
 		tx->width = mt.width;
