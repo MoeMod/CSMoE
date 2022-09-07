@@ -147,7 +147,7 @@ int CHudSniperScope::VidInit()
 	for (int i = 0; i < 10; i++)
 	{
 		char str[32];
-		sprintf_s(str, "bunkerbuster_cooltime%d", i);
+		sprintf(str, "bunkerbuster_cooltime%d", i);
 		iBunkerSpriteNumber[i] = gHUD.GetSpriteIndex(str);
 	}
 
@@ -794,15 +794,15 @@ void CHudSniperScope::DrawBunkerBusterScope(float flTime)
 
 	char sTime[10];
 	if (m_flBunkerBusterCoolDownGlobal < flTime)
-		sprintf_s(sTime, "0");
+		sprintf(sTime, "0");
 	else
-		sprintf_s(sTime, "%d", (int)(m_flBunkerBusterCoolDownGlobal - flTime));
+		sprintf(sTime, "%d", (int)(m_flBunkerBusterCoolDownGlobal - flTime));
 
 	int number = strlen(sTime);
 	while (number > 0)
 	{
 		char temp[2];
-		sprintf_s(temp, "%c", sTime[number - 1]);
+		sprintf(temp, "%c", sTime[number - 1]);
 		int iNum = atoi(temp);
 		if (0 <= iNum && iNum < 10)
 		{
@@ -813,15 +813,15 @@ void CHudSniperScope::DrawBunkerBusterScope(float flTime)
 	}
 	char sTime2[10];
 	if (m_flBunkerBusterCoolDown < flTime)
-		sprintf_s(sTime2, "0");
+		sprintf(sTime2, "0");
 	else
-		sprintf_s(sTime2, "%d", (int)(m_flBunkerBusterCoolDown - flTime));
+		sprintf(sTime2, "%d", (int)(m_flBunkerBusterCoolDown - flTime));
 
 	int number2 = strlen(sTime2);
 	while (number2 > 0)
 	{
 		char temp[2];
-		sprintf_s(temp, "%c", sTime2[number2 - 1]);
+		sprintf(temp, "%c", sTime2[number2 - 1]);
 		int iNum = atoi(temp);
 		if (0 <= iNum && iNum < 10)
 		{

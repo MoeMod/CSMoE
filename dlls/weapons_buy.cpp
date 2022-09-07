@@ -164,6 +164,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "crow3",	WEAPON_CROW3 },
 	{ "balrog3",	WEAPON_BALROG3 },
 	{ "kronos3",	WEAPON_KRONOS3 },
+	{ "laserfist",	WEAPON_LASERFIST },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -536,6 +537,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "crow3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "balrog3", WEAPONCLASS_SUBMACHINEGUN },
 	{ "kronos3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "laserfist",	WEAPONCLASS_SUBMACHINEGUN },
 	
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },

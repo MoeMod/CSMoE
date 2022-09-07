@@ -55,13 +55,13 @@ namespace cl::event::bunkerbuster {
 			}
 			case 1:
 			{
-				sprintf_s(szSoundBunkerbuster, "weapons/bunkerbuster_whistling%d.wav", gEngfuncs.pfnRandomLong(1, 3));
+				sprintf(szSoundBunkerbuster, "weapons/bunkerbuster_whistling%d.wav", gEngfuncs.pfnRandomLong(1, 3));
 				gEngfuncs.pEventAPI->EV_PlaySound(ent, origin, CHAN_STREAM, szSoundBunkerbuster, 1.0, ATTN_NORM, 0, PITCH_NORM);
 				break;
 			}
 			case 2:
 			{
-				sprintf_s(szSoundBunkerbuster, "weapons/bunkerbuster_explosion_%s1st.wav", args->iparam2 == 1 ? "after_" : "");
+				sprintf(szSoundBunkerbuster, "weapons/bunkerbuster_explosion_%s1st.wav", args->iparam2 == 1 ? "after_" : "");
 				gEngfuncs.pEventAPI->EV_PlaySound(ent, origin, CHAN_VOICE, szSoundBunkerbuster, 1.0, ATTN_NORM, 0, PITCH_NORM);
 				gEngfuncs.pEventAPI->EV_PlaySound(ent, origin, CHAN_VOICE, "weapons/bunkerbuster_fire.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
 

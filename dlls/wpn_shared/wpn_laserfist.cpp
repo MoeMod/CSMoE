@@ -1,309 +1,488 @@
-/***
-*
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*
-*	This product contains software technology licensed from Id
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
-*	All Rights Reserved.
-*
-*   Use, distribution, and modification of this source code and/or resulting
-*   object code is restricted to non-commercial enhancements to products from
-*   Valve LLC.  All other use, distribution, or modification is prohibited
-*   without written permission from Valve LLC.
-*
-****/
+/*
+laserfist.cpp
+Copyright (C) 2019 Moemod Haoyuan
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-#include "wpn_laserfist.h"
 
-#ifndef CLIENT_DLL
-#include "common/netadr.h"
-#include "gamemode/mods.h"
-#endif
+#include "weapons/WeaponTemplate.hpp"
 
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
 #endif
+    class CLaserFist : public LinkWeaponTemplate< CLaserFist,
+            TGeneralData,
+            BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
+            TPrecacheEvent,
+            TReloadDefault,
+            TGetDamageDefault,
+            TPrimaryAttackRifle
+    >
+    {
+    public:
+    static constexpr const auto &DefaultReloadTime = 2.2s;
+    static constexpr const char *V_Model = "models/v_laserfist.mdl";
+    static constexpr const char *P_Model = "models/p_laserfist.mdl";
+    static constexpr const char *W_Model = "models/w_laserfist.mdl";
+    static constexpr const char *EventFile = "events/laserfist.sc";
+    static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
+    static constexpr const char *ClassName = "weapon_laserfist";
+    static constexpr int MaxClip = 500;
+    enum
+    {
+        ANIM_IDLE1 = 0,
+        ANIM_SHOOTA_EMPTY_LOOP,
+        ANIM_SHOOTA_EMPTY_END,
+        ANIM_SHOOTA_LOOP,
+        ANIM_SHOOTA_END,
+        ANIM_SHOOTB_READY,
+        ANIM_SHOOTB_LOOP,
+        ANIM_SHOOTB_SHOOT,
+        ANIM_RELOAD,
+        ANIM_DRAW,
+	};
 
+#define LASERFIST_CHARGE_AMMO 100
+
+    static constexpr float PlayerMaxSpeed = 260;
+    static constexpr float ArmorRatioModifier = 1.2f;
+
+    static constexpr const auto &SpreadCalcNotOnGround = 0.3*A;
+    static constexpr const auto &SpreadCalcDefault = 0.03*A;
+
+	static constexpr const auto& CycleTime = 0.1s;
+    static constexpr int DamageDefault = 3;
+    static constexpr int DamageZB = 33;
+    static constexpr int DamageZBS = 110;
+   
+    static constexpr float AccuracyDefault = 0.2;
+    static constexpr float AccuracyMax = 0.8;
+
+    static constexpr auto BulletType = BULLET_PLAYER_9MM;
+    /*static constexpr*/ int Penetration = 1;
+    KnockbackData KnockBack = { 350.0f, 250.0f, 300.0f, 100.0f, 0.5f };
+
+    int m_iExpIndex;
+    int m_iHitIndex;
+    int m_iChargeState;
+    time_point_t m_flFinishTime;
+
+    int GetItemInfo(ItemInfo* p)
+    {
+        p->pszName = STRING(pev->classname);
+        p->pszAmmo1 = "laserfist";
+        p->iMaxAmmo1 = 500;
+        p->pszAmmo2 = NULL;
+        p->iMaxAmmo2 = -1;
+        p->iMaxClip = 500;
+        p->iSlot = 0;
+        p->iPosition = 1;
+        p->iId = m_iId = WEAPON_LASERFIST;
+        p->iFlags = 0;
+        p->iWeight = AK47_WEIGHT;
+
+        return 1;
+    }
+
+    float GetArmorRatioModifier() override { return 1.65; }
+
+#ifndef CLIENT_DLL
+    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_laserfist" , 200 }; }
+#endif
+    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR, 4, 4, 0 }; }
+
+    void Precache(void) override
+    {
+        PRECACHE_SOUND("weapons/sfpistol_shoot1.wav");
+        PRECACHE_SOUND("weapons/sfpistol_clipin.wav");
+        PRECACHE_SOUND("weapons/sfpistol_clipout.wav");
+
+        PRECACHE_MODEL("sprites/ef_laserfist_laserbeam.spr");
+        PRECACHE_MODEL("sprites/ef_laserfist_charge_left.spr");
+        PRECACHE_MODEL("sprites/ef_laserfist_charge.spr");
+
+        m_iExpIndex = PRECACHE_MODEL("sprites/ef_laserfist_laser_explosion.spr");
+        PRECACHE_MODEL("sprites/ef_laserfist_laser.spr");
+        m_iHitIndex = PRECACHE_MODEL("sprites/ef_laserfist_laser_hit.spr");
+
+
+        PRECACHE_MODEL("sprites/muzzleflash85.spr");
+        PRECACHE_MODEL("sprites/muzzleflash86.spr");
+        PRECACHE_MODEL("sprites/muzzleflash87.spr");
+        PRECACHE_MODEL("sprites/muzzleflash91.spr");
+        return Base::Precache();
+    }
+
+
+    float GetSecondaryAttackDamage() const
+    {
+        float flDamage = 130.0f;
+#ifndef CLIENT_DLL
+        if (g_pModRunning->DamageTrack() == DT_ZB)
+            flDamage = 3739.0f;
+        else if (g_pModRunning->DamageTrack() == DT_ZBS)
+            flDamage = 15000.0f;
+#endif
+        return flDamage;
+    }
+
+    BOOL Deploy(void) override
+    {
+        m_flAccuracy = AccuracyDefault;
+        m_iChargeState = 0;
+        m_pPlayer->m_bShieldDrawn = false;
+   
+        if (DefaultDeploy(V_Model, P_Model, ANIM_DRAW, m_pPlayer->m_bIsFemale ? "dualpistols" : "dualpistols_2", UseDecrement() != FALSE, 1.7s, 1.7s))
+        {
+            m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    void FireRemaining(int& shotsFired, time_point_t& shootTime, BOOL isGlock18)
+    {
+#ifndef CLIENT_DLL
+        if (!m_iWeaponState)
+            pev->iuser1++;
+#endif
+ 
+        m_iClip--;
+        shotsFired++;
+
+        if (shotsFired != 8)
+        {
+            shootTime = gpGlobals->time + 0.0125s;
+        }
+        else
+            shootTime = invalid_time_point;
+
+        if (m_iClip < 0)
+        {
+            m_iClip = 0;
+            return;
+        }
+
+        UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+
+        Vector vecSrc = m_pPlayer->GetGunPosition();
+        Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, m_fBurstSpread, 8192, 1, BULLET_PLAYER_9MM, GetDamage(), 0.995, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+    
+        int flags;
+
+#ifdef CLIENT_WEAPONS
+        flags = FEV_NOTHOST;
+#else
+        flags = 0;
+#endif
+
+        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), shotsFired % 2, FALSE);
+
+        m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
+#ifndef CLIENT_DLL
+        m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+       
+    }
+
+    void ItemPostFrame()
+    {
+#ifndef CLIENT_DLL
+        if (!m_iWeaponState && pev->iuser1 >= LASERFIST_CHARGE_AMMO)
+        {
+            pev->iuser1 = 0;
+            m_iWeaponState = pev->skin = 1;
+        }
+#endif
+            
+        return CBasePlayerWeapon::ItemPostFrame();
+    }
+
+    void SecondaryAttack()
+    {
+        if (!m_iWeaponState)
+            return;
+
+        if (!m_iChargeState)
+        {    
+            m_flFinishTime = gpGlobals->time + 1.3s;
+            SendWeaponAnim(ANIM_SHOOTB_READY, UseDecrement() != FALSE);
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.3s;
+            m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.3s;
+            m_iChargeState = 1;
+
+            PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.833, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, TRUE);
+
+        }
+        else if (gpGlobals->time > m_flFinishTime && m_iChargeState != 2)
+        {
+            m_iChargeState = 2;
+            SendWeaponAnim(ANIM_SHOOTB_LOOP, UseDecrement() != FALSE);
+            m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 9999.0s;
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 9999.0s;
+        }
+    }
+
+    void OnAttack2Released()
+    {
+        TraceResult tr;
+
+        SendWeaponAnim(ANIM_SHOOTB_SHOOT, UseDecrement() != FALSE);
+
+        m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
+#ifndef CLIENT_DLL
+        m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+        m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
+        m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
+#ifndef CLIENT_DLL
+        UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+
+        Vector vecSrc = m_pPlayer->GetGunPosition();
+        Vector vecDir = gpGlobals->v_forward;
+        Vector vecEnd = vecSrc + gpGlobals->v_forward * 8192.0;
+
+        UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+        
+        vecEnd = tr.vecEndPos;
+
+        if (tr.flFraction < 1.0)
+        {
+            CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+
+          /*  MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecEnd);
+            WRITE_BYTE(TE_TEMPSPRITE);
+            WRITE_COORD(vecEnd.x);
+            WRITE_COORD(vecEnd.y);
+            WRITE_COORD(vecEnd.z);
+            WRITE_SHORT(m_iHitIndex);
+            WRITE_BYTE(4);
+            WRITE_BYTE(255);
+            WRITE_BYTE(30);
+            MESSAGE_END();*/
+
+            MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, tr.vecEndPos);
+            WRITE_BYTE(TE_STREAK_SPLASH);
+            WRITE_COORD(tr.vecEndPos.x);
+            WRITE_COORD(tr.vecEndPos.y);
+            WRITE_COORD(tr.vecEndPos.z);
+            WRITE_COORD(tr.vecPlaneNormal.x);
+            WRITE_COORD(tr.vecPlaneNormal.y);
+            WRITE_COORD(tr.vecPlaneNormal.z);
+            WRITE_BYTE(5); // color
+            WRITE_SHORT(22); // count
+            WRITE_SHORT(25); // base speed
+            WRITE_SHORT(65); // ramdon velocity
+            MESSAGE_END();
+
+            ClearMultiDamage();
+
+            pEntity->TraceAttack(m_pPlayer->pev, GetSecondaryAttackDamage(), gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
+
+            ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+        }
+
+        Vector vecPos = vecEnd - gpGlobals->v_forward * 10;
+      /*  MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecPos);
+        WRITE_BYTE(TE_TEMPSPRITE);
+        WRITE_COORD(vecPos.x);
+        WRITE_COORD(vecPos.y);
+        WRITE_COORD(vecPos.z);
+        WRITE_SHORT(m_iExpIndex);
+        WRITE_BYTE(8);
+        WRITE_BYTE(255);
+        WRITE_BYTE(30);
+        MESSAGE_END();*/
+
+        CBaseEntity* pEntity = NULL;
+        while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecEnd, 3 * 39.37)) != NULL)
+        {
+            if (pEntity->IsDormant())
+                continue;
+
+            if (pEntity->pev->takedamage == DAMAGE_NO)
+                continue;
+
+            if (pEntity->pev == m_pPlayer->pev)
+                continue;
+
+            Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
+            UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 6000.0, 500);
+
+            if (pEntity->edict() == tr.pHit)
+                continue;
+
+            pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, GetSecondaryAttackDamage(), DMG_NEVERGIB | DMG_BULLET);
+        }
+
+        PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 2.0, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+#endif
+        m_iChargeState = 0;
+        m_iWeaponState = pev->skin = 0;
+        m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
+        m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+    }
+
+    void WeaponIdle(void)
+    {
+        ResetEmptySound();
+        m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+
+        if (m_iChargeState && !(m_pPlayer->pev->button & IN_ATTACK2) && m_flNextSecondaryAttack <= 0.0s)
+            OnAttack2Released();
+
+        if (m_pPlayer->pev->weaponanim == ANIM_SHOOTA_LOOP)
+        {
+            SendWeaponAnim(ANIM_SHOOTA_END, UseDecrement() != FALSE);
+
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
+        }
+        else if (m_pPlayer->pev->weaponanim == ANIM_SHOOTA_EMPTY_LOOP)
+        {
+            SendWeaponAnim(ANIM_SHOOTA_EMPTY_END, UseDecrement() != FALSE);
+
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
+        }
+
+        if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
+            return;
+
+        m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
+
+        SendWeaponAnim(ANIM_IDLE1, UseDecrement() != FALSE);
+    }
+
+    void KickBackCustom(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max, float lateral_max, int direction_change)
+    {
+        float up, lateral;
+        int iRan;
+
+        up = ((rand() % 10) * up_base) * 0.1;
+        lateral = ((rand() % 10) * lateral_base) * 0.1;
+
+        if (m_iShotsFired != 1)
+        {
+            up += (rand() % (m_iShotsFired * 2)) * up_modifier;
+            lateral += (rand() % (m_iShotsFired * 2)) * lateral_modifier;
+        }
+
+        iRan = rand();
+
+        if (!iRan || iRan % 2)
+        {
+            m_pPlayer->pev->punchangle.x += up;
+
+            if (m_pPlayer->pev->punchangle.x > up_max)
+                m_pPlayer->pev->punchangle.x = up_max;
+        }
+        else
+        {
+            m_pPlayer->pev->punchangle.x -= up;
+
+            if (m_pPlayer->pev->punchangle.x < -up_max)
+                m_pPlayer->pev->punchangle.x = -up_max;
+        }
+
+        if (rand() % 2 == 1)
+        {
+            m_pPlayer->pev->punchangle.y += lateral;
+
+            if (m_pPlayer->pev->punchangle.y > lateral_max)
+                m_pPlayer->pev->punchangle.y = lateral_max;
+        }
+        else
+        {
+            m_pPlayer->pev->punchangle.y -= lateral;
+
+            if (m_pPlayer->pev->punchangle.y < -lateral_max)
+                m_pPlayer->pev->punchangle.y = -lateral_max;
+        }
+    }
+
+    void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+    {
+#ifndef CLIENT_DLL
+        if(!m_iWeaponState)
+            pev->iuser1++;
+#endif
+        if (m_iWeaponState && m_iChargeState)
+            return;
+
+        m_iFamasShotsFired = 0;
+
+        m_bDelayFire = true;
+        m_iShotsFired++;
+        m_flAccuracy = ((float)(m_iShotsFired * m_iShotsFired) / 200.0) + 0.2;
+
+        if (m_flAccuracy > 0.8)
+            m_flAccuracy = 0.8;
+
+        if(m_iClip > 0)
+            m_fBurstSpread = flSpread;
+        m_iFamasShotsFired++;
+        m_flFamasShoot = gpGlobals->time + 0.0125s;
+
+        SendWeaponAnim(m_iClip > 0 ? ANIM_SHOOTA_LOOP : ANIM_SHOOTA_EMPTY_LOOP, UseDecrement() != FALSE);
+
+        m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
+        m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.1s;
+
+         if (m_iClip <= 0)
+            return;
+
+        m_iClip--;
+        m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
+#ifndef CLIENT_DLL
+        m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+        m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
+        m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
+
+        UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+
+        Vector vecSrc = m_pPlayer->GetGunPosition();
+        Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 1, BULLET_PLAYER_9MM, GetDamage(), 0.995, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+
+        int flags;
+#ifdef CLIENT_WEAPONS
+        flags = FEV_NOTHOST;
+#else
+        flags = 0;
+#endif
+
+        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), m_iShotsFired % 2, FALSE);
+      
+#ifndef CLIENT_DLL
+        if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+            m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
+#endif
+
+        if (m_pPlayer->pev->velocity.Length2D() > 0)
+            KickBackCustom(0.15, 0.1, 0.015, 0.01, 1.5, 5.5, 0);
+        else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+            KickBackCustom(0.3, 0.21, 0.03, 0.021, 3, 10, 0);
+        else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+            KickBackCustom(0.08, 0.05, 0.008, 0.005, 0.8, 4.8, 0);
+        else
+            KickBackCustom(0.1, 0.07, 0.01, 0.007, 1, 5, 0);
+    }
+
+};
 LINK_ENTITY_TO_CLASS(weapon_laserfist, CLaserFist)
-
-void CLaserFist::Spawn(void)
-{
-	pev->classname = MAKE_STRING("weapon_laserfist");
-
-	Precache();
-	m_iId = WEAPON_P90;
-	SET_MODEL(ENT(pev), "models/w_laserfist.mdl");
-
-	m_iDefaultAmmo = 500;
-	m_flAccuracy = 0;
-	m_iShotsFired = 0;
-	m_bDelayFire = false;
-
-	FallInit();
-}
-
-void CLaserFist::Precache(void)
-{
-	PRECACHE_MODEL("models/v_laserfist.mdl");
-	PRECACHE_MODEL("models/w_laserfist.mdl");
-	PRECACHE_MODEL("models/p_laserfist.mdl");
-
-	PRECACHE_SOUND("weapons/laserfist-1.wav");
-
-	m_iShell = PRECACHE_MODEL("models/pshell.mdl");
-	m_usFirelaserfist = PRECACHE_EVENT(1, "events/laserfist.sc");
-}
-
-int CLaserFist::GetItemInfo(ItemInfo *p)
-{
-	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "LaserBeam";
-	p->iMaxAmmo1 = 500;
-	p->pszAmmo2 = NULL;
-	p->iMaxAmmo2 = -1;
-	p->iMaxClip = 500;
-	p->iSlot = 0;
-	p->iPosition = 8;
-	p->iId = m_iId = WEAPON_LASERFIST;
-	p->iFlags = 0;
-	p->iWeight = P90_WEIGHT;
-
-	return 1;
-}
-
-BOOL CLaserFist::Deploy(void)
-{
-	m_iShotsFired = 0;
-	m_bDelayFire = false;
-	m_flAccuracy = 0;
-
-	return DefaultDeploy("models/v_laserfist.mdl", "models/p_laserfist.mdl", ANIM_DRAW, "mp5", UseDecrement() != FALSE);
-}
-
-void CLaserFist::PrimaryAttack(void)
-{
-	m_iChargeCount++;
-	pev->iuser2 = m_iClip;	//iuser2 ClipBeforeShoot
-	if (m_iClip < 7)
-		m_iDecreasdShoot = m_iClip - 1;
-	else
-		m_iDecreasdShoot = 7;
-
-	if (!(m_pPlayer->pev->flags & FL_ONGROUND))
-		LaserFistFire(0.3 * m_flAccuracy, FALSE);
-	else
-		LaserFistFire(0.03 * m_flAccuracy, FALSE);
-
-	m_flNextShootTime = gpGlobals->time + 0.1s;
-	m_Clip = iClipBeforeShoot - 1 - m_iDecreasdShoot;	//actually cost 
-	pev->iuser1 = 1;	//mark
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.8s;
-}
-
-void CLaserFist::SecondaryAttack
-{
-
-}
-
-void CLaserFist::ItemPostFrame(void)
-{
-	if (pev->iuser1)
-	{
-		pev->iuser1 = 0;
-		m_iClip = pev->iuser2;
-	}
-
-	if (m_flGlock18Shoot != invalid_time_point)
-	{
-#ifndef CLIENT_DLL
-		int iClipBeforeAttack = m_iClip;
-		FireRemaining(m_iGlock18ShotsFired, m_flGlock18Shoot, TRUE);
-		m_pPlayer->m_pModStrategy->OnAttack_Post(this, iClipBeforeAttack, m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
-#else
-		m_iClip--;
-		if (m_iClip < 0)
-		{
-			m_iClip = m_iGlock18ShotsFired = 0;
-		}
-		FireRemaining(m_iGlock18ShotsFired, m_flGlock18Shoot, TRUE);
-#endif
-	}
-
-
-	if (m_iDecreasdShoot && m_flNextShootTime != invalid_time_point && m_flNextShootTime <= gpGlobals->time)
-	{
-		if (!(m_pPlayer->pev->flags & FL_ONGROUND))
-			LaserFistFire(0.3 * m_flAccuracy, FALSE);
-		else
-			LaserFistFire(0.03 * m_flAccuracy, FALSE);
-
-		m_iDecreasdShoot--;
-		m_flNextShootTime = gpGlobals->time + 0.1s;
-	}
-
-}
-
-void CLaserFist::FireRemaining(int& shotsFired, time_point_t& shootTime, BOOL bIsGlock)
-{
-	if (!m_iClip || shotsFired >= 1)
-	{
-		shotsFired = 1;
-		shootTime = invalid_time_point;
-
-		return;
-	}
-
-	m_iClip--;
-
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir;
-
-	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.05, 8192, 1, BULLET_PLAYER_9MM, 18, 0.9, m_pPlayer->pev, true, m_pPlayer->random_seed);
-	--m_pPlayer->ammo_9mm;
-
-	PLAYBACK_EVENT_FULL(flag, m_pPlayer->edict(), m_usFireGlock18, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y,
-		(int)(m_pPlayer->pev->punchangle.x * 10000), (int)(m_pPlayer->pev->punchangle.y * 10000), m_iClip == 0, FALSE);
-
-	int flag;
-#ifdef CLIENT_WEAPONS
-	flag = FEV_NOTHOST;
-#else
-	flag = 0;
-#endif // CLIENT_WEAPONS
-
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecEnd.x, vecEnd.y, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
-
-	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-
-	if (++shotsFired >= 1)
-		shootTime = invalid_time_point;
-	else
-		shootTime = gpGlobals->time + 0.06s;
-
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
-}
-
-void CLaserFist::LaserFistFire(float flSpread, BOOL fUseAutoAim)
-{
-	m_iChargeCount++;
-	pev->iuser = 1;
-	m_bDelayFire = true;
-	m_iShotsFired++;
-	m_flAccuracy = ((float)(m_iShotsFired * m_iShotsFired) / 200) + 0.2;
-
-	if (m_flAccuracy > 0.8)
-		m_flAccuracy = 0.8;
-
-	if (m_iClip <= 0)
-	{
-		m_iDecreasdShoot = 0;
-		m_flNextShootTime = invalid_time_point;
-		pev->iuser1 = 0;
-		if (m_fFireOnEmpty)
-		{
-			PlayEmptySound();
-		}
-
-		return;
-	}
-
-	m_iClip--;
-	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
-#ifndef CLIENT_DLL
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
-
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-
-	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
-	m_pPlayer->m_iWeaponFlash = DIM_GUN_FLASH;
-
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 1, BULLET_PLAYER_9MM, GetDamage(), laserfist_RANGE_MODIFER, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
-
-	int flags;
-#ifdef CLIENT_WEAPONS
-	flags = FEV_NOTHOST;
-#else
-	flags = 0;
-#endif
-
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFirelaserfist, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), 5, FALSE);
-	
-#ifndef CLIENT_DLL
-	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
-#endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
-
-	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		KickBack(0.3, 0.21, 0.03, 0.021, 3.0, 10.0, 0);
-	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		KickBack(0.15, 0.1, 0.015, 0.01, 1.5, 5.5, 0);
-	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		KickBack(0.08, 0.05, 0.008, 0.005, 0.8, 4.8, 0);
-	else
-		KickBack(0.1, 0.07, 0.01, 0.007, 1, 5, 0);
-}
-
-void CLaserFist::Reload(void)
-{
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-		return;
-
-	if (DefaultReload(laserfist_MAX_CLIP, BIZON_RELOAD, laserfist_RELOAD_TIME))
-	{
-#ifndef CLIENT_DLL
-		m_pPlayer->SetAnimation(PLAYER_RELOAD);
-#endif
-		m_flAccuracy = 0;
-		m_iShotsFired = 0;
-	}
-}
-
-void CLaserFist::WeaponIdle(void)
-{
-	ResetEmptySound();
-	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
-
-	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
-		return;
-
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
-	SendWeaponAnim(BIZON_IDLE1, UseDecrement() != FALSE);
-}
-
-float CLaserFist::GetPrimaryAttackDamage()
-{
-	float flDamage = 3.0f;
-#ifndef CLIENT_DLL
-	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 33.0f;
-	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 110.0f;
-#endif
-	return flDamage;
-}
-
-float CLaserFist::GetSecondaryAttackDamage()
-{
-	float flDamage = 130.0f;
-#ifndef CLIENT_DLL
-	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 3739.0f;
-	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 15000.0f;
-#endif
-	return flDamage;
-}
 }
