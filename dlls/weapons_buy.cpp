@@ -146,6 +146,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "m1887",	WEAPON_M1887G },
 	{ "thanatos11",	WEAPON_THANATOS11 },
 	{ "m1887xmas",	WEAPON_M1887XMAS },
+	{ "rainbowgun",	WEAPON_RAINBOWGUN },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -518,6 +519,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "m1887g",	WEAPONCLASS_SHOTGUN },
 	{ "thanatos11",	WEAPONCLASS_SHOTGUN },
 	{ "m1887xmas",	WEAPONCLASS_SHOTGUN },
+	{ "rainbowgun",	WEAPONCLASS_SHOTGUN },
+
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -979,6 +982,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_KRONOS3:
 	case WEAPON_KRONOS7:
 	case WEAPON_LASERFISTEX:
+	case WEAPON_RAINBOWGUN:
 		return true;
 	default:
 		break;

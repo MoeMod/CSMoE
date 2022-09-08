@@ -308,6 +308,7 @@ TL_ADD(CKronos3)
 TL_ADD(CKronos1)
 TL_ADD(CLaserFist)
 TL_ADD(CLaserFistEX)
+TL_ADD(CRainbowGun)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
