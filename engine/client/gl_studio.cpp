@@ -4357,7 +4357,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 
 		// build the texname
 		Q_snprintf( texname, sizeof( texname ), "#%s/%s.mdl", mdlname, name );
-        gl_texturenum = xe::TexLru_LoadTextureInternal(texname, mod->name, ptexture, size, flags, filter);
+        gl_texturenum = xe::TexLru_LoadTextureInternal(texname, mod->name, phdr, ptexture, size, flags, filter);
         xe::TexLru_CreateAttr(ptexture, gl_texturenum);
 	}
 	else MsgDev( D_NOTE, "Loading HQ: %s\n", texname );

@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include "studio.h"
 
 #include <string>
-#include <vector>
+#include <deque>
 #include <list>
 #include <unordered_map>
 #include <variant>
@@ -36,7 +36,7 @@ GNU General Public License for more details.
 static int	r_textureMinFilter = GL_LINEAR_MIPMAP_LINEAR;
 static int	r_textureMagFilter = GL_LINEAR;
 
-std::vector<gltexture_t> r_textures(1);
+std::deque<gltexture_t> r_textures(1);
 std::unordered_map<std::string, int> r_texturesHashTable;
 
 static byte	*scaledImage = NULL;			// pointer to a scaled image
@@ -1704,6 +1704,7 @@ namespace xe {
 	struct texlru_src_internal_s {
 		std::string texture_name;
 		std::string model_name;
+        const studiohdr_t *phdr;
         const mstudiotexture_t *texture;
 		size_t size;
 	};
@@ -1818,7 +1819,7 @@ namespace xe {
 		return i;
 	}
 
-	int TexLru_LoadTextureInternal(const char *name, const char *model_name, const mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter)
+	int TexLru_LoadTextureInternal(const char *name, const char *model_name, const studiohdr_t *phdr, const mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter)
 	{
 		uint		picFlags = 0;
 
@@ -1865,7 +1866,7 @@ namespace xe {
 		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
 
 		// add to lru
-		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_internal_s{ name, model_name, ptexture, size } });
+		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_internal_s{ name, model_name, phdr, ptexture, size } });
 
 		// NOTE: always return texnum as index in array or engine will stop work !!!
 		return i;
@@ -2001,27 +2002,7 @@ namespace xe {
 		}
 		std::shared_ptr<gltexture_t> operator()(texlru_src_internal_s &src) const
 		{
-            fs_offset_t filesize;
-			const byte *buf = FS_MapFile( src.model_name.c_str(), &filesize, false );
-			if(!buf)
-			{
-				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
-				return {}; // couldn't loading image
-			}
-
-            if(Mod_IsModelEncrypted(src.model_name.c_str(), buf) || Mod_NumExtendSeq(src.model_name.c_str()) > 0)
-            {
-                // switch to COW mode
-                FS_MapFree(buf, filesize);
-                auto buf2 = FS_MapFileCOW( src.model_name.c_str(), &filesize, false );
-                buf = buf2;
-                Mod_DecryptModel(src.model_name.c_str(), buf2);
-
-                buf2 = Mod_LoadExtendSeq(src.model_name.c_str(), buf2, &filesize);
-                buf = buf2;
-            }
-            const studiohdr_t *phdr = reinterpret_cast<const studiohdr_t *>(buf);
-
+            const studiohdr_t *phdr = src.phdr;
 			Image_SetMDLPointer((const byte *)phdr + src.texture->index);
 
 			int flags = tex->flags;
@@ -2029,7 +2010,6 @@ namespace xe {
 			auto pic = FS_LoadImage( src.texture_name.c_str(), (const byte *)src.texture, src.size );
 			if( !pic )
 			{
-				FS_MapFree( buf, filesize );
 				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
 				return {}; // couldn't loading image
 			}
@@ -2042,8 +2022,6 @@ namespace xe {
 
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 				pic = nullptr; // release source texture
-
-            FS_MapFree( buf, filesize );
 
 			MsgDev(D_INFO, "TexLru : load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
