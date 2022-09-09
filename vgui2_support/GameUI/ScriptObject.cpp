@@ -940,6 +940,8 @@ void CDescription::TransferCurrentValues(const char *pszConfigFile)
 
 void CDescription::setDescription(const char *pszDesc)
 {
+    if (m_pszDescriptionType)
+        free(m_pszDescriptionType);
 	m_pszDescriptionType = strdup(pszDesc);
 }
 

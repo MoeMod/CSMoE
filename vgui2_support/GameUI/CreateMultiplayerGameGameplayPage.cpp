@@ -61,6 +61,7 @@ CCreateMultiplayerGameGameplayPage::CCreateMultiplayerGameGameplayPage(vgui2::Pa
 //-----------------------------------------------------------------------------
 CCreateMultiplayerGameGameplayPage::~CCreateMultiplayerGameGameplayPage()
 {
+    delete m_pDescription;
 }
 
 //-----------------------------------------------------------------------------
