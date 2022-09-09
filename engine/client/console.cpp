@@ -1772,10 +1772,7 @@ void Con_DrawVersion( void )
 {
 	// draws the current build
 	byte	*color = g_color_table[7];
-	int	i, stringLen, width = 0, charH = 0;
-	int	start, height = scr_height->integer;
 	qboolean	draw_version = false;
-	string	curbuild;
 
 	switch( cls.scrshot_action )
 	{
@@ -1798,35 +1795,28 @@ void Con_DrawVersion( void )
 			host.force_draw_version = false;
 	}
 
-	Q_snprintf( curbuild, MAX_STRING, "CSMoE 柑橘 Xash3D %s build %i %s-%s", XASH_VERSION, Q_buildnum( ), Q_buildos( ), Q_buildarch( ));
-#ifdef XASH_IMGUI
-	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
-	start = scr_width->integer - stringLen;
-	ImGui_Console_AddGenericString(start, 0, curbuild, color);
-
+    string	curbuild;
+    int	width, height = 0;
 	// draw cpu info
 	int ram = Cpu_GetInstalledRamMegaBytes();
-	if (ram > 0)
-	{
-		Q_snprintf(curbuild, MAX_STRING, "CPU: %s (%d MB RAM)\nGPU: %s%s",
-			Cpu_GetName(),
-			ram,
-			glConfig.renderer_string,
-			GL_Support(GL_ASTC_EXT) ? "(ASTC)" : "");
-	}
-	else
-	{
-		Q_snprintf(curbuild, MAX_STRING, "CPU: %s \nGPU: %s%s",
-			Cpu_GetName(),
-			glConfig.renderer_string,
-			GL_Support(GL_ASTC_EXT) ? "(ASTC)" : "");
-	}
-	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
-	start = scr_width->integer - stringLen;
-	ImGui_Console_AddGenericString(start, scr_height->integer - charH, curbuild, color);
-#else
-#error "NYI"
-#endif
+    int y = 0;
+    Q_snprintf(curbuild, MAX_STRING, "CSMoE Xash3D %s build %d %s-%s",
+               XASH_VERSION,
+               Q_buildnum(),
+               Q_buildos( ),
+               Q_buildarch());
+    ImGui_Console_DrawStringLen(curbuild, &width, &height);
+    y = scr_height->integer - height;
+    ImGui_Console_AddGenericString(scr_width->integer - width, y, curbuild, color);
+
+    Q_snprintf(curbuild, MAX_STRING, "CPU: %s (%.1f GB)\nGPU: %s%s",
+               Cpu_GetName(),
+               (ram + 0.5) / 1024.0,
+               glConfig.renderer_string,
+               GL_Support(GL_ASTC_EXT) ? "(ASTC)" : "");
+	ImGui_Console_DrawStringLen(curbuild, &width, &height);
+    y -= height;
+	ImGui_Console_AddGenericString(scr_width->integer - width, y, curbuild, color);
 }
 
 /*
