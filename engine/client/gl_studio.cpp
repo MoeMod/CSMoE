@@ -1850,7 +1850,7 @@ static void GAME_EXPORT R_StudioSetupSkin( mstudiotexture_t *ptexture, int index
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
 		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
 
-    xe::TexLru_Bind(xe::TexLru_GetAttr(&ptexture[pskinref[index]]));
+    xe::TexLru_Bind(&ptexture[pskinref[index]]);
 }
 
 /*
@@ -2117,7 +2117,7 @@ static void R_StudioDrawPoints_legacy( void )
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
-            xe::TexLru_Bind(attr);
+            xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 
 		while( ( i = *( ptricmds++ ) ) )
@@ -2531,7 +2531,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
-            xe::TexLru_Bind(attr);
+            xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 
 		if (RI.currententity->curstate.renderfx == kRenderFxWallHack) {
@@ -4413,7 +4413,7 @@ const studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
 Mod_LoadStudioModel
 =================
 */
-void Mod_LoadStudioModel( model_t *mod, const void *buffer, size_t filesize, qboolean *loaded )
+void Mod_LoadStudioModel( model_t *mod, const byte *buffer, size_t filesize, qboolean *loaded )
 {
     const studiohdr_t	*phdr;
 
@@ -4471,7 +4471,8 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, size_t filesize, qbo
 #else
 	// just copy model into memory
 	loadmodel->cache.data = (void *)buffer; // Mem_Alloc( loadmodel->mempool, phdr->length );
-    loadmodel->cache_size = filesize;
+    loadmodel->buffer = buffer;
+    loadmodel->buffer_size = filesize;
     phdr = (const studiohdr_t *)loadmodel->cache.data;
 #endif
 
@@ -4540,7 +4541,7 @@ void Mod_UnloadStudioModel( model_t *mod )
 	}
 
 	Mem_FreePool( &mod->mempool );
-    FS_MapFree((const byte *)mod->cache.data, mod->cache_size);
+    FS_MapFree((const byte *)mod->buffer, mod->buffer_size);
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 		

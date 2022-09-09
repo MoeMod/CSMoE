@@ -620,7 +620,7 @@ void Mod_UnloadStudioModel( model_t *mod )
 	if( !pstudio ) return; // already freed
 
 	Mem_FreePool( &mod->mempool );
-    FS_MapFree((const byte *)mod->cache.data, mod->cache_size);
+    FS_MapFree((const byte *)mod->buffer, mod->buffer_size);
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 
@@ -703,6 +703,7 @@ void Mod_UnloadSpriteModel( model_t *mod )
 	if( !psprite ) return; // already freed
 
 	Mem_FreePool( &mod->mempool );
+    FS_MapFree((const byte *)mod->buffer, mod->buffer_size);
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 

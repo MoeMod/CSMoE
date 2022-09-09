@@ -434,7 +434,7 @@ void R_DrawSpriteModel( cl_entity_t *e );
 // gl_studio.c
 //
 void R_StudioInit( void );
-void Mod_LoadStudioModel( model_t *mod, const void *buffer, size_t filesize, qboolean *loaded );
+void Mod_LoadStudioModel( model_t *mod, const byte *buffer, size_t filesize, qboolean *loaded );
 void Mod_StudioBigEndian( model_t *mod, byte *buffer );
 struct mstudiotex_s *R_StudioGetTexture( cl_entity_t *e );
 void R_DrawStudioModel( cl_entity_t *e );

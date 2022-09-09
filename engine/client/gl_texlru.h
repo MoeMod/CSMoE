@@ -17,12 +17,12 @@ GNU General Public License for more details.
 
 #include "common.h"
 #include "studio.h"
+#include "sprite.h"
 
 namespace xe {
 
     struct TextureAttr
     {
-        const mstudiotexture_t *ptexture;
         unsigned int	flags;
         int		width;
         int		height;
@@ -31,11 +31,13 @@ namespace xe {
 
 	int TexLru_LoadTextureExternal(const char *name, const mstudiotexture_t* ptexture, int flags, imgfilter_t *filter);
 	int TexLru_LoadTextureInternal(const char *name, const char *model_name, const mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter);
+    int TexLru_LoadTextureSPR(const char *name, const dsprite_t *psprite, const byte *buf, const dspriteframe_t *frame, int flags, imgfilter_t *filter);
 
-	void TexLru_Bind( const TextureAttr &attr );
     const TextureAttr &TexLru_GetAttr(const mstudiotexture_t *ptexture);
-    inline void TexLru_Bind(const mstudiotexture_t *ptexture) { return TexLru_Bind(TexLru_GetAttr(ptexture)); }
+    void TexLru_Bind(const mstudiotexture_t *ptexture);
+    void TexLru_Bind(const mspriteframe_t *pspriteframe);
     void TexLru_CreateAttr(const mstudiotexture_t *ptexture, int gl_texturenum);
+    //void TexLru_CreateAttr(const mspriteframe_t *pspriteframe, int gl_texturenum);
     void TexLru_FreeTexture(const mstudiotexture_t *ptexture);
 
 	void TexLru_Shrink();

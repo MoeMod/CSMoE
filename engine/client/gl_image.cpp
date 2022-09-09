@@ -1707,18 +1707,21 @@ namespace xe {
         const mstudiotexture_t *texture;
 		size_t size;
 	};
+    struct texlru_src_spr_s {
+        std::string path;
+        const dsprite_t *psprite;
+        const dspriteframe_t *texture;
+    };
 	struct texlru_extdata_s {
 		int texnum;
 		imgfilter_t *filter;
-		std::variant<texlru_src_external_s, texlru_src_internal_s> src;
+		std::variant<texlru_src_external_s, texlru_src_internal_s, texlru_src_spr_s> src;
 	};
 
     std::unordered_map<const mstudiotexture_t *, TextureAttr> g_textureAttrMap;
 
-    void UpdateAttr(const mstudiotexture_t *ptexture)
+    void UpdateAttr(const mstudiotexture_t *ptexture, TextureAttr &attr)
     {
-        TextureAttr &attr = g_textureAttrMap.at(ptexture);
-
         if ( ptexture->name[0] == '$' )
         {
             if ( ptexture->name[1] == '0' && ptexture->name[2] == 'b' )
@@ -1738,7 +1741,7 @@ namespace xe {
 
     void TexLru_CreateAttr(const mstudiotexture_t *ptexture, int gl_texturenum)
     {
-        TextureAttr attr = {ptexture, ptexture->flags, ptexture->width, ptexture->height, gl_texturenum };
+        TextureAttr attr = { ptexture->flags, ptexture->width, ptexture->height, gl_texturenum };
 
         if ( ptexture->name[0] == '$' )
         {
@@ -1757,8 +1760,8 @@ namespace xe {
             attr.height = gltex->height;
         }
 
-        auto [iter, succ] = g_textureAttrMap.emplace(ptexture, TextureAttr{ ptexture, ptexture->flags, ptexture->width, ptexture->height, gl_texturenum });
-        return UpdateAttr(ptexture);
+        auto [iter, succ] = g_textureAttrMap.emplace(ptexture, TextureAttr{  ptexture->flags, ptexture->width, ptexture->height, gl_texturenum });
+        return UpdateAttr(ptexture, iter->second);
     }
 
 	int TexLru_LoadTextureExternal(const char *name, const mstudiotexture_t *ptexture, int flags, imgfilter_t *filter)
@@ -1868,6 +1871,60 @@ namespace xe {
 		return i;
 	}
 
+    int TexLru_LoadTextureSPR(const char *name, const dsprite_t *psprite, const byte *buf, const dspriteframe_t *frame, int flags, imgfilter_t *filter)
+    {
+        uint		picFlags = 0;
+
+        if( !name || !name[0] || !glw_state.initialized )
+            return 0;
+
+        // see if already loaded
+        int i = GL_FindTexture(name);
+        if(i > 0)
+        {
+            // prolonge registration
+            gltexture_t	*tex = &r_textures[i];
+            tex->cacheframe = world.load_sequence;
+            if (tex->name[0] != '*')
+                tex->refCount++;
+
+            return i;
+        }
+
+        if( flags & TF_NOFLIP_TGA )
+            picFlags |= IL_DONTFLIP_TGA;
+
+        if( flags & TF_KEEP_8BIT )
+            picFlags |= IL_KEEP_8BIT;
+
+        // set some image flags
+        Image_SetForceFlags( picFlags );
+
+        // HACKHACK: get rid of black vertical line on a 'BlackMesa map'
+        if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
+            flags |= TF_NEAREST;
+
+        i = GL_AllocateTextureSlot(name);
+
+        auto tex = &r_textures[i];
+        Q_strncpy( tex->name, name, sizeof( tex->name ));
+        tex->flags = (texFlags_t)flags;
+
+        // init reference exclude brush model's texture
+        if (tex->name[0] != '*')
+            tex->refCount = 1;
+
+        if( flags & TF_SKYSIDE )
+            tex->texnum = i;//tr.skyboxbasenum++;
+        else tex->texnum = i; // texnum is used for fast acess into r_textures array too
+
+        // add to lru
+        tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_spr_s{ name, psprite, frame } });
+
+        // NOTE: always return texnum as index in array or engine will stop work !!!
+        return i;
+    }
+
 	int TexLru_ReleaseTexture(gltexture_t *image)
 	{
 		// release source
@@ -1890,10 +1947,36 @@ namespace xe {
 		return 0;
 	}
 
+    void SPR_InstallPal(const dsprite_t *psprite)
+    {
+        image_ref pal;
+
+        auto buffer = (const byte *)psprite + sizeof(dsprite_t) + sizeof(short);
+
+        // install palette
+        switch (psprite->texFormat) {
+            case SPR_ADDITIVE:
+                pal = FS_LoadImage("#normal.pal", buffer, 768);
+                break;
+            case SPR_INDEXALPHA:
+                pal = FS_LoadImage("#decal.pal", buffer, 768);
+                break;
+            case SPR_ALPHTEST:
+                pal = FS_LoadImage("#transparent.pal", buffer, 768);
+                break;
+            case SPR_NORMAL:
+            default:
+                pal = FS_LoadImage("#normal.pal", buffer, 768);
+                break;
+        }
+
+        buffer += 768; //读下一个数据块
+        pal = nullptr; // palette installed, no reason to keep this data
+    }
+
 	struct TexLru_Uploader{
 		gltexture_t	*tex;
 		imgfilter_t *filter;
-		const mstudiotexture_t *ptexture;
 		std::shared_ptr<gltexture_t> operator()(texlru_src_external_s &src) const
 		{
 			int flags = tex->flags;
@@ -1909,9 +1992,6 @@ namespace xe {
 
 			GL_UploadTexture( pic, tex, false, filter );
 			GL_TexFilter( tex, false ); // update texture filter, wrap etc
-
-			// set size for external texture
-            UpdateAttr(ptexture);
 
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 				pic = nullptr; // release source texture
@@ -1946,7 +2026,7 @@ namespace xe {
 
 			int flags = tex->flags;
 			// hack : expected mstudiotexture_t* as buffer
-			auto pic = FS_LoadImage( src.texture_name.c_str(), (byte *)src.texture, src.size );
+			auto pic = FS_LoadImage( src.texture_name.c_str(), (const byte *)src.texture, src.size );
 			if( !pic )
 			{
 				FS_MapFree( buf, filesize );
@@ -1960,8 +2040,6 @@ namespace xe {
 			GL_UploadTexture( pic, tex, false, filter );
 			GL_TexFilter( tex, false ); // update texture filter, wrap etc
 
-            UpdateAttr(ptexture);
-
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 				pic = nullptr; // release source texture
 
@@ -1970,6 +2048,32 @@ namespace xe {
 			MsgDev(D_INFO, "TexLru : load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
 		}
+        std::shared_ptr<gltexture_t> operator()(texlru_src_spr_s &src) const
+        {
+            SPR_InstallPal(src.psprite);
+            int flags = tex->flags;
+            auto pic = FS_LoadImage( src.path.c_str(), (const byte*)src.texture, src.texture->width * src.texture->height );
+            if( !pic )
+            {
+                MsgDev(D_ERROR, "TexLru : fail to load load sprite texture %s\n", src.path.c_str());
+                return {}; // couldn't loading image
+            }
+
+            // force upload texture as RGB or RGBA (detail textures requires this)
+            if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
+
+            GL_UploadTexture( pic, tex, false, filter );
+            GL_TexFilter( tex, false ); // update texture filter, wrap etc
+
+            if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
+                pic = nullptr; // release source texture
+
+            // set spr type
+            tex->texType = TEX_SPRITE;
+
+            MsgDev(D_INFO, "TexLru : load SPR texture %s\n", src.path.c_str());
+            return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
+        }
 	};
 
 	template<class Key, class Value>
@@ -2096,33 +2200,23 @@ namespace xe {
 
 	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(0);
 
-	int TexLru_Upload( const TextureAttr &attr )
+	bool TexLru_Upload( int texnum )
 	{
-		int texnum = attr.index;
 		gltexture_t	*tex = &r_textures[texnum];
 		if(!tex->texlru_extdata)
-			return 0; // unknown texture
+			return false; // unknown texture
 
 		if (textureCache.contains((GLuint)texnum)) {
-			// ptexture with same texnum which is from differet model, so it need to update size
-			if (attr.width != tex->width) {
-                UpdateAttr(attr.ptexture);
-			}
-			return texnum; // already present
+			return false; // already present
 		}
 
 		textureCache.set_capacity(r_texlru->integer);
 
 		auto &lrudata = *tex->texlru_extdata;
-		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter, attr.ptexture }, lrudata.src);
+		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter }, lrudata.src);
 		textureCache.insert((GLuint)texnum, std::move(deleter));
-        return texnum;
+        return true;
 	}
-
-    void TexLru_Bind( const TextureAttr &attr )
-    {
-        GL_Bind( XASH_TEXTURE0, TexLru_Upload(attr) );
-    }
 
     const TextureAttr &TexLru_GetAttr(const mstudiotexture_t *ptexture)
     {
@@ -2160,6 +2254,22 @@ namespace xe {
 	{
         textureCache.clear();
 	}
+
+    void TexLru_Bind(const mstudiotexture_t *ptexture)
+    {
+        auto &attr = g_textureAttrMap.at(ptexture);
+
+        // set size for external texture
+        TexLru_Upload(attr.index);
+        UpdateAttr(ptexture, attr);
+        return GL_Bind( XASH_TEXTURE0, attr.index);
+    }
+
+    void TexLru_Bind(const mspriteframe_t *pspriteframe)
+    {
+        TexLru_Upload(pspriteframe->gl_texturenum);
+        return GL_Bind(XASH_TEXTURE0, pspriteframe->gl_texturenum);
+    }
 }
 
 /*

@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "common.h"
 #include "client.h"
 #include "gl_local.h"
+#include "gl_texlru.h"
 
 /*
 =============
@@ -57,8 +58,9 @@ int R_GetSpriteTexture( const model_t *m_pSpriteModel, int frame )
 {
 	if( !m_pSpriteModel || m_pSpriteModel->type != mod_sprite || !m_pSpriteModel->cache.data )
 		return 0;
-
-	return R_GetSpriteFrame( m_pSpriteModel, frame, 0.0f )->gl_texturenum;
+    auto pspriteframe = R_GetSpriteFrame( m_pSpriteModel, frame, 0.0f );
+    xe::TexLru_Bind(pspriteframe);
+	return pspriteframe->gl_texturenum;
 }
 
 /*
