@@ -398,7 +398,7 @@ public:
 
 			TraceResult tr;
 			UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
-			//tr.iHitgroup = HITGROUP_CHEST; // ...
+			tr.iHitgroup = HITGROUP_CHEST; // ...
 
 			ClearMultiDamage();
 			pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);

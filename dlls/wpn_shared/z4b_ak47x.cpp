@@ -129,14 +129,11 @@ struct Z4B_AK47X_WeaponData
 				pOther->IsAlive()
 				)
 			{
-				//Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
-				Vector vecDirection = pev->velocity.Normalize();
-				Vector vecStart = pev->origin;
-				Vector vecEnd = vecStart + vecDirection * 30;
+				Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
+
 				TraceResult tr;
-				//UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
-				UTIL_TraceLine(vecStart, vecEnd, missile, ENT(pAttackePlayer->pev), &tr);
-				//tr.iHitgroup = HITGROUP_CHEST; // ...
+				UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
+				tr.iHitgroup = HITGROUP_CHEST; // ...
 
 				ClearMultiDamage();
 				pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
