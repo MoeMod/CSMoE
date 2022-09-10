@@ -85,6 +85,7 @@ short g_sModelIndexFrostGibs;
 short g_sModelIndexShockWave;
 short g_sModelIndexWind;
 short g_sModelIndexWindExp;
+short g_sModelIndexGuillotineGibs;
 
 int giAmmoIndex;
 

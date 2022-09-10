@@ -424,6 +424,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_laserfist");
 	UTIL_PrecacheOtherWeapon("weapon_laserfistex");
 	UTIL_PrecacheOtherWeapon("weapon_rainbowgun");
+	UTIL_PrecacheOtherWeapon("weapon_guillotine");
+	UTIL_PrecacheOtherWeapon("weapon_guillotineex");
 
 	if (g_pGameRules->IsDeathmatch())
 	{
@@ -449,6 +451,7 @@ void W_Precache()
 	g_sModelIndexBoomerEffectEx = PRECACHE_MODEL("sprites/ef_boomer_ex.spr");
 	g_sModelIndexBoomerSprite = PRECACHE_MODEL("sprites/spr_boomer.spr");
 	g_sModelIndexPosionEffect = PRECACHE_MODEL("models/ef_poison03.mdl");
+	g_sModelIndexGuillotineGibs = PRECACHE_MODEL("models/gibs_guilotine.mdl");
 
 	g_sModelIndexEventBombExp = PRECACHE_MODEL("sprites/heart_bombexp.spr");
 	g_sModelIndexEventBombExp2 = PRECACHE_MODEL("sprites/cakeexp.spr");

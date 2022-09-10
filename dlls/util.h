@@ -531,6 +531,7 @@ void UTIL_LogPrintfDetail(const char *fmt, ...);
 void UTIL_StripToken(const char *pKey, char *pDest);
 void EntvarsKeyvalue(entvars_t *pev, KeyValueData *pkvd);
 char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd);
+char UTIL_TextureHit(edict_t* pHit, Vector vecSrc, Vector vecEnd);
 //NOXREF int GetPlayerTeam(int index);
 bool UTIL_IsGame(const char *gameName);
 float UTIL_GetPlayerGaitYaw(int playerIndex);

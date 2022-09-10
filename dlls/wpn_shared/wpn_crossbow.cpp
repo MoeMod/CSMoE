@@ -124,6 +124,28 @@ namespace sv {
 				TraceResult tr = UTIL_GetGlobalTrace();
 				entvars_t* pevOwner = VARS(pev->owner);
 
+				Vector vecStart = pevOwner->origin;
+				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+				WRITE_BYTE(TE_BEAMPOINTS);
+				WRITE_COORD(vecStart.x);
+				WRITE_COORD(vecStart.y);
+				WRITE_COORD(vecStart.z);
+				WRITE_COORD(tr.vecEndPos.x);
+				WRITE_COORD(tr.vecEndPos.y);
+				WRITE_COORD(tr.vecEndPos.z); // coord coord coord (end position) 
+				WRITE_SHORT(g_sModelIndexLaser); // short (sprite index) 
+				WRITE_BYTE(0); // byte (starting frame) 
+				WRITE_BYTE(0); // byte (frame rate in 0.1's) 
+				WRITE_BYTE(50); // byte (life in 0.1's) 
+				WRITE_BYTE(10); // byte (line width in 0.1's) 
+				WRITE_BYTE(0); // byte (noise amplitude in 0.01's) 
+				WRITE_BYTE(0); // byte,byte,byte (color)
+				WRITE_BYTE(0);
+				WRITE_BYTE(255);
+				WRITE_BYTE(255); // byte (brightness)
+				WRITE_BYTE(15); // byte (scroll speed in 0.1's)
+				MESSAGE_END();
+
 				ClearMultiDamage();
 
 				pOther->TraceAttack(pevOwner, m_DirectDmg, pev->velocity.Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
@@ -230,7 +252,7 @@ namespace sv {
 	};
 	static constexpr float ArmorRatioModifier = 1.7f;
 
-    static constexpr int DamageDefault = 50;
+    static constexpr int DamageDefault = 10;
 	static constexpr int DamageZB = 70;
     static constexpr int DamageZBS = 70;
    

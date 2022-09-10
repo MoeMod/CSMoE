@@ -2333,6 +2333,41 @@ char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd)
 	return chTextureType;
 }
 
+
+char UTIL_TextureHit(edict_t* pHit, Vector vecSrc, Vector vecEnd)
+{
+	char chTextureType;
+	const char* pTextureName;
+	char szbuffer[64];
+
+	CBaseEntity* pEntity = CBaseEntity::Instance(pHit);
+
+	if (pEntity && pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
+		return CHAR_TEX_FLESH;
+
+	if (pEntity)
+		pTextureName = TRACE_TEXTURE(ENT(pEntity->pev), vecSrc, vecEnd);
+	else
+		pTextureName = TRACE_TEXTURE(ENT(0), vecSrc, vecEnd);
+
+	if (pTextureName)
+	{
+		if (*pTextureName == '-' || *pTextureName == '+')
+			pTextureName += 2;
+
+		if (*pTextureName == '{' || *pTextureName == '!' || *pTextureName == '~' || *pTextureName == ' ')
+			pTextureName++;
+
+		strcpy(szbuffer, pTextureName);
+		szbuffer[CBTEXTURENAMEMAX - 1] = 0;
+		chTextureType = TEXTURETYPE_Find(szbuffer);
+	}
+	else
+		chTextureType = 0;
+
+	return chTextureType;
+}
+
 NOXREF int GetPlayerTeam(int index)
 {
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(index));

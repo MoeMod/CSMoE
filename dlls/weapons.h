@@ -1176,6 +1176,115 @@ private:
 	int m_iTail;
 	int m_iExp[3];
 };
+
+class CGuillotine;
+class CGuillotineAmmo : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+
+	int GetWeaponsId(void)
+	{
+		return WEAPON_GUILLOTINE;
+	}
+
+	float GetArmorRatio(void)
+	{
+		return 1.8;
+	}
+
+	KnockbackData GetKnockBackData() override { return { 450.0f, 350.0f, 400.0f, 300.0f, 1.0f }; }
+
+public:
+	void EXPORT FireThink(void);
+	void EXPORT FireTouch(CBaseEntity* pOther);
+	void EXPORT ReturnThink(void);
+	void EXPORT ReturnTouch(CBaseEntity* pOther);
+	void EXPORT HeadCutThink(void);
+
+public:
+	bool ShouldCrashHalfway(void);
+	bool RecursiveWorldTrace(float delta, Vector vecOrigin, edict_t* pentIgnore, bool bWorldSound);
+	void Crash(void);
+	void StartHeadCut(CBaseEntity* pOther);
+	bool IsHeadCutting(void);
+	bool ShouldHeadCut(TraceResult* ptr, CBaseEntity* pEntity, Vector vecAbsMins, Vector vecAbsMaxs);
+	bool CanAttack(CBaseEntity* pOther);
+	void MaterialSound(TraceResult* ptr);
+	bool RangeAttack(TraceResult* ptr, Vector vecTraceDelta);
+	void Return(bool bResetFrame);
+	void SetAnimation(int sequence, bool bResetFrame);
+
+	void Fire(TraceResult* ptr, CBaseEntity* pOther, Vector vecAbsMins, Vector vecAbsMaxs);
+	void Attack(TraceResult* ptr, CBaseEntity* pOther);
+
+public:
+	float m_flDirectDamage;
+	float m_flHeadCutDamage;
+	short m_nCurrentAnimation;
+	int m_iModelIndex;
+	short m_iLostSpriteIndex;
+	int m_iHeadCutCounter;
+	time_point_t m_flHeadCutTime;
+	Vector m_vecInitialPos;
+	Vector m_vecImpactPos;
+	Vector m_vecMins, m_vecMaxs;
+
+	EHANDLE m_hHeadCutting;
+	std::vector<int> m_TargetVector;
+};
+
+class CGuillotineexAmmo : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+
+	int GetWeaponsId(void)
+	{
+		return WEAPON_GUILLOTINE;
+	}
+
+	float GetArmorRatio(void)
+	{
+		return 1.8;
+	}
+
+	KnockbackData GetKnockBackData() override { return { 450.0f, 350.0f, 400.0f, 300.0f, 1.0f }; }
+
+public:
+	void EXPORT FireThink(void);
+	void EXPORT ReturnThink(void);
+	void EXPORT FireTouch(CBaseEntity* pOther);
+	void EXPORT ReturnTouch(CBaseEntity* pOther);
+	void EXPORT HeadCutThink(void);
+
+public:
+	void Catched();
+	void CheckDamage();
+	bool ShouldCrashHalfway(void);
+	void Crash(void);
+	bool IsHeadCutting(void);
+	bool ShouldHeadCut(TraceResult* ptr, CBaseEntity* pEntity, Vector vecAbsMins, Vector vecAbsMaxs);
+	bool CanAttack(CBaseEntity* pOther);
+	void MaterialSound(TraceResult* ptr);
+
+
+public:
+	time_point_t m_flTimeReturn;
+	int m_iState;	//iuser1
+	int m_iHeadCutCounter;
+	EHANDLE m_hHeadCutting; //euser2
+	std::vector<int> m_TargetVector;
+	Vector m_vecDelta;
+	time_point_t m_flHeadCutTime;
+	float m_flDirectDamage;
+	float m_flHeadCutDamage;
+	
+	int m_iModelIndex;
+	short m_iLostSpriteIndex;
+};
 #endif
 
 #ifdef ENABLE_SHIELD
@@ -1238,6 +1347,8 @@ extern short g_sModelIndexFrostGibs;
 extern short g_sModelIndexShockWave;
 extern short g_sModelIndexWind;
 extern short g_sModelIndexWindExp;
+
+extern short g_sModelIndexGuillotineGibs;
 
 void AnnounceFlashInterval(float interval, float offset = 0);
 

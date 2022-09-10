@@ -250,6 +250,8 @@ set(HLDLL_SRCS
 	./gamemode/zb3zp/zp_zclass_pyrammid.cpp
 	./gamemode/zb3zp/zp_zclass_tf.cpp
 	./gamemode/zb3zp/zp_zclass_human.cpp
+	./guillotineammo.cpp
+	./guillotineexammo.cpp
 	)
 
 set (HLWPN_SRCS
@@ -537,6 +539,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_laserfist.cpp
 	../dlls/wpn_shared/wpn_laserfistex.cpp
 	../dlls/wpn_shared/wpn_rainbowgun.cpp
+	../dlls/wpn_shared/wpn_guillotine.cpp
+	../dlls/wpn_shared/wpn_guillotineex.cpp
 	)
 
 set(PM_SRCS

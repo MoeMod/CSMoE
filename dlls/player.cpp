@@ -37,6 +37,7 @@
 #include "wpn_shared/wpn_m32venom.h"
 #include "wpn_shared/z4b_ar57amethyst.h"
 #include "wpn_shared/wpn_sgdrillex.h"
+#include "wpn_shared/wpn_guillotine.h"
 
 // gamemode
 #include "gamemode/mods.h"
@@ -8336,6 +8337,16 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 				}
 			}
 
+			if (FClassnameIs(pWeapon->pev, "weapon_guillotine"))
+			{
+				((CGuillotine*)pWeapon)->CrashAmmo();
+			}
+
+			if (FClassnameIs(pWeapon->pev, "weapon_guillotineex"))
+			{
+				((CGuillotineex*)pWeapon)->CrashAmmo();
+			}
+
 			if (pWeapon->iFlags() & ITEM_FLAG_EXHAUSTIBLE)
 			{
 				int iAmmoIndex = GetAmmoIndex(pWeapon->pszAmmo1());
@@ -9165,6 +9176,8 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_KINGCOBRA:
 		case WEAPON_KINGCOBRAG:
 		case WEAPON_RAINBOWGUN:
+		case WEAPON_GUILLOTINE:
+		case WEAPON_GUILLOTINEEX:
 			return TRUE;
 		}
 	}

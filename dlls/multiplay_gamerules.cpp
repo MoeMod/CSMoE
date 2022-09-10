@@ -4215,6 +4215,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "thanatos11";
 					else if (iId == WEAPON_BUNKERBUSTER)
 						killer_weapon_name = "bunkbuster";
+					else if (iId == WEAPON_GUILLOTINE)
+						killer_weapon_name = "guillotine";
+					else if (iId == WEAPON_GUILLOTINEEX)
+						killer_weapon_name = "guillotineex";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}

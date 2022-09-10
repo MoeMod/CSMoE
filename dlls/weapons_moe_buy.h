@@ -157,6 +157,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_PIANOGUN, "weapon_pianogun",        "【命运】寂静之音",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_CANNONEX, "weapon_cannonex",         "赤焰魔龙",           6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SPEARGUN, "weapon_speargun",         "海皇之怒",           5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ WEAPON_GUILLOTINE, "weapon_guillotine",         "盘龙血煞",           7500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ WEAPON_GUILLOTINEEX, "weapon_guillotineex",         "【弧光】回旋刃",           7500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SGMISSILE, "weapon_sgmissile",        "撼宇碎星",                  6400, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SGMISSILEM, "weapon_sgmissilem",        "爆烈神机弩",                  6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SGMISSILEEX, "weapon_sgmissileex",        "撼宇碎星Zero",                  6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -335,7 +337,17 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 };
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
-#if 0
+#if 1
+	{ WEAPON_Z4B_M4A1RAZER, "z4b_m4a1razer",      "雷蛇M4A1",    4250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+
+		{ WEAPON_Z4B_AK47X, "z4b_ak47x",      "黑武士AK47",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_Z4B_M4A1MW, "z4b_m4a1mw",      "暗羽冥王M4A1",    3600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+
+	{ KNIFE_Z4B_FREQUENCY9, "z4b_Frequency9",      "迷迭F9",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
+
+	{ WEAPON_GUILLOTINE, "weapon_guillotine",         "盘龙血煞",           7500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ WEAPON_GUILLOTINEEX, "weapon_guillotineex",         "【弧光】回旋刃",           7500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+
 	{ WEAPON_LASERFISTEX, "weapon_laserfistex",         "【无限】机械臂铠MK2",           10000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 
 		{ WEAPON_LASERFIST, "weapon_laserfist",         "【无限】机械臂铠",           10000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
