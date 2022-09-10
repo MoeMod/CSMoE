@@ -24,6 +24,14 @@
 		1D3623EC0D0F72F000981E51 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D3623EB0D0F72F000981E51 /* CoreGraphics.framework */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		3D006E8D28AEA1BD004C1F67 /* libmpg123.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D006E7E28AEA1BD004C1F67 /* libmpg123.a */; };
+		3D006E8E28AEA205004C1F67 /* libBullet3Common.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DC76FD228AA9DEA0021B4F6 /* libBullet3Common.a */; };
+		3D006E8F28AEA205004C1F67 /* libBulletCollision.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DC76FDA28AA9DEA0021B4F6 /* libBulletCollision.a */; };
+		3D006E9028AEA205004C1F67 /* libBulletDynamics.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DC76FDC28AA9DEA0021B4F6 /* libBulletDynamics.a */; };
+		3D006E9328AEA279004C1F67 /* libBullet3Collision.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DC76FD028AA9DEA0021B4F6 /* libBullet3Collision.a */; };
+		3D006E9428AEA27A004C1F67 /* libBullet3Dynamics.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DC76FD428AA9DEA0021B4F6 /* libBullet3Dynamics.a */; };
+		3D006E9528AEA27A004C1F67 /* libBullet3Geometry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DC76FD628AA9DEA0021B4F6 /* libBullet3Geometry.a */; };
+		3D006E9628AEA29D004C1F67 /* libLinearMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DC76FE228AA9DEA0021B4F6 /* libLinearMath.a */; };
 		3D0090C02788B2D200E68FC3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0090BF2788B2D200E68FC3 /* Security.framework */; };
 		3D0090E62788B7F900E68FC3 /* Bugly.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0090E52788B7F900E68FC3 /* Bugly.framework */; };
 		3D4416DA231D1711001A0696 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96ED30DEFC9C700FAF19F /* OpenGLES.framework */; };
@@ -94,26 +102,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3D691BCE2843CF2600D5221C /* PBXContainerItemProxy */ = {
+		3D006E7D28AEA1BD004C1F67 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 0EDEC216C1ED456887BE8E58;
-			remoteInfo = GL;
-		};
-		3D691BD02843CF2600D5221C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 0F55135424B444C2A7180E4F;
-			remoteInfo = example;
-		};
-		3D691BD22843CF2600D5221C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FCF0B45C7A504377BC28640E;
-			remoteInfo = minigzip;
+			remoteGlobalIDString = FC6C00806FD443639641F078;
+			remoteInfo = libmpg123;
 		};
 		3D691BD42843CF2600D5221C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -157,75 +151,82 @@
 			remoteGlobalIDString = B5FC4F73016849B69A293B09;
 			remoteInfo = test_opus_padding;
 		};
-		3D691BF02843CF2600D5221C /* PBXContainerItemProxy */ = {
+		3DC76FCD28AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D58F7002EA024F07837E07DD;
-			remoteInfo = zlib;
+			remoteGlobalIDString = 35BDD00745D9481E9F0A7AB9;
+			remoteInfo = Bullet2FileLoader;
 		};
-		3D691BF22843CF2600D5221C /* PBXContainerItemProxy */ = {
+		3DC76FCF28AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8786DFE089C5454D86D70489;
-			remoteInfo = zlibstatic;
+			remoteGlobalIDString = 3F1EA3E6BB6D41A4870CFA4A;
+			remoteInfo = Bullet3Collision;
 		};
-		3DDBD7DF2843DBC900C4D2C9 /* PBXContainerItemProxy */ = {
+		3DC76FD128AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = AF2089E9EF9A4103B2BE2E18;
-			remoteInfo = png;
+			remoteGlobalIDString = 5E7EA16A189F40EA8A1C6011;
+			remoteInfo = Bullet3Common;
 		};
-		3DDBD7E12843DBC900C4D2C9 /* PBXContainerItemProxy */ = {
+		3DC76FD328AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 438BF4BE08AD44D2AEFBB2E4;
-			remoteInfo = "png-fix-itxt";
+			remoteGlobalIDString = 97D3FC88E9CF43889BEE3CCD;
+			remoteInfo = Bullet3Dynamics;
 		};
-		3DDBD7E32843DBC900C4D2C9 /* PBXContainerItemProxy */ = {
+		3DC76FD528AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = CF3BFF1BC62140A8AB4B1C7D;
-			remoteInfo = pngfix;
+			remoteGlobalIDString = 306E683C37A64CFFA3C5CC72;
+			remoteInfo = Bullet3Geometry;
 		};
-		3DDBD7E52843DBC900C4D2C9 /* PBXContainerItemProxy */ = {
+		3DC76FD728AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 29BB1DB1D45A41F284BE2670;
-			remoteInfo = pngimage;
+			remoteGlobalIDString = BD2E7245D65B4594BE51D885;
+			remoteInfo = Bullet3OpenCL_clew;
 		};
-		3DDBD7E72843DBC900C4D2C9 /* PBXContainerItemProxy */ = {
+		3DC76FD928AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = DD45C21D0E13465B891F1C9D;
-			remoteInfo = pngstest;
+			remoteGlobalIDString = 397C8EB030A4438395E280BA;
+			remoteInfo = BulletCollision;
 		};
-		3DDBD7E92843DBC900C4D2C9 /* PBXContainerItemProxy */ = {
+		3DC76FDB28AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 031232C7CD42408D8E096B05;
-			remoteInfo = pngtest;
+			remoteGlobalIDString = 4CBDD73CAAD84E8CB5AE40D1;
+			remoteInfo = BulletDynamics;
 		};
-		3DDBD7EB2843DBC900C4D2C9 /* PBXContainerItemProxy */ = {
+		3DC76FDD28AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 719E4F3CDC234B27A79B8200;
-			remoteInfo = pngunknown;
+			remoteGlobalIDString = 8B0E3A040A7A4021831E9E99;
+			remoteInfo = BulletInverseDynamics;
 		};
-		3DDBD7ED2843DBC900C4D2C9 /* PBXContainerItemProxy */ = {
+		3DC76FDF28AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = F90B63261E1A4229AABDC80B;
-			remoteInfo = pngvalid;
+			remoteGlobalIDString = 90E48ACDCD354CF18AAD7246;
+			remoteInfo = BulletSoftBody;
+		};
+		3DC76FE128AA9DEA0021B4F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DBC97AC889184E0EA289FB24;
+			remoteInfo = LinearMath;
 		};
 		3DF9821D27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -626,6 +627,13 @@
 			remoteGlobalIDString = AB980332CB1C4FDD9D81D36C;
 			remoteInfo = xash;
 		};
+		3DFDDBBA28C2279E00351ACE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 065FBDED999B461CB2FC1EA5;
+			remoteInfo = "3rdparty-gl4es";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -698,6 +706,7 @@
 		3DF9828F27F9AF820030D0B5 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libSDL2.a"; sourceTree = "<group>"; };
 		3DF9829027F9AF820030D0B5 /* libSDL2main.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2main.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libSDL2main.a"; sourceTree = "<group>"; };
 		3DF9829127F9AF820030D0B5 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libfreetype.a"; sourceTree = "<group>"; };
+		3DFDDB6328C2279E00351ACE /* CSMoE-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CSMoE-iOS.entitlements"; sourceTree = "<group>"; };
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B646751B253FE21E00F557B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
@@ -716,6 +725,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D006E9628AEA29D004C1F67 /* libLinearMath.a in Frameworks */,
+				3D006E9328AEA279004C1F67 /* libBullet3Collision.a in Frameworks */,
+				3D006E9428AEA27A004C1F67 /* libBullet3Dynamics.a in Frameworks */,
+				3D006E9528AEA27A004C1F67 /* libBullet3Geometry.a in Frameworks */,
+				3D006E8E28AEA205004C1F67 /* libBullet3Common.a in Frameworks */,
+				3D006E8F28AEA205004C1F67 /* libBulletCollision.a in Frameworks */,
+				3D006E9028AEA205004C1F67 /* libBulletDynamics.a in Frameworks */,
+				3D006E8D28AEA1BD004C1F67 /* libmpg123.a in Frameworks */,
 				3DDBD7F12843DC0100C4D2C9 /* libboost_container.a in Frameworks */,
 				3DDBD7F32843DC1700C4D2C9 /* libopus.a in Frameworks */,
 				3DDBD7F52843DC1F00C4D2C9 /* libpng16.a in Frameworks */,
@@ -919,6 +936,7 @@
 		3DF981D927F9AE940030D0B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				3DFDDBBB28C2279E00351ACE /* lib3rdparty-gl4es.a */,
 				3DF9821E27F9AE940030D0B5 /* libboost_atomic.a */,
 				3DF9822027F9AE940030D0B5 /* libboost_chrono.a */,
 				3DF9822227F9AE940030D0B5 /* libboost_container.a */,
@@ -944,8 +962,18 @@
 				3DF9824A27F9AE940030D0B5 /* libboost_type_erasure.a */,
 				3DF9824C27F9AE940030D0B5 /* libboost_unit_test_framework.a */,
 				3DF9824E27F9AE940030D0B5 /* libboost_wave.a */,
-				3D691BCF2843CF2600D5221C /* libGL.dylib */,
+				3DC76FCE28AA9DEA0021B4F6 /* libBullet2FileLoader.a */,
+				3DC76FD028AA9DEA0021B4F6 /* libBullet3Collision.a */,
+				3DC76FD228AA9DEA0021B4F6 /* libBullet3Common.a */,
+				3DC76FD428AA9DEA0021B4F6 /* libBullet3Dynamics.a */,
+				3DC76FD628AA9DEA0021B4F6 /* libBullet3Geometry.a */,
+				3DC76FD828AA9DEA0021B4F6 /* libBullet3OpenCL_clew.a */,
+				3DC76FDA28AA9DEA0021B4F6 /* libBulletCollision.a */,
+				3DC76FDC28AA9DEA0021B4F6 /* libBulletDynamics.a */,
+				3DC76FDE28AA9DEA0021B4F6 /* libBulletInverseDynamics.a */,
+				3DC76FE028AA9DEA0021B4F6 /* libBulletSoftBody.a */,
 				3DF9825027F9AE940030D0B5 /* libGameUI.a */,
+				3DC76FE228AA9DEA0021B4F6 /* libLinearMath.a */,
 				3DF9825227F9AE940030D0B5 /* libSDL2.a */,
 				3DF9825427F9AE940030D0B5 /* libSDL2main.a */,
 				3DF9825627F9AE940030D0B5 /* libastcenc-native-static.a */,
@@ -957,26 +985,17 @@
 				3DF9826227F9AE940030D0B5 /* libcrypto.a */,
 				3DF9826427F9AE940030D0B5 /* libcso_controls.a */,
 				3DF9826627F9AE940030D0B5 /* libdead_wrapper.a */,
-				3D691BD12843CF2600D5221C /* example */,
 				3DF9826827F9AE940030D0B5 /* libexpat.a */,
 				3DF9826A27F9AE940030D0B5 /* libfreetype.a */,
 				3DF9826C27F9AE940030D0B5 /* libimgui.a */,
 				3DF9826E27F9AE940030D0B5 /* libimgui_ext.a */,
+				3D006E7E28AEA1BD004C1F67 /* libmpg123.a */,
 				3DF9827027F9AE940030D0B5 /* liblua.a */,
 				3DF9827227F9AE940030D0B5 /* luac */,
 				3DF9827427F9AE940030D0B5 /* libluash.a */,
 				3DF9827627F9AE940030D0B5 /* libmathlib.a */,
-				3D691BD32843CF2600D5221C /* minigzip */,
 				3D691BD52843CF2600D5221C /* libopus.a */,
-				3DDBD7E02843DBC900C4D2C9 /* libpng16.dylib */,
-				3DDBD7E22843DBC900C4D2C9 /* png-fix-itxt */,
 				3D691BDB2843CF2600D5221C /* libpng16.a */,
-				3DDBD7E42843DBC900C4D2C9 /* pngfix */,
-				3DDBD7E62843DBC900C4D2C9 /* pngimage */,
-				3DDBD7E82843DBC900C4D2C9 /* pngstest */,
-				3DDBD7EA2843DBC900C4D2C9 /* pngtest */,
-				3DDBD7EC2843DBC900C4D2C9 /* pngunknown */,
-				3DDBD7EE2843DBC900C4D2C9 /* pngvalid */,
 				3DF9827827F9AE940030D0B5 /* libserver.a */,
 				3DF9827A27F9AE940030D0B5 /* libssl.a */,
 				3D691BE92843CF2600D5221C /* test_opus_api */,
@@ -993,8 +1012,6 @@
 				3DF9828A27F9AE940030D0B5 /* libvinterface.a */,
 				3DF9828C27F9AE940030D0B5 /* libvstdlib.a */,
 				3DF9828E27F9AE940030D0B5 /* libxash.a */,
-				3D691BF12843CF2600D5221C /* libz.dylib */,
-				3D691BF32843CF2600D5221C /* libz.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1002,6 +1019,7 @@
 		FD77A0040E26BC0500F39101 /* CSMoE-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				3DFDDB6328C2279E00351ACE /* CSMoE-iOS.entitlements */,
 				3D3EE8A9228F1C6300A695FE /* controller */,
 				3D3EE8A7228F19A900A695FE /* model */,
 				3D3EE8A6228F197200A695FE /* view */,
@@ -1071,27 +1089,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		3D691BCF2843CF2600D5221C /* libGL.dylib */ = {
+		3D006E7E28AEA1BD004C1F67 /* libmpg123.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libGL.dylib;
-			remoteRef = 3D691BCE2843CF2600D5221C /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3D691BD12843CF2600D5221C /* example */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			name = example;
-			path = example.app;
-			remoteRef = 3D691BD02843CF2600D5221C /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3D691BD32843CF2600D5221C /* minigzip */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			name = minigzip;
-			path = minigzip.app;
-			remoteRef = 3D691BD22843CF2600D5221C /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libmpg123.a;
+			remoteRef = 3D006E7D28AEA1BD004C1F67 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		3D691BD52843CF2600D5221C /* libopus.a */ = {
@@ -1140,83 +1142,81 @@
 			remoteRef = 3D691BEE2843CF2600D5221C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3D691BF12843CF2600D5221C /* libz.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			name = libz.dylib;
-			path = libz.1.2.12.dylib;
-			remoteRef = 3D691BF02843CF2600D5221C /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3D691BF32843CF2600D5221C /* libz.a */ = {
+		3DC76FCE28AA9DEA0021B4F6 /* libBullet2FileLoader.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libz.a;
-			remoteRef = 3D691BF22843CF2600D5221C /* PBXContainerItemProxy */;
+			path = libBullet2FileLoader.a;
+			remoteRef = 3DC76FCD28AA9DEA0021B4F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DDBD7E02843DBC900C4D2C9 /* libpng16.dylib */ = {
+		3DC76FD028AA9DEA0021B4F6 /* libBullet3Collision.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			name = libpng16.dylib;
-			path = libpng16.16.38.git.dylib;
-			remoteRef = 3DDBD7DF2843DBC900C4D2C9 /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libBullet3Collision.a;
+			remoteRef = 3DC76FCF28AA9DEA0021B4F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DDBD7E22843DBC900C4D2C9 /* png-fix-itxt */ = {
+		3DC76FD228AA9DEA0021B4F6 /* libBullet3Common.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			name = "png-fix-itxt";
-			path = "png-fix-itxt.app";
-			remoteRef = 3DDBD7E12843DBC900C4D2C9 /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libBullet3Common.a;
+			remoteRef = 3DC76FD128AA9DEA0021B4F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DDBD7E42843DBC900C4D2C9 /* pngfix */ = {
+		3DC76FD428AA9DEA0021B4F6 /* libBullet3Dynamics.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			name = pngfix;
-			path = pngfix.app;
-			remoteRef = 3DDBD7E32843DBC900C4D2C9 /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libBullet3Dynamics.a;
+			remoteRef = 3DC76FD328AA9DEA0021B4F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DDBD7E62843DBC900C4D2C9 /* pngimage */ = {
+		3DC76FD628AA9DEA0021B4F6 /* libBullet3Geometry.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			name = pngimage;
-			path = pngimage.app;
-			remoteRef = 3DDBD7E52843DBC900C4D2C9 /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libBullet3Geometry.a;
+			remoteRef = 3DC76FD528AA9DEA0021B4F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DDBD7E82843DBC900C4D2C9 /* pngstest */ = {
+		3DC76FD828AA9DEA0021B4F6 /* libBullet3OpenCL_clew.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			name = pngstest;
-			path = pngstest.app;
-			remoteRef = 3DDBD7E72843DBC900C4D2C9 /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libBullet3OpenCL_clew.a;
+			remoteRef = 3DC76FD728AA9DEA0021B4F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DDBD7EA2843DBC900C4D2C9 /* pngtest */ = {
+		3DC76FDA28AA9DEA0021B4F6 /* libBulletCollision.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			name = pngtest;
-			path = pngtest.app;
-			remoteRef = 3DDBD7E92843DBC900C4D2C9 /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libBulletCollision.a;
+			remoteRef = 3DC76FD928AA9DEA0021B4F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DDBD7EC2843DBC900C4D2C9 /* pngunknown */ = {
+		3DC76FDC28AA9DEA0021B4F6 /* libBulletDynamics.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			name = pngunknown;
-			path = pngunknown.app;
-			remoteRef = 3DDBD7EB2843DBC900C4D2C9 /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libBulletDynamics.a;
+			remoteRef = 3DC76FDB28AA9DEA0021B4F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DDBD7EE2843DBC900C4D2C9 /* pngvalid */ = {
+		3DC76FDE28AA9DEA0021B4F6 /* libBulletInverseDynamics.a */ = {
 			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			name = pngvalid;
-			path = pngvalid.app;
-			remoteRef = 3DDBD7ED2843DBC900C4D2C9 /* PBXContainerItemProxy */;
+			fileType = archive.ar;
+			path = libBulletInverseDynamics.a;
+			remoteRef = 3DC76FDD28AA9DEA0021B4F6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DC76FE028AA9DEA0021B4F6 /* libBulletSoftBody.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libBulletSoftBody.a;
+			remoteRef = 3DC76FDF28AA9DEA0021B4F6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DC76FE228AA9DEA0021B4F6 /* libLinearMath.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libLinearMath.a;
+			remoteRef = 3DC76FE128AA9DEA0021B4F6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		3DF9821E27F9AE940030D0B5 /* libboost_atomic.a */ = {
@@ -1619,6 +1619,13 @@
 			remoteRef = 3DF9828D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		3DFDDBBB28C2279E00351ACE /* lib3rdparty-gl4es.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "lib3rdparty-gl4es.a";
+			remoteRef = 3DFDDBBA28C2279E00351ACE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -1667,7 +1674,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cmake -G \"Xcode\" -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../3rdparty/ios-cmake/ios.toolchain.cmake\" -DPLATFORM=OS64  -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_GLES=1 -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
+			shellScript = "cmake -G \"Xcode\" -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../3rdparty/ios-cmake/ios.toolchain.cmake\" -DPLATFORM=OS64  -DXASH_STATIC_GAMELIB=1 -DXASH_WES=1 -DXASH_GLES=1  -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1690,10 +1697,11 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "CSMoE-iOS/CSMoE-iOS.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = 24RZN93GW3;
+				DEVELOPMENT_TEAM = CH8A9652D3;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1711,9 +1719,9 @@
 					"$(PROJECT_DIR)/Resources",
 					"$(PROJECT_DIR)/cmake-build",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus3;
 				PRODUCT_NAME = CSMoE;
-				PROVISIONING_PROFILE_SPECIFIER = citrus2development;
+				PROVISIONING_PROFILE_SPECIFIER = citrus3development;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Debug;
@@ -1722,6 +1730,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1734,10 +1743,11 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_ENTITLEMENTS = "CSMoE-iOS/CSMoE-iOS.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = 24RZN93GW3;
+				DEVELOPMENT_TEAM = CH8A9652D3;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1755,9 +1765,9 @@
 					"$(PROJECT_DIR)/Resources",
 					"$(PROJECT_DIR)/cmake-build",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus3;
 				PRODUCT_NAME = CSMoE;
-				PROVISIONING_PROFILE_SPECIFIER = citrus2development;
+				PROVISIONING_PROFILE_SPECIFIER = cirtus3distrubution;
 			};
 			name = Release;
 		};

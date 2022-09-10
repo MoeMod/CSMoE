@@ -34,7 +34,7 @@ COptionsDialog::COptionsDialog(vgui2::Panel *parent) : PropertyDialog(parent, "O
 	m_pOptionsSubKeyboard = NULL;
 	m_pOptionsSubMouse = NULL;
 	m_pOptionsSubAudio = NULL;
-	//m_pOptionsSubVideo = NULL;
+	m_pOptionsSubVideo = NULL;
 	//m_pOptionsSubVoice = NULL;
 	//m_pOptionsSubAdvanced = NULL;
     m_pOptionsSubMoeSettings = NULL;
@@ -46,7 +46,7 @@ COptionsDialog::COptionsDialog(vgui2::Panel *parent) : PropertyDialog(parent, "O
 	m_pOptionsSubKeyboard = new COptionsSubKeyboard(this);
 	m_pOptionsSubMouse = new COptionsSubMouse(this);
 	m_pOptionsSubAudio = new COptionsSubAudio(this);
-	//m_pOptionsSubVideo = new COptionsSubVideo(this);
+	m_pOptionsSubVideo = new COptionsSubVideo(this);
 	//if (!ModInfo().IsSinglePlayerOnly())
 	//{
 	//	m_pOptionsSubVoice = new COptionsSubVoice(this);
@@ -62,7 +62,7 @@ COptionsDialog::COptionsDialog(vgui2::Panel *parent) : PropertyDialog(parent, "O
 	AddPage(m_pOptionsSubMouse, "#GameUI_Mouse");
     AddPage(m_pOptionsSubTouch, "#GameUI_Touch");
 	AddPage(m_pOptionsSubAudio, "#GameUI_Audio");
-	//AddPage(m_pOptionsSubVideo, "#GameUI_Video");
+	AddPage(m_pOptionsSubVideo, "#GameUI_Video");
 	//AddPage(m_pOptionsSubVoice, "#GameUI_Voice");
 	//AddPage(m_pOptionsSubAdvanced, "#GameUI_Advanced");
 

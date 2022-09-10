@@ -217,7 +217,7 @@ qboolean FS_AddSideToPack( const char *name, int adjust_flags )
 	if( resampled ) image.rgba = Image_Copy( image.size );
 
 	image.cubemap = (byte*)Mem_Realloc( host.imagepool, image.cubemap, image.ptr + image.size );
-	Q_memcpy( image.cubemap + image.ptr, image.rgba, image.size ); // add new side
+    Mem_VirtualCopy( image.cubemap + image.ptr, image.rgba, image.size ); // add new side
 
 	Mem_Free( image.rgba );	// release source buffer
 	image.ptr += image.size; 	// move to next
@@ -243,7 +243,7 @@ image_ref FS_LoadImage( const char *filename, const byte *buffer, size_t size )
 	fs_offset_t	filesize = 0;
 	const loadpixformat_t *format;
 	const cubepack_t	*cmap;
-	byte		*f;
+	const byte		*f;
 
 	Image_Reset(); // clear old image
 	Q_strncpy( loadname, filename, sizeof( loadname ));
@@ -278,15 +278,15 @@ search_fs:
 		{
 			Q_sprintf( path, format->formatstring, loadname, "", format->ext );
 			image.hint = format->hint;
-			f = FS_LoadFile( path, &filesize, gamedironly );
+			f = FS_MapFile( path, &filesize, gamedironly );
 			if( f && filesize > 0 )
 			{
 				if( format->loadfunc( path, f, (size_t)filesize ))
 				{
-					Mem_Free( f ); // release buffer
+					FS_MapFree( f, filesize ); // release buffer
 					return ImagePack(); // loaded
 				}
-				else Mem_Free(f); // release buffer 
+				else FS_MapFree( f, filesize ); // release buffer
 			}
 		}
 	}
@@ -311,7 +311,7 @@ search_fs:
 					Q_sprintf( path, format->formatstring, loadname, cmap->type[i].suf, format->ext );
 					image.hint = (image_hint_t)cmap->type[i].hint; // side hint
 
-					f = FS_LoadFile( path, &filesize, false );
+					f = FS_MapFile( path, &filesize, false );
 					if( f && filesize > 0 )
 					{
 						// this name will be used only for tell user about problems 
@@ -320,11 +320,11 @@ search_fs:
 							Q_snprintf( sidename, sizeof( sidename ), "%s%s.%s", loadname, cmap->type[i].suf, format->ext );
 							if( FS_AddSideToPack( sidename, cmap->type[i].flags )) // process flags to flip some sides
 							{
-								Mem_Free( f );
+								FS_MapFree( f, filesize );
 								break; // loaded
 							}
 						}
-						Mem_Free( f );
+                        FS_MapFree( f, filesize );
 					}
 				}
 			}
@@ -376,15 +376,15 @@ load_internal_ext:
 	{
 		Q_sprintf(path, "%s.bmp", loadname);
 		image.hint = IL_HINT_HL;
-		f = FS_LoadFile(path, &filesize, gamedironly);
+		f = FS_MapFile(path, &filesize, gamedironly);
 		if (f && filesize > 0)
 		{
 			if (Image_LoadMDL_BMP(path, f, (size_t)filesize, buffer))
 			{
-				Mem_Free(f); // release buffer
+				FS_MapFree(f, filesize); // release buffer
 				return ImagePack(); // loaded
 			}
-			else Mem_Free(f); // release buffer 
+			else FS_MapFree(f, filesize); // release buffer
 		}
 	}
 
@@ -546,13 +546,13 @@ image_ref FS_CopyImage( image_ref in )
 	if( palSize )
 	{
 		out->palette = (byte *)Mem_Alloc( host.imagepool, palSize );
-		Q_memcpy( out->palette, in->palette, palSize );
+        Mem_VirtualCopy( out->palette, in->palette, palSize );
 	}
 
 	if( in->size )
 	{
 		out->buffer = (byte*)Mem_Alloc( host.imagepool, in->size );
-		Q_memcpy( out->buffer, in->buffer, in->size );
+        Mem_VirtualCopy( out->buffer, in->buffer, in->size );
 	}
 
 	return out;

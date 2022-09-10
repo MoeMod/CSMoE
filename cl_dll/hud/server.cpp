@@ -31,6 +31,17 @@
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
 
+	extern float g_flBloodhunterAnimTime;
+	extern int g_iBloodhunterSecAnim;
+	extern int g_iBloodhunterState;
+
+	extern float g_flMGSMAnimTime;
+	extern int g_iMGSMSecAnim;
+	extern int g_iMGSMState;
+
+	extern float g_flM1887xmasAnimTime;
+	extern int g_iM1887xmasAnim;
+
 enum
 {
 	HUMAN_SKILL_KNIFE2X,
@@ -50,10 +61,12 @@ enum
 	HOLYFIST_GLITCH,
 	HOLYFIST_GLITCH_RING,
 	WINGGUN_WING,
+	DIVINETITAN_PARTICLE,
 };
 
 TEMPENTITY *iHolyFistRingEffect[33];
 TEMPENTITY *iWingGunEffect[33];
+TEMPENTITY* iDivinetitanParticle[33];
 
 void CreateAttachedEntitiesToPlayer(int entity, int type);
 void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
@@ -84,7 +97,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 			}
 			for (int i = 0; i < length; i++)
 			{
-				int id = reader.ReadByte();
+				int id = reader.ReadShort();
 				if(iDataType <= 1)
 					gHUD.m_setBanWeapon.insert(id);
 				else if(iDataType == 2)
@@ -127,6 +140,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 			case WEAPON_M95TIGER:
 			case WEAPON_M3DRAGON:
 			case WEAPON_M3DRAGONM:
+			case WEAPON_KRONOS12:
 				pActiveBTEWeapon->pev->iuser1 = reader.ReadByte();
 			default:
 				break;
@@ -177,6 +191,12 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		case 44:
 			gEngfuncs.pfnPlaySoundByNameAtLocation("weapons/sgmissile_reload.wav", VOL_NORM, gHUD.m_vecOrigin);
 			break;
+		case 80:
+			gEngfuncs.pfnPlaySoundByNameAtLocation("weapons/divinetitan_charge.wav", VOL_NORM, gHUD.m_vecOrigin);
+			break;
+		case 81:
+			gEngfuncs.pfnPlaySoundByNameAtLocation("weapons/bunkerbuster_gauge.wav", VOL_NORM, gHUD.m_vecOrigin);
+			break;
 		}
 
 		break;
@@ -186,6 +206,20 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		switch (arg2)
 		{
+		case DIVINETITAN_PARTICLE:
+		{
+			if (iDivinetitanParticle[arg1])
+			{
+				iDivinetitanParticle[arg1]->die = gHUD.m_flTime;
+				iDivinetitanParticle[arg1] = nullptr;
+				break;
+			}
+
+			if (!iDivinetitanParticle[arg1])
+				iDivinetitanParticle[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_particle.spr"),
+					Vector(0.0, 0.0, 5.0), 5.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.8, kRenderTransAdd, 30.0);
+			break;
+		}
 		case WINGGUN_WING:
 		{
 			if (iWingGunEffect[arg1])
@@ -274,6 +308,159 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 			pBeam->endEntity = arg2;
 			pBeam->flags = FBEAM_STARTENTITY | FBEAM_ENDENTITY;
 		}
+
+		break;
+	}
+	case 20:
+	{
+		arg1 = reader.ReadShort();
+
+		m_SniperScope.SetKronosTime(arg1);
+		break;
+	}
+	case 21:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		int arg3 = reader.ReadByte();
+		m_SniperScope.SetLockOnData(arg1, arg2, arg3);
+		break;
+	}
+	case 22:
+	{
+		m_SniperScope.ClearAllLockOnData();
+		break;
+	}
+	case 23:
+	{
+		int length = reader.ReadByte();
+
+		for (int i = 0; i < length; i++)
+		{
+			arg1 = reader.ReadShort();
+			arg2 = reader.ReadByte();
+			m_SniperScope.InsertPatrolDroneData(i, arg1, arg2);
+		}
+		
+		m_SniperScope.SetPatrolDroneDeployTime();
+		break;
+	}
+	case 24:
+	{
+		int Slot = reader.ReadByte();
+		arg1 = reader.ReadShort();
+		arg2 = reader.ReadByte();
+		m_SniperScope.InsertPatrolDroneData(Slot, arg1, arg2);
+		break;
+	}
+	case 25:
+	{
+		//bloodhunter
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
+		if (pActiveBTEWeapon)
+		{
+			if (pActiveBTEWeapon->m_iId == WEAPON_BLOODHUNTER)
+			{
+				if (arg1 < 3)	//iAnim
+				{
+					if (!g_flBloodhunterAnimTime)
+						g_flBloodhunterAnimTime = gHUD.m_flTime;
+					g_iBloodhunterSecAnim = 19 + arg2;
+				}
+				else
+				{
+					g_flBloodhunterAnimTime = 0.0;
+					g_iBloodhunterSecAnim = 0;
+				}
+			}
+			else
+			{
+				g_flBloodhunterAnimTime = 0.0;
+				g_iBloodhunterSecAnim = 0;
+			}
+		}
+		break;
+	}
+	case 26:
+	{
+		//bloodhunter
+		arg1 = reader.ReadByte();
+		g_iBloodhunterState = arg1;
+		break;
+	}
+	case 27:
+	{
+		//mgsm
+		float arg3 = reader.ReadCoord();
+		float arg4 = reader.ReadShort();
+		m_SniperScope.SetMGSMAmmo(arg3, arg4);
+		break;
+	}
+	case 28:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
+		if (pActiveBTEWeapon)
+		{
+			if (pActiveBTEWeapon->m_iId == WEAPON_MGSM)
+			{
+				if (arg1)	//iWpnState
+				{
+					//if (!g_flMGSMAnimTime)
+					g_flMGSMAnimTime = gHUD.m_flTime;
+					g_iMGSMSecAnim = arg2;
+				}
+				else
+				{
+					g_flMGSMAnimTime = 0.0;
+					g_iMGSMSecAnim = 0;
+				}
+			}
+			else
+			{
+				g_flMGSMAnimTime = 0.0;
+				g_iMGSMSecAnim = 0;
+			}
+		}
+		break;
+	}
+	case 29:
+	{
+		//bunkerbuster
+		arg2 = reader.ReadByte();
+		float arg3 = reader.ReadCoord();
+		float arg4 = reader.ReadCoord();
+
+		m_SniperScope.InsertBunkerBusterData(arg2,arg3, arg4);
+		break;
+	}
+	case 30:
+	{
+		float arg3 = reader.ReadCoord();
+
+		m_SniperScope.InsertBunkerBusterData2(arg3);
+		break;
+
+
+	}
+	case 31:
+	{
+		g_iM1887xmasAnim = -1;
+		g_flM1887xmasAnimTime = 0.0;
+		break;
+	}
+	case 42:
+	{
+		arg1 = reader.ReadShort();
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+
+		R_AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_burn01.spr"),
+			pos, reader.ReadShort() * 0.1, TRUE, FTENT_FADEOUT | FTENT_SPRANIMATE | FTENT_PERSIST | FTENT_PLYRATTACHMENT | FTENT_SPRANIMATELOOP, 0.3, kRenderTransAdd, 1.0);
 
 		break;
 	}

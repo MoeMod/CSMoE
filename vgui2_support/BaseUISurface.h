@@ -209,13 +209,13 @@ protected:
 #if defined(LINUX) || defined(OSX) || defined(_WIN32)
     struct font_entry
     {
-        void *data;
+        const void *data;
         int size;
     };
 
     static CUtlDict< font_entry, unsigned short > m_FontData;
 
-    static void *FontDataHelper( const char *pchFontName, int &size, const char *fontFileName );
+    static const void *FontDataHelper( const char *pchFontName, int &size, const char *fontFileName );
 #endif
 
 private:

@@ -505,17 +505,16 @@ void pfnDrawConsoleStringLen( const char *pText, int *length, int *height )
 R_StudioLoadHeader
 =================
 */
-studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
+const studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
 {
-	byte		*pin;
-	studiohdr_t	*phdr;
-	mstudiotexture_t	*ptexture;
+	const byte		*pin;
+	const studiohdr_t	*phdr;
 	int		i;
 
 	if( !buffer ) return NULL;
 
-	pin = (byte *)buffer;
-	phdr = (studiohdr_t *)pin;
+	pin = (const byte *)buffer;
+	phdr = (const studiohdr_t *)pin;
 	i = LittleLong(phdr->version);
 
 	if( i != STUDIO_VERSION )
@@ -528,7 +527,7 @@ studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
 	Mod_StudioBigEndian( mod, phdr );
 #endif
 
-	return (studiohdr_t *)buffer;
+	return (const studiohdr_t *)buffer;
 }
 
 /*
@@ -565,7 +564,7 @@ Mod_LoadStudioModel
 */
 void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 {
-	studiohdr_t	*phdr;
+    const studiohdr_t	*phdr;
 
 	if( loaded ) *loaded = false;
 	loadmodel->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", loadmodel->name ));
@@ -575,10 +574,9 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	if( !phdr ) return;	// bad model
 
 	// just copy model into memory
-	loadmodel->cache.data = Mem_Alloc( loadmodel->mempool, phdr->length );
-	Q_memcpy( loadmodel->cache.data, buffer, phdr->length );
-
-	phdr = (studiohdr_t *)loadmodel->cache.data;
+	loadmodel->cache.data = (void *)buffer; // Mem_Alloc( loadmodel->mempool, phdr->length );
+    loadmodel->cache_size = filesize;
+	phdr = (const studiohdr_t *)loadmodel->cache.data;
 
 	// setup bounding box
 	VectorCopy( phdr->bbmin, loadmodel->mins );
@@ -611,7 +609,6 @@ Mod_UnloadStudioModel
 void Mod_UnloadStudioModel( model_t *mod )
 {
 	studiohdr_t	*pstudio;
-	mstudiotexture_t	*ptexture;
 	int		i;
 
 	ASSERT( mod != NULL );
@@ -623,6 +620,7 @@ void Mod_UnloadStudioModel( model_t *mod )
 	if( !pstudio ) return; // already freed
 
 	Mem_FreePool( &mod->mempool );
+    FS_MapFree((const byte *)mod->buffer, mod->buffer_size);
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 
@@ -635,7 +633,7 @@ Mod_LoadSpriteModel
 load sprite model
 ====================
 */
-void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint texFlags )
+void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, uint texFlags )
 {
 	dsprite_t		pin;
 	short		numi;
@@ -705,6 +703,7 @@ void Mod_UnloadSpriteModel( model_t *mod )
 	if( !psprite ) return; // already freed
 
 	Mem_FreePool( &mod->mempool );
+    FS_MapFree((const byte *)mod->buffer, mod->buffer_size);
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 

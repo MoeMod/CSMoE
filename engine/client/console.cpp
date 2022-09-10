@@ -35,6 +35,7 @@ extern IGameUI* staticGameUIFuncs;
 #endif
 #if XASH_IMGUI
 #include "imgui_console.h"
+#include "imgui_surface.h"
 #endif
 
 convar_t	*con_notifytime;
@@ -703,40 +704,7 @@ int Con_UtfMoveRight( char *str, int pos, int length )
 
 int Con_DrawGenericChar( int x, int y, int number, rgba_t color )
 {
-	int	width, height;
-	float	s1, t1, s2, t2;
-	int w, h;
-	wrect_t	*rc;
-
-	number &= 255;
-
-	if( !con.curFont || !con.curFont->valid )
-		return 0;
-
-	number = Con_UtfProcessChar(number);
-	if( number < 32 )
-		return 0;
-	if( y < -con.curFont->charHeight )
-		return 0;
-
-	rc = &con.curFont->fontRc[number];
-
-	pglColor4ubv( color );
-	R_GetTextureParms( &w, &h, con.curFont->hFontTexture );
-
-	// calc rectangle
-	s1 = (float)rc->left / (float)w;
-	t1 = (float)rc->top / (float)h;
-	s2 = (float)rc->right / (float)w;
-	t2 = (float)rc->bottom / (float)h;
-	width = (rc->right - rc->left) * con_fontscale->value;
-	height = (rc->bottom - rc->top) * con_fontscale->value;
-
-	TextAdjustSize( &x, &y, &width, &height );
-	R_DrawStretchPic( x, y, width, height, s1, t1, s2, t2, con.curFont->hFontTexture );
-	pglColor4ub( 255, 255, 255, 255 ); // don't forget reset color
-
-	return con.curFont->charWidths[number];
+    return ImGui_Surface_DrawChar(x, y, number, color[0], color[1], color[2], color[3] );
 }
 
 void Con_SetFont( int fontNum )
@@ -764,43 +732,7 @@ void Con_DrawCharacterLen( int number, int *width, int *height )
 
 void Con_DrawStringLen( const char *pText, int *length, int *height )
 {
-	int	curLength = 0;
-
-	if( !con.curFont ) return;
-
-	if( height ) *height = con.curFont->charHeight;
-	if( !length ) return;
-
-	*length = 0;
-
-	while( *pText )
-	{
-		byte	c = *pText;
-
-		if( *pText == '\n' ) //-V595
-		{
-			pText++;
-			curLength = 0;
-		}
-
-		// skip color strings they are not drawing
-		if( IsColorString( pText ))
-		{
-			pText += 2;
-			continue;
-		}
-
-		// Convert to unicode
-		c = Con_UtfProcessChar( c );
-
-		if( c )
-			curLength += con.curFont->charWidths[ c ];
-
-		pText++;
-
-		if( curLength > *length )
-			*length = curLength;
-	}
+	return ImGui_Console_DrawStringLen(pText, length, height);
 }
 
 /*
@@ -813,58 +745,12 @@ to a fixed color.
 */
 int Con_DrawGenericString( int x, int y, const char *string, rgba_t setColor, qboolean forceColor, int hideChar )
 {
-	rgba_t		color;
-	int		drawLen = 0;
-	int		numDraws = 0;
-	const char	*s;
-
-	if( !con.curFont ) return 0; // no font set
-
-	Con_UtfProcessChar( 0 );
-
-	// draw the colored text
-	s = string;
-	*(uint *)color = *(uint *)setColor;
-
-	while ( s && *s )
-	{
-		if( *s == '\n' )
-		{
-			s++;
-			if( !*s ) break; // at end the string
-			drawLen = 0; // begin new row
-			y += con.curFont->charHeight;
-		}
-
-		if( IsColorString( s ))
-		{
-			if( !forceColor )
-			{
-				Q_memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ));
-				color[3] = setColor[3];
-			}
-
-			s += 2;
-			numDraws++;
-			continue;
-		}
-
-		// hide char for overstrike mode
-		if( hideChar == numDraws )
-			drawLen += con.curFont->charWidths[*s];
-		else drawLen += Con_DrawCharacter( x + drawLen, y, *s, color );
-
-		numDraws++;
-		s++;
-	}
-
-	pglColor4ub( 255, 255, 255, 255 );
-	return drawLen;
+    return ImGui_Console_AddGenericString(x, y, string, setColor);
 }
 
 int Con_DrawString( int x, int y, const char *string, rgba_t setColor )
 {
-	return Con_DrawGenericString( x, y, string, setColor, false, -1 );
+    return ImGui_Console_AddGenericString(x, y, string, setColor);
 }
 
 /*
@@ -1357,18 +1243,13 @@ void Field_DrawInputLine( int x, int y, field_t *edit )
 #elif defined XASH_IMGUI
 	ImGui_Console_DrawStringLen(str, &curPos, NULL);
 #else
-	Con_DrawStringLen(str, &curPos, NULL);
+#error "NYI"
 #endif
 	
 	Con_UtfProcessChar( 0 );
 
 	if( host.key_overstrike && cursorChar )
 	{
-		// overstrike cursor
-		pglEnable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
-		pglBlendFunc( GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA );
-		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 //#ifdef XASH_VGUI2
 #if 0
         char str[2] = { (char)cursorChar, '\0' };
@@ -1377,6 +1258,11 @@ void Field_DrawInputLine( int x, int y, field_t *edit )
 		char str[2] = { (char)cursorChar, '\0' };
 		ImGui_Console_AddGenericString(x + curPos, y, str, colorDefault);
 #else
+        // overstrike cursor
+		pglEnable( GL_BLEND );
+		pglDisable( GL_ALPHA_TEST );
+		pglBlendFunc( GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA );
+		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 		Con_DrawGenericChar( x + curPos, y, cursorChar, colorDefault );
 #endif
 	}
@@ -1720,8 +1606,6 @@ void Con_DrawNotify( void )
 	if( host.developer && ( !Cvar_VariableInteger( "cl_background" ) && !Cvar_VariableInteger( "sv_background" )))
 	{
 		currentColor = 7;
-		pglColor4ubv( g_color_table[currentColor] );
-
 		for( i = con.current - CON_TIMES + 1; i <= con.current; i++ )
 		{
 			if( i < 0 ) continue;
@@ -1762,7 +1646,6 @@ void Con_DrawNotify( void )
 		int	len;
 
 		currentColor = 7;
-		pglColor4ubv( g_color_table[currentColor] );
 
 		start = con.curFont->charWidths[' ']; // offset one space at left screen side
 
@@ -1781,13 +1664,11 @@ void Con_DrawNotify( void )
 		ImGui_Console_AddGenericString(start, v, buf, g_color_table[7]);
 #else
 		Con_DrawStringLen( buf, &len, NULL );
-		Con_DrawString( start, v, buf, g_color_table[7] );
+		Con_DrawString( start, v, buf, g_color_table[currentColor] );
 #endif
 
 		Field_DrawInputLine( start + len, v, &con.chat );
 	}
-
-	pglColor4ub( 255, 255, 255, 255 );
 }
 
 /*
@@ -1799,136 +1680,7 @@ Draws the console with the solid background
 */
 void Con_DrawSolidConsole( float frac, qboolean fill )
 {
-#ifndef XASH_VGUI2
-	int	i, x, y;
-	int	rows;
-	short	*text;
-	int	row;
-	int	lines, start;
-	int	currentColor;
-	string	curbuild;
-
-	lines = scr_height->integer * frac;
-	if( lines <= 0 ) return;
-	if( lines > scr_height->integer )
-		lines = scr_height->integer;
-
-	// draw the background
-	y = scr_height->integer;
-	if( !fill )
-		y *= frac;
-	if( y >= 1 )
-	{
-		con_rect.x = 0;
-		con_rect.y = y - scr_width->value * 3 / 4;
-		con_rect.w = scr_width->value;
-		con_rect.h = scr_width->value * 3 / 4;
-		if( fill )
-		{
-			GL_SetRenderMode( kRenderNormal );
-			if( con_black->integer )
-			{
-				pglColor4ub( 0, 0, 0, 255 );
-				R_DrawStretchPic( con_rect.x, con_rect.y, con_rect.w, con_rect.h, 0, 0, 1, 1, cls.fillImage );
-			}
-			else
-			{
-				pglColor4ub( 255, 255, 255, 255 );
-				R_DrawStretchPic( con_rect.x, con_rect.y, con_rect.w, con_rect.h, 0, 0, 1, 1, con.background );
-			}
-		}
-		else
-		{
-			GL_SetRenderMode( kRenderTransTexture );
-			if( con_black->value )
-			{
-				pglColor4ub( 0, 0, 0, 255 * con_alpha->value );
-				R_DrawStretchPic( con_rect.x, con_rect.y, con_rect.w, con_rect.h, 0, 0, 1, 1, cls.fillImage );
-			}
-			else
-			{
-				pglColor4ub( 255, 255, 255, 255 * con_alpha->value );
-				R_DrawStretchPic( con_rect.x, con_rect.y, con_rect.w, con_rect.h, 0, 0, 1, 1, con.background );
-			}
-		}
-		pglColor4ub( 255, 255, 255, 255 );
-	}
-	else y = 0;
-
-	if( !con.curFont ) return; // nothing to draw
-
-	rows = ( lines - QCHAR_WIDTH ) / QCHAR_WIDTH; // rows of text to draw
-
-	if( host.developer )
-	{
-		// draw current version
-		byte	*color = g_color_table[7];
-		int	stringLen, width = 0, charH;
-
-		Q_snprintf( curbuild, MAX_STRING, "CSMoE 柑橘 Xash3D %s build %i %s-%s", XASH_VERSION, Q_buildnum( ), Q_buildos( ), Q_buildarch( ));
-#ifdef XASH_IMGUI
-		ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
-		start = scr_width->integer - stringLen;
-		ImGui_Console_AddGenericString(start, 0, curbuild, color);
-#else
-		Con_DrawStringLen( curbuild, &stringLen, &charH );
-		start = scr_width->integer - stringLen;
-		stringLen = Con_StringLength( curbuild );
-
-		for( i = 0; i < stringLen; i++ )
-			width += Con_DrawCharacter( start + width, 0, curbuild[i], color );
-#endif
-
-		host.force_draw_version_time = 0;
-	}
-
-
-	// draw the text
-	con.vislines = lines;
-	y = lines - ( con.curFont->charHeight * (Con_DrawProgress()?4:3) );
-
-	// draw from the bottom up
-	if( con.display != con.current )
-	{
-		start = con.curFont->charWidths[' ']; // offset one space at left screen side
-
-		// draw red arrows to show the buffer is backscrolled
-		for( x = 0; x < con.linewidth; x += 4 )
-			Con_DrawCharacter(( x + 1 ) * start, y, '^', g_color_table[1] );
-		y -= con.curFont->charHeight;
-		rows--;
-	}
-	
-	row = con.display;
-	if( con.x == 0 ) row--;
-
-	currentColor = 7;
-	pglColor4ubv( g_color_table[currentColor] );
-
-	for( i = 0; i < rows; i++, y -= con.curFont->charHeight, row-- )
-	{
-		if( row < 0 ) break;
-		if( con.current - row >= con.totallines )
-		{
-			// past scrollback wrap point
-			continue;	
-		}
-
-		text = con.text + ( row % con.totallines ) * con.linewidth;
-		start = con.curFont->charWidths[' ']; // offset one space at left screen side
-
-		for( x = 0; x < con.linewidth; x++ )
-		{
-			if((( text[x] >> 8 ) & 7 ) != currentColor )
-				currentColor = ( text[x] >> 8 ) & 7;
-			start += Con_DrawCharacter( start, y, text[x] & 0xFF, g_color_table[currentColor] );
-		}
-	}
-
-	// draw the input prompt, user text, and cursor if desired
-	Con_DrawInput();
-	pglColor4ub( 255, 255, 255, 255 );
-#endif // XASH_VGUI2
+    // removed
 }
 
 /*
@@ -2020,10 +1772,7 @@ void Con_DrawVersion( void )
 {
 	// draws the current build
 	byte	*color = g_color_table[7];
-	int	i, stringLen, width = 0, charH = 0;
-	int	start, height = scr_height->integer;
 	qboolean	draw_version = false;
-	string	curbuild;
 
 	switch( cls.scrshot_action )
 	{
@@ -2046,41 +1795,28 @@ void Con_DrawVersion( void )
 			host.force_draw_version = false;
 	}
 
-	Q_snprintf( curbuild, MAX_STRING, "CSMoE 柑橘 Xash3D %s build %i %s-%s", XASH_VERSION, Q_buildnum( ), Q_buildos( ), Q_buildarch( ));
-#ifdef XASH_IMGUI
-	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
-	start = scr_width->integer - stringLen;
-	ImGui_Console_AddGenericString(start, 0, curbuild, color);
-
+    string	curbuild;
+    int	width, height = 0;
 	// draw cpu info
 	int ram = Cpu_GetInstalledRamMegaBytes();
-	if (ram > 0)
-	{
-		Q_snprintf(curbuild, MAX_STRING, "CPU: %s (%d MB RAM)\nGPU: %s%s",
-			Cpu_GetName(),
-			ram,
-			glConfig.renderer_string,
-			GL_Support(GL_ASTC_EXT) ? "(ASTC)" : "");
-	}
-	else
-	{
-		Q_snprintf(curbuild, MAX_STRING, "CPU: %s \nGPU: %s%s",
-			Cpu_GetName(),
-			glConfig.renderer_string,
-			GL_Support(GL_ASTC_EXT) ? "(ASTC)" : "");
-	}
-	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
-	start = scr_width->integer - stringLen;
-	ImGui_Console_AddGenericString(start, scr_height->integer - charH, curbuild, color);
-#else
-	Con_DrawStringLen( curbuild, &stringLen, &charH );
-	start = scr_width->integer - stringLen * 1.05f;
-	stringLen = Con_StringLength( curbuild );
-	height -= charH * 1.05f;
+    int y = 0;
+    Q_snprintf(curbuild, MAX_STRING, "CSMoE Xash3D %s build %d %s-%s",
+               XASH_VERSION,
+               Q_buildnum(),
+               Q_buildos( ),
+               Q_buildarch());
+    ImGui_Console_DrawStringLen(curbuild, &width, &height);
+    y = scr_height->integer - height;
+    ImGui_Console_AddGenericString(scr_width->integer - width, y, curbuild, color);
 
-	for( i = 0; i < stringLen; i++ )
-		width += Con_DrawCharacter( start + width, height, curbuild[i], color );
-#endif
+    Q_snprintf(curbuild, MAX_STRING, "CPU: %s (%.1f GB)\nGPU: %s%s",
+               Cpu_GetName(),
+               (ram + 0.5) / 1024.0,
+               glConfig.renderer_string,
+               GL_Support(GL_ASTC_EXT) ? "(ASTC)" : "");
+	ImGui_Console_DrawStringLen(curbuild, &width, &height);
+    y -= height;
+	ImGui_Console_AddGenericString(scr_width->integer - width, y, curbuild, color);
 }
 
 /*

@@ -121,6 +121,7 @@ struct MapData
 	int zombi_5;
 	int ZSmaxDifficulty;
 	int scenariotx;*/
+	int randomrespawn;
 };
 // same map_filename but different map_id
 std::unordered_map<std::string, MapData> g_MapData;
@@ -187,6 +188,14 @@ float MapMgr_GetMapDensity_b(const char* szMapName)
 		return 0;
 
 	return g_MapData[std::string(szMapName)].density_b;
+}
+
+int MapMgr_GetMapRandomRespawn(const char* szMapName)
+{
+	if (g_MapData.find(std::string(szMapName)) == g_MapData.end())
+		return 0;
+
+	return g_MapData[std::string(szMapName)].randomrespawn;
 }
 
 void MapMgr_LoadMapSafeArea()
@@ -327,6 +336,9 @@ void MapMgr_LoadMapList()
 
 		std::getline(ss, data, ',');
 		map.density_b = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		map.randomrespawn = atoi(data.c_str());
 
 		data = map.map_filename;
 		if (g_MapData.find(data) != g_MapData.end())

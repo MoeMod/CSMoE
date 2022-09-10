@@ -84,6 +84,7 @@ public:
 	virtual void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) = 0;
 	virtual void Holster_Post(CBasePlayerWeapon* weapon) = 0;
 	virtual void UpdateStatusBar(CBaseEntity *pEntity, char *sbuf0, int* newSBarState) = 0;
+	virtual BOOL OnReactToDeimosTail() = 0;
 	
 };
 
@@ -135,6 +136,7 @@ public:
 	void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) {};
 	void Holster_Post(CBasePlayerWeapon* weapon) {};
 	void UpdateStatusBar(CBaseEntity* pEntity, char* sbuf0, int *newSBarState) override {};
+	BOOL OnReactToDeimosTail() override { return false; };
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

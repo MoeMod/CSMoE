@@ -45,6 +45,10 @@ GNU General Public License for more details.
 #include "platform/winrt/winrt_interop.h"
 #endif
 
+#ifdef IMGUI_IMPL_XASH_ES2
+#include "GLES2/gl2.h"
+#endif
+
 // Data
 double g_Time = 0.0;
 bool g_MouseJustPressed[5] = { false, false, false, false, false };
@@ -65,6 +69,13 @@ int g_imguiRenderMode = 0;
 
 extern "C" mempool_t *imgui_pool = nullptr;
 
+#ifdef IMGUI_IMPL_XASH_ES2
+static GLuint       g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
+static GLint        g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;                                // Uniforms location
+static GLuint       g_AttribLocationVtxPos = 0, g_AttribLocationVtxUV = 0, g_AttribLocationVtxColor = 0; // Vertex attributes location
+static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
+#endif
+
 void* ImGui_ImplGL_OperatorNew(size_t sz, void* user_data)
 {
 	return Mem_Alloc(imgui_pool, sz);
@@ -75,6 +86,147 @@ void ImGui_ImplGL_OperatorDelete(void* ptr, void* user_data)
 	return ptr ? Mem_Free(ptr) : void();
 }
 
+#ifdef IMGUI_IMPL_XASH_ES2
+static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_width, int fb_height)
+{
+    // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
+
+    // Setup viewport, orthographic projection matrix
+    // Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right). DisplayPos is (0,0) for single viewport apps.
+    //glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
+    float L = draw_data->DisplayPos.x;
+    float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
+    float T = draw_data->DisplayPos.y;
+    float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
+    const float ortho_projection[4][4] =
+            {
+                    { 2.0f/(R-L),   0.0f,         0.0f,   0.0f },
+                    { 0.0f,         2.0f/(T-B),   0.0f,   0.0f },
+                    { 0.0f,         0.0f,        -1.0f,   0.0f },
+                    { (R+L)/(L-R),  (T+B)/(B-T),  0.0f,   1.0f },
+            };
+    glUseProgram(g_ShaderHandle);
+    glUniform1i(g_AttribLocationTex, 0);
+    glUniformMatrix4fv(g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0]);
+
+    // Bind vertex/index buffers and setup attributes for ImDrawVert
+    glBindBuffer(GL_ARRAY_BUFFER, g_VboHandle);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ElementsHandle);
+
+    glEnableVertexAttribArray(g_AttribLocationVtxPos);
+    glEnableVertexAttribArray(g_AttribLocationVtxUV);
+    glEnableVertexAttribArray(g_AttribLocationVtxColor);
+    glVertexAttribPointer(g_AttribLocationVtxPos,   2, GL_FLOAT,         GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
+    glVertexAttribPointer(g_AttribLocationVtxUV,    2, GL_FLOAT,         GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, uv));
+    glVertexAttribPointer(g_AttribLocationVtxColor, 4, GL_UNSIGNED_BYTE, GL_TRUE,  sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, col));
+}
+
+static void ImGui_ImplOpenGL3_ResetRenderState(ImDrawData* draw_data, int fb_width, int fb_height)
+{
+    glDisableVertexAttribArray(g_AttribLocationVtxPos);
+    glDisableVertexAttribArray(g_AttribLocationVtxUV);
+    glDisableVertexAttribArray(g_AttribLocationVtxColor);
+}
+
+// OpenGL3 Render function.
+// (this used to be set in io.RenderDrawListsFn and called by ImGui::Render(), but you can now call this directly from your main loop)
+// Note that this implementation is little overcomplicated because we are saving/setting up/restoring every OpenGL state explicitly, in order to be able to run within any OpenGL engine that doesn't do so.
+void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
+{
+    // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+    int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
+    int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
+    if (fb_width <= 0 || fb_height <= 0)
+        return;
+
+    // Backup GL state
+    GLenum last_active_texture; glGetIntegerv(GL_ACTIVE_TEXTURE, (GLint*)&last_active_texture);
+    glActiveTexture(GL_TEXTURE0);
+    GLuint last_program; glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&last_program);
+    GLuint last_texture; glGetIntegerv(GL_TEXTURE_BINDING_2D, (GLint*)&last_texture);
+    GLuint last_array_buffer; glGetIntegerv(GL_ARRAY_BUFFER_BINDING, (GLint*)&last_array_buffer);
+    GLuint last_element_array_buffer; glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, (GLint*)&last_element_array_buffer);
+    GLint last_viewport[4]; glGetIntegerv(GL_VIEWPORT, last_viewport);
+    GLint last_scissor_box[4]; glGetIntegerv(GL_SCISSOR_BOX, last_scissor_box);
+    GLenum last_blend_src_rgb; glGetIntegerv(GL_BLEND_SRC_RGB, (GLint*)&last_blend_src_rgb);
+    GLenum last_blend_dst_rgb; glGetIntegerv(GL_BLEND_DST_RGB, (GLint*)&last_blend_dst_rgb);
+    GLenum last_blend_src_alpha; glGetIntegerv(GL_BLEND_SRC_ALPHA, (GLint*)&last_blend_src_alpha);
+    GLenum last_blend_dst_alpha; glGetIntegerv(GL_BLEND_DST_ALPHA, (GLint*)&last_blend_dst_alpha);
+    GLenum last_blend_equation_rgb; glGetIntegerv(GL_BLEND_EQUATION_RGB, (GLint*)&last_blend_equation_rgb);
+    GLenum last_blend_equation_alpha; glGetIntegerv(GL_BLEND_EQUATION_ALPHA, (GLint*)&last_blend_equation_alpha);
+    GLboolean last_enable_blend = glIsEnabled(GL_BLEND);
+    GLboolean last_enable_cull_face = glIsEnabled(GL_CULL_FACE);
+    GLboolean last_enable_depth_test = glIsEnabled(GL_DEPTH_TEST);
+    GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
+
+    // Setup desired GL state
+    // Recreate the VAO every time (this is to easily allow multiple GL contexts to be rendered to. VAO are not shared among GL contexts)
+    // The renderer would actually work without any VAO bound, but then our VertexAttrib calls would overwrite the default one currently bound.
+    ImGui_ImplOpenGL3_SetupRenderState(draw_data, fb_width, fb_height);
+    // Will project scissor/clipping rectangles into framebuffer space
+    ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
+    ImVec2 clip_scale = draw_data->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
+
+    // Render command lists
+    for (int n = 0; n < draw_data->CmdListsCount; n++)
+    {
+        const ImDrawList* cmd_list = draw_data->CmdLists[n];
+
+        // Upload vertex/index buffers
+        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * (int)sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * (int)sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+
+        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+        {
+            const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
+            if (pcmd->UserCallback != NULL)
+            {
+                // User callback, registered via ImDrawList::AddCallback()
+                // (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset render state.)
+                if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
+                    ImGui_ImplOpenGL3_SetupRenderState(draw_data, fb_width, fb_height);
+                else
+                    pcmd->UserCallback(cmd_list, pcmd);
+            }
+            else
+            {
+                // Project scissor/clipping rectangles into framebuffer space
+                ImVec4 clip_rect;
+                clip_rect.x = (pcmd->ClipRect.x - clip_off.x) * clip_scale.x;
+                clip_rect.y = (pcmd->ClipRect.y - clip_off.y) * clip_scale.y;
+                clip_rect.z = (pcmd->ClipRect.z - clip_off.x) * clip_scale.x;
+                clip_rect.w = (pcmd->ClipRect.w - clip_off.y) * clip_scale.y;
+
+                if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0f && clip_rect.w >= 0.0f)
+                {
+                    // Apply scissor/clipping rectangle
+                    glScissor((int)clip_rect.x, (int)(fb_height - clip_rect.w), (int)(clip_rect.z - clip_rect.x), (int)(clip_rect.w - clip_rect.y));
+
+                    // Bind texture, Draw
+                    auto tex = R_GetTexture((GLuint)(intptr_t)pcmd->TextureId);
+                    glBindTexture(tex->target, tex->texnum);
+                    glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
+                }
+            }
+        }
+    }
+    ImGui_ImplOpenGL3_ResetRenderState(draw_data, fb_width, fb_height);
+    // Restore modified GL state
+    glUseProgram(last_program);
+    glBindTexture(GL_TEXTURE_2D, last_texture);
+    glActiveTexture(last_active_texture);
+    glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, last_element_array_buffer);
+    glBlendEquationSeparate(last_blend_equation_rgb, last_blend_equation_alpha);
+    glBlendFuncSeparate(last_blend_src_rgb, last_blend_dst_rgb, last_blend_src_alpha, last_blend_dst_alpha);
+    if (last_enable_blend) glEnable(GL_BLEND); else glDisable(GL_BLEND);
+    if (last_enable_cull_face) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
+    if (last_enable_depth_test) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+    if (last_enable_scissor_test) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
+    glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
+    glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
+}
+#else
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
 void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 {
@@ -85,45 +237,52 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	if (fb_width <= 0 || fb_height <= 0)
 		return;
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
+	pglShadeModel(GL_SMOOTH);
+	g_imguiRenderMode = kRenderTransAlpha;
+	GL_SetRenderMode(kRenderTransAlpha);
+	// Render command lists
+#if 0
+    for (int n = 0; n < draw_data->CmdListsCount; n++)
+    {
+        const ImDrawList* cmd_list = draw_data->CmdLists[n];
+        const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
+        const ImDrawIdx* idx_buffer = cmd_list->IdxBuffer.Data;
+        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+        {
+            const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
+            if (pcmd->UserCallback)
+            {
+                pcmd->UserCallback(cmd_list, pcmd);
+            }
+            else
+            {
+				pglEnable( GL_BLEND );
+				pglEnable( GL_ALPHA_TEST );
+				pglAlphaFunc( GL_GREATER, 0.0f );
+				pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+				pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-	// We are using the OpenGL fixed pipeline to make the example code simpler to read!
-	// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers, polygon fill.
-	GLint last_texture; pglGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-	GLint last_polygon_mode[2]; pglGetIntegerv(GL_POLYGON_MODE, last_polygon_mode);
-	GLint last_viewport[4]; pglGetIntegerv(GL_VIEWPORT, last_viewport);
-	GLint last_scissor_box[4]; pglGetIntegerv(GL_SCISSOR_BOX, last_scissor_box);
-	//pglPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
-	GLboolean last_enable_blend = pglIsEnabled(GL_BLEND);
-	GLboolean last_enable_cull_face = pglIsEnabled(GL_CULL_FACE);
-	GLboolean last_enable_depth_test = pglIsEnabled(GL_DEPTH_TEST);
-	GLboolean last_enable_scissor_test = pglIsEnabled(GL_SCISSOR_TEST);
+				GL_Bind( GL_KEEP_UNIT, (ptrdiff_t)pcmd->TextureId );
 
-	pglEnable(GL_BLEND);
-	pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	pglDisable(GL_CULL_FACE);
-	pglDisable(GL_DEPTH_TEST);
-	pglEnable(GL_SCISSOR_TEST);
-	pglEnableClientState(GL_VERTEX_ARRAY);
+                pglScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+
+                pglBegin(GL_TRIANGLES);
+                for(int i = 0; i < pcmd->ElemCount; ++i)
+                {
+                    auto vtx = vtx_buffer + idx_buffer[i];
+                    pglColor4ubv((ImU8 *)&vtx->col);
+                    pglTexCoord2f(vtx->uv.x, vtx->uv.y);
+                    pglVertex2f(vtx->pos.x, vtx->pos.y);
+                }
+                pglEnd();
+            }
+            idx_buffer += pcmd->ElemCount;
+        }
+    }
+#else
+    pglEnableClientState(GL_VERTEX_ARRAY);
 	pglEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	pglEnableClientState(GL_COLOR_ARRAY);
-	pglEnable(GL_TEXTURE_2D);
-	pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	pglShadeModel(GL_SMOOTH);
-
-	g_imguiRenderMode = kRenderTransTexture;
-	GL_SetRenderMode(kRenderTransTexture);
-
-	// Setup viewport, orthographic projection matrix
-//	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
-//	glMatrixMode(GL_PROJECTION);
-//	glPushMatrix();
-//	glLoadIdentity();
-//	glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
-//	glMatrixMode(GL_MODELVIEW);
-//	glPushMatrix();
-//	glLoadIdentity();
-
-	// Render command lists
 	for (int n = 0; n < draw_data->CmdListsCount; n++)
 	{
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];
@@ -145,6 +304,11 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 				//pglBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
 				GL_Bind( XASH_TEXTURE0, (ptrdiff_t)pcmd->TextureId );
 				pglScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+#if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
+                if( pglDrawRangeElements )
+                    pglDrawRangeElements( GL_TRIANGLES, 0, (GLsizei)pcmd->ElemCount, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer );
+                else
+#endif
 				pglDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
 			}
 			idx_buffer += pcmd->ElemCount;
@@ -155,22 +319,9 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	pglDisableClientState(GL_COLOR_ARRAY);
 	pglDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	pglDisableClientState(GL_VERTEX_ARRAY);
-	pglBindTexture(GL_TEXTURE_2D, (GLuint)last_texture);
-//	pglMatrixMode(GL_MODELVIEW);
-//	pglPopMatrix();
-//	pglMatrixMode(GL_PROJECTION);
-//	pglPopMatrix();
-	//pglPopAttrib();
-
-	if (last_enable_blend) pglEnable(GL_BLEND); else pglDisable(GL_BLEND);
-	if (last_enable_cull_face) pglEnable(GL_CULL_FACE); else pglDisable(GL_CULL_FACE);
-	if (last_enable_depth_test) pglEnable(GL_DEPTH_TEST); else pglDisable(GL_DEPTH_TEST);
-	if (last_enable_scissor_test) pglEnable(GL_SCISSOR_TEST); else pglDisable(GL_SCISSOR_TEST);
-
-	pglPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
-//	pglViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
-	pglScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
+#endif
 }
+#endif
 
 //=============
 // -button
@@ -289,19 +440,116 @@ qboolean ImGui_ImplGL_CharCallbackUTF(const char *c)
 	return io.WantTextInput;
 }
 
+#ifdef IMGUI_IMPL_XASH_ES2
+// If you get an error please report on github. You may try different GL context version or GLSL version. See GL<>GLSL version table at the top of this file.
+static bool CheckShader(GLuint handle, const char* desc)
+{
+    GLint status = 0, log_length = 0;
+    glGetShaderiv(handle, GL_COMPILE_STATUS, &status);
+    glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &log_length);
+    if ((GLboolean)status == GL_FALSE)
+        MsgDev( D_ERROR, "ImGui_ImplOpenGL3_CreateDeviceObjects: failed to compile %s\n", desc);
+    if (log_length > 1)
+    {
+        ImVector<char> buf;
+        buf.resize((int)(log_length + 1));
+        glGetShaderInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
+        MsgDev( D_ERROR, "%s\n", buf.begin());
+    }
+    return (GLboolean)status == GL_TRUE;
+}
+
+// If you get an error please report on GitHub. You may try different GL context version or GLSL version.
+static bool CheckProgram(GLuint handle, const char* desc)
+{
+    GLint status = 0, log_length = 0;
+    glGetProgramiv(handle, GL_LINK_STATUS, &status);
+    glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
+    if ((GLboolean)status == GL_FALSE)
+        MsgDev( D_ERROR, "ImGui_ImplOpenGL3_CreateDeviceObjects: failed to link %s\n", desc);
+    if (log_length > 1)
+    {
+        ImVector<char> buf;
+        buf.resize((int)(log_length + 1));
+        glGetProgramInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
+        MsgDev( D_ERROR, "%s\n", buf.begin());
+    }
+    return (GLboolean)status == GL_TRUE;
+}
+#endif
+
 #define GL_UNPACK_ROW_LENGTH			0x0CF2
 
 qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 {
 	// Build texture atlas
 	ImGuiIO& io = ImGui::GetIO();
+#ifdef IMGUI_IMPL_XASH_ES2
+    // compile shaders for es2
+    const GLchar* vertex_shader_with_version =
+            "#version 100\n"
+            "uniform mat4 ProjMtx;\n"
+            "attribute vec2 Position;\n"
+            "attribute vec2 UV;\n"
+            "attribute vec4 Color;\n"
+            "varying vec2 Frag_UV;\n"
+            "varying vec4 Frag_Color;\n"
+            "void main()\n"
+            "{\n"
+            "    Frag_UV = UV;\n"
+            "    Frag_Color = Color;\n"
+            "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
+            "}\n";
+
+    const GLchar* fragment_shader_with_version =
+            "#version 100\n"
+            "#ifdef GL_ES\n"
+            "    precision mediump float;\n"
+            "#endif\n"
+            "uniform sampler2D Texture;\n"
+            "varying vec2 Frag_UV;\n"
+            "varying vec4 Frag_Color;\n"
+            "void main()\n"
+            "{\n"
+            "    gl_FragColor = Frag_Color * texture2D(Texture, Frag_UV.st);\n"
+            "}\n";
+    g_VertHandle = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(g_VertHandle, 1, &vertex_shader_with_version, NULL);
+    glCompileShader(g_VertHandle);
+    CheckShader(g_VertHandle, "vertex shader");
+
+    g_FragHandle = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(g_FragHandle, 1, &fragment_shader_with_version, NULL);
+    glCompileShader(g_FragHandle);
+    CheckShader(g_FragHandle, "fragment shader");
+
+    g_ShaderHandle = glCreateProgram();
+    glAttachShader(g_ShaderHandle, g_VertHandle);
+    glAttachShader(g_ShaderHandle, g_FragHandle);
+    glLinkProgram(g_ShaderHandle);
+    CheckProgram(g_ShaderHandle, "shader program");
+
+    g_AttribLocationTex = glGetUniformLocation(g_ShaderHandle, "Texture");
+    g_AttribLocationProjMtx = glGetUniformLocation(g_ShaderHandle, "ProjMtx");
+    g_AttribLocationVtxPos = (GLuint)glGetAttribLocation(g_ShaderHandle, "Position");
+    g_AttribLocationVtxUV = (GLuint)glGetAttribLocation(g_ShaderHandle, "UV");
+    g_AttribLocationVtxColor = (GLuint)glGetAttribLocation(g_ShaderHandle, "Color");
+
+    // Create buffers
+    glGenBuffers(1, &g_VboHandle);
+    glGenBuffers(1, &g_ElementsHandle);
+#endif
 
 	ImGui_ImplGL_ReloadFonts();
 
 	unsigned char* pixels;
 	int width, height, bytes_per_pixel;
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
-	io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bytes_per_pixel);
+#ifdef XASH_WES
+    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytes_per_pixel);
+#else
+    io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bytes_per_pixel);
+#endif
 
 	// Upload texture to graphics system
 	//GLint last_texture;
@@ -320,6 +568,11 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	r_image->size = r_image->width * r_image->height * r_image->depth;
 	r_image->flags = IMAGE_HAS_ALPHA | IMAGE_TEMP;
 	r_image->buffer = (byte *)pixels;
+
+#ifdef XASH_WES
+    r_image->type = PF_RGBA_32;
+    r_image->flags |= IMAGE_HAS_COLOR;
+#endif
 
 	//pglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 	auto i = GL_LoadTextureInternal( "*imgui_font", r_image, (texFlags_t)(TF_FONT | TF_FONT_ALPHA), false );
@@ -365,6 +618,18 @@ void ImGui_ImplGL_InvalidateDeviceObjects(void)
 
 int pfnGetScreenInfo( SCREENINFO *pscrinfo );
 
+void ImGui_ImplGL_ClearFontCache()
+{
+    // clear font
+    ImGuiIO& io = ImGui::GetIO();
+    for(auto *font : io.Fonts->Fonts)
+    {
+        if(!font->ConfigData->FontDataOwnedByAtlas)
+            FS_MapFree((const byte *)font->ConfigData->FontData, font->ConfigData->FontDataSize);
+    }
+    io.Fonts->ClearFonts();
+}
+
 void ImGui_ImplGL_ReloadFonts()
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -382,6 +647,8 @@ void ImGui_ImplGL_ReloadFonts()
 
 	if (size_pixels <= 0.0f)
 		return;
+
+    ImGui_ImplGL_ClearFontCache();
 	
 	t = FS_Search( "resource/font/*.ttf", true, false );
 	if (t)
@@ -390,11 +657,10 @@ void ImGui_ImplGL_ReloadFonts()
 		{
 			const char* filename = t->filenames[i];
 			fs_offset_t length = 0;
-			auto file = FS_LoadFile(filename, &length, false);
-			std::unique_ptr<void, decltype(&ImGui::MemFree)> new_ptr(ImGui::MemAlloc(length + 1), ImGui::MemFree);
-			memcpy(new_ptr.get(), file, length);
-			Mem_Free(std::exchange(file, nullptr));
-			auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, size_pixels, NULL, io.Fonts->GetGlyphRangesChineseFull());
+			auto file = FS_MapFile(filename, &length, false);
+            ImFontConfig cfg = {};
+            cfg.FontDataOwnedByAtlas = false;
+			auto font = io.Fonts->AddFontFromMemoryTTF((void *)file, length, size_pixels, &cfg, io.Fonts->GetGlyphRangesChineseFull());
 		}
 		Mem_Free(t);
 	}
@@ -516,7 +782,7 @@ qboolean ImGui_ImplGL_Init(void)
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
-	//io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
+	io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
 
 #ifdef XASH_SDL
 	ImGui_ImplSDL2_Init();
@@ -748,13 +1014,13 @@ qboolean ImGui_ImplGL_IsCursorVisible()
 void ImGui_ImplGL_Render(void)
 {
 	ImGuiIO& io = ImGui::GetIO();
-    ImGui::Render();
 	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	//pglViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 	//pglClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 	//pglClear(GL_COLOR_BUFFER_BIT);
 	//pglUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
-	ImGui_ImplGL_RenderDrawLists(ImGui::GetDrawData());
+	//ImGui_ImplGL_RenderDrawLists(ImGui::GetDrawData());
+    ImGui::Render();
 }
 
 void Engine_OnGUI(struct ImGuiContext *context)

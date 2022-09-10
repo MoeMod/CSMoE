@@ -4,7 +4,8 @@
 #include "mod_local.h"
 
 
-	void Mod_DecryptModel(const char *model_name, byte *buffer);
+bool Mod_IsModelEncrypted(const char *model_name, const byte *buffer);
+void Mod_DecryptModel(const char *model_name, byte *buffer);
 
 
 #endif

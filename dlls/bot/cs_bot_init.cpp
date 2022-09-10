@@ -307,7 +307,7 @@ void CCSBot::SpawnBot()
 
 	Q_strcpy(m_name, STRING(pev->netname));
 
-	if (!m_bIsZombie)
+	if (!m_bIsZombie && IsBot())
 	{
 		SetState(&m_buyState);
 	}

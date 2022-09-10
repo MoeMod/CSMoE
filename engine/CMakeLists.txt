@@ -47,9 +47,6 @@ if(XASH_WES)
 	set(XASH_WES_SRC "${CMAKE_SOURCE_DIR}/gl-wes-v2" CACHE PATH "GL WES path")
 endif()
 option(XASH_GL4ES    "Use gl4es(GLES2). Implicitly enables XASH_GLES." OFF)
-if(XASH_GL4ES)
-	set(XASH_GL4ES_SRC "${CMAKE_SOURCE_DIR}/3rdparty/gl4es" CACHE PATH "GL4ES path")
-endif()
 if(WIN32)
 	option(XASH_QINDIEGL    "Use QindieGL(D3D9). Only avaible on Win32" OFF)
 endif()
@@ -132,6 +129,7 @@ set(XASH_ENGINE_SOURCES
 	common/textconsole.cpp
 	common/cook.cpp
 	common/model_encrypt.cpp
+	common/fs_mmap.cpp
 	server/sv_client.cpp
 	server/sv_cmds.cpp
 	server/sv_custom.cpp
@@ -337,16 +335,9 @@ elseif(XASH_WES)
 	list(APPEND XASH_ENGINE_SOURCES ${XASH_ENGINE_GLESWRAP_SOURCES})
 
 	include_directories(${XASH_NANOGL_SRC}/ ${XASH_NANOGL_SRC}/GL/ ${XASH_WES_SRC}/src/)
-	add_definitions(-DXASH_WES)
+	add_definitions(-DXASH_WES -DWES_MANGLE_PREPEND)
 elseif(XASH_GL4ES)
-	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES ${XASH_GL4ES_SRC}/src/gl/*.c ${XASH_GL4ES_SRC}/src/gl/*/*.c ${XASH_GL4ES_SRC}/src/glx/hardext.c)
-	if(NOT XASH_ENGINE_GLESWRAP_SOURCES)
-		message(FATAL_ERROR "Clone gl4es sources to engine folder!")
-	endif()
-	list(APPEND XASH_ENGINE_SOURCES ${XASH_ENGINE_GLESWRAP_SOURCES})
-
-	include_directories(${XASH_GL4ES_SRC}/src ${XASH_GL4ES_SRC}/src/gl ${XASH_GL4ES_SRC}/src/glx ${XASH_GL4ES_SRC}/include)
-	add_definitions(-DXASH_GL4ES -DNOX11 -DNO_GBM -DNO_INIT_CONSTRUCTOR -DDEFAULT_ES=2 -DNOEGL -DEXTERNAL_GETPROCADDRESS=GL4ES_GetProcAddress -DNO_LOADER -DSTATICLIB)
+	add_definitions(-DXASH_GL4ES)
 elseif(XASH_QINDIEGL)
 	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES 
 		${XASH_QINDIEGL_SRC}/code/d3d_array.cpp
@@ -490,12 +481,23 @@ if(XASH_SDL)
 endif()
 
 if(XASH_GLES)
-	add_definitions(-DXASH_GLES -DXASH_GL_STATIC)
+	add_definitions(-DXASH_GLES)
+endif()
+
+if(XASH_ANGLE)
+	add_definitions(-DXASH_ANGLE -DXASH_GL_STATIC)
+	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-angle)
+	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-spirv_cross 3rdparty-spirv_tools 3rdparty-glslang)
 endif()
 
 if(XASH_QINDIEGL)
-	add_definitions(-DXASH_D3D -DXASH_GL_STATIC -D__MULTITEXTURE_SUPPORT__)
-	target_link_libraries(${XASH_ENGINE} QindieGL)
+	add_definitions(-DXASH_GL_STATIC -D__MULTITEXTURE_SUPPORT__)
+	target_link_libraries(${XASH_ENGINE} PRIVATE QindieGL)
+endif()
+
+if(XASH_GL4ES)
+	add_definitions(-DXASH_GL_STATIC)
+	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-gl4es)
 endif()
 
 if(XASH_CPUINFO)
@@ -517,6 +519,10 @@ if(XASH_TBBMALLOC)
 endif()
 
 target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus 3rdparty-mpg123)
+
+if(WIN32)
+	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-mman-win32)
+endif()
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)
@@ -543,7 +549,7 @@ else()
 endif()
 
 if(APPLE)
-	target_link_libraries(${XASH_ENGINE} PUBLIC "-framework AppKit -framework AudioToolBox")
+	target_link_libraries(${XASH_ENGINE} PUBLIC "-framework AppKit -framework AudioToolBox -framework IOSurface")
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
 endif()

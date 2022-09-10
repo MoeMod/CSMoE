@@ -163,6 +163,7 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_HPBUFF			(1<<9)
 #define BUFF_SHOOTINGDOWN			(1<<10)
 #define BUFF_EMERGENCYESCAPE				(1<<11)
+#define BUFF_CLOAKING			(1<<12)
 
 #define COUNT_M32VENOM	0
 
@@ -240,6 +241,12 @@ struct WeaponStruct
 	int m_side;
 	int m_slot;
 	int m_ammoPrice;
+};
+
+struct PlayerItemData
+{
+	uint32_t id;
+	uint32_t num;
 };
 
 class CWeaponBox;
@@ -445,6 +452,10 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	int m_iNewMenuID;
 	int m_iNewMenuPage;
 	time_point_t m_iNewMenuExpire;
+	uint32_t m_iUID;
+	int64_t m_iQQ;
+	int32_t m_iToken;
+	bool m_bItemLoaded;
 };
 
 class CBasePlayer : public CBaseMonster, public PrivateData<class CBasePlayer, CBaseMonster>
@@ -776,9 +787,6 @@ public:
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
 #endif
 	int iuser1;
-	time_point_t m_tHealthDecreaseStartTime;
-	float m_flHealthDecreaseAmount;
-	time_point_t m_tHealthDecreaseInterval;
 	time_point_t m_tHealthBuffTime;
 	time_point_t m_tShootingDownBuffTime;
 	time_point_t m_tAvoidInfectBuffTime;
@@ -789,7 +797,7 @@ public:
 
 	float m_flBuffHealthAmount;
 	float m_flSaveArmorAmount;
-	int m_iHealthDecreaseCount;
+
 	int m_iHealthDamageType;
 	const char* m_ZombieClass;
 	time_point_t m_flCustomSequenceUntilTime;
@@ -808,6 +816,11 @@ public:
 	int m_bHasBuffWpn;	//revivegun buffak buffm4 and more
 	float m_flAccumulateDamage[33];	//like m32venom
 	int m_iReviveGunShotsFired;
+
+	float m_flPlayerBuffData;
+	bool m_bBlockWdnmd;
+	std::map<uint32_t, PlayerItemData> m_ItemData;
+	time_point_t m_flCloaking;
 };
 
 }

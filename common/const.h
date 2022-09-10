@@ -371,6 +371,10 @@
 // coord, coord, coord	boxmaxs
 // short life in 0.1 s
 // 3 bytes r, g, b
+#define TE_BEAMPARTICLE		32
+//short
+//short, short, short
+//
 
 #define TE_KILLBEAM			99	// kill all beams attached to entity
 // short (entity)
@@ -655,6 +659,35 @@
 
 #define TE_KILLENTITYATTACHMENTS	135	// will expire all TENTS attached to a ent.
 // short (entity index of ent)
+
+#define TE_CUSTOMBEAMPOINTS		136	// beam effect between two points (advanced)
+// coord coord coord (start position) 
+// float float float (end position) 
+// short (sprite index) 
+// byte (starting frame) 
+// byte (frame rate in 0.1's) 
+// byte (life in 0.1's) 
+// byte (line width in 0.1's) 
+// byte (noise amplitude in 0.01's) 
+// byte,byte,byte (color)
+// byte (brightness)
+// byte (scroll speed in 0.1's)
+// byte (flags)
+
+#define	TE_BEAMPOINTS_TRACER		137	// flying beam
+// coord coord coord (start position) 
+// coord coord coord (end position)
+// short (sprite index) 
+// byte (starting frame) 
+// byte (frame rate in 0.1's) 
+// byte (life in 0.1's) 
+// byte (line width in 0.1's) 
+// byte (noise amplitude in 0.01's) 
+// byte,byte,byte (color)
+// byte (brightness)
+// byte (scroll speed in 0.1's)
+// byte (flags)
+
 
 
 #define MSG_BROADCAST		0	// unreliable to all

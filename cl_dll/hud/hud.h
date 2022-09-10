@@ -220,6 +220,9 @@ public:
 	{
 		m_flLastBuffHit = flTime + 0.1;
 	}
+
+	int m_iInfinite;
+
 	//newhud
 	int m_iWeaponSelect;
 	UniqueTexture m_iWeaponList;
@@ -810,15 +813,126 @@ public:
 	void FuncDrawScope(const CTextureRef& tex, int type, int x, int y, int width, int height);
 	void FuncDrawCorner(const CTextureRef& tex, int type, int width, int height, int width2 = 0, int height2 = 0);
 	void FuncDraw2DQuadScaled(const CTextureRef& tex, int x, int y, int width, int height, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
+	void FuncDrawCircle(int index, int width, int height, float gauge);
 	void Shutdown( void );
 	void DrawSpecialScope(int iId, int iType);
+	void DrawKronosScope(float flTime);
+	void SetKronosTime(float time);
+	void DrawCrossbowEX21Scope(float flTime);
+	void DrawBUFFAWPScope(float flTime);
+	void BUFFAWPRun();
+	void BUFFAWPEnd();
+	void DrawLockOnGunScope(float flTime);
+	void SetLockOnData(float time, int slot, int hitgroup);
+	void ClearAllLockOnData();
+	void DrawPatrolDroneScope(float flTime);
+	void SetPatrolDroneDeployTime();
+	void InsertPatrolDroneData(int iSlot, int iClip, int iState);
+	void DrawMGSMScope(float flTime);
+	void SetMGSMAmmo(float flDelta, float flFinishTime);
+	void DrawBunkerBusterScope(float flTime);
+	void InsertBunkerBusterData(int iGauge, float iCoolDown, float gCoolDown);
+	void InsertBunkerBusterData2(float ShootTime);
 private:
+
+	struct LockOnData
+	{
+		float dietime;
+		int hitgroup;
+	};
+
 	float left, right, centerx, centery;
 	UniqueTexture m_iScopeArc[4];
 	UniqueTexture m_iM95TigerScope[2];
 	UniqueTexture m_iM95TigerScopeCorner;
 	UniqueTexture m_iCheytaclrrsScope;
-	UniqueTexture m_iFreedomScope;
+
+	UniqueTexture m_iAimBG;
+	UniqueTexture m_iAimFrame;
+	UniqueTexture m_iAimGauge;
+
+	float m_flScopeTime;
+	float m_flScopeTimeEnd;
+
+	UniqueTexture m_iCrossbowex21_AimBG;
+	UniqueTexture m_iCrossbowex21_AimImage;
+
+	UniqueTexture m_iBUFFAWP_BG;
+	UniqueTexture m_iBUFFAWP_Bar;
+	UniqueTexture m_iBUFFAWP_Light[3];
+	UniqueTexture m_iBUFFAWP_Outline;
+
+	float m_flBUFFAWPStartTime;
+
+	UniqueTexture m_iLockOnGun_BG;
+	UniqueTexture m_iLockOnGun_Top;
+	UniqueTexture m_iLockOnGun_Center;
+	UniqueTexture m_iLockOnGun_Bottom_BG;
+	UniqueTexture m_iLockOnGun_Bottom[6];
+
+	LockOnData m_iLockOnData[10];
+
+	UniqueTexture m_iPatrolDrone_Top_BG;
+	UniqueTexture m_iPatrolDrone_Bottom_BG;
+	UniqueTexture m_iPatrolDrone_Center_Default;
+	UniqueTexture m_iPatrolDrone_Icon_Disabled;
+	UniqueTexture m_iPatrolDrone_Icon_Warning01;
+	UniqueTexture m_iPatrolDrone_Icon_Warning02;
+	UniqueTexture m_iPatrolDrone_Icon_Activation;
+	UniqueTexture m_iPatrolDrone_Icon_Blasting;
+	UniqueTexture m_iPatrolDrone_Center_Red;
+
+	struct patroldronedata
+	{
+		int state;
+		int ammo;
+		float nextcheckammo;
+	};
+
+	enum patroldronestate_e
+	{
+		PATROLDRONE_OFF,
+		PATROLDRONE_WANDER,
+		PATROLDRONE_RETURN,
+		PATROLDRONE_ATTACK,
+	};
+
+	float m_flPatrolDroneDeployTime;
+	int m_iPatrolDroneState;
+
+	std::map<int, patroldronedata> m_vecPatrolDroneData;
+
+	//bunkerbuster
+	UniqueTexture m_iBunkerBusterTgaBG_Blue;
+	UniqueTexture m_iBunkerBusterTgaBG_Red;
+	UniqueTexture m_iBunkerBusterTgaFrame_Blue;
+	UniqueTexture m_iBunkerBusterTgaFrame_Red;
+	
+	UniqueTexture m_iBunkerBusterTgaGauge;
+	UniqueTexture m_iBunkerBusterTgaCoolTimeLeft;
+	UniqueTexture m_iBunkerBusterTgaCoolTimeRight;
+
+	float m_flBunkerBusterCoolDown;
+	float m_flBunkerBusterCoolDownGlobal;
+
+	float m_flBunkerBusterShoot;
+	float m_flBunkerBusterShootEnd;
+
+	float m_flLastFrameTime;
+
+	int m_iGauge;
+	int iBunkerSpriteNumber[10];
+	int m_iBunkerSpriteFrame;
+
+	HSPRITE m_iBunkerSprite;
+	model_t* m_pModelBunkerSprite;
+
+	UniqueTexture m_iMGSM_Aim_BG;
+	UniqueTexture m_iMGSM_Aim_Gauge;
+
+	float m_flMGSMTimeChargeStart;
+	float m_flMGSMFinishTime;
+
 };
 
 //
@@ -926,7 +1040,7 @@ private:
 	int iStoredType;
 	int iWeapon;
 	int DisplayTime;
-	SharedTexture m_pCurTexture[12];
+	SharedTexture m_pCurTexture[16];
 };
 
 //

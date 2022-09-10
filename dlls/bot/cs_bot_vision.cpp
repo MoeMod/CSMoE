@@ -149,6 +149,10 @@ void CCSBot::UpdateLookAngles()
 		}
 	}
 
+	if (isnan(useYaw) || isnan(usePitch))
+		//DebuggerBreak();
+		return;
+
 	// Yaw
 	float angleDiff = NormalizeAngle(useYaw - pev->v_angle.y);
 
@@ -202,6 +206,10 @@ void CCSBot::UpdateLookAngles()
 		m_lookPitchVel += deltaT / 1s * accel;
 		pev->v_angle.x += deltaT / 1s * m_lookPitchVel;
 	}
+
+	if (isnan(pev->v_angle.x) || isnan(pev->v_angle.y))
+		return;
+		//DebuggerBreak();
 
 	// limit range - avoid gimbal lock
 	if (pev->v_angle.x < -89.0f)

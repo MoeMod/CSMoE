@@ -290,6 +290,7 @@ void EV_HLDM_DecalGunshot( pmtrace_t *pTrace, int iBulletType )
 		case BULLET_PLAYER_MP5:
 		case BULLET_MONSTER_MP5:
 		case BULLET_PLAYER_BUCKSHOT:
+		case BULLET_PLAYER_WINGGUN_BUCKSHOT:
 		case BULLET_PLAYER_357:
 		default:
 			// smoke and decal
@@ -363,7 +364,7 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 			
 		float x, y, z;
 		//We randomize for the Shotgun.
-		if ( iBulletType == BULLET_PLAYER_BUCKSHOT )
+		if ( iBulletType == BULLET_PLAYER_BUCKSHOT || iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT:)
 		{
 			do {
 				x = gEngfuncs.pfnRandomFloat(-0.5,0.5) + gEngfuncs.pfnRandomFloat(-0.5,0.5);
@@ -421,6 +422,7 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 				}
 				break;
 			case BULLET_PLAYER_BUCKSHOT:
+			case BULLET_PLAYER_WINGGUN_BUCKSHOT:
 				
 				EV_HLDM_DecalGunshot( &tr, iBulletType );
 			

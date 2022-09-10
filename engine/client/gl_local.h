@@ -426,7 +426,7 @@ void R_AddDecalVBO( decal_t *pdecal, msurface_t *surf );
 // gl_sprite.c
 //
 void R_SpriteInit( void );
-void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint texFlags );
+void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, size_t filesize, qboolean *loaded, uint texFlags );
 mspriteframe_t *R_GetSpriteFrame( const model_t *pModel, int frame, float yaw );
 void R_DrawSpriteModel( cl_entity_t *e );
 
@@ -434,7 +434,7 @@ void R_DrawSpriteModel( cl_entity_t *e );
 // gl_studio.c
 //
 void R_StudioInit( void );
-void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded );
+void Mod_LoadStudioModel( model_t *mod, const byte *buffer, size_t filesize, qboolean *loaded );
 void Mod_StudioBigEndian( model_t *mod, byte *buffer );
 struct mstudiotex_s *R_StudioGetTexture( cl_entity_t *e );
 void R_DrawStudioModel( cl_entity_t *e );
@@ -444,7 +444,8 @@ void R_DrawStudioModel( cl_entity_t *e );
 //
 // gl_warp.c
 //
-void R_InitSky( struct mip_s *mt, byte *buf, struct texture_s *tx );
+typedef struct mip_s mip_t;
+void R_InitSky( const mip_t *mt, const byte *buf, struct texture_s *tx );
 void R_AddSkyBoxSurface( msurface_t *fa );
 void R_ClearSkyBox( void );
 void R_DrawSkyBox( void );
@@ -499,7 +500,7 @@ qboolean R_CullBox( const vec3_t mins, const vec3_t maxs, uint clipflags );
 qboolean R_WorldToScreen( const vec3_t point, vec3_t_ref screen );
 void R_ScreenToWorld( const vec3_t screen, vec3_t_ref point );
 qboolean R_AddEntity( struct cl_entity_s *pRefEntity, int entityType );
-void Mod_LoadMapSprite( struct model_s *mod, const void *buffer, size_t size, qboolean *loaded );
+void Mod_LoadMapSprite( struct model_s *mod, const byte *buffer, size_t size, qboolean *loaded );
 void Mod_UnloadSpriteModel( struct model_s *mod );
 void Mod_UnloadStudioModel( struct model_s *mod );
 void Mod_UnloadBrushModel( struct model_s *mod );
@@ -645,7 +646,10 @@ typedef struct
 
 typedef struct
 {
-#ifdef XASH_SDL
+#ifdef XASH_ANGLE
+    void *context;
+    void *surface;
+#elif defined XASH_SDL
 	SDL_GLContext		context;		// SDL GL Context
 #else
 	void *context;

@@ -302,16 +302,10 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 
 	switch(menuType)
 	{
-	case MENU_TEAM:
-		szCmd = "exec touch/chooseteam.cfg";
-		break;
-	case MENU_CLASS_T:
-		szCmd = "exec touch/chooseteam_tr.cfg";
-		break;
-	case MENU_CLASS_CT:
-		szCmd = "exec touch/chooseteam_ct.cfg";
-		break;
 #ifdef XASH_VGUI2
+	case MENU_TEAM:
+	case MENU_CLASS_T:
+	case MENU_CLASS_CT:
     case MENU_BUY:
 	case MENU_BUY_PISTOL:
 	case MENU_BUY_SHOTGUN:
@@ -324,6 +318,15 @@ void CHudMenu::ShowVGUIMenu( int menuType )
             return;
         }
 #else
+	case MENU_TEAM:
+		szCmd = "exec touch/chooseteam.cfg";
+		break;
+	case MENU_CLASS_T:
+		szCmd = "exec touch/chooseteam_tr.cfg";
+		break;
+	case MENU_CLASS_CT:
+		szCmd = "exec touch/chooseteam_ct.cfg";
+		break;
 	case MENU_BUY:
 		switch (gHUD.m_iModRunning)
 		{
@@ -398,16 +401,6 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 		break;
 	}
 
-#ifdef XASH_IMGUI
-	if (menuType == MENU_CLASS_T || menuType == MENU_CLASS_CT)
-		return;
-
-	if (menuType == MENU_TEAM)
-	{
-		LuaCL_Exec("imgui_jointeam_open = true");
-		return;
-	}
-#endif
 	m_fMenuDisplayed = 1;
     if(szCmd)
 	    ClientCmd(szCmd);

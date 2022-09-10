@@ -26,7 +26,6 @@ CModInfo &ModInfo()
 //-----------------------------------------------------------------------------
 CModInfo::CModInfo()
 {
-	int *p = new int;
 	m_pModData = new KeyValues("ModData");
 }
 

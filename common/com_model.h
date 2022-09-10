@@ -342,6 +342,8 @@ typedef struct model_s
 	// additional model data
 	//
 	cache_user_t	cache;		// only access through Mod_Extradata
+    const byte *buffer;
+    size_t buffer_size;
 
 	char		suffix[MAX_MODEL_SUFFIX];
 

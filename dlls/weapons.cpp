@@ -59,6 +59,7 @@ short g_sModelIndexWExplosion;		// holds the index for the underwater explosion
 short g_sModelIndexBubbles;		// holds the index for the bubbles model
 short g_sModelIndexBloodDrop;		// holds the sprite index for the initial blood
 short g_sModelIndexBloodSpray;		// holds the sprite index for splattered blood
+short g_sModelIndexSmokeBeam;
 short g_sModelIndexSmokePuff;
 short g_sModelIndexFireball2;
 short g_sModelIndexFireball3;
@@ -84,6 +85,7 @@ short g_sModelIndexFrostGibs;
 short g_sModelIndexShockWave;
 short g_sModelIndexWind;
 short g_sModelIndexWindExp;
+short g_sModelIndexGuillotineGibs;
 
 int giAmmoIndex;
 
@@ -557,7 +559,9 @@ void CBasePlayerWeapon::EjectBrassLate()
 		|| m_iId == WEAPON_Z4B_M37SE
 		|| m_iId == WEAPON_Z4B_CSG12SS
 		|| m_iId == WEAPON_CSGO_MAG7
-		|| m_iId == WEAPON_CSGO_SAWEDOFF)
+		|| m_iId == WEAPON_CSGO_SAWEDOFF
+		|| m_iId == WEAPON_JANUS11
+		|| m_iId == WEAPON_THANATOS11)
 		? TE_BOUNCE_SHOTSHELL : TE_BOUNCE_SHELL;
 
 	EjectBrass(pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_up * -9 + gpGlobals->v_forward * 16, gpGlobals->v_right * -9,
@@ -1339,7 +1343,10 @@ int CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, duration_t fDelay
 	}
 
 	duration_t fNewDelay = m_pPlayer->m_pModStrategy->OnDefaultReload_Pre(this, fDelay);
-	m_pPlayer->m_flNextAttack = fNewDelay;
+	if (body)
+		this->m_flNextPrimaryAttack = m_flNextSecondaryAttack = fNewDelay;
+	else
+		m_pPlayer->m_flNextAttack = fNewDelay;
 	ReloadSound();
 	SendWeaponAnim(iAnim, UseDecrement() ? 1 : 0, fDelay / fNewDelay);
 
@@ -1384,6 +1391,14 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_M950SE:
 		case WEAPON_SFPISTOL:
 		case WEAPON_Y22S2SFPISTOL:
+		case WEAPON_Z4B_RAGINGBULL:
+		case WEAPON_BALROG1:
+		case WEAPON_SAPIENTIA:
+		case WEAPON_BLOODHUNTER:
+		case WEAPON_THUNDERPISTOL:
+		case WEAPON_KRONOS1:
+		case WEAPON_KINGCOBRA:
+		case WEAPON_KINGCOBRAG:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:
@@ -1813,6 +1828,9 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 
 					switch (pGrenade->m_iId)
 					{
+					case WEAPON_DIVINETITAN:
+					case WEAPON_PATROLDRONE:
+					case WEAPON_BUNKERBUSTER:
 					case WEAPON_HEGRENADE:
 						grenadeName = "weapon_hegrenade";
 						maxGrenades = 1;

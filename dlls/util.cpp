@@ -2333,6 +2333,41 @@ char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd)
 	return chTextureType;
 }
 
+
+char UTIL_TextureHit(edict_t* pHit, Vector vecSrc, Vector vecEnd)
+{
+	char chTextureType;
+	const char* pTextureName;
+	char szbuffer[64];
+
+	CBaseEntity* pEntity = CBaseEntity::Instance(pHit);
+
+	if (pEntity && pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
+		return CHAR_TEX_FLESH;
+
+	if (pEntity)
+		pTextureName = TRACE_TEXTURE(ENT(pEntity->pev), vecSrc, vecEnd);
+	else
+		pTextureName = TRACE_TEXTURE(ENT(0), vecSrc, vecEnd);
+
+	if (pTextureName)
+	{
+		if (*pTextureName == '-' || *pTextureName == '+')
+			pTextureName += 2;
+
+		if (*pTextureName == '{' || *pTextureName == '!' || *pTextureName == '~' || *pTextureName == ' ')
+			pTextureName++;
+
+		strcpy(szbuffer, pTextureName);
+		szbuffer[CBTEXTURENAMEMAX - 1] = 0;
+		chTextureType = TEXTURETYPE_Find(szbuffer);
+	}
+	else
+		chTextureType = 0;
+
+	return chTextureType;
+}
+
 NOXREF int GetPlayerTeam(int index)
 {
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(index));
@@ -2670,6 +2705,147 @@ float UTIL_CalculateDamageRate(Vector vecSrc, CBaseEntity* pOther)
 		rate += 0.1;
 
 	return rate;
+}
+
+
+void UTIL_AdvancedBeamPoints(Vector vecSrc, Vector vecEnd, int life, int r, int g, int b, int width, int brightness, int flags)
+{
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSrc);
+	WRITE_BYTE(TE_CUSTOMBEAMPOINTS);
+	WRITE_COORD(vecSrc.x);
+	WRITE_COORD(vecSrc.y);
+	WRITE_COORD(vecSrc.z);
+	WRITE_COORD(vecEnd.x);
+	WRITE_COORD(vecEnd.y);
+	WRITE_COORD(vecEnd.z);
+	WRITE_SHORT(g_sModelIndexSmokeBeam);
+	WRITE_BYTE(0);
+	WRITE_BYTE(0);
+	WRITE_BYTE(life);
+	WRITE_BYTE(width);
+	WRITE_BYTE(0);
+	WRITE_BYTE(r);
+	WRITE_BYTE(g);
+	WRITE_BYTE(b);
+	WRITE_BYTE(brightness);
+	WRITE_BYTE(0);
+	WRITE_BYTE(flags);
+	MESSAGE_END();
+}
+
+
+void UTIL_BeamPointsStretch(Vector vecSrc, Vector vecEnd, int beamindex, int framerate, int life, int r, int g, int b, int width, int brightness, int flags)
+{
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSrc);
+	WRITE_BYTE(TE_BEAMPOINTS_STRETCH);
+	WRITE_COORD(vecSrc.x);
+	WRITE_COORD(vecSrc.y);
+	WRITE_COORD(vecSrc.z);
+	WRITE_COORD(vecEnd.x);
+	WRITE_COORD(vecEnd.y);
+	WRITE_COORD(vecEnd.z); // coord coord coord (end position) 
+	WRITE_SHORT(beamindex); // short (sprite index) 
+	WRITE_BYTE(0); // byte (starting frame) 
+	WRITE_BYTE(framerate); // byte (frame rate in 0.1's) 
+	WRITE_BYTE(life); // byte (life in 0.1's) 
+	WRITE_BYTE(width); // byte (line width in 0.1's) 
+	WRITE_BYTE(r); // byte,byte,byte (color)
+	WRITE_BYTE(g);
+	WRITE_BYTE(b);
+	WRITE_BYTE(brightness); // byte (brightness)
+	MESSAGE_END();
+
+}
+
+int UTIL_GetLineTarget(Vector vecSrc, Vector vecDirShooting, Vector vecRight, Vector vecUp, Vector vecSpread, float flDistance, CBaseEntity* pEntity, bool CheckTeamMate)
+{
+	CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+	if (!pPlayer)
+		return 0;
+
+	int HitResult = HIT_NONE;
+
+	TraceResult tr;
+
+	Vector vecDir, vecEnd;
+
+	vecDir = vecDirShooting + vecSpread[0] * vecRight + vecSpread[1] * vecUp;
+	vecEnd = vecSrc + vecDir * flDistance;
+	/*for (int i = 0; i < 3; i++)
+	{
+		vecDir[i] = vecDirShooting[i] + vecSpread[0] * vecRight[i] + vecSpread[1] * vecUp[i];
+		vecEnd[i] = vecSrc[i] + flDistance * vecDir[i];
+	}*/
+
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pPlayer->pev), &tr);
+
+	if (tr.flFraction < 1.0)
+	{
+		HitResult = HIT_WALL;
+		CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+
+		if (pEntity && (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY))
+		{
+			if (pEntity->IsPlayer())
+			{
+				if (CheckTeamMate)
+				{
+					if (g_pGameRules->PlayerRelationship(pPlayer, pEntity) != GR_TEAMMATE)
+						HitResult = HIT_PLAYER;
+				}
+				else
+					HitResult = HIT_PLAYER;
+			}
+			else
+			{
+				if (CheckTeamMate)
+				{
+					if (pEntity->m_iTeam != pPlayer->m_iTeam)
+						HitResult = HIT_PLAYER;
+				}
+				else
+					HitResult = HIT_PLAYER;
+			}
+		}
+	}
+	return HitResult;
+}
+
+Vector UTIL_GetSpeedVector(Vector vecSrc, Vector vecEnd, float flSpeed)
+{
+	Vector vecVelocity = vecEnd - vecSrc;
+	float num = flSpeed / vecVelocity.Length();
+	return vecVelocity * num;
+
+}
+
+bool UTIL_IsWallBetweenEntity(CBaseEntity* pEntity, CBaseEntity* pAttackPlayer)
+{
+	TraceResult tr;
+	Vector vecSrc = pAttackPlayer->pev->origin;
+	Vector vecEnd = pEntity->pev->origin;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, pAttackPlayer->edict(), &tr);
+
+	if (tr.flFraction < 1.0)
+	{
+		if (!tr.pHit)
+			return false;
+
+		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+		if (pHit)
+		{
+			if (pHit == pEntity)
+				return false;
+
+			if (!Q_strcmp(STRING(pHit->pev->classname), "holysword_parray") || !Q_strcmp(STRING(pHit->pev->classname), "y22s1holyswordmb_parray"))
+				return false;
+		}
+
+
+		return true;
+	}
+	return false;
 }
 
 }

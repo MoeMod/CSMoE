@@ -19,6 +19,7 @@
 #include <dlls/gamemode/mod_zb1.h>
 
 #include "wpn_shared/wpn_wondercannon.h"
+#include <common/beamdef.h>
 
 namespace sv {
 
@@ -1764,6 +1765,18 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 		vecDir = vecDirShooting + x * vecSpread.x * vecRight + y * vecSpread.y * vecUp;
 		vecEnd = vecSrc + vecDir * flDistance;
 
+		if (iBulletType == BULLET_PLAYER_DEPLETEDALLOY_BEAMSHOT)
+		{
+			Vector vecBeamSrc = vecSrc + vecDir * 10;
+			Vector vecBeamEnd = vecSrc + vecDir * 1024;
+
+			UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 0, 0, 10, 100, FBEAM_FADEIN);
+			UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 94, 0, 8, 80, FBEAM_FADEIN);
+			UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 228, 0, 6, 60, FBEAM_FADEIN);
+			UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 1, 0, 255, 4, 40, FBEAM_FADEIN);
+			UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 0, 221, 2, 20, FBEAM_FADEIN);
+		}
+
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
 		tracer = 0;
 
@@ -1802,7 +1815,8 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 				                     DMG_BULLET);
 				TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
 				DecalGunshot(&tr, iBulletType, false, pev, false);
-				if (iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT)
+				switch (iBulletType) {
+				case BULLET_PLAYER_WINGGUN_BUCKSHOT:
 				{
 					if (pEntity->IsPlayer())
 					{
@@ -1816,8 +1830,10 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 								strategy->SetStunGravityTime(1.0s);
 							}
 						}
-					}				
+					}
 				}
+				}
+				
 			} else {
 				float flDamage;
 
@@ -1826,6 +1842,7 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 						pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP5, vecDir, &tr, DMG_BULLET);
 						break;
 					case BULLET_PLAYER_BUCKSHOT:
+					case BULLET_PLAYER_WINGGUN_BUCKSHOT:
 						flDamage = ((1 - tr.flFraction) * 20);
 						pEntity->TraceAttack(pevAttacker, (int) flDamage, vecDir, &tr, DMG_BULLET);
 						break;
@@ -1969,7 +1986,7 @@ void CBaseEntity::FireBullets2(ULONG cShots, Vector vecSrc, Vector vecDirShootin
 				case BULLET_PLAYER_MP5:
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP5, vecDir, &tr, DMG_BULLET);
 					break;
-				case BULLET_PLAYER_BUCKSHOT:
+				case BULLET_PLAYER_BUCKSHOT:			
 					flDamage = ((1 - tr.flFraction) * 20);
 					pEntity->TraceAttack(pevAttacker, (int)flDamage, vecDir, &tr, DMG_BULLET);
 					break;
@@ -2079,6 +2096,7 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 			flPenetrationDistance = 4000;
 			break;
 		case BULLET_PLAYER_338MAG:
+		case BULLET_PLAYER_JANUS11_BEAMSHOT:
 			iPenetrationPower = 45;
 			flPenetrationDistance = 8000;
 			break;
@@ -2147,13 +2165,25 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		if (pPlayer) {
 			vecDir = pPlayer->m_pModStrategy->AdjustFireBullets3Dir(vecDir);
 		}
-		if (!pPlayer->IsUsingPC() && !pPlayer->IsBot() && (int)CVAR_GET_FLOAT("mp_assistaim"))
+		if (!pPlayer->IsUsingPC() && !pPlayer->IsBot() && assistaim.value)
 		{
 			FireBulletsForMobile(vecSrc, vecDir, flDistance, flPenetrationDistance, iPenetration, iBulletType, iDamage, flRangeModifier, pevAttacker, bPistol, this);
 			return Vector(x * vecSpread, y * vecSpread, 0);
 		}
 	}
 	vecEnd = vecSrc + vecDir * flDistance;
+
+	if (iBulletType == BULLET_PLAYER_JANUS11_BEAMSHOT)
+	{
+		Vector vecBeamSrc = vecSrc + vecDir * 10;
+		Vector vecBeamEnd = vecSrc + vecDir * 1024;
+
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 0, 0, 10, 100, FBEAM_FADEIN);
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 94, 0, 8, 80, FBEAM_FADEIN);
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 228, 0, 6, 60, FBEAM_FADEIN);
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 1, 0, 255, 4, 40, FBEAM_FADEIN);
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 0, 221, 2, 20, FBEAM_FADEIN);
+	}
 
 	float flDamageModifier = 0.5;
 
@@ -2302,14 +2332,29 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 				WRITE_BYTE(255);
 			MESSAGE_END();
 #endif
-
+			CBasePlayer* pAttack = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pevAttacker));
 
 			vecSrc = tr.vecEndPos + (vecDir * iPenetrationPower);
 			flDistance = (flDistance - flCurrentDistance) * flDistanceModifier;
 			vecEnd = vecSrc + (vecDir * flDistance);
 
+			if (pAttack)
+			{
+				if (pAttack->m_iBuff & BUFF_CLOAKING)
+					tr.iHitgroup = HITGROUP_HEAD;
+			}
 			pEntity->TraceAttack(pevAttacker, iCurrentDamage, vecDir, &tr, (DMG_BULLET | DMG_NEVERGIB));
 			iCurrentDamage *= flDamageModifier;
+
+			
+			if (pAttack)
+			{
+				if (pAttack->m_pActiveItem)
+				{
+					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
+					pWeapon->FireBullet3CallBack(iPenetration + 1, vecDir, &tr);
+				}
+			}
 		} else
 			iPenetration = 0;
 
@@ -2593,10 +2638,13 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 							WRITE_SHORT(pInflictorPlayer->entindex());
 							WRITE_BYTE(8);
 							MESSAGE_END();
-						}
 
-						pInflictorPlayer->m_iHealthDecreaseCount = 5;
-						pInflictorPlayer->m_flHealthDecreaseAmount = 20;
+							pInflictorPlayer->m_pBuffAttacker = pevAttacker;
+							pInflictorPlayer->m_iHealthDecreaseCount = 5;
+							pInflictorPlayer->m_flHealthDecreaseAmount = 20;
+							pInflictorPlayer->m_flHealthDecreaseInterval = 1.0s;
+							pInflictorPlayer->m_flHealthDecreaseStartTime = gpGlobals->time + 1.0s;
+						}
 					}				
 				}
 				break;
@@ -2946,6 +2994,18 @@ void FireBulletsForMobile(Vector vecSrc, Vector vecDir, float flDistance, float 
 	TraceResult tr, tr2;
 	Vector vecEnd = vecSrc + vecDir * flDistance;
 
+	if (iBulletType == BULLET_PLAYER_JANUS11_BEAMSHOT)
+	{
+		Vector vecBeamSrc = vecSrc + vecDir * 10;
+		Vector vecBeamEnd = vecSrc + vecDir * 1024;
+
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 0, 0, 10, 100, FBEAM_FADEIN);
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 94, 0, 8, 80, FBEAM_FADEIN);
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 228, 0, 6, 60, FBEAM_FADEIN);
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 1, 0, 255, 4, 40, FBEAM_FADEIN);
+		UTIL_AdvancedBeamPoints(vecBeamSrc, vecBeamEnd, 10, 255, 0, 221, 2, 20, FBEAM_FADEIN);
+	}
+
 	float flDamageModifier = 0.5;
 
 	while (iPenetration != 0) {
@@ -2965,6 +3025,28 @@ void FireBulletsForMobile(Vector vecSrc, Vector vecDir, float flDistance, float 
 				if (tr2.flFraction != 1.0f)
 				{
 					pEnt = CBaseEntity::Instance(tr2.pHit);
+
+					if (pEnt->IsPlayer() || pEnt->Classify() == CLASS_PLAYER_ALLY)
+					{
+						if (iBulletType == BULLET_PLAYER_WONDERCANNON)
+						{
+							if (iPenetration >= 2 && pevAttacker)
+							{
+								CBasePlayer* pAttack = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pevAttacker));
+								if (pAttack)
+								{
+									if (pAttack->m_pActiveItem)
+									{
+										CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
+
+										CWonderCannon* pLinkWeapon = dynamic_cast<CWonderCannon*>(pWeapon);
+										if (pLinkWeapon)
+											pLinkWeapon->DoExpAttachVicStart(pEnt);
+									}
+								}
+							}
+						}
+					}
 
 					iPenetration--;
 

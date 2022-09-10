@@ -60,7 +60,16 @@ void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
-
+#ifdef U_VECTOR_SIMD
+	vec3_t sina, cosa;
+	sincos_ps(angles * 0.5, &sina.m_xmm, &cosa.m_xmm);
+	sy = sina[2];
+	cy = cosa[2];
+	sp = sina[1];
+	cp = cosa[1];
+	sr = sina[0];
+	cr = cosa[0];
+#else
 	// FIXME: rescale the inputs to 1/2 angle
 	angle = angles[2] * 0.5;
 	sy = sin(angle);
@@ -71,7 +80,7 @@ void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 	angle = angles[0] * 0.5;
 	sr = sin(angle);
 	cr = cos(angle);
-
+#endif
 	quaternion[0] = sr * cp * cy - cr * sp * sy; // X
 	quaternion[1] = cr * sp * cy + sr * cp * sy; // Y
 	quaternion[2] = cr * cp * sy - sr * sp * cy; // Z
@@ -87,7 +96,7 @@ QuaternionSlerp
 void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 {
 	int i;
-	float omega, cosom, sinom, sclp, sclq;
+	float cosom, sclp, sclq;
 
     // decide if one of the quaternions is backwards
     float a = (p-q).LengthSquared();
@@ -104,11 +113,19 @@ void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 	{
 		if ((1.0 - cosom) > 0.000001)
 		{
-            // TODO(MoeMod) : SIMD opt
-			omega = acos(cosom);
-			sinom = sin(omega);
+			float omega = acos(cosom);
+#ifdef U_VECTOR_SIMD
+            vec3_t x = { omega, (1.0f - t) * omega, t * omega };
+            vec3_t sinx = sin_ps(x);
+            float sinom = sinx[0];
+            sclp = sinx[1] / sinom;
+            sclq = sinx[2] / sinom;
+#else
+            float sinom = sin(omega);
+
 			sclp = sin((1.0 - t) * omega) / sinom;
 			sclq = sin(t * omega) / sinom;
+#endif
 		}
 		else
 		{

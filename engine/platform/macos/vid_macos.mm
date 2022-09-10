@@ -47,3 +47,33 @@ void MacOS_OpenURL(const char *url)
 {
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[[NSString alloc] initWithUTF8String:url]]];
 }
+
+void MacOS_InstallWindow()
+{
+    auto nsw = MacOS_GetNSWindow();
+
+    nsw.styleMask |=  NSWindowStyleMaskUnifiedTitleAndToolbar;
+    nsw.styleMask |=  NSWindowStyleMaskFullSizeContentView;
+    nsw.titleVisibility = NSWindowTitleHidden;
+    nsw.titlebarAppearsTransparent = TRUE;
+}
+
+void MacOS_ToggleWindowButtons(bool bShow)
+{
+    auto nsw = MacOS_GetNSWindow();
+
+    NSButton *closeBtn = [nsw standardWindowButton:NSWindowCloseButton];
+    NSButton *miniaturizeBtn = [nsw standardWindowButton:NSWindowMiniaturizeButton];
+    NSButton *zoomBtn = [nsw standardWindowButton:NSWindowZoomButton];
+
+    [closeBtn setHidden:!bShow];
+    [miniaturizeBtn setHidden:!bShow];
+    [zoomBtn setHidden:!bShow];
+}
+
+void MacOS_HiDPI_Scale(int *w, int *h)
+{
+    auto nsw = MacOS_GetNSWindow();
+    if(w) *w *= nsw.backingScaleFactor;
+    if(h) *h *= nsw.backingScaleFactor;
+}

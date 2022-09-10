@@ -68,7 +68,7 @@ bool UTIL_IsNameTaken (const char *name, bool ignoreHumans)
 			// bots can have prefixes so we need to check the name
 			// against the profile name instead.
 			CBot *bot = static_cast<CBot *>(player);
-			if (FStrEq (name, bot->GetProfile ()->GetName ()))
+			if (bot->GetProfile() && FStrEq (name, bot->GetProfile ()->GetName ()))
 			{
 				return true;
 			}
@@ -158,7 +158,7 @@ int UTIL_HumansInGame(bool ignoreSpectators)
 
 		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
 
-		if (player->IsBot())
+		if (player->IsBot() && player->pev->flags & FL_FAKECLIENT)
 			continue;
 
 		if (ignoreSpectators && player->m_iTeam != TERRORIST && player->m_iTeam != CT)
@@ -191,7 +191,7 @@ int UTIL_HumansOnTeam(int teamID, bool isAlive)
 
 		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
 
-		if (player->IsBot())
+		if (player->IsBot() && player->pev->flags & FL_FAKECLIENT)
 			continue;
 
 		if (player->m_iTeam != teamID)
@@ -223,7 +223,7 @@ int UTIL_BotsInGame()
 		if (FStrEq(STRING(pPlayer->pev->netname), ""))
 			continue;
 
-		if (!pPlayer->IsBot())
+		if (!(pPlayer->IsBot() && pPlayer->pev->flags & FL_FAKECLIENT))
 			continue;
 
 		++iCount;
@@ -251,7 +251,7 @@ bool UTIL_KickBotFromTeam(TeamName kickTeam)
 		if (FStrEq(name, ""))
 			continue;
 
-		if (!player->IsBot())
+		if (!(player->IsBot() && player->pev->flags & FL_FAKECLIENT))
 			continue;
 
 		if (!player->IsAlive() && player->m_iTeam == kickTeam)
@@ -277,7 +277,7 @@ bool UTIL_KickBotFromTeam(TeamName kickTeam)
 		if (FStrEq(name, ""))
 			continue;
 
-		if (!player->IsBot())
+		if (!(player->IsBot() && player->pev->flags & FL_FAKECLIENT))
 			continue;
 
 		if (player->m_iTeam == kickTeam)
@@ -578,7 +578,9 @@ float BotSIN(float angle)
 {
 	angle = NormalizeAnglePositive(angle - 90);
 	int i = angle * ((COS_TABLE_SIZE - 1) / 360.0f);
-	return cosTable[ i ];
+	if (cosTable[i])
+		return cosTable[i];
+	else return angle;
 }
 
 // Determine if this event is audible, and if so, return its audible range and priority

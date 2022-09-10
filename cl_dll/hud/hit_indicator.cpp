@@ -279,6 +279,7 @@ int CHudHitIndicator::MsgFunc_HitMsg( const char *pszName, int iSize, void *pbuf
 
 	int iVictim = reader.ReadShort();
 	byte byFlag = reader.ReadByte();
+	byte byIsRemove = reader.ReadByte();
 
 	pList[i].iId = 1;
 	sprintf(pList[i].damage_num, "%d", pList[i].iDamage);
@@ -289,6 +290,16 @@ int CHudHitIndicator::MsgFunc_HitMsg( const char *pszName, int iSize, void *pbuf
 
 	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iVictim);
 	pList[i].fRange = (gEngfuncs.GetLocalPlayer()->origin - ent->origin).Length();
+
+	
+	g_iDamage[gEngfuncs.GetLocalPlayer()->index] = pList[i].iDamage;
+	g_iDamageTotal[gEngfuncs.GetLocalPlayer()->index] += pList[i].iDamage;
+
+	if (byIsRemove)
+	{
+		g_iDamage[gEngfuncs.GetLocalPlayer()->index] = 0;
+		g_iDamageTotal[gEngfuncs.GetLocalPlayer()->index] = 0;
+	}
 
 
 	//if (!CheckForPlayer(ent))

@@ -105,7 +105,10 @@ struct beam_s *CL_BeamFollow( int startEnt, int modelIndex, float life, float wi
 void CL_BeamKill( int deadEntity );
 struct beam_s* CL_BeamPoints_Stretch(const vec3_t start, const vec3_t end, int modelIndex, float life, float width,
 	float brightness, int startFrame, float framerate, float r, float g, float b);
-
+struct beam_s* CL_BeamPoints_Tracer(const vec3_t start, const vec3_t end, int modelIndex, float life, float width, float length, float amplitude, float brightness, float speed, int startFrame, float framerate, float r, float g, float b);
+//void CL_UpdateFCtail(BEAM* pbeam, float frametime);
+//BEAM* CL_BeamParticle(int startEnt, int modelIndex1, int modelIndex2, int modelIndex3, float scale, float freq, float fadetime, int count, int random, int speed);
+void  CL_FancySpray(const vec3_t pos, int count, float fadetime, float scale, int iRand, float speed, int id1, int id2, int id3,float r,float g,float b,float frametime,int randomcolor);
 
 // TriAPI
 void TriVertex3fv( const float *v );

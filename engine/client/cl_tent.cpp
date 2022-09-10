@@ -137,6 +137,7 @@ void CL_PrepareTEnt( TEMPENTITY *pTemp, model_t *pmodel )
 	pTemp->entity.trivial_accept = modelHandle; // keep unchanged
 	pTemp->flags = FTENT_NONE;		
 	pTemp->die = cl.time + 0.75f;
+	pTemp->entity.curstate.eflags = 0;
 
 	if( pmodel )
 	{
@@ -443,6 +444,128 @@ TEMPENTITY *GAME_EXPORT CL_TempEntAllocCustom( const vec3_t org, model_t *model,
 
 ==============================================================
 */
+/*
+===============
+CL_Spray
+
+Throws a shower of sprites or models
+===============
+*/
+void CB_Floating(TEMPENTITY* pEntity, float frametime, float currenttime)
+{
+
+	if (pEntity->entity.baseline.fuser1 > pEntity->entity.curstate.scale)
+		pEntity->entity.curstate.scale += 0.03;
+
+	int amt = (int)((pEntity->die - cl.time)/ pEntity->livetime * 255.0f);
+	if (amt > 0) {
+		pEntity->entity.curstate.renderamt = amt;
+		if (pEntity->entity.curstate.gravity == 0.25f) {
+			float gravity = -frametime * 96.0;
+			pEntity->entity.baseline.origin[2] += gravity;
+		}
+	}
+	else {
+		pEntity->die = cl.time;
+	}
+}
+
+void  CL_FancySpray(const vec3_t pos, int count, float fadetime, float scale, int iRand, float speed, int id1, int id2, int id3,float r,float g,float b,float frametime,int iRandomColor)
+{
+	TEMPENTITY* pTemp;
+	float		noise;
+	float		znoise;
+	int		i, frameCount;
+	int modelIndex;
+	const int COLOR_INSIDE[7][3] =
+	{
+		{  255, 215,  0}, {  255, 97,  0}, {  0, 201,  87},
+		{  135, 206,  235}, { 153, 51,  250}, { 218, 112,  214}
+	};
+
+	noise = 1.0f;
+
+	if (Mod_GetType(id1) == mod_bad)
+	{
+		MsgDev(D_INFO, "No model %d!\n", id1);
+		return;
+	}
+
+	Mod_GetFrames(id1, &frameCount);
+
+	for (i = 0; i < count; i++)
+	{
+		vec3_t	velocity;
+		vec3_t  rand_org;
+		vec3_t  rand_vec;
+
+		rand_vec[0] = Com_RandomFloat(-noise, noise);
+		rand_vec[1] = Com_RandomFloat(-noise, noise);
+		rand_vec[2] = Com_RandomFloat(-noise, noise);
+
+		rand_org[0] = pos[0] + iRand * rand_vec[0];
+		rand_org[1] = pos[1] + iRand * rand_vec[1];
+		rand_org[2] = pos[2] + iRand * rand_vec[2];
+
+		switch (rand() % 3) {
+		case 0: modelIndex = id3; break;
+		case 1: modelIndex = id2; break;
+		default: modelIndex = id1; break;
+		}
+
+		switch (rand() % 3) {
+		case 0: modelIndex = id3; break;
+		case 1: modelIndex = id2; break;
+		default: modelIndex = id1; break;
+		}
+
+		pTemp = CL_TempEntAlloc(rand_org, Mod_Handle(modelIndex));
+		if (!pTemp) return;
+
+		pTemp->entity.curstate.rendermode = kRenderTransAdd;
+		pTemp->entity.curstate.renderfx = kRenderFxNone;
+		pTemp->entity.curstate.scale = scale;
+		pTemp->entity.baseline.renderamt = 255;
+		pTemp->flags |= FTENT_CLIENTCUSTOM;
+
+		if (iRandomColor)
+		{
+	
+				int RandomColor = Com_RandomLong(0, 6);
+
+				pTemp->entity.curstate.rendercolor.r = COLOR_INSIDE[RandomColor][0];
+				pTemp->entity.curstate.rendercolor.g = COLOR_INSIDE[RandomColor][1];
+				pTemp->entity.curstate.rendercolor.b = COLOR_INSIDE[RandomColor][2];
+
+		}
+		else
+		{
+			pTemp->entity.curstate.rendercolor.r = r;
+			pTemp->entity.curstate.rendercolor.g = g;
+			pTemp->entity.curstate.rendercolor.b = b;
+		}
+		
+
+		pTemp->entity.angles.x = Com_RandomLong(-256, 255);
+		pTemp->entity.angles.y = Com_RandomLong(-512, 511);
+		pTemp->entity.angles.z = Com_RandomLong(-256, 255);
+
+		pTemp->entity.curstate.scale = 0.01;
+		pTemp->entity.baseline.fuser1 = scale;
+
+
+		// make the spittle fly the direction indicated, but mix in some noise.
+
+		float rand_scale = speed * Com_RandomFloat(0.8f, 1.2f);
+		VectorScale(rand_vec, rand_scale, pTemp->entity.baseline.origin);
+
+		if (speed > 0) pTemp->entity.curstate.gravity = 0.25f;
+		pTemp->die = cl.time + fadetime;
+		pTemp->livetime = fadetime;
+		pTemp->entity.curstate.frame = Com_RandomLong(0, frameCount - 1);
+		pTemp->callback = CB_Floating;
+	}
+}
 /*
 ==============
 CL_FizzEffect
@@ -909,6 +1032,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	pTemp->entity.curstate.renderamt = 255;
 	pTemp->entity.curstate.framerate = framerate;
 	pTemp->entity.curstate.renderfx = 0;
+	pTemp->entity.curstate.eflags = 0;
 	pTemp->die = cl.time + life;
 	pTemp->entity.curstate.frame = frame;
 	pTemp->entity.curstate.movetype = MOVETYPE_FOLLOW;
@@ -925,8 +1049,8 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	if (RP_LOCALCLIENT(RI.currententity) && !RI.thirdPerson && (RI.params & RP_MIRRORVIEW))
 		pTemp->entity.curstate.effects |= EF_REFLECTONLY;
 
-	if (RP_LOCALCLIENT(parent))
-		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+	/*if (RP_LOCALCLIENT(parent))
+		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;*/
 
 	CL_TEntAddEntity(&pTemp->entity);
 }
@@ -1045,8 +1169,8 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 	if (RP_LOCALCLIENT(RI.currententity) && !RI.thirdPerson && (RI.params & RP_MIRRORVIEW))
 		pTemp->entity.curstate.effects |= EF_REFLECTONLY;
 
-	if (RP_LOCALCLIENT(parent))
-		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+	/*if (RP_LOCALCLIENT(parent))
+		pTemp->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;*/
 
 	CL_TEntAddEntity( &pTemp->entity );
 }
@@ -2396,6 +2520,7 @@ TEMPENTITY* R_TempSprite2(vec3_t pos, vec3_t dir, float scale, int modelIndex, i
 		pTemp->entity.curstate.framerate = framerate;
 		pTemp->entity.curstate.renderamt = pTemp->entity.baseline.renderamt = brightness * 255.0;
 		pTemp->flags |= flags;
+		pTemp->entity.curstate.eflags |= EF_NOCULL;
 		pTemp->entity.curstate.scale = scale;
 		pTemp->entity.baseline.origin = dir;
 		pTemp->entity.origin = pos;
@@ -2511,10 +2636,13 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 	case TE_BEAMDISK:
 	case TE_BEAMCYLINDER:
 	case TE_BEAMFOLLOW:
+	case TE_BEAMPARTICLE:
 	case TE_BEAMRING:
 	case TE_BEAMHOSE:
 	case TE_KILLBEAM:
 	case TE_BEAMPOINTS_STRETCH:
+	case TE_CUSTOMBEAMPOINTS:
+	case TE_BEAMPOINTS_TRACER:
 		CL_ParseViewBeam( &buf, type );
 		break;
 	case TE_GUNSHOT:

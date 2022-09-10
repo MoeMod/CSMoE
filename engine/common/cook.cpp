@@ -84,16 +84,24 @@ namespace xe {
 
     void Cook_SubmitMDL(std::shared_ptr<CookContext> cook_ctx, std::string mdl)
     {
-        auto buf = FS_LoadFile(mdl.c_str(), nullptr, true);
+        fs_offset_t filesize;
+        auto buf = FS_MapFile(mdl.c_str(), &filesize, true);
         if(buf)
         {
-            std::shared_ptr<void> free_helper(buf, [](void *buf) { Mem_Free(buf); });
+            if(Mod_IsModelEncrypted(mdl.c_str(), buf) || Mod_NumExtendSeq(mdl.c_str()) > 0)
+            {
+                // switch to COW mode
+                FS_MapFree(buf, filesize);
+                auto buf2 = FS_MapFileCOW( mdl.c_str(), &filesize, false );
+                buf = buf2;
+                Mod_DecryptModel(mdl.c_str(), buf2);
 
-            Mod_DecryptModel(mdl.c_str(), buf);
-            byte *buf2 = Mod_LoadExtendSeq(mdl.c_str(), buf);
-            studiohdr_t *phdr = (studiohdr_t *)buf2;
+                buf2 = Mod_LoadExtendSeq(mdl.c_str(), buf2, &filesize);
+                buf = buf2;
+            }
+            const studiohdr_t *phdr = (const studiohdr_t *)buf;
 
-            auto ptexture = (mstudiotexture_t *)(((byte *)phdr) + phdr->textureindex);
+            auto ptexture = (const mstudiotexture_t *)(((const byte *)phdr) + phdr->textureindex);
             if( phdr->textureindex > 0 && phdr->numtextures <= MAXSTUDIOSKINS )
             {
                 char mdlname[128];
@@ -113,7 +121,7 @@ namespace xe {
                     char texname[128];
                     Q_snprintf( texname, sizeof( texname ), "#%s/%s.mdl", mdlname, name );
                     auto size = sizeof( mstudiotexture_t ) + ptexture[i].width * ptexture[i].height + 768;
-                    Image_SetMDLPointer((byte *)phdr + ptexture[i].index);
+                    Image_SetMDLPointer((const byte *)phdr + ptexture[i].index);
                     auto pic = FS_LoadImage( texname, (byte *)&ptexture[i], size );
                     if(!pic)
                     {

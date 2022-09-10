@@ -26,7 +26,7 @@ private:
 	class COptionsSubKeyboard *m_pOptionsSubKeyboard;
 	class COptionsSubMouse *m_pOptionsSubMouse;
 	class COptionsSubAudio *m_pOptionsSubAudio;
-	//class COptionsSubVideo *m_pOptionsSubVideo;
+	class COptionsSubVideo *m_pOptionsSubVideo;
 	//class COptionsSubVoice *m_pOptionsSubVoice;
 	//class COptionsSubAdvanced *m_pOptionsSubAdvanced;
     class COptionsSubMoeSettings* m_pOptionsSubMoeSettings;

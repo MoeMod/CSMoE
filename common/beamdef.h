@@ -28,10 +28,13 @@
 #define FBEAM_SOLID				0x00000020
 #define FBEAM_SHADEIN			0x00000040
 #define FBEAM_SHADEOUT			0x00000080
+#define FBEAM_FANCYTAIL			0x00000100
 #define FBEAM_STARTVISIBLE		0x10000000		// Has this client actually seen this beam's start entity yet?
 #define FBEAM_ENDVISIBLE		0x20000000		// Has this client actually seen this beam's end entity yet?
 #define FBEAM_ISACTIVE			0x40000000
 #define FBEAM_FOREVER			0x80000000
+#define FBEAM_CURVEDBEAM  		0x00000200
+
 
 typedef struct beam_s BEAM;
 struct beam_s
@@ -52,6 +55,8 @@ struct beam_s
 	float		speed;
 	float		frameRate;
 	float		frame;
+	float		extra;
+	float		extra2;
 	int			segments;
 	int			startEntity;
 	int			endEntity;

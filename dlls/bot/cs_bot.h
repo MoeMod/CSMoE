@@ -39,9 +39,7 @@
 #include "bot/cs_bot_chatter.h"
 #include "bot/cs_bot_statemachine.h"
 #include <chrono>
-#include <chrono>
-#include <chrono>
-#include <chrono>
+#include "usercmd.h"
 
 #define CSBOT_VERSION_MAJOR		1
 #define CSBOT_VERSION_MINOR		50
@@ -372,7 +370,7 @@ public:
 
 	// looking around
 	void SetLookAngles(float yaw, float pitch);			// set our desired look angles
-	void UpdateLookAngles();					// move actual view angles towards desired ones
+	virtual void UpdateLookAngles();					// move actual view angles towards desired ones
 	void UpdateLookAround(bool updateNow = false);			// update "looking around" mechanism
 	void InhibitLookAround(duration_t duration);				// block all "look at" and "looking around" behavior for given duration - just look ahead
 
@@ -1556,6 +1554,24 @@ void hideProgressMeter();
 
 bool isSniperRifle(CBasePlayerItem *item);
 float StayOnLadderLine(CCSBot *me, const CNavLadder *ladder);
+
+class CMoePlayer : public CCSBot
+{
+public:
+    CMoePlayer();
+
+    BOOL IsBot() override;
+    void ExecuteCommand() override;
+    void UpdateLookAngles() override;
+	void Spawn() override;
+
+public:
+    void ApplyUC(usercmd_t *cmd);
+    void PauseAutoMove();
+
+private:
+    time_point_t m_flLastCommandTime;
+};
 
 }
 

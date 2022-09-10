@@ -6,6 +6,8 @@
 #include "weapons.h"
 #include "client.h"
 #include "weapons_moe_buy.h"
+#include "wpn_shared/wpn_patroldrone.h"
+
 
 namespace sv {
 
@@ -114,6 +116,14 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "m950se",	WEAPON_M950SE },
 	{ "sfpistol",	WEAPON_SFPISTOL },
 	{ "y22s2sfpistol",	WEAPON_Y22S2SFPISTOL },
+	{ "ragingbull",	WEAPON_Z4B_RAGINGBULL },
+	{ "balrog1",	WEAPON_BALROG1},
+	{ "sapientia",	WEAPON_SAPIENTIA },
+	{ "bloodhunter", WEAPON_BLOODHUNTER },
+	{ "thunderpistol", WEAPON_THUNDERPISTOL },
+	{ "kronos1", WEAPON_KRONOS1 },
+	{ "kingcobra", WEAPON_KINGCOBRA },
+	{ "kingcobrag", WEAPON_KINGCOBRAG },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -128,6 +138,15 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "csg12ss",	WEAPON_Z4B_CSG12SS },
 	{ "m3dragon",	WEAPON_M3DRAGON },
 	{ "m3dragonm",	WEAPON_M3DRAGONM },
+	{ "kronos12",	WEAPON_KRONOS12 },
+	{ "railcannon",	WEAPON_RAILCANNON },
+	{ "skull11",	WEAPON_SKULL11 },
+	{ "janus11",	WEAPON_JANUS11 },
+	{ "crow3",	WEAPON_CROW3 },
+	{ "m1887",	WEAPON_M1887G },
+	{ "thanatos11",	WEAPON_THANATOS11 },
+	{ "m1887xmas",	WEAPON_M1887XMAS },
+	{ "rainbowgun",	WEAPON_RAINBOWGUN },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -142,6 +161,12 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "bison",	WEAPON_BISON },
 	{ "tmpdragon",	WEAPON_TMPDRAGON },
 	{ "spsmg",	WEAPON_SPSMG },
+	{ "janus3",	WEAPON_JANUS3 },
+	{ "crow3",	WEAPON_CROW3 },
+	{ "balrog3",	WEAPON_BALROG3 },
+	{ "kronos3",	WEAPON_KRONOS3 },
+	{ "laserfist",	WEAPON_LASERFIST },
+	{ "laserfistex",	WEAPON_LASERFISTEX },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -164,6 +189,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "buffm4",	WEAPON_BUFFM4 },
 	{ "buffak",	WEAPON_BUFFAK },
 	{ "plasmagun",	WEAPON_PLASMAGUN },
+	{ "aquariusplasmagun",	WEAPON_Z4B_AQUARIUSPLASMAGUN },
 	{ "y20s2scard",	WEAPON_Y20S2SCARD },
 	{ "lightzg",	WEAPON_LIGHTZG },
 	{ "heavyzg",	WEAPON_HEAVYZG },
@@ -172,6 +198,17 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "ethereal",	WEAPON_ETHEREAL },
 	{ "crow5",	WEAPON_CROW5 },
 	{ "stunrifle",	WEAPON_STUNRIFLE },
+	{ "crossbowex21",	WEAPON_CROSSBOWEX21 },
+	{ "janusmk5",	WEAPON_JANUSMK5 },
+	{ "crossbow",	WEAPON_CROSSBOW },
+	{ "charger5",	WEAPON_CHARGER5 },
+	{ "lockongun",	WEAPON_LOCKONGUN },
+	{ "buffaug",	WEAPON_BUFFAUG },
+	{ "buffsg552",	WEAPON_BUFFSG552 },
+	{ "balrog5",	WEAPON_BALROG5 },
+	{ "kronos5",	WEAPON_KRONOS5 },
+	{ "an94",	WEAPON_AN94 },
+	{ "m16a4",	WEAPON_M16A4 },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -200,6 +237,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "zgun",	WEAPON_ZGUN },
 	{ "barrettd",	WEAPON_Z4B_BARRETTD },
 	{ "freedom",	WEAPON_Z4B_FREEDOM },
+	{ "buffawp",	WEAPON_BUFFAWP },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -223,6 +261,19 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "m249ep",	WEAPON_M249EP },
 	{ "thanatos7",	WEAPON_THANATOS7 },
 	{ "crow7",	WEAPON_CROW7 },
+	{ "k3",	WEAPON_K3 },
+	{ "charger7",	WEAPON_CHARGER7 },
+	{ "z4b_m60amethyst",	WEAPON_Z4B_M60AMETHYST },
+	{ "z4b_dbarrelamethyst",	WEAPON_Z4B_DBARRELAMETHYST },
+	{ "z4b_deagleamethyst",	WEAPON_Z4B_DEAGLEAMETHYST },
+	{ "z4b_acramethyst",	WEAPON_Z4B_ACRAMETHYST },
+	{ "z4b_ar57amethyst",	WEAPON_Z4B_AR57AMETHYST },
+	{ "broad",	WEAPON_BROAD },
+	{ "coilmg",	WEAPON_COILMG },
+	{ "spmg",	WEAPON_SPMG },
+	{ "cameragun",	WEAPON_CAMERAGUN },
+	{ "mgsm",	WEAPON_MGSM },
+	{ "kronos7",	WEAPON_KRONOS7 },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -251,7 +302,17 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "lasersg",	WEAPON_LASERSG },
 	{ "wondercannon",	WEAPON_WONDERCANNON },
 	{ "pianogun",	WEAPON_PIANOGUN },
-	
+	{ "pianogunex",	WEAPON_PIANOGUNEX },
+	{ "sgdrillex",	WEAPON_SGDRILLEX },
+	{ "airburster",	WEAPON_AIRBURSTER },
+	{ "flamethrower",	WEAPON_FLAMETHROWER },
+	{ "poisongun",	WEAPON_POISONGUN },
+	{ "watercannon",	WEAPON_WATERCANNON },
+	{ "fglauncher",	WEAPON_FGLAUNCHER },
+	{ "guillotine",	WEAPON_GUILLOTINE },
+	{ "guillotineex",	WEAPON_GUILLOTINEEX },
+
+
 	{ NULL,		WEAPON_NONE }
 };
 
@@ -306,7 +367,8 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 {
 	{ "weapon_hegrenade", GRENADE_HEGRENADE },
 	{ "weapon_pumpkin", GRENADE_PUMPKIN },
-	{ "weapon_holybomb", GRENADE_HOLYBOMB }
+	{ "weapon_holybomb", GRENADE_HOLYBOMB },
+	{ "weapon_patroldrone", GRENADE_PATROLDRONE }
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -426,6 +488,15 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "m950se",	WEAPONCLASS_PISTOL },
 	{ "sfpistol",	WEAPONCLASS_PISTOL },
 	{ "y22s2sfpistol",	WEAPONCLASS_PISTOL },
+	{ "ragingbull",	WEAPONCLASS_PISTOL },
+	{ "balrog1",	WEAPONCLASS_PISTOL},
+	{ "sapientia",	WEAPONCLASS_PISTOL },
+	{ "z4b_deagleamethyst",	WEAPONCLASS_PISTOL },
+	{ "bloodhunter", WEAPONCLASS_PISTOL },
+	{ "kronos1", WEAPONCLASS_PISTOL },
+	{ "thunderpistol", WEAPONCLASS_PISTOL },
+	{ "kingcobra", WEAPONCLASS_PISTOL },
+	{ "kingcobrag", WEAPONCLASS_PISTOL },
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -441,6 +512,17 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "m3dragon",	WEAPONCLASS_SHOTGUN },
 	{ "m3dragonm",	WEAPONCLASS_SHOTGUN },
 	{ "lasersg",	WEAPONCLASS_SHOTGUN },
+	{ "kronos12",	WEAPONCLASS_SHOTGUN },
+	{ "railcannon",	WEAPONCLASS_SHOTGUN },
+	{ "skull11",	WEAPONCLASS_SHOTGUN },
+	{ "janus11",	WEAPONCLASS_SHOTGUN },
+	{ "crow3",	WEAPONCLASS_SHOTGUN },
+	{ "z4b_dbarrelamethyst",	WEAPONCLASS_SHOTGUN },
+	{ "m1887g",	WEAPONCLASS_SHOTGUN },
+	{ "thanatos11",	WEAPONCLASS_SHOTGUN },
+	{ "m1887xmas",	WEAPONCLASS_SHOTGUN },
+	{ "rainbowgun",	WEAPONCLASS_SHOTGUN },
+
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -457,6 +539,13 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "spsmg",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "thanatos7",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "crow7",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "janus3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "crow3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "balrog3", WEAPONCLASS_SUBMACHINEGUN },
+	{ "kronos3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "laserfist",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "laserfistex",	WEAPONCLASS_SUBMACHINEGUN },
+
 	
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
@@ -480,6 +569,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "buffm4",	WEAPONCLASS_RIFLE },
 	{ "buffak",	WEAPONCLASS_RIFLE },
 	{ "plasmagun",	WEAPONCLASS_RIFLE },
+	{ "aquariusplasmagun",	WEAPONCLASS_RIFLE },
 	{ "y20s2scard",	WEAPONCLASS_RIFLE },
 	{ "lightzg",	WEAPONCLASS_RIFLE },
 	{ "heavyzg",	WEAPONCLASS_RIFLE },
@@ -489,6 +579,20 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "railgun",	WEAPONCLASS_RIFLE },
 	{ "crow5",	WEAPONCLASS_RIFLE },
 	{ "stunrifle",	WEAPONCLASS_RIFLE },
+	{ "crossbowex21",	WEAPONCLASS_RIFLE },
+	{ "janusmk5",	WEAPONCLASS_RIFLE },
+	{ "crossbow",	WEAPONCLASS_RIFLE },
+	{ "charger5",	WEAPONCLASS_RIFLE },
+	{ "z4b_acramethyst",	WEAPONCLASS_RIFLE },
+	{ "z4b_ar57amethyst",	WEAPONCLASS_RIFLE },
+	{ "lockongun",	WEAPONCLASS_RIFLE },
+	{ "buffaug",	WEAPONCLASS_RIFLE },
+	{ "buffsg552",	WEAPONCLASS_RIFLE },
+	{ "balrog5",	WEAPONCLASS_RIFLE },
+	{ "kronos5",	WEAPONCLASS_RIFLE },
+	{ "an94",	WEAPONCLASS_RIFLE },
+	{ "m16a4",	WEAPONCLASS_RIFLE },
+
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -517,6 +621,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "zgun",	WEAPONCLASS_SNIPERRIFLE },
 	{ "barrettd",	WEAPONCLASS_SNIPERRIFLE },
 	{ "freedom",	WEAPONCLASS_SNIPERRIFLE },
+	{ "buffawp",	WEAPONCLASS_SNIPERRIFLE },
 
 	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
 	{ "buffm249",	WEAPONCLASS_MACHINEGUN },
@@ -538,6 +643,15 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "skull8",	WEAPONCLASS_MACHINEGUN },
 	{ "skull6",	WEAPONCLASS_MACHINEGUN },
 	{ "m249ep",	WEAPONCLASS_MACHINEGUN },
+	{ "charger7",	WEAPONCLASS_MACHINEGUN },
+	{ "z4b_m60amethyst",	WEAPONCLASS_MACHINEGUN },
+	{ "broad",	WEAPONCLASS_MACHINEGUN },
+	{ "coilmg",	WEAPONCLASS_MACHINEGUN },
+	{ "spmg",	WEAPONCLASS_MACHINEGUN },
+	{ "cameragun",	WEAPONCLASS_MACHINEGUN },
+	{ "mgsm",	WEAPONCLASS_MACHINEGUN },
+	{ "kronos7",	WEAPONCLASS_MACHINEGUN },
+
 
 	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
@@ -562,6 +676,17 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "winggun",	WEAPONCLASS_EQUIPMENT },
 	{ "wondercannon",	WEAPONCLASS_EQUIPMENT },
 	{ "pianogun",	WEAPONCLASS_EQUIPMENT },
+	{ "pianogunex",	WEAPONCLASS_EQUIPMENT },
+	{ "sgdrillex",	WEAPONCLASS_EQUIPMENT },
+	{ "airburster",	WEAPONCLASS_EQUIPMENT },
+	{ "flamethrower",	WEAPONCLASS_EQUIPMENT },
+	{ "poisongun",	WEAPONCLASS_EQUIPMENT },
+	{ "watercannon",	WEAPONCLASS_EQUIPMENT },
+	{ "fglauncher",	WEAPONCLASS_EQUIPMENT },
+	{ "guillotine",	WEAPONCLASS_EQUIPMENT },
+	{ "guillotineex",	WEAPONCLASS_EQUIPMENT },
+
+
 
 	{ "syringe",	WEAPONCLASS_EQUIPMENT },
 	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
@@ -738,6 +863,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_BUFFM4:
 	case WEAPON_BUFFAK:
 	case WEAPON_PLASMAGUN:
+	case WEAPON_Z4B_AQUARIUSPLASMAGUN:
 	case WEAPON_Y20S2SCARD:
 	case WEAPON_LIGHTZG:
 	case WEAPON_HEAVYZG:
@@ -813,12 +939,57 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_ETHEREAL:
 	case WEAPON_RAILGUN:
 	case WEAPON_WINGGUN:
+	case WEAPON_CROW7:
 	case WEAPON_CROW5:
 	case WEAPON_LASERSG:
 	case WEAPON_LASERFIST:
 	case WEAPON_WONDERCANNON:
 	case WEAPON_PIANOGUN:
 	case WEAPON_STUNRIFLE:
+	case WEAPON_KRONOS12:
+	case WEAPON_CROSSBOWEX21:
+	case WEAPON_BUFFAWP:
+	case WEAPON_RAILCANNON:
+	case WEAPON_SKULL11:
+	case WEAPON_JANUS11:
+	case WEAPON_JANUSMK5:
+	case WEAPON_JANUS3:
+	case WEAPON_CROW3:
+	case WEAPON_CROW11:
+	case WEAPON_CHARGER5:
+	case WEAPON_CHARGER7:
+	case WEAPON_Z4B_M60AMETHYST:
+	case WEAPON_Z4B_DBARRELAMETHYST:
+	case WEAPON_Z4B_ACRAMETHYST:
+	case WEAPON_Z4B_AR57AMETHYST:
+	case WEAPON_BROAD:
+	case WEAPON_PIANOGUNEX:
+	case WEAPON_SGDRILLEX:
+	case WEAPON_BALROG3:
+	case WEAPON_BALROG5:
+	case WEAPON_COILMG:
+	case WEAPON_AIRBURSTER:
+	case WEAPON_POISONGUN:
+	case WEAPON_FLAMETHROWER:
+	case WEAPON_WATERCANNON:
+	case WEAPON_LOCKONGUN:
+	case WEAPON_FGLAUNCHER:
+	case WEAPON_BUFFAUG:
+	case WEAPON_BUFFSG552:
+	case WEAPON_CAMERAGUN:
+	case WEAPON_M1887G:
+	case WEAPON_MGSM:
+	case WEAPON_THANATOS11:
+	case WEAPON_M1887XMAS:
+	case WEAPON_KRONOS5:
+	case WEAPON_AN94:
+	case WEAPON_M16A4:
+	case WEAPON_KRONOS3:
+	case WEAPON_KRONOS7:
+	case WEAPON_LASERFISTEX:
+	case WEAPON_RAINBOWGUN:
+	case WEAPON_GUILLOTINE:
+	case WEAPON_GUILLOTINEEX:
 		return true;
 	default:
 		break;
@@ -862,6 +1033,15 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_M950SE:
 	case WEAPON_SFPISTOL:
 	case WEAPON_Y22S2SFPISTOL:
+	case WEAPON_Z4B_RAGINGBULL:
+	case WEAPON_BALROG1:
+	case WEAPON_SAPIENTIA:
+	case WEAPON_Z4B_DEAGLEAMETHYST:
+	case WEAPON_BLOODHUNTER:
+	case WEAPON_THUNDERPISTOL:
+	case WEAPON_KRONOS1:
+	case WEAPON_KINGCOBRA:
+	case WEAPON_KINGCOBRAG:
 		return true;
 	default:
 		break;
@@ -996,7 +1176,11 @@ bool HasPlayerItem(CBasePlayer *pPlayer, const char *pszCheckItem)
 {
 	for (CBasePlayerItem *pItem : pPlayer->m_rgpPlayerItems) {
 		while (pItem != nullptr) {
-			if (FClassnameIs(pItem->pev, pszCheckItem))
+			if (FClassnameIs(pItem->pev, "weapon_patroldrone"))
+			{
+
+			}
+			else if (FClassnameIs(pItem->pev, pszCheckItem))
 				return true;
 
 			pItem = pItem->m_pNext;
@@ -1075,7 +1259,110 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 			}
 			break;
 		case GRENADE_SLOT:
-			pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+			{
+			CBasePlayerItem* pItem = pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+
+			// have at least one weapon in this slot
+			while (pItem != NULL)
+			{
+				if (pPlayer->m_rgpPlayerItems[GRENADE_SLOT]->IsWeapon() && pPlayer->m_rgpPlayerItems[GRENADE_SLOT])
+				{
+					CBasePlayerWeapon* pGrenade = static_cast<CBasePlayerWeapon*>(pItem);
+
+					if (iter->iID == WEAPON_PATROLDRONE)
+					{
+						//buy patroldrone
+						if (pGrenade->m_iId == WEAPON_PATROLDRONE)
+						{
+							//add clip
+							if (pPlayer->m_rgAmmo[pGrenade->m_iPrimaryAmmoType] >= PATROLDRONE_MAX_CLIP)
+							{
+								//full ammo
+								ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
+								return false;
+							}
+
+							CPatrolDrone* pLinkWeapon = dynamic_cast<CPatrolDrone*>(pGrenade);
+							pPlayer->m_rgAmmo[pLinkWeapon->m_iPrimaryAmmoType]++;
+							for (int i = 0; i < PATROLDRONE_MAX_CLIP; i++)
+							{
+								if (pLinkWeapon->m_iClipAmmo[i] == -1)
+								{
+									pLinkWeapon->m_iClipAmmo[i] = 0;
+									MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
+									WRITE_BYTE(24);
+									WRITE_BYTE(i);
+									WRITE_SHORT(pLinkWeapon->m_iClipAmmo[i]);
+									WRITE_BYTE(PATROLDRONE_OFF);
+									MESSAGE_END();
+									break;
+								}							
+							}
+							pPlayer->AddAccount(-500);
+							pPlayer->BuildRebuyStruct();
+
+							return true;
+						}
+						else if (pGrenade->m_iId == WEAPON_DIVINETITAN ||
+							pGrenade->m_iId == WEAPON_HEGRENADE ||
+							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+						{
+							pPlayer->RemovePlayerItem(pGrenade);
+							break;
+						}
+					}
+					else if(iter->iID == WEAPON_DIVINETITAN)
+					{
+						//buy divientitan
+						if (pGrenade->m_iId == WEAPON_DIVINETITAN)
+						{
+							ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
+							return false;
+							//already have
+						}
+						else if (pGrenade->m_iId == WEAPON_PATROLDRONE || 
+							pGrenade->m_iId == WEAPON_HEGRENADE ||
+							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+						{
+							pPlayer->RemovePlayerItem(pGrenade);
+							break;
+						}
+					}
+					else if (iter->iID == WEAPON_BUNKERBUSTER)
+					{
+						//buy bunkerbuster
+						if (pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+						{
+							ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
+							return false;
+							//already have
+						}
+						else if (pGrenade->m_iId == WEAPON_PATROLDRONE || 
+							pGrenade->m_iId == WEAPON_HEGRENADE || 
+							pGrenade->m_iId == WEAPON_DIVINETITAN)
+						{
+							pPlayer->RemovePlayerItem(pGrenade);
+							break;
+						}
+					}
+					else
+					{
+						//buy grenande
+						if (pGrenade->m_iId == WEAPON_DIVINETITAN || 
+							pGrenade->m_iId == WEAPON_PATROLDRONE ||
+							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+						{
+							//remove and add
+							pPlayer->RemovePlayerItem(pGrenade);
+						}
+						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+						break;
+					}
+				}
+				pItem = pItem->m_pNext;
+			}			
+			}
+
 			break;
 		default:
 			break;

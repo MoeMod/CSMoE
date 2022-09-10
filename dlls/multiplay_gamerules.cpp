@@ -22,6 +22,11 @@
 #include "player/player_model.h"
 #include "weapons_moe_buy.h"
 #include "newmenus.h"
+#include "client/wdnmd.h"
+
+#ifdef XASH_MYSQL
+#include "database/db_main.h"
+#endif
 
 namespace sv {
 
@@ -230,7 +235,7 @@ void SV_AddBanWeapon()
 	WRITE_BYTE(vecTemp.size());
 	for (auto& x : vecTemp)
 	{
-		WRITE_BYTE(x);
+		WRITE_SHORT(x);
 	}
 	MESSAGE_END();
 }
@@ -254,7 +259,7 @@ void SV_RemoveBanWeapon()
 	WRITE_BYTE(vecTemp.size());
 	for (auto& x : vecTemp)
 	{
-		WRITE_BYTE(x);
+		WRITE_SHORT(x);
 	}
 	MESSAGE_END();
 }
@@ -576,7 +581,7 @@ void EndRoundMessage(const char* sentence, int event)
 	int teamTriggered = 1;
 #ifdef XASH_DEDICATED
 	const char* mod_str = CVAR_GET_STRING("mp_gamemode");
-	if (!strcmp(mod_str, "zb3") || !strcmp(mod_str, "z4") || !strcmp(mod_str, "zbz") || !strcmp(mod_str, "zb3f2p"))
+	if (!strcmp(mod_str, "zb3") || !strcmp(mod_str, "z4") || !strcmp(mod_str, "zbz") || !strcmp(mod_str, "zb3f2p") || !strcmp(mod_str, "zb3zp"))
 	{
 		EndRoundMVPMessage(event == ROUND_CTS_WIN ? 2 : 1);
 	}
@@ -826,6 +831,9 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 	InstallBotControl();
 #endif // CSTRIKE
 
+#ifdef XASH_MYSQL
+	db::InstallDataBaseManager();
+#endif
 	InstallHostageManager();
 
 	m_bSkipSpawn = m_bInCareerGame;
@@ -2352,6 +2360,7 @@ void CHalfLifeMultiplay::RestartRound()
 	m_bTargetBombed = m_bBombDefused = false;
 	m_bLevelInitialized = false;
 	m_bCompleteReset = false;
+	wdnmdmenu::WdnmdResetTime();
 }
 
 BOOL CHalfLifeMultiplay::IsThereABomber()
@@ -3595,7 +3604,7 @@ void CHalfLifeMultiplay::InitHUD(CBasePlayer* pl)
 		WRITE_BYTE(m_setBanWeapon.size());
 		for (auto& x : m_setBanWeapon) // 注意别超过250个，否则会发不出msg
 		{
-			WRITE_BYTE(x);
+			WRITE_SHORT(x);
 		}
 		MESSAGE_END();
 	}
@@ -4118,6 +4127,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							killer_weapon_name = "chaingren";
 							break;
 
+						case GRENADE_PATROLDRONE:
+							killer_weapon_name = "patroldrone";
+							break;
+
 						default:
 							killer_weapon_name = "grenade";
 							break;
@@ -4134,6 +4147,82 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 
 				CBaseEntity* pInflictor = CBaseEntity::Instance(pevInflictor);
 				int iId = pInflictor->GetWeaponsId();
+
+				if (iId == WEAPON_KNIFE)
+				{
+					killer_weapon_name = STRING(pevInflictor->classname);
+
+					if (!Q_strcmp(killer_weapon_name, "dgaxe_summon"))
+						killer_weapon_name = "dgaxe";
+					else if (!Q_strcmp(killer_weapon_name, "dualsword_specialeffect"))
+						killer_weapon_name = "dualsword";
+					else if (!Q_strcmp(killer_weapon_name, "whipsword_stabbox"))
+						killer_weapon_name = "whipsword";
+					else if (!Q_strcmp(killer_weapon_name, "holysword_cannon"))
+						killer_weapon_name = "holysword";
+					else if (!Q_strcmp(killer_weapon_name, "summonknife_cannon"))
+						killer_weapon_name = "summonknife";
+				}
+				else
+				{
+					if (iId == WEAPON_SPEARGUN)
+						killer_weapon_name = "speargun";
+					else if (iId == WEAPON_BUFFAK)
+						killer_weapon_name = "buffak";
+					else if (iId == WEAPON_M32VENOM)
+						killer_weapon_name = "m32venom";
+					else if (iId == WEAPON_GATLINGEX)
+						killer_weapon_name = "gatlingex";
+					else if (iId == WEAPON_M95TIGER)
+						killer_weapon_name = "m95tiger";
+					else if (iId == WEAPON_HUNTBOW)
+						killer_weapon_name = "huntbow";
+					else if (iId == WEAPON_BOW)
+						killer_weapon_name = "bow";
+					else if (iId == WEAPON_PLASMAGUN)
+						killer_weapon_name = "plasmagun";
+					else if (iId == WEAPON_SVDEX)
+						killer_weapon_name = "svdex";
+					else if (iId == WEAPON_VOIDPISTOL)
+						killer_weapon_name = "voidpistol";
+					else if (iId == WEAPON_PLASMAGUN)
+						killer_weapon_name = "plasmagun";
+					else if (iId == WEAPON_M3DRAGON)
+						killer_weapon_name = "m3dragon";
+					else if (iId == WEAPON_M3DRAGONM)
+						killer_weapon_name = "m3dragonm";
+					else if (iId == WEAPON_THANATOS7)
+						killer_weapon_name = "thanatos7";
+					else if (iId == WEAPON_WINGGUN)
+						killer_weapon_name = "winggun";
+					else if (iId == WEAPON_CHAINSAWEX)
+						killer_weapon_name = "chainsawex";
+					else if (iId == WEAPON_WONDERCANNON)
+						killer_weapon_name = "wondercannon";
+					else if (iId == WEAPON_PIANOGUN)
+						killer_weapon_name = "pianogun";
+					else if (iId == WEAPON_PIANOGUNEX)
+						killer_weapon_name = "pianogunex";
+					else if (iId == WEAPON_DIVINETITAN)
+						killer_weapon_name = "divinetitan";
+					else if (iId == WEAPON_CROSSBOW)
+						killer_weapon_name = "crossbow";
+					else if (iId == WEAPON_LOCKONGUN)
+						killer_weapon_name = "lockongun";
+					else if (iId == WEAPON_PATROLDRONE)
+						killer_weapon_name = "patroldrone";
+					else if (iId == WEAPON_THANATOS11)
+						killer_weapon_name = "thanatos11";
+					else if (iId == WEAPON_BUNKERBUSTER)
+						killer_weapon_name = "bunkbuster";
+					else if (iId == WEAPON_GUILLOTINE)
+						killer_weapon_name = "guillotine";
+					else if (iId == WEAPON_GUILLOTINEEX)
+						killer_weapon_name = "guillotineex";
+					else
+						killer_weapon_name = STRING(pevInflictor->classname);
+				}
+
 
 				CGrenade* pGrenade = dynamic_cast<CGrenade*>(pInflictor);
 
@@ -4185,66 +4274,15 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "chaingren";
 						break;
 
+					case GRENADE_PATROLDRONE:
+						killer_weapon_name = "patroldrone";
+						break;
+
 					default:
 						killer_weapon_name = "grenade";
 						break;
 					}
 				}
-				else if (iId == WEAPON_KNIFE)
-				{
-					if (!Q_strcmp(killer_weapon_name, "dgaxe_summon"))
-						killer_weapon_name = "dgaxe";
-					else if (!Q_strcmp(killer_weapon_name, "dualsword_specialeffect"))
-						killer_weapon_name = "dualsword";
-					else if (!Q_strcmp(killer_weapon_name, "whipsword_stabbox"))
-						killer_weapon_name = "whipsword";
-					else if (!Q_strcmp(killer_weapon_name, "holysword_cannon"))
-						killer_weapon_name = "holysword";
-					else if (!Q_strcmp(killer_weapon_name, "summonknife_cannon"))
-						killer_weapon_name = "summonknife";
-				}
-				else
-				{
-					if (iId == WEAPON_SPEARGUN)
-						killer_weapon_name = "speargun";
-					else if (iId == WEAPON_BUFFAK)
-						killer_weapon_name = "buffak";
-					else if (iId == WEAPON_M32VENOM)
-						killer_weapon_name = "m32venom";
-					else if (iId == WEAPON_GATLINGEX)
-						killer_weapon_name = "gatlingex";
-					else if (iId == WEAPON_M95TIGER)
-						killer_weapon_name = "m95tiger";
-					else if (iId == WEAPON_HUNTBOW)
-						killer_weapon_name = "huntbow";
-					else if (iId == WEAPON_BOW)
-						killer_weapon_name = "bow";
-					else if (iId == WEAPON_PLASMAGUN)
-						killer_weapon_name = "plasmagun";
-					else if (iId == WEAPON_SVDEX)
-						killer_weapon_name = "svdex";
-					else if (iId == WEAPON_VOIDPISTOL)
-						killer_weapon_name = "voidpistol";
-					else if (iId == WEAPON_PLASMAGUN)
-						killer_weapon_name = "plasmagun";
-					else if (iId == WEAPON_M3DRAGON)
-						killer_weapon_name = "m3dragon";
-					else if (iId == WEAPON_M3DRAGONM)
-						killer_weapon_name = "m3dragonm";
-					else if (iId == WEAPON_THANATOS7)
-						killer_weapon_name = "thanatos7";
-					else if (iId == WEAPON_WINGGUN)
-						killer_weapon_name = "winggun";
-					else if (iId == WEAPON_CHAINSAWEX)
-						killer_weapon_name = "chainsawex";
-					else if (iId == WEAPON_WONDERCANNON)
-						killer_weapon_name = "wondercannon";
-					else if (iId == WEAPON_PIANOGUN)
-						killer_weapon_name = "pianogun";
-					else
-						killer_weapon_name = STRING(pevInflictor->classname);
-				}
-
 			}
 		}
 	}
@@ -5244,6 +5282,13 @@ void CHalfLifeMultiplay::ClientUserInfoChanged(CBasePlayer *pPlayer, char *infob
 {
 	pPlayer->SetPlayerModel(pPlayer->m_bHasC4);
 	pPlayer->SetPrefsFromUserinfo(infobuffer);
+
+#ifdef XASH_MYSQL
+	if (db::g_pDataBase != NULL)
+	{
+		db::g_pDataBase->ClientUserInfoChanged(pPlayer, infobuffer);
+	}
+#endif // XASH_MYSQL
 }
 
 bool CHalfLifeMultiplay::CheckCanStartVoteMaps(bool bAlert)
@@ -5263,6 +5308,30 @@ bool CHalfLifeMultiplay::CheckCanStartVoteMaps(bool bAlert)
 		if (bAlert) ALERT(at_console, "votemap list is empty\n");
 		return false;
 	}
+
+	return true;
+#else
+	return false;
+#endif
+}
+bool CHalfLifeMultiplay::CheckCanStartVotePlayer(bool bAlert)
+{
+#ifdef XASH_DEDICATED
+	if (voteplayer_enabled.value <= 0.0f) {
+		if (bAlert) ALERT(at_console, "voteplayer is disabled\n");
+		return false;
+	}
+
+	if (m_bIsVoting) {
+		if (bAlert) ALERT(at_console, "voteplayer currently in process\n");
+		return false;
+	}
+
+	if (!m_vecVotePlayer.size()) {
+		if (bAlert) ALERT(at_console, "voteplayer list is empty\n");
+		return false;
+	}
+
 
 	return true;
 #else
@@ -5405,7 +5474,7 @@ void ShowMenu_VoteMap(CBasePlayer* player)
 		}
 
 		char szText[128];
-		Q_sprintf(szText, "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iItem].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iItem].second);
+		Q_snprintf(szText, ARRAYSIZE(szText), "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iItem].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iItem].second);
 		int iClientIndex = pPlayer->entindex();
 		MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
 		WRITE_BYTE(iClientIndex);
@@ -5419,7 +5488,68 @@ void ShowMenu_VoteMap(CBasePlayer* player)
 	}
 	pMenu->Display(player, 0, votemap_tally_delay_time.value * 1s);
 }
+void KickOutPlayer(CBasePlayer* KickPlayer)
+{
+	int iUserID = GETPLAYERUSERID(ENT(KickPlayer->pev));
+	SERVER_COMMAND(UTIL_VarArgs("kick # %d\n", iUserID));
+	
+}
+void CHalfLifeMultiplay::VotePlayerThink(CBasePlayer* KickPlayer)
+{
+	if (m_bIsVoting)
+	{
+		if (m_flKickVoteThink <= gpGlobals->time)
+		{
+			if (m_bProcessing)
+			{
+				if (m_bIsVoteRequest)
+				{
+					m_iVoteTimeLimit--;
+					if (m_iVoteTimeLimit < 0)
+					{
+						m_bIsVoting = false;
+						m_bRequesting = false;
+						m_iVoterId = 0;
+						m_bProcessing = false;
+					}
+				}
+				if (m_bRequesting)
+				{
+					m_iVoteTimeLimit--;
+					if (m_iVoteTimeLimit < 0)
+					{
+						m_bRequesting = false;
+						m_bIsVoting = false;
+						m_iVoteChoice[1]++;
 
+						float flPercent = (float)m_iVoteChoice[0] / (float)(m_iVoteChoice[0]+ m_iVoteChoice[1]);
+						if (flPercent > voteplayer_kick_percent.value)
+						{
+							char szText[128];
+							Q_sprintf(szText, "%.2f%% 的玩家同意从服务器踢出 %s。", flPercent * 100, STRING(KickPlayer->pev->netname));
+							UTIL_SayTextAll(szText);
+							KickOutPlayer(KickPlayer);
+						}
+						else
+						{
+							char szText[128];
+							Q_sprintf(szText, "同意踢出 %s 的玩家人数不足，至少需要 %.2f%% 的玩家同意。", STRING(KickPlayer->pev->netname), voteplayer_kick_percent.value * 100);
+							UTIL_SayTextAll(szText);
+						}
+						m_iVoteTimeLimit = 0;
+						if (m_bProcessing)
+							m_bProcessing = 0;
+
+					}
+				}
+
+			}
+			
+			m_flKickVoteThink = gpGlobals->time + 1s;
+		}
+		
+	}
+}
 void CHalfLifeMultiplay::VoteMapThink()
 {
 	if (m_flVoteNextThink > gpGlobals->time) {
@@ -5635,5 +5765,63 @@ void CHalfLifeMultiplay::VoteMapThink()
 		break;
 	}
 }
+
+void SV_Start_VotePlayer()
+{
+	if (!g_pGameRules->CheckCanStartVotePlayer(true))
+	{
+		return;
+	}
+	
+
+	ALERT(at_console, "Start voting player\n");
+	g_pGameRules->m_bIsVoting = 1;
+}
+
+const char* g_szVotingReasons_List[] = { "堵路","使用 BUG / 作弊程序", "卖队友", "脏话", "其他理由" };
+void ShowMenu_VoteKick_Main(CBasePlayer* player)
+{
+	PlayerMenu* pMenu = g_MenuMgr.menu_create("投票提出 - 选择理由", [&](CBasePlayer* pPlayer, PlayerMenu* pCurMenu, int iItem) {
+		if (iItem == MENU_EXIT || iItem == MENU_TIMEOUT)
+		{
+			return;
+		}
+
+		if (iItem < 0 )
+		{
+			return;
+		}
+
+
+		});
+	for (int i = 0; i < 5; ++i)
+		pMenu->AddBlank();
+
+	for (size_t i = 0; i < sizeof(g_szVotingReasons_List); i++)
+	{
+		pMenu->AddItem(NumAsString(i));
+	}
+	pMenu->Display(player, 0, 1s);
+}
+void ShowMenu_VoteKick_Reason(CBasePlayer* player)
+{
+
+	PlayerMenu* pMenu = g_MenuMgr.menu_create("投票提出 - 选择理由", [&](CBasePlayer* pPlayer, PlayerMenu* pCurMenu, int iItem) {
+		if (iItem == MENU_EXIT || iItem == MENU_TIMEOUT)
+		{
+			return;
+		}
+
+		int length = g_pGameRules->m_vecVotePlayer.size();
+		if (iItem < 0 || iItem >= length)
+		{
+			return;
+		}
+
+		});
+
+}
+
+
 
 }

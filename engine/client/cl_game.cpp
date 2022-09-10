@@ -1277,22 +1277,20 @@ void CL_ClearEdicts( void )
 */
 static qboolean CL_LoadHudSprite( const char *szSpriteName, model_t *m_pSprite, qboolean mapSprite, uint texFlags )
 {
-	byte	*buf;
+	const byte	*buf;
 	fs_offset_t	size;
 	qboolean	loaded;
 
 	ASSERT( m_pSprite != NULL );
 
-	buf = FS_LoadFile( szSpriteName, &size, false );
+	buf = FS_MapFile( szSpriteName, &size, false );
 	if( !buf ) return false;
 
 	Q_strncpy( m_pSprite->name, szSpriteName, sizeof( m_pSprite->name ));
 	m_pSprite->flags = 256; // it's hud sprite, make difference names to prevent free shared textures
 
-	if( mapSprite ) Mod_LoadMapSprite( m_pSprite, buf, (size_t)size, &loaded );
-	else Mod_LoadSpriteModel( m_pSprite, buf, &loaded, texFlags );		
-
-	Mem_Free( buf );
+	if( mapSprite ) Mod_LoadMapSprite( m_pSprite, buf, size, &loaded );
+	else Mod_LoadSpriteModel( m_pSprite, buf, size, &loaded, texFlags );
 
 	if( !loaded )
 	{
@@ -3962,6 +3960,7 @@ static efx_api_t gEfxApi =
 	CL_BeamPoints_Stretch,
 	CL_KillAttachedTentsFromEntity,
 	CL_AttachTentToModel,
+	CL_BeamPoints_Tracer,
 };
 
 static event_api_t gEventApi =

@@ -7,7 +7,7 @@
 #include <vgui_controls/PropertyPage.h>
 
 class CPanelListPanel;
-class CDescription;
+class CServerDescription;
 class mpcontrol_t;
 
 //-----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ private:
 	void LoadGameOptionsList();
 	void GatherCurrentValues();
 
-	CDescription *m_pDescription;
+    CServerDescription *m_pDescription;
 	mpcontrol_t *m_pList;
 	CPanelListPanel *m_pOptionsList;
 };

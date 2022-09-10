@@ -219,6 +219,8 @@ namespace cl
 		errc = luaL_loadbufferx(L, buffer, length, ModuleName, "bt");
 		// #3 = require function
 
+        gEngfuncs.COM_FreeFile(buffer);
+
 		if (errc)
 		{
 			const char* msg = lua_tostring(L, -1);

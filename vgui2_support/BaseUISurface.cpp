@@ -24,6 +24,15 @@
 #include "client/imgui_surface.h"
 #endif
 
+#define USE_XASH_MMAP
+#ifdef USE_XASH_MMAP
+#include <fs_int.h>
+#endif
+
+namespace vgui2 {
+    extern fs_api_t gFileSystemAPI;
+}
+
 // from engine/common/common.h
 typedef struct rgbdata_s
 {
@@ -1431,7 +1440,7 @@ static void RemoveSpaces( CUtlString &str )
     *dst = 0;
 }
 
-void *BaseUISurface::FontDataHelper( const char *pchFontName, int &size, const char *fontFileName )
+const void *BaseUISurface::FontDataHelper( const char *pchFontName, int &size, const char *fontFileName )
 {
     size = 0;
 
@@ -1447,22 +1456,13 @@ void *BaseUISurface::FontDataHelper( const char *pchFontName, int &size, const c
 
         // Just load the font data, decrypt in memory and register for this process]
 
-        char *buffer = nullptr;
-        int fileSize = 0;
+        const void *buffer = nullptr;
+        fs_offset_t fileSize = 0;
 
         // find with filesystem
         if(!buffer)
         {
-            FileHandle_t f = vgui2::filesystem()->Open(fontFileName, "rb");
-            if(f)
-            {
-                fileSize = vgui2::filesystem()->Size(f);
-                buffer = (char *)MemAllocScratch(fileSize + 1);
-                Assert(buffer);
-
-                vgui2::filesystem()->Read(buffer, fileSize, f);
-                vgui2::filesystem()->Close(f);
-            }
+            buffer = gFileSystemAPI.FS_MapFile(fontFileName, &fileSize, false);
         }
 
         // xash added : find with stdio
@@ -1473,9 +1473,9 @@ void *BaseUISurface::FontDataHelper( const char *pchFontName, int &size, const c
             {
                 fseek(f, SEEK_SET, SEEK_END);
                 fileSize = ftell(f);
-                buffer = (char *)MemAllocScratch(fileSize + 1);
+                buffer = gFileSystemAPI.FS_MapAlloc(fileSize);
                 fseek(f, SEEK_SET, 0);
-                fread(buffer, 1, fileSize, f);
+                fread((char *)buffer, 1, fileSize, f);
                 fclose(f);
             }
         }
@@ -1487,14 +1487,15 @@ void *BaseUISurface::FontDataHelper( const char *pchFontName, int &size, const c
         }
 
         FT_Face face;
-        const FT_Error error = FT_New_Memory_Face( FontManager().GetFontLibraryHandle(), (FT_Byte *)buffer, fileSize, 0, &face );
+        const FT_Error error = FT_New_Memory_Face( FontManager().GetFontLibraryHandle(), (const FT_Byte *)buffer, fileSize, 0, &face );
 
         if ( error  )
         {
             // FT_Err_Unknown_File_Format, etc.
             Msg( "ERROR %d: UNABLE TO LOAD FONT FILE %s\n", error, fontFileName );
 
-            MemFreeScratch();
+            gFileSystemAPI.FS_MapFree(buffer, fileSize);
+
             return NULL;
         }
 
@@ -1514,15 +1515,12 @@ void *BaseUISurface::FontDataHelper( const char *pchFontName, int &size, const c
 
         font_entry entry;
         entry.size = fileSize;
-        entry.data = malloc( entry.size );
-        memcpy( entry.data, buffer, entry.size );
+        entry.data = buffer;
         m_FontData.Insert( strFontName.Get(), entry );
 
         FT_Done_Face( face );
 
         size = entry.size;
-
-        MemFreeScratch();
         return entry.data;
     }
     else
@@ -1541,6 +1539,8 @@ void *BaseUISurface::FontDataHelper( const char *pchFontName, int &size, const c
 
     return NULL;
 }
+
+// TODO : m_FontData never frees, possibly leaked.
 
 #endif // LINUX
 

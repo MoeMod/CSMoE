@@ -34,6 +34,10 @@ GNU General Public License for more details.
 #include "imgui_impl_xash.h"
 #endif
 
+#if TARGET_OS_OSX
+#include "platform/macos/vid_macos.h"
+#endif
+
 Xash_Cursor*	in_mousecursor;
 qboolean	in_mouseactive;				// false when not focus app
 qboolean	in_mouseinitialized;
@@ -486,6 +490,9 @@ void IN_ToggleClientMouse( int newstate, int oldstate )
 	{
 		if( cls.initialized )
 			clgame.dllFuncs.IN_DeactivateMouse();
+#if TARGET_OS_OSX
+        MacOS_ToggleWindowButtons(true);
+#endif
 	}
 	else if( newstate == key_game )
 	{
@@ -506,6 +513,9 @@ void IN_ToggleClientMouse( int newstate, int oldstate )
 #endif
 		if( cls.initialized )
 			clgame.dllFuncs.IN_ActivateMouse();
+#if TARGET_OS_OSX
+        MacOS_ToggleWindowButtons(false);
+#endif
 	}
 
 	if( ( newstate == key_menu || newstate == key_console || newstate == key_message ) && ( !CL_IsBackgroundMap() || CL_IsBackgroundDemo()))
@@ -582,6 +592,9 @@ void IN_ActivateMouse( qboolean force )
 #ifdef XASH_SDL
 		SDL_GetRelativeMouseState( 0, 0 ); // Reset mouse position
 #endif
+#if TARGET_OS_OSX
+    MacOS_ToggleWindowButtons(false);
+#endif
 	}
 
 }
@@ -605,6 +618,9 @@ void IN_DeactivateMouse( void )
 	in_mouseactive = false;
 #ifdef XASH_SDL
 	SDL_SetWindowGrab( host.hWnd, SDL_FALSE );
+#endif
+#if TARGET_OS_OSX
+    MacOS_ToggleWindowButtons(true);
 #endif
 }
 
@@ -702,7 +718,22 @@ void IN_MouseEvent( int mstate )
 #endif
 
 #if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_OSX )
-
+        int top, left, bottom, right;
+        int w, h;
+        SDL_GetWindowBordersSize(host.hWnd, &top, &left, &bottom, &right);
+        SDL_GetWindowSize(host.hWnd, &w, &h);
+        int window_center_x = (right - left) / 2;
+        int window_center_y = (bottom - top) / 2;
+        int division = 32; // 2
+        if( x < window_center_x - w / division ||
+            y < window_center_y - h / division ||
+            x > window_center_x + w / division ||
+            y > window_center_y + h / division)
+        {
+            SDL_WarpMouseInWindow(host.hWnd, w / 2, h / 2);
+            ignore = 1; // next mouse event will be mouse warp
+            return;
+        }
 #else
 		int division = 32; // 2
 		if( x < host.window_center_x - host.window_center_x / division ||

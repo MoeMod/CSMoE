@@ -18,3 +18,6 @@ GNU General Public License for more details.
 float MacOS_GetDPI();
 float MacOS_TitleBarHeight();
 void MacOS_OpenURL(const char *url);
+void MacOS_InstallWindow();
+void MacOS_ToggleWindowButtons(bool bShow);
+void MacOS_HiDPI_Scale(int *w, int *h);

@@ -35,6 +35,9 @@
 #include "wpn_shared/wpn_flashbang.h"
 #include "wpn_shared/wpn_smokegrenade.h"
 #include "wpn_shared/wpn_m32venom.h"
+#include "wpn_shared/z4b_ar57amethyst.h"
+#include "wpn_shared/wpn_sgdrillex.h"
+#include "wpn_shared/wpn_guillotine.h"
 
 // gamemode
 #include "gamemode/mods.h"
@@ -50,11 +53,14 @@
 #include <algorithm>
 #include <dlls/gamemode/zb1/zb1_const.h>
 
+
+
 namespace sv {
 
 /*
 * Globals initialization
 */
+
 
 BOOL gInitHUD = TRUE;
 cvar_t *sv_aim = NULL;
@@ -161,9 +167,11 @@ const char *CDeadHEV::m_szPoses[] =
 int gEvilImpulse101;
 char g_szMapBriefingText[512];
 
+
 entvars_t *g_pevLastInflictor;
 
-LINK_ENTITY_TO_CLASS(player, CBasePlayer);
+//LINK_ENTITY_TO_CLASS(player, CBasePlayer);
+LINK_ENTITY_TO_CLASS(player, CMoePlayer);
 
 CBasePlayer::CBasePlayer()
 {
@@ -930,6 +938,17 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				}
 				return flDamage;
 			}
+			else
+			{
+				if (CBaseEntity::Instance(this->pev)->IsPlayer()) {
+					MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, this->pev);
+					WRITE_LONG(-1);
+					WRITE_SHORT(ENTINDEX(edict()));
+					WRITE_BYTE(0);
+					WRITE_BYTE(1);
+					MESSAGE_END();
+				}
+			}
 
 			if (m_bIsZombie && m_ZombieClass)
 			{
@@ -950,6 +969,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
 			WRITE_LONG((long)flDamage);
 			WRITE_SHORT(ENTINDEX(edict()));
+			WRITE_BYTE(0);
 			WRITE_BYTE(0);
 			MESSAGE_END();
 		}
@@ -1146,7 +1166,12 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_LASERSG
 					|| pWeapon->m_iId == WEAPON_WONDERCANNON
 					|| pWeapon->m_iId == WEAPON_PIANOGUN
-					|| pWeapon->m_iId == WEAPON_PIANOGUNEX)
+					|| pWeapon->m_iId == WEAPON_PIANOGUNEX
+					|| pWeapon->m_iId == WEAPON_CROSSBOWEX21
+					|| pWeapon->m_iId == WEAPON_BUFFAWP
+					|| pWeapon->m_iId == WEAPON_LOCKONGUN
+					|| pWeapon->m_iId == WEAPON_BLOODHUNTER
+					|| pWeapon->m_iId == WEAPON_MGSM)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -1162,6 +1187,13 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 						WRITE_BYTE(1);
 						WRITE_BYTE(pWeapon->pev->iuser1);
 						MESSAGE_END();
+					}
+				}
+				if (pWeapon->m_iId == WEAPON_Z4B_DBARRELAMETHYST)
+				{
+					if (pevInflictor == pevAttacker)
+					{
+						pWeapon->pev->iuser1++;
 					}
 				}
 			}		
@@ -1320,6 +1352,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		WRITE_LONG((long)flDamage);
 		WRITE_SHORT(ENTINDEX(edict()));
 		WRITE_BYTE(hitBits);
+		WRITE_BYTE(0);
 		MESSAGE_END();
 	}
 
@@ -2072,6 +2105,8 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 		WRITE_BYTE(0);
 	MESSAGE_END();
 
+	
+
 	m_bNightVisionOn = false;
 
 	for (int i = 1; i <= gpGlobals->maxClients; ++i)
@@ -2105,6 +2140,47 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 	}
 
 	SetAnimation(PLAYER_DIE);
+
+	CBaseEntity* pAttacker = CBaseEntity::Instance(pevAttacker);
+	CBasePlayer* pAttackPlayer = nullptr;
+	if (pAttacker && pAttacker->IsPlayer())
+		pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+	if (pAttackPlayer && pAttackPlayer->m_pActiveItem)
+	{
+		if (pAttackPlayer->m_pActiveItem->m_iId == WEAPON_Z4B_AR57AMETHYST)
+		{
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttackPlayer->m_pActiveItem;
+			pWeapon->m_iClip = 40;
+		}
+		if (pAttackPlayer->m_pActiveItem->m_iId == WEAPON_SGDRILLEX)
+		{
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttackPlayer->m_pActiveItem;
+			CSgdrillEx* pWpn = (CSgdrillEx*)m_pActiveItem;
+
+			if (pAttackPlayer->m_rgAmmo[pWeapon->m_iSecondaryAmmoType] + 25 > 100)
+			{
+
+				pAttackPlayer->m_rgAmmo[pWeapon->m_iSecondaryAmmoType] = pWpn->m_iSpecialAmmo = 100;
+			}
+			else
+			{
+				pAttackPlayer->m_rgAmmo[pWeapon->m_iSecondaryAmmoType] += 25;
+				pWpn->m_iSpecialAmmo += 25;
+			}
+			pWpn->m_flTimeNextCharge = invalid_time_point;
+			
+		}
+		if (pAttackPlayer->m_pActiveItem->m_iId == WEAPON_Z4B_AQUARIUSPLASMAGUN)
+		{
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttackPlayer->m_pActiveItem;
+			if (pWeapon->pev->iuser3 < 2)
+			{
+				pWeapon->pev->iuser3++;
+			}
+		}
+
+	}
 
 	if (m_pActiveItem && m_pActiveItem->m_pPlayer)
 	{
@@ -2141,6 +2217,13 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 					CGrenade::ShootSmokeGrenade(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5s, pSmoke->m_usCreateSmoke);
 			}
 			break;
+		}
+		case WEAPON_Z4B_AR57AMETHYST:
+		{
+
+			CAR57AMETHYST *pWeapon = (CAR57AMETHYST *)m_pActiveItem;
+			pWeapon->m_iClip = 40;
+			//m_rgAmmo[pWeapon->m_iPrimaryAmmoType] = 40;
 		}
 		default:
 			break;
@@ -5482,6 +5565,45 @@ void CBasePlayer::CheckZombieModeBuff(void)
 		}
 	}
 
+	if (m_iHealthDecreaseCount && gpGlobals->time > m_flHealthDecreaseStartTime)
+	{
+		pev->health -= m_flHealthDecreaseAmount;
+
+		if (m_pBuffAttacker)
+		{
+			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, m_pBuffAttacker);
+			WRITE_LONG((long)m_flHealthDecreaseAmount);
+			WRITE_SHORT(ENTINDEX(edict()));
+			WRITE_BYTE(0);
+			WRITE_BYTE(0);
+			MESSAGE_END();
+		}
+
+		if (pev->health > 0)
+		{
+			m_iHealthDecreaseCount--;
+			m_flHealthDecreaseStartTime = gpGlobals->time + m_flHealthDecreaseInterval;
+
+			if (!m_iHealthDecreaseCount)
+			{
+				m_flHealthDecreaseStartTime = invalid_time_point;
+				m_flHealthDecreaseAmount = 0;
+				m_flHealthDecreaseInterval = 0.0s;
+				m_pBuffAttacker = nullptr;
+			}
+		}
+		else
+		{
+			m_iHealthDecreaseCount = 0;
+			pev->health = 1;
+
+			m_flHealthDecreaseStartTime = invalid_time_point;
+			m_flHealthDecreaseAmount = 0;
+			m_flHealthDecreaseInterval = 0.0s;
+			m_pBuffAttacker = nullptr;
+		}
+	}
+
 	if (m_bIsZombie)
 	{
 		if (m_iBuff & BUFF_SHOOTINGDOWN)
@@ -5507,33 +5629,8 @@ void CBasePlayer::CheckZombieModeBuff(void)
 			WRITE_SHORT(int(m_flBuffHealthAmount));
 			MESSAGE_END();
 		}
-
-		if (m_iHealthDecreaseCount && gpGlobals->time > m_tHealthDecreaseStartTime)
-		{
-			pev->health -= m_flHealthDecreaseAmount;
-
-			if (pev->health > 0)
-			{
-				m_iHealthDecreaseCount--;
-
-				m_tHealthDecreaseStartTime = gpGlobals->time + 1.0s;
-			}
-			else
-			{
-				m_iHealthDecreaseCount = 0;
-				pev->health = 1;
-
-				m_tHealthDecreaseStartTime = invalid_time_point;
-			}
-		}
 	}
-	else
-	{
-		m_tHealthDecreaseStartTime = invalid_time_point;
-		m_flHealthDecreaseAmount = 0;
-		m_tHealthDecreaseInterval = invalid_time_point;
-		m_iHealthDecreaseCount = 0;
-	}
+
 }
 
 void CBasePlayer::PostThink()
@@ -5864,9 +5961,9 @@ void CBasePlayer::Spawn()
 	m_tShootingDownBuffTime = invalid_time_point;
 	m_tHealthBuffTime = invalid_time_point;
 	m_flBuffHealthAmount = 0.0f;
-	m_tHealthDecreaseStartTime = invalid_time_point;
+	m_flHealthDecreaseStartTime = invalid_time_point;
 	m_flHealthDecreaseAmount = 0.0f;
-	m_tHealthDecreaseInterval = invalid_time_point;
+	m_flHealthDecreaseInterval = 0.0s;
 	m_iHealthDecreaseCount = 0;
 
 	m_iZombieFlying = 0;
@@ -5913,6 +6010,13 @@ void CBasePlayer::Spawn()
 
 	m_iNumSpawns++;
 	InitStatusBar();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pev);
+	WRITE_LONG(-1);
+	WRITE_SHORT(ENTINDEX(edict()));
+	WRITE_BYTE(0);
+	WRITE_BYTE(1);
+	MESSAGE_END();
 
 	for (size_t i = 0; i < MAX_RECENT_PATH; ++i)
 		m_vRecentPath[ i ] = Vector(0, 0, 0);
@@ -5989,6 +6093,10 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/z4b/v_freedom.mdl");
 		case WEAPON_Z4B_FREEDOM:
 			pev->viewmodel = MAKE_STRING("models/z4b/v_barrettd.mdl");
+		case WEAPON_BUFFAWP:
+			pev->viewmodel = MAKE_STRING("models/v_buffawp.mdl");
+		case WEAPON_CROSSBOW:
+			pev->viewmodel = MAKE_STRING("models/v_crossbow.mdl");
 		default:
 			break;
 		}
@@ -6097,6 +6205,13 @@ void CBasePlayer::Spawn()
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgNVGToggle, NULL, pev);
 		WRITE_BYTE(0);
+	MESSAGE_END();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pev);
+	WRITE_LONG((long)0);
+	WRITE_SHORT(ENTINDEX(edict()));
+	WRITE_BYTE(0);
+	WRITE_BYTE(1);
 	MESSAGE_END();
 
 	m_bNightVisionOn = false;
@@ -6313,6 +6428,7 @@ int CBasePlayer::Restore(CRestore &restore)
 	return status;
 }
 
+
 void CBasePlayer::Reset()
 {
 	pev->frags = 0;
@@ -6336,6 +6452,12 @@ void CBasePlayer::Reset()
 		WRITE_SHORT(0);
 		WRITE_SHORT(m_iTeam);
 	MESSAGE_END();
+	/*
+#ifdef CLINET_DLL
+	g_iDamage[this->entindex()] = 0;
+	g_iDamageTotal[this->entindex()] = 0;
+#endif
+*/
 }
 
 NOXREF void CBasePlayer::SelectNextItem(int iItem)
@@ -8026,22 +8148,8 @@ bool CBasePlayer::ReactToDeimosTail()
 	if (m_bIsZombie)
 		return false;
 
-	int enable_antidgaxe = 0;
-
-	if (enable_antidgaxe)
-	{
-		CBasePlayerItem* pKnife = m_rgpPlayerItems[KNIFE_SLOT];
-		if (pKnife)
-		{
-			if (!Q_strcmp(STRING(pKnife->pev->classname), "knife_lance") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dgaxe") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dualsword") || !Q_strcmp(STRING(pKnife->pev->classname), "z4b_stormgiantx") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_stormgiant"))
-			{
-				RemovePlayerItem(m_rgpPlayerItems[KNIFE_SLOT]);
-
-				GiveNamedItem("weapon_knife");
-				return true;
-			}
-		}
-	}
+	//if (m_pModStrategy->ReactToDeimosTail())
+	//	return false;
 
 	CBasePlayerItem* pItem = m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 
@@ -8051,15 +8159,6 @@ bool CBasePlayer::ReactToDeimosTail()
 	if (!pItem)
 	{
 		return false;
-		/*pItem = m_rgpPlayerItems[KNIFE_SLOT];
-		if (!pItem)
-			return false;
-		else
-		{
-			RemovePlayerItem(m_rgpPlayerItems[KNIFE_SLOT]);
-			GiveNamedItem("weapon_knife");
-			return true;
-		}*/
 	}
 	DropPlayerItem(STRING(pItem->pev->classname));
 	m_flNextAttack = UTIL_WeaponTimeBase() + 2.0s;
@@ -8238,6 +8337,16 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 				}
 			}
 
+			if (FClassnameIs(pWeapon->pev, "weapon_guillotine"))
+			{
+				((CGuillotine*)pWeapon)->CrashAmmo();
+			}
+
+			if (FClassnameIs(pWeapon->pev, "weapon_guillotineex"))
+			{
+				((CGuillotineex*)pWeapon)->CrashAmmo();
+			}
+
 			if (pWeapon->iFlags() & ITEM_FLAG_EXHAUSTIBLE)
 			{
 				int iAmmoIndex = GetAmmoIndex(pWeapon->pszAmmo1());
@@ -8399,10 +8508,9 @@ void CBasePlayer::SwitchTeam()
 		szNewTeam
 	);
 
-	CCSBot *pBot = static_cast<CCSBot *>(this);
-
-	if (pBot->IsBot())
+	if (this->IsBot() && this->pev->flags & FL_FAKECLIENT)
 	{
+		CCSBot* pBot = static_cast<CCSBot*>(this);
 		const BotProfile *pProfile = pBot->GetProfile();
 
 		if (pProfile != NULL)
@@ -9009,6 +9117,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_GUNGNIR:
 		case WEAPON_HUNTBOW:
 		case WEAPON_SGDRILL:
+		case WEAPON_SGDRILLEX:
 		case WEAPON_REVIVEGUN:
 		case WEAPON_CSGO_ZEUS:
 		case WEAPON_ZOMBIELAW:
@@ -9034,6 +9143,41 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_WONDERCANNON:
 		case WEAPON_CROSSBOWEX21:
 		case WEAPON_STUNRIFLE:
+		case WEAPON_BUFFAWP:
+		case WEAPON_JANUSMK5:
+		case WEAPON_CROW5:
+		case WEAPON_JANUS11:
+		case WEAPON_CROW11:
+		case WEAPON_CHARGER5:
+		case WEAPON_CHARGER7:
+		case WEAPON_Z4B_M60AMETHYST:
+		case WEAPON_Z4B_DBARRELAMETHYST:
+		case WEAPON_Z4B_DEAGLEAMETHYST:
+		case WEAPON_Z4B_AR57AMETHYST:
+		case WEAPON_Z4B_ACRAMETHYST:
+		case WEAPON_BROAD:
+		case WEAPON_COILMG:
+		case WEAPON_AIRBURSTER:
+		case WEAPON_POISONGUN:
+		case WEAPON_FLAMETHROWER:
+		case WEAPON_WATERCANNON:
+		case WEAPON_LOCKONGUN:
+		case WEAPON_BUFFAUG:
+		case WEAPON_BUFFSG552:
+		case WEAPON_M1887G:
+		case WEAPON_CAMERAGUN:
+		case WEAPON_MGSM:
+		case WEAPON_THANATOS11:
+		case WEAPON_M1887XMAS:
+		case WEAPON_KRONOS5:
+		case WEAPON_AN94:
+		case WEAPON_M16A4:
+		case WEAPON_KRONOS7:
+		case WEAPON_KINGCOBRA:
+		case WEAPON_KINGCOBRAG:
+		case WEAPON_RAINBOWGUN:
+		case WEAPON_GUILLOTINE:
+		case WEAPON_GUILLOTINEEX:
 			return TRUE;
 		}
 	}
@@ -9065,6 +9209,13 @@ void CBasePlayer::SetPrefsFromUserinfo(char *infobuffer)
 		m_bShowHints = Q_atoi(pszKeyVal) != 0;
 	else
 		m_bShowHints = true;
+
+	pszKeyVal = GET_KEY_VALUE(infobuffer, "cl_blockwdnmd");
+
+	if (Q_strcmp(pszKeyVal, ""))
+		m_bBlockWdnmd = Q_atoi(pszKeyVal) != 0;
+	else
+		m_bBlockWdnmd = true;
 }
 
 bool CBasePlayer::IsLookingAtPosition(Vector *pos, float angleTolerance)
@@ -10203,4 +10354,5 @@ float CBasePlayer::GetArmorRatioModifier(void)
 
 	return m_pActiveItem->GetArmorRatioModifier();
 }
+
 }

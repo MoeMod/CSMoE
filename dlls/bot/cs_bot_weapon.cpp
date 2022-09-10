@@ -373,6 +373,7 @@ bool isSniperRifle(CBasePlayerItem *item)
 	case WEAPON_ZGUN:
 	case WEAPON_Z4B_BARRETTD:
 	case WEAPON_Z4B_FREEDOM:
+	case WEAPON_BUFFAWP:
 		return true;
 
 	default:
@@ -402,7 +403,8 @@ bool CCSBot::IsUsingAWP() const
 		|| weapon->m_iId == WEAPON_M95XMAS
 		|| weapon->m_iId == WEAPON_SFSNIPER
 		|| weapon->m_iId == WEAPON_Z4B_BARRETTD
-		|| weapon->m_iId == WEAPON_Z4B_FREEDOM))
+		|| weapon->m_iId == WEAPON_Z4B_FREEDOM
+		|| weapon->m_iId == WEAPON_BUFFAWP))
 		return true;
 
 	return false;
@@ -498,7 +500,13 @@ bool CCSBot::IsUsingMachinegun() const
 	if (weapon != NULL && WeaponIDToWeaponClass(weapon->m_iId) == WEAPONCLASS_MACHINEGUN)
 		return true;
 
-	if(weapon->m_iId == WEAPON_WONDERCANNON || weapon->m_iId == WEAPON_PIANOGUN || weapon->m_iId == WEAPON_PIANOGUNEX)
+	if(weapon->m_iId == WEAPON_WONDERCANNON || 
+		weapon->m_iId == WEAPON_PIANOGUN || 
+		weapon->m_iId == WEAPON_PIANOGUNEX || 
+		weapon->m_iId == WEAPON_AIRBURSTER ||
+		weapon->m_iId == WEAPON_FLAMETHROWER ||
+		weapon->m_iId == WEAPON_POISONGUN ||
+		weapon->m_iId == WEAPON_WATERCANNON)
 		return true;
 
 	return false;
@@ -753,9 +761,12 @@ bool CCSBot::IsUsingGrenade() const
 	if (weapon == NULL)
 		return false;
 
-	if (weapon->m_iId == WEAPON_SMOKEGRENADE
-		|| weapon->m_iId == WEAPON_FLASHBANG
-		|| weapon->m_iId == WEAPON_HEGRENADE)
+	if (weapon->m_iId == WEAPON_SMOKEGRENADE ||
+		weapon->m_iId == WEAPON_FLASHBANG ||
+		weapon->m_iId == WEAPON_HEGRENADE ||
+		weapon->m_iId == WEAPON_PATROLDRONE ||
+		weapon->m_iId == WEAPON_DIVINETITAN ||
+		weapon->m_iId == WEAPON_BUNKERBUSTER)
 		return true;
 
 	return false;
@@ -765,7 +776,10 @@ bool CCSBot::IsUsingHEGrenade() const
 {
 	CBasePlayerWeapon *weapon = GetActiveWeapon();
 
-	if (weapon != NULL && weapon->m_iId == WEAPON_HEGRENADE)
+	if (weapon != NULL && (weapon->m_iId == WEAPON_HEGRENADE || 
+		weapon->m_iId == WEAPON_PATROLDRONE || 
+		weapon->m_iId == WEAPON_DIVINETITAN ||
+		weapon->m_iId == WEAPON_BUNKERBUSTER))
 		return true;
 
 	return false;

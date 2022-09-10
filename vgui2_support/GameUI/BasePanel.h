@@ -141,6 +141,7 @@ public:
 	void OnSizeChanged(int newWide, int newTall);
 	void OnGameUIHidden(void);
 	void OnOpenMoeSettings(void);
+	void OnOpenMoeLogin(void);
 
 public:
 	KeyValues *GetConsoleControlSettings(void);
@@ -217,6 +218,7 @@ private:
 	vgui2::DHANDLE<vgui2::Frame> m_hCreateMultiplayerGameDialog;
 	vgui2::DHANDLE<vgui2::QueryBox> m_hQuitQueryBox;
 	vgui2::DHANDLE<vgui2::PropertyDialog> m_hMoeSettings;
+	vgui2::DHANDLE<vgui2::Frame> m_hMoeLogin;
 	
 	vgui2::AnimationController *m_pConsoleAnimationController;
 	KeyValues *m_pConsoleControlSettings;

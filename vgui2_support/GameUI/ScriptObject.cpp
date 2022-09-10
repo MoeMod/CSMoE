@@ -652,6 +652,9 @@ CDescription::CDescription(CPanelListPanel *panel)
 	pObjList = NULL;
 
 	m_pListPanel = panel;
+
+	m_pszHintText = NULL;
+	m_pszDescriptionType = NULL;
 }
 
 CDescription::~CDescription(void)
@@ -937,10 +940,14 @@ void CDescription::TransferCurrentValues(const char *pszConfigFile)
 
 void CDescription::setDescription(const char *pszDesc)
 {
+    if (m_pszDescriptionType)
+        free(m_pszDescriptionType);
 	m_pszDescriptionType = strdup(pszDesc);
 }
 
 void CDescription::setHint(const char *pszHint)
 {
+    if (m_pszHintText)
+        free(m_pszHintText);
 	m_pszHintText = strdup(pszHint);
 }

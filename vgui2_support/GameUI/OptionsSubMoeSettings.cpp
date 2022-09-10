@@ -34,8 +34,20 @@ COptionsSubMoeSettings::COptionsSubMoeSettings(vgui2::Panel *parent) : PropertyP
 	m_pHudScale = new CLabeledCommandComboBox(this, "HudScaleComboBox");
 	InitHudScaleList(m_pHudScale);
 
-	m_pGammaSlider = new CCvarSlider(this, "Gamma", "#GameUI_Brightness",
+	m_pGammaSlider = new CCvarSlider(this, "GameUI_Brightness", "#GameUI_Brightness",
 		1.0f, 10.0f, "gamma");
+
+	m_pQZSound = new  CCvarToggleCheckButton(
+		this,
+		"CheckButton1",
+		"#CSMoE_QZSound",
+		"cl_blockwdnmd");
+
+	m_pAutoAim = new  CCvarToggleCheckButton(
+		this,
+		"CCvarToggleCheckButton1",
+		"#CSMoE_AutoAim",
+		"in_autoaim");
 
 	LoadControlSettings("Resource/optionssubmoesettings.res");
 }
@@ -222,6 +234,8 @@ void COptionsSubMoeSettings::OnResetData()
 	m_pTexlru->Reset();
 	m_pHudScale->Reset();
 	m_pGammaSlider->Reset();
+	m_pQZSound->Reset();
+	m_pAutoAim->Reset();
 }
 
 void COptionsSubMoeSettings::OnApplyChanges()
@@ -243,6 +257,12 @@ void COptionsSubMoeSettings::OnApplyChanges()
 
 	if(m_pGammaSlider)
 		m_pGammaSlider->ApplyChanges();
+
+	if (m_pQZSound)
+		m_pQZSound->ApplyChanges();
+
+	if (m_pAutoAim)
+		m_pAutoAim->ApplyChanges();
 	
 }
 

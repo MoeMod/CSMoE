@@ -20,10 +20,13 @@ protected:
 	//newhud
 public:
 	static void BuildNumberRC(wrect_t(&rgrc)[10], int w, int h);
-	static int DrawTexturedNumbersTopRightAligned(const CTextureRef& tex, const wrect_t(&rect)[10], int iNumber, int x, int y, int iflags, int igaps = 0, float scale = 1.0f, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
-	static int DrawTexturedNumbers(const CTextureRef& tex, const wrect_t(&rect)[10], int iNumber, int x, int y, int iflags, int igaps = 0, float scale = 1.0f, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
+	static int DrawTexturedNumbersTopRightAligned(const CTextureRef& tex, const wrect_t(&rect)[10], int iNumber, int x, int y, int iflags, int igaps = 0, float scale = 1.0f, byte r = 255, byte g = 255, byte b = 255, byte a = 255, int Long = 0);
+	static int DrawTexturedNumbers(const CTextureRef& tex, const wrect_t(&rect)[10], int iNumber, int x, int y, int iflags, int igaps = 0, float scale = 1.0f, byte r = 255, byte g = 255, byte b = 255, byte a = 255,int iLong = 0);
+	static int DrawTexturedNumbersLong(const CTextureRef& tex, const wrect_t(&rect)[10], int iNumber, int x, int y, int iflags, int igaps, float scale, byte r, byte g, byte b, byte a);
 	static void DrawTexturePart(const CTextureRef& tex, const wrect_t& rect, int x1, int y1, float scale = 1.0f, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
 	static unsigned math_log10(unsigned v, int iflags);
+	static unsigned math_log10_long(unsigned v, int iflags);
+	static unsigned math_div(unsigned v, int iflags);
 
 private:
 	int m_iBGIndex;

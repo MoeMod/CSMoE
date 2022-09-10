@@ -7,6 +7,8 @@
 
 class CClientMOTD;
 class CCSBaseBuyMenu;
+class CCSTeamMenu;
+class CCSClassMenu;
 
 /**
 *	Viewport for the Hud.
@@ -46,6 +48,8 @@ public:
 	std::string	m_szMOTD;
 	
 	CClientMOTD *m_pMOTD = nullptr;
+	CCSTeamMenu *m_pTeamMenu = nullptr;
+	CCSClassMenu *m_pClassMenu = nullptr;
     CCSBaseBuyMenu *m_pBuyMenu = nullptr;
 };
 

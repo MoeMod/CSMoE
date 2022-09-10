@@ -34,7 +34,7 @@ GNU General Public License for more details.
 
 world_static_t	world;
 
-byte		*mod_base;
+const byte		*mod_base;
 mempool_t		*com_studiocache;		// cache for submodels
 mempool_t		*mempool_mdl;		// cache for submodels
 static model_t	*com_models[MAX_MODELS];	// shared replacement modeltable
@@ -615,11 +615,11 @@ Mod_LoadSubmodels
 */
 static void Mod_LoadSubmodels( const dlump_t *l )
 {
-	dmodel_t	*in;
+	const dmodel_t	*in;
 	dmodel_t	*out;
 	int	i, j, count;
 	
-	in = (dmodel_t*)(mod_base + l->fileofs);
+	in = (const dmodel_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in )) Host_Error( "Mod_LoadBModel: funny lump size\n" );
 	count = l->filelen / sizeof( *in );
 
@@ -683,8 +683,8 @@ Mod_LoadTextures
 */
 static void Mod_LoadTextures( const dlump_t *l )
 {
-	byte		*buf;
-	int		*offset;
+	const byte		*buf;
+    const int		*offset;
 	texture_t		*tx, *tx2;
 	texture_t		*anims[10];
 	texture_t		*altanims[10];
@@ -715,7 +715,7 @@ static void Mod_LoadTextures( const dlump_t *l )
 		return;
 	}
 
-	offset = (int *)(mod_base + l->fileofs);
+	offset = (const int *)(mod_base + l->fileofs);
 	LittleLongSW(*offset);
 
 	loadmodel->numtextures = *offset;
@@ -743,8 +743,8 @@ static void Mod_LoadTextures( const dlump_t *l )
 			continue; // missed
 		}
 
-		buf = (byte *)offset + *(offset + i + 1);
-		Q_memcpy( &mt, buf, sizeof(mip_t));
+		buf = (const byte *)offset + *(offset + i + 1);
+		Mem_VirtualCopy( &mt, buf, sizeof(mip_t));
 
 #ifdef XASH_BIG_ENDIAN
 		LittleLongSW(mt.width);
@@ -762,10 +762,10 @@ static void Mod_LoadTextures( const dlump_t *l )
 		tx = (texture_t*)Mem_ZeroAlloc( loadmodel->mempool, sizeof( *tx ));
 		loadmodel->textures[i] = tx;
 
-		// convert to lowercase
-		Q_strnlwr( mt.name, mt.name, sizeof( mt.name ));
-		Q_strncpy( tx->name, mt.name, sizeof( tx->name ));
-		Q_memcpy( buf, mt.name, sizeof(mt.name));
+        // convert to lowercase
+        Q_strnlwr( mt.name, mt.name, sizeof( mt.name ));
+        Q_strncpy( tx->name, mt.name, sizeof( tx->name ));
+        //Q_memcpy( buf, mt.name, sizeof(mt.name));
 		filter = R_FindTexFilter( tx->name ); // grab texture filter
 
 		tx->width = mt.width;
@@ -892,7 +892,8 @@ static void Mod_LoadTextures( const dlump_t *l )
 				if( bmodel_version >= HLBSP_VERSION ) size += sizeof( short ) + 768;
 
 				Q_snprintf( texname, sizeof( texname ), "#%s.mip", mt.name );
-				Q_memcpy( buf, &mt, sizeof( mt ) );
+                // MoeMod : no more writing back our modifications
+				//Q_memcpy( buf, &mt, sizeof( mt ) );
 				tx->gl_texturenum = GL_LoadTexture( texname, buf, size, 0, filter );
 			}
 		}
@@ -1161,13 +1162,13 @@ Mod_LoadTexInfo
 */
 static void Mod_LoadTexInfo( const dlump_t *l )
 {
-	dtexinfo_t	*in;
+    const dtexinfo_t	*in;
 	mtexinfo_t	*out;
 	int		miptex;
 	int		i, j, count;
 	float		len1, len2;
 
-	in = (dtexinfo_t*)(mod_base + l->fileofs);
+	in = (const dtexinfo_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in ))
 		Host_Error( "Mod_LoadTexInfo: funny lump size in %s\n", loadmodel->name );
 
@@ -1215,7 +1216,7 @@ static void Mod_LoadDeluxemap( void )
 {
 	char	path[64];
 	int	iCompare;
-	byte	*in;
+	const byte	*in;
 	fs_offset_t	filesize;
 
 	if( !world.loading ) return;	// only world can have deluxedata
@@ -1240,7 +1241,7 @@ static void Mod_LoadDeluxemap( void )
 	if( iCompare < 0 ) // this may happen if level-designer used -onlyents key for hlcsg
 		MsgDev( D_WARN, "Mod_LoadDeluxemap: %s is probably out of date\n", path );
 
-	in = FS_LoadFile( path, &filesize, false );
+	in = FS_MapFile( path, &filesize, false );
 	world.vecdatasize = filesize;
 
 	ASSERT( in != NULL );
@@ -1250,7 +1251,7 @@ static void Mod_LoadDeluxemap( void )
 		MsgDev( D_ERROR, "Mod_LoadDeluxemap: %s is not a deluxemap file\n", path );
 		world.deluxedata = NULL;
 		world.vecdatasize = 0;
-		Mem_Free( in );
+		FS_MapFree( in, filesize );
 		return;
 	}
 
@@ -1262,14 +1263,14 @@ static void Mod_LoadDeluxemap( void )
 		MsgDev( D_ERROR, "Mod_LoadDeluxemap: %s has mismatched size (%i should be %i)\n", path, world.vecdatasize, world.litdatasize );
 		world.deluxedata = NULL;
 		world.vecdatasize = 0;
-		Mem_Free( in );
+		FS_MapFree( in, filesize );
 		return;
 	}
 
 	MsgDev( D_INFO, "Mod_LoadDeluxemap: %s loaded\n", path );
 	world.deluxedata = (color24 *)Mem_Alloc( loadmodel->mempool, world.vecdatasize );
-	Q_memcpy( world.deluxedata, in + 8, world.vecdatasize );
-	Mem_Free( in );
+	Mem_VirtualCopy( world.deluxedata, in + 8, world.vecdatasize );
+    FS_MapFree( in, filesize );
 }
 
 /*
@@ -1279,7 +1280,8 @@ Mod_LoadLighting
 */
 static void Mod_LoadLighting( const dlump_t *l )
 {
-	byte	d, *in;
+	byte	d;
+    const byte *in;
 	color24	*out;
 	int	i;
 
@@ -1295,7 +1297,7 @@ static void Mod_LoadLighting( const dlump_t *l )
 		}
 		return;
 	}
-	in = (byte *)(mod_base + l->fileofs);
+	in = (const byte *)(mod_base + l->fileofs);
 	if( world.loading ) world.litdatasize = l->filelen;
 
 	switch( bmodel_version )
@@ -1317,7 +1319,7 @@ static void Mod_LoadLighting( const dlump_t *l )
 	case XTBSP_VERSION:
 		// load colored lighting
 		loadmodel->lightdata = (color24 *)Mem_Alloc( loadmodel->mempool, l->filelen );
-		Q_memcpy( loadmodel->lightdata, in, l->filelen );
+		Mem_VirtualCopy( loadmodel->lightdata, in, l->filelen );
 		break;
 	}
 
@@ -1780,7 +1782,7 @@ static void Mod_ConvertSurface( mextrasurf_t *info, msurface_t *surf )
 			outElems[i*3+2] = numVerts + i + 2;
 		}
 
-		Q_memcpy( outVerts, poly->verts, sizeof( glvert_t ) * poly->numVerts );
+		Mem_VirtualCopy( outVerts, poly->verts, sizeof( glvert_t ) * poly->numVerts );
 
 		numElems += (poly->numVerts - 2) * 3;
 		numVerts += poly->numVerts;
@@ -1917,13 +1919,13 @@ Mod_LoadSurfaces
 */
 static void Mod_LoadSurfaces( const dlump_t *l )
 {
-	dface_t		*in;
+    const dface_t		*in;
 	msurface_t	*out;
 	mextrasurf_t	*info;
 	int		i, j;
 	int		count;
 
-	in = (dface_t*)(mod_base + l->fileofs);
+	in = (const dface_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in ))
 		Host_Error( "Mod_LoadSurfaces: funny lump size in '%s'\n", loadmodel->name );
 	count = l->filelen / sizeof( *in );
@@ -2030,11 +2032,11 @@ Mod_LoadVertexes
 */
 static void Mod_LoadVertexes( const dlump_t *l )
 {
-	dvertex_t	*in;
+    const dvertex_t	*in;
 	mvertex_t	*out;
 	int	i, count;
 
-	in = (dvertex_t*)( mod_base + l->fileofs );
+	in = (const dvertex_t*)( mod_base + l->fileofs );
 	if( l->filelen % sizeof( *in ))
 		Host_Error( "Mod_LoadVertexes: funny lump size in %s\n", loadmodel->name );
 	count = l->filelen / sizeof( *in );
@@ -2069,11 +2071,11 @@ Mod_LoadEdges
 */
 static void Mod_LoadEdges( const dlump_t *l )
 {
-	dedge_t	*in;
+    const dedge_t	*in;
 	medge_t	*out;
 	int	i, count;
 
-	in = (dedge_t*)( mod_base + l->fileofs );
+	in = (const dedge_t*)( mod_base + l->fileofs );
 	if( l->filelen % sizeof( *in ))
 		Host_Error( "Mod_LoadEdges: funny lump size in %s\n", loadmodel->name );
 
@@ -2095,10 +2097,11 @@ Mod_LoadSurfEdges
 */
 static void Mod_LoadSurfEdges( const dlump_t *l )
 {
-	dsurfedge_t	*in, *out;
+    const dsurfedge_t	*in;
+    dsurfedge_t *out;
 	int		count, i;
 
-	in = (dsurfedge_t*)( mod_base + l->fileofs );
+	in = (const dsurfedge_t*)( mod_base + l->fileofs );
 	if( l->filelen % sizeof( *in ))
 		Host_Error( "Mod_LoadSurfEdges: funny lump size in %s\n", loadmodel->name );
 
@@ -2106,9 +2109,12 @@ static void Mod_LoadSurfEdges( const dlump_t *l )
 	loadmodel->surfedges = out = (dsurfedge_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( dsurfedge_t ));
 	loadmodel->numsurfedges = count;
 
-	//Q_memcpy( loadmodel->surfedges, in, count * sizeof( dsurfedge_t ));
+#ifndef XASH_BIG_ENDIAN
+	Mem_VirtualCopy( loadmodel->surfedges, in, count * sizeof( dsurfedge_t ));
+#else
 	for( i = 0; i < count; i++)
 		out[i] = LittleLong (in[i]);
+#endif
 
 }
 
@@ -2119,11 +2125,11 @@ Mod_LoadMarkSurfaces
 */
 static void Mod_LoadMarkSurfaces( const dlump_t *l )
 {
-	dmarkface_t	*in;
+	const dmarkface_t	*in;
 	int		i, j, count;
 	msurface_t	**out;
 	
-	in = (dmarkface_t*)( mod_base + l->fileofs );
+	in = (const dmarkface_t*)( mod_base + l->fileofs );
 	if( l->filelen % sizeof( *in ))
 		Host_Error( "Mod_LoadMarkFaces: funny lump size in %s\n", loadmodel->name );
 
@@ -2162,11 +2168,11 @@ Mod_LoadNodes
 */
 static void Mod_LoadNodes( const dlump_t *l )
 {
-	dnode_t	*in;
+    const dnode_t	*in;
 	mnode_t	*out;
 	int	i, j, p;
 	
-	in = (dnode_t*)(mod_base + l->fileofs);
+	in = (const dnode_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in )) Host_Error( "Mod_LoadNodes: funny lump size\n" );
 	loadmodel->numnodes = l->filelen / sizeof( *in );
 
@@ -2205,11 +2211,11 @@ Mod_LoadLeafs
 */
 static void Mod_LoadLeafs( const dlump_t *l )
 {
-	dleaf_t 	*in;
+    const dleaf_t 	*in;
 	mleaf_t	*out;
 	int	i, j, p, count;
 		
-	in = (dleaf_t*)(mod_base + l->fileofs);
+	in = (const dleaf_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in )) Host_Error( "Mod_LoadLeafs: funny lump size\n" );
 
 	count = l->filelen / sizeof( *in );
@@ -2263,11 +2269,11 @@ Mod_LoadPlanes
 */
 static void Mod_LoadPlanes( const dlump_t *l )
 {
-	dplane_t	*in;
+    const dplane_t	*in;
 	mplane_t	*out;
 	int	i, j, count;
 	
-	in = (dplane_t*)(mod_base + l->fileofs);
+	in = (const dplane_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in )) Host_Error( "Mod_LoadPlanes: funny lump size\n" );
 	count = l->filelen / sizeof( *in );
 
@@ -2310,7 +2316,7 @@ static void Mod_LoadVisibility( const dlump_t *l )
 	}
 
 	loadmodel->visdata = (byte*)Mem_Alloc( loadmodel->mempool, l->filelen );
-	Q_memcpy( loadmodel->visdata, (void *)(mod_base + l->fileofs), l->filelen );
+    Mem_VirtualCopy( loadmodel->visdata, mod_base + l->fileofs, l->filelen );
 	world.visdatasize = l->filelen; // save it for PHS allocation
 }
 
@@ -2396,11 +2402,12 @@ Mod_LoadClipnodes
 */
 static void Mod_LoadClipnodes( const dlump_t *l )
 {
-	dclipnode_t	*in, *out;
+    const dclipnode_t	*in;
+    dclipnode_t	*out;
 	int		i, count;
 	hull_t		*hull;
 
-	in = (dclipnode_t*)(mod_base + l->fileofs);
+	in = (const dclipnode_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in )) Host_Error( "Mod_LoadClipnodes: funny lump size\n" );
 	count = l->filelen / sizeof( *in );
 	out = (dclipnode_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
@@ -2452,21 +2459,22 @@ Mod_LoadClipnodes31
 */
 static void Mod_LoadClipnodes31( const dlump_t *l, const dlump_t *l2, const dlump_t *l3 )
 {
-	dclipnode_t	*in, *in2, *in3, *out, *out2, *out3;
+    const dclipnode_t	*in, *in2, *in3;
+    dclipnode_t *out, *out2, *out3;
 	int		i, count, count2, count3;
 	hull_t		*hull;
 
-	in = (dclipnode_t*)(mod_base + l->fileofs);
+	in = (const dclipnode_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in )) Host_Error( "Mod_LoadClipnodes: funny lump size\n" );
 	count = l->filelen / sizeof( *in );
 	out = (dclipnode_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
 
-	in2 = (dclipnode_t*)(mod_base + l2->fileofs);
+	in2 = (const dclipnode_t*)(mod_base + l2->fileofs);
 	if( l2->filelen % sizeof( *in2 )) Host_Error( "Mod_LoadClipnodes2: funny lump size\n" );
 	count2 = l2->filelen / sizeof( *in2 );
 	out2 = (dclipnode_t*)Mem_ZeroAlloc( loadmodel->mempool, count2 * sizeof( *out2 ));
 
-	in3 = (dclipnode_t*)(mod_base + l3->fileofs);
+	in3 = (const dclipnode_t*)(mod_base + l3->fileofs);
 	if( l3->filelen % sizeof( *in3 )) Host_Error( "Mod_LoadClipnodes3: funny lump size\n" );
 	count3 = l3->filelen / sizeof( *in3 );
 	out3 = (dclipnode_t*)Mem_ZeroAlloc( loadmodel->mempool, count3 * sizeof( *out3 ));
@@ -2793,16 +2801,16 @@ void Mod_UnloadBrushModel( model_t *mod )
 Mod_LoadBrushModel
 =================
 */
-static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *loaded )
+static void Mod_LoadBrushModel( model_t *mod, const byte *buffer, size_t filesize, qboolean *loaded )
 {
 	int	i, j;
 	int	sample_size;
 	char	*ents;
-	dheader_t	*header;
+	const dheader_t	*header;
 	dmodel_t 	*bm;
 
 	if( loaded ) *loaded = false;	
-	header = (dheader_t *)buffer;
+	header = (const dheader_t *)buffer;
 	loadmodel->type = mod_brush;
 	i = LittleLong(header->version);
 
@@ -2822,6 +2830,7 @@ static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *load
 		break;
 	default:
 		MsgDev( D_ERROR, "%s has wrong version number (%i should be %i)\n", loadmodel->name, i, HLBSP_VERSION );
+        FS_MapFree( buffer, filesize );
 		return;
 	}
 
@@ -2835,12 +2844,13 @@ static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *load
 	{
 		// can't mix world and bmodels with different sample sizes!
 		MsgDev( D_ERROR, "%s has wrong version number (%i should be %i)\n", loadmodel->name, i, world.version );
+        FS_MapFree( buffer, filesize );
 		return;		
 	}
 	bmodel_version = i;	// share it
 
 	// swap all the lumps
-	mod_base = (byte *)header;
+	mod_base = (const byte *)header;
 #ifdef XASH_BIG_ENDIAN
 	for (i=0 ; i<sizeof(dheader_t)/4 ; i++)
 		LittleLongSW(((int *)header)[i]);
@@ -2963,6 +2973,7 @@ static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *load
 	}
 
 	if( loaded ) *loaded = true;	// all done
+    FS_MapFree( buffer, filesize );
 }
 
 /*
@@ -3075,7 +3086,8 @@ Loads a model into the cache
 */
 model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 {
-	byte	*buf;
+	const byte	*buf;
+    fs_offset_t filesize;
 	char	tempname[64];
 	qboolean	loaded;
 
@@ -3094,7 +3106,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	Q_strncpy( tempname, mod->name, sizeof( tempname ));
 	COM_FixSlashes( tempname );
 
-	buf = FS_LoadFile( tempname, NULL, false );
+	buf = FS_MapFile( tempname, &filesize, false );
 
 	if( !buf )
 	{
@@ -3117,19 +3129,34 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	switch( LittleLong(*(uint *)buf) )
 	{
 	case IDSTUDIOHEADER:
-		Mod_DecryptModel(mod->name, buf);
-		Mod_LoadStudioModel( mod, Mod_LoadExtendSeq(mod->name, buf), &loaded );
-		break;
+        {
+            // replace model
+            bool bIsReplace = false;
+            if(Mod_IsModelEncrypted(mod->name, buf) || Mod_NumExtendSeq(mod->name) > 0)
+            {
+                // switch to COW mode
+                FS_MapFree(buf, filesize);
+                auto buf2 = FS_MapFileCOW( tempname, &filesize, false );
+                buf = buf2;
+                Mod_DecryptModel(mod->name, buf2);
+
+                buf2 = Mod_LoadExtendSeq(mod->name, buf2, &filesize);
+                buf = buf2;
+            }
+            // normal mode
+            Mod_LoadStudioModel( mod, buf, filesize, &loaded );
+            break;
+        }
 	case IDSPRITEHEADER:
-		Mod_LoadSpriteModel( mod, buf, &loaded, 0 );
+		Mod_LoadSpriteModel( mod, buf, filesize, &loaded, 0 );
 		break;
 	case Q1BSP_VERSION:
 	case HLBSP_VERSION:
 	case XTBSP_VERSION:
-		Mod_LoadBrushModel( mod, buf, &loaded );
+        Mod_LoadBrushModel( mod, buf, filesize, &loaded );
 		break;
 	default:
-		Mem_Free( buf );
+		FS_MapFree( buf, filesize );
 		if( crash ) Host_MapDesignError( "Mod_ForName: %s unknown format\n", tempname );
 		else MsgDev( D_ERROR, "Mod_ForName: %s unknown format\n", tempname );
 		return NULL;
@@ -3138,21 +3165,19 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	if( !loaded )
 	{
 		Mod_FreeModel( mod );
-		Mem_Free( buf );
 
 		if( crash ) Host_MapDesignError( "Mod_ForName: %s couldn't load\n", tempname );
 		else MsgDev( D_ERROR, "Mod_ForName: %s couldn't load\n", tempname );
 
 		return NULL;
 	}
-#ifndef XASH_DEDICATED
+#if 0 // MoeMod : CSMoE removed this feature
 	else if( clgame.drawFuncs.Mod_ProcessUserData != NULL )
 	{
 		// let the client.dll load custom data
 		clgame.drawFuncs.Mod_ProcessUserData( mod, true, buf );
 	}
 #endif
-	Mem_Free( buf );
 
 	return mod;
 }
@@ -3350,7 +3375,7 @@ Mod_LoadCacheFile
 */
 void GAME_EXPORT Mod_LoadCacheFile( const char *filename, cache_user_t *cu )
 {
-	byte	*buf;
+	const byte	*buf;
 	string	name;
 	size_t	i, j;
 	fs_offset_t size;
@@ -3369,15 +3394,15 @@ void GAME_EXPORT Mod_LoadCacheFile( const char *filename, cache_user_t *cu )
 	}
 	name[j] = '\0';
 
-	buf = FS_LoadFile( name, &size, false );
+	buf = FS_MapFile( name, &size, false );
 	if( !buf || !size )
 	{
 		Host_MapDesignError( "LoadCacheFile: ^1can't load %s^7\n", filename );
 		return;
 	}
 	cu->data = Mem_Alloc( com_studiocache, size );
-	Q_memcpy( cu->data, buf, size );
-	Mem_Free( buf );
+	Mem_VirtualCopy( cu->data, buf, size );
+	FS_MapFree( buf, size );
 }
 
 /*

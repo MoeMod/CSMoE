@@ -483,6 +483,16 @@ void V_DropPunchAngle ( float frametime, vec3_t &ev_punchangle )
 	VectorScale ( ev_punchangle, len, ev_punchangle );
 }
 
+/*
+=============
+V_PunchAxis
+Client side punch effect
+=============
+*/
+void V_PunchAxis(int axis, float punch)
+{
+	ev_punchangle[axis] = punch;
+}
 
 /*
 ==================
@@ -950,6 +960,8 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 			if (!strcmp(view->model->name, "models/v_skull5.mdl"))
 				view->model = NULL;
 			else if (!strcmp(view->model->name, "models/v_skull6.mdl"))
+				view->model = NULL;
+			else if (!strcmp(view->model->name, "models/v_crossbow.mdl"))
 				view->model = NULL;
 		}
 	}

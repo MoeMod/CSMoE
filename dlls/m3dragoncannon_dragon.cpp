@@ -310,7 +310,12 @@ namespace sv {
 		{
 			flDamage = 4;
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1350;
+			{
+				if (enhancedzombie.value)
+					flDamage = 1350;
+				else
+					flDamage = 650;
+			}
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1820;
 		}
@@ -318,7 +323,12 @@ namespace sv {
 		{
 			flDamage = 6;
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 2100;
+			{
+				if (enhancedzombie.value)
+					flDamage = 2100;
+				else
+					flDamage = 1350;
+			}
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 2800;
 		}

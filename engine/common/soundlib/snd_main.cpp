@@ -61,7 +61,7 @@ wavdata_t *FS_LoadSound( const char *filename, const byte *buffer, size_t size )
 	qboolean		anyformat = true;
 	fs_offset_t		filesize = 0;
 	const loadwavfmt_t	*format;
-	byte		*f;
+	const byte	*f;
 
 	Sound_Reset(); // clear old sounddata
 	Q_strncpy( loadname, filename, sizeof( loadname ));
@@ -90,15 +90,15 @@ wavdata_t *FS_LoadSound( const char *filename, const byte *buffer, size_t size )
 		if( anyformat || !Q_stricmp( ext, format->ext ))
 		{
 			Q_sprintf( path, format->formatstring, loadname, "", format->ext );
-			f = FS_LoadFile( path, &filesize, false );
+			f = FS_MapFile( path, &filesize, false );
 			if( f && filesize > 0 )
 			{
 				if( format->loadfunc( path, f, (size_t)filesize ))
 				{
-					Mem_Free(f); // release buffer
+                    FS_MapFree(f, filesize); // release buffer
 					return SoundPack(); // loaded
 				}
-				else Mem_Free(f); // release buffer 
+				else FS_MapFree(f, filesize); // release buffer
 			}
 		}
 	}

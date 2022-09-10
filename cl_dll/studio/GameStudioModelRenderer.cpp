@@ -77,6 +77,19 @@ engine_studio_api_t IEngineStudio;
 static client_anim_state_t g_state;
 static client_anim_state_t g_clientstate;
 
+TEMPENTITY* g_BuffAugSmoke = NULL;
+
+float g_flBloodhunterAnimTime = 0.0;
+int g_iBloodhunterSecAnim = 0;
+int g_iBloodhunterState = 0;
+
+float g_flMGSMAnimTime = 0.0;
+int g_iMGSMSecAnim = 0;
+int g_iMGSMState = 0;
+
+float g_flM1887xmasAnimTime = 0.0;
+int g_iM1887xmasAnim = -1;
+
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {
 	m_bLocal = false;
@@ -1103,7 +1116,94 @@ int R_StudioDrawPlayer(int flags, entity_state_t *pplayer)
 
 int R_StudioDrawModel(int flags)
 {
-	return g_StudioRenderer.StudioDrawModel(flags);
+	cl_entity_s* viewent = IEngineStudio.GetViewEntity();
+	cl_entity_s* curent = IEngineStudio.GetCurrentEntity();
+	if (curent == viewent)
+	{
+		if (CStudioModelRenderer::s_pBloodHunterViewModel && curent->model == CStudioModelRenderer::s_pBloodHunterViewModel && g_iBloodhunterSecAnim)
+		{
+			static cl_entity_t saveent;
+			saveent = *curent;
+			curent->model = CStudioModelRenderer::s_pBloodHunterViewModel;
+
+			//从CStudioModelRenderer::StudioEstimateFrame抄来的f'(t)微积分QAQ
+			//dfdt = (m_clTime - m_pCurrentEntity->curstate.animtime) * m_pCurrentEntity->curstate.framerate * pseqdesc->fps;
+
+			curent->curstate.animtime = g_flBloodhunterAnimTime;
+			curent->curstate.framerate = 1.0;
+			curent->curstate.sequence = g_iBloodhunterSecAnim;
+
+			g_StudioRenderer.StudioDrawModel(flags);
+			*curent = saveent;
+		}
+
+		if (CStudioModelRenderer::s_pMGSMViewModel && curent->model == CStudioModelRenderer::s_pMGSMViewModel && g_iMGSMSecAnim)
+		{
+			static cl_entity_t saveent;
+			saveent = *curent;
+			curent->model = CStudioModelRenderer::s_pMGSMLauncherModel;
+
+			curent->curstate.animtime = g_flMGSMAnimTime;
+			curent->curstate.framerate = 1.0;
+			curent->curstate.sequence = g_iMGSMSecAnim;
+
+			g_StudioRenderer.StudioDrawModel(flags);
+			*curent = saveent;
+		}
+
+		if (CStudioModelRenderer::s_pM1887xmasViewModel && curent->model == CStudioModelRenderer::s_pM1887xmasViewModel && g_iM1887xmasAnim != -1)
+		{
+			static cl_entity_t saveent;
+			saveent = *curent;
+			curent->model = CStudioModelRenderer::s_pXmasEmptyModel;
+
+			curent->curstate.animtime = g_flM1887xmasAnimTime;
+			curent->curstate.framerate = 1.0;
+			curent->curstate.sequence = g_iM1887xmasAnim;
+
+			g_StudioRenderer.StudioDrawModel(flags);
+			*curent = saveent;
+		}
+	}
+
+	int iReturn = g_StudioRenderer.StudioDrawModel(flags);
+
+	if (curent == viewent)
+	{
+		if (CStudioModelRenderer::s_pBuffAugViewModel && CStudioModelRenderer::s_pBuffAugSmokeModel && curent->model == CStudioModelRenderer::s_pBuffAugViewModel && (curent->curstate.sequence <= 0 || curent->curstate.sequence > 2))
+		{
+			if (!g_BuffAugSmoke)
+			{
+				g_BuffAugSmoke = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[2], CStudioModelRenderer::s_pBuffAugSmokeModel);
+
+				g_BuffAugSmoke->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_BuffAugSmoke->entity.curstate.aiment = curent->index;
+				g_BuffAugSmoke->entity.curstate.body = 3;
+				g_BuffAugSmoke->entity.curstate.rendermode = kRenderTransAdd;
+				g_BuffAugSmoke->entity.curstate.renderamt = 255;
+				g_BuffAugSmoke->entity.curstate.renderfx = 0;
+				g_BuffAugSmoke->entity.curstate.scale = 0.05;
+				g_BuffAugSmoke->entity.curstate.framerate = 24;
+				g_BuffAugSmoke->entity.curstate.rendercolor.r = g_BuffAugSmoke->entity.curstate.rendercolor.g = g_BuffAugSmoke->entity.curstate.rendercolor.b = 255;
+				g_BuffAugSmoke->frameMax = 30;
+				g_BuffAugSmoke->die = gHUD.m_flTime + 9999.0f;
+				g_BuffAugSmoke->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+				g_BuffAugSmoke->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+				g_BuffAugSmoke->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+			}
+		}
+		else
+		{
+			if (g_BuffAugSmoke)
+			{
+				g_BuffAugSmoke->die = 0.0;
+				g_BuffAugSmoke = NULL;
+			}
+		}
+	}
+
+	return iReturn;
 }
 // The simple drawing interface we'll pass back to the engine
 r_studio_interface_t studio =

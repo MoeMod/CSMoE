@@ -99,6 +99,14 @@ public:
     matrix3x4 (*m_paliastransform);
     matrix3x4 (*m_pbonetransform)[MAXSTUDIOBONES];
     matrix3x4 (*m_plighttransform)[MAXSTUDIOBONES];
+
+	static struct model_s* s_pBuffAugViewModel;
+	static struct model_s* s_pBuffAugSmokeModel;
+	static struct model_s* s_pBloodHunterViewModel;
+	static struct model_s* s_pMGSMViewModel;
+	static struct model_s* s_pMGSMLauncherModel;
+	static struct model_s* s_pM1887xmasViewModel;
+	static struct model_s* s_pXmasEmptyModel;
 };
 
 }

@@ -547,7 +547,7 @@ public:
 		return DefaultDeploy(szViewModel, szWeaponModel, iAnim, szAnimExt, skiplocal, 0.75s, 1.5s);
 	}*/
 	int DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body = 0);
-	void FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18);
+	virtual void FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18);
 	void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max,
 	              float lateral_max, int direction_change);
 	void EjectBrassLate();
@@ -590,6 +590,11 @@ public:
 			|| m_iId == WEAPON_M950SE
 			|| m_iId == WEAPON_SFPISTOL
 			|| m_iId == WEAPON_Y22S2SFPISTOL
+			|| m_iId == WEAPON_Z4B_RAGINGBULL
+			|| m_iId == WEAPON_BALROG1
+			|| m_iId == WEAPON_SAPIENTIA
+			|| m_iId == WEAPON_BLOODHUNTER
+			|| m_iId == WEAPON_KRONOS1
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -605,10 +610,12 @@ public:
 	virtual int GetPriority() { return 1; }
 	virtual int GetPriorityByTarget(CBaseEntity* target) { return 1; }
 	virtual void WeaponCallBack(int iType = 0) {};
+	virtual void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace) {};
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];
 	time_point_t m_flHolsterTime;
+	time_point_t m_flBunkerBusterCoolDown;
 };
 
 }
@@ -689,7 +696,7 @@ private:
 	int m_iSign;
 	float m_flDamage;
 	float m_flNumFrames;
-
+	int m_iSprIndex[3];
 	CUtlVector<CBaseEntity*>* m_pEnemyList;
 	CUtlVector<CBaseEntity*>* m_pGroupList;
 
@@ -720,6 +727,53 @@ private:
 	int m_Exp2Index;
 	Vector m_vecStartVelocity;
 };
+#ifndef CLIENT_DLL
+class CBunkerBusterBase : public CBaseEntity
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	void EXPORT OnThink();
+	void EXPORT SoundAfterThink();
+	void EXPORT OnTouch(CBaseEntity* pOther);
+
+
+	// 1 ->b52   2->missile  3->fire
+	static CBunkerBusterBase* CreateBaseEnt(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	void InitB52(Vector vecVelocity, Vector vecStart, Vector vecEnd);
+	void InitB52Missile(Vector vecVelocity, Vector vecStart);
+
+
+	float GetMaxHeight(Vector vecStart);
+	void GetSpeedVector(Vector vecStart, Vector vecEnd, float flSpeed, Vector vecVelocity);
+	float GetDamageMissile();
+	float GetDamageFire();
+	float GetRangeFire();
+	float GetRangeMissile();
+
+	void CreateExplosion(Vector vecOrigin);
+	void CreateRandomFire(Vector vecOrigin);
+
+public:
+	int m_iType;
+	int m_iTouchCounts;
+	int m_iMissileCounts;
+	int m_iSoundCounts;
+	bool m_bFireEnabled;
+	bool m_bNoInit;
+	time_point_t m_flArriveTime;
+	time_point_t m_flFlySoundTime;
+	time_point_t m_flCanThrowTime;
+	time_point_t m_flFireTime;
+	Vector m_vecEnd;
+	Vector m_vecStart;
+	Vector m_vecVelocity;
+
+private:
+	time_point_t m_flRemoveTime;
+	unsigned short m_usFireBunkerBuster;
+};
+#endif
 
 class CCannonEX;
 #ifndef CLIENT_DLL
@@ -1006,6 +1060,7 @@ public:
 	void EXPORT FlyingThink(void);
 	void EXPORT FlyingTouch(CBaseEntity* pOther);
 	void EXPORT AttachmentThink(void);
+	//void EXPORT BuffThink(void);
 
 public:
 	static CPianoGunWave* Create(int iWpnType, int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
@@ -1013,19 +1068,27 @@ public:
 	void RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
 	//void RadiusAttack(float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer);
 	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.3f }; }
+
+public:
+	float m_maxFrame;
 private:
 	void StartFadeOut();
 	void FadeOut();
 private:
 	float GetDirectDamage();
 	float GetExplodeDamage();
+	
 	//float GetRadiusDamage();
 
 	time_point_t m_flRemoveTime;
+	time_point_t m_flSkillTime;
 	int m_iType;
 	int m_iWpnType;
-	int m_iPianoNoteExp[2];
+	int m_iPianoNoteExp[5];
+	int m_iPianoNote[4];
 	int m_iPianoShootMuzzle;
+	int m_iActiveSkill;
+
 
 };
 
@@ -1079,6 +1142,149 @@ private:
 	CBaseEntity* m_pAttachedEnt;
 	CWonderCannon* m_pWeapon;
 };
+
+
+class CLockOnGunMissile : public CGrenade
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT MissileThink(void);
+	void EXPORT MissileTouch(CBaseEntity* pOther);
+
+public:
+	static CLockOnGunMissile* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, CBaseEntity* pEntity, int iHitGroup, int iTeam);
+	float GetArmorRatioModifier() { return 1.75; }
+	bool RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
+	KnockbackData GetKnockBackData() override 
+	{ 
+		if(m_pEntity != nullptr)
+			return { 0.0f, 0.0f, 0.0f, 0.0f, 0.2f };
+		return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; 
+	}
+
+private:
+	float GetDirectDamage();
+	float GetExplodeDamage();
+	int m_iType;
+	int m_iM3DragonmExp;
+	int m_iHitGroup;
+	CBaseEntity* m_pEntity;
+	int m_iTail;
+	int m_iExp[3];
+};
+
+class CGuillotine;
+class CGuillotineAmmo : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+
+	int GetWeaponsId(void)
+	{
+		return WEAPON_GUILLOTINE;
+	}
+
+	float GetArmorRatio(void)
+	{
+		return 1.8;
+	}
+
+	KnockbackData GetKnockBackData() override { return { 450.0f, 350.0f, 400.0f, 300.0f, 1.0f }; }
+
+public:
+	void EXPORT FireThink(void);
+	void EXPORT FireTouch(CBaseEntity* pOther);
+	void EXPORT ReturnThink(void);
+	void EXPORT ReturnTouch(CBaseEntity* pOther);
+	void EXPORT HeadCutThink(void);
+
+public:
+	bool ShouldCrashHalfway(void);
+	bool RecursiveWorldTrace(float delta, Vector vecOrigin, edict_t* pentIgnore, bool bWorldSound);
+	void Crash(void);
+	void StartHeadCut(CBaseEntity* pOther);
+	bool IsHeadCutting(void);
+	bool ShouldHeadCut(TraceResult* ptr, CBaseEntity* pEntity, Vector vecAbsMins, Vector vecAbsMaxs);
+	bool CanAttack(CBaseEntity* pOther);
+	void MaterialSound(TraceResult* ptr);
+	bool RangeAttack(TraceResult* ptr, Vector vecTraceDelta);
+	void Return(bool bResetFrame);
+	void SetAnimation(int sequence, bool bResetFrame);
+
+	void Fire(TraceResult* ptr, CBaseEntity* pOther, Vector vecAbsMins, Vector vecAbsMaxs);
+	void Attack(TraceResult* ptr, CBaseEntity* pOther);
+
+public:
+	float m_flDirectDamage;
+	float m_flHeadCutDamage;
+	short m_nCurrentAnimation;
+	int m_iModelIndex;
+	short m_iLostSpriteIndex;
+	int m_iHeadCutCounter;
+	time_point_t m_flHeadCutTime;
+	Vector m_vecInitialPos;
+	Vector m_vecImpactPos;
+	Vector m_vecMins, m_vecMaxs;
+
+	EHANDLE m_hHeadCutting;
+	std::vector<int> m_TargetVector;
+};
+
+class CGuillotineexAmmo : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+
+	int GetWeaponsId(void)
+	{
+		return WEAPON_GUILLOTINE;
+	}
+
+	float GetArmorRatio(void)
+	{
+		return 1.8;
+	}
+
+	KnockbackData GetKnockBackData() override { return { 450.0f, 350.0f, 400.0f, 300.0f, 1.0f }; }
+
+public:
+	void EXPORT FireThink(void);
+	void EXPORT ReturnThink(void);
+	void EXPORT FireTouch(CBaseEntity* pOther);
+	void EXPORT ReturnTouch(CBaseEntity* pOther);
+	void EXPORT HeadCutThink(void);
+
+public:
+	void Catched();
+	void CheckDamage();
+	bool ShouldCrashHalfway(void);
+	void Crash(void);
+	bool IsHeadCutting(void);
+	bool ShouldHeadCut(TraceResult* ptr, CBaseEntity* pEntity, Vector vecAbsMins, Vector vecAbsMaxs);
+	bool CanAttack(CBaseEntity* pOther);
+	void MaterialSound(TraceResult* ptr);
+
+
+public:
+	time_point_t m_flTimeReturn;
+	int m_iState;	//iuser1
+	int m_iHeadCutCounter;
+	EHANDLE m_hHeadCutting; //euser2
+	std::vector<int> m_TargetVector;
+	Vector m_vecDelta;
+	time_point_t m_flHeadCutTime;
+	float m_flDirectDamage;
+	float m_flHeadCutDamage;
+	
+	int m_iModelIndex;
+	short m_iLostSpriteIndex;
+};
 #endif
 
 #ifdef ENABLE_SHIELD
@@ -1109,6 +1315,7 @@ extern short g_sModelIndexLaserDot;
 
 extern short g_sModelIndexFireball;
 extern short g_sModelIndexSmoke;
+extern short g_sModelIndexSmokeBeam;
 extern short g_sModelIndexWExplosion;
 extern short g_sModelIndexBubbles;
 extern short g_sModelIndexBloodDrop;
@@ -1140,6 +1347,8 @@ extern short g_sModelIndexFrostGibs;
 extern short g_sModelIndexShockWave;
 extern short g_sModelIndexWind;
 extern short g_sModelIndexWindExp;
+
+extern short g_sModelIndexGuillotineGibs;
 
 void AnnounceFlashInterval(float interval, float offset = 0);
 

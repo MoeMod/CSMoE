@@ -3,7 +3,7 @@
 
 #include "mod_local.h"
 
-
-byte* Mod_LoadExtendSeq(const char *mod_name, byte *buffer);
+int Mod_NumExtendSeq(const char *mod_name);
+byte *Mod_LoadExtendSeq(const char *mod_name, byte *buffer, fs_offset_t *filesize);
 
 #endif

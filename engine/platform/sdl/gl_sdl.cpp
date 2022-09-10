@@ -27,6 +27,9 @@ GNU General Public License for more details.
 #include "gl4esinit.h"
 #include "gl4eshint.h"
 #endif
+#ifdef XASH_ANGLE
+#include <EGL/egl.h>
+#endif
 
 #ifdef WIN32
 // Enable NVIDIA High Performance Graphics while using Integrated Graphics.
@@ -409,8 +412,9 @@ GL_GetProcAddress
 */
 void EXPORT *GL_GetProcAddress( const char *name )
 {
-#if defined( XASH_NANOGL )
-	void *func = nanoGL_GetProcAddress(name);
+    // GetProcAddress for desktop OpenGL 1.x functions
+#if defined( XASH_NANOGL ) || defined( XASH_WES )
+	void *func = nullptr; // not supported
 #elif defined( XASH_QINDIEGL )
 	PROC wrap_wglGetProcAddress(LPCSTR s);
 	void* func = wrap_wglGetProcAddress(name);
@@ -492,12 +496,14 @@ void GL_UpdateSwapInterval( void )
 	if( gl_swapInterval->modified )
 	{
 		gl_swapInterval->modified = false;
-#ifndef XASH_QINDIEGL
+#if defined(XASH_ANGLE)
+        eglSwapInterval(eglGetCurrentDisplay(), gl_swapInterval->integer);
+#elif defined(XASH_QINDIEGL)
+        BOOL wglSwapInterval(int interval);
+		wglSwapInterval(gl_swapInterval->integer);
+#else
 		if( SDL_GL_SetSwapInterval( gl_swapInterval->integer ) )
 			MsgDev( D_ERROR, "SDL_GL_SetSwapInterval: %s\n", SDL_GetError( ) );
-#else
-		BOOL wglSwapInterval(int interval);
-		wglSwapInterval(gl_swapInterval->integer);
 #endif
 	}
 }
@@ -516,7 +522,7 @@ GL_SetupAttributes
 */
 void GL_SetupAttributes()
 {
-#ifdef XASH_QINDIEGL
+#if defined XASH_QINDIEGL || defined XASH_ANGLE
 	// stub
 #else
 	int samples;
@@ -912,7 +918,7 @@ void *GL4ES_GetProcAddress( const char *name )
 	if( !Q_strcmp(name, "glShadeModel") )
 		// combined gles/gles2/gl implementation exports this, but it is invalid
 		return NULL;
-	return GL_GetProcAddress( name );
+	return (void *)eglGetProcAddress( name );
 }
 #endif
 
@@ -926,8 +932,84 @@ qboolean GL_CreateContext( void )
 	int colorBits[3];
 #ifdef XASH_NANOGL
 	nanoGL_Init();
+	nanoGL_Init();
 #endif
-#ifdef XASH_QINDIEGL
+#ifdef XASH_ANGLE
+    // empty
+    EGLDisplay dpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if(dpy == nullptr)
+    {
+        MsgDev(D_ERROR, "GL_CreateContext: ANGLE eglGetDisplay failed\n");
+        return false;
+    }
+    EGLint version[2];
+    if(!eglInitialize(dpy, &version[0], &version[1]))
+    {
+        MsgDev(D_ERROR, "GL_CreateContext: ANGLE eglInitialize failed\n");
+        return false;
+    }
+    EGLint config_attr[] = {
+            EGL_STENCIL_SIZE, gl_stencilbits->integer,
+            EGL_DEPTH_SIZE, 8,
+            EGL_RED_SIZE,   8,
+            EGL_GREEN_SIZE, 8,
+            EGL_BLUE_SIZE,  8,
+            EGL_ALPHA_SIZE, 8,
+            EGL_NONE
+    };
+    EGLConfig config;
+    int num_config;
+    if(!eglChooseConfig(dpy, config_attr, &config, 1, &num_config))
+    {
+        MsgDev(D_ERROR, "GL_CreateContext: ANGLE eglChooseConfig failed\n");
+        return false;
+    }
+    EGLint context_attr[] = {
+            EGL_CONTEXT_CLIENT_VERSION, 2,
+            EGL_NONE
+    };
+    auto ctx = eglCreateContext(dpy, config, EGL_NO_CONTEXT, context_attr);
+    if(ctx == EGL_NO_CONTEXT)
+    {
+        MsgDev(D_ERROR, "GL_CreateContext: ANGLE eglCreateContext failed\n");
+        return false;
+    }
+
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+#ifdef __APPLE__
+    auto metalView = SDL_Metal_CreateView(host.hWnd);
+    auto hwnd = SDL_Metal_GetLayer(metalView);
+#elif defined _WIN32
+    auto hwnd = wmInfo.info.win.window;
+#endif
+    EGLint surface_attr[] = {
+            EGL_NONE
+    };
+    EGLSurface surface = eglCreateWindowSurface(dpy, config, hwnd, surface_attr);
+    if(surface == EGL_NO_SURFACE)
+    {
+        MsgDev(D_ERROR, "GL_CreateContext: ANGLE eglCreateWindowSurface failed\n");
+#ifdef __APPLE__
+        SDL_Metal_DestroyView(hwnd);
+#endif
+        eglDestroyContext(dpy, ctx);
+        return false;
+    }
+    if(!eglMakeCurrent(dpy, surface, surface, ctx))
+    {
+        MsgDev(D_ERROR, "GL_CreateContext: ANGLE eglMakeCurrent failed\n");
+#ifdef __APPLE__
+        SDL_Metal_DestroyView(hwnd);
+#endif
+        eglDestroySurface(dpy, surface);
+        eglDestroyContext(dpy, ctx);
+        return false;
+    }
+    glw_state.surface = surface;
+    glw_state.context = ctx;
+#elif defined XASH_QINDIEGL
 	void QindieGL_Init(void);
 	HGLRC wrap_wglCreateContext(HDC hdc);
 	QindieGL_Init();
@@ -997,7 +1079,9 @@ GL_UpdateContext
 */
 qboolean GL_UpdateContext( void )
 {
-#ifdef XASH_QINDIEGL
+#ifdef XASH_ANGLE
+    eglMakeCurrent(eglGetCurrentDisplay(), glw_state.surface, glw_state.surface, glw_state.context);
+#elif defined XASH_QINDIEGL
 	BOOL wrap_wglMakeCurrent(HDC hdc, HGLRC hglrc);
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
@@ -1030,7 +1114,10 @@ GL_DeleteContext
 */
 qboolean GL_DeleteContext( void )
 {
-#ifdef XASH_QINDIEGL
+#ifdef XASH_ANGLE
+    eglDestroySurface(eglGetCurrentDisplay(), glw_state.surface);
+    eglDestroyContext(eglGetCurrentDisplay(), glw_state.context);
+#elif defined XASH_QINDIEGL
 	HGLRC wrap_wglGetCurrentContext();
 	BOOL wrap_wglDeleteContext(HGLRC hglrc);
 	wrap_wglDeleteContext(wrap_wglGetCurrentContext());
@@ -1077,7 +1164,7 @@ qboolean R_Init_OpenGL( void )
 		return false;
 
 
-#ifdef XASH_QINDIEGL
+#if defined XASH_QINDIEGL || defined XASH_ANGLE
 	
 #else
 	GL_SetupAttributes();
@@ -1104,7 +1191,7 @@ void R_Free_OpenGL( void )
 
 	VID_DestroyWindow ();
 
-#ifdef XASH_QINDIEGL
+#if defined XASH_QINDIEGL || defined XASH_ANGLE
 
 #else
 	SDL_GL_UnloadLibrary ();

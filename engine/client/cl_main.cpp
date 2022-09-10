@@ -44,7 +44,6 @@ GNU General Public License for more details.
 #include <boost/asio/use_awaitable.hpp>
 
 #define MAX_TOTAL_CMDS		16
-#define MIN_CMD_RATE		10.0
 #define MAX_CMD_BUFFER		4000
 #define CONNECTION_PROBLEM_TIME	15.0	// 15 seconds
 
@@ -572,12 +571,10 @@ void CL_WritePacket( void )
 
 	CL_ComputePacketLoss ();
 
-#ifndef _DEBUG
-	if( cl_cmdrate->value < MIN_CMD_RATE )
-	{
-		Cvar_SetFloat( "cl_cmdrate", MIN_CMD_RATE );
-	}
-#endif
+    // clamp cmdrate
+    if( cl_cmdrate->value < 0.0f ) Cvar_SetFloat( "cl_cmdrate", 0.0f );
+    else if( cl_cmdrate->value > 100.0f ) Cvar_SetFloat( "cl_cmdrate", 100.0f );
+
 	Q_memset( data, 0, MAX_CMD_BUFFER );
 	BF_Init( &buf, "ClientData", data, sizeof( data ));
 
@@ -626,7 +623,8 @@ void CL_WritePacket( void )
 		int	outgoing_sequence;
 
 		if( cl_cmdrate->integer > 0 )
-			cls.nextcmdtime = host.realtime + ( 1.0f / cl_cmdrate->value );
+			cls.nextcmdtime = host.realtime + (1.0f / cl_cmdrate->value);
+			//cls.nextcmdtime = host.realtime + bound( 0.1f, ( 1.0f / cl_cmdrate->value ), 0.01f );
 		else cls.nextcmdtime = host.realtime; // always able to send right away
 
 		if( cls.lastoutgoingcommand == -1 )

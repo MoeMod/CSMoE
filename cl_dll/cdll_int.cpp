@@ -33,7 +33,8 @@
 #include "cl_entity.h"
 #include "cdll_exp.h"
 #include "events.h"
-
+#include "StudioModelRenderer.h"
+#include "GameStudioModelRenderer.h"
 #ifdef XASH_LUASH
 #include "luash_cl/lua_cl.h"
 #endif
@@ -56,11 +57,13 @@ fs_api_t gFileSystemAPI = { };
 CHud gHUD;
 int g_iXash = 0; // indicates a buildnum
 vec3_t g_velocity;
+long g_iDamage[MAX_CLIENTS + 1];
+long g_iDamageTotal[MAX_CLIENTS + 1];
 int g_iMobileAPIVersion = 0;
 void InitInput (void);
 void IN_Commands( void );
 void Input_Shutdown (void);
-
+extern engine_studio_api_t IEngineStudio;
 /*
 ==========================
 	Initialize
@@ -190,6 +193,14 @@ int DLLEXPORT HUD_VidInit( void )
 	gHUD.VidInit();
 
 	isLoaded = true;
+
+	CStudioModelRenderer::s_pBuffAugViewModel = IEngineStudio.Mod_ForName("models/v_buffaug.mdl", FALSE);
+	CStudioModelRenderer::s_pBuffAugSmokeModel = IEngineStudio.Mod_ForName("sprites/ef_buffaugsmoke.spr", FALSE);
+	CStudioModelRenderer::s_pBloodHunterViewModel = IEngineStudio.Mod_ForName("models/v_bloodhunter.mdl", FALSE);
+	CStudioModelRenderer::s_pMGSMViewModel = IEngineStudio.Mod_ForName("models/v_mgsm.mdl", FALSE);
+	CStudioModelRenderer::s_pMGSMLauncherModel = IEngineStudio.Mod_ForName("models/ef_mgsm_launcher.mdl", FALSE);
+	CStudioModelRenderer::s_pM1887xmasViewModel = IEngineStudio.Mod_ForName("models/v_m1887xmas.mdl", FALSE);
+	CStudioModelRenderer::s_pXmasEmptyModel = IEngineStudio.Mod_ForName("models/xmas_empty.mdl", FALSE);
 
 	//VGui_Startup();
 

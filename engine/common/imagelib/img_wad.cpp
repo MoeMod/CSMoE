@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include "sprite.h"
 #include "qfont.h"
 
+static byte mutable_pal[768];
+
 /*
 ============
 Image_LoadPAL
@@ -141,8 +143,8 @@ Image_SetMDLPointer
 Transfer buffer pointer before Image_LoadMDL
 ======================
 */
-void *g_mdltexdata;
-void Image_SetMDLPointer(byte *p)
+const void *g_mdltexdata;
+void Image_SetMDLPointer(const byte *p)
 {
 	g_mdltexdata = p;
 }
@@ -154,19 +156,19 @@ Image_LoadMDL
 */
 qboolean Image_LoadMDL( const char *name, const byte *buffer, size_t filesize )
 {
-	byte		*fin;
+	const byte		*fin;
 	size_t		pixels;
-	mstudiotexture_t	*pin;
+	const mstudiotexture_t	*pin;
 	int		flags;
 
-	pin = (mstudiotexture_t *)buffer;
+	pin = (const mstudiotexture_t *)buffer;
 	flags = pin->flags;
 
 	image.width = pin->width;
 	image.height = pin->height;
 	pixels = image.width * image.height;
 
-	fin = (byte *)g_mdltexdata;
+	fin = (const byte *)g_mdltexdata;
 	ASSERT(fin);
 	g_mdltexdata = NULL;
 
@@ -179,7 +181,8 @@ qboolean Image_LoadMDL( const char *name, const byte *buffer, size_t filesize )
 
 		if( flags & STUDIO_NF_TRANSPARENT )
 		{
-			byte	*pal = fin + pixels;
+			byte	*pal = mutable_pal;
+            Mem_VirtualCopy(pal, fin + pixels, 768);
 
 			// make transparent color is black, blue color looks ugly
 			pal[255*3+0] = pal[255*3+1] = pal[255*3+2] = 0;
@@ -266,7 +269,7 @@ Image_LoadLMP
 qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize )
 {
 	lmp_t	lmp;
-	byte	*fin, *pal;
+	const byte	*fin, *pal;
 	int	rendermode;
 	int	pixels;
 
@@ -287,11 +290,11 @@ qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize )
 		image.flags |= IMAGE_HAS_ALPHA;
 		rendermode = LUMP_QFONT;
 		filesize += sizeof(lmp);
-		fin = (byte *)buffer;
+		fin = (const byte *)buffer;
 	}
 	else
 	{
-		fin = (byte *)buffer;
+		fin = (const byte *)buffer;
 		Q_memcpy( &lmp, fin, sizeof( lmp ));
 		image.width = LittleLong(lmp.width);
 		image.height = LittleLong(lmp.height);
@@ -345,7 +348,8 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 {
 	mip_t	mip;
 	qboolean	hl_texture;
-	byte	*fin, *pal;
+    const byte	*fin;
+    byte *pal = nullptr;
 	int	ofs[4], rendermode;
 	int	i, pixels, numcolors;
 
@@ -356,6 +360,10 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 	}
 
 	Q_memcpy( &mip, buffer, sizeof( mip ));
+
+    // MoeMod : reproduce strlwr modification for sky
+    Q_strnlwr( mip.name, mip.name, sizeof( mip.name ));
+
 	image.width = LittleLong(mip.width);
 	image.height = LittleLong(mip.height);
 
@@ -371,11 +379,18 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 	if( image.hint != IL_HINT_Q1 && filesize >= (int)sizeof(mip) + ((pixels * 85)>>6) + sizeof(short) + 768)
 	{
 		// half-life 1.0.0.1 mip version with palette
-		fin = (byte *)buffer + ofs[0];
-		pal = (byte *)buffer + ofs[0] + (((image.width * image.height) * 85)>>6);
-		numcolors = LittleShort(*(short *)pal);
-		if( numcolors != 256 ) pal = NULL; // corrupted mip ?
-		else pal += sizeof( short ); // skip colorsize 
+		fin = (const byte *)buffer + ofs[0];
+		const byte *pal_buf = (const byte *)buffer + ofs[0] + (((image.width * image.height) * 85)>>6);
+		numcolors = LittleShort(*(const short *)pal_buf);
+		if( numcolors != 256 ) pal_buf = NULL; // corrupted mip ?
+		else pal_buf += sizeof( short ); // skip colorsize
+
+        pal = nullptr;
+        if(pal_buf)
+        {
+            pal = mutable_pal;
+            Mem_VirtualCopy(mutable_pal, pal_buf, 768);
+        }
 
 		hl_texture = true;
 
@@ -433,7 +448,7 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 	else if( image.hint != IL_HINT_HL && filesize >= (int)sizeof(mip) + ((pixels * 85)>>6))
 	{
 		// quake1 1.01 mip version without palette
-		fin = (byte *)buffer + ofs[0];
+		fin = (const byte *)buffer + ofs[0];
 		pal = NULL; // clear palette
 		rendermode = LUMP_NORMAL;
 

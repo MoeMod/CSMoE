@@ -1371,7 +1371,7 @@ void Host_FreeCommon( void )
 	Sound_Shutdown();
 	Netchan_Shutdown();
 	FS_Shutdown();
-
+	Cpu_Shutdown();
 	Mem_FreePool( &host.mempool );
 }
 /*

@@ -47,6 +47,8 @@ enum
 	WPN_SKULLT9,
 	WPN_WHIPSWORD,
 	WPN_Y22S2SFSWORD,
+	WPN_PIANOGUNEX,
+	WPN_DIVINETITAN,
 };
 
 enum
@@ -67,6 +69,12 @@ enum
 	WHIPSWORD_AIM_OFF,
 	WHIPSWORD_AIM_ON,
 	Y22S2SFSWORD_AIM_ON,
+	PIANOGUNEX_CRITICAL,
+	PIANOGUNEX_HEAL,
+	PIANOGUNEX_NULL,
+	DIVINETITAN_ON,
+	DIVINETITAN_BMODE,
+	DIVINETITAN_FULL,
 };
 
 int CHudSpecialCrossHair::Init()
@@ -132,6 +140,12 @@ int CHudSpecialCrossHair::VidInit()
 	R_InitTexture(m_pCurTexture[9], "sprites/whipsword_aim_off.tga");
 	R_InitTexture(m_pCurTexture[10], "sprites/whipsword_aim_on.tga");
 	R_InitTexture(m_pCurTexture[11], "sprites/y22s2sfsword_aim_on.tga");
+
+	R_InitTexture(m_pCurTexture[12], "resource/hud/buffclassskill_heal.tga");
+	R_InitTexture(m_pCurTexture[13], "resource/hud/buff_critical.tga");
+
+	R_InitTexture(m_pCurTexture[14], "sprites/divinetitan_aim_on.tga");
+	//R_InitTexture(m_pCurTexture[15], "sprites/ef_divinetitan_bmode.tga");
 	return 1;
 }
 
@@ -293,6 +307,115 @@ int CHudSpecialCrossHair::Draw(float flTime)
 
 
 		break;
+	}
+	case WPN_PIANOGUNEX:
+	{		
+		wide = 96 * 3;
+		height = 256 * 3;
+
+		float x1 = 0;
+		float x2 = ScreenWidth;
+		float y = ScreenHeight;
+		const float flScale = 0.0f;
+
+		float iX1, iY, iX2;
+		//Left UI
+		iX1 = x1;
+		iY = y - height;
+
+		//Right UI
+		iX2 = x2;
+
+		//Fade
+		float flAlpha;
+		float flFadeTime = flTime;
+		flFadeTime -= (int)flFadeTime;
+		flFadeTime -= 0.5;
+		flFadeTime = fabsf(flFadeTime);
+
+		//How long to fade?
+		flAlpha = flFadeTime + 0.5;
+		flAlpha *= 255;
+
+		float flMaxOffset;
+		flMaxOffset = ScreenHeight * 0.15;
+
+		float flMoved;
+		float flMoving = flTime;
+		flMoving -= (int)flMoving;
+		flMoving -= 0.005;
+		flMoving = fabsf(flMoving);
+		flMoved = flMoving + 0.005;
+		flMoved *= ScreenHeight * 0.015;
+
+		if (flMoved >= flMaxOffset)
+		{
+			flMoved = 0;
+		}
+
+		float iY4,iY3;
+		if(flMoved)
+			iY3 = iY4 = iY - flMoved;
+		else iY3 = iY4 = iY;
+
+		switch (iType)
+		{
+		case PIANOGUNEX_CRITICAL:
+		{
+			m_pCurTexture[13]->Draw2DQuadScaled(iX1, iY3, iX1 + wide, iY3 + height, 0, 0, 1, 1, 255, 255, 255, flAlpha);
+			m_pCurTexture[13]->Draw2DQuadScaled(iX2, iY4, iX2 - wide, iY4 + height, 0, 0, 1, 1, 255, 255, 255, flAlpha);
+
+			break;
+		}
+		case PIANOGUNEX_HEAL:
+		{
+			m_pCurTexture[12]->Draw2DQuadScaled(iX1, iY3, iX1 + wide, iY3 + height, 0, 0, 1, 1, 255, 255, 255, flAlpha);
+			m_pCurTexture[12]->Draw2DQuadScaled(iX2, iY4, iX2 - wide, iY4 + height, 0, 0, 1, 1, 255, 255, 255, flAlpha);
+
+			break;
+		}
+		case PIANOGUNEX_NULL:
+		{
+			return 1;
+		}
+		}
+		break;
+	}
+	case WPN_DIVINETITAN:
+	{
+		wide = 200;
+		height = 200;
+
+		float x = ScreenWidth / 2;
+		float y = ScreenHeight / 2;
+		const float flScale = 0.0f;
+		float iX, iY;
+		float iX2, iY2;
+		iX = x - wide / 2;
+		iY = y - height / 2;
+
+		float wide2, height2;
+		wide2 = 752;
+		height2 = 752;
+		iX2 = x - wide2 / 2;
+		iY2 = y - height2 / 2;
+
+		switch (iType)
+		{
+		case DIVINETITAN_ON:m_pCurTexture[14]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		//case DIVINETITAN_BMODE:m_pCurTexture[15]->Draw2DQuadScaled(iX2, iY2, iX + wide2, iY + height2); break;
+		case DIVINETITAN_FULL :
+		{
+			m_pCurTexture[14]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+			//m_pCurTexture[15]->Draw2DQuadScaled(iX2, iY2, iX + wide2, iY + height2); break;
+		}
+		case AIM_NO:return 1;
+		default:
+			break;
+		}
+
+
+
 	}
 	}
 

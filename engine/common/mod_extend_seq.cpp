@@ -41,7 +41,27 @@ file_t* g_hSequencePack[MAX_SEQUENCEPACKS];
 fs_offset_t g_nSequenceSize[MAX_SEQUENCEPACKS];
 int g_iSequenceNums = 0;
 
-byte *Mod_LoadExtendSeq(const char *mod_name, byte *buffer)
+int Mod_NumExtendSeq(const char *mod_name)
+{
+    int result = 0;
+    char newname[PATH_MAX];
+    strcpy(newname, mod_name);
+    newname[strlen(newname) - 4] = 0;
+    for (int i = 0; i < MAX_SEQUENCEPACKS; i++)
+    {
+        char filename[PATH_MAX];
+        sprintf(filename, "%s%d.seq", newname, i + 1);
+        auto f = FS_Open(filename, "rb", false);
+        if (!f)
+            break;
+
+        FS_Close(f);
+        ++result;
+    }
+    return result;
+}
+
+byte *Mod_LoadExtendSeq(const char *mod_name, byte *buffer, fs_offset_t *filesize)
 {
 	// flip to native endian
 #ifdef XASH_BIG_ENDIAN
@@ -67,31 +87,31 @@ byte *Mod_LoadExtendSeq(const char *mod_name, byte *buffer)
 
 	if (g_iSequenceNums > 0)
 	{
-		int totalsize = 0;
+		int totalsize = studiohdr->length;
 
 		for (int i = 0; i < g_iSequenceNums; i++)
-			totalsize += g_nSequenceSize[i];
+			totalsize += g_nSequenceSize[i] + sizeof(mstudioseqdesc_t) * 256;
 
+        totalsize += sizeof(mstudiotexture_t) * studiohdr->numtextures;
+
+        int texdatasize = studiohdr->length - studiohdr->texturedataindex;
 		if (totalsize)
 		{
-			static byte newbuf[0x5000000];
-			memset(newbuf, 0, sizeof(newbuf));
-			memcpy(newbuf, buffer, LittleLong(studiohdr->length));
-			buffer = newbuf;
+            byte *new_buf = (byte *)FS_MapAlloc(totalsize);
+            Mem_VirtualCopy(new_buf, buffer, LittleLong(studiohdr->length));
+            FS_MapFree((const byte *)buffer, *filesize);
+            buffer = new_buf;
+            *filesize = totalsize;
 			studiohdr = reinterpret_cast<studiohdr_t*>(buffer);
 		}
 
 		mstudiotexture_t* ptexture = (mstudiotexture_t*)((byte*)studiohdr + studiohdr->textureindex);
-		int texdatasize = 0;
-
-		for (int i = 0; i < studiohdr->numtextures; i++)
-			texdatasize += ptexture[i].width * ptexture[i].height + 256 * 3;
 
 		mstudiotexture_t* texbuf = (mstudiotexture_t*)Mem_Alloc( com_studiocache, studiohdr->numtextures * sizeof(mstudiotexture_t));
 		memcpy(texbuf, ptexture, studiohdr->numtextures * sizeof(mstudiotexture_t));
 
 		byte* texdatabuf = (byte*)Mem_Alloc( com_studiocache, texdatasize);
-		memcpy(texdatabuf, (byte*)studiohdr + studiohdr->texturedataindex, texdatasize);
+        Mem_VirtualCopy(texdatabuf, (byte*)studiohdr + studiohdr->texturedataindex, texdatasize);
 
 		int offset = 0;
 		int endpos = studiohdr->texturedataindex;
@@ -167,15 +187,14 @@ byte *Mod_LoadExtendSeq(const char *mod_name, byte *buffer)
 		ptexture = (mstudiotexture_t*)endbuf;
 		studiohdr->textureindex = endbuf - (byte*)studiohdr;
 		endbuf += sizeof(mstudiotexture_t) * studiohdr->numtextures;
-		texdatasize = 0;
+        int texoffset = endbuf - buffer - studiohdr->texturedataindex;
 
 		for (int i = 0; i < studiohdr->numtextures; i++)
 		{
-			ptexture[i].index = (endbuf + texdatasize) - (byte*)studiohdr;
-			texdatasize += ptexture[i].width * ptexture[i].height + 256 * 3;
+			ptexture[i].index += texoffset;
 		}
 
-		memcpy(endbuf, texdatabuf, texdatasize);
+		Mem_VirtualCopy(endbuf, texdatabuf, texdatasize);
 
 		studiohdr->texturedataindex = endbuf - (byte*)studiohdr;
 		endbuf += texdatasize;

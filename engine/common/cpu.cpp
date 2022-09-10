@@ -30,3 +30,10 @@ int Cpu_GetInstalledRamMegaBytes(void)
 	return 0;
 #endif
 }
+
+void Cpu_Shutdown(void)
+{
+#ifdef XASH_CPUINFO
+	cpuinfo_deinitialize();
+#endif
+}

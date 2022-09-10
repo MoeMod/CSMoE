@@ -30,9 +30,23 @@ GNU General Public License for more details.
 #include "physics.h"
 #endif
 
+// TBB and <execution> is only supported on win32
+#ifdef _WIN32
+#define XASH_RENDER_PAR 1
+#endif
+
+#ifdef XASH_RENDER_PAR
+#ifdef XASH_TBBMALLOC
+#include "tbb/parallel_for_each.h"
+#else
+#include <execution>
+#endif
+#endif
+
 // NOTE: enable this if you want merge both 'model' and 'modelT' files into one model slot.
 // otherwise it's uses two slots in models[] array for models with external textures
-#define STUDIO_MERGE_TEXTURES
+// MoeMod : disabled due to crash in CSMoE win32
+// #define STUDIO_MERGE_TEXTURES
 
 #define EVENT_CLIENT	5000	// less than this value it's a server-side studio events
 #define MAXARRAYVERTS	20000	// used for draw shadows
@@ -63,6 +77,12 @@ const char *legs_bones[] =
  "Bip01 R Foot" ,
 };
 
+typedef struct studiolight_item_s
+{
+	vec3_t vec[MAXSTUDIOBONES];
+	vec3_t color;	// ambient light colors
+} studiolight_item_t;
+
 typedef struct studiolight_s
 {
 	vec3_t		lightvec;			// light vector
@@ -70,10 +90,8 @@ typedef struct studiolight_s
 	vec3_t		lightspot;		// potential coords where placed lightsource
 
 	vec3_t		blightvec[MAXSTUDIOBONES];	// ambient lightvectors per bone
-	vec3_t		dlightvec[MAX_DLIGHTS][MAXSTUDIOBONES];
-	vec3_t		dlightcolor[MAX_DLIGHTS];	// ambient dynamic light colors
-	vec3_t		elightvec[MAX_ELIGHTS][MAXSTUDIOBONES];
-	vec3_t		elightcolor[MAX_ELIGHTS];	// ambient entity light colors
+	studiolight_item_t	dlight[MAX_DLIGHTS];
+	studiolight_item_t	elight[MAX_ELIGHTS];
 	int		numdlights;
 	int		numelights;
 } studiolight_t;
@@ -1575,13 +1593,13 @@ void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
 				lightinfo->shadelight += atten;
 			}
 
-			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->dlightvec[plight->numdlights][i] );
-			VectorScale( plight->dlightvec[plight->numdlights][i], atten, plight->dlightvec[plight->numdlights][i] );
+			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->dlight[plight->numdlights].vec[i] );
+			VectorScale( plight->dlight[plight->numdlights].vec[i], atten, plight->dlight[plight->numdlights].vec[i] );
 		}
 
-		plight->dlightcolor[plight->numdlights][0] = dl->color.r * (1.0f / 255.0f);
-		plight->dlightcolor[plight->numdlights][1] = dl->color.g * (1.0f / 255.0f);
-		plight->dlightcolor[plight->numdlights][2] = dl->color.b * (1.0f / 255.0f);
+		plight->dlight[plight->numdlights].color[0] = dl->color.r * (1.0f / 255.0f);
+		plight->dlight[plight->numdlights].color[1] = dl->color.g * (1.0f / 255.0f);
+		plight->dlight[plight->numdlights].color[2] = dl->color.b * (1.0f / 255.0f);
 		plight->numdlights++;
 	}
 
@@ -1661,13 +1679,13 @@ void GAME_EXPORT R_StudioEntityLight( alight_t *lightinfo )
 				lightinfo->shadelight += atten;
 			}
 
-			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->elightvec[plight->numelights][i] );
-			VectorScale( plight->elightvec[plight->numelights][i], atten, plight->elightvec[plight->numelights][i] );
+			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->elight[plight->numelights].vec[i] );
+			VectorScale( plight->elight[plight->numelights].vec[i], atten, plight->elight[plight->numelights].vec[i] );
 		}
 
-		plight->elightcolor[plight->numelights][0] = el->color.r * (1.0f / 255.0f);
-		plight->elightcolor[plight->numelights][1] = el->color.g * (1.0f / 255.0f);
-		plight->elightcolor[plight->numelights][2] = el->color.b * (1.0f / 255.0f);
+		plight->elight[plight->numelights].color[0] = el->color.r * (1.0f / 255.0f);
+		plight->elight[plight->numelights].color[1] = el->color.g * (1.0f / 255.0f);
+		plight->elight[plight->numelights].color[2] = el->color.b * (1.0f / 255.0f);
 		plight->numelights++;
 	}
 
@@ -1693,7 +1711,7 @@ void GAME_EXPORT R_StudioSetupLighting( alight_t *lightinfo )
 	if( !m_pStudioHeader || !lightinfo )
 		return;
 
-	plight = &g_studiolight; 
+	plight = &g_studiolight;
 
 	for( i = 0; i < m_pStudioHeader->numbones; i++ )
 		Matrix3x4_VectorIRotate( g_lighttransform[i], *lightinfo->plightvec, plight->blightvec[i] );
@@ -1724,7 +1742,7 @@ void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 		return;
 	}
 
-	plight = &g_studiolight; 
+	plight = &g_studiolight;
 	ambient = max( 0.1f, r_lighting_ambient->value ); // to avoid divison by zero
 	VectorScale( plight->lightcolor, ambient, illum );
 
@@ -1742,37 +1760,34 @@ void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 		if( lightcos > 1.0f ) lightcos = 1;
 		VectorAdd( illum, plight->lightcolor, illum );
 
-		r = r_studio_lambert->value;
-		if( r < 1.0f ) r = 1.0f;
+		r = max(r_studio_lambert->value, 1.0f);
 		lightcos = (lightcos + ( r - 1.0f )) / r; // do modified hemispherical lighting
 		if( lightcos > 0.0f ) VectorMA( illum, -lightcos, plight->lightcolor, illum );
-		
-		if( illum[0] <= 0.0f ) illum[0] = 0.0f;
-		if( illum[1] <= 0.0f ) illum[1] = 0.0f;
-		if( illum[2] <= 0.0f ) illum[2] = 0.0f;
+
+		illum = maxs(illum, {});
 
 		// now add all dynamic lights
 	//	#pragma omp parallel for
 		for( i = 0; i < plight->numdlights; i++)
 		{
-			lightcos = -DotProduct( normal, plight->dlightvec[i][bone] );
-			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->dlightcolor[i], illum );
+			lightcos = -DotProduct( normal, plight->dlight[i].vec[bone] );
+			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->dlight[i].color, illum );
 		}
 
 		// now add all entity lights
 		//#pragma omp parallel for
 		for( i = 0; i < plight->numelights; i++)
 		{
-			lightcos = -DotProduct( normal, plight->elightvec[i][bone] );
-			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->elightcolor[i], illum );
+			lightcos = -DotProduct( normal, plight->elight[i].vec[bone] );
+			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->elight[i].color, illum );
 		}
 	}
-	
+
 	_max = VectorMaxElement( illum );
 
 	if( _max > 1.0f )
 		VectorScale( illum, ( 1.0f / _max ), lv );
-	else VectorCopy( illum, lv ); 
+	else VectorCopy( illum, lv );
 
 }
 
@@ -1835,8 +1850,7 @@ static void GAME_EXPORT R_StudioSetupSkin( mstudiotexture_t *ptexture, int index
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
 		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
 
-    xe::TexLru_Upload(&ptexture[pskinref[index]]);
-	GL_Bind( XASH_TEXTURE0, ptexture[pskinref[index]].index );
+    xe::TexLru_Bind(&ptexture[pskinref[index]]);
 }
 
 /*
@@ -2041,17 +2055,14 @@ static void R_StudioDrawPoints_legacy( void )
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
 
-		g_nFaceFlags = ptexture[pskinref[pmesh->skinref]].flags;
-		s = 1.0f / (float)ptexture[pskinref[pmesh->skinref]].width;
-		t = 1.0f / (float)ptexture[pskinref[pmesh->skinref]].height;
+        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		g_nFaceFlags = attr.flags;
+		s = 1.0f / (float)attr.width;
+		t = 1.0f / (float)attr.height;
 
 		if( g_iRenderMode != kRenderTransAdd )
 			pglDepthMask( GL_TRUE );
 		else pglDepthMask( GL_FALSE );
-
-		// check bounds
-		if( ptexture[pskinref[pmesh->skinref]].index < 0 || ptexture[pskinref[pmesh->skinref]].index > R_TextureNum() )
-			ptexture[pskinref[pmesh->skinref]].index = tr.defaultTexture;
 
 		if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 		{
@@ -2106,8 +2117,7 @@ static void R_StudioDrawPoints_legacy( void )
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
-            xe::TexLru_Upload(&ptexture[pskinref[pmesh->skinref]]);
-			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
+            xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 
 		while( ( i = *( ptricmds++ ) ) )
@@ -2417,17 +2427,14 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
 
-		g_nFaceFlags = ptexture[pskinref[pmesh->skinref]].flags;
-		s = 1.0f / (float)ptexture[pskinref[pmesh->skinref]].width;
-		t = 1.0f / (float)ptexture[pskinref[pmesh->skinref]].height;
+        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		g_nFaceFlags = attr.flags;
+		s = 1.0f / (float)attr.width;
+		t = 1.0f / (float)attr.height;
 
 		if( g_iRenderMode != kRenderTransAdd )
 			pglDepthMask( GL_TRUE );
 		else pglDepthMask( GL_FALSE );
-
-		// check bounds
-		if( ptexture[pskinref[pmesh->skinref]].index < 0 || ptexture[pskinref[pmesh->skinref]].index > R_TextureNum() )
-			ptexture[pskinref[pmesh->skinref]].index = tr.defaultTexture;
 
 		if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 		{
@@ -2524,8 +2531,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
-            xe::TexLru_Upload(&ptexture[pskinref[pmesh->skinref]]);
-			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
+            xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 
 		if (RI.currententity->curstate.renderfx == kRenderFxWallHack) {
@@ -2615,8 +2621,9 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 #ifdef STUDIO_SKINNING_OMP_MIN
 #pragma omp parallel for private(i) if(m_pSubModel->numverts > STUDIO_SKINNING_OMP_MIN)
 #endif
-	for (i = 0; i < m_pSubModel->numverts; i++)
+	auto vert_calc_fn = [pvertbone, pstudioverts](vec3_t &v)
 	{
+		int i = &v - g_xformverts;
 		Matrix3x4_VectorTransform(g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i]);
 		//scale multi by Rentro
 		if (RI.currententity->curstate.scale != 1.0f) {
@@ -2630,7 +2637,17 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 			VectorAdd(g_xformverts[i], temp2, g_xformverts[i]);
 			g_xformverts[i][2] += scale_offset * (RI.currententity->curstate.scale - 1.0f);
 		}
-	}
+	};
+#ifdef XASH_RENDER_PAR
+#ifdef XASH_TBBMALLOC
+	tbb::parallel_for_each(g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
+#else
+	std::for_each(std::execution::par_unseq, g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
+#endif
+#else
+	std::for_each(g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
+#endif
+
 	if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 	{
 		scale = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
@@ -2641,21 +2658,40 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 
 	for( j = 0; j < m_pSubModel->nummesh; j++ )
 	{
-		g_nFaceFlags = ptexture[pskinref[pmesh[j].skinref]].flags;
+        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		g_nFaceFlags = attr.flags;
 
 		// fill in sortedmesh info
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
-
-		for( i = 0; i < pmesh[j].numnorms; i++, pstudionorms++, pnormbone++ )
+		auto norm_calc_fn = [pnormbone, pstudionorms](vec3_t& v)
 		{
-			R_StudioLighting( g_lightvalues[i], *pnormbone, g_nFaceFlags, *pstudionorms );
+			int i = &v - g_lightvalues;
+			R_StudioLighting(g_lightvalues[i], pnormbone[i], g_nFaceFlags, pstudionorms[i]);
+		};
 
+		auto chrome_calc_fn = [pnormbone, pstudionorms](vec2_t& v)
+		{
+			int i = &v - g_chrome;
+			
 			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 			{
-				R_StudioSetupChrome( g_chrome[i], *pnormbone, *pstudionorms );
+				R_StudioSetupChrome(g_chrome[i], pnormbone[i], pstudionorms[i]);
 			}
-		}
+		};
+
+#ifdef XASH_RENDER_PAR
+#ifdef XASH_TBBMALLOC
+		tbb::parallel_for_each(g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
+		tbb::parallel_for_each(g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
+#else
+		std::for_each(std::execution::par_unseq, g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
+		std::for_each(std::execution::par_unseq, g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
+#endif
+#else
+		std::for_each(g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
+		std::for_each(g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
+#endif
 	}
 
 	if( r_studio_sort_textures->integer )
@@ -3084,6 +3120,9 @@ int GameStudioRenderer_StudioDrawPlayer(int flags, struct entity_state_s* pplaye
 
 		auto model = R_StudioSetupPlayerModel(playerindex - 1);
 
+		if (!model)
+			return pStudioDraw->StudioDrawPlayer(flags, pplayer);
+
 		int iActivityType = GetSequenceActivityType(model, pplayer);
 
 		auto ragdoll = gPhysicsManager.FindRagdoll(playerindex);
@@ -3385,19 +3424,26 @@ Deform vertices by specified lightdir
 void R_StudioDeformShadow( void )
 {
 	float		*verts, dist, dist2;
-	int		numVerts;
 
 	dist = g_shadowTrace.plane.dist + 1.0f;
 	dist2 = -1.0f / DotProduct( g_mvShadowVec, g_shadowTrace.plane.normal );
 	VectorScale( g_mvShadowVec, dist2, g_mvShadowVec );
 
-	for( numVerts = 0;
-		 numVerts < g_nNumArrayVerts;
-		 numVerts++ )
+	auto vert_calc_fn = [dist](vec3_t& v)
 	{
-		dist2 = DotProduct( g_xarrayverts[numVerts], g_shadowTrace.plane.normal ) - dist;
-		if( dist2 > 0.0f ) VectorMA( g_xarrayverts[numVerts], dist2, g_mvShadowVec, g_xarrayverts[numVerts] );
-	}
+		float dist3 = DotProduct(v, g_shadowTrace.plane.normal) - dist;
+		if (dist3 > 0.0f) VectorMA(v, dist3, g_mvShadowVec, v);
+	};
+
+#ifdef XASH_RENDER_PAR
+#ifdef XASH_TBBMALLOC
+	tbb::parallel_for_each(g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
+#else
+	std::for_each(std::execution::par_unseq, g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
+#endif
+#else
+	std::for_each(g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
+#endif
 }
 
 static void R_StudioDrawPlanarShadow( void )
@@ -4140,7 +4186,7 @@ R_StudioLoadTexture
 load model texture with unique name
 ====================
 */
-static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture_t *ptexture )
+static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const mstudiotexture_t *ptexture )
 {
 	size_t		size;
 	int		flags = 0;
@@ -4148,21 +4194,23 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 	char		texname[128], name[128], mdlname[128];
 	imgfilter_t	*filter = NULL;
 	texture_t		*tx = NULL;
+    int	gl_texturenum = 0;
 	
 	if( ptexture->flags & STUDIO_NF_NORMALMAP )
 		flags |= (TF_NORMALMAP);
 
-#if TARGET_OS_IPHONE
+#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
 	// dont build mipmap on iOS to reduce memory usage
 	flags |= TF_NOPICMIP|TF_NOMIPMAP;
 #endif
 
+#if 0 // Useless feature in CSMoE, removed for optimization
 	// store some textures for remapping
 	if( !Q_strnicmp( ptexture->name, "DM_Base", 7 ) || !Q_strnicmp( ptexture->name, "remap", 5 ))
 	{
 		int	i;
 		char	val[6];
-		byte	*pixels;
+		const byte	*pixels;
 
 		i = mod->numtextures;
 		mod->textures = (texture_t **)Mem_Realloc( mod->mempool, mod->textures, ( i + 1 ) * sizeof( texture_t* ));
@@ -4196,7 +4244,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		tx->height = ptexture->height;
 
 		// the pixels immediately follow the structures
-		pixels = (byte *)phdr + ptexture->index;
+		pixels = (const byte *)phdr + ptexture->index;
         Mem_VirtualCopy( tx+1, pixels, size );
 
 		ptexture->flags |= STUDIO_NF_COLORMAP;	// yes, this is colormap image
@@ -4204,6 +4252,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 
 		mod->numtextures++;	// done
 	}
+#endif
 
 	Q_strncpy( mdlname, mod->name, sizeof( mdlname ));
 	FS_FileBase( ptexture->name, name );
@@ -4216,7 +4265,6 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 	// NOTE: colormaps must have the palette for properly work. Ignore it.
 	if( Mod_AllowMaterials( ) && !( ptexture->flags & STUDIO_NF_COLORMAP ))
 	{
-		int	gl_texturenum = 0;
 
 		Q_snprintf( texname, sizeof( texname ), "materials/%s/%s.tga", mdlname, name );
 
@@ -4227,12 +4275,11 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 
 		if( gl_texturenum )
 		{
-			ptexture->index = gl_texturenum;
+            xe::TexLru_CreateAttr(ptexture, gl_texturenum);
 			load_external = true; // sucessfully loaded
 		}
 	}
 
-    int gl_texturenum = 0;
     do {
         // CSO Texture Load
         if (name[0] == '#' || name[0] == '@')
@@ -4293,27 +4340,16 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
         gltexture_t *gltex = R_GetTexture(gl_texturenum);
         if (gltex)
         {
-            ptexture->index = gl_texturenum;
-            ptexture->width = gltex->width;
-            ptexture->height = gltex->height;
+            xe::TexLru_CreateAttr(ptexture, gl_texturenum);
             load_external = true; // sucessfully loaded
         }
     }
-
-    if ( name[0] == '$' )
-	{
-		if ( name[1] == '0' && name[2] == 'b' )
-		{
-			ptexture->flags |= STUDIO_NF_ADDITIVE;
-			ptexture->flags |= STUDIO_NF_FULLBRIGHT;
-		}
-	}
 
 	if( !load_external )
 	{
 		// NOTE: replace index with pointer to start of imagebuffer, ImageLib expected it
 		//ptexture->index = (int)((byte *)phdr) + ptexture->index;
-		Image_SetMDLPointer((byte *)phdr + ptexture->index);
+		Image_SetMDLPointer((const byte *)phdr + ptexture->index);
 		size = sizeof( mstudiotexture_t ) + ptexture->width * ptexture->height + 768;
 
 		if( host.features & ENGINE_DISABLE_HDTEXTURES && ptexture->flags & STUDIO_NF_TRANSPARENT )
@@ -4321,20 +4357,22 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 
 		// build the texname
 		Q_snprintf( texname, sizeof( texname ), "#%s/%s.mdl", mdlname, name );
-        ptexture->index = xe::TexLru_LoadTextureInternal(texname, mod->name, ptexture, size, flags, filter);
+        gl_texturenum = xe::TexLru_LoadTextureInternal(texname, mod->name, phdr, ptexture, size, flags, filter);
+        xe::TexLru_CreateAttr(ptexture, gl_texturenum);
 	}
 	else MsgDev( D_NOTE, "Loading HQ: %s\n", texname );
 
-	if( !ptexture->index )
+	if( !gl_texturenum )
 	{
 		MsgDev( D_WARN, "%s has null texture %s\n", mod->name, ptexture->name );
-		ptexture->index = tr.defaultTexture;
+        gl_texturenum = tr.defaultTexture;
+        xe::TexLru_CreateAttr(ptexture, gl_texturenum);
 	}
 	else
 	{
 		// duplicate texnum for easy acess 
-		if( tx ) tx->gl_texturenum = ptexture->index;
-		GL_SetTextureType( ptexture->index, TEX_STUDIO );
+		if( tx ) tx->gl_texturenum = gl_texturenum;
+		GL_SetTextureType( gl_texturenum, TEX_STUDIO );
         // upload immediately
        // xe::TexLru_Upload(ptexture);
 	}
@@ -4345,17 +4383,16 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 R_StudioLoadHeader
 =================
 */
-studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
+const studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
 {
-	byte		*pin;
-	studiohdr_t	*phdr;
-	mstudiotexture_t	*ptexture;
+    const byte		*pin;
+    const studiohdr_t	*phdr;
 	int		i;
 
 	if( !buffer ) return NULL;
 
-	pin = (byte *)buffer;
-	phdr = (studiohdr_t *)pin;
+	pin = (const byte *)buffer;
+	phdr = (const studiohdr_t *)pin;
 	i = LittleLong(phdr->version);
 
 	if( i != STUDIO_VERSION )
@@ -4368,17 +4405,7 @@ studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
 	Mod_StudioBigEndian( mod, phdr );
 #endif
 
-	if( !Host_IsDedicated() )
-	{
-		ptexture = (mstudiotexture_t *)(((byte *)phdr) + phdr->textureindex);
-		if( phdr->textureindex > 0 && phdr->numtextures <= MAXSTUDIOSKINS )
-		{
-			for( i = 0; i < phdr->numtextures; i++ )
-				R_StudioLoadTexture( mod, phdr, &ptexture[i] );
-		}
-	}
-
-	return (studiohdr_t *)buffer;
+	return (const studiohdr_t *)buffer;
 }
 
 /*
@@ -4386,9 +4413,9 @@ studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
 Mod_LoadStudioModel
 =================
 */
-void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
+void Mod_LoadStudioModel( model_t *mod, const byte *buffer, size_t filesize, qboolean *loaded )
 {
-	studiohdr_t	*phdr;
+    const studiohdr_t	*phdr;
 
 	if( loaded ) *loaded = false;
 	loadmodel->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", loadmodel->name ));
@@ -4400,7 +4427,7 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 #ifdef STUDIO_MERGE_TEXTURES
 	if( phdr->numtextures == 0 )
 	{
-		studiohdr_t	*thdr;
+        const studiohdr_t	*thdr;
 		byte		*in, *out;
 		void		*buffer2 = NULL;
 		size_t		size1, size2;
@@ -4443,9 +4470,23 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	}
 #else
 	// just copy model into memory
-	loadmodel->cache.data = Mem_Alloc( loadmodel->mempool, phdr->length );
-	Mem_VirtualCopy( loadmodel->cache.data, buffer, phdr->length );
+	loadmodel->cache.data = (void *)buffer; // Mem_Alloc( loadmodel->mempool, phdr->length );
+    loadmodel->buffer = buffer;
+    loadmodel->buffer_size = filesize;
+    phdr = (const studiohdr_t *)loadmodel->cache.data;
 #endif
+
+    // load model
+    if( !Host_IsDedicated() )
+    {
+        const mstudiotexture_t	*ptexture = (const mstudiotexture_t *)(((const byte *)phdr) + phdr->textureindex);
+        if( phdr->textureindex > 0 && phdr->numtextures <= MAXSTUDIOSKINS )
+        {
+            for( int i = 0; i < phdr->numtextures; i++ )
+                R_StudioLoadTexture( mod, phdr, &ptexture[i] );
+        }
+    }
+
 	// setup bounding box
 	VectorCopy( phdr->bbmin, loadmodel->mins );
 	VectorCopy( phdr->bbmax, loadmodel->maxs );
@@ -4455,6 +4496,7 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	loadmodel->flags = phdr->flags; // copy header flags
 
 	// check for static model
+#if 0
 	if( phdr->numseqgroups == 1 && phdr->numseq == 1 && phdr->numbones == 1 )
 	{
 		mstudioseqdesc_t	*pseqdesc = (mstudioseqdesc_t *)((byte *)phdr + phdr->seqindex);
@@ -4465,7 +4507,7 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 		if( pseqdesc->numframes == 1 || pseqdesc->numframes == 30 )
 			pseqdesc->flags |= STUDIO_STATIC;
 	}
-
+#endif
 	if( loaded ) *loaded = true;
 }
 
@@ -4495,10 +4537,11 @@ void Mod_UnloadStudioModel( model_t *mod )
 	{
 		if( ptexture[i].index == tr.defaultTexture )
 			continue;
-		GL_FreeTexture( ptexture[i].index );
+		xe::TexLru_FreeTexture( &ptexture[i] );
 	}
 
 	Mem_FreePool( &mod->mempool );
+    FS_MapFree((const byte *)mod->buffer, mod->buffer_size);
 	Q_memset( mod, 0, sizeof( *mod ));
 }
 		

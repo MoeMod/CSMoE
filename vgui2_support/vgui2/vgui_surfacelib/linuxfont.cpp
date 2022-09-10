@@ -209,7 +209,7 @@ static FcPattern* FontMatch(const char* type, ...)
 }
 #endif
 
-bool CLinuxFont::CreateFromMemory(const char *windowsFontName, void *data, int datasize, int tall, int weight, int blur, int scanlines, int flags)
+bool CLinuxFont::CreateFromMemory(const char *windowsFontName, const void *data, int datasize, int tall, int weight, int blur, int scanlines, int flags)
 {
 	// setup font properties
 	m_szName = windowsFontName;
@@ -234,7 +234,7 @@ bool CLinuxFont::CreateFromMemory(const char *windowsFontName, void *data, int d
 	}
 
 	Assert( !m_faceValid );
-	FT_Error error = FT_New_Memory_Face( FontManager().GetFontLibraryHandle(), (FT_Byte *)data, datasize, 0, &m_face );
+	FT_Error error = FT_New_Memory_Face( FontManager().GetFontLibraryHandle(), (const FT_Byte *)data, datasize, 0, &m_face );
 	if ( error ) 
 	{
 		// FT_Err_Unknown_File_Format?

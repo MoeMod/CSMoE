@@ -193,6 +193,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_flying.cpp
 	./gamemode/zb2/zb2_zclass_nemesis.cpp
 	./balrog11cannon.cpp
+	./bunkerbuster.cpp
 	./gamemode/mod_zbz.cpp
 	./gamemode/zbz/zbz_skill.cpp
 	./map_manager.cpp
@@ -233,6 +234,24 @@ set(HLDLL_SRCS
 	./wondercannonchain.cpp
 	./y22s2sfpistolfield.cpp
 	./pianogunwave.cpp
+	./client/wdnmd.cpp
+	./database/db_config.cpp
+	./database/db_main.cpp
+	./gamemode/mod_zb3zp.cpp
+	./lockongun_missile.cpp
+	./gamemode/zb3zp/zp_zclass_alien_boss.cpp
+	./gamemode/zb3zp/zp_zclass_source.cpp
+	./gamemode/zb3zp/zp_zclass_tank.cpp
+	./gamemode/zb3zp/zp_zclass_alien_infected.cpp
+	./gamemode/zb3zp/zp_zclass_ap.cpp
+	./gamemode/zb3zp/zp_zclass_hostex.cpp
+	./gamemode/zb3zp/zp_zclass_licker.cpp
+	./gamemode/zb3zp/zp_zclass_nohead.cpp
+	./gamemode/zb3zp/zp_zclass_pyrammid.cpp
+	./gamemode/zb3zp/zp_zclass_tf.cpp
+	./gamemode/zb3zp/zp_zclass_human.cpp
+	./guillotineammo.cpp
+	./guillotineexammo.cpp
 	)
 
 set (HLWPN_SRCS
@@ -462,7 +481,66 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfpistol.cpp
 	../dlls/wpn_shared/wpn_y22s2sfpistol.cpp
 	../dlls/wpn_shared/wpn_pianogun.cpp
+	../dlls/wpn_shared/wpn_pianogunex.cpp
 	../dlls/wpn_shared/wpn_stunrifle.cpp
+	../dlls/wpn_shared/z4b_ragingbull.cpp
+	../dlls/wpn_shared/wpn_kronos12.cpp
+	../dlls/wpn_shared/wpn_crossbowex21.cpp
+	../dlls/wpn_shared/wpn_buffawp.cpp
+	../dlls/wpn_shared/wpn_divinetitan.cpp
+	../dlls/wpn_shared/wpn_railcannon.cpp
+	../dlls/wpn_shared/wpn_skull11.cpp
+	../dlls/wpn_shared/wpn_janus11.cpp
+	../dlls/wpn_shared/wpn_crow5.cpp
+	../dlls/wpn_shared/wpn_janusmk5.cpp
+	../dlls/wpn_shared/wpn_janus3.cpp
+	../dlls/wpn_shared/wpn_crow3.cpp
+	../dlls/wpn_shared/wpn_crow11.cpp
+	../dlls/wpn_shared/z4b_m60amethyst.cpp
+	../dlls/wpn_shared/z4b_ar57amethyst.cpp
+	../dlls/wpn_shared/z4b_acramethyst.cpp
+	../dlls/wpn_shared/z4b_dbarrelamethyst.cpp
+	../dlls/wpn_shared/z4b_deagleamethyst.cpp
+	../dlls/wpn_shared/wpn_crossbow.cpp
+	../dlls/wpn_shared/wpn_broad.cpp
+	../dlls/wpn_shared/wpn_sgdrillex.cpp
+	../dlls/wpn_shared/wpn_balrog1.cpp
+	../dlls/wpn_shared/wpn_sapientia.cpp
+	../dlls/wpn_shared/wpn_balrog3.cpp
+	../dlls/wpn_shared/wpn_coilmg.cpp
+	../dlls/wpn_shared/wpn_charger7.cpp
+	../dlls/wpn_shared/wpn_charger5.cpp
+	../dlls/wpn_shared/wpn_airburster.cpp
+	../dlls/wpn_shared/wpn_poisongun.cpp
+	../dlls/wpn_shared/wpn_flamethrower.cpp
+	../dlls/wpn_shared/wpn_watercannon.cpp
+	../dlls/wpn_shared/wpn_spmg.cpp
+	../dlls/wpn_shared/wpn_lockongun.cpp
+	../dlls/wpn_shared/wpn_patroldrone.cpp
+	../dlls/wpn_shared/z4b_aquariusplasmagun.cpp
+	../dlls/wpn_shared/wpn_fglauncher.cpp
+	../dlls/wpn_shared/wpn_bloodhunter.cpp
+	../dlls/wpn_shared/wpn_buffaug.cpp
+	../dlls/wpn_shared/wpn_buffsg552.cpp
+	../dlls/wpn_shared/wpn_m1887g.cpp
+	../dlls/wpn_shared/wpn_cameragun.cpp
+	../dlls/wpn_shared/wpn_mgsm.cpp
+	../dlls/wpn_shared/wpn_bunkerbuster.cpp
+	../dlls/wpn_shared/wpn_thunderpistol.cpp
+	../dlls/wpn_shared/wpn_balrog5.cpp
+	../dlls/wpn_shared/wpn_thanatos11.cpp
+	../dlls/wpn_shared/wpn_m1887xmas.cpp
+	../dlls/wpn_shared/wpn_kronos5.cpp
+	../dlls/wpn_shared/wpn_an94.cpp
+	../dlls/wpn_shared/wpn_m16a4.cpp
+	../dlls/wpn_shared/wpn_kronos7.cpp
+	../dlls/wpn_shared/wpn_kronos3.cpp
+	../dlls/wpn_shared/wpn_kronos1.cpp
+	../dlls/wpn_shared/wpn_laserfist.cpp
+	../dlls/wpn_shared/wpn_laserfistex.cpp
+	../dlls/wpn_shared/wpn_rainbowgun.cpp
+	../dlls/wpn_shared/wpn_guillotine.cpp
+	../dlls/wpn_shared/wpn_guillotineex.cpp
 	)
 
 set(PM_SRCS
@@ -596,4 +674,20 @@ endif()
 
 if(XASH_UNITY_BUILD)
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES UNITY_BUILD ON)
+endif()
+
+if(XASH_DEDICATED)
+	option(XASH_MYSQL "MYSQL support for CSMoE." ON)
+else()
+	option(XASH_MYSQL "MYSQL support for CSMoE." OFF)
+endif()
+
+if(XASH_MYSQL)
+	add_library (mysql SHARED IMPORTED)
+	set_property(TARGET mysql PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/3rdparty/mysql/lib/libmysql.dll)
+	set_property(TARGET mysql PROPERTY IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/3rdparty/mysql/lib/libmysql.lib)
+	include_directories(${CMAKE_SOURCE_DIR}/3rdparty/mysql/include)
+	target_link_libraries(${SERVER_LIBRARY} mysql)
+	install(FILES ${CMAKE_SOURCE_DIR}/3rdparty/mysql/lib/libmysql.dll DESTINATION ".")
+	add_definitions(-DXASH_MYSQL=1)
 endif()

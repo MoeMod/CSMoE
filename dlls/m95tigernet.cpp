@@ -24,7 +24,7 @@ namespace sv {
 		pev->solid = SOLID_TRIGGER;
 		pev->movetype = MOVETYPE_FLY;
 
-		m_flRemoveTime = invalid_time_point;
+		m_flRemoveTime = gpGlobals->time + 5.0s;
 		UTIL_SetSize(pev, Vector(-16.0, -16.0, -16.0), Vector(16.0, 16.0, 16.0));
 		pev->classname = MAKE_STRING("m95tiger_net");//nodamage
 

@@ -100,6 +100,7 @@ typedef struct tempent_s
 	float		y;
 	float		z;
 	float		fadeSpeed;
+	float       livetime;
 	float		bounceFactor;
 	int			hitSound;
 	void		( *hitcallback )	( struct tempent_s *ent, struct pmtrace_s *ptr );
@@ -199,8 +200,8 @@ struct efx_api_s
 	TEMPENTITY* (*R_TempCustomModel)			(const vec3_t pos, const vec3_t angles, const vec3_t velocity, float life, int modelIndex, int sequence, float framerate, bool fadeOut, int brightness, int rendermode, int entity, float fadeSpeed, bool fadeIn, float fadeInSpeed, float scale, int frameMax, int flags);
 	BEAM*		(*R_BeamPoints_Stretch)			(const vec3_t start, const vec3_t end, int modelIndex, float life, float width, float brightness, int startFrame, float framerate, float r, float g, float b);
 	void		(*R_KillAttachedTentsFromEntity)		(int client);
-
 	TEMPENTITY* (*R_AttachTentToModel)			(int clientindex, int iAttachment, float life, int modelIndex, float framerate, int brightness, int rendermode, float scale, int frameMax, int flags, int eflags);
+	BEAM* (*R_BeamPoints_Tracer)		(const vec3_t start, const vec3_t end, int modelIndex, float life, float width, float length, float amplitude, float brightness, float speed, int startFrame, float framerate, float r, float g, float b);
 };
 
 extern efx_api_t efx;

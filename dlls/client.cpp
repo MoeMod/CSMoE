@@ -36,9 +36,14 @@
 #include "player/player_fuck.h"
 #endif
 
+#ifdef XASH_MYSQL
+#include "database/db_main.h"
+#endif
+
 #include "luash_sv/luash_sv.h"
 #include "newmenus.h"
 #include "client/admin.h"
+#include "client/wdnmd.h"
 
 #include <tuple>
 
@@ -481,7 +486,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 {
 
 	entvars_t *pev = &pEntity->v;
-	CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pev);
+	CBasePlayer *pPlayer = GetClassPtr<CMoePlayer>(pev);
 	CHalfLifeMultiplay *mp = g_pGameRules;
 	
 	pPlayer->SetCustomDecalFrames(-1);
@@ -492,6 +497,12 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 		return;
 	}
 
+#ifdef XASH_MYSQL
+	if (db::g_pDataBase != NULL)
+	{
+		db::g_pDataBase->ClientPutInServer(pPlayer);
+	}
+#endif // XASH_MYSQL
 	pPlayer->m_bNotKilled = true;
 	pPlayer->m_iIgnoreGlobalChat = IGNOREMSG_NONE;
 	pPlayer->m_iTeamKills = 0;
@@ -2533,6 +2544,20 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			Host_Say(pEntity, 0);
 		}
 	}
+#ifdef XASH_MYSQL
+	else if (db::g_pDataBase != NULL && FStrEq(pcmd, "get_token"))
+	{
+		if (CMD_ARGC_() == 2) {
+			db::g_pDataBase->ClientToken(player, CMD_ARGV_(1));
+		}
+	}
+	else if (db::g_pDataBase != NULL && FStrEq(pcmd, "login"))
+	{
+		if (CMD_ARGC_() == 3) {
+			db::g_pDataBase->ClientLogin(player, CMD_ARGV_(1), CMD_ARGV_(2));
+		}
+	}
+#endif // XASH_MYSQL
 	else if (FStrEq(pcmd, "inspect"))
 	{
 		if ((int)CVAR_GET_FLOAT("mp_csgoinspect"))
@@ -3377,17 +3402,37 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (FStrEq(pcmd, "radio1"))
 			{
+				if (!player->m_bBlockWdnmd)
+				{
+					wdnmdmenu::ShowWdnmdMenu(player, 0);
+					return;
+				}
+
+
 				ShowMenu(player, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_0), -1, FALSE, "#RadioA");
 				player->m_iMenu = Menu_Radio1;
 			}
 			else if (FStrEq(pcmd, "radio2"))
 			{
+				if (!player->m_bBlockWdnmd)
+				{
+					wdnmdmenu::ShowWdnmdMenu(player, 7);
+					return;
+				}
+
 				ShowMenu(player, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_0), -1, FALSE, "#RadioB");
 				player->m_iMenu = Menu_Radio2;
 				return;
 			}
 			else if (FStrEq(pcmd, "radio3"))
 			{
+				if (!player->m_bBlockWdnmd)
+				{
+					wdnmdmenu::ShowWdnmdMenu(player, 14);
+					return;
+				}
+
+
 				ShowMenu(player, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_9 | MENU_KEY_0), -1, FALSE, "#RadioC");
 				player->m_iMenu = Menu_Radio3;
 			}
@@ -3584,6 +3629,10 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 					admin::ShowAdminMenu(player);
 			}
 #endif
+			else if (FStrEq(pcmd, "wdnmd"))
+			{
+				wdnmdmenu::ShowWdnmdMenu(player);
+			}
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))
@@ -3706,6 +3755,13 @@ void EXT_FUNC ServerDeactivate()
 	{
 		g_pHostages->ServerDeactivate();
 	}
+
+#ifdef XASH_MYSQL
+	if (db::g_pDataBase != NULL)
+	{
+		db::g_pDataBase->ServerDeactivate();
+	}
+#endif // XASH_MYSQL
 }
 
 void EXT_FUNC ServerActivate(edict_t *pEdictList, int edictCount, int clientMax)
@@ -3759,6 +3815,13 @@ void EXT_FUNC ServerActivate(edict_t *pEdictList, int edictCount, int clientMax)
 	{
 		g_pHostages->ServerActivate();
 	}
+
+#ifdef XASH_MYSQL
+	if (db::g_pDataBase != NULL)
+	{
+		db::g_pDataBase->ServerActivate();
+	}
+#endif // XASH_MYSQL
 }
 
 void EXT_FUNC PlayerPreThink(edict_t *pEntity)
@@ -3834,6 +3897,13 @@ void EXT_FUNC StartFrame()
 	{
 		TheTutor->StartFrame(gpGlobals->time);
 	}
+
+#ifdef XASH_MYSQL
+	if (db::g_pDataBase != NULL)
+	{
+		db::g_pDataBase->StartFrame();
+	}
+#endif // XASH_MYSQL
 }
 
 void ClientPrecache()
@@ -3953,6 +4023,7 @@ void ClientPrecache()
 	PRECACHE_SOUND("player/pl_pain6.wav");
 	PRECACHE_SOUND("player/pl_pain7.wav");
 
+	wdnmdmenu::WdnmdSoundPrecache();
 	PlayerZombie_Precache();
 	PlayerModel_Precache();
 
@@ -4448,9 +4519,12 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
 
    if (pPlayer && pPlayer->IsPlayer())
    {
+	   float flInvisibleAlpha = 0.0;
+	   float flAlpha = 0.0;
+
 	   if (pPlayer->m_pActiveItem)
 	   {
-		   if (!Q_strcmp(STRING(pPlayer->m_pActiveItem->pev->classname), "weapon_cannonex"))
+		   if (pPlayer->m_pActiveItem->m_iId == WEAPON_CANNONEX)
 		   {
 			   CCannonEX* pWeapon = (CCannonEX*)pPlayer->m_pActiveItem;
 
@@ -4461,6 +4535,12 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
 			   }
 		   }
 	   }
+   }
+
+   if (!Q_strcmp(STRING(ent->v.classname), "lasersgfakeeffect") && ent->v.body != 0)
+   {
+	   if (ent->v.owner == host)
+		   state->effects = EF_NODRAW;
    }
 
    if (ent != host)
@@ -4922,10 +5002,11 @@ void EXT_FUNC UpdateClientData(const struct edict_s *ent, int sendweapons, struc
 void EXT_FUNC CmdStart(const edict_t *player, struct usercmd_s *cmd, unsigned int random_seed)
 {
 	entvars_t *pev = const_cast<entvars_t *>(&player->v);
-	CBasePlayer *pl = dynamic_cast<CBasePlayer *>(CBasePlayer::Instance(pev));
+    CMoePlayer *pl = dynamic_cast<CMoePlayer *>(CBasePlayer::Instance(pev));
 
 	if (pl != NULL)
 	{
+        pl->ApplyUC(cmd);
 		/*
 		if (pl->pev->groupinfo)
 		{

@@ -35,6 +35,10 @@ void WeaponImagePanel::SetWeapon(const char *name)
     {
         name += 7;
     }
+    if (!strncmp(name, "z4b_", 4))
+    {
+        name += 4;
+    }
     if(!strncmp(name, "knife_", 6))
     {
         name += 6;

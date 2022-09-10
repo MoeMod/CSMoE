@@ -14,6 +14,8 @@
 #include "globals.h"
 
 #include "bot_include.h"
+#include "cs_bot.h"
+
 
 namespace sv {
 
@@ -900,4 +902,72 @@ void CCSBot::SetKiller(CBaseEntity* killer)
 	m_killer = killer;
 }
 
+CMoePlayer::CMoePlayer() {
+    auto profile = TheBotProfiles->GetRandomProfile(BOT_EXPERT, BOT_TEAM_ANY);
+    CCSBot::Initialize(profile); // non-virtual
+}
+
+BOOL CMoePlayer::IsBot()
+{
+    return IsAlive() && gpGlobals->time - m_flLastCommandTime > 20s;
+}
+
+void CMoePlayer::ExecuteCommand()
+{
+    // handled in CmdStart -> ApplyUC
+}
+
+void CMoePlayer::UpdateLookAngles()
+{
+    // handled in CmdStart -> ApplyUC
+}
+
+void CMoePlayer::Spawn()
+{
+	CCSBot::Spawn();
+	pev->flags &= ~FL_FAKECLIENT;
+}
+
+void CMoePlayer::PauseAutoMove()
+{
+    m_flLastCommandTime = gpGlobals->time;
+}
+
+void CMoePlayer::ApplyUC(usercmd_t *cmd)
+{
+    if(cmd->buttons || cmd->forwardmove > 0 || cmd->sidemove > 0 || cmd->upmove > 0)
+    {
+        return PauseAutoMove();
+    }
+
+    if(!IsBot())
+    {
+        return;
+    }
+
+    //byte adjustedMSec = ThrottledMsec();
+
+    CCSBot::UpdateLookAngles();
+    pev->fixangle = 1;
+
+    // player model is "munged"
+    pev->angles = pev->v_angle;
+    //pev->angles.x /= -3.0f;
+
+    // save the command time
+    m_flPreviousCommandTime = gpGlobals->time;
+
+    if (IsCrouching())
+    {
+        m_buttonFlags |= IN_DUCK;
+    }
+
+    cmd->viewangles = pev->v_angle;
+    cmd->forwardmove = m_forwardSpeed;
+    cmd->sidemove = m_strafeSpeed;
+    cmd->upmove = m_verticalSpeed;
+    cmd->buttons = m_buttonFlags;
+    cmd->impulse = 0;
+    //cmd->msec = adjustedMSec;
+}
 }

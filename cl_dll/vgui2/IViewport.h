@@ -14,6 +14,7 @@ public:
 	virtual void ShowBackGround( bool bShow ) = 0;
 	virtual IViewportPanel* FindPanelByName( const char *szPanelName ) = 0;
 	virtual IViewportPanel* GetActivePanel() = 0;
+	virtual int GetAllowSpectators(void) = 0;
 };
 
 inline IViewport::~IViewport()

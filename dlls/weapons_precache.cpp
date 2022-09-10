@@ -366,8 +366,66 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_sfpistol");
 	UTIL_PrecacheOtherWeapon("weapon_y22s2sfpistol");
 	UTIL_PrecacheOtherWeapon("weapon_pianogun");
+	UTIL_PrecacheOtherWeapon("weapon_pianogunex");
 	UTIL_PrecacheOtherWeapon("weapon_stunrifle");
-
+	UTIL_PrecacheOtherWeapon("z4b_ragingbull");
+	UTIL_PrecacheOtherWeapon("weapon_kronos12");
+	UTIL_PrecacheOtherWeapon("weapon_crossbowex21");
+	UTIL_PrecacheOtherWeapon("weapon_buffawp");
+	UTIL_PrecacheOtherWeapon("weapon_divinetitan");
+	UTIL_PrecacheOtherWeapon("weapon_railcannon");
+	UTIL_PrecacheOtherWeapon("weapon_skull11");
+	UTIL_PrecacheOtherWeapon("weapon_janus11");
+	UTIL_PrecacheOtherWeapon("weapon_crow5");
+	UTIL_PrecacheOtherWeapon("weapon_janusmk5");
+	UTIL_PrecacheOtherWeapon("weapon_janus3");
+	UTIL_PrecacheOtherWeapon("weapon_crow3");
+	UTIL_PrecacheOtherWeapon("weapon_crow11");
+	UTIL_PrecacheOtherWeapon("z4b_m60amethyst");
+	UTIL_PrecacheOtherWeapon("z4b_ar57amethyst");
+	UTIL_PrecacheOtherWeapon("z4b_acramethyst");
+	UTIL_PrecacheOtherWeapon("z4b_dbarrelamethyst");
+	UTIL_PrecacheOtherWeapon("z4b_deagleamethyst");
+	UTIL_PrecacheOtherWeapon("weapon_crossbow");
+	UTIL_PrecacheOtherWeapon("weapon_broad");
+	UTIL_PrecacheOtherWeapon("weapon_sgdrillex");
+	UTIL_PrecacheOtherWeapon("weapon_balrog1");
+	UTIL_PrecacheOtherWeapon("weapon_sapientia");
+	UTIL_PrecacheOtherWeapon("weapon_balrog3");
+	UTIL_PrecacheOtherWeapon("weapon_coilmg");
+	UTIL_PrecacheOtherWeapon("weapon_charger7");
+	UTIL_PrecacheOtherWeapon("weapon_charger5");
+	UTIL_PrecacheOtherWeapon("weapon_airburster");
+	UTIL_PrecacheOtherWeapon("weapon_poisongun");
+	UTIL_PrecacheOtherWeapon("weapon_flamethrower");
+	UTIL_PrecacheOtherWeapon("weapon_watercannon");
+	UTIL_PrecacheOtherWeapon("weapon_spmg");
+	UTIL_PrecacheOtherWeapon("weapon_lockongun");
+	UTIL_PrecacheOtherWeapon("weapon_patroldrone");
+	UTIL_PrecacheOtherWeapon("z4b_aquariusplasmagun");
+	UTIL_PrecacheOtherWeapon("weapon_fglauncher");
+	UTIL_PrecacheOtherWeapon("weapon_bloodhunter");
+	UTIL_PrecacheOtherWeapon("weapon_buffaug");
+	UTIL_PrecacheOtherWeapon("weapon_buffsg552");
+	UTIL_PrecacheOtherWeapon("weapon_cameragun");
+	UTIL_PrecacheOtherWeapon("weapon_m1887g");
+	UTIL_PrecacheOtherWeapon("weapon_mgsm");
+	UTIL_PrecacheOtherWeapon("weapon_bunkerbuster");
+	UTIL_PrecacheOtherWeapon("weapon_thunderpistol");
+	UTIL_PrecacheOtherWeapon("weapon_balrog5");
+	UTIL_PrecacheOtherWeapon("weapon_thanatos11");
+	UTIL_PrecacheOtherWeapon("weapon_m1887xmas");
+	UTIL_PrecacheOtherWeapon("weapon_kronos5");
+	UTIL_PrecacheOtherWeapon("weapon_an94");
+	UTIL_PrecacheOtherWeapon("weapon_m16a4");
+	UTIL_PrecacheOtherWeapon("weapon_kronos7");
+	UTIL_PrecacheOtherWeapon("weapon_kronos3");
+	UTIL_PrecacheOtherWeapon("weapon_kronos1");
+	UTIL_PrecacheOtherWeapon("weapon_laserfist");
+	UTIL_PrecacheOtherWeapon("weapon_laserfistex");
+	UTIL_PrecacheOtherWeapon("weapon_rainbowgun");
+	UTIL_PrecacheOtherWeapon("weapon_guillotine");
+	UTIL_PrecacheOtherWeapon("weapon_guillotineex");
 
 	if (g_pGameRules->IsDeathmatch())
 	{
@@ -378,6 +436,7 @@ void W_Precache()
 	g_sModelIndexFireball = PRECACHE_MODEL("sprites/zerogxplode.spr");	// fireball
 	g_sModelIndexWExplosion = PRECACHE_MODEL("sprites/WXplo1.spr");		// underwater fireball
 	g_sModelIndexSmoke = PRECACHE_MODEL("sprites/steam1.spr");		// smoke
+	g_sModelIndexSmokeBeam = PRECACHE_MODEL("sprites/smoke.spr");
 	g_sModelIndexBubbles = PRECACHE_MODEL("sprites/bubble.spr");		// bubbles
 	g_sModelIndexBloodSpray = PRECACHE_MODEL("sprites/bloodspray.spr");	// initial blood
 	g_sModelIndexBloodDrop = PRECACHE_MODEL("sprites/blood.spr");		// splattered blood
@@ -392,6 +451,7 @@ void W_Precache()
 	g_sModelIndexBoomerEffectEx = PRECACHE_MODEL("sprites/ef_boomer_ex.spr");
 	g_sModelIndexBoomerSprite = PRECACHE_MODEL("sprites/spr_boomer.spr");
 	g_sModelIndexPosionEffect = PRECACHE_MODEL("models/ef_poison03.mdl");
+	g_sModelIndexGuillotineGibs = PRECACHE_MODEL("models/gibs_guilotine.mdl");
 
 	g_sModelIndexEventBombExp = PRECACHE_MODEL("sprites/heart_bombexp.spr");
 	g_sModelIndexEventBombExp2 = PRECACHE_MODEL("sprites/cakeexp.spr");

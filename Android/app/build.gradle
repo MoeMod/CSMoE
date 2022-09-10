@@ -25,7 +25,7 @@ android {
         externalNativeBuild {
             cmake {
                 arguments "-DXASH_SDL=1",
-                        "-DXASH_NANOGL=1",
+                        "-DXASH_WES=1",
                         "-DXASH_STATIC_GAMELIB=1"
                 version "3.18.1"
             }
@@ -58,7 +58,7 @@ android {
             assets.srcDirs = ['src/main/assets', '../../CSMoE-Full']
         }
     }
-    ndkVersion '21.1.6352462'
+    ndkVersion '23.2.8568313'
 }
 
 dependencies {

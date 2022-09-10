@@ -17,6 +17,7 @@
 #include "library.h"
 #include "library_static.h"
 #include "server.h"
+#include <string>
 
 typedef struct dll_s
 {
@@ -27,7 +28,7 @@ typedef struct dll_s
 } dll_t;
 
 static dll_t *dll_list;
-char lasterror[1024] = "";
+std::string lasterror;
 
 static void *LS_dlfind( const char *name )
 {
@@ -158,16 +159,16 @@ void Com_FreeLibrary( void *hInstance )
 
 void Com_PushLibraryError( const char *error )
 {
-	Q_strncat( lasterror, error, sizeof( lasterror ) );
-	Q_strncat( lasterror, "\n", sizeof( lasterror ) );
+	lasterror += error;
+	lasterror += "\n";
 }
 
 void Com_ResetLibraryError()
 {
-	lasterror[0] = '\0';
+	lasterror.clear();
 }
 
 const char *Com_GetLibraryError()
 {
-	return lasterror;
+	return lasterror.c_str();
 }

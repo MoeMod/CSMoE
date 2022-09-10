@@ -193,6 +193,13 @@ enum
 
 typedef enum
 {
+	HIT_NONE = 0,
+	HIT_WALL = 1,
+	HIT_PLAYER = 2,
+} HIT_RESULT;
+
+typedef enum
+{
 	MONSTERSTATE_NONE = 0,
 	MONSTERSTATE_IDLE,
 	MONSTERSTATE_COMBAT,
@@ -524,6 +531,7 @@ void UTIL_LogPrintfDetail(const char *fmt, ...);
 void UTIL_StripToken(const char *pKey, char *pDest);
 void EntvarsKeyvalue(entvars_t *pev, KeyValueData *pkvd);
 char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd);
+char UTIL_TextureHit(edict_t* pHit, Vector vecSrc, Vector vecEnd);
 //NOXREF int GetPlayerTeam(int index);
 bool UTIL_IsGame(const char *gameName);
 float UTIL_GetPlayerGaitYaw(int playerIndex);
@@ -536,7 +544,11 @@ float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDam
 float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flRange, Vector& vecDir);
 float UTIL_CalculateDamageRate(Vector vecSrc, CBaseEntity* pOther);
 void UTIL_TE_Sprite(const short sprite, const float x, const float y, const float z, const byte scale, const byte brightness);
-
+void UTIL_AdvancedBeamPoints(Vector vecSrc, Vector vecEnd, int life, int r, int g, int b, int width, int brightness, int flags);
+void UTIL_BeamPointsStretch(Vector vecSrc, Vector vecEnd, int beamindex, int framerate, int life, int r, int g, int b, int width, int brightness, int flags);
+int UTIL_GetLineTarget(Vector vecSrc, Vector vecDirShooting, Vector vecRight, Vector vevUp, Vector vecSpread, float flDistance, CBaseEntity* pEntity, bool CheckTeamMate);
+Vector UTIL_GetSpeedVector(Vector vecSrc, Vector vecEnd, float flSpeed);
+bool UTIL_IsWallBetweenEntity(CBaseEntity* pEntity, CBaseEntity* pAttackPlayer);
 }
 #else
 namespace cl {

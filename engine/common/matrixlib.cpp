@@ -16,6 +16,22 @@ GNU General Public License for more details.
 #include "common.h"
 #include "mathlib.h"
 
+const matrix3x4	matrix3x4_identity =
+        {
+                { 1, 0, 0, 0 },	// PITCH	[forward], org[0]
+                { 0, 1, 0, 0 },	// YAW	[right]  , org[1]
+                { 0, 0, 1, 0 },	// ROLL	[up]     , org[2]
+        };
+const matrix4x4	matrix4x4_identity =
+        {
+                { 1, 0, 0, 0 },	// PITCH
+                { 0, 1, 0, 0 },	// YAW
+                { 0, 0, 1, 0 },	// ROLL
+                { 0, 0, 0, 1 },	// ORIGIN
+        };
+void Matrix3x4_LoadIdentity( matrix3x4_ref mat ) { Matrix3x4_Copy( mat, matrix3x4_identity ); }
+void Matrix4x4_LoadIdentity( matrix4x4_ref mat ) { Matrix4x4_Copy( mat, matrix4x4_identity ); }
+
 /*
 ========================================================================
 
@@ -25,15 +41,45 @@ GNU General Public License for more details.
 */
 void Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
+#if U_VECTOR_NEON
+    float32x4_t v2 = v;
+    v2[3] = 1;
+    VectorSet(out,
+              vaddvq_f32(vmulq_f32(v2, in[0])),
+              vaddvq_f32(vmulq_f32(v2, in[1])),
+              vaddvq_f32(vmulq_f32(v2, in[2]))
+    );
+#else
 	VectorSet(out,
 		v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2] + in[0][3],
 		v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2] + in[1][3],
 		v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2] + in[2][3]
 	);
+#endif
 }
 
 void Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
+#if U_VECTOR_NEON
+    // a(uzp) = { x0, z0, x1, z1 }, { y0, w0, y1, w1 }
+    // b(uzp) = { x2, z2, 0, 0 }, { y2, w2, 0, 0 }
+
+    // c(uzp) = { x0, x1, x2, 0 }, { z0, z1, z2, 0 }
+    // d(uzp) = { y0, y1, y2, 0 }, { w0, w1, w2, 0 }
+
+    auto a = vuzpq_f32(in[0], in[1]);
+    auto b = vuzpq_f32(in[1], vdupq_n_f32(0));
+    auto c = vuzpq_f32(a.val[0], b.val[0]);
+    auto d = vuzpq_f32(a.val[1], b.val[1]);
+
+    vec3_t dir = d.val[1] - v;
+
+    VectorSet(out,
+              vaddvq_f32(vmulq_f32(dir, c.val[0])),
+              vaddvq_f32(vmulq_f32(dir, d.val[0])),
+              vaddvq_f32(vmulq_f32(dir, c.val[1]))
+    );
+#else
 	vec3_t dir;
 	vec3_t in3;
 	VectorSet(in3, in[0][3], in[1][3], in[2][3]);
@@ -44,24 +90,51 @@ void Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 		dir[0] * in[0][1] + dir[1] * in[1][1] + dir[2] * in[2][1],
 		dir[0] * in[0][2] + dir[1] * in[1][2] + dir[2] * in[2][2]
 		);
+#endif
 }
 
 void Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
+#if U_VECTOR_NEON
+    VectorSet(out,
+              vaddvq_f32(vmulq_f32(v, in[0])),
+              vaddvq_f32(vmulq_f32(v, in[1])),
+              vaddvq_f32(vmulq_f32(v, in[2]))
+    );
+#else
 	VectorSet(out,
 		v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2],
 		v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2],
 		v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2]
 	);
+#endif
 }
 
 void Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
+#if U_VECTOR_NEON
+    // a(uzp) = { x0, z0, x1, z1 }, { y0, w0, y1, w1 }
+    // b(uzp) = { x2, z2, 0, 0 }, { y2, w2, 0, 0 }
+    // c(uzp) = { x0, x1, x2, 0 }, { z0, z1, z2, 0 }
+    // d(uzp) = { y0, y1, y2, 0 }, { w0, w1, w2, 0 }
+
+    auto a = vuzpq_f32(in[0], in[1]);
+    auto b = vuzpq_f32(in[1], vdupq_n_f32(0));
+    auto c = vuzpq_f32(a.val[0], b.val[0]);
+    auto d = vuzpq_f32(a.val[1], b.val[1]);
+
+    VectorSet(out,
+            vaddvq_f32(vmulq_f32(v, c.val[0])),
+            vaddvq_f32(vmulq_f32(v, d.val[0])),
+            vaddvq_f32(vmulq_f32(v, c.val[1]))
+    );
+#else
 	VectorSet(out,
 		v[0] * in[0][0] + v[1] * in[1][0] + v[2] * in[2][0],
 		v[0] * in[0][1] + v[1] * in[1][1] + v[2] * in[2][1],
 		v[0] * in[0][2] + v[1] * in[1][2] + v[2] * in[2][2]
 	);
+#endif
 }
 
 void Matrix3x4_ConcatTransforms( matrix3x4_ref out, cmatrix3x4 in1, cmatrix3x4 in2 )

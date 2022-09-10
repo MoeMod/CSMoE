@@ -476,6 +476,26 @@ void CVGui::PanelDeleted( vgui2::VPanel* panel )
 
 	panel->SetListEntry( 0xFFFF );
 	RemoveTickSignal( vPanel );
+
+	// MoeMod fix : remove all wild pointer in msg queue
+	for (int index = m_MessageQueue.Head();
+		index != m_MessageQueue.InvalidIndex();
+		index = m_MessageQueue.Next(index))
+	{
+		auto& element = m_MessageQueue[index];
+
+		if (auto pRoot = element._params)
+		{
+			for (KeyValues* pValue = pRoot->GetFirstValue(); pValue; pValue = pValue->GetNextValue())
+			{
+				if (pValue->GetPtr(nullptr) == panel->Client())
+				{
+					// invalidate param
+					pValue->SetPtr(nullptr, nullptr);
+				}
+			}
+		}
+	}
 }
 
 void CVGui::ClearMessageQueues()

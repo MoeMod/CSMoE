@@ -192,14 +192,17 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
-		m_pPlayer->GiveNamedItem("weapon_stunrifle");
+		//m_pPlayer->GiveNamedItem("weapon_divinetitan");
+		//m_pPlayer->GiveNamedItem("knife_y22s2sfsword");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
-		m_pPlayer->GiveNamedItem("weapon_pianogun");
+		//m_pPlayer->GiveNamedItem("weapon_y22s2sfpistol");
+		//m_pPlayer->GiveNamedItem("z4b_m60amethyst");
+		//m_pPlayer->GiveNamedItem("weapon_bunkerbuster");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
@@ -371,7 +374,56 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 	
 		m_pPlayer->RemoveAllItems(FALSE);
 		m_pPlayer->m_bHasPrimary = false;
+#if XASH_DEDICATED
+		if (randomwpn.value)
+		{
+			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+			{
+				std::vector<MoEWeaponBuyInfo_s> candidate_list;
+#ifndef XASH_DEDICATED
+				std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+#else
+				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+#endif // !XASH_DEDICATED
+				std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+				const MoEWeaponBuyInfo_s& info = candidate_list.front();
+				if (iSlot == KNIFE_SLOT) {
+					m_pPlayer->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+				}
+				m_pPlayer->GiveNamedItem(info.pszClassName);
+				GiveSlotAmmo(m_pPlayer, iSlot);
+			}
+			m_pPlayer->GiveNamedItem("weapon_hegrenade");
+		}
+		else
+		{
+			if (m_pPlayer->IsBot())
+			{
+				m_pPlayer->RemoveAllItems(FALSE);
+				m_pPlayer->m_bHasPrimary = false;
 
+				for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+				{
+					std::vector<MoEWeaponBuyInfo_s> candidate_list;
+#ifndef XASH_DEDICATED
+					std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+#else
+					std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+#endif // !XASH_DEDICATED
+					std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+					const MoEWeaponBuyInfo_s& info = candidate_list.front();
+					if (iSlot == KNIFE_SLOT) {
+						m_pPlayer->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+					}
+					m_pPlayer->GiveNamedItem(info.pszClassName);
+					GiveSlotAmmo(m_pPlayer, iSlot);
+				}
+				m_pPlayer->GiveNamedItem("weapon_hegrenade");
+			}
+			else
+				CPlayerModStrategy_Default::GiveDefaultItems();
+		}
+#else
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
 		{
 			std::vector<MoEWeaponBuyInfo_s> candidate_list;
@@ -389,8 +441,9 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 			GiveSlotAmmo(m_pPlayer, iSlot);
 		}
 		m_pPlayer->GiveNamedItem("weapon_hegrenade");
+
 #if 0
-		if (m_pPlayer->entindex()==1)
+		if (m_pPlayer->entindex() == 1)
 		{
 
 			CBaseEntity* Entity = UTIL_PlayerByIndex(1);
@@ -409,6 +462,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 
 			}
 		}
+#endif
 #endif
 		return;
 	}
@@ -445,7 +499,14 @@ bool CPlayerModStrategy_Zombie::CanPlayerBuy(bool display)
 
 	//return !m_pPlayer->m_bIsZombie;
 	// random weapon now, DONT BUY!!!
+#if XASH_DEDICATED
+	if(randomwpn.value)
+		return false;
+	else
+		return !m_pPlayer->m_bIsZombie;
+#else
 	return false;
+#endif
 }
 
 bool IBasePlayerModStrategy::GiveGunAmmo(CBasePlayer* player, CBasePlayerItem* weapon)

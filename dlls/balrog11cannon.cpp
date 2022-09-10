@@ -52,13 +52,31 @@ namespace sv {
 		m_flNumFrames = (float)(MODEL_FRAMES(pev->modelindex) - 1);
 		pev->framerate = RANDOM_FLOAT(1.0, 30.0);
 
-		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL);
+	/*	MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL);
 		WRITE_BYTE(2);
 		WRITE_COORD(m_vecOrigin.x);
 		WRITE_COORD(m_vecOrigin.y);
 		WRITE_COORD(m_vecOrigin.z);
 		WRITE_SHORT(this->entindex());
 		WRITE_BYTE(iType);
+		MESSAGE_END();*/
+
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_BEAMPARTICLE); //defined as 32
+		WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
+		WRITE_SHORT(m_iSprIndex[iType]);// short (sprite index)
+		WRITE_SHORT(m_iSprIndex[iType]);// short (sprite index)
+		WRITE_SHORT(m_iSprIndex[iType]);// short (sprite index)
+		WRITE_BYTE(255); //r
+		WRITE_BYTE(255); //g
+		WRITE_BYTE(255); //b
+		WRITE_BYTE(0); //randomcolor
+		WRITE_BYTE(100); //scale in 0.01's
+		WRITE_BYTE(6); //freq(time of one cycle) in 0.01's
+		WRITE_BYTE(4); //fadetime in 0.1s
+		WRITE_BYTE(1);  //count
+		WRITE_BYTE(0);  //random in org
+		WRITE_BYTE(0);  //speed (if>0 do slow gravity)
 		MESSAGE_END();
 
 		//PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, m_vecOrigin, g_vecZero, 0.0, 0.0, 7, iType, FALSE, FALSE);
@@ -83,8 +101,8 @@ namespace sv {
 
 	void CBalrog11Cannon::Precache()
 	{
-		PRECACHE_MODEL("sprites/flame_puff01.spr");
-		PRECACHE_MODEL("sprites/ef_hwater.spr");		//balrog11b
+		m_iSprIndex[0] = PRECACHE_MODEL("sprites/flame_puff01.spr");
+		m_iSprIndex[1] = PRECACHE_MODEL("sprites/ef_hwater.spr");		//balrog11b
 	}
 
 	void CBalrog11Cannon::AnimationThink()

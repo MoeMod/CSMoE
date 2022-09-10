@@ -294,7 +294,66 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfpistol.cpp
 	../dlls/wpn_shared/wpn_y22s2sfpistol.cpp
 	../dlls/wpn_shared/wpn_pianogun.cpp
+	../dlls/wpn_shared/wpn_pianogunex.cpp
 	../dlls/wpn_shared/wpn_stunrifle.cpp
+	../dlls/wpn_shared/z4b_ragingbull.cpp
+	../dlls/wpn_shared/wpn_kronos12.cpp
+	../dlls/wpn_shared/wpn_crossbowex21.cpp
+	../dlls/wpn_shared/wpn_buffawp.cpp
+	../dlls/wpn_shared/wpn_divinetitan.cpp
+	../dlls/wpn_shared/wpn_railcannon.cpp
+	../dlls/wpn_shared/wpn_skull11.cpp
+	../dlls/wpn_shared/wpn_janus11.cpp
+	../dlls/wpn_shared/wpn_crow5.cpp
+	../dlls/wpn_shared/wpn_janusmk5.cpp
+	../dlls/wpn_shared/wpn_janus3.cpp
+	../dlls/wpn_shared/wpn_crow3.cpp
+	../dlls/wpn_shared/wpn_crow11.cpp
+	../dlls/wpn_shared/z4b_m60amethyst.cpp
+	../dlls/wpn_shared/z4b_ar57amethyst.cpp
+	../dlls/wpn_shared/z4b_acramethyst.cpp
+	../dlls/wpn_shared/z4b_dbarrelamethyst.cpp
+	../dlls/wpn_shared/z4b_deagleamethyst.cpp
+	../dlls/wpn_shared/wpn_crossbow.cpp
+	../dlls/wpn_shared/wpn_broad.cpp
+	../dlls/wpn_shared/wpn_sgdrillex.cpp
+	../dlls/wpn_shared/wpn_balrog1.cpp
+	../dlls/wpn_shared/wpn_sapientia.cpp
+	../dlls/wpn_shared/wpn_balrog3.cpp
+	../dlls/wpn_shared/wpn_coilmg.cpp
+	../dlls/wpn_shared/wpn_charger7.cpp
+	../dlls/wpn_shared/wpn_charger5.cpp
+	../dlls/wpn_shared/wpn_airburster.cpp
+	../dlls/wpn_shared/wpn_poisongun.cpp
+	../dlls/wpn_shared/wpn_flamethrower.cpp
+	../dlls/wpn_shared/wpn_watercannon.cpp
+	../dlls/wpn_shared/wpn_spmg.cpp
+	../dlls/wpn_shared/wpn_lockongun.cpp
+	../dlls/wpn_shared/wpn_patroldrone.cpp
+	../dlls/wpn_shared/z4b_aquariusplasmagun.cpp
+	../dlls/wpn_shared/wpn_fglauncher.cpp
+	../dlls/wpn_shared/wpn_bloodhunter.cpp
+	../dlls/wpn_shared/wpn_buffaug.cpp
+	../dlls/wpn_shared/wpn_buffsg552.cpp
+	../dlls/wpn_shared/wpn_m1887g.cpp
+	../dlls/wpn_shared/wpn_cameragun.cpp
+	../dlls/wpn_shared/wpn_mgsm.cpp
+	../dlls/wpn_shared/wpn_bunkerbuster.cpp
+	../dlls/wpn_shared/wpn_thunderpistol.cpp
+	../dlls/wpn_shared/wpn_balrog5.cpp
+	../dlls/wpn_shared/wpn_thanatos11.cpp
+	../dlls/wpn_shared/wpn_m1887xmas.cpp
+	../dlls/wpn_shared/wpn_kronos5.cpp
+	../dlls/wpn_shared/wpn_an94.cpp
+	../dlls/wpn_shared/wpn_m16a4.cpp
+	../dlls/wpn_shared/wpn_kronos7.cpp
+	../dlls/wpn_shared/wpn_kronos3.cpp
+	../dlls/wpn_shared/wpn_kronos1.cpp
+	../dlls/wpn_shared/wpn_laserfist.cpp
+	../dlls/wpn_shared/wpn_laserfistex.cpp
+	../dlls/wpn_shared/wpn_rainbowgun.cpp
+	../dlls/wpn_shared/wpn_guillotine.cpp
+	../dlls/wpn_shared/wpn_guillotineex.cpp
 	)
 
 set (HUD_SRCS
@@ -419,8 +478,12 @@ if(XASH_VGUI2)
 		vgui2/CGameUITestPanel.cpp
 		vgui2/game_controls/buymenu.cpp
 		vgui2/game_controls/buysubmenu.cpp
+		vgui2/game_controls/teammenu.cpp
+		vgui2/game_controls/classmenu.cpp
 		vgui2/csmoe/CSBackGroundPanel.cpp
 		vgui2/csmoe/vgui_int.cpp
+		vgui2/csmoe/cstriketeammenu.cpp
+		vgui2/csmoe/cstrikeclassmenu.cpp
 		vgui2/csmoe/BuyMenu/buypresetbutton.cpp
 		vgui2/csmoe/BuyMenu/cstrikebuymenu.cpp
 		vgui2/csmoe/BuyMenu/cstrikebuymouseoverpanel.cpp
@@ -463,6 +526,7 @@ set (CLDLL_SOURCES
 	./calcscreen.cpp
 	./input_touch.cpp
 	./fog.cpp
+
 
 	${LUASH_SRCS}
 	${INPUT_SRCS}

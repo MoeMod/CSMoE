@@ -33,9 +33,11 @@ COptionsSubVideo::COptionsSubVideo(vgui2::Panel *parent) : PropertyPage(parent, 
 
 	m_pBrightnessSlider = new CCvarSlider( this, "Brightness", "#GameUI_Brightness",
 		0.0f, 2.0f, "brightness" );
+	m_pBrightnessSlider->SetVisible(false);
 
 	m_pGammaSlider = new CCvarSlider( this, "Gamma", "#GameUI_Gamma",
 		1.0f, 3.0f, "gamma" );
+	m_pGammaSlider->SetVisible(false);
 
 	GetVidSettings();
 
@@ -91,7 +93,13 @@ COptionsSubVideo::COptionsSubVideo(vgui2::Panel *parent) : PropertyPage(parent, 
 
     SetCurrentRendererComboItem();
 
-	m_pWindowed = new vgui2::CheckButton( this, "Windowed", "#GameUI_Windowed" );
+	m_pWindowed = new  CCvarToggleCheckButton(
+		this,
+		"Windowed",
+		"#GameUI_Windowed",
+		"fullscreen");
+
+	//m_pWindowed = new vgui2::CheckButton( this, "Windowed", "#GameUI_Windowed" );
 	m_pWindowed->SetSelected( m_CurrentSettings.windowed ? true : false);
 	m_pWindowed->SetVisible(true);
 
@@ -396,7 +404,7 @@ void COptionsSubVideo::ApplyVidSettings(bool bForceRefresh)
 	engine->pfnClientCmd( szCmd );
 
 	// Set renderer
-	sprintf( szCmd, "_setrenderer %s %s\n", p->renderer, p->windowed ? "windowed" : "fullscreen" );
+	sprintf( szCmd, p->windowed ? "fullscreen 0" : "fullscreen 1" );
 	engine->pfnClientCmd(szCmd);
 	sprintf( szCmd, "_sethdmodels %d\n", p->hdmodels );
 	engine->pfnClientCmd(szCmd);

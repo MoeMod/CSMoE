@@ -24,6 +24,10 @@ GNU General Public License for more details.
 #include <SDL.h>
 #include <SDL_syswm.h>
 
+#ifdef XASH_ANGLE
+#include <EGL/egl.h>
+#endif
+
 #if defined(SDL_VIDEO_DRIVER_COCOA)
 #include "platform/macos/TouchBar.h"
 #include "platform/macos/vid_macos.h"
@@ -53,7 +57,13 @@ void *SDL_GetVideoDevice( void );
 
 static void SDLCALL GL_GetDrawableSize(SDL_Window* window, int* w, int* h)
 {
-#ifdef XASH_QINDIEGL
+#if defined(XASH_ANGLE)
+    SDL_GetRendererOutputSize(SDL_GetRenderer(window), w, h);
+    // TODO macos hidpi
+#ifdef __APPLE__
+    MacOS_HiDPI_Scale(w, h);
+#endif
+#elif defined(XASH_QINDIEGL)
 	//return SDL_GetWindowSize(window, w, h);
 	GLint params[4]; pglGetIntegerv(GL_VIEWPORT, params);
 	*w = params[2];
@@ -221,7 +231,15 @@ static void WIN_SetWindowIcon( HICON ico )
 qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 {
 	static string	wndname;
-	Uint32 wndFlags = SDL_WINDOW_OPENGL;
+#ifdef XASH_ANGLE
+#ifdef __APPLE__
+    Uint32 wndFlags = SDL_WINDOW_METAL;
+#else
+	Uint32 wndFlags = SDL_WINDOW_VULKAN;
+#endif
+#else
+    Uint32 wndFlags = SDL_WINDOW_OPENGL;
+#endif
 	char iconpath[MAX_STRING];
 
 	if( vid_highdpi->integer ) wndFlags |= SDL_WINDOW_ALLOW_HIGHDPI;
@@ -363,9 +381,9 @@ void VID_DestroyWindow( void )
 {
 	GL_DeleteContext();
 
-	VID_RestoreScreenResolution();
 	if( host.hWnd )
 	{
+        VID_RestoreScreenResolution();
 		SDL_DestroyWindow ( host.hWnd );
 		host.hWnd = NULL;
 	}
@@ -414,6 +432,10 @@ void R_ChangeDisplaySettingsFast( int width, int height )
 		if (success)
 			Cvar_SetFloat("hud_scale", dpi);
 	}
+
+#if defined(SDL_VIDEO_DRIVER_COCOA)
+    MacOS_InstallWindow();
+#endif
 }
 
 rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )

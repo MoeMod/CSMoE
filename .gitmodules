@@ -72,4 +72,28 @@
 	url = https://github.com/bulletphysics/bullet3
 [submodule "3rdparty/mpg123"]
 	path = 3rdparty/mpg123
-	url = https://github.com/madebr/mpg123
+	url = https://github.com/libsdl-org/mpg123
+[submodule "3rdparty/mman-win32"]
+	path = 3rdparty/mman-win32
+	url = https://github.com/mcgarrah/mman-win32
+[submodule "3rdparty/angle-static-cmake"]
+	path = 3rdparty/angle-static-cmake
+	url = https://github.com/okuoku/angle-static-cmake
+[submodule "3rdparty/angle"]
+	path = 3rdparty/angle
+	url = https://github.com/google/angle
+[submodule "3rdparty/chromium-zlib"]
+	path = 3rdparty/chromium-zlib
+	url = https://chromium.googlesource.com/chromium/src/third_party/zlib
+[submodule "3rdparty/SPIRV-Headers"]
+	path = 3rdparty/SPIRV-Headers
+	url = https://github.com/KhronosGroup/SPIRV-Headers
+[submodule "3rdparty/SPIRV-Cross"]
+	path = 3rdparty/SPIRV-Cross
+	url = https://github.com/KhronosGroup/SPIRV-Cross
+[submodule "3rdparty/SPIRV-Tools"]
+	path = 3rdparty/SPIRV-Tools
+	url = https://github.com/KhronosGroup/SPIRV-Tools
+[submodule "3rdparty/glslang"]
+	path = 3rdparty/glslang
+	url = https://github.com/KhronosGroup/glslang

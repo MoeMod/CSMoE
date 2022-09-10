@@ -53,30 +53,12 @@ SCR_DrawFPS
 void SCR_DrawFPS( void )
 {
 	float calc;
-	rgba_t color;
+	byte *color;
 	static double nexttime = 0, lasttime = 0;
-	static double framerate = 0, avgrate = 0;
+	static double framerate = 0;
 	static int framecount = 0;
-	static int minfps     = 9999;
-	static int maxfps     = 0;
 	double newtime;
 	char fpsstring[64];
-	int offset;
-
-	if ( cls.state != ca_active )
-		return;
-	if ( !cl_showfps->integer || cl.background )
-		return;
-
-	switch ( cls.scrshot_action )
-	{
-	case scrshot_normal:
-	case scrshot_snapshot:
-	case scrshot_inactive:
-		break;
-	default:
-		return;
-	}
 
 	newtime = Sys_DoubleTime( );
 	if ( newtime >= nexttime )
@@ -91,44 +73,37 @@ void SCR_DrawFPS( void )
 	calc = framerate;
 
 	if ( calc == 0 )
-		return;
-
-	if ( calc < 1.0f )
+    {
+        Q_snprintf( fpsstring, sizeof( fpsstring ), "        " );
+        color = g_color_table[7];
+    }
+	else if ( calc < 1.0f )
 	{
 		Q_snprintf( fpsstring, sizeof( fpsstring ), "%4i spf", (int)( 1.0f / calc + 0.5f ) );
-		MakeRGBA( color, 255, 0, 0, 255 );
+        color = g_color_table[1];
 	}
 	else
 	{
-		int curfps = (int)( calc + 0.5f );
-
-		if ( curfps < minfps )
-			minfps = curfps;
-		if ( curfps > maxfps )
-			maxfps = curfps;
-
-		/*if( !avgrate ) avgrate = ( maxfps - minfps ) / 2.0f;
-		else */
-		avgrate += ( calc - avgrate ) / host.framecount;
-
-		switch ( cl_showfps->integer )
-		{
-		case 3:
-			Q_snprintf( fpsstring, sizeof( fpsstring ), "fps: ^1%4i min, ^3%4i cur, ^2%4i max | ^3%.2f avg", minfps, curfps, maxfps, avgrate );
-			break;
-		case 2:
-			Q_snprintf( fpsstring, sizeof( fpsstring ), "fps: ^1%4i min, ^3%4i cur, ^2%4i max", minfps, curfps, maxfps );
-			break;
-		case 1:
-		default:
-			Q_snprintf( fpsstring, sizeof( fpsstring ), "%4i fps", curfps );
-		}
-
-		MakeRGBA( color, 255, 255, 255, 255 );
+        Q_snprintf( fpsstring, sizeof( fpsstring ), "%4i fps", (int)( calc + 0.5f ) );
+        if(calc >= 119)
+            color = g_color_table[5];
+        else if(calc >= 59)
+            color = g_color_table[2];
+        else if(calc >= 29)
+            color = g_color_table[7];
+        else
+            color = g_color_table[1];
 	}
 
-	Con_DrawStringLen( fpsstring, &offset, NULL );
-	Con_DrawString( scr_width->integer - offset - 2, 4, fpsstring, color );
+    if(!cl_showfps->integer)
+        fpsstring[0] = '\0';
+
+    string	curbuild;
+    int	width, height = 0;
+    Q_snprintf( curbuild, MAX_STRING, "柑橘官方群:706711420 %s", fpsstring);
+    Con_DrawStringLen(curbuild, &width, &height);
+    Con_DrawString(scr_width->integer - width, 0, curbuild, color);
+
 }
 
 /*
@@ -671,7 +646,7 @@ void SCR_VidInit( void )
 	
 	// vid_state has changed
 	if( menu.hInstance ) menu.dllFuncs.pfnVidInit();
-	if( clgame.hInstance ) clgame.dllFuncs.pfnVidInit();
+	if( clgame.hInstance && cls.state != ca_disconnected ) clgame.dllFuncs.pfnVidInit();
 #ifdef XASH_VGUI2
     extern int VGui2_VidInit();
     if( clgame.hInstance ) VGui2_VidInit();

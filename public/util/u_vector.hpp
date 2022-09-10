@@ -41,7 +41,7 @@ typedef struct lua_State lua_State;
 
 namespace moe {
 
-template<class T, std::size_t N, std::size_t Align = alignof(float)>
+template<class T, std::size_t N, std::size_t Align = alignof(T)>
 struct VectorBase;
 
 template<class T, std::size_t N, class Seq, std::size_t Align, class Base>
@@ -68,6 +68,7 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align, Base> : Base
 		std::copy_n(arr, N, this->m_data);
 	}
 
+    // TODO : no more unaligned please!
     template<class T2, std::size_t Align2, class Base2>
     constexpr VectorBase_Gen(const VectorBase_Gen<T2, N, std::index_sequence<I...>, Align2, Base2> &other) : VectorBase_Gen{ other[I]... } {}
 
@@ -206,7 +207,37 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
     using Base = VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 16, VectorBase3f_SIMD_Data>;
     using Base::Base;
 
+    constexpr VectorBase_Storage() = default;
+
     constexpr VectorBase_Storage(float x1, float y1, float z1) : Base{ x1, y1, z1 }
+    {
+    }
+
+    VectorBase_Storage(xmm_t xmm)
+    {
+        this->m_xmm = xmm;
+    }
+
+    operator xmm_t() const
+    {
+        return this->m_xmm;
+    }
+
+    // TODO : no more unaligned please!
+    constexpr VectorBase_Storage(const VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 4, VectorBase3_Data<float, 4>>& other)
+    {
+        x = other.x;
+        y = other.y;
+        z = other.z;
+    }
+};
+
+template<> struct VectorBase_Storage<float, 4, 16> : VectorBase_Gen<float, 4, std::index_sequence<0, 1, 2, 3>, 16, VectorBase4f_SIMD_Data>
+{
+    using Base = VectorBase_Gen<float, 4, std::index_sequence<0, 1, 2, 3>, 16, VectorBase4f_SIMD_Data>;
+    using Base::Base;
+
+    constexpr VectorBase_Storage(float x1, float y1, float z1, float w1) : Base{ x1, y1, z1, w1 }
     {
     }
 
@@ -498,28 +529,29 @@ struct VectorBase : VectorBase_Storage<T, N, Align>
 };
 
 #if U_VECTOR_SIMD
-template<>
-struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
+template<class ThisClass, int XmmMask, class = void>
+struct VectorBaseSIMD;
+template<size_t N, int XmmMask>
+struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if<(N <= 4)>::type> : VectorBase_Storage<float, N, 16>
 {
-    using Base = VectorBase_Storage<float, 3, 16>;
-    using Base::Base;
+    using ThisClass = VectorBase<float, N, 16>;
+    using BaseClass = VectorBase_Storage<float, N, 16>;
+    using BaseClass::BaseClass;
 
     using T = float;
     using value_type = float;
-    static constexpr auto N = 4;
     static constexpr auto Align = 16;
-    static constexpr auto XmmMask = 0x7F; // 0x7F for vector3f
 
     template<std::size_t I> T &get() & { return (*this)[I]; }
     template<std::size_t I> T &&get() && { return std::move((*this)[I]); }
     template<std::size_t I> constexpr const T &get() const & { return (*this)[I]; }
     template<std::size_t I> constexpr const T &&get() const && { return std::move((*this)[I]); }
-    template<std::size_t I> friend T &get(VectorBase &v) { return v.get<I>(); }
-    template<std::size_t I> friend T &&get(VectorBase &&v) { return std::move(v).template get<I>(); }
-    template<std::size_t I> friend const T &get(const VectorBase &v) { return v.get<I>(); }
-    template<std::size_t I> friend const T &&get(const VectorBase &&v) { return std::move(v).template get<I>(); }
+    template<std::size_t I> friend T &get(ThisClass &v) { return v.template get<I>(); }
+    template<std::size_t I> friend T &&get(ThisClass &&v) { return std::move(v).template get<I>(); }
+    template<std::size_t I> friend const T &get(const ThisClass &v) { return v.template get<I>(); }
+    template<std::size_t I> friend const T &&get(const ThisClass &&v) { return std::move(v).template get<I>(); }
 
-    bool operator==(VectorBase v) const
+    bool operator==(ThisClass v) const
     {
 #if U_VECTOR_NEON
         return !vaddvq_u32(vceqq_f32(*this, v));
@@ -528,7 +560,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
         return 0xF == _mm_movemask_ps(_mm_cmpeq_ps(*this, v.m_xmm));
 #endif
     }
-    VectorBase operator+(VectorBase v) const
+    ThisClass operator+(ThisClass v) const
     {
 #if U_VECTOR_NEON
         return vaddq_f32(*this, v);
@@ -536,7 +568,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
         return _mm_add_ps(*this, v.m_xmm);
 #endif
     }
-    VectorBase operator-(VectorBase v) const
+    ThisClass operator-(ThisClass v) const
     {
 #if U_VECTOR_NEON
         return vsubq_f32(*this, v);
@@ -544,19 +576,19 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
         return _mm_sub_ps(*this, v.m_xmm);
 #endif
     }
-    VectorBase operator+() const
+    ThisClass operator+() const
     {
         return *this;
     }
-    VectorBase operator-() const
+    ThisClass operator-() const
     {
 #if U_VECTOR_NEON
         return vnegq_f32(*this);
 #elif U_VECTOR_SSE
-        return VectorBase(_mm_setzero_ps()) - *this;
+        return ThisClass(_mm_setzero_ps()) - (const ThisClass &)*this;
 #endif
     }
-    VectorBase operator*(float fl) const
+    ThisClass operator*(float fl) const
     {
 #ifdef U_VECTOR_NEON
         return vmulq_n_f32(*this, fl);
@@ -564,7 +596,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
         return _mm_mul_ps(*this, _mm_load_ps1(&fl));
 #endif
     }
-    VectorBase operator/(T fl) const
+    ThisClass operator/(T fl) const
     {
 #ifdef U_VECTOR_NEON
         return *this * (1 / fl);
@@ -572,28 +604,28 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
         return _mm_div_ps(*this, _mm_load_ps1(&fl));
 #endif
     }
-    friend VectorBase operator*(T fl, VectorBase vec)
+    friend ThisClass operator*(T fl, ThisClass vec)
     {
         return vec * fl;
     }
-    VectorBase &operator+=(VectorBase v)
+    ThisClass &operator+=(ThisClass v)
     {
-        return *this = *this + v;
+        return (ThisClass &)*this = *this + v;
     }
-    VectorBase &operator-=(VectorBase v)
+    ThisClass &operator-=(ThisClass v)
     {
-        return *this = *this - v;
+        return (ThisClass &)*this = *this - v;
     }
-    VectorBase &operator*=(T fl)
+    ThisClass &operator*=(T fl)
     {
-        return *this = *this * fl;
+        return (ThisClass &)*this = *this * fl;
     }
-    VectorBase &operator/=(T fl)
+    ThisClass &operator/=(T fl)
     {
-        return *this = *this / fl;
+        return (ThisClass &)*this = *this / fl;
     }
 
-    friend T DotProduct(VectorBase v1, VectorBase v2)
+    friend T DotProduct(ThisClass v1, ThisClass v2)
     {
 #if U_VECTOR_NEON
         return vaddvq_f32(vmulq_f32(v1, v2));
@@ -602,7 +634,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 #endif
     }
 
-    friend VectorBase fma(T x, VectorBase y, VectorBase z)
+    friend ThisClass fma(T x, ThisClass y, ThisClass z)
     {
 #if U_VECTOR_NEON
         return vfmaq_n_f32(z, y, x);
@@ -614,7 +646,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
     }
 
     // (a*b)+c
-    friend VectorBase fma(VectorBase x, T y, VectorBase z)
+    friend ThisClass fma(ThisClass x, T y, ThisClass z)
     {
 #if U_VECTOR_NEON
         return vfmaq_n_f32(z, x, y);
@@ -626,18 +658,18 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
     }
 
     // t*(b-a) + a;
-    friend VectorBase lerp(VectorBase a, VectorBase b, T t)
+    friend ThisClass lerp(ThisClass a, ThisClass b, T t)
     {
         return fma(t, b - a, a);
     }
 
     // 0.5*(b-a) + a;
-    friend VectorBase midpoint(VectorBase a, VectorBase b)
+    friend ThisClass midpoint(ThisClass a, ThisClass b)
     {
         return lerp(a, b, 0.5f);
     }
 
-    friend VectorBase maxs(VectorBase a, VectorBase b)
+    friend ThisClass maxs(ThisClass a, ThisClass b)
     {
 #if U_VECTOR_NEON
         return vmaxq_f32(a, b);
@@ -646,7 +678,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 #endif
     }
 
-    friend VectorBase mins(VectorBase a, VectorBase b)
+    friend ThisClass mins(ThisClass a, ThisClass b)
     {
 #if U_VECTOR_NEON
         return vminq_f32(a, b);
@@ -655,7 +687,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 #endif
     }
 
-    friend T reduce(VectorBase a)
+    friend T reduce(ThisClass a)
     {
 #if U_VECTOR_NEON
         return vaddvq_f32(a);
@@ -668,7 +700,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 #endif
     }
 
-    friend VectorBase abs(VectorBase a)
+    friend ThisClass abs(ThisClass a)
     {
 #if U_VECTOR_NEON
         constexpr int32x4_t mask = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0};
@@ -717,7 +749,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
 #endif
     }
 
-    VectorBase Normalize() const
+    ThisClass Normalize() const
     {
 #if U_VECTOR_NEON
         return vmulq_n_f32(*this, vrsqrtes_f32(vaddvq_f32(vmulq_f32(*this, *this))));
@@ -750,7 +782,7 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
         return Make2D().Length();
     }
 
-    friend T DotProduct2D(VectorBase v1, VectorBase v2)
+    friend T DotProduct2D(ThisClass v1, ThisClass v2)
     {
         return DotProduct(v1.Make2D(), v2.Make2D());
     }
@@ -763,8 +795,20 @@ struct VectorBase<float, 3, 16> : VectorBase_Storage<float, 3, 16>
     {
         return !IsNaN();
     }
+};
+
+template<>
+struct VectorBase<float, 3, 16> : VectorBaseSIMD<VectorBase<float, 3, 16>, 0x7F>
+{
+    using VectorBaseSIMD<VectorBase<float, 3, 16>, 0x7F>::VectorBaseSIMD;
     void LuaPush(lua_State* L) const;
     void LuaGet(lua_State* L, int idx);
+};
+
+template<>
+struct VectorBase<float, 4, 16> : VectorBaseSIMD<VectorBase<float, 4, 16>, 0xFF>
+{
+    using VectorBaseSIMD<VectorBase<float, 4, 16>, 0xFF>::VectorBaseSIMD;
 };
 #endif
 
@@ -827,24 +871,11 @@ template<class T, std::size_t Align> constexpr VectorBase<T, 3, Align> CrossProd
 inline VectorBase<float, 3, 16> CrossProduct(VectorBase<float, 3, 16> a, VectorBase<float, 3, 16> b)
 {
 #if U_VECTOR_NEON
-    float32x4_t vec_a = { a.y, a.z, a.x, a.y }; //Q register = [aj, ai, ak, aj]
-    float32x4_t vec_b = { b.y, b.z, b.x, b.y }; //Q register = [bj, bi, bk, bj]
-    float32x4_t vec_a_rot = vextq_f32(vec_a, vec_a, 1);
-    float32x4_t vec_b_rot = vextq_f32(vec_b, vec_b, 1);
-
-    // vec_a     = [ aj, ai, ak, aj ]
-    // vec_b_rot = [ bj, bj, bi, bk ]
-    // vec_a_rot = [ aj, aj, ai, ak ]
-    // vec_b     = [ bj, bi, bk, bj ]
-
-    float32x4_t prod = vmulq_f32(vec_a, vec_b_rot);
-
-    // prod = [ ajbj, aibj, akbi, ajbk ]
-
-    prod = vmlsq_f32(prod, vec_a_rot, vec_b);
-    // prod = [ ajbj-ajbj, aibj-ajbi, akbi-aibk, ajbk-akbj ]
-
-    return prod;
+    float32x4_t yzxy_a = vextq_f32(vextq_f32(a, a, 3), a, 2); // [aj, ak, ai, aj]
+    float32x4_t yzxy_b = vextq_f32(vextq_f32(b, b, 3), b, 2); // [bj, bk, bi, bj]
+    float32x4_t zxyy_a = vextq_f32(yzxy_a, yzxy_a, 1); // [ak, ai, aj, aj]
+    float32x4_t zxyy_b = vextq_f32(yzxy_b, yzxy_b, 1); // [bk, ai, bj, bj]
+    return vfmsq_f32(vmulq_f32(yzxy_a, zxyy_b), zxyy_a, yzxy_b); // [ajbk-akbj, akbi-aibk, aibj-ajbi, 0]
 #elif U_VECTOR_SSE
     __m128 result = _mm_sub_ps(
             _mm_mul_ps(b.m_xmm, _mm_shuffle_ps(a.m_xmm, a.m_xmm, _MM_SHUFFLE(3, 0, 2, 1))),

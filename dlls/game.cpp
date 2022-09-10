@@ -48,7 +48,7 @@ cvar_t forcechasecam = {"mp_forcechasecam", "0", FCVAR_SERVER, 0.0f, NULL};
 cvar_t mapvoteratio = {"mp_mapvoteratio", "0.66", FCVAR_SERVER, 0.0f, NULL};
 cvar_t logdetail = {"mp_logdetail", "0", FCVAR_SERVER, 0.0f, NULL};
 cvar_t startmoney = {"mp_startmoney", "800", FCVAR_SERVER, 0.0f, NULL};
-cvar_t maxrounds = {"mp_maxrounds", "13", FCVAR_SERVER, 0.0f, NULL};
+cvar_t maxrounds = {"mp_maxrounds", "15", FCVAR_SERVER, 0.0f, NULL};
 cvar_t winlimit = {"mp_winlimit", "0", FCVAR_SERVER, 0.0f, NULL};
 cvar_t windifference = {"mp_windifference", "1", FCVAR_SERVER, 0.0f, NULL};
 cvar_t playerid = {"mp_playerid", "0", FCVAR_SERVER, 0.0f, NULL};
@@ -99,6 +99,8 @@ cvar_t sk_scientist_heal1 = {"sk_scientist_heal1", "0", 0, 0.0f, NULL};
 cvar_t sk_scientist_heal2 = {"sk_scientist_heal2", "0", 0, 0.0f, NULL};
 cvar_t sk_scientist_heal3 = {"sk_scientist_heal3", "0", 0, 0.0f, NULL};
 cvar_t assistaim = { "mp_assistaim", "0", FCVAR_SERVER, 0.0f, NULL };
+cvar_t randomwpn = { "mp_randomwpn", "1", FCVAR_SERVER, 1.0f, NULL };
+cvar_t enhancedzombie = { "mp_enhancedzombie", "0", FCVAR_SERVER, 0.0f, NULL };
 
 cvar_t gamemode = {"mp_gamemode", "none", FCVAR_SERVER, 0.0f, NULL};
 cvar_t maxkills = {"mp_maxkills", "60", FCVAR_SERVER, 0.0f, NULL};
@@ -106,6 +108,12 @@ cvar_t maxkills = {"mp_maxkills", "60", FCVAR_SERVER, 0.0f, NULL};
 cvar_t votemap_enabled = { "mp_votemap_enabled", "1", FCVAR_SERVER, 0.0f, NULL }; // Takes map change for it to turn off / on. (Default: 1)
 cvar_t votemap_tally_delay_time = { "mp_votemap_tally_delay_time", "15", FCVAR_SERVER, 0.0f, NULL }; // Delay between when vote starts and when votes are tallied. (Default: 15)
 cvar_t votemap_type = { "mp_votemap_type", "0", FCVAR_SERVER, 0.0f, NULL }; // 0-default 1-extend
+
+cvar_t voteplayer_enabled = { "mp_voteplayer_enabled", "1", FCVAR_SERVER, 0.0f, NULL }; // (Default: 1)
+cvar_t voteplayer_cooldown_time = { "mp_voteplayer_cooldown_time", "300", FCVAR_SERVER, 0.0f, NULL }; // Delay between two Votes. (Default: 300)
+cvar_t voteplayer_last_time = { "mp_voteplayer_last_time", "10", FCVAR_SERVER, 0.0f, NULL }; // Duration?. (Default: 10)
+cvar_t voteplayer_kick_time = { "mp_voteplayer_kick_time", "3600", FCVAR_SERVER, 0.0f, NULL }; // Duration?. (Default: 3600)
+cvar_t voteplayer_kick_percent = { "mp_voteplayer_kick_percent", "0.5", FCVAR_SERVER, 0.0f, NULL };
 
 extern void Bot_RegisterCvars();
 extern void Tutor_RegisterCVars();
@@ -173,6 +181,16 @@ void EXT_FUNC GameDLLInit()
 	CVAR_REGISTER(&votemap_enabled);
 	CVAR_REGISTER(&votemap_tally_delay_time);
 	CVAR_REGISTER(&votemap_type);
+
+	CVAR_REGISTER(&voteplayer_enabled);
+	CVAR_REGISTER(&voteplayer_cooldown_time);
+	CVAR_REGISTER(&voteplayer_last_time);
+	CVAR_REGISTER(&voteplayer_kick_time);
+	CVAR_REGISTER(&voteplayer_kick_percent);
+
+	CVAR_REGISTER(&randomwpn);
+	CVAR_REGISTER(&assistaim);
+	CVAR_REGISTER(&enhancedzombie);
 
 	Bot_RegisterCvars();
 	Tutor_RegisterCVars();

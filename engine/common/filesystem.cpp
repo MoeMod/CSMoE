@@ -20,32 +20,17 @@ GNU General Public License for more details.
 #include "library.h"
 #include "mathlib.h"
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <stdarg.h> // va
 #ifdef XASH_SDL
 #include <SDL_system.h> // Android External storage
 #include <SDL_filesystem.h> // Android External storage
 #endif
-#ifdef _WIN32
-#include <io.h>
-#include <direct.h>
-#else
-#include <dirent.h>
-#include <errno.h>
-#include <unistd.h>
-#endif
-
-#if defined __ANDROID__
-#include <android/asset_manager.h>
-#endif
+#include "fs_io.h"
+#include "fs_impl.h"
 
 #ifdef XASH_WINRT
 #include "platform/winrt/winrt_interop.h"
 #endif
 
-#define FILE_BUFF_SIZE		2048
 #define PAK_LOAD_OK			0
 #define PAK_LOAD_COULDNT_OPEN		1
 #define PAK_LOAD_BAD_HEADER		2
@@ -68,22 +53,6 @@ typedef struct wadtype_s
 	signed char		type;
 } wadtype_t;
 
-struct file_s
-{
-	int		handle;			// file descriptor
-	fs_offset_t	real_length;		// uncompressed file size (for files opened in "read" mode)
-	fs_offset_t	position;			// current position in the file
-	fs_offset_t	offset;			// offset into the package (0 if external file)
-	int		ungetc;			// single stored character from ungetc, cleared to EOF when read
-	time_t		filetime;			// pak, wad or real filetime
-						// Contents buffer
-	fs_offset_t	buff_ind, buff_len;		// buffer current index and length
-	byte		buff[FILE_BUFF_SIZE];	// intermediate buffer
-#if defined __ANDROID__
-	AAsset *asset;
-#endif
-};
-
 mempool_t		*fs_mempool;
 searchpath_t	*fs_searchpaths = NULL;
 searchpath_t	fs_directpath;		// static direct path
@@ -101,7 +70,11 @@ static void FS_InitMemory( void );
 static dlumpinfo_t *W_FindLump( wfile_t *wad, const char *name, const signed char matchtype );
 static packfile_t* FS_AddFileToPack( const char* name, pack_t *pack, fs_offset_t offset, fs_offset_t size );
 static byte *W_LoadFile( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly );
-static qboolean FS_SysFolderExists( const char *path );
+
+template<class ResultType = void *, void *(*pmmap)(xe::fs::fd_t, size_t, off_t, void*) = xe::fs::mmap_file>
+static ResultType W_MapFileImpl( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly );
+
+extern qboolean FS_SysFolderExists( const char *path );
 static int FS_SysFileTime( const char *filename );
 static signed char W_TypeFromExt( const char *lumpname );
 static const char *W_ExtFromType( signed char lumptype );
@@ -268,13 +241,8 @@ static void listdirectory( stringlist_t *list, const char *path, qboolean lowerc
 	signed char *c;
 #ifdef _WIN32
 	char pattern[4096];
-#ifdef _WIN64
-	struct _finddatai64_t	n_file;
-	intptr_t		hFile;
-#else
-	struct _finddata_t	n_file;
-	int		hFile;
-#endif
+	WIN32_FIND_DATAW	n_file;
+	HANDLE		hFile;
 #else
 	DIR *dir;
 	struct dirent *entry;
@@ -282,18 +250,18 @@ static void listdirectory( stringlist_t *list, const char *path, qboolean lowerc
 
 #if defined(__ANDROID__)
 	// handle android asset
-	if(!strcmp(path, "/android_asset"))
+	if (!strcmp(path, "/android_asset"))
 	{
 		Android_AssetList(list, "", stringlistappend);
 	}
-	if(!strncmp(path, "/android_asset/", 15))
+	if (!strncmp(path, "/android_asset/", 15))
 	{
 #if 0
-		AAssetManager *mgr = Android_GetAssetManager();
-		AAssetDir *assetDir = AAssetManager_openDir(mgr, path + 14);
-		const char *d_name = NULL;
-		while( ( d_name = AAssetDir_getNextFileName( assetDir ) ))
-			stringlistappend( list, d_name );
+		AAssetManager* mgr = Android_GetAssetManager();
+		AAssetDir* assetDir = AAssetManager_openDir(mgr, path + 14);
+		const char* d_name = NULL;
+		while ((d_name = AAssetDir_getNextFileName(assetDir)))
+			stringlistappend(list, d_name);
 		AAssetDir_close(assetDir);
 #else
 		Android_AssetList(list, path + 15, stringlistappend);
@@ -303,27 +271,27 @@ static void listdirectory( stringlist_t *list, const char *path, qboolean lowerc
 #endif
 
 #ifdef _WIN32
-	Q_snprintf( pattern, sizeof( pattern ), "%s*", path );
+	// MoeMod : fix Chinese path
+	Q_snprintf(pattern, sizeof(pattern), "%s*", path);
+	wchar_t wpattern[4096];
+	MultiByteToWideChar(CP_UTF8, 0, pattern, 4096, wpattern, 4096);
 
 	// ask for the directory listing handle
-#ifdef _WIN64
-	hFile = _findfirsti64( pattern, &n_file );
-	if (hFile < 0) return;
-#else
-	hFile = _findfirst(pattern, &n_file);
-	if (hFile == -1) return;
-#endif
+	hFile = FindFirstFileW(wpattern, &n_file);
+	if (hFile == INVALID_HANDLE_VALUE) return;
 
 	// start a new chain with the the first name
-	stringlistappend( list, n_file.name );
+	char filename[MAX_PATH];
+	WideCharToMultiByte(CP_UTF8, 0, n_file.cFileName, MAX_PATH, filename, MAX_PATH, nullptr, nullptr);
+	stringlistappend(list, filename);
+
 	// iterate through the directory
-#ifdef _WIN64
-	while (_findnexti64( hFile, &n_file ) == 0 )
-#else
-	while (_findnext(hFile, &n_file) == 0)
-#endif
-		stringlistappend( list, n_file.name );
-	_findclose( hFile );
+	while (FindNextFileW(hFile, &n_file))
+	{
+		WideCharToMultiByte(CP_UTF8, 0, n_file.cFileName, MAX_PATH, filename, MAX_PATH, nullptr, nullptr);
+		stringlistappend(list, filename);
+	}
+	FindClose(hFile);
 #else
 	if( !( dir = opendir( path ) ) )
 		return;
@@ -513,7 +481,7 @@ void FS_CreatePath( char *path )
 			// create the directory
 			save = *ofs;
 			*ofs = 0;
-			_mkdir( path );
+			xe::fs::mkdir( path );
 			*ofs = save;
 		}
 	}
@@ -689,32 +657,32 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 {
 	dpackheader_t	header;
 	int		i, numpackfiles;
-	int		packhandle;
+	xe::fs::fd_t		packhandle;
 	pack_t		*pack;
 	dpackfile_t	*info;
 
-	packhandle = open( packfile, O_RDONLY|O_BINARY, 0 );
+	packhandle = xe::fs::fopen( packfile, "rb" );
 
 #ifndef _WIN32
-	if( packhandle < 0 )
+	if( packhandle == xe::fs::invalid_file )
 	{
 		const char *fpackfile = FS_FixFileCase( packfile );
 		if( fpackfile!= packfile )
         {
-            packhandle = open( fpackfile, O_RDONLY|O_BINARY );
+            packhandle = xe::fs::fopen(packfile, "rb");
             packfile = fpackfile;
         }
 	}
 #endif
 
-	if( packhandle < 0 )
+	if( packhandle == xe::fs::invalid_file )
 	{
 		MsgDev( D_NOTE, "%s couldn't open\n", packfile );
 		if( error ) *error = PAK_LOAD_COULDNT_OPEN;
 		return NULL;
 	}
 
-	read( packhandle, (void *)&header, sizeof( header ));
+	xe::fs::fread( packhandle, (void *)&header, sizeof( header ));
 
 	LittleLongSW(header.ident);
 	LittleLongSW(header.dirlen);
@@ -724,7 +692,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_NOTE, "%s is not a packfile. Ignored.\n", packfile );
 		if( error ) *error = PAK_LOAD_BAD_HEADER;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		return NULL;
 	}
 
@@ -732,7 +700,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_ERROR, "%s has an invalid directory size. Ignored.\n", packfile );
 		if( error ) *error = PAK_LOAD_BAD_FOLDERS;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		return NULL;
 	}
 
@@ -742,7 +710,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_ERROR, "%s has too many files ( %i ). Ignored.\n", packfile, numpackfiles );
 		if( error ) *error = PAK_LOAD_TOO_MANY_FILES;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		return NULL;
 	}
 
@@ -750,18 +718,18 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		MsgDev( D_NOTE, "%s has no files. Ignored.\n", packfile );
 		if( error ) *error = PAK_LOAD_NO_FILES;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		return NULL;
 	}
 
 	info = (dpackfile_t *)Mem_ZeroAlloc( fs_mempool, sizeof( *info ) * numpackfiles );
-	lseek( packhandle, header.dirofs, SEEK_SET );
+	xe::fs::fseek( packhandle, header.dirofs, SEEK_SET );
 
-	if( header.dirlen != read( packhandle, (void *)info, header.dirlen ))
+	if( header.dirlen != xe::fs::fread( packhandle, (void *)info, header.dirlen ))
 	{
 		MsgDev( D_NOTE, "%s is an incomplete PAK, not loading\n", packfile );
 		if( error ) *error = PAK_LOAD_CORRUPTED;
-		close( packhandle );
+		xe::fs::fclose( packhandle );
 		Mem_Free( info );
 		return NULL;
 	}
@@ -1969,7 +1937,7 @@ void FS_Init( void )
 				// magic here is that dirs.strings don't contain full path
 				// so code below checks and creates folders in current directory(host.rootdir)
 				if( !FS_SysFolderExists( dirs.strings[i] ) )
-					_mkdir( dirs.strings[i] );
+					xe::fs::mkdir( dirs.strings[i] );
 			}
 
 			stringlistfreecontents( &dirs );
@@ -2120,44 +2088,6 @@ Internal function used to create a file_t and open the relevant non-packed file 
 static file_t* FS_SysOpen( const char* filepath, const char* mode )
 {
 	file_t	*file;
-	int	mod, opt;
-	uint	ind;
-
-	// Parse the mode string
-	switch( mode[0] )
-	{
-	case 'r':
-		mod = O_RDONLY;
-		opt = 0;
-		break;
-	case 'w':
-		mod = O_WRONLY;
-		opt = O_CREAT | O_TRUNC;
-		break;
-	case 'a':
-		mod = O_WRONLY;
-		opt = O_CREAT | O_APPEND;
-		break;
-	default:
-		MsgDev( D_ERROR, "FS_SysOpen(%s, %s): invalid mode\n", filepath, mode );
-		return NULL;
-	}
-
-	for( ind = 1; mode[ind] != '\0'; ind++ )
-	{
-		switch( mode[ind] )
-		{
-		case '+':
-			mod = O_RDWR;
-			break;
-		case 'b':
-			opt |= O_BINARY;
-			break;
-		default:
-			MsgDev( D_ERROR, "FS_SysOpen: %s: unknown char in mode %s (%c)\n", filepath, mode, mode[ind] );
-			break;
-		}
-	}
 
 #if defined __ANDROID__
 	// handle android assets
@@ -2198,7 +2128,7 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 
 
 		// For files opened in append mode, we start at the end of the file
-		if( mod & O_APPEND )
+		if( strchr(mode, 'a') )
 		{
 			file->position = file->real_length;
 		}
@@ -2224,28 +2154,28 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	file->asset = NULL;
 #endif
 
-	file->handle = open( filepath, mod|opt, 0666 );
+	file->handle = xe::fs::fopen( filepath, mode );
 
 #ifndef _WIN32
-	if( file->handle < 0 )
+	if( file->handle == xe::fs::invalid_file )
 	{
 		const char *ffilepath = FS_FixFileCase( filepath );
 		if( ffilepath != filepath )
         {
-            file->handle = open( ffilepath, mod|opt, 0666 );
+            file->handle = xe::fs::fopen( ffilepath, mode );
             filepath = ffilepath;
         }
 	}
 #endif
 
-	if( file->handle < 0 )
+	if( file->handle == xe::fs::invalid_file )
 	{
 		Mem_Free( file );
 		return NULL;
 	}
 
 
-	file->real_length = lseek( file->handle, 0, SEEK_END );
+	file->real_length = xe::fs::fseek( file->handle, 0, SEEK_END );
 	if( file->real_length == -1 )
 	{
 		MsgDev( D_ERROR, "FS_SysOpen: Cannot lseek file: %s\n", strerror(errno));
@@ -2253,8 +2183,8 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	}
 
 	// For files opened in append mode, we start at the end of the file
-	if( mod & O_APPEND ) file->position = file->real_length;
-	else lseek( file->handle, 0, SEEK_SET );
+	if( strchr(mode, 'a') ) file->position = file->real_length;
+	else xe::fs::fseek( file->handle, 0, SEEK_SET );
 
 	return file;
 }
@@ -2270,17 +2200,17 @@ Open a packed file using its package file descriptor
 file_t *FS_OpenPackedFile( pack_t *pack, int pack_ind )
 {
 	packfile_t	*pfile;
-	int		dup_handle;
+	xe::fs::fd_t		dup_handle;
 	file_t		*file;
 
 	pfile = &pack->files[pack_ind];
 
-	if( lseek( pack->handle, pfile->offset, SEEK_SET ) == -1 )
+	if( xe::fs::fseek( pack->handle, pfile->offset, SEEK_SET ) == -1 )
 		return NULL;
 
-	dup_handle = dup( pack->handle );
+	dup_handle = xe::fs::fdup( pack->handle );
 
-	if( dup_handle < 0 )
+	if( dup_handle == xe::fs::invalid_file )
 		return NULL;
 
 	file = (file_t *)Mem_ZeroAlloc( fs_mempool, sizeof( *file ));
@@ -2329,11 +2259,11 @@ qboolean FS_SysFileExists( const char *path, qboolean caseinsensitive )
 #endif
 
 #ifdef _WIN32
-	int desc;
+	xe::fs::fd_t desc;
 
-	desc = open( path, O_RDONLY|O_BINARY, 0 );
-	if( desc < 0 ) return false;
-	close( desc );
+	desc = xe::fs::fopen( path, "rb" );
+	if( desc == xe::fs::invalid_file ) return false;
+	xe::fs::fclose( desc );
 	return true;
 #else
 	int ret;
@@ -2390,7 +2320,10 @@ qboolean FS_SysFolderExists( const char *path )
 	_findclose(hFile);
 	return 1;
 #elif defined( _WIN32 )
-	DWORD	dwFlags = GetFileAttributes( path );
+	// MoeMod : fix Chinese path
+	wchar_t wpath[MAX_PATH];
+	MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, MAX_PATH);
+	DWORD	dwFlags = GetFileAttributesW(wpath);
 
 	return ( dwFlags != -1 ) && ( dwFlags & FILE_ATTRIBUTE_DIRECTORY );
 #else
@@ -2688,7 +2621,7 @@ int FS_Close( file_t *file )
 		file->asset = NULL;
 	}
 #endif
-	if( file->handle && close( file->handle ))
+	if( file->handle && xe::fs::fclose( file->handle ))
 		return EOF;
 
 	Mem_Free( file );
@@ -2716,14 +2649,14 @@ fs_offset_t FS_Write( file_t *file, const void *data, size_t datasize )
 
 	// if necessary, seek to the exact file position we're supposed to be
 	if( file->buff_ind != file->buff_len )
-		lseek( file->handle, file->buff_ind - file->buff_len, SEEK_CUR );
+		xe::fs::fseek( file->handle, file->buff_ind - file->buff_len, SEEK_CUR );
 
 	// purge cached data
 	FS_Purge( file );
 
 	// write the buffer and update the position
-	result = write( file->handle, data, (fs_offset_t)datasize );
-	file->position = lseek( file->handle, 0, SEEK_CUR );
+	result = xe::fs::fwrite( file->handle, data, (fs_offset_t)datasize );
+	file->position = xe::fs::fseek( file->handle, 0, SEEK_CUR );
 	if( file->real_length < file->position )
 		file->real_length = file->position;
 
@@ -2794,8 +2727,8 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 		else
 #endif
 		{
-			lseek( file->handle, file->offset + file->position, SEEK_SET );
-			nb = read (file->handle, &((byte *)buffer)[done], count );
+			xe::fs::fseek( file->handle, file->offset + file->position, SEEK_SET );
+			nb = xe::fs::fread (file->handle, &((byte *)buffer)[done], count );
 		}
 
 		if( nb > 0 )
@@ -2827,8 +2760,8 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 		else
 #endif
 		{
-			lseek( file->handle, file->offset + file->position, SEEK_SET );
-			nb = read( file->handle, file->buff, count );
+			xe::fs::fseek( file->handle, file->offset + file->position, SEEK_SET );
+			nb = xe::fs::fread( file->handle, file->buff, count );
 		}
 
 		if( nb > 0 )
@@ -2907,7 +2840,7 @@ int FS_VPrintf( file_t *file, const char* format, va_list ap )
 		buff_size *= 2;
 	}
 
-	len = write( file->handle, tempbuff, len );
+	len = xe::fs::fwrite( file->handle, tempbuff, len );
 	Mem_Free( tempbuff );
 
 	return len;
@@ -2995,7 +2928,7 @@ int FS_Seek( file_t *file, fs_offset_t offset, int whence )
 	}
 	else
 #endif
-	if( lseek( file->handle, file->offset + offset, SEEK_SET ) == -1 )
+	if( xe::fs::fseek( file->handle, file->offset + offset, SEEK_SET ) == -1 )
 		return -1;
 	file->position = offset;
 
@@ -3088,6 +3021,100 @@ byte *FS_LoadFile( const char *path, fs_offset_t *filesizeptr, qboolean gamediro
 		*filesizeptr = filesize;
 
 	return buf;
+}
+
+template<class ResultType = void *, void *(*pmmap)(xe::fs::fd_t, size_t, off_t, void*) = xe::fs::mmap_file>
+static ResultType FS_MapFileImpl(const char* path, fs_offset_t* filesizeptr, qboolean gamedironly)
+{
+	auto file = FS_Open(path, "rb", gamedironly);
+
+#ifndef _WIN32
+	if (!file)
+	{
+		// Try to open this file with lowered path
+		file = FS_Open(FS_ToLowerCase(path), "rb", gamedironly);
+	}
+#endif // _WIN32
+
+    if( !file )
+    {
+        fs_offset_t	filesize = 0;
+        // Now it truly doesn't exist in file system
+        ResultType buf = (ResultType)W_MapFileImpl<ResultType, pmmap>( path, &filesize, gamedironly );
+
+        if( filesizeptr )
+            *filesizeptr = filesize;
+
+        if(buf)
+            return buf;
+        return nullptr;
+    }
+
+    // try to use swappable memory
+    auto filesize = file->real_length;
+    if(auto fd = file->handle; fd != xe::fs::invalid_file)
+    {
+        if(auto buf = (ResultType)(pmmap(fd, filesize, 0, nullptr)))
+        {
+            FS_Close(file);
+            if (filesizeptr)
+                *filesizeptr = filesize;
+            return buf;
+        }
+    }
+
+#if __ANDROID__
+    if(auto asset = file->asset)
+    {
+        off_t offset, filesize;
+    #ifdef XASH_64BIT
+        auto fd = AAsset_openFileDescriptor64(asset, &offset, &filesize);
+    #else
+        auto fd = AAsset_openFileDescriptor(asset, &offset, &filesize);
+    #endif
+        if (fd > 0)
+        {
+            auto buf = (ResultType)(pmmap(fd, filesize, offset, nullptr));
+            if (filesizeptr)
+                *filesizeptr = filesize;
+            ::close(fd);
+            FS_Close(file);
+            return buf;
+        }
+    }
+    #endif
+    // plain copy
+    if(void *buf = xe::fs::mmap_anon(filesize))
+    {
+        FS_Read(file, buf, filesize);
+        FS_Close(file);
+        if (filesizeptr)
+            *filesizeptr = filesize;
+        return (ResultType)buf;
+    }
+    FS_Close(file);
+    return nullptr;
+}
+
+const byte* FS_MapFile(const char* path, fs_offset_t* filesizeptr, qboolean gamedironly)
+{
+	return FS_MapFileImpl<const byte*, xe::fs::mmap_file>(path, filesizeptr, gamedironly);
+}
+
+byte* FS_MapFileCOW(const char* path, fs_offset_t* filesizeptr, qboolean gamedironly)
+{
+	return FS_MapFileImpl<byte*, xe::fs::mmap_file_cow>(path, filesizeptr, gamedironly);
+}
+
+void FS_MapFree(const byte *data, fs_offset_t filesize)
+{
+    if(data)
+        xe::fs::munmap((void *)data, filesize);
+}
+
+void *FS_MapAlloc(fs_offset_t filesize)
+{
+    return xe::fs::mmap_anon(filesize);
 }
 
 /*
@@ -4038,6 +4065,63 @@ byte *W_ReadLump( wfile_t *wad, dlumpinfo_t *lump, fs_offset_t *lumpsizeptr )
 	return buf;
 }
 
+template<class ResultType = void *, void *(*pmmap)(xe::fs::fd_t, size_t, off_t, void*) = xe::fs::mmap_file>
+ResultType W_MapLump( wfile_t *wad, dlumpinfo_t *lump, fs_offset_t *lumpsizeptr )
+{
+	// assume error
+	if( lumpsizeptr ) *lumpsizeptr = 0;
+
+	// no wads loaded
+	if( !wad || !lump ) return NULL;
+
+    if(auto fd = wad->wadfile->handle; fd != xe::fs::invalid_file)
+    {
+        if(auto buf = (ResultType)pmmap(fd, lump->disksize, lump->filepos, nullptr))
+        {
+            if( lumpsizeptr ) *lumpsizeptr = lump->size;
+            return buf;
+        }
+    }
+
+#if __ANDROID__
+    if(auto asset = wad->wadfile->asset)
+    {
+        off_t offset, filesize;
+#ifdef XASH_64BIT
+        auto fd = AAsset_openFileDescriptor64(asset, &offset, &filesize);
+#else
+        auto fd = AAsset_openFileDescriptor(asset, &offset, &filesize);
+#endif
+        if (fd > 0)
+        {
+            auto buf = (ResultType)(xe::fs::mmap_file(fd, lump->disksize, offset + lump->filepos));
+
+            if( lumpsizeptr ) *lumpsizeptr = lump->size;
+            ::close(fd);
+            return buf;
+        }
+    }
+#endif
+
+    if( FS_Seek( wad->wadfile, lump->filepos, SEEK_SET ) == -1 )
+    {
+        MsgDev( D_ERROR, "W_ReadLump: %s is corrupted\n", lump->name );
+        return NULL;
+    }
+
+    void *buf = xe::fs::mmap_anon( lump->disksize );
+    size_t size = FS_Read( wad->wadfile, buf, lump->disksize );
+    if( size < lump->disksize )
+    {
+        MsgDev( D_WARN, "W_ReadLump: %s is probably corrupted\n", lump->name );
+        xe::fs::munmap( buf, lump->disksize );
+        return NULL;
+    }
+
+    if( lumpsizeptr ) *lumpsizeptr = lump->size;
+    return (ResultType)buf;
+}
+
 /*
 =============================================================================
 
@@ -4084,7 +4168,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 
 		wad->numlumps = 0;		// blank wad
 		wad->lumps = NULL;		//
-		wad->mode = O_WRONLY;
+		wad->mode = 'w';
 
 		// save space for header
 		hdr.ident = LittleLong(IDWAD3HEADER);
@@ -4099,7 +4183,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		if( mode[0] == 'a' )
 		{
 			FS_Seek( wad->wadfile, 0, SEEK_SET );
-			wad->mode = O_APPEND;
+			wad->mode = 'a';
 		}
 
 		if( FS_Read( wad->wadfile, &header, sizeof( dwadinfo_t )) != sizeof( dwadinfo_t ))
@@ -4125,10 +4209,10 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		}
 
 		wad->numlumps = header.numlumps;
-		if( wad->numlumps >= MAX_FILES_IN_WAD && wad->mode == O_APPEND )
+		if( wad->numlumps >= MAX_FILES_IN_WAD && wad->mode == 'a' )
 		{
 			MsgDev( D_WARN, "W_Open: %s is full (%i lumps)\n", filename, wad->numlumps );
-			wad->mode = O_RDONLY; // set read-only mode
+			wad->mode = 'r'; // set read-only mode
 		}
 		wad->infotableofs = header.infotableofs; // save infotableofs position
 		if( FS_Seek( wad->wadfile, wad->infotableofs, SEEK_SET ) == -1 )
@@ -4141,7 +4225,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		// NOTE: lumps table can be reallocated for O_APPEND mode
 		wad->lumps = (dlumpinfo_t*)Mem_Alloc( wad->mempool, wad->numlumps * sizeof( dlumpinfo_t ));
 
-		if( wad->mode == O_APPEND )
+		if( wad->mode == 'a')
 		{
 			size_t	lat_size = wad->numlumps * sizeof( dlumpinfo_t );
 
@@ -4179,7 +4263,7 @@ void W_Close( wfile_t *wad )
 
 	if( !wad ) return;
 
-	if( wad->wadfile && ( wad->mode == O_APPEND || wad->mode == O_WRONLY ))
+	if( wad->wadfile && ( wad->mode == 'a' || wad->mode == 'w'))
 	{
 		dwadinfo_t	hdr;
 
@@ -4219,6 +4303,18 @@ static byte *W_LoadFile( const char *path, fs_offset_t *lumpsizeptr, qboolean ga
 	return NULL;
 }
 
+template<class ResultType, void *(*pmmap)(xe::fs::fd_t, size_t, off_t, void*)>
+static ResultType W_MapFileImpl( const char *path, fs_offset_t *lumpsizeptr, qboolean gamedironly )
+{
+    searchpath_t	*search;
+    int		index;
+
+    search = FS_FindFile( path, &index, gamedironly );
+    if( search && search->wad )
+        return W_MapLump<ResultType, pmmap>( search->wad, &search->wad->lumps[index], lumpsizeptr );
+    return NULL;
+}
+
 /*
 =============================================================================
 
@@ -4228,6 +4324,27 @@ FILESYSTEM PUBLIC API
 */
 void *FSAPI_MemAlloc( size_t size, const char *filename, int fileline );
 void FSAPI_MemFree( void *data, const char *filename, int fileline );
+
+const void *FSAPI_MapFile( const char *path, fs_offset_t *filesizeptr, qboolean gamedironly )
+{
+    return FS_MapFile(path, filesizeptr, gamedironly);
+}
+void* FSAPI_MapFileCOW(const char* path, fs_offset_t* filesizeptr, qboolean gamedironly)
+{
+	return FS_MapFileCOW(path, filesizeptr, gamedironly);
+}
+void FSAPI_MapFree( const void *data, fs_offset_t filesize )
+{
+    return FS_MapFree((const byte *)data, filesize);
+}
+void *FSAPI_MapAlloc( fs_offset_t filesize )
+{
+    return FS_MapAlloc(filesize);
+}
+void *FSAPI_MapCopy( void *dest, const void *src, fs_offset_t filesize )
+{
+    return Mem_VirtualCopy(dest, src, filesize);
+}
 
 fs_api_t g_fsapi =
 {
@@ -4252,7 +4369,12 @@ fs_api_t g_fsapi =
 	FS_AddPack_Fullpath,
 	Msg,
 	FSAPI_MemAlloc,
-    FSAPI_MemFree
+    FSAPI_MemFree,
+    FSAPI_MapFile,
+	FSAPI_MapFileCOW,
+    FSAPI_MapFree,
+    FSAPI_MapAlloc,
+    FSAPI_MapCopy
 };
 
 void *FSAPI_MemAlloc( size_t size, const char *filename, int fileline )
