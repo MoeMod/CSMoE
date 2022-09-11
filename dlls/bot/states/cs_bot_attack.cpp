@@ -325,6 +325,20 @@ void AttackState::OnUpdate(CCSBot *me)
 		if ((enemy->pev->origin - me->pev->origin).IsLengthGreaterThan(shotgunMaxRange))
 			me->EquipPistol();
 	}
+    else if (me->IsUsingChainsaw())
+    {
+        // if we have a saw equipped and enemy is too far away, switch to pistol
+        const float distance = (enemy->pev->origin - me->pev->origin).Length();
+        if (distance > 1000.0f)
+            me->EquipPistol();
+
+        // way too close and dangerous, stab him
+        if (distance < 50.0f || (distance < 100.0f && me->GetNearbyEnemyCount() > 2))
+        {
+            me->StopAttacking();
+            me->SecondaryAttack();
+        }
+    }
 
 	// if we're sniping, look through the scope - need to do this here in case a reload resets our scope
 	if (me->IsUsingSniperRifle())
@@ -516,8 +530,23 @@ void AttackState::OnUpdate(CCSBot *me)
             combatRange = 75.0f + me->pev->maxspeed * me->m_flNextAttack / 1s;
             hysterisRange = 10.0f * (1 - me->GetProfile()->GetSkill());
         }
+        else if(me->IsUsingChainsaw())
+        {
+            auto weapon = me->GetActiveWeapon();
+            if(weapon->pev->iuser1 == 1 || me->IsAttacking())
+            {
+                // using saw attacking
+                combatRange = 110.0f;
+                hysterisRange = 5.0f * (1 - me->GetProfile()->GetSkill());
+            }
+            else
+            {
+                combatRange = 400.0f;
+            }
+        }
         else if(CBasePlayerWeapon *weapon = static_cast<CBasePlayerWeapon *>(me->m_rgpPlayerItems[ KNIFE_SLOT ]); weapon->GetBotStrategy() == BOT_STRATEGY_SKULLAXE)
         {
+            // using skullaxe bug
             auto delta_time = weapon->pev->nextthink - gpGlobals->time;
             if(delta_time > 0.1s)
             {

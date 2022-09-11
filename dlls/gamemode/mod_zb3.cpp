@@ -926,9 +926,9 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 	{
 		m_pPlayer->RemoveAllItems(FALSE);
 		m_pPlayer->m_bHasPrimary = false;
-		if(!RANDOM_LONG(0, 10))
+		if(!RANDOM_LONG(0, 3))
 		{
-			// 电锯套 10%
+			// 电锯套 25%
 			m_pPlayer->GiveNamedItem("weapon_chainsaw");
 			m_pPlayer->GiveNamedItem("weapon_infinityex2");
 			m_pPlayer->GiveNamedItem("knife_dragonsword");

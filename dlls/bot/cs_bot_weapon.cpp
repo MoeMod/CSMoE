@@ -128,7 +128,7 @@ void CCSBot::FireWeaponAtEnemy()
 							}
 						}
 					}
-					else if (IsUsingCannon())
+					else if (IsUsingCannon() || IsUsingChainsaw())
 					{
 						const float cannonRange = 150.0f; // 50.0f
 						if (rangeToEnemy < cannonRange)
@@ -137,7 +137,7 @@ void CCSBot::FireWeaponAtEnemy()
 							//ForceRun(5.0s);
 
 							// if multiple enemy found, press 6
-							if (GetNearbyEnemyCount() > 2 && m_flNextAttack < 0.2s)
+							if ((GetNearbyEnemyCount() > 2 || GetEnemiesRemaining() <= 2 || GetFriendsRemaining() <= 2 || g_pGameRules->TimeRemaining() <= 15.0s) && m_flNextAttack < 0.2s)
 							{
 								m_pModStrategy->ClientCommand("MoE_HumanSkill2");
 							}
@@ -512,6 +512,24 @@ bool CCSBot::IsUsingMachinegun() const
 	return false;
 }
 
+// Returns true if using chainsaw
+
+bool CCSBot::IsUsingChainsaw() const
+{
+	CBasePlayerWeapon *weapon = GetActiveWeapon();
+
+	if (weapon == NULL)
+		return false;
+
+	if (weapon->m_iId == WEAPON_CHAINSAW)
+		return true;
+
+	if(weapon->GetBotStrategy() == BOT_STRATEGY_CHAINSAW)
+		return true;
+
+	return false;
+}
+
 // Returns true if using cannon
 
 bool CCSBot::IsUsingCannon() const
@@ -628,7 +646,8 @@ void CCSBot::EquipBestWeapon(bool mustEquip)
 			|| (ctrl->AllowRifles() && weaponClass == WEAPONCLASS_RIFLE)
 			|| (ctrl->AllowSnipers() && weaponClass == WEAPONCLASS_SNIPERRIFLE)
 			|| (ctrl->AllowSubMachineGuns() && weaponClass == WEAPONCLASS_SUBMACHINEGUN)
-			|| (ctrl->AllowTacticalShield() && primary->m_iId == WEAPON_SHIELDGUN))
+			|| (ctrl->AllowTacticalShield() && primary->m_iId == WEAPON_SHIELDGUN)
+            || weaponClass == WEAPONCLASS_EQUIPMENT)
 		{
 			if (DoEquip(primary))
 				return;
