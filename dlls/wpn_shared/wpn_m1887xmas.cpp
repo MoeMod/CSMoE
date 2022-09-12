@@ -78,9 +78,7 @@ namespace sv {
 
 	void Precache() override
 	{
-		PRECACHE_SOUND("weapons/m1887xmas-1.wav");
-		PRECACHE_SOUND("weapons/m1887xmas-2.wav");
-		PRECACHE_SOUND("weapons/m1887xmas-3.wav");
+		PRECACHE_SOUND("weapons/m1887-1.wav");
 		PRECACHE_SOUND("weapons/reload1.wav");
 		PRECACHE_SOUND("weapons/reload3.wav");
 		PRECACHE_MODEL("models/xmas_empty.mdl");
@@ -200,9 +198,9 @@ namespace sv {
 #ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_RELOAD);
 
-			MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+			/*MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
 			WRITE_BYTE(31);
-			MESSAGE_END();
+			MESSAGE_END();*/
 #endif
 			m_fInSpecialReload = 1;
 			m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.55s;

@@ -280,6 +280,7 @@ void CGuillotineex::PrimaryAttack(void)
 		pAmmo->pev->velocity = gpGlobals->v_forward * flSpeed;
 		pAmmo->m_flDirectDamage = GetDamageAmountA();
 		pAmmo->m_flHeadCutDamage = GetDamageAmountB();
+		pAmmo->m_pOwner = m_pPlayer;
 
 		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/guillotineex-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	}

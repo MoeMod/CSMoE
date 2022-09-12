@@ -457,8 +457,7 @@ namespace sv {
 		if (UTIL_IsZombieScenario())
 			return false;
 		*/
-
-		if (g_pGameRules->PlayerRelationship(((CBasePlayer*)pev->owner), pOther) == GR_TEAMMATE && !friendlyfire.value)
+		if (g_pGameRules->PlayerRelationship(m_pOwner, pOther) == GR_TEAMMATE && !friendlyfire.value)
 			return false;
 
 		/*if (!friendlyfire.value && m_iTeam == pOther->m_iTeam)

@@ -27,6 +27,11 @@ namespace sv {
 	class CBloodGrenade : public CGrenade
 	{
 	public:
+		int GetWeaponsId(void)
+		{
+			return WEAPON_BLOODHUNTER;
+		}
+		
 		static CBloodGrenade* ShootGrenade(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, int iTeam, int iType, float flDamage)
 		{
 			CBloodGrenade* pGrenade = CreateClassPtr<CBloodGrenade>();
@@ -40,7 +45,7 @@ namespace sv {
 			pGrenade->ResetSequenceInfo();
 			pGrenade->m_fSequenceLoops = TRUE;
 			pGrenade->pev->framerate = 1.0f;
-			pGrenade->pev->gravity = 1.0f;
+			pGrenade->pev->gravity = 0.55f;
 			pGrenade->pev->friction = 0.7f;
 			pGrenade->pev->dmg = flDamage;
 			pGrenade->pev->dmgtime = gpGlobals->time + 1.0s;
@@ -69,7 +74,7 @@ namespace sv {
 				RemoveEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
 			}
 
-			MAKE_STRING_CLASS("grenade", pev);
+			MAKE_STRING_CLASS("bloodgrenade", pev);
 			AddEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
 			pev->solid = SOLID_BBOX;
 
@@ -205,8 +210,8 @@ namespace sv {
 					continue;
 
 				Vector vecEnd, vecDelta;
-				vecEnd = pEntity->pev->origin;
-				vecDelta = vecEnd - vecSrc;
+				vecEnd = pevOwner->origin;
+				vecDelta = vecSrc - vecEnd;
 
 				flAdjustedDamage *= 1.0 - (vecDelta.Length() / flRadius);
 
@@ -395,6 +400,7 @@ namespace sv {
 
 	int m_iChargedFired;
 	int m_iExpIndex;
+	bool m_bHit;
 
 	int GetItemInfo(ItemInfo* p)
 	{
@@ -418,6 +424,9 @@ namespace sv {
 		PRECACHE_MODEL("sprites/ef_bloodhunter1.spr");
 		PRECACHE_MODEL("sprites/ef_bloodhunter2.spr");
 		m_iExpIndex = PRECACHE_MODEL("sprites/ef_bloodhunter3.spr");
+
+		PRECACHE_SOUND("weapons/bloodhunter_throwa.wav");
+
 		Base::Precache();
 	}
 
@@ -460,9 +469,19 @@ namespace sv {
 
 		Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
 
+		if (angThrow.x < 0)
+			angThrow.x = -10 + angThrow.x * ((90 - 10) / 90.0);
+		else
+			angThrow.x = -10 + angThrow.x * ((90 + 10) / 90.0);
+
+		float flVel = (90 - angThrow.x) * 6;
+
+		if (flVel > 750)
+			flVel = 750;
+
 		UTIL_MakeVectors(angThrow);
-		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_up * 2;
-		Vector vecThrow = gpGlobals->v_forward * 1000 + gpGlobals->v_up * 100;
+		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
+		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
 
 #ifndef CLIENT_DLL
 		CBloodGrenade::ShootGrenade(m_pPlayer->pev, vecSrc, vecThrow, m_pPlayer->m_iTeam, m_iWeaponState, GetGrenadeDamage());
@@ -475,6 +494,8 @@ namespace sv {
 	{
         if (!m_iWeaponState)
             return;
+
+		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/bloodhunter_throwa.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 
 		PlayWeaponAnim(ANIM_THROW + m_iWeaponState);
 
@@ -562,24 +583,12 @@ namespace sv {
 
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		Vector vecDir;
-#ifdef CLIENT_DLL
-		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 3, BULLET_PLAYER_50AE, GetDamage(), 0.8, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
-#else
-		vecDir = FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 3, BULLET_PLAYER_50AE, GetDamage(), 0.8, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
-		m_iChargedFired++;
-		if (m_iWeaponState < 3)
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, FALSE);
-#endif
-		int flags;
-#ifdef CLIENT_WEAPONS
-		flags = FEV_NOTHOST;
-#else
-		flags = 0;
-#endif
 
-#ifdef CLIENT_DLL
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
-#else
+		m_bHit = false;
+
+		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 3, BULLET_PLAYER_50AE, GetDamage(), 0.8, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+
+#ifndef CLIENT_DLL
 		int bParam2 = (m_iWeaponState < 3 && m_iChargedFired == BLOODHUNTER_CHARGE_REQUIRED) ? TRUE : FALSE;
 		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), FALSE, bParam2);
 #endif
@@ -666,224 +675,38 @@ namespace sv {
 		return flDamage;
 	}
 
+
 #ifndef CLIENT_DLL
-    Vector FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread, float flDistance, int iPenetration,
-        int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, bool bPistol,
-        int shared_rand)
-    {
-        int iOriginalPenetration = iPenetration;
-        int iPenetrationPower;
-        float flPenetrationDistance;
-        int iCurrentDamage = iDamage;
-        float flCurrentDistance;
-
-        TraceResult tr, tr2;
-        Vector vecRight, vecUp;
-
-        bool bHitMetal = false;
-        int iSparksAmount = 1;
-
-        vecRight = gpGlobals->v_right;
-        vecUp = gpGlobals->v_up;
-
-        iPenetrationPower = 30;
-        flPenetrationDistance = 1000;
-
-        if (!pevAttacker) {
-            // the default attacker is ourselves
-            pevAttacker = pev;
-        }
-
-        gMultiDamage.type = (DMG_BULLET | DMG_NEVERGIB);
-
-        float x, y, z;
-
-        if (IsPlayer()) {
-            // Use player's random seed.
-            // get circular gaussian spread
-            x = UTIL_SharedRandomFloat(shared_rand, -0.5, 0.5) + UTIL_SharedRandomFloat(shared_rand + 1, -0.5, 0.5);
-            y = UTIL_SharedRandomFloat(shared_rand + 2, -0.5, 0.5) + UTIL_SharedRandomFloat(shared_rand + 3, -0.5, 0.5);
-        }
-        else {
-            do {
-                x = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
-                y = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
-                z = x * x + y * y;
-            } while (z > 1);
-        }
-
-        Vector vecDir, vecEnd;
-        Vector vecOldSrc, vecNewSrc;
-
-        vecDir = vecDirShooting + x * vecSpread * vecRight + y * vecSpread * vecUp;
-        vecEnd = vecSrc + vecDir * flDistance;
-
-
-        float flDamageModifier = 0.5;
-
-        while (iPenetration != 0) {
-            ClearMultiDamage();
-            UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
-
-            if (TheBots != NULL && tr.flFraction != 1.0f) {
-                TheBots->OnEvent(EVENT_BULLET_IMPACT, this, (CBaseEntity*)&tr.vecEndPos);
-            }
-
-            char cTextureType = UTIL_TextureHit(&tr, vecSrc, vecEnd);
-            bool bSparks = false;
-
-            switch (cTextureType) {
-            case CHAR_TEX_METAL:
-                bHitMetal = true;
-                bSparks = true;
-
-                iPenetrationPower *= 0.15;
-                flDamageModifier = 0.2;
-                break;
-            case CHAR_TEX_CONCRETE:
-                iPenetrationPower *= 0.25;
-                break;
-            case CHAR_TEX_GRATE:
-                bHitMetal = true;
-                bSparks = true;
-
-                iPenetrationPower *= 0.5;
-                flDamageModifier = 0.4;
-                break;
-            case CHAR_TEX_VENT:
-                bHitMetal = true;
-                bSparks = true;
-
-                iPenetrationPower *= 0.5;
-                flDamageModifier = 0.45;
-                break;
-            case CHAR_TEX_TILE:
-                iPenetrationPower *= 0.65;
-                flDamageModifier = 0.3;
-                break;
-            case CHAR_TEX_COMPUTER:
-                bHitMetal = true;
-                bSparks = true;
-
-                iPenetrationPower *= 0.4;
-                flDamageModifier = 0.45;
-                break;
-            case CHAR_TEX_WOOD:
-                flDamageModifier = 0.6;
-                break;
-            default:
-                break;
-            }
-            if (tr.flFraction != 1.0f) {
-                CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-
-                iPenetration--;
-
-                flCurrentDistance = tr.flFraction * flDistance;
-                iCurrentDamage *= pow(flRangeModifier, flCurrentDistance / 500);
-
-                if (flCurrentDistance > flPenetrationDistance) {
-                    iPenetration = 0;
-                }
-
-                if (tr.iHitgroup == HITGROUP_SHIELD) {
-                    EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
-                        (RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,
-                        ATTN_NORM);
-                    UTIL_Sparks(tr.vecEndPos);
-
-                    pEntity->pev->punchangle.x = iCurrentDamage * RANDOM_FLOAT(-0.15, 0.15);
-                    pEntity->pev->punchangle.z = iCurrentDamage * RANDOM_FLOAT(-0.15, 0.15);
-
-                    if (pEntity->pev->punchangle.x < 4) {
-                        pEntity->pev->punchangle.x = -4;
-                    }
-
-                    if (pEntity->pev->punchangle.z < -5) {
-                        pEntity->pev->punchangle.z = -5;
-                    }
-                    else if (pEntity->pev->punchangle.z > 5) {
-                        pEntity->pev->punchangle.z = 5;
-                    }
-
-                    break;
-                }
-
-                float flDistanceModifier;
-                if (VARS(tr.pHit)->solid != SOLID_BSP || !iPenetration) {
-                    iPenetrationPower = 42;
-                    flDamageModifier = 0.75;
-                    flDistanceModifier = 0.75;
-                }
-                else
-                    flDistanceModifier = 0.5;
-
-                if (!Q_strcmp(STRING(pEntity->pev->classname), "zombiepile")) {
-                    EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
-                        (RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,
-                        ATTN_NORM);
-                    UTIL_Sparks(tr.vecEndPos);
-                    iPenetration = 0;
-                    flDistanceModifier = 0.0;
-                }
-
-                DecalGunshot(&tr, iBulletType, (!bPistol && RANDOM_LONG(0, 3)), pev, bHitMetal);
-
-#ifdef TRACE_BULLETS
-                Vector vecEndPos2 = tr.vecEndPos - (vecDir * 3);
-                MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
-                WRITE_BYTE(TE_LINE);
-                WRITE_COORD(vecEndPos2.x);
-                WRITE_COORD(vecEndPos2.y);
-                WRITE_COORD(vecEndPos2.z);
-
-                WRITE_COORD(tr.vecEndPos.x);
-                WRITE_COORD(tr.vecEndPos.y);
-                WRITE_COORD(tr.vecEndPos.z);
-                WRITE_SHORT(300);
-                WRITE_BYTE(0);
-                WRITE_BYTE(0);
-                WRITE_BYTE(255);
-                MESSAGE_END();
-#endif
-
-
-                vecSrc = tr.vecEndPos + (vecDir * iPenetrationPower);
-                flDistance = (flDistance - flCurrentDistance) * flDistanceModifier;
-                vecEnd = vecSrc + (vecDir * flDistance);
-
-                pEntity->TraceAttack(pevAttacker, iCurrentDamage, vecDir, &tr, (DMG_BULLET | DMG_NEVERGIB));
-
-#if 0
-                if (pEntity && (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY))
-                {
-                    if (pEntity->IsPlayer())
-                    {
-                        if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
-                        {		
+	void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace)
+	{
+		if (!m_bHit)
+		{
+			if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+			{
+				if (pEntity && (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY))
+				{
+					if (pEntity->IsPlayer())
+					{
+						if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
+						{
 							m_iChargedFired++;
-							if(m_iWeaponState < 3)
+							if (m_iWeaponState < 3)
 								PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, FALSE);
-                        }
-                    }
-                    else
-                    {
+						}
+					}
+					else
+					{
 						m_iChargedFired++;
 						if (m_iWeaponState < 3)
 							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, FALSE);
-                    }
-                }
-#endif   
-                iCurrentDamage *= flDamageModifier;
-            }
-            else
-                iPenetration = 0;
+					}
+				}
 
-            ApplyMultiDamage(pev, pevAttacker);
-        }
+				m_bHit = true;
+			}
+		}
 
-        return Vector(x * vecSpread, y * vecSpread, 0);
-    }
+	}
 #endif
 };
 LINK_ENTITY_TO_CLASS(weapon_bloodhunter, CBloodHunter)

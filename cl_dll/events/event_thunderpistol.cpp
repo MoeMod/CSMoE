@@ -148,9 +148,9 @@ void EV_FireThunderPistol( event_args_t *args )
 		pBeam->flags |= FBEAM_FADEIN | FBEAM_FADEOUT | FBEAM_SHADEOUT;
 
 	if (args->bparam1)
-		PLAY_EVENT_SOUND("weapons/thundergun-1.wav");
+		PLAY_EVENT_SOUND("weapons/thundergun-1-1.wav");
 	else
-		PLAY_EVENT_SOUND("weapons/thundergun_2.wav");
+		PLAY_EVENT_SOUND("weapons/thundergun-1.wav");
 
 	EV_GetGunPosition(args, vecSrc, origin);
 	VectorCopy(forward, vecAiming);

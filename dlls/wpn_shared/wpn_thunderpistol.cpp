@@ -18,6 +18,9 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#ifndef CLIENT_DLL
+#include "gamemode/mod_zb1.h"
+#endif
 
 #include "weapons/WeaponTemplate.hpp"
 
@@ -73,7 +76,7 @@ namespace sv {
 
     static constexpr float AccuracyDefault = 0.15;
     /*static constexpr*/ int Penetration = 10;
-    KnockbackData KnockBack = { 400.0f, 300.0f, 350.0f, 150.0f, 0.6f };
+    KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_thunderpistol" , 100 }; }
@@ -114,7 +117,7 @@ namespace sv {
 	float GetMaxSpeed(void)
 	{
 		if (m_iWeaponState & WPNSTATE_THUNDERPISTOL_MODEB)
-			return 280;
+			return 330;
 
 		return 250;
 	}
@@ -148,6 +151,8 @@ namespace sv {
 		PRECACHE_MODEL("sprites/ef_thunderpistol_transform_left.spr");
 		PRECACHE_MODEL("sprites/muzzleflash83.spr");
 		PRECACHE_MODEL("sprites/muzzleflash84.spr");
+
+		PRECACHE_SOUND("weapons/thundergun_2.wav");
 		Base::Precache();
 	}
 
@@ -160,17 +165,20 @@ namespace sv {
 			m_pPlayer->m_flCloaking = gpGlobals->time + 0.5s;
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1s;
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1s;
+			m_pPlayer->ResetMaxSpeed();
 		}
 		else
 		{
 			if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] > 0)
 			{
+				EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/thundergun_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 #ifndef CLIENT_DLL
 				PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, (m_iWeaponState & WPNSTATE_THUNDERPISTOL_MODEB) ? TRUE : FALSE, TRUE);
 
 				UTIL_TempModel({ 0, 0, 0 }, g_vecZero, g_vecZero, m_iEfIndex, 20, 0, 255, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 5, 30, 0);
 #endif
 				m_iWeaponState |= WPNSTATE_THUNDERPISTOL_MODEB;
+				m_pPlayer->ResetMaxSpeed();
 				m_pPlayer->m_iBuff |= BUFF_CLOAKING;
 				m_pPlayer->m_flCloaking = m_flNextThink = gpGlobals->time + 1s;
 				m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1s;
@@ -198,6 +206,7 @@ namespace sv {
 			m_pPlayer->m_iBuff &= ~BUFF_CLOAKING;
 			m_flNextThink = invalid_time_point;
 			m_iWeaponState &= ~WPNSTATE_THUNDERPISTOL_MODEB;
+			m_pPlayer->ResetMaxSpeed();
 		}
 
 		return CBasePlayerWeapon::ItemPostFrame();
@@ -242,6 +251,21 @@ namespace sv {
 					continue;
 
 				pEntity->TraceAttack(m_pPlayer->pev, GetExpDamage(), vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
+
+				CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
+				if (target->m_bIsZombie)
+				{
+					if (!(target->m_iBuff & BUFF_IGNORE_KNOCKBACK))
+					{
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(target->m_pModStrategy.get());
+						if (strategy)
+						{
+							strategy->SetStunSpeedTime(1.5s, m_iWeaponState & WPNSTATE_THUNDERPISTOL_MODEB ? 70.0f : 100.0f);
+							strategy->SetStunGravityTime(1.5s);
+						}
+					}
+
+				}
 			}
 		}
 	}
@@ -288,7 +312,7 @@ namespace sv {
 
 		bool bShootB = m_iWeaponState & WPNSTATE_THUNDERPISTOL_MODEB && m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 10;
 
-		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, bShootB, BULLET_PLAYER_50AE, GetDamage(), 1.0, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, bShootB ? 1 : 10, BULLET_PLAYER_50AE, GetDamage(), 1.0, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 #ifndef CLIENT_DLL
 		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), bShootB ? TRUE : FALSE, FALSE);
 #endif
@@ -304,6 +328,7 @@ namespace sv {
 			m_pPlayer->m_flCloaking = gpGlobals->time + 0.5s;
 			m_iWeaponState &= ~WPNSTATE_THUNDERPISTOL_MODEB;
 			m_pPlayer->m_iBuff &= ~BUFF_CLOAKING;
+			m_pPlayer->ResetMaxSpeed();
 		}
 
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1s;

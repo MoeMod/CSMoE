@@ -209,6 +209,8 @@ namespace sv {
             m_iWeaponState = pev->skin = 1;
         }
 #endif
+        if (m_iChargeState && !(m_pPlayer->pev->button & IN_ATTACK2) && m_flNextSecondaryAttack <= 0.0s)
+            OnAttack2Released();
             
         return CBasePlayerWeapon::ItemPostFrame();
     }
@@ -332,9 +334,6 @@ namespace sv {
     {
         ResetEmptySound();
         m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
-
-        if (m_iChargeState && !(m_pPlayer->pev->button & IN_ATTACK2) && m_flNextSecondaryAttack <= 0.0s)
-            OnAttack2Released();
 
         if (m_pPlayer->pev->weaponanim == ANIM_SHOOTA_LOOP)
         {

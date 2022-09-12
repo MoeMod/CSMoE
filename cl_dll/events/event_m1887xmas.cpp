@@ -53,13 +53,6 @@ enum m1887xmas_e
 	M1887_DRAW
 };
 
-static const char* SOUNDS_NAME[] =
-{
-	"weapons/m1887xmas-1.wav",
-	"weapons/m1887xmas-2.wav",
-	"weapons/m1887xmas-3.wav"
-};
-
 void EV_FireM1887xmas( event_args_t *args )
 {
 	vec3_t vecSrc, vecAiming;
@@ -120,7 +113,7 @@ void EV_FireM1887xmas( event_args_t *args )
 
 	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHOTSHELL, 3);
 
-	PLAY_EVENT_SOUND( SOUNDS_NAME[Com_RandomLong(0, 2)]);
+	PLAY_EVENT_SOUND( "weapons/m1887-1.wav" );
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );

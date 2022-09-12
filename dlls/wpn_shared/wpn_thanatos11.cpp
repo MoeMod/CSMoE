@@ -81,26 +81,47 @@ namespace sv {
 			m_iEfIndex = PRECACHE_MODEL("sprites/thanatos11_scythe.spr");
 			//PRECACHE_MODEL("sprites/thanatos_hit.spr");
 			m_iCircleIndex = PRECACHE_MODEL("sprites/circle.spr");
+
+			PRECACHE_SOUND("weapons/m1887-1.wav");
+			PRECACHE_SOUND("weapons/thanatos11_shootb_hit.wav");
+			PRECACHE_SOUND("weapons/thanatos11_explode.wav");
+			PRECACHE_SOUND("weapons/thanatos11_count_start.wav");
+			PRECACHE_SOUND("weapons/reload3.wav");
+			PRECACHE_SOUND("weapons/reload3.wav");
 		}
 
 		void EXPORT SpearTouch(CBaseEntity* pOther)
 		{
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_KILLBEAM);
+			WRITE_SHORT(this->entindex());
+			MESSAGE_END();
+
 			if (!pOther)
 				return;
 
 			if (pOther->edict() == pev->owner)
 				return;
 
-			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-			WRITE_BYTE(TE_KILLBEAM);
-			WRITE_SHORT(this->entindex());
-			MESSAGE_END();
+			CBasePlayer* pOwner = (CBasePlayer*)GET_PRIVATE(pev->owner);
+
+			if (!pOwner)
+			{
+				Remove();
+				return;
+			}
+
+			if (pOwner->m_bIsZombie)
+			{
+				Remove();
+				return;
+			}
 
 			float flDamage = GetDirectDamage();
 
 			entvars_t* pevOwner = VARS(pev->owner);
 
-			if ((pOther->IsPlayer() || pOther->Classify() == CLASS_PLAYER_ALLY) && pOther->IsAlive() && pOther->m_iTeam != m_iTeam)
+			if ((pOther->IsPlayer() || pOther->Classify() == CLASS_PLAYER_ALLY) && pOther->IsAlive() && g_pGameRules->PlayerRelationship(pOwner, pOther) != GR_TEAMMATE)
 			{
 				m_pHit = pOther;
 
@@ -120,6 +141,10 @@ namespace sv {
 				UTIL_TempModel({ 0, 0, 40 }, g_vecZero, g_vecZero, m_iEfIndex, 20, 0, 150, 0, 0, 255, kRenderTransAdd, pOther, false, 0, 4, 6, 0x00010000);
 			
 				UTIL_TempModel({ 0, 0, 40 }, g_vecZero, g_vecZero, m_iCircleIndex, 20, 0, 50, 0, 0, 255, kRenderTransAdd, pOther, false, 0, 3, 10, 0);
+
+				EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/thanatos11_count_start.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
+
+				EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "weapons/thanatos11_shootb_hit.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
 
 				SetTouch(nullptr);
 				pev->effects |= EF_NODRAW; // 0x80u
@@ -153,7 +178,7 @@ namespace sv {
 
 							Vector vecEnd = pEntity->BodyTarget(pev->origin);
 
-							UTIL_TraceLine(m_pHit->pev->origin, vecEnd, dont_ignore_monsters, pev->owner, &tr);
+							UTIL_TraceLine(m_pHit->pev->origin, vecEnd, dont_ignore_monsters, m_pHit->edict(), &tr);
 
 							if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
 								continue;
@@ -169,6 +194,8 @@ namespace sv {
 
 							pEntity->TakeDamage(pev, pevOwner, GetExpDamage(), DMG_GENERIC | DMG_EXPLOSION);
 						}
+
+						EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "weapons/thanatos11_explode.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
 
 						MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 						WRITE_BYTE(TE_TEMPSPRITE);
@@ -273,7 +300,7 @@ namespace sv {
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
     static constexpr const char *ClassName = "weapon_thanatos11";
     static constexpr const char *AnimExtension = "shotgun";
-    static constexpr int MaxClip = 30;
+    static constexpr int MaxClip = 15;
 	static constexpr int DamageDefault = 20;
 	static constexpr int DamageZB = 28;
 	static constexpr int DamageZBS = 115;
@@ -339,15 +366,8 @@ namespace sv {
 
 	void Precache() override
 	{
-		PRECACHE_SOUND("weapons/m1887-1.wav");
-		PRECACHE_SOUND("weapons/reload1.wav");
-		PRECACHE_SOUND("weapons/reload3.wav");
-		PRECACHE_SOUND("weapons/reload3.wav");
-		PRECACHE_SOUND("weapons/reload3.wav");
-		PRECACHE_SOUND("weapons/reload3.wav");
 		PRECACHE_SOUND("weapons/thanatos11_shootb.wav");
 		PRECACHE_SOUND("weapons/thanatos11_shootb_empty.wav");
-		PRECACHE_SOUND("weapons/thanatos11_shootb_hit.wav");
 
 		m_iShellId = PRECACHE_MODEL("models/shotgunshell.mdl");
 

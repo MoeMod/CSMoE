@@ -122,6 +122,11 @@ namespace sv {
 				return;
 			}
 
+			float flDamage = GetDirectDamage();
+
+			entvars_t* pevOwner = VARS(pev->owner);
+			TraceResult tr;
+
 			pev->velocity = m_vecVelocity;
 
 			if (m_bLockingTarget)
@@ -148,6 +153,20 @@ namespace sv {
 
 				if (pEntity->IsPlayer())
 				{
+					UTIL_TraceLine(pev->origin, pev->origin + m_vecDirection * 50, missile, pev->owner, &tr);
+
+					ClearMultiDamage();
+
+					pEntity->TraceAttack(pevOwner, flDamage, m_vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
+
+					ApplyMultiDamage(pev, pevOwner);
+
+					if (tr.pHit && tr.pHit == pEntity->edict())
+					{
+						RadiusDamage(pEntity);
+					}
+
+					m_iTouchID.push_back(pEntity->entindex());
 					Vector vecDelta = pev->origin - pEntity->pev->origin;
 					float yaw = g_engfuncs.pfnVecToYaw(vecDelta);
 					g_engfuncs.pfnWalkMove(pEntity->edict(), yaw, vecDelta.Length(), WALKMOVE_NORMAL);
@@ -166,43 +185,33 @@ namespace sv {
 			if (pOther->edict() == pev->owner)
 				return;
 
+			m_vecOrigin = pev->origin;
+
+			Vector vecEnd = m_vecOrigin + pev->velocity.Normalize() * 80;
+			TraceResult tr;
+
+			UTIL_TraceLine(m_vecOrigin, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+
+			if (tr.fStartSolid)
+				return;
+
+			pev->origin += m_vecDirection * 0.5 * 39.37;
+
+			m_vecLockingPos = pev->origin;
+			m_bLockingTarget = TRUE;
+
+			pev->nextthink = gpGlobals->time;
+
+			if (std::find(m_iTouchID.begin(), m_iTouchID.end(), pOther->entindex()) == m_iTouchID.end())
+				RadiusDamage(pOther);
+		}
+
+		void RadiusDamage(CBaseEntity* pEnt)
+		{
 			float flDamage = GetDirectDamage();
 			float flExplodeDamage = GetExplodeDamage();
 
 			entvars_t* pevOwner = VARS(pev->owner);
-
-			m_vecOrigin = pev->origin;
-
-			if (!pOther->IsDormant())
-			{	
-				if (pOther->pev->takedamage != DAMAGE_NO)
-				{
-					if (std::find(m_iTouchID.begin(), m_iTouchID.end(), pOther->entindex()) == m_iTouchID.end())
-					{
-						TraceResult tr = UTIL_GetGlobalTrace();
-
-						ClearMultiDamage();
-
-						pOther->TraceAttack(pevOwner, flDamage, m_vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
-
-						ApplyMultiDamage(pev, pevOwner);
-
-						pOther->pev->origin = m_vecOrigin;
-
-						m_iTouchID.push_back(pOther->entindex());
-					}				
-				}
-
-				pev->origin += m_vecDirection * 0.5 * 39.37;
-
-				m_vecLockingPos = pev->origin;
-				m_bLockingTarget = TRUE;
-
-				pev->nextthink = gpGlobals->time;
-
-				if (pOther->IsPlayer())
-					return;
-			}
 
 			CBaseEntity* pEntity = NULL;
 
@@ -214,7 +223,7 @@ namespace sv {
 				if (pEntity->pev->takedamage == DAMAGE_NO)
 					continue;
 
-				if (pEntity == pOther)
+				if (pEntity == pEnt)
 					continue;
 
 				if (pEntity->pev == pevOwner)
@@ -636,7 +645,7 @@ namespace sv {
 
 #ifndef CLIENT_DLL
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-		Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 15;
+		Vector vecSrc = m_pPlayer->GetGunPosition();
 		Vector vecAngles = UTIL_VecToAngles(gpGlobals->v_forward);
 		CMGSMMissile* pMissile = static_cast<CMGSMMissile*>(CBaseEntity::Create("mgsm_missile", vecSrc, vecAngles, ENT(m_pPlayer->pev)));
 		if (pMissile)

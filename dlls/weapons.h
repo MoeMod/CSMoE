@@ -1233,6 +1233,7 @@ public:
 
 	EHANDLE m_hHeadCutting;
 	std::vector<int> m_TargetVector;
+	CBasePlayer* m_pOwner;
 };
 
 class CGuillotineexAmmo : public CBaseAnimating
@@ -1281,6 +1282,7 @@ public:
 	time_point_t m_flHeadCutTime;
 	float m_flDirectDamage;
 	float m_flHeadCutDamage;
+	CBasePlayer* m_pOwner;
 	
 	int m_iModelIndex;
 	short m_iLostSpriteIndex;
