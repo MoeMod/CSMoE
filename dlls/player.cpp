@@ -1171,7 +1171,10 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_BUFFAWP
 					|| pWeapon->m_iId == WEAPON_LOCKONGUN
 					|| pWeapon->m_iId == WEAPON_BLOODHUNTER
-					|| pWeapon->m_iId == WEAPON_MGSM)
+					|| pWeapon->m_iId == WEAPON_MGSM
+					|| pWeapon->m_iId == WEAPON_LASERFIST
+					|| pWeapon->m_iId == WEAPON_LASERFISTEX
+					|| pWeapon->m_iId == WEAPON_THUNDERPISTOL)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}

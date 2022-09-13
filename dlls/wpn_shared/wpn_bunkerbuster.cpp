@@ -167,8 +167,8 @@ namespace sv {
 
 	void CBunkerBuster::PrimaryAttack(void)
 	{
-
-		if (m_flCoolDownTime <= gpGlobals->time && m_flBunkerBusterCoolDown <= gpGlobals->time)
+#ifndef CLIENT_DLL
+		if (g_pGameRules->m_flBunkerBusterPersonalCoolDown[m_pPlayer->entindex()] <= gpGlobals->time && g_pGameRules->m_flBunkerBusterGlobalCoolDown <= gpGlobals->time)
 		{
 			if (m_bSightMode)
 			{
@@ -182,7 +182,7 @@ namespace sv {
 					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 10.0s;
 
 
-#ifndef CLIENT_DLL
+
 					//UTIL_ScreenFade(pPlayer, Vector(255, 255, 255), fadeTime, fadeHold, alpha, 0);
 					//UTIL_ScreenFade(m_pPlayer, Vector(255, 187, 0), 2s, 10s, 50, 0x0004);
 
@@ -200,8 +200,6 @@ namespace sv {
 					WRITE_BYTE(30);
 					WRITE_COORD(3.0);
 					MESSAGE_END();
-#endif
-
 
 					m_vecStart = Get_ShootPosition(m_pPlayer, m_pPlayer->GetGunPosition());
 
@@ -310,9 +308,10 @@ namespace sv {
 							SetThink(&CBunkerBuster::OnSoundThink);
 
 							m_bSightMode = false;
-							m_flCoolDownTime = gpGlobals->time + BunkerBusterPersonalTime;
-							m_flBunkerBusterCoolDown = gpGlobals->time + BunkerBusterGlobalTime;
+							
 #ifndef CLIENT_DLL		
+							g_pGameRules->m_flBunkerBusterPersonalCoolDown[m_pPlayer->entindex()] = gpGlobals->time + BunkerBusterPersonalTime;
+							g_pGameRules->m_flBunkerBusterGlobalCoolDown = gpGlobals->time + BunkerBusterGlobalTime;
 							auto flTimeLeft = duration_t(BunkerBusterPersonalTime);
 							auto flTimeLeft2 = duration_t(BunkerBusterGlobalTime);
 
@@ -350,6 +349,7 @@ namespace sv {
 				}
 			}
 		}
+#endif
 
 	}
 	void CBunkerBuster::OnSoundThink(void)

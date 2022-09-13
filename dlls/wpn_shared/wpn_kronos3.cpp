@@ -207,8 +207,7 @@ namespace sv {
         if (m_iWeaponState & WPNSTATE_KRONOS3_ZOOM_ACTIVATE && !m_pEnemylist.empty())
         {
             PrimaryAttack_InstantDamage();
-            SendWeaponAnim(ANIM_SHOOT3, UseDecrement() != FALSE);
-            EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/kronos3-1.wav", VOL_NORM, ATTN_NORM, 0, 94 + RANDOM_LONG(0, 15));
+            PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 2.0, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), m_iWeaponState & WPNSTATE_KRONOS3_ZOOM_ACTIVATE, m_iWeaponState & WPNSTATE_KRONOS3_SCAN_ACTIVATE);
         }
         else
         {

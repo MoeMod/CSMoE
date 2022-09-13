@@ -206,20 +206,6 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		switch (arg2)
 		{
-		case DIVINETITAN_PARTICLE:
-		{
-			if (iDivinetitanParticle[arg1])
-			{
-				iDivinetitanParticle[arg1]->die = gHUD.m_flTime;
-				iDivinetitanParticle[arg1] = nullptr;
-				break;
-			}
-
-			if (!iDivinetitanParticle[arg1])
-				iDivinetitanParticle[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_particle.spr"),
-					Vector(0.0, 0.0, 5.0), 5.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.8, kRenderTransAdd, 30.0);
-			break;
-		}
 		case WINGGUN_WING:
 		{
 			if (iWingGunEffect[arg1])

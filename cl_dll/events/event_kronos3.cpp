@@ -111,12 +111,12 @@ void EV_FireKronos3(event_args_s *args)
 	vSpread.x = args->fparam1;
 	vSpread.y = args->fparam2;
 
-	
-	EV_HLDM_FireBullets(idx,
-		forward, right, up,
-		1, vecSrc, vecAiming,
-		vSpread, 8192.0, BULLET_PLAYER_57MM,
-		2);
+	if(vSpread.x != 2.0)
+		EV_HLDM_FireBullets(idx,
+			forward, right, up,
+			1, vecSrc, vecAiming,
+			vSpread, 8192.0, BULLET_PLAYER_57MM,
+			2);
 }
 
 }

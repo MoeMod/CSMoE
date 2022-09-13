@@ -126,15 +126,16 @@ void EV_FireKronos12(event_args_s *args)
 
 	VectorCopy(forward, vecAiming);
 
-	vSpread[0] = args->fparam2;
+	vSpread[0] = args->fparam1;
 	vSpread[1] = args->fparam2;
 	vSpread[2] = 0;
 
-	EV_HLDM_FireBullets( idx,
-		forward, right,	up,
-		args->bparam2, vecSrc, vecAiming,
-		vSpread, 8192.0, BULLET_PLAYER_BUCKSHOT,
-		1 );
+	if (vSpread[0] != 2.0)
+		EV_HLDM_FireBullets( idx,
+			forward, right,	up,
+			args->bparam2, vecSrc, vecAiming,
+			vSpread, 8192.0, BULLET_PLAYER_BUCKSHOT,
+			1 );
 }
 
 }

@@ -735,12 +735,6 @@ namespace sv {
 			pev->rendermode = kRenderTransAdd;
 			pev->renderfx = kRenderFxGlowShell;
 
-			MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, this->pev);
-			WRITE_BYTE(16);
-			WRITE_SHORT(this->entindex());
-			WRITE_BYTE(17);
-			MESSAGE_END();
-
 			pev->rendercolor.x = 255;
 			pev->rendercolor.y = 215;
 			pev->rendercolor.z = 0;
@@ -1112,12 +1106,6 @@ namespace sv {
 			MESSAGE_END();
 		}
 		EMIT_SOUND_DYN(ENT(pev), CHAN_AUTO, "weapons/divinetitan_exp.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
-
-		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, this->pev);
-		WRITE_BYTE(16);
-		WRITE_SHORT(this->entindex());
-		WRITE_BYTE(17);
-		MESSAGE_END();
 
 		//Fps 51/30.0
 		pev->nextthink = gpGlobals->time + 0.1s;

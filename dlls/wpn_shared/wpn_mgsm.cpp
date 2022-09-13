@@ -480,7 +480,7 @@ namespace sv {
 		{
 			if (CBaseEntity* pEntity = gMultiDamage.pEntity)
 			{
-				if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+				if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY && (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE))
 				{
 					float flBuffDamage = GetBuffDamage();
 					float flExplodeDamage = GetExplodeDamage();
@@ -511,13 +511,11 @@ namespace sv {
 
 					if (pEntity->IsPlayer())
 					{
-						if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
-						{
-							pEntity->m_pBuffAttacker = m_pPlayer->pev;
-							pEntity->m_flHealthDecreaseAmount = flBuffDamage;
-							pEntity->m_iHealthDecreaseCount = 6;
-							pEntity->m_flHealthDecreaseInterval = 1.0s;
-						}
+						pEntity->m_pBuffAttacker = m_pPlayer->pev;
+						pEntity->m_flHealthDecreaseAmount = flBuffDamage;
+						pEntity->m_iHealthDecreaseCount = 6;
+						pEntity->m_flHealthDecreaseInterval = 1.0s;
+						
 					}
 					else
 					{

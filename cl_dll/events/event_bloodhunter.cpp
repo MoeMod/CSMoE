@@ -108,20 +108,24 @@ void EV_CreateBloodhunterEffect(event_args_t* args)
 
 	EV_GetGunPosition(args, vecSrc, args->origin);
 	pEnt = gEngfuncs.pEfxAPI->R_DefaultSprite(vecSrc, iModelIndex, 30.0);
-	pEnt->entity.curstate.rendermode = kRenderTransAdd;
-	pEnt->entity.curstate.renderamt = 250;
-	pEnt->entity.curstate.scale = 0.125;
+	if (pEnt)
+	{
+		pEnt->entity.curstate.rendermode = kRenderTransAdd;
+		pEnt->entity.curstate.renderamt = 250;
+		pEnt->entity.curstate.scale = 0.125;
 
-	if (!gHUD.cl_righthand->value)
-		pEnt->entity.angles[2] -= 180.0f;
+		if (!gHUD.cl_righthand->value)
+			pEnt->entity.angles[2] -= 180.0f;
 
-	pEnt->clientIndex = args->entindex;
+		pEnt->clientIndex = args->entindex;
 
-	pEnt->entity.curstate.vuser1 = vecSrc - gEngfuncs.GetLocalPlayer()->origin;
+		pEnt->entity.curstate.vuser1 = vecSrc - gEngfuncs.GetLocalPlayer()->origin;
 
-	pEnt->die = gHUD.m_flTime + 1.5;
-	pEnt->callback = EV_BloodhunterEffectCallback;
-	pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATE;
+		pEnt->die = gHUD.m_flTime + 1.5;
+		pEnt->callback = EV_BloodhunterEffectCallback;
+		pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATE;
+	}
+	
 }
 
 void EV_FireBloodHunter( event_args_t *args )

@@ -78,8 +78,6 @@ namespace sv {
 		Vector m_vecStart;
 		Vector m_vecEnd;
 		unsigned short m_usFireBunkerBuster;
-	private:
-		time_point_t m_flCoolDownTime;
 
 	};
 

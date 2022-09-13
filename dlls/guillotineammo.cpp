@@ -121,7 +121,7 @@ namespace sv {
 
 		TraceResult tr;
 
-		UTIL_TraceLine(pev->origin, pev->origin + pev->velocity.Normalize() * 50, missile, pev->owner, &tr);
+		UTIL_TraceLine(pev->origin, pev->origin + pev->velocity.Normalize() * 10, dont_ignore_monsters, pev->owner, &tr);
 
 		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 		WRITE_BYTE(TE_BEAMPOINTS);
@@ -258,7 +258,7 @@ namespace sv {
 			Vector vecStart = vecPositions[i];
 			Vector vecEnd = vecStart + pev->velocity.Normalize() * delta;
 
-			UTIL_TraceLine(vecStart, vecEnd, missile, pentIgnore, &tr);
+			UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, pentIgnore, &tr);
 
 			if (tr.flFraction < 1.0 && tr.pHit && tr.pHit != ENT(pev))
 			{
@@ -671,7 +671,7 @@ namespace sv {
 
 		TraceResult tr;
 
-		UTIL_TraceLine(pev->origin, pev->origin + pev->velocity.Normalize() * 50, missile, pev->owner, &tr);
+		UTIL_TraceLine(pev->origin, pev->origin + pev->velocity.Normalize() * 10, dont_ignore_monsters, pev->owner, &tr);
 
 		if (!CanAttack(pOther))
 		{

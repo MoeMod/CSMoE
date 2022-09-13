@@ -301,8 +301,7 @@ void CKronos12::PrimaryAttack(void)
 	if (m_iWeaponState & WPNSTATE_KRONOS12_ZOOM_ACTIVATE && !m_pEnemylist.empty())
 	{
 		PrimaryAttack_InstantDamage();
-		SendWeaponAnim(ANIM_SHOOT3, UseDecrement() != FALSE);
-		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/kronos12-1.wav", VOL_NORM, ATTN_NORM, 0, 94 + RANDOM_LONG(0, 15));
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFireKronos12, 0, g_vecZero, g_vecZero, 2.0, 0, 0, 0, m_iWeaponState & WPNSTATE_KRONOS12_ZOOM_ACTIVATE, m_iWeaponState & WPNSTATE_KRONOS12_SCAN_ACTIVATE);
 	}	
 	else
 	{

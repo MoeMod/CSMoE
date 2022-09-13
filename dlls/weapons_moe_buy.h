@@ -168,6 +168,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_WATERCANNON, "weapon_watercannon",        "极冻水加农",                  5450, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_AIRBURSTER, "weapon_flamethrower",        "焚烬者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_POISONGUN, "weapon_poisongun",        "腐蚀烈焰",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	//{ WEAPON_FGLAUNCHER, "weapon_fglauncher",        "礼花发射器",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 
 	{ WEAPON_CSGO_CZ75, "csgo_cz75",         "CZ75",                  500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_CSGO_TEC9, "csgo_tec9",         "Tec-9",                  500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
@@ -328,6 +329,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ WEAPON_CSGO_ZEUS, "csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ WEAPON_BUNKERBUSTER, "weapon_bunkerbuster",      "天降正义LTD",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_PATROLDRONE, "weapon_patroldrone",      "【幽浮】控制核心",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_DIVINETITAN, "weapon_divinetitan",      "圣翼皓印",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SGDRILLEX, "weapon_sgdrillex",         "【电光】狂龙钻", 6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -338,6 +340,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+	{ WEAPON_FGLAUNCHER, "weapon_fglauncher",        "礼花发射器",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+
+	{ WEAPON_BUNKERBUSTER, "weapon_bunkerbuster",      "天降正义LTD",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_Z4B_M4A1RAZER, "z4b_m4a1razer",      "雷蛇M4A1",    4250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 
 		{ WEAPON_Z4B_AK47X, "z4b_ak47x",      "黑武士AK47",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },

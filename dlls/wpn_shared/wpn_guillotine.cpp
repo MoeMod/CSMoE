@@ -92,8 +92,14 @@ int CGuillotine::GetItemInfo(ItemInfo *p)
 
 int CGuillotine::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 {
-	m_iClip = WEAPON_NOCLIP;
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = iMaxClip();
+	if (m_iDefaultAmmo)
+	{
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 10;
+		m_iClip = WEAPON_NOCLIP;
+		m_iDefaultAmmo = 0;
+		return TRUE;
+	}
+
 	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
 }
 

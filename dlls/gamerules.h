@@ -549,6 +549,8 @@ public:
 	int m_iVoteMapStatus;
 	time_point_t m_flVoteNextThink;
 	time_point_t m_flVoteTipsThink;
+	time_point_t m_flBunkerBusterGlobalCoolDown;
+	time_point_t m_flBunkerBusterPersonalCoolDown[33];
 	std::vector<std::pair<std::string, int>> m_vecVoteMaps;
 	int m_iVoteOptionCount[2];
 
