@@ -224,6 +224,15 @@ static const byte* R_SpriteLoadFrame(model_t* mod, const dsprite_t *psprite, con
     pinframe = reinterpret_cast<const dspriteframe_t *>(pin);
 
 	// build unique frame name
+#if XASH_ASTC
+    Q_snprintf(texname, sizeof(texname), "ddc/%s/%s_%i%i.astc", mod->name, group_suffix, num / 10, num % 10);
+    if (GL_Support(GL_ASTC_EXT) > 0 && FS_FileExists(texname, true)) // it's a HUD sprite
+    {
+        gl_texturenum = xe::TexLru_LoadTextureExternal(texname, r_texFlags, NULL);
+        if(auto tex = R_GetTexture(gl_texturenum)) tex->texType = TEX_SPRITE;
+    }
+    else
+#endif
 	if (mod->flags & 256) // it's a HUD sprite
 	{
 		Q_snprintf(texname, sizeof(texname), "#HUD/%s_%s_%i%i.spr", mod->name, group_suffix, num / 10, num % 10);

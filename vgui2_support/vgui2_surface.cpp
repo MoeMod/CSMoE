@@ -47,6 +47,10 @@ int VGUI2_Draw_StringLenW( std::basic_string_view<uchar32> wsv, unsigned int fon
 
     for( size_t i = 0; i < wsv.length(); ++i )
     {
+        if (wsv[i] == U'^' && wsv[i + 1] >= U'1' && wsv[i + 1] <= U'7')
+            i += 2;
+        if (wsv[i] >= U'\x01' && wsv[i] <= U'\x07')
+            i += 1;
         len += VGUI2_GetFontWide( wsv[ i ], font );
     }
 

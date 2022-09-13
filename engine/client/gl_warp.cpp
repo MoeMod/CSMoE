@@ -429,14 +429,17 @@ void R_SetupSky( const char *skyboxname )
 	}
 
     loadname[0] = '\0';
-    // try load ddc
-    if( !loadname[0] || !CheckSkybox( loadname ) )
+    if(GL_Support(GL_ASTC_EXT) > 0)
     {
-        Q_snprintf( loadname, sizeof( loadname ), "ddc/gfx/env/%s", skyboxname );
-        FS_StripExtension( loadname );
+        // try load ddc
+        if( !loadname[0] || !CheckSkybox( loadname ) )
+        {
+            Q_snprintf( loadname, sizeof( loadname ), "ddc/gfx/env/%s", skyboxname );
+            FS_StripExtension( loadname );
 
-        if( loadname[Q_strlen( loadname ) - 1] == '_' )
-            loadname[Q_strlen( loadname ) - 1] = '\0';
+            if( loadname[Q_strlen( loadname ) - 1] == '_' )
+                loadname[Q_strlen( loadname ) - 1] = '\0';
+        }
     }
     // fallback to default
     if( !loadname[0] || !CheckSkybox( loadname ) )

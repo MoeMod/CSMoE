@@ -4270,7 +4270,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 
 		if( FS_FileExists( texname, false ))
 		{
-            gl_texturenum = xe::TexLru_LoadTextureExternal(texname, NULL, flags, filter);
+            gl_texturenum = xe::TexLru_LoadTextureExternal(texname,  flags, filter);
 		}
 
 		if( gl_texturenum )
@@ -4289,7 +4289,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 				sprintf(texname, "models/texture/%s%s.bmp", mod->suffix, name);
 				if (FS_FileExists(texname, false))
 				{
-                    gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+                    gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 					break;
 				}
 			}
@@ -4300,7 +4300,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 				Q_snprintf(texname, sizeof(texname), "ddc/models/texture/%s.astc", name);
 				if (FS_FileExists(texname, false))
 				{
-					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 					break;
 				}
 			}
@@ -4309,14 +4309,14 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
 			if (FS_FileExists(texname, false))
 			{
-                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 				break;
 			}
 
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.bmp", name);
 			if (FS_FileExists(texname, false))
 			{
-                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 				break;
 			}
 			break;
@@ -4328,7 +4328,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
         {
             Q_snprintf(texname, sizeof(texname), "ddc/%s.mdl/%s.astc", mdlname, name);
             if (FS_FileExists(texname, false)) {
-                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
                 break;
             }
         }
