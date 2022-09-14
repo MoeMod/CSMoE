@@ -311,6 +311,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "fglauncher",	WEAPON_FGLAUNCHER },
 	{ "guillotine",	WEAPON_GUILLOTINE },
 	{ "guillotineex",	WEAPON_GUILLOTINEEX },
+	{ "speargunm",	WEAPON_SPEARGUNM },
 
 
 	{ NULL,		WEAPON_NONE }
@@ -685,7 +686,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "fglauncher",	WEAPONCLASS_EQUIPMENT },
 	{ "guillotine",	WEAPONCLASS_EQUIPMENT },
 	{ "guillotineex",	WEAPONCLASS_EQUIPMENT },
-
+	{ "speargunm",	WEAPONCLASS_EQUIPMENT },
 
 
 	{ "syringe",	WEAPONCLASS_EQUIPMENT },
@@ -990,6 +991,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_RAINBOWGUN:
 	case WEAPON_GUILLOTINE:
 	case WEAPON_GUILLOTINEEX:
+	case WEAPON_SPEARGUNM:
 		return true;
 	default:
 		break;

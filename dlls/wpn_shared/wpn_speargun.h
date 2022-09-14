@@ -85,4 +85,37 @@ private:
 	time_point_t m_flTimeReloadSpear;
 	EHANDLE m_hSpears[2];
 };
+
+#define SPEARGUNM_MAX_CLIP	3
+class CSpearGunm : public CSpearGun
+{
+public:
+	float GetArmorRatioModifier() override { return 1.9; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 140 }; }
+
+public:
+	const char* GetCSModelName() override { return "models/w_speargunm.mdl"; }
+	int GetItemInfo(ItemInfo* p) override;
+	void Spawn() override;
+	void Precache() override;
+	void PrimaryAttack() override;
+	BOOL Deploy() override;
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override { return CBasePlayerWeapon::ExtractAmmo(pWeapon); }; // sync Clip -> BpAmmo
+	void SecondaryAttack(void) override;
+	void ItemPostFrame(void) override;
+	void Reload(void) override;
+	bool HasSecondaryAttack() override { return true; }
+	void WeaponIdle(void) override;
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_spear" , 180 }; }
+#endif
+
+private:
+	float GetSpread(void);
+
+	unsigned short m_usFireSpearGunm;
+	int iShellOn;
+	time_point_t m_flTimeReloadSpear;
+	EHANDLE m_hSpears[SPEARGUNM_MAX_CLIP];
+};
 }

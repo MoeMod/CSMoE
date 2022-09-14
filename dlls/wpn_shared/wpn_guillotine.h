@@ -58,7 +58,7 @@ private:
 };
 
 #define GUILLOTINEEX_MAX_AMMO 50
-
+#define GUILLOTINEEX_MAX_PROJECTILE 2
 class CGuillotineex : public CGuillotine
 {
 public:
@@ -100,9 +100,10 @@ public:
 	float GetArmorRatioModifier() override { return 1.1; }
 	WeaponCrosshairData GetCrosshairData() override { return { 0, 4, 3, 0 }; }
 
+	int m_iHitCount;
 #ifndef CLIENT_DLL
 private:
-	EHANDLE m_hAmmo;
+	EHANDLE m_hAmmo[GUILLOTINEEX_MAX_PROJECTILE];
 #endif
 };
 

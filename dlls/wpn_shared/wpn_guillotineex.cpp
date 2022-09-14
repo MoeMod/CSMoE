@@ -28,20 +28,18 @@ namespace sv {
 
 LINK_ENTITY_TO_CLASS(weapon_guillotineex, CGuillotineex)
 
-#define BTE_VER 1
-
 enum guillotineex_e
 {
-	guillotineex_IDLE,
-	guillotineex_IDLE_EMPTY,
-	guillotineex_SHOOT1,
-	guillotineex_DRAW,
-	guillotineex_DRAW_EMPTY,
-	guillotineex_CATCH,
-	guillotineex_LOST,
-	guillotineex_EIDLE,
-	guillotineex_EIDLE_FX,
-	guillotineex_SHOOT_EMPTY,
+	GUILLOTINEEX_IDLE,
+	GUILLOTINEEX_IDLE_EMPTY,
+	GUILLOTINEEX_SHOOT,
+	GUILLOTINEEX_DRAW,
+	GUILLOTINEEX_DRAW_EMPTY,
+	GUILLOTINEEX_CATCH,
+	GUILLOTINEEX_LOST,
+	GUILLOTINEEX_EIDLE,
+	GUILLOTINEEX_EIDLE_FX,
+	GUILLOTINEEX_SHOOT_EMPTY,
 	
 	
 };
@@ -56,12 +54,12 @@ void CGuillotineex::Spawn(void)
 	m_iDefaultAmmo = 50;
 
 	FallInit();
-	m_iState = 0;
-	m_iWeaponState = 0;
-	m_flTimeWeaponIdle2 = invalid_time_point;
 
 #ifndef CLIENT_DLL
-	m_hAmmo = NULL;
+	for (int i = 0; i < GUILLOTINEEX_MAX_PROJECTILE; i++)
+	{
+		m_hAmmo[i] = NULL;
+	}
 #endif
 }
 
@@ -74,6 +72,19 @@ void CGuillotineex::Precache(void)
 	PRECACHE_MODEL("models/v_guillotineex.mdl");
 	PRECACHE_MODEL("models/w_guillotineex.mdl");
 
+	PRECACHE_SOUND("weapons/guillotineex_shoot_1_start.wav");
+	PRECACHE_SOUND("weapons/guillotineex_shoot-1_exp.wav");
+	PRECACHE_SOUND("weapons/guillotineex_shoot-1_end.wav");
+	PRECACHE_SOUND("weapons/guillotineex_shoot-2_exp.wav");
+	
+	PRECACHE_SOUND("weapons/guillotineex_shoot-2.wav");
+
+	PRECACHE_SOUND("weapons/guillotineex_idle1.wav");
+	PRECACHE_SOUND("weapons/guillotineex_idle2.wav");
+	PRECACHE_SOUND("weapons/guillotineex-1.wav");
+	PRECACHE_SOUND("weapons/guillotineex-1.wav");
+	PRECACHE_SOUND("weapons/guillotineex-1.wav");
+	PRECACHE_SOUND("weapons/guillotineex-1.wav");
 	PRECACHE_SOUND("weapons/guillotineex-1.wav");
 	PRECACHE_SOUND("weapons/guillotineex_catch2.wav");
 }
@@ -83,8 +94,8 @@ int CGuillotineex::GetItemInfo(ItemInfo *p)
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "guillotineexAmmo";
 	p->iMaxAmmo1 = iMaxClip();
-	p->pszAmmo2 = NULL;
-	p->iMaxAmmo2 = -1;
+	p->pszAmmo2 = "guillotineexAmmo2";
+	p->iMaxAmmo2 = 1;
 	p->iMaxClip = -1;
 	p->iSlot = 0;
 	p->iPosition = 5;
@@ -97,8 +108,14 @@ int CGuillotineex::GetItemInfo(ItemInfo *p)
 
 int CGuillotineex::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 {
-	m_iClip = WEAPON_NOCLIP;
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = iMaxClip();
+	if (m_iDefaultAmmo)
+	{
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 50;
+		m_iClip = WEAPON_NOCLIP;
+		m_iDefaultAmmo = 0;
+		return TRUE;
+	}
+
 	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
 }
 
@@ -108,21 +125,9 @@ BOOL CGuillotineex::Deploy(void)
 	int iAnim;
 
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
-		iAnim = guillotineex_DRAW;
+		iAnim = GUILLOTINEEX_DRAW;
 	else
-		iAnim = guillotineex_DRAW_EMPTY;
-
-#ifndef CLIENT_DLL
-	if (m_hAmmo.Get() != NULL)
-	{
-		iAnim = guillotineex_DRAW_EMPTY;
-	}
-	else
-	{
-		m_iWeaponState = 0;
-		m_flTimeWeaponIdle2 = invalid_time_point;
-	}
-#endif
+		iAnim = GUILLOTINEEX_DRAW_EMPTY;
 
 	duration_t flNextAttack = 1.2s;
 
@@ -141,31 +146,21 @@ BOOL CGuillotineex::Deploy(void)
 
 void CGuillotineex::CatchAmmo(void)
 {
+	SendWeaponAnim(GUILLOTINEEX_CATCH);
 #ifndef CLIENT_DLL
 	int iMaxClip = this->iMaxClip();
-
-	if (m_iWeaponState == 1 || m_iWeaponState == 2)
-		iMaxClip++;
 
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < iMaxClip)
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
 
-#ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_RELOAD);
+
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
+
+	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/guillotineex_shoot-1_end.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 #endif
-	SendWeaponAnim(guillotineex_CATCH);
 
-	m_iWeaponState = 0;
-
-	duration_t flNextAttack = UTIL_WeaponTimeBase() + 1.03s;
-
-	if (flNextAttack > m_flNextPrimaryAttack)
-		m_flNextPrimaryAttack = flNextAttack;
-
-	m_flTimeWeaponIdle = flNextAttack;
-
-	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/guillotineex_catch2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-#endif
+	
 }
 
 #ifndef CLIENT_DLL
@@ -178,69 +173,77 @@ void CGuillotineex::Drop(void)
 
 void CGuillotineex::CrashAmmo(void)
 {
-
-	if (m_hAmmo.Get() != NULL)
+	for (int i = 0; i < GUILLOTINEEX_MAX_PROJECTILE; i++)
 	{
-		((CGuillotineexAmmo*)((CBaseEntity*)m_hAmmo))->Crash();	
+		if (m_hAmmo[i].Get() != NULL)
+		{
+			((CGuillotineExAmmo*)((CBaseEntity*)m_hAmmo[i]))->Crash();
+		}
+
+		m_hAmmo[i] = NULL;
 	}
-
-	m_hAmmo = NULL;
-
 }
 #endif
 
 
 void CGuillotineex::ItemPostFrame(void)
 {
-	CBasePlayerWeapon::ItemPostFrame();
-
 #ifndef CLIENT_DLL
-
-	CGuillotineexAmmo* pAmmo = (CGuillotineexAmmo*)((CBaseEntity*)m_hAmmo);
-
-	if (m_hAmmo.Get() && pAmmo)
+	if (!m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] && m_iHitCount >= 15)
 	{
-		if (m_iWeaponState == 1 && m_pPlayer->pev->weaponanim != guillotineex_SHOOT1 && pAmmo->IsHeadCutting())
-		{
-			m_iWeaponState = 2;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase();
-		}
-	}
-	else
-	{
-		if (m_iWeaponState && m_iWeaponState != 3)
-		{
-			SendWeaponAnim(guillotineex_LOST);
-
-			m_iWeaponState = 3;
-			m_flTimeWeaponIdle2 = gpGlobals->time + 1.36s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.36s;
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.36s + 1.2s;
-		}
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
+		pev->skin = 1;
+		
 	}
 #endif
-
-	if ((m_iWeaponState == 3 && m_flTimeWeaponIdle2 != invalid_time_point && gpGlobals->time > m_flTimeWeaponIdle2) ||
-		(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0 && (m_pPlayer->pev->weaponanim == guillotineex_IDLE_EMPTY || m_pPlayer->pev->weaponanim == guillotineex_DRAW_EMPTY)))
-	{
-		Deploy();
-	}
+	CBasePlayerWeapon::ItemPostFrame();
 }
 
 void CGuillotineex::SecondaryAttack(void)
 {
-	m_iState = (m_iState + 1) % 2;
+	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
+		return;
 
-	SendWeaponAnim(guillotineex_DRAW, UseDecrement() != FALSE);
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.36s;
-	m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+	m_iHitCount = 0;
+	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
+
+	if (!m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType])
+		pev->skin = 0;
+
+#ifndef CLIENT_DLL
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+	m_pPlayer->pev->effects &= ~EF_MUZZLEFLASH;
+	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
+
+#ifndef CLIENT_DLL
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+
+	CGuillotineExAmmo* pAmmo = CGuillotineExAmmo::CreateAmmo(m_pPlayer->GetGunPosition(), UTIL_VecToAngles(gpGlobals->v_forward), m_pPlayer, 1);
+
+	if (pAmmo)
+	{
+		pAmmo->m_iTeam = m_pPlayer->m_iTeam;
+
+		float flSpeed = 1000.0;
+
+		pAmmo->pev->velocity = gpGlobals->v_forward * flSpeed;
+		pAmmo->m_flDirectDamage = GetDamageAmountA();
+		pAmmo->m_flHeadCutDamage = GetDamageAmountB();
+		pAmmo->m_pWeapon = this;
+
+		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/guillotineex_shoot-2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	}
+#endif
+
+	SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? GUILLOTINEEX_SHOOT : GUILLOTINEEX_SHOOT_EMPTY, UseDecrement() != FALSE);
+
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.75s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.73s;
 }
 
 void CGuillotineex::PrimaryAttack(void)
 {
-	if (m_iWeaponState)
-		return;
-
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 	{
 		if (m_fFireOnEmpty)
@@ -258,6 +261,18 @@ void CGuillotineex::PrimaryAttack(void)
 		return;
 	}
 
+#ifndef CLIENT_DLL
+	int iAmmoOutside = 0;
+	for (int i = 0; i < GUILLOTINEEX_MAX_PROJECTILE; i++)
+	{
+		if (m_hAmmo[i])
+			iAmmoOutside++;
+	}
+
+	if (iAmmoOutside >= GUILLOTINEEX_MAX_PROJECTILE)
+		return;
+#endif
+
 	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -268,28 +283,34 @@ void CGuillotineex::PrimaryAttack(void)
 #ifndef CLIENT_DLL
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-	CGuillotineexAmmo* pAmmo = static_cast<CGuillotineexAmmo*>(CBaseEntity::Create("guillotineexAmmo", m_pPlayer->GetGunPosition(), UTIL_VecToAngles(gpGlobals->v_forward), m_pPlayer->edict()));
+	CGuillotineExAmmo* pAmmo = CGuillotineExAmmo::CreateAmmo(m_pPlayer->GetGunPosition(), UTIL_VecToAngles(gpGlobals->v_forward), m_pPlayer, 0);
 
 	if (pAmmo)
 	{
+		int iId = 0;
+		for (iId = 0; iId < GUILLOTINEEX_MAX_PROJECTILE; iId++)
+		{
+			if (!m_hAmmo[iId])
+				break;
+		}
+	
 		pAmmo->m_iTeam = m_pPlayer->m_iTeam;
-		m_hAmmo = pAmmo;
-		pAmmo->pev->solid = m_iState ? SOLID_BBOX : SOLID_TRIGGER;
+		m_hAmmo[iId] = pAmmo;
+
 		float flSpeed = 1000.0;
 		
 		pAmmo->pev->velocity = gpGlobals->v_forward * flSpeed;
 		pAmmo->m_flDirectDamage = GetDamageAmountA();
 		pAmmo->m_flHeadCutDamage = GetDamageAmountB();
-		pAmmo->m_pOwner = m_pPlayer;
+		pAmmo->m_pWeapon = this;
 
-		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/guillotineex-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/guillotineex_shoot_1_start.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	}
 #endif
 
-	m_iWeaponState = 1;
-	SendWeaponAnim(guillotineex_SHOOT1, UseDecrement() != FALSE);
+	SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? GUILLOTINEEX_SHOOT : GUILLOTINEEX_SHOOT_EMPTY, UseDecrement() != FALSE);
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.75s;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.73s;
 }
 
@@ -305,20 +326,13 @@ void CGuillotineex::WeaponIdle(void)
 
 	int iAnim;
 
-	if (m_iWeaponState)
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
 	{
-		if (m_iWeaponState == 1)
-			iAnim = guillotineex_IDLE;
-		else
-			iAnim = guillotineex_IDLE;
-	}
-	else if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
-	{
-		iAnim = guillotineex_IDLE;
+		iAnim = GUILLOTINEEX_IDLE;
 	}
 	else
 	{
-		iAnim = guillotineex_IDLE_EMPTY;
+		iAnim = GUILLOTINEEX_IDLE_EMPTY;
 	}
 
 	SendWeaponAnim(iAnim, UseDecrement() != FALSE);
@@ -331,12 +345,12 @@ float CGuillotineex::GetDamageAmountA(void)
 	if (g_pModRunning->DamageTrack() == DT_ZB)
 	{
 		if (enhancedzombie.value)
-			flDamage = 400;
+			flDamage = 1000;
 		else
-			flDamage = 400;	//200
+			flDamage = 1000;	//200
 	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 3025;	//2750
+		flDamage = 2450;	//2750
 #endif
 	return flDamage;
 }
@@ -348,25 +362,19 @@ float CGuillotineex::GetDamageAmountB(void)
 	if (g_pModRunning->DamageTrack() == DT_ZB)
 	{
 		if (enhancedzombie.value)
-			flDamage = 432;
+			flDamage = 1050;
 		else
-			flDamage = 432;	//360
+			flDamage = 1050;	//360
 	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 432;	//2750
+		flDamage = 1050;	//2750
 #endif
 	return flDamage;
 }
 
-
 int CGuillotineex::iMaxClip(void)
 {
-	int iMaxClip = GUILLOTINEEX_MAX_AMMO;
-
-	if (m_iWeaponState == 1 || m_iWeaponState == 2)
-		iMaxClip = iMaxClip - 1;
-
-	return iMaxClip;
+	return GUILLOTINEEX_MAX_AMMO;
 }
 
 }

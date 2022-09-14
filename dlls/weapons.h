@@ -849,8 +849,8 @@ class CSpear : public CBaseEntity
 {
 public:
 	float GetArmorRatioModifier() { return 1.85; }
-	int GetWeaponsId(void) { return WEAPON_SPEARGUN; }
-	static CSpear* Create(void);
+	int GetWeaponsId(void) { return m_iType ? WEAPON_SPEARGUNM : WEAPON_SPEARGUN; }
+	static CSpear* Create(int iType = 0);
 
 public:
 	void CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind);
@@ -914,6 +914,7 @@ public:
 	float m_flCrowdDamage;
 	float m_flExplodeForce;
 	int m_iExplosionCount;
+	int m_iType;
 };
 
 
@@ -1236,6 +1237,56 @@ public:
 	CBasePlayer* m_pOwner;
 };
 
+class CGuillotineex;
+class CGuillotineExAmmo : public CGuillotineAmmo
+{
+	void Spawn(void);
+	void Precache(void);
+
+	int GetWeaponsId(void)
+	{
+		return WEAPON_GUILLOTINEEX;
+	}
+
+	float GetArmorRatio(void)
+	{
+		return 1.8;
+	}
+
+	KnockbackData GetKnockBackData() override { return { 450.0f, 350.0f, 400.0f, 300.0f, 1.0f }; }
+
+public:
+	static CGuillotineExAmmo* CreateAmmo(const Vector& vecOrigin, const Vector& vecAngles, CBasePlayer* pOwner, int iType);
+
+	void EXPORT FireThink(void);
+	void EXPORT FireTouch(CBaseEntity* pOther);
+	void EXPORT ReturnThink(void);
+	void EXPORT ReturnTouch(CBaseEntity* pOther);
+	void EXPORT HeadCutThink(void);
+	void EXPORT ChargeAttackThink(void);
+
+public:
+	bool ShouldCrashHalfway(void);
+	bool RecursiveWorldTrace(float delta, Vector vecOrigin, edict_t* pentIgnore, bool bWorldSound);
+	void Crash(void);
+	void StartHeadCut(CBaseEntity* pOther);
+	bool IsHeadCutting(void);
+	bool ShouldHeadCut(TraceResult* ptr, CBaseEntity* pEntity, Vector vecAbsMins, Vector vecAbsMaxs);
+	bool CanAttack(CBaseEntity* pOther);
+	void MaterialSound(TraceResult* ptr);
+	bool RangeAttack(TraceResult* ptr, Vector vecTraceDelta);
+	void Return(bool bResetFrame);
+	void SetAnimation(int sequence, bool bResetFrame);
+
+	void Fire(TraceResult* ptr, CBaseEntity* pOther, Vector vecAbsMins, Vector vecAbsMaxs);
+	void Attack(TraceResult* ptr, CBaseEntity* pOther);
+
+	int m_iType;
+	CBaseEntity* m_pTarget;
+	CGuillotineex* m_pWeapon;
+};
+
+#if 0
 class CGuillotineexAmmo : public CBaseAnimating
 {
 public:
@@ -1287,6 +1338,7 @@ public:
 	int m_iModelIndex;
 	short m_iLostSpriteIndex;
 };
+#endif
 #endif
 
 #ifdef ENABLE_SHIELD

@@ -354,6 +354,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_rainbowgun.cpp
 	../dlls/wpn_shared/wpn_guillotine.cpp
 	../dlls/wpn_shared/wpn_guillotineex.cpp
+	../dlls/wpn_shared/wpn_speargunm.cpp
 	)
 
 set (HUD_SRCS

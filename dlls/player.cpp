@@ -9181,6 +9181,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_RAINBOWGUN:
 		case WEAPON_GUILLOTINE:
 		case WEAPON_GUILLOTINEEX:
+		case WEAPON_SPEARGUNM:
 			return TRUE;
 		}
 	}

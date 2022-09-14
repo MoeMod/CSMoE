@@ -132,6 +132,8 @@ int CHudFlashlight::DrawNewHudFlashLight(float flTime)
 		SPR_Set(m_hSprite2.spr, r, g, b);
 		SPR_DrawAdditive(0, iX + iOffset, iY, &rc);
 	}
+
+	return 1;
 }
 
 

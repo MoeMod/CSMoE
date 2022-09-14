@@ -123,27 +123,6 @@ namespace sv {
 
 		UTIL_TraceLine(pev->origin, pev->origin + pev->velocity.Normalize() * 10, dont_ignore_monsters, pev->owner, &tr);
 
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_BEAMPOINTS);
-		WRITE_COORD(pev->origin.x);
-		WRITE_COORD(pev->origin.y);
-		WRITE_COORD(pev->origin.z);
-		WRITE_COORD(tr.vecEndPos.x);
-		WRITE_COORD(tr.vecEndPos.y);
-		WRITE_COORD(tr.vecEndPos.z); // coord coord coord (end position) 
-		WRITE_SHORT(g_sModelIndexLaser); // short (sprite index) 
-		WRITE_BYTE(0); // byte (starting frame) 
-		WRITE_BYTE(0); // byte (frame rate in 0.1's) 
-		WRITE_BYTE(50); // byte (life in 0.1's) 
-		WRITE_BYTE(10); // byte (line width in 0.1's) 
-		WRITE_BYTE(0); // byte (noise amplitude in 0.01's) 
-		WRITE_BYTE(0); // byte,byte,byte (color)
-		WRITE_BYTE(0);
-		WRITE_BYTE(255);
-		WRITE_BYTE(255); // byte (brightness)
-		WRITE_BYTE(15); // byte (scroll speed in 0.1's)
-		MESSAGE_END();
-
 		if (CanAttack(pOther))
 		{
 			Fire(&tr, pOther, pev->origin + m_vecMins, pev->origin + pev->maxs);

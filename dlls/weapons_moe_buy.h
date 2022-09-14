@@ -157,6 +157,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_PIANOGUN, "weapon_pianogun",        "【命运】寂静之音",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_CANNONEX, "weapon_cannonex",         "赤焰魔龙",           6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SPEARGUN, "weapon_speargun",         "海皇之怒",           5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ WEAPON_SPEARGUNM, "weapon_speargunm",         "血猎重弩",           6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_GUILLOTINE, "weapon_guillotine",         "盘龙血煞",           7500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_GUILLOTINEEX, "weapon_guillotineex",         "【弧光】回旋刃",           7500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SGMISSILE, "weapon_sgmissile",        "撼宇碎星",                  6400, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -340,6 +341,10 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+	{ WEAPON_SPEARGUN, "weapon_speargun",         "海皇之怒",           5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+
+	{ WEAPON_SPEARGUNM, "weapon_speargunm",         "血猎重弩",           6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+
 	{ WEAPON_FGLAUNCHER, "weapon_fglauncher",        "礼花发射器",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 
 	{ WEAPON_BUNKERBUSTER, "weapon_bunkerbuster",      "天降正义LTD",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },

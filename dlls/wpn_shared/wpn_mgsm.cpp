@@ -480,7 +480,7 @@ namespace sv {
 		{
 			if (CBaseEntity* pEntity = gMultiDamage.pEntity)
 			{
-				if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY && (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE))
+				if ((pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY) && (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE))
 				{
 					float flBuffDamage = GetBuffDamage();
 					float flExplodeDamage = GetExplodeDamage();

@@ -159,36 +159,12 @@ namespace sv {
 				{
 					if (pOther->pev->takedamage != DAMAGE_NO)
 					{
-						
-						TraceResult tr = UTIL_GetGlobalTrace();
-						//TraceResult tr;
-						/*Vector vecStart = pev->origin;
+						TraceResult tr;
+						Vector vecStart = pev->origin;
 						Vector vecEnd = pev->origin + pev->velocity.Normalize() * 42;
-						UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, this->edict(), &tr);*/
-
-						//MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-						//WRITE_BYTE(TE_BEAMPOINTS);
-						//WRITE_COORD(vecStart.x);
-						//WRITE_COORD(vecStart.y);
-						//WRITE_COORD(vecStart.z);
-						//WRITE_COORD(tr.vecEndPos.x);
-						//WRITE_COORD(tr.vecEndPos.y);
-						//WRITE_COORD(tr.vecEndPos.z); // coord coord coord (end position) 
-						//WRITE_SHORT(PRECACHE_MODEL("sprites/laserbeam.spr")); // short (sprite index) 
-						//WRITE_BYTE(0); // byte (starting frame) 
-						//WRITE_BYTE(1); // byte (frame rate in 0.1's) 
-						//WRITE_BYTE(100); // byte (life in 0.1's) 
-						//WRITE_BYTE(10); // byte (line width in 0.1's) 
-						//WRITE_BYTE(0); // byte (noise amplitude in 0.01's) 
-						//WRITE_BYTE(0); // byte,byte,byte (color)
-						//WRITE_BYTE(0);
-						//WRITE_BYTE(255);
-						//WRITE_BYTE(255); // byte (brightness)
-						//WRITE_BYTE(0); // byte (scroll speed in 0.1's)
-						//MESSAGE_END();
-
-						//if (tr.pHit && (CBaseEntity*)GET_PRIVATE(tr.pHit) == pOther)
-						if(g_pGameRules->PlayerRelationship(pEntityOwner, pOther) != GR_TEAMMATE)
+						UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, pev->owner, &tr);
+				
+						if (g_pGameRules->PlayerRelationship(pEntityOwner, pOther) != GR_TEAMMATE)
 						{
 							entvars_t* pevOwner = VARS(pev->owner);
 

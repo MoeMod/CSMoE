@@ -311,6 +311,7 @@ TL_ADD(CLaserFistEX)
 TL_ADD(CRainbowGun)
 TL_ADD(CGuillotine)
 TL_ADD(CGuillotineex)
+TL_ADD(CSpearGunm)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
@@ -634,7 +635,7 @@ TL_ADD(CBunkerBusterBase)
 TL_ADD(CBunkerBusterTarget)
 TL_ADD(CThanatos112ndAmmo)
 TL_ADD(CGuillotineAmmo)
-TL_ADD(CGuillotineexAmmo)
+TL_ADD(CGuillotineExAmmo)
 //TL_ADD(CStunBeamEffect)
 
 #endif
