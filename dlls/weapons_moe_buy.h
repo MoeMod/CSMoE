@@ -198,7 +198,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     { WEAPON_INFINITYSB, "weapon_infinitysb",  "恒宇黑星",        600,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
     { WEAPON_ANACONDA, "weapon_anaconda",	 "左轮军魂",			  650,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_BALROG1, "weapon_balrog1",	 "红莲Balrog-Ⅰ",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
+	
 	{ WEAPON_SAPIENTIA, "weapon_sapientia",	 "冰魄",			  1300,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
+	{ WEAPON_KINGCOBRA, "weapon_kingcobra",	 "眼镜王蛇Kingcobra",			  650,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_M950, "weapon_m950",	 "卡利柯M950",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_M950SE, "weapon_m950se",	 "黯夜流光",			  2000,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_SKULL1, "weapon_skull1",	 "噬魂SKULL-1",			  1200,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
@@ -341,6 +343,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+	{ WEAPON_KINGCOBRA, "weapon_kingcobra",	 "眼镜王蛇Kingcobra",			  650,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_SPEARGUN, "weapon_speargun",         "海皇之怒",           5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 
 	{ WEAPON_SPEARGUNM, "weapon_speargunm",         "血猎重弩",           6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -486,6 +489,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_INFINITYSR, "weapon_infinitysr",  "恒宇红星",          600,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_INFINITYSB, "weapon_infinitysb",  "恒宇黑星",        600,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_ANACONDA, "weapon_anaconda",	 "左轮军魂",			  650,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
+	{ WEAPON_KINGCOBRA, "weapon_kingcobra",	 "眼镜王蛇Kingcobra",			  650,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_M950, "weapon_m950",	 "卡利柯M950",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_M950SE, "weapon_m950se",	 "黯夜流光",			  2000,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_SKULL1, "weapon_skull1",	 "噬魂SKULL-1",			  1200,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },

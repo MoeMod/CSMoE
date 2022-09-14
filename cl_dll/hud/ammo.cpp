@@ -1194,7 +1194,11 @@ int CHudAmmo::Draw(float flTime)
 	}
 	else if( gHUD.m_iFOV > 40 )
 	{
-		if (m_pWeapon && (m_pWeapon->iId == WEAPON_SKULL5 || m_pWeapon->iId == WEAPON_SKULL6 || m_pWeapon->iId == WEAPON_CROSSBOW) && gHUD.m_iFOV < 90)
+		if (m_pWeapon && gHUD.m_iFOV < 90 && (m_pWeapon->iId == WEAPON_SKULL5 ||
+			m_pWeapon->iId == WEAPON_SKULL6 ||
+			m_pWeapon->iId == WEAPON_CROSSBOW ||
+			m_pWeapon->iId == WEAPON_KINGCOBRA ||
+			m_pWeapon->iId == WEAPON_KINGCOBRAG))
 		{
 			if (!switchCrosshairType)
 			{

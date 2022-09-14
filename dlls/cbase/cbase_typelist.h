@@ -312,6 +312,7 @@ TL_ADD(CRainbowGun)
 TL_ADD(CGuillotine)
 TL_ADD(CGuillotineex)
 TL_ADD(CSpearGunm)
+TL_ADD(CKingcobra)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)

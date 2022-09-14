@@ -427,6 +427,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_guillotine");
 	UTIL_PrecacheOtherWeapon("weapon_guillotineex");
 	UTIL_PrecacheOtherWeapon("weapon_speargunm");
+	UTIL_PrecacheOtherWeapon("weapon_kingcobra");
 
 	if (g_pGameRules->IsDeathmatch())
 	{
