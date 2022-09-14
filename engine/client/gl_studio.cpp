@@ -51,6 +51,7 @@ GNU General Public License for more details.
 #define EVENT_CLIENT	5000	// less than this value it's a server-side studio events
 #define MAXARRAYVERTS	20000	// used for draw shadows
 #define LEGS_BONES_COUNT	8
+#define MAX_LOCALLIGHTS	4
 
 static vec3_t hullcolor[8] = 
 {
@@ -90,10 +91,18 @@ typedef struct studiolight_s
 	vec3_t		lightspot;		// potential coords where placed lightsource
 
 	vec3_t		blightvec[MAXSTUDIOBONES];	// ambient lightvectors per bone
-	studiolight_item_t	dlight[MAX_DLIGHTS];
-	studiolight_item_t	elight[MAX_ELIGHTS];
-	int		numdlights;
-	int		numelights;
+
+    // elights cache
+    int		numlocallights;
+    int		lightage[MAXSTUDIOBONES];
+    dlight_t		*locallight[MAX_LOCALLIGHTS];
+    color24		locallightcolor[MAX_LOCALLIGHTS];
+    vec4_t		lightpos[MAXSTUDIOVERTS][MAX_LOCALLIGHTS];
+    vec3_t		lightbonepos[MAXSTUDIOBONES][MAX_LOCALLIGHTS];
+    float		locallightR2[MAX_LOCALLIGHTS];
+
+    int			ambientlight;	// clip at 128
+    int			shadelight;		// clip at 192 - ambientlight
 } studiolight_t;
 
 typedef struct sortedmesh_s
@@ -1467,148 +1476,183 @@ static int GAME_EXPORT R_StudioCheckBBox( void )
 
 /*
 ===============
-R_StudioGetShadowImpactAndDir
-===============
-*/
-void R_StudioGetShadowImpactAndDir( void )
-{
-	float		angle;
-	vec3_t		skyAngles, origin, end;
-
-	if( !cl.refdef.movevars ) return; // e.g. in menu
-
-	// convert skyvec into angles then back into vector to avoid 0 0 0 direction
-	vec3_t skyvec = { cl.refdef.movevars->skyvec_x, cl.refdef.movevars->skyvec_y, cl.refdef.movevars->skyvec_z };
-	VectorAngles( skyvec, skyAngles );
-	angle = skyAngles[YAW] / 180 * M_PI;
-
-	Matrix3x4_OriginFromMatrix( g_bonestransform[0], origin );
-	SinCos( angle, &g_mvShadowVec[1], &g_mvShadowVec[0] );
-
-	R_LightDir( origin, g_mvShadowVec, 256.0f );
-
-	VectorSet( g_mvShadowVec, -g_mvShadowVec[0], -g_mvShadowVec[1], -1.0f );
-	VectorNormalize( g_mvShadowVec );
-
-	VectorMA( origin, 256.0f, g_mvShadowVec, end );
-
-	g_shadowTrace = CL_TraceLine( origin, end, PM_WORLD_ONLY );
-}
-
-/*
-===============
 R_StudioDynamicLight
 
 ===============
 */
 void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
 {
-	uint		lnum, i;
-	studiolight_t	*plight;
-	qboolean		invLight;
-	color24		ambient;
-	float		dist, radius2;
-	vec3_t		direction, origin;
-	dlight_t		*dl;
+    movevars_t	*mv = cl.refdef.movevars;
+    vec3_t		lightDir, vecSrc, vecEnd;
+    vec3_t		origin, dist, finalLight;
+    float		add, radius, total;
+    colorVec		light;
+    uint		lnum;
+    dlight_t		*dl;
 
-	if( !lightinfo ) return;
+    if( !lightinfo || !ent || !ent->model )
+        return;
 
-	plight = &g_studiolight;
-	plight->numdlights = 0;	// clear previous dlights
+    if( !RI.drawWorld || r_fullbright->value || ( ent->curstate.effects & EF_FULLBRIGHT ))
+    {
+        lightinfo->shadelight = 0;
+        lightinfo->ambientlight = 192;
 
-	if( r_studio_lighting->integer == 2 )
-	{
-		Matrix3x4_OriginFromMatrix( g_lighttransform[0], origin );
+        VectorSet( *lightinfo->plightvec, 0.0f, 0.0f, -1.0f );
+        VectorSet( lightinfo->color, 1.0f, 1.0f, 1.0f );
+        return;
+    }
 
-		// NOTE: in some cases bone origin may be stuck in the geometry
-		// and produced completely black model. Run additional check for this case
-		if( CL_PointContents( origin ) == CONTENTS_SOLID )
-			Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
-	}
-	else Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
+    // determine plane to get lightvalues from: ceil or floor
+    if(  ent->curstate.effects & EF_INVLIGHT )
+        VectorSet( lightDir, 0.0f, 0.0f, 1.0f );
+    else VectorSet( lightDir, 0.0f, 0.0f, -1.0f );
 
-	// setup light dir
-	if( cl.refdef.movevars )
-	{
-		// pre-defined light vector
-		plight->lightvec[0] = cl.refdef.movevars->skyvec_x;
-		plight->lightvec[1] = cl.refdef.movevars->skyvec_y;
-		plight->lightvec[2] = cl.refdef.movevars->skyvec_z;
-	}
-	else VectorSet( plight->lightvec, 0.0f, 0.0f, -1.0f );
+    VectorCopy( ent->origin, origin );
 
-	if( VectorIsNull( plight->lightvec ))
-		VectorSet( plight->lightvec, 0.0f, 0.0f, -1.0f );
+    VectorSet( vecSrc, origin[0], origin[1], origin[2] - lightDir[2] * 8.0f );
+    light.r = light.g = light.b = light.a = 0;
 
-	VectorCopy( plight->lightvec, *lightinfo->plightvec );
+    if(( mv->skycolor_r + mv->skycolor_g + mv->skycolor_b ) != 0 )
+    {
+        msurface_t	*psurf = NULL;
+        pmtrace_t		trace;
 
-	// setup ambient lighting
-	invLight = (ent && ent->curstate.effects & EF_INVLIGHT) ? true : false;
-	R_LightForPoint( origin, &ambient, invLight, true, 0.0f ); // ignore dlights
+        if( host.features & ENGINE_WRITE_LARGE_COORD )
+        {
+            vecEnd[0] = origin[0] - mv->skyvec_x * 65536.0f;
+            vecEnd[1] = origin[1] - mv->skyvec_y * 65536.0f;
+            vecEnd[2] = origin[2] - mv->skyvec_z * 65536.0f;
+        }
+        else
+        {
+            vecEnd[0] = origin[0] - mv->skyvec_x * 8192.0f;
+            vecEnd[1] = origin[1] - mv->skyvec_y * 8192.0f;
+            vecEnd[2] = origin[2] - mv->skyvec_z * 8192.0f;
+        }
 
-	R_GetLightSpot( plight->lightspot );	// shadow stuff
+        trace = CL_TraceLine( vecSrc, vecEnd, PM_WORLD_ONLY );
+        if( trace.ent > 0 ) psurf = PM_TraceSurface( &clgame.pmove->physents[trace.ent], vecSrc, vecEnd );
+        else psurf = PM_TraceSurface( clgame.pmove->physents, vecSrc, vecEnd );
 
-	plight->lightcolor[0] = lightinfo->color[0] = ambient.r * (1.0f / 255.0f);
-	plight->lightcolor[1] = lightinfo->color[1] = ambient.g * (1.0f / 255.0f);
-	plight->lightcolor[2] = lightinfo->color[2] = ambient.b * (1.0f / 255.0f);
+        if( ( psurf && (psurf->flags & SURF_DRAWSKY )))
+        {
+            VectorSet( lightDir, mv->skyvec_x, mv->skyvec_y, mv->skyvec_z );
 
-	VectorCopy( plight->lightcolor, lightinfo->color );
-	lightinfo->shadelight = (ambient.r + ambient.g + ambient.b) / 3;
-	lightinfo->ambientlight = lightinfo->shadelight;
+            light.r = ( bound( 0, mv->skycolor_r, 255 ));
+            light.g = ( bound( 0, mv->skycolor_g, 255 ));
+            light.b = ( bound( 0, mv->skycolor_b, 255 ));
+        }
+    }
 
-	if( !ent || !ent->model || !r_dynamic->integer )
-		return;
+    if(( light.r + light.g + light.b ) < 16 ) // TESTTEST
+    {
+        colorVec	gcolor;
+        float	grad[4];
 
-	for( lnum = 0, dl = cl_dlights; lnum < MAX_DLIGHTS; lnum++, dl++ )
-	{
-		if( dl->die < RI.refdef.time || !dl->radius )
-			continue;
+        VectorScale( lightDir, 2048.0f, vecEnd );
+        VectorAdd( vecEnd, vecSrc, vecEnd );
 
-		VectorSubtract( dl->origin, origin, direction );
-		dist = VectorLength( direction );
+        light = R_LightVec( vecSrc, vecEnd, g_studiolight.lightspot, g_studiolight.lightvec );
 
-		if( !dist || dist > dl->radius + studio_radius )
-			continue;
+        if( VectorIsNull( g_studiolight.lightvec ))
+        {
+            vec3_t spot, vec;
+            vecSrc[0] -= 16.0f;
+            vecSrc[1] -= 16.0f;
+            vecEnd[0] -= 16.0f;
+            vecEnd[1] -= 16.0f;
 
-		radius2 = dl->radius * dl->radius; // squared radius
+            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+            grad[0] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-		for( i = 0; i < m_pStudioHeader->numbones; i++ )
-		{
-			vec3_t	vec, org;
-			float	atten;
+            vecSrc[0] += 32.0f;
+            vecEnd[0] += 32.0f;
 
-			Matrix3x4_OriginFromMatrix( g_lighttransform[i], org );
-			VectorSubtract( org, dl->origin, vec );
+            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+            grad[1] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-			dist = DotProduct( vec, vec );
-			atten = (dist / radius2 - 1) * -1;
-			if( atten < 0 ) atten = 0;
-			dist = sqrt( dist );
+            vecSrc[1] += 32.0f;
+            vecEnd[1] += 32.0f;
 
-			if( dist )
-			{
-				dist = 1.0f / dist;
-				VectorScale( vec, dist, vec );
-				lightinfo->ambientlight += atten;
-				lightinfo->shadelight += atten;
-			}
+            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+            grad[2] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->dlight[plight->numdlights].vec[i] );
-			VectorScale( plight->dlight[plight->numdlights].vec[i], atten, plight->dlight[plight->numdlights].vec[i] );
-		}
+            vecSrc[0] -= 32.0f;
+            vecEnd[0] -= 32.0f;
 
-		plight->dlight[plight->numdlights].color[0] = dl->color.r * (1.0f / 255.0f);
-		plight->dlight[plight->numdlights].color[1] = dl->color.g * (1.0f / 255.0f);
-		plight->dlight[plight->numdlights].color[2] = dl->color.b * (1.0f / 255.0f);
-		plight->numdlights++;
-	}
+            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+            grad[3] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-	// clamp lighting so it doesn't overbright as much
-	if( lightinfo->ambientlight > 128 )
-		lightinfo->ambientlight = 128;
+            lightDir[0] = grad[0] - grad[1] - grad[2] + grad[3];
+            lightDir[1] = grad[1] + grad[0] - grad[2] - grad[3];
+            VectorNormalize( lightDir );
+        }
+        else
+        {
+            VectorCopy( g_studiolight.lightvec, lightDir );
+        }
+    }
 
-	if( lightinfo->ambientlight + lightinfo->shadelight > 192 )
-		lightinfo->shadelight = 192 - lightinfo->ambientlight;
+    VectorSet( finalLight, light.r, light.g, light.b );
+    ent->cvFloorColor = light;
+
+    total = max( max( light.r, light.g ), light.b );
+    if( total == 0.0f ) total = 1.0f;
+
+    // scale lightdir by light intentsity
+    VectorScale( lightDir, total, lightDir );
+
+    for( lnum = 0, dl = cl_dlights; lnum < MAX_DLIGHTS; lnum++, dl++ )
+    {
+        if( dl->die < RI.refdef.time || !r_dynamic->value )
+            continue;
+
+        VectorSubtract( ent->origin, dl->origin, dist );
+
+        radius = VectorLength( dist );
+        add = (dl->radius - radius);
+
+        if( add > 0.0f )
+        {
+            total += add;
+
+            if( radius > 1.0f )
+                VectorScale( dist, ( add / radius ), dist );
+            else VectorScale( dist, add, dist );
+
+            VectorAdd( lightDir, dist, lightDir );
+
+            finalLight[0] += ( dl->color.r ) * ( add / 256.0f ) * 2.0f;
+            finalLight[1] += ( dl->color.g ) * ( add / 256.0f ) * 2.0f;
+            finalLight[2] += ( dl->color.b ) * ( add / 256.0f ) * 2.0f;
+        }
+    }
+
+    add = 0.9f;
+
+    VectorScale( lightDir, add, lightDir );
+
+    lightinfo->shadelight = VectorLength( lightDir );
+    lightinfo->ambientlight = total - g_studiolight.shadelight;
+
+    total = max_element(finalLight);
+
+    if( total > 0.0f )
+    {
+        lightinfo->color[0] = finalLight[0] * ( 1.0f / total );
+        lightinfo->color[1] = finalLight[1] * ( 1.0f / total );
+        lightinfo->color[2] = finalLight[2] * ( 1.0f / total );
+    }
+    else VectorSet( lightinfo->color, 1.0f, 1.0f, 1.0f );
+
+    if( lightinfo->ambientlight > 128 )
+        lightinfo->ambientlight = 128;
+
+    if( lightinfo->ambientlight + g_studiolight.shadelight > 255 )
+        lightinfo->shadelight = 255 - g_studiolight.ambientlight;
+
+    *lightinfo->plightvec = lightDir.Normalize();
 }
 
 /*
@@ -1619,82 +1663,76 @@ pfnStudioEntityLight
 */
 void GAME_EXPORT R_StudioEntityLight( alight_t *lightinfo )
 {
-	uint		lnum, i;
-	studiolight_t	*plight;
-	float		dist, radius2;
-	vec3_t		direction, origin;
-	cl_entity_t	*ent;
-	dlight_t		*el;
+    int		lnum, i, j, k;
+    float		minstrength, dist2, f, r2;
+    float		lstrength[MAX_LOCALLIGHTS];
+    cl_entity_t	*ent = RI.currententity;
+    vec3_t		mid, origin, pos;
+    dlight_t		*el;
 
-	ent = RI.currententity;
+    g_studiolight.numlocallights = 0;
 
-	if( !ent || !ent->model || !r_dynamic->integer )
-		return;
+    if( !ent || !r_dynamic->value )
+        return;
 
-	plight = &g_studiolight;
-	plight->numelights = 0;	// clear previous elights
+    for( i = 0; i < MAX_LOCALLIGHTS; i++ )
+        lstrength[i] = 0;
 
-	if( r_studio_lighting->integer == 2 )
-	{
-		Matrix3x4_OriginFromMatrix( g_lighttransform[0], origin );
+    Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
+    dist2 = 1000000.0f;
+    k = 0;
 
-		// NOTE: in some cases bone origin may be stuck in the geometry
-		// and produced completely black model. Run additional check for this case
-		if( CL_PointContents( origin ) == CONTENTS_SOLID )
-			Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
-	}
-	else Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
+    for( lnum = 0, el = cl_elights; lnum < MAX_ELIGHTS; lnum++, el++ )
+    {
+        if( el->die < RI.refdef.time || el->radius <= 0.0f )
+            continue;
 
-	for( lnum = 0, el = cl_elights; lnum < MAX_ELIGHTS; lnum++, el++ )
-	{
-		if( el->die < RI.refdef.time || !el->radius )
-			continue;
+        if(( el->key & 0xFFF ) == ent->index )
+        {
+            int	att = (el->key >> 12) & 0xF;
 
-		VectorSubtract( el->origin, origin, direction );
-		dist = VectorLength( direction );
+            if( att ) VectorCopy( ent->attachment[att], el->origin );
+            else VectorCopy( ent->origin, el->origin );
+        }
 
-		if( !dist || dist > el->radius + studio_radius )
-			continue;
+        VectorCopy( el->origin, pos );
+        VectorSubtract( origin, el->origin, mid );
 
-		radius2 = el->radius * el->radius; // squared radius
+        f = DotProduct( mid, mid );
+        r2 = el->radius * el->radius;
 
-		for( i = 0; i < m_pStudioHeader->numbones; i++ )
-		{
-			vec3_t	vec, org;
-			float	atten;
+        if( f > r2 ) minstrength = r2 / f;
+        else minstrength = 1.0f;
 
-			Matrix3x4_OriginFromMatrix( g_lighttransform[i], org );
-			VectorSubtract( org, origin, vec );
+        if( minstrength > 0.05f )
+        {
+            if( g_studiolight.numlocallights >= MAX_LOCALLIGHTS )
+            {
+                for( j = 0, k = -1; j < g_studiolight.numlocallights; j++ )
+                {
+                    if( lstrength[j] < dist2 && lstrength[j] < minstrength )
+                    {
+                        dist2 = lstrength[j];
+                        k = j;
+                    }
+                }
+            }
+            else k = g_studiolight.numlocallights;
 
-			dist = DotProduct( vec, vec );
-			atten = (dist / radius2 - 1) * -1;
-			if( atten < 0 ) atten = 0;
-			dist = sqrt( dist );
+            if( k != -1 )
+            {
+                g_studiolight.locallightcolor[k].r = ( el->color.r ) * (1.0f / 255.0f);
+                g_studiolight.locallightcolor[k].g = ( el->color.g ) * (1.0f / 255.0f);
+                g_studiolight.locallightcolor[k].b = ( el->color.b ) * (1.0f / 255.0f);
+                g_studiolight.locallightR2[k] = r2;
+                g_studiolight.locallight[k] = el;
+                lstrength[k] = minstrength;
 
-			if( dist )
-			{
-				dist = 1.0f / dist;
-				VectorScale( vec, dist, vec );
-				lightinfo->ambientlight += atten;
-				lightinfo->shadelight += atten;
-			}
-
-			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->elight[plight->numelights].vec[i] );
-			VectorScale( plight->elight[plight->numelights].vec[i], atten, plight->elight[plight->numelights].vec[i] );
-		}
-
-		plight->elight[plight->numelights].color[0] = el->color.r * (1.0f / 255.0f);
-		plight->elight[plight->numelights].color[1] = el->color.g * (1.0f / 255.0f);
-		plight->elight[plight->numelights].color[2] = el->color.b * (1.0f / 255.0f);
-		plight->numelights++;
-	}
-
-	// clamp lighting so it doesn't overbright as much
-	if( lightinfo->ambientlight > 128 )
-		lightinfo->ambientlight = 128;
-
-	if( lightinfo->ambientlight + lightinfo->shadelight > 192 )
-		lightinfo->shadelight = 192 - lightinfo->ambientlight;
+                if( k >= g_studiolight.numlocallights )
+                    g_studiolight.numlocallights = k + 1;
+            }
+        }
+    }
 }
 
 /*
@@ -1705,23 +1743,28 @@ R_StudioSetupLighting
 */
 void GAME_EXPORT R_StudioSetupLighting( alight_t *lightinfo )
 {
-	studiolight_t	*plight;
+    float	scale = 1.0f;
 	int		i;
 
 	if( !m_pStudioHeader || !lightinfo )
 		return;
 
-	plight = &g_studiolight;
+
+    if( RI.currententity != NULL )
+        scale = RI.currententity->curstate.scale;
+
+    g_studiolight.ambientlight = lightinfo->ambientlight;
+    g_studiolight.shadelight = lightinfo->shadelight;
+    VectorCopy( *lightinfo->plightvec, g_studiolight.lightvec );
 
 	for( i = 0; i < m_pStudioHeader->numbones; i++ )
-		Matrix3x4_VectorIRotate( g_lighttransform[i], *lightinfo->plightvec, plight->blightvec[i] );
+    {
+		Matrix3x4_VectorIRotate( g_lighttransform[i], *lightinfo->plightvec, g_studiolight.blightvec[i] );
+        if( scale > 1.0f ) VectorNormalize( g_studiolight.blightvec[i] ); // in case model may be scaled
+    }
 
 	// copy custom alight color in case of mod-maker changed it
-	plight->lightcolor[0] = lightinfo->color[0];
-	plight->lightcolor[1] = lightinfo->color[1];
-	plight->lightcolor[2] = lightinfo->color[2];
-
-	R_StudioGetShadowImpactAndDir();
+    g_studiolight.lightcolor = lightinfo->color;
 }
 
 /*
@@ -1732,9 +1775,7 @@ R_StudioLighting
 */
 void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 {
-	float		_max, ambient;
-	vec3_t		illum;
-	studiolight_t	*plight;
+	float		illum;
 
 	if( !RI.drawWorld || RI.currententity->curstate.effects & EF_FULLBRIGHT )
 	{
@@ -1742,53 +1783,121 @@ void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 		return;
 	}
 
-	plight = &g_studiolight;
-	ambient = max( 0.1f, r_lighting_ambient->value ); // to avoid divison by zero
-	VectorScale( plight->lightcolor, ambient, illum );
+    illum = g_studiolight.ambientlight;
 
 	if( flags & STUDIO_NF_FLATSHADE )
 	{
-		VectorMA( illum, 0.8f, plight->lightcolor, illum );
+        illum += g_studiolight.shadelight * 0.8f;
 	}
 	else
 	{
 		float	r, lightcos;
-		int	i;
 
-		lightcos = DotProduct( normal, plight->blightvec[bone] ); // -1 colinear, 1 opposite
+        if( bone != -1 ) lightcos = DotProduct( normal, g_studiolight.blightvec[bone] );
+        else lightcos = DotProduct( normal, g_studiolight.lightvec ); // -1 colinear, 1 opposite
+        if( lightcos > 1.0f ) lightcos = 1.0f;
 
-		if( lightcos > 1.0f ) lightcos = 1;
-		VectorAdd( illum, plight->lightcolor, illum );
+        illum += g_studiolight.shadelight;
 
-		r = max(r_studio_lambert->value, 1.0f);
-		lightcos = (lightcos + ( r - 1.0f )) / r; // do modified hemispherical lighting
-		if( lightcos > 0.0f ) VectorMA( illum, -lightcos, plight->lightcolor, illum );
+        r = SHADE_LAMBERT;
 
-		illum = maxs(illum, {});
+        // do modified hemispherical lighting
+        if( r <= 1.0f )
+        {
+            r += 1.0f;
+            lightcos = (( r - 1.0f ) - lightcos) / r;
+            if( lightcos > 0.0f )
+                illum += g_studiolight.shadelight * lightcos;
+        }
+        else
+        {
+            lightcos = (lightcos + ( r - 1.0f )) / r;
+            if( lightcos > 0.0f )
+                illum -= g_studiolight.shadelight * lightcos;
+        }
 
-		// now add all dynamic lights
-	//	#pragma omp parallel for
-		for( i = 0; i < plight->numdlights; i++)
-		{
-			lightcos = -DotProduct( normal, plight->dlight[i].vec[bone] );
-			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->dlight[i].color, illum );
-		}
-
-		// now add all entity lights
-		//#pragma omp parallel for
-		for( i = 0; i < plight->numelights; i++)
-		{
-			lightcos = -DotProduct( normal, plight->elight[i].vec[bone] );
-			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->elight[i].color, illum );
-		}
+        illum = max( illum, 0.0f );
 	}
 
-	_max = VectorMaxElement( illum );
+    illum = min( illum, 255.0f );
+    lv = illum * vec3_t(1.0f / 255.0f, 1.0f / 255.0f, 1.0f / 255.0f);
+}
 
-	if( _max > 1.0f )
-		VectorScale( illum, ( 1.0f / _max ), lv );
-	else VectorCopy( illum, lv );
 
+
+/*
+====================
+R_LightLambert
+====================
+*/
+void R_LightLambert( vec4_t light[MAX_LOCALLIGHTS], const vec3_t normal, const vec3_t color, byte *out )
+{
+    vec3_t	finalLight;
+    vec3_t	localLight;
+    int	i;
+
+    VectorCopy( color, finalLight );
+
+    for( i = 0; i < g_studiolight.numlocallights; i++ )
+    {
+        float	r, r2;
+
+        if( tr.fFlipViewModel )
+            r = DotProduct( normal, light[i] );
+        else r = -DotProduct( normal, light[i] );
+
+        if( r > 0.0f )
+        {
+            if( light[i][3] == 0.0f )
+            {
+                r2 = DotProduct( light[i], light[i] );
+
+                if( r2 > 0.0f )
+                    light[i][3] = g_studiolight.locallightR2[i] / ( r2 * sqrt( r2 ));
+                else light[i][3] = 0.0001f;
+            }
+
+            localLight[0] = min( g_studiolight.locallightcolor[i].r * r * light[i][3], 255.0f );
+            localLight[1] = min( g_studiolight.locallightcolor[i].g * r * light[i][3], 255.0f );
+            localLight[2] = min( g_studiolight.locallightcolor[i].b * r * light[i][3], 255.0f );
+            VectorScale( localLight, ( 1.0f / 255.0f ), localLight );
+
+            finalLight[0] = min( finalLight[0] + localLight[0], 1.0f );
+            finalLight[1] = min( finalLight[1] + localLight[1], 1.0f );
+            finalLight[2] = min( finalLight[2] + localLight[2], 1.0f );
+        }
+    }
+
+    out[0] = finalLight[0] * 255;
+    out[1] = finalLight[1] * 255;
+    out[2] = finalLight[2] * 255;
+}
+
+/*
+====================
+R_LightStrength
+====================
+*/
+void R_LightStrength( int bone, const vec3_t localpos, vec4_t light[MAX_LOCALLIGHTS] )
+{
+    int	i;
+
+    if( g_studiolight.lightage[bone] != tr.framecount )
+    {
+        for( i = 0; i < g_studiolight.numlocallights; i++ )
+        {
+            dlight_t *el = g_studiolight.locallight[i];
+            Matrix3x4_VectorITransform( g_lighttransform[bone], el->origin, g_studiolight.lightbonepos[bone][i] );
+        }
+
+        g_studiolight.lightage[bone] = tr.framecount;
+    }
+
+    for( i = 0; i < g_studiolight.numlocallights; i++ )
+    {
+        VectorSubtract( localpos, g_studiolight.lightbonepos[bone][i], light[i] );
+        light[i][3] = 0.0f;
+    }
 }
 
 /*
@@ -2014,7 +2123,10 @@ static void R_StudioDrawPoints_legacy( void )
 		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
 
 	for( i = 0; i < m_pSubModel->numverts; i++ )
+    {
 		Matrix3x4_VectorTransform( g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i] );
+        R_LightStrength( pvertbone[i], pstudioverts[i], g_studiolight.lightpos[i] );
+    }
 
 	if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 	{
@@ -2197,7 +2309,9 @@ static void R_StudioDrawPoints_legacy( void )
 					else
 					{
 						lv = g_lightvalues[ptricmds[1]];
-						pglColor4f( lv[0], lv[1], lv[2], alpha );
+                        byte col[3];
+                        R_LightLambert( g_studiolight.lightpos[ptricmds[0]], pstudionorms[ptricmds[1]], lv, col );
+                        pglColor4ub( col[0], col[1], col[2], alpha * 255 );
 					}
 				}
 
@@ -2336,9 +2450,10 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				else
 				{
 					lv = g_lightvalues[ptricmds[1]];
-					cl[0] = lv[0]*255;
-					cl[1] = lv[1]*255;
-					cl[2] = lv[2]*255;
+                    R_LightLambert( g_studiolight.lightpos[ptricmds[0]], g_xformnorms[ptricmds[1]], lv, cl );
+					//cl[0] = lv[0]*255;
+					//cl[1] = lv[1]*255;
+					//cl[2] = lv[2]*255;
 					cl[3] = alpha;
 				}
 			}
@@ -4195,7 +4310,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 	imgfilter_t	*filter = NULL;
 	texture_t		*tx = NULL;
     int	gl_texturenum = 0;
-	
+
 	if( ptexture->flags & STUDIO_NF_NORMALMAP )
 		flags |= (TF_NORMALMAP);
 

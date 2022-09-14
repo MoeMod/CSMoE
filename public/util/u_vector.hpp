@@ -450,6 +450,16 @@ struct VectorBase : VectorBase_Storage<T, N, Align>
         return std::reduce(a.data(), a.data() + N);
     }
 
+    friend T max_element(VectorBase in)
+    {
+        return *std::max_element(in.data(), in.data() + N);
+    }
+
+    friend T min_element(VectorBase in)
+    {
+        return *std::min_element(in.data(), in.data() + N);
+    }
+
     friend VectorBase abs(VectorBase a)
     {
         using std::abs;
@@ -700,6 +710,34 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
+    friend T max_element(ThisClass a)
+    {
+        // warning: zero a.w can affect the result
+#if U_VECTOR_NEON
+        return vmaxvq_f32(a);
+#elif U_VECTOR_SSE
+        __m128 shuf = _mm_movehdup_ps(a);        // broadcast elements 3,1 to 2,0
+        __m128 sums = _mm_max_ps(a, shuf);
+        shuf = _mm_movehl_ps(shuf, sums); // high half -> low half
+        sums = _mm_max_ss(sums, shuf);
+        return _mm_cvtss_f32(sums);
+#endif
+    }
+
+    friend T min_element(ThisClass a)
+    {
+        // warning: zero a.w can affect the result
+#if U_VECTOR_NEON
+        return vminvq_f32(a);
+#elif U_VECTOR_SSE
+        __m128 shuf = _mm_movehdup_ps(a);        // broadcast elements 3,1 to 2,0
+        __m128 sums = _mm_min_ps(a, shuf);
+        shuf = _mm_movehl_ps(shuf, sums); // high half -> low half
+        sums = _mm_min_ss(sums, shuf);
+        return _mm_cvtss_f32(sums);
+#endif
+    }
+
     friend ThisClass abs(ThisClass a)
     {
 #if U_VECTOR_NEON
@@ -919,11 +957,6 @@ template<class T, std::size_t N, std::size_t Align> inline void VectorMA(T scale
 template<class T, std::size_t N, std::size_t Align> inline void VectorLerp(VectorBase<T, N, Align> a, T t, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
 	out = lerp(a, b, t);
-}
-
-template<class T, std::size_t N, std::size_t Align> constexpr T VectorMaxElement(VectorBase<T, N, Align> in)
-{
-    return *std::max_element(in.data(), in.data() + N);
 }
 
 template<class T, std::size_t N, std::size_t Align> constexpr bool VectorIsNull(VectorBase<T, N, Align> in)

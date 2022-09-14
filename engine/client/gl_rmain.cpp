@@ -29,7 +29,7 @@ GNU General Public License for more details.
 #include "physics.h"
 #endif
 
-#ifdef XASH_ANGLE
+#ifdef XASH_EGL
 #include <EGL/egl.h>
 #endif
 
@@ -1394,7 +1394,7 @@ void R_EndFrame( void )
 	else
 		R_Set2DMode( false );
 
-#if defined(XASH_ANGLE)
+#if defined(XASH_EGL)
     eglSwapBuffers(eglGetCurrentDisplay(), glw_state.surface);
 #elif defined(XASH_QINDIEGL)
 	BOOL wrap_wglSwapBuffers(HDC);
