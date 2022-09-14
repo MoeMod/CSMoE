@@ -28,7 +28,13 @@ GNU General Public License for more details.
 #ifdef XASH_RAGDOLL
 #include "physics.h"
 #endif
-
+#ifdef XASH_SDL
+#include <SDL.h>
+#include <SDL_syswm.h>
+#ifdef __ANDROID__
+#include <EGL/egl.h>
+#endif
+#endif
 #ifdef XASH_EGL
 #include <EGL/egl.h>
 #endif
@@ -1400,7 +1406,16 @@ void R_EndFrame( void )
 	BOOL wrap_wglSwapBuffers(HDC);
 	wrap_wglSwapBuffers(NULL);
 #elif defined(XASH_SDL)
+#ifdef __ANDROID__
+	// skip useless lock
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+	auto egl_surface = wmInfo.info.android.surface;
+	eglSwapBuffers(eglGetCurrentDisplay(), egl_surface);
+#else
 	SDL_GL_SwapWindow( host.hWnd );
+#endif
 #elif defined __ANDROID__ // For direct android backend
 	Android_SwapBuffers();
 #endif

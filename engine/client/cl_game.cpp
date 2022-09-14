@@ -2695,9 +2695,10 @@ static model_t *GAME_EXPORT pfnLoadMapSprite( const char *filename )
 	COM_FixSlashes( name );
 
     // try to use ddc first
-    if(GL_Support(GL_ASTC_EXT) > 0)
+	// MoeMod : texture scaling will crash here, DO NOT enable it
+    if(false)
     {
-        char name2[64];
+        char name2[PATH_MAX];
         Q_snprintf(name2, PATH_MAX, "ddc/%s", name);
         FS_StripExtension(name2);
         Q_strcat(name2, ".astc");

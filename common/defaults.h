@@ -67,7 +67,7 @@ SETUP BACKENDS DEFINITIONS
 		#endif
 	#endif // android case
 
-    #if defined __ANDROID__ || defined XASH_ANGLE
+    #if defined XASH_ANGLE
         #define XASH_EGL
     #endif
 

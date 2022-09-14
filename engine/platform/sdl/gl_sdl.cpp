@@ -977,7 +977,7 @@ qboolean GL_CreateContext( void )
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
     SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
-#ifdef ( TARGET_OS_IOS || TARGET_OS_IPHONE )
+#if ( TARGET_OS_IOS || TARGET_OS_IPHONE )
     auto hwnd = wmInfo.info.uikit.window;
 #elif __ANDROID__
     auto hwnd = wmInfo.info.android.window;

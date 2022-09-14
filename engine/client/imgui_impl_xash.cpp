@@ -241,7 +241,7 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	g_imguiRenderMode = kRenderTransAlpha;
 	GL_SetRenderMode(kRenderTransAlpha);
 	// Render command lists
-#if 0
+#ifndef XASH_GLES
     for (int n = 0; n < draw_data->CmdListsCount; n++)
     {
         const ImDrawList* cmd_list = draw_data->CmdLists[n];

@@ -4161,10 +4161,18 @@ void R_DrawStudioModelInternal( cl_entity_t *e, qboolean follow_entity )
 	}
 	else
 	{
+#ifdef XASH_RAGDOLL
 		// select the properly method
 		if (e->player)
 			result = GameStudioRenderer_StudioDrawPlayer(flags, &e->curstate);
 		else result = GameStudioRenderer_StudioDrawModel(flags);
+#else
+		// select the properly method
+		if (e->player)
+			result = pStudioDraw->StudioDrawPlayer(flags, &e->curstate);
+		else result = pStudioDraw->StudioDrawModel(flags);
+#endif
+
 	}
 	
 	// old frame must be restored
