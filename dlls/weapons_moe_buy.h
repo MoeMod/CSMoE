@@ -221,7 +221,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     { WEAPON_M134, "weapon_m134",      "终结者",               7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
     { WEAPON_M134EX, "weapon_m134ex",      "终结者EX",               7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
     { WEAPON_TBARREL, "weapon_tbarrel",         "破碎炙焱",                  2600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
-    { WEAPON_M134XMAS, "weapon_m134xmas",         "圣诞终结者",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+	{ WEAPON_SPSG, "weapon_spsg",         "暴乱蒸汽",           5650, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+
+	{ WEAPON_M134XMAS, "weapon_m134xmas",         "圣诞终结者",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_KRONOS7, "weapon_kronos7",        "捍卫者X-7",                  5200, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 
 	{ WEAPON_MG36, "weapon_mg36",         "开拓者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
@@ -259,6 +261,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_ETHEREAL, "weapon_ethereal",         "尘埃之光",           3900, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_RAILGUN, "weapon_railgun",         "爆能磁轨炮",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SFSNIPER, "weapon_sfsniper",         "雷神",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_DESTROYER, "weapon_destroyer",         "虚空破碎",           5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_M400, "weapon_m400",         "死神M200",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_M82, "weapon_m82",         "帕克-黑尔M82",           4700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_M24, "weapon_m24",         "狂蟒之吻M24",           4500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
@@ -343,6 +346,11 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+		{ WEAPON_WINGGUN, "weapon_winggun",        "曙光辉翼",                  6100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+
+		{ WEAPON_DESTROYER, "weapon_destroyer",         "虚空破碎",           5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_SPSG, "weapon_spsg",         "暴乱蒸汽",           5650, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+
 	{ WEAPON_KINGCOBRA, "weapon_kingcobra",	 "眼镜王蛇Kingcobra",			  650,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_SPEARGUN, "weapon_speargun",         "海皇之怒",           5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 

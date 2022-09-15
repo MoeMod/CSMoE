@@ -147,6 +147,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "thanatos11",	WEAPON_THANATOS11 },
 	{ "m1887xmas",	WEAPON_M1887XMAS },
 	{ "rainbowgun",	WEAPON_RAINBOWGUN },
+	{ "spsg",	WEAPON_SPSG },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -238,6 +239,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "barrettd",	WEAPON_Z4B_BARRETTD },
 	{ "freedom",	WEAPON_Z4B_FREEDOM },
 	{ "buffawp",	WEAPON_BUFFAWP },
+	{ "destroyer",	WEAPON_DESTROYER },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -523,6 +525,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "thanatos11",	WEAPONCLASS_SHOTGUN },
 	{ "m1887xmas",	WEAPONCLASS_SHOTGUN },
 	{ "rainbowgun",	WEAPONCLASS_SHOTGUN },
+	{ "spsg",	WEAPONCLASS_SHOTGUN },
 
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
@@ -623,6 +626,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "barrettd",	WEAPONCLASS_SNIPERRIFLE },
 	{ "freedom",	WEAPONCLASS_SNIPERRIFLE },
 	{ "buffawp",	WEAPONCLASS_SNIPERRIFLE },
+	{ "destroyer",	WEAPONCLASS_SNIPERRIFLE },
+
 
 	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
 	{ "buffm249",	WEAPONCLASS_MACHINEGUN },
@@ -992,6 +997,8 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_GUILLOTINE:
 	case WEAPON_GUILLOTINEEX:
 	case WEAPON_SPEARGUNM:
+	case WEAPON_SPSG:
+	case WEAPON_DESTROYER:
 		return true;
 	default:
 		break;

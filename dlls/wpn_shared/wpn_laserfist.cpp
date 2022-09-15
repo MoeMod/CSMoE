@@ -103,7 +103,7 @@ namespace sv {
     float GetArmorRatioModifier() override { return 1.65; }
 
 #ifndef CLIENT_DLL
-    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_laserfist" , 200 }; }
+    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_laserfist" , 500 }; }
 #endif
     WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR, 4, 4, 0 }; }
 

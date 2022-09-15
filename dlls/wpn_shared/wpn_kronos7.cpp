@@ -536,7 +536,7 @@ namespace sv {
     }
 
 #ifndef CLIENT_DLL
-    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762kbox" , 60 }; }
+    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762kbox" , 90 }; }
 #endif
     float GetArmorRatioModifier() override { return 1.5; }
     WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 195 }; }

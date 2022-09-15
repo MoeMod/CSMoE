@@ -107,7 +107,7 @@ public:
 	bool HasSecondaryAttack() override { return true; }
 	void WeaponIdle(void) override;
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_spear" , 180 }; }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_spearm" , 450 }; }
 #endif
 
 private:

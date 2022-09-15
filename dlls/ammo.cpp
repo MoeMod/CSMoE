@@ -1704,7 +1704,7 @@ void CBloodHunterAmmo::Precache()
 
 BOOL CBloodHunterAmmo::AddAmmo(CBaseEntity* pOther)
 {
-	if (pOther->GiveAmmo(12, "bloodhunter", 120) == -1) {
+	if (pOther->GiveAmmo(12, "bloodhunter", 100) == -1) {
 		return FALSE;
 	}
 
@@ -1929,7 +1929,7 @@ void C45ACPKAmmo::Precache()
 
 BOOL C45ACPKAmmo::AddAmmo(CBaseEntity* pOther)
 {
-	if (pOther->GiveAmmo(AMMO_45ACP_BUY, "45acpk", MAX_AMMO_45ACP) == -1) {
+	if (pOther->GiveAmmo(15, "45acpk", MAX_AMMO_45ACP) == -1) {
 		return FALSE;
 	}
 
@@ -1954,6 +1954,7 @@ void CLaserFistAmmo::Precache()
 
 BOOL CLaserFistAmmo::AddAmmo(CBaseEntity* pOther)
 {
+	// 500$ per 50 in cso
 	if (pOther->GiveAmmo(500, "laserfist", 500) == -1) {
 		return FALSE;
 	}
@@ -2012,4 +2013,54 @@ BOOL CAmmoGuillotineex::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_guillotineex, CAmmoGuillotineex);
+
+void CSpearmAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CSpearmAmmo::Precache()
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CSpearmAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(3, "SpearmAmmo", 30) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_spearm, CSpearmAmmo);
+
+void C20MMAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C20MMAmmo::Precache()
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C20MMAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(3, "20mm", 30) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_20mm, C20MMAmmo);
 }

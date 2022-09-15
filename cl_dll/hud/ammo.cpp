@@ -1198,7 +1198,8 @@ int CHudAmmo::Draw(float flTime)
 			m_pWeapon->iId == WEAPON_SKULL6 ||
 			m_pWeapon->iId == WEAPON_CROSSBOW ||
 			m_pWeapon->iId == WEAPON_KINGCOBRA ||
-			m_pWeapon->iId == WEAPON_KINGCOBRAG))
+			m_pWeapon->iId == WEAPON_KINGCOBRAG ||
+			m_pWeapon->iId == WEAPON_DESTROYER))
 		{
 			if (!switchCrosshairType)
 			{
@@ -1484,7 +1485,8 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		|| weaponid == WEAPON_CHAINSAWM
 		|| weaponid == WEAPON_HEROCHAINSAW
 		|| weaponid == WEAPON_Z4B_BARRETTD
-		|| weaponid == WEAPON_BUFFAWP)
+		|| weaponid == WEAPON_BUFFAWP
+		|| weaponid == WEAPON_DESTROYER)
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )

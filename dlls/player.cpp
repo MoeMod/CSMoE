@@ -6106,6 +6106,8 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/v_kingcobra.mdl");
 		case WEAPON_KINGCOBRAG:
 			pev->viewmodel = MAKE_STRING("models/v_kingcobrag.mdl");
+		case WEAPON_DESTROYER:
+			pev->viewmodel = MAKE_STRING("models/v_destroyer.mdl");
 		default:
 			break;
 		}
@@ -9188,6 +9190,8 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_GUILLOTINE:
 		case WEAPON_GUILLOTINEEX:
 		case WEAPON_SPEARGUNM:
+		case WEAPON_SPSG:
+		case WEAPON_DESTROYER:
 			return TRUE;
 		}
 	}

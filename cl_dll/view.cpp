@@ -967,6 +967,8 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 				view->model = NULL;
 			else if (!strcmp(view->model->name, "models/v_kingcobrag.mdl"))
 				view->model = NULL;
+			else if (!strcmp(view->model->name, "models/v_destroyer.mdl"))
+				view->model = NULL;
 		}
 	}
 

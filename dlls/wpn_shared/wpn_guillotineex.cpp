@@ -81,11 +81,6 @@ void CGuillotineex::Precache(void)
 
 	PRECACHE_SOUND("weapons/guillotineex_idle1.wav");
 	PRECACHE_SOUND("weapons/guillotineex_idle2.wav");
-	PRECACHE_SOUND("weapons/guillotineex-1.wav");
-	PRECACHE_SOUND("weapons/guillotineex-1.wav");
-	PRECACHE_SOUND("weapons/guillotineex-1.wav");
-	PRECACHE_SOUND("weapons/guillotineex-1.wav");
-	PRECACHE_SOUND("weapons/guillotineex-1.wav");
 	PRECACHE_SOUND("weapons/guillotineex_catch2.wav");
 }
 

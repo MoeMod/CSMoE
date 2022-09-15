@@ -44,6 +44,9 @@ version.
 
 namespace cl {
 
+
+extern vec3_t g_vecEyePos;
+
 enum drawscope_type
 {
 	TYPE_QUADRD_SQUARE = 0,
@@ -154,8 +157,19 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iMGSM_Aim_BG, "sprites/mgsm_aim_bg.tga");
 	R_InitTexture(m_iMGSM_Aim_Gauge, "sprites/mgsm_aim_gauge.tga");
 
-
 	m_flMGSMTimeChargeStart = gHUD.m_flTime + 9999.0;
+
+	R_InitTexture(m_iDestroyer_Aim01, "sprites/destroyer_aim01.tga");
+	R_InitTexture(m_iDestroyer_Aim02, "sprites/destroyer_aim02.tga");
+	R_InitTexture(m_iDestroyer_Frame01, "sprites/destroyer_frame01.tga");
+	R_InitTexture(m_iDestroyer_Frame02, "sprites/destroyer_frame02.tga");
+	R_InitTexture(m_iDestroyer_Range, "sprites/destroyer_range.tga");
+	
+	m_bDestroyerInSight = false;
+
+	m_iDestroyer_NumberZero = gHUD.GetSpriteIndex("destroyer_count0");
+	m_iDestroyer_Meter = gHUD.GetSpriteIndex("destroyer_countM");
+	m_rcDestroyer_Meter = gHUD.GetSpriteRect(m_iDestroyer_Meter);
 
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
@@ -356,6 +370,14 @@ int CHudSniperScope::Draw(float flTime)
 		else if (pActiveBTEWeapon->m_iId == WEAPON_SFSNIPER)
 		{
 			return 1;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_DESTROYER)
+		{
+			if (gHUD.m_iFOV > 89)
+				return 1;
+
+			DrawDestroyerScope(flTime);
+			return 0;
 		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_KRONOS12 || 
 			pActiveBTEWeapon->m_iId == WEAPON_KRONOS5 ||
@@ -1052,6 +1074,171 @@ void CHudSniperScope::SetMGSMAmmo(float flDelta, float flFinishTime)
 		m_flMGSMTimeChargeStart = gHUD.m_flTime;
 	m_flMGSMFinishTime = flFinishTime;
 
+}
+
+
+int CHudSniperScope::DrawDestroyerSniperScopeNumbers(int x, int y, int iFlags, int iNumber, int r, int g, int b)
+{
+	int k;
+	int iWidth = gHUD.GetSpriteRect(m_iDestroyer_NumberZero).right - gHUD.GetSpriteRect(m_iDestroyer_NumberZero).left;
+
+	if (iNumber > 0)
+	{
+		if (iNumber >= 10000)
+		{
+			k = iNumber / 10000;
+			gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iDestroyer_NumberZero + k), r, g, b);
+			gEngfuncs.pfnSPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iDestroyer_NumberZero + k));
+			x += iWidth;
+		}
+		else if (iFlags & (DHN_5DIGITS))
+			x += iWidth;
+
+		if (iNumber >= 1000)
+		{
+			k = (iNumber % 10000) / 1000;
+			gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iDestroyer_NumberZero + k), r, g, b);
+			gEngfuncs.pfnSPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iDestroyer_NumberZero + k));
+			x += iWidth;
+		}
+		else if (iFlags & (DHN_5DIGITS | DHN_4DIGITS))
+			x += iWidth;
+
+		if (iNumber >= 100)
+		{
+			k = (iNumber % 1000) / 100;
+			gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iDestroyer_NumberZero + k), r, g, b);
+			gEngfuncs.pfnSPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iDestroyer_NumberZero + k));
+			x += iWidth;
+		}
+		else if (iFlags & (DHN_5DIGITS | DHN_4DIGITS | DHN_3DIGITS))
+			x += iWidth;
+
+		if (iNumber >= 10)
+		{
+			k = (iNumber % 100) / 10;
+			gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iDestroyer_NumberZero + k), r, g, b);
+			gEngfuncs.pfnSPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iDestroyer_NumberZero + k));
+			x += iWidth;
+		}
+		else if (iFlags & (DHN_5DIGITS | DHN_4DIGITS | DHN_3DIGITS | DHN_2DIGITS))
+			x += iWidth;
+
+		k = iNumber % 10;
+		gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iDestroyer_NumberZero + k), r, g, b);
+		gEngfuncs.pfnSPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iDestroyer_NumberZero + k));
+		x += iWidth;
+	}
+	else if (iFlags & DHN_DRAWZERO)
+	{
+		gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iDestroyer_NumberZero), r, g, b);
+
+		if (iFlags & (DHN_5DIGITS))
+			x += iWidth;
+
+		if (iFlags & (DHN_5DIGITS | DHN_4DIGITS))
+			x += iWidth;
+
+		if (iFlags & (DHN_5DIGITS | DHN_4DIGITS | DHN_3DIGITS))
+			x += iWidth;
+
+		if (iFlags & (DHN_5DIGITS | DHN_4DIGITS | DHN_3DIGITS | DHN_2DIGITS))
+			x += iWidth;
+
+		gEngfuncs.pfnSPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iDestroyer_NumberZero));
+		x += iWidth;
+	}
+	return x;
+}
+
+
+int CHudSniperScope::CalculateDistance(void)
+{
+	cl_entity_t* pPlayer = gEngfuncs.GetLocalPlayer();
+	if (!pPlayer)
+		return 0;
+	vec3_t up, right, forward;
+
+	pmtrace_t tr;
+	gEngfuncs.pfnAngleVectors(v_angles, forward, right, up);
+	gEngfuncs.pEventAPI->EV_SetUpPlayerPrediction(false, true);
+	gEngfuncs.pEventAPI->EV_PushPMStates();
+	gEngfuncs.pEventAPI->EV_SetSolidPlayers(gEngfuncs.GetLocalPlayer()->index - 1);
+	gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+	gEngfuncs.pEventAPI->EV_PlayerTrace(g_vecEyePos, g_vecEyePos + forward * 8192, PM_STUDIO_BOX, -1, &tr);
+	gEngfuncs.pEventAPI->EV_PopPMStates();
+
+	int iEntity = gEngfuncs.pEventAPI->EV_IndexFromTrace(&tr);
+
+	if (iEntity > 0 && iEntity <= gEngfuncs.GetMaxClients() && g_PlayerExtraInfo[iEntity].teamnumber != g_PlayerExtraInfo[gEngfuncs.GetLocalPlayer()->index].teamnumber)
+		m_bDestroyerInSight = true;
+	else
+		m_bDestroyerInSight = false;
+
+	return int((tr.endpos - g_vecEyePos).Length() / 39.37f);
+}
+
+void CHudSniperScope::DrawDestroyerScope(float flTime)
+{
+
+
+	float LENGTH_SCOPE = min(ScreenWidth, ScreenHeight) / 2 / 0.75;
+
+	int iX, iY, iWidth, iHeight;
+
+	iWidth = iHeight = min(ScreenWidth, ScreenHeight) / 2 / 0.75;
+
+	iX = ScreenWidth / 2 - iWidth;
+	iY = ScreenHeight / 2 - iHeight;
+
+	if (!m_bDestroyerInSight)
+	{
+		gEngfuncs.pfnFillRGBABlend(0, 0, ScreenWidth / 2 - LENGTH_SCOPE + 1, ScreenHeight, 0, 12, 32, 238);
+		gEngfuncs.pfnFillRGBABlend(ScreenWidth / 2 + LENGTH_SCOPE - 1, 0, ScreenWidth / 2 - LENGTH_SCOPE + 10, ScreenHeight, 0, 12, 32, 238);
+		gEngfuncs.pfnFillRGBABlend(0, 0, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE + 1, 0, 12, 32, 238);
+		gEngfuncs.pfnFillRGBABlend(0, ScreenHeight / 2 + LENGTH_SCOPE, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE + 10, 0, 12, 32, 238);
+	
+		FuncDraw2DQuadScaled(*m_iDestroyer_Frame01, iX, iY, iWidth, iHeight);
+		iY = ScreenHeight / 2 + iHeight;
+		FuncDraw2DQuadScaled(*m_iDestroyer_Frame01, iX, iY, iWidth, -iHeight);
+		iX = ScreenWidth / 2 + iWidth;
+		iY = ScreenHeight / 2 - iHeight;
+		FuncDraw2DQuadScaled(*m_iDestroyer_Frame01, iX, iY, -iWidth, iHeight);
+		iY = ScreenHeight / 2 + iHeight;
+		FuncDraw2DQuadScaled(*m_iDestroyer_Frame01, iX, iY, -iWidth, -iHeight);	
+	}
+	else
+	{
+		gEngfuncs.pfnFillRGBABlend(0, 0, ScreenWidth / 2 - LENGTH_SCOPE + 1, ScreenHeight, 5, 21, 31, 238);
+		gEngfuncs.pfnFillRGBABlend(ScreenWidth / 2 + LENGTH_SCOPE - 1, 0, ScreenWidth / 2 - LENGTH_SCOPE + 10, ScreenHeight, 5, 21, 31, 238);
+		gEngfuncs.pfnFillRGBABlend(0, 0, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE + 1, 5, 21, 31, 238);
+		gEngfuncs.pfnFillRGBABlend(0, ScreenHeight / 2 + LENGTH_SCOPE, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE + 10, 5, 21, 31, 238);
+	
+		FuncDraw2DQuadScaled(*m_iDestroyer_Frame02, iX, iY, iWidth, iHeight);
+		iY = ScreenHeight / 2 + iHeight;
+		FuncDraw2DQuadScaled(*m_iDestroyer_Frame02, iX, iY, iWidth, -iHeight);
+		iX = ScreenWidth / 2 + iWidth;
+		iY = ScreenHeight / 2 - iHeight;
+		FuncDraw2DQuadScaled(*m_iDestroyer_Frame02, iX, iY, -iWidth, iHeight);
+		iY = ScreenHeight / 2 + iHeight;
+		FuncDraw2DQuadScaled(*m_iDestroyer_Frame02, iX, iY, -iWidth, -iHeight);
+	}
+
+	iX = ScreenWidth / 2 + iWidth / 4;
+	iY -= iHeight / 2;
+
+	FuncDraw2DQuadScaled(*m_iDestroyer_Range, iX, iY, m_iDestroyer_Range->w(), m_iDestroyer_Range->h());
+	iY += 13;
+	iX += 85;
+
+	iX = DrawDestroyerSniperScopeNumbers(iX, iY, DHN_3DIGITS | DHN_DRAWZERO, CalculateDistance(), 255, 255, 255);
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iDestroyer_Meter), 255, 255, 255);
+	gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY, &m_rcDestroyer_Meter);
+
+	if (!m_bDestroyerInSight)
+		FuncDraw2DQuadScaled(*m_iDestroyer_Aim01, (ScreenWidth - m_iDestroyer_Aim01->w()) / 2, (ScreenHeight - m_iDestroyer_Aim01->h()) / 2, m_iDestroyer_Aim01->w(), m_iDestroyer_Aim01->h());
+	else
+		FuncDraw2DQuadScaled(*m_iDestroyer_Aim02, (ScreenWidth - m_iDestroyer_Aim02->w()) / 2, (ScreenHeight - m_iDestroyer_Aim02->h()) / 2, m_iDestroyer_Aim02->w(), m_iDestroyer_Aim02->h());
 }
 
 void CHudSniperScope::Shutdown()
