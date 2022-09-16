@@ -323,6 +323,7 @@ namespace xe {
             co_await Cook_SearchResursive("gfx/env", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
             co_await Cook_SearchResursive("overviews", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
             co_await Cook_SearchResursive("overviews", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            co_await Cook_SearchResursive("resource", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
             co_await Cook_SearchResursive("sprites", "*.spr", std::bind(Cook_SubmitSPR, local_cook_ctx, std::placeholders::_1));
 
             while(g_cook_ctx->cur_num < g_cook_ctx->total_num)

@@ -214,13 +214,31 @@ void R_StudioInit( void )
 
 /*
 ===============
-R_LeftHand
+R_GenAlignedVertAndNormCache
 
 ===============
 */
-_inline qboolean R_LeftHand( void )
+static void R_GenAlignedVertAndNormCache()
 {
-	return r_lefthand->integer == 1 && !g_bCustomStudioRenderer;
+    // for cache friendly
+    const float* pstudioverts_unaligned = (const float*)((const byte*)m_pStudioHeader + m_pSubModel->vertindex);
+    const float* pstudionorms_unaligned = (const float*)((const byte*)m_pStudioHeader + m_pSubModel->normindex);
+    float *pstudioverts_out = (float *)pstudioverts;
+    float *pstudionorms_out = (float *)pstudionorms;
+    for(int i = 0; i < m_pSubModel->numverts; ++i)
+    {
+        pstudioverts_out[i * 4 + 0] = pstudioverts_unaligned[i * 3 + 0];
+        pstudioverts_out[i * 4 + 1] = pstudioverts_unaligned[i * 3 + 1];
+        pstudioverts_out[i * 4 + 2] = pstudioverts_unaligned[i * 3 + 2];
+        pstudioverts_out[i * 4 + 3] = 0;
+    }
+    for(int i = 0; i < m_pSubModel->numnorms; ++i)
+    {
+        pstudionorms_out[i * 4 + 0] = pstudionorms_unaligned[i * 3 + 0];
+        pstudionorms_out[i * 4 + 1] = pstudionorms_unaligned[i * 3 + 1];
+        pstudionorms_out[i * 4 + 2] = pstudionorms_unaligned[i * 3 + 2];
+        pstudionorms_out[i * 4 + 3] = 0;
+    }
 }
 
 /*
@@ -1461,6 +1479,7 @@ static void GAME_EXPORT R_StudioSetupModel( int bodypart, void **ppbodypart, voi
 	index = index % m_pBodyPart->nummodels;
 
 	m_pSubModel = (mstudiomodel_t *)((byte *)m_pStudioHeader + m_pBodyPart->modelindex) + index;
+    R_GenAlignedVertAndNormCache();
 
 	if( ppbodypart ) *ppbodypart = m_pBodyPart;
 	if( ppsubmodel ) *ppsubmodel = m_pSubModel;
@@ -2081,16 +2100,6 @@ static bool R_StudioMeshCompare( const sortedmesh_t &a, const sortedmesh_t &b )
 	return ((a.flags & STUDIO_NF_TRANSPARENT) && !(a.flags & STUDIO_NF_ADDITIVE)) && !((b.flags & STUDIO_NF_TRANSPARENT) && !(b.flags & STUDIO_NF_ADDITIVE));
 }
 
-static void R_GenAlignedVertAndNormCache()
-{
-	// for cache friendly
-	const vec3_c* pstudioverts_unaligned = (const vec3_c*)((const byte*)m_pStudioHeader + m_pSubModel->vertindex);
-	const vec3_c* pstudionorms_unaligned = (const vec3_c*)((const byte*)m_pStudioHeader + m_pSubModel->normindex);
-	
-	std::copy_n(pstudioverts_unaligned, m_pSubModel->numverts, pstudioverts);
-	std::copy_n(pstudionorms_unaligned, m_pSubModel->numnorms, pstudionorms);
-}
-
 /*
 ===============
 R_StudioDrawPoints
@@ -2128,7 +2137,6 @@ static void R_StudioDrawPoints_legacy( void )
 	ASSERT( ptexture != NULL );
 
 	pmesh = (mstudiomesh_t *)((byte *)m_pStudioHeader + m_pSubModel->meshindex);
-	R_GenAlignedVertAndNormCache();
 
 	pskinref = (short *)((byte *)m_pTextureHeader + m_pTextureHeader->skinindex);
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
@@ -2733,7 +2741,6 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	ASSERT( ptexture != NULL );
 
 	pmesh = (mstudiomesh_t *)((byte *)m_pStudioHeader + m_pSubModel->meshindex);
-	R_GenAlignedVertAndNormCache();
 
 	pskinref = (short *)((byte *)m_pTextureHeader + m_pTextureHeader->skinindex);
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
