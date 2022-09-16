@@ -205,13 +205,39 @@ static_assert(sizeof(VectorBase3f_SIMD_Data) == 16 && alignof(VectorBase3f_SIMD_
 template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 16, VectorBase3f_SIMD_Data>
 {
     using Base = VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 16, VectorBase3f_SIMD_Data>;
-    using Base::Base;
+    //using Base::Base;
 
     constexpr VectorBase_Storage() = default;
 
-    constexpr VectorBase_Storage(float x1, float y1, float z1) : Base{ x1, y1, z1 }
+    constexpr VectorBase_Storage(float x1, float y1, float z1)
     {
+        if constexpr (std::is_constant_evaluated())
+        {
+            this->x = x1;
+            this->y = y1;
+            this->z = z1;
+            this->w_ununsed = 0;
+        }
+        else
+        {
+#if U_VECTOR_NEON
+            this->m_xmm = { x1, y1, z1, 0 };
+#elif U_VECTOR_SSE
+            this->m_xmm = _mm_set_ps(x1, y1, z1, 0);
+#endif
+        }
     }
+
+    VectorBase_Storage(std::nullptr_t)
+    {
+#if U_VECTOR_NEON
+        this->m_xmm = vdupq_n_f32(NAN);
+#elif U_VECTOR_SSE
+        this->m_xmm = _mm_set1_ps(NAN);
+#endif
+    }
+
+    explicit VectorBase_Storage(const float *p) : VectorBase_Storage(p[0], p[1], p[2]) {}
 
     VectorBase_Storage(xmm_t xmm)
     {
@@ -235,10 +261,45 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
 template<> struct VectorBase_Storage<float, 4, 16> : VectorBase_Gen<float, 4, std::index_sequence<0, 1, 2, 3>, 16, VectorBase4f_SIMD_Data>
 {
     using Base = VectorBase_Gen<float, 4, std::index_sequence<0, 1, 2, 3>, 16, VectorBase4f_SIMD_Data>;
-    using Base::Base;
+    //using Base::Base;
 
-    constexpr VectorBase_Storage(float x1, float y1, float z1, float w1) : Base{ x1, y1, z1, w1 }
+    constexpr VectorBase_Storage() = default;
+
+    constexpr VectorBase_Storage(float x1, float y1, float z1, float w1)
     {
+        if constexpr (std::is_constant_evaluated())
+        {
+            this->x = x1;
+            this->y = y1;
+            this->z = z1;
+            this->w = w1;
+        }
+        else
+        {
+#if U_VECTOR_NEON
+            this->m_xmm = { x1, y1, z1, w1 };
+#elif U_VECTOR_SSE
+            this->m_xmm = _mm_set_ps(x1, y1, z1, w1);
+#endif
+        }
+    }
+
+    VectorBase_Storage(std::nullptr_t)
+    {
+#if U_VECTOR_NEON
+        this->m_xmm = vdupq_n_f32(NAN);
+#elif U_VECTOR_SSE
+        this->m_xmm = _mm_set1_ps(NAN);
+#endif
+    }
+
+    explicit VectorBase_Storage(const float *p)
+    {
+#if U_VECTOR_NEON
+        this->m_xmm = vld1q_f32(p);
+#elif U_VECTOR_SSE
+        this->m_xmm = _mm_loadu_ps(p);
+#endif
     }
 
     VectorBase_Storage(xmm_t xmm)

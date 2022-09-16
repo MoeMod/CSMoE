@@ -1226,7 +1226,7 @@ void S_StartLocalSound(  const char *name, float volume, qboolean reliable )
 
 	if( !dma.initialized ) return;	
 	sfxHandle = S_RegisterSound( name );
-	S_StartSound( NULL, s_listener.entnum, channel, sfxHandle, volume, ATTN_NONE, PITCH_NORM, flags );
+	S_StartSound( nullptr, s_listener.entnum, channel, sfxHandle, volume, ATTN_NONE, PITCH_NORM, flags );
 }
 
 /*
