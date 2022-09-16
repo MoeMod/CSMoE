@@ -516,14 +516,6 @@ public:
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
 
-class C9MMAHEAmmo : public CBasePlayerAmmo
-{
-public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual BOOL AddAmmo(CBaseEntity* pOther);
-};
-
 class CCoilAmmo : public CBasePlayerAmmo
 {
 public:
@@ -693,6 +685,22 @@ public:
 };
 
 class C20MMAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class CBlockBulletAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class CBlockMissileAmmo : public CBasePlayerAmmo
 {
 public:
 	virtual void Spawn();

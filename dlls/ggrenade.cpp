@@ -1048,6 +1048,23 @@ void CGrenade::ZombieBombExplosion()
 }
 // Contact grenade, explode when it touches something
 
+void CGrenade::ExplodeTouch3(CBaseEntity* pOther, int iRadius, E_EXPLODE_TYPE type, bool bKickRate)
+{
+	TraceResult tr;
+
+	if (pOther)
+		pev->enemy = ENT(pOther->pev);
+	else
+		pev->enemy = NULL;
+
+	UTIL_TraceLine(pev->origin - pev->velocity.Normalize() * 32, pev->origin + pev->velocity.Normalize() * 32, ignore_monsters, ENT(pev), &tr);
+
+	Explode3(&tr, DMG_EXPLOSION, type, iRadius);
+
+	if (bKickRate)
+		KickRate(NULL, NULL, ((rand() % 6) / 10.0 + 1.7) * 350.0, 250.0, 0.0, DMGFLAG_TRONLY, 0.0);
+}
+
 void CGrenade::ExplodeTouch(CBaseEntity *pOther)
 {
 	TraceResult tr;

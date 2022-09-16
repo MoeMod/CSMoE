@@ -92,7 +92,21 @@ Bullet shell casings
 inline void EV_EjectBrass( const vec3_t origin, const vec3_t velocity, float rotation, int model, int soundtype, float life = 2.5f )
 {
 	Vector angles(0.0f, 0.0f, rotation);
-	gEngfuncs.pEfxAPI->R_TempModel( origin, velocity, angles, life, model, soundtype );
+	TEMPENTITY* shell = gEngfuncs.pEfxAPI->R_TempModel( origin, velocity, angles, life, model, soundtype );
+
+	if (shell)
+	{
+		if (soundtype == TE_BOUNCE_BLOCKSHELL)
+		{
+			shell->hitSound = BOUNCE_BLOCKSHELL;
+
+			shell->entity.baseline.angles.x = Com_RandomFloat(-512.0, 511.0);
+			shell->entity.baseline.angles.y = Com_RandomFloat(-256.0, 255.0);
+			shell->entity.baseline.angles.z = Com_RandomFloat(-256.0, 255.0);
+
+			shell->flags |= FTENT_ROTATE;
+		}
+	}
 }
 
 }

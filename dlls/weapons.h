@@ -282,6 +282,7 @@ public:
 	void EXPORT BounceTouch(CBaseEntity *pOther);
 	void EXPORT SlideTouch(CBaseEntity *pOther);
 	void EXPORT C4Touch(CBaseEntity *pOther);
+	void EXPORT ExplodeTouch3(CBaseEntity* pOther, int radius, E_EXPLODE_TYPE type, bool bBoost);
 	void EXPORT ExplodeTouch(CBaseEntity *pOther);
 	void EXPORT DangerSoundThink();
 	void EXPORT PreDetonate();

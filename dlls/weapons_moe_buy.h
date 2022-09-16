@@ -103,6 +103,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_BUFFM249, "weapon_buffm249",      "【朱雀】M249",    9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_CROSSBOW, "weapon_crossbow",      "追月连弩",    3500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_CROSSBOWEX21, "weapon_crossbowex21",      "【歼星】十字弩",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_BLOCKAR, "weapon_blockar",        "玩具奇兵V2",                  6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_STUNRIFLE, "weapon_stunrifle",      "雷电风暴",    3600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_BUFFM4, "weapon_buffm4",      "【邪皇】M4A1",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_BUFFAK, "weapon_buffak",      "【圣帝】AK47",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
@@ -345,7 +346,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 };
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
-#if 0
+#if 1
+		{ WEAPON_BLOCKAR, "weapon_blockar",        "玩具奇兵V2",                  6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 		{ WEAPON_WINGGUN, "weapon_winggun",        "曙光辉翼",                  6100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 
 		{ WEAPON_DESTROYER, "weapon_destroyer",         "虚空破碎",           5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },

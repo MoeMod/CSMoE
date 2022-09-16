@@ -2848,4 +2848,25 @@ bool UTIL_IsWallBetweenEntity(CBaseEntity* pEntity, CBaseEntity* pAttackPlayer)
 	return false;
 }
 
+void UTIL_BreakModel(const Vector& pos, const Vector& size, const Vector& velocity, int random_velocity, int modelindex, int flags, int count, float life)
+{
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pos);
+	WRITE_BYTE(TE_BREAKMODEL);
+	WRITE_COORD(pos.x);
+	WRITE_COORD(pos.y);
+	WRITE_COORD(pos.z);
+	WRITE_COORD(size.x);
+	WRITE_COORD(size.y);
+	WRITE_COORD(size.z);
+	WRITE_COORD(velocity.x);
+	WRITE_COORD(velocity.y);
+	WRITE_COORD(velocity.z);
+	WRITE_BYTE(random_velocity);
+	WRITE_SHORT(modelindex);
+	WRITE_BYTE(count);
+	WRITE_BYTE(int(life * 10));
+	WRITE_BYTE(flags);
+	MESSAGE_END();
+}
+
 }

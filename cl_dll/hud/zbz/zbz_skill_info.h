@@ -48,6 +48,12 @@ private:
 	int m_iExp;
 	int m_iSkillPoints;
 	std::set<ZombieZSkillSkillId> m_SkillList;
+
+	UniqueTexture m_iVKeyButton;
+	UniqueTexture m_iLevelBar;
+	UniqueTexture m_iSkillPointIcon;
+
+	
 };
 
 }

@@ -430,6 +430,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_kingcobra");
 	UTIL_PrecacheOtherWeapon("weapon_spsg");
 	UTIL_PrecacheOtherWeapon("weapon_destroyer");
+	UTIL_PrecacheOtherWeapon("weapon_blockar");
+
 
 	if (g_pGameRules->IsDeathmatch())
 	{

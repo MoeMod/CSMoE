@@ -210,6 +210,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "kronos5",	WEAPON_KRONOS5 },
 	{ "an94",	WEAPON_AN94 },
 	{ "m16a4",	WEAPON_M16A4 },
+	{ "blockar",	WEAPON_BLOCKAR },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -596,6 +597,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "kronos5",	WEAPONCLASS_RIFLE },
 	{ "an94",	WEAPONCLASS_RIFLE },
 	{ "m16a4",	WEAPONCLASS_RIFLE },
+	{ "blockar",	WEAPONCLASS_RIFLE },
 
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
@@ -999,6 +1001,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_SPEARGUNM:
 	case WEAPON_SPSG:
 	case WEAPON_DESTROYER:
+	case WEAPON_BLOCKAR:
 		return true;
 	default:
 		break;

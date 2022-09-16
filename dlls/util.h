@@ -549,6 +549,7 @@ void UTIL_BeamPointsStretch(Vector vecSrc, Vector vecEnd, int beamindex, int fra
 int UTIL_GetLineTarget(Vector vecSrc, Vector vecDirShooting, Vector vecRight, Vector vevUp, Vector vecSpread, float flDistance, CBaseEntity* pEntity, bool CheckTeamMate);
 Vector UTIL_GetSpeedVector(Vector vecSrc, Vector vecEnd, float flSpeed);
 bool UTIL_IsWallBetweenEntity(CBaseEntity* pEntity, CBaseEntity* pAttackPlayer);
+void UTIL_BreakModel(const Vector& pos, const Vector& size, const Vector& velocity, int random_velocity, int modelindex, int flags, int count, float life);
 }
 #else
 namespace cl {

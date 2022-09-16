@@ -9192,6 +9192,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_SPEARGUNM:
 		case WEAPON_SPSG:
 		case WEAPON_DESTROYER:
+		case WEAPON_BLOCKAR:
 			return TRUE;
 		}
 	}

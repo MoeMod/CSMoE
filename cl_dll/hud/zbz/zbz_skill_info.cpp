@@ -32,6 +32,8 @@ CHudZBZ_Skill::CHudZBZ_Skill(void)
 
 int CHudZBZ_Skill::VidInit(void)
 {
+	R_LoadTextureUnique("resource/hud/hud_character_bg_new_top");
+
 	return 1;
 }
 

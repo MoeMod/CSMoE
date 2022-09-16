@@ -545,6 +545,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_kingcobra.cpp
 	../dlls/wpn_shared/wpn_spsg.cpp
 	../dlls/wpn_shared/wpn_destroyer.cpp
+	../dlls/wpn_shared/wpn_blockar.cpp
 	)
 
 set(PM_SRCS

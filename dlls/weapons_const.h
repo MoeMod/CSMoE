@@ -279,6 +279,7 @@ enum WeaponIdType
 	WEAPON_SPEARGUNM,
 	WEAPON_SPSG,
 	WEAPON_DESTROYER,
+
 };
 enum KnifeIdType
 {

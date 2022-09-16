@@ -807,11 +807,13 @@
 #define BOUNCE_SHELL		0x20
 #define BOUNCE_CONCRETE		BREAK_CONCRETE
 #define BOUNCE_SHOTSHELL		0x80
+#define BOUNCE_BLOCKSHELL	0x90
 
 // Temp entity bounce sound types
 #define TE_BOUNCE_NULL		0
 #define TE_BOUNCE_SHELL		1
 #define TE_BOUNCE_SHOTSHELL		2
+#define TE_BOUNCE_BLOCKSHELL	3
 
 // Rendering constants
 enum
