@@ -168,6 +168,11 @@ vec3_t			g_mvShadowVec;
 int			g_nTopColor, g_nBottomColor;	// remap colors
 int			g_nFaceFlags, g_nForceFaceFlags;
 
+// quick cache aligned
+vec3_t pstudioverts[MAXSTUDIOVERTS]; // copied from m_pStudioHeader + m_pSubModel->vertindex
+vec3_t pstudionorms[MAXSTUDIOVERTS]; // copied from m_pStudioHeader + m_pSubModel->normindex
+
+
 /*
 ====================
 R_StudioInit
@@ -2076,6 +2081,16 @@ static bool R_StudioMeshCompare( const sortedmesh_t &a, const sortedmesh_t &b )
 	return ((a.flags & STUDIO_NF_TRANSPARENT) && !(a.flags & STUDIO_NF_ADDITIVE)) && !((b.flags & STUDIO_NF_TRANSPARENT) && !(b.flags & STUDIO_NF_ADDITIVE));
 }
 
+static void R_GenAlignedVertAndNormCache()
+{
+	// for cache friendly
+	const vec3_c* pstudioverts_unaligned = (const vec3_c*)((const byte*)m_pStudioHeader + m_pSubModel->vertindex);
+	const vec3_c* pstudionorms_unaligned = (const vec3_c*)((const byte*)m_pStudioHeader + m_pSubModel->normindex);
+	
+	std::copy_n(pstudioverts_unaligned, m_pSubModel->numverts, pstudioverts);
+	std::copy_n(pstudionorms_unaligned, m_pSubModel->numnorms, pstudionorms);
+}
+
 /*
 ===============
 R_StudioDrawPoints
@@ -2087,8 +2102,6 @@ static void R_StudioDrawPoints_legacy( void )
 	int		i, j, m_skinnum;
 	byte		*pvertbone;
 	byte		*pnormbone;
-	vec3_c		*pstudioverts;
-	vec3_c		*pstudionorms;
 	mstudiotexture_t	*ptexture;
 	mstudiomesh_t	*pmesh;
 	short		*pskinref;
@@ -2115,8 +2128,7 @@ static void R_StudioDrawPoints_legacy( void )
 	ASSERT( ptexture != NULL );
 
 	pmesh = (mstudiomesh_t *)((byte *)m_pStudioHeader + m_pSubModel->meshindex);
-	pstudioverts = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->vertindex);
-	pstudionorms = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->normindex);
+	R_GenAlignedVertAndNormCache();
 
 	pskinref = (short *)((byte *)m_pTextureHeader + m_pTextureHeader->skinindex);
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
@@ -2144,12 +2156,12 @@ static void R_StudioDrawPoints_legacy( void )
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
 
-		for( i = 0; i < pmesh[j].numnorms; i++, pstudionorms++, pnormbone++ )
+		for( i = 0; i < pmesh[j].numnorms; i++ )
 		{
-			R_StudioLighting( g_lightvalues[i], *pnormbone, g_nFaceFlags, *pstudionorms );
+			R_StudioLighting( g_lightvalues[i], pnormbone[i], g_nFaceFlags, pstudionorms[i]);
 
 			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
-				R_StudioSetupChrome( g_chrome[i], *pnormbone, *pstudionorms );
+				R_StudioSetupChrome( g_chrome[i], pnormbone[i], pstudionorms[i]);
 		}
 	}
 
@@ -2690,8 +2702,6 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	int		i, j, m_skinnum;
 	byte		*pvertbone;
 	byte		*pnormbone;
-	vec3_c		*pstudioverts;
-	vec3_c		*pstudionorms;
 	mstudiotexture_t	*ptexture;
 	mstudiomesh_t	*pmesh;
 	short		*pskinref;
@@ -2723,8 +2733,7 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	ASSERT( ptexture != NULL );
 
 	pmesh = (mstudiomesh_t *)((byte *)m_pStudioHeader + m_pSubModel->meshindex);
-	pstudioverts = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->vertindex);
-	pstudionorms = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->normindex);
+	R_GenAlignedVertAndNormCache();
 
 	pskinref = (short *)((byte *)m_pTextureHeader + m_pTextureHeader->skinindex);
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
@@ -2736,7 +2745,7 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 #ifdef STUDIO_SKINNING_OMP_MIN
 #pragma omp parallel for private(i) if(m_pSubModel->numverts > STUDIO_SKINNING_OMP_MIN)
 #endif
-	auto vert_calc_fn = [pvertbone, pstudioverts](vec3_t &v)
+	auto vert_calc_fn = [pvertbone](vec3_t &v)
 	{
 		int i = &v - g_xformverts;
 		Matrix3x4_VectorTransform(g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i]);
@@ -2779,13 +2788,13 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 		// fill in sortedmesh info
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
-		auto norm_calc_fn = [pnormbone, pstudionorms](vec3_t& v)
+		auto norm_calc_fn = [pnormbone](vec3_t& v)
 		{
 			int i = &v - g_lightvalues;
 			R_StudioLighting(g_lightvalues[i], pnormbone[i], g_nFaceFlags, pstudionorms[i]);
 		};
 
-		auto chrome_calc_fn = [pnormbone, pstudionorms](vec2_t& v)
+		auto chrome_calc_fn = [pnormbone](vec2_t& v)
 		{
 			int i = &v - g_chrome;
 			
