@@ -1856,13 +1856,9 @@ R_LightLambert
 */
 void R_LightLambert( vec4_t light[MAX_LOCALLIGHTS], const vec3_t normal, const vec3_t color, byte *out )
 {
-    vec3_t	finalLight;
-    vec3_t	localLight;
-    int	i;
+    vec3_t	finalLight = color;
 
-    VectorCopy( color, finalLight );
-
-    for( i = 0; i < g_studiolight.numlocallights; i++ )
+    for( int i = 0; i < g_studiolight.numlocallights; i++ )
     {
         float	r, r2;
 
@@ -1881,14 +1877,10 @@ void R_LightLambert( vec4_t light[MAX_LOCALLIGHTS], const vec3_t normal, const v
                 else light[i][3] = 0.0001f;
             }
 
-            localLight[0] = min( g_studiolight.locallightcolor[i].r * r * light[i][3], 255.0f );
-            localLight[1] = min( g_studiolight.locallightcolor[i].g * r * light[i][3], 255.0f );
-            localLight[2] = min( g_studiolight.locallightcolor[i].b * r * light[i][3], 255.0f );
-            VectorScale( localLight, ( 1.0f / 255.0f ), localLight );
-
-            finalLight[0] = min( finalLight[0] + localLight[0], 1.0f );
-            finalLight[1] = min( finalLight[1] + localLight[1], 1.0f );
-            finalLight[2] = min( finalLight[2] + localLight[2], 1.0f );
+            constexpr vec3_t ones = { 1.0f, 1.0f, 1.0f };
+            vec3_t col = vec3_t( g_studiolight.locallightcolor[i].r, g_studiolight.locallightcolor[i].g, g_studiolight.locallightcolor[i].b )  / 255.0f;
+            vec3_t localLight = col * r * light[i][3];
+            finalLight = mins( finalLight + localLight, ones );
         }
     }
 
