@@ -2310,28 +2310,88 @@ R_StudioDrawMesh
 
 ===============
 */
+static void (*R_MeshUVFunc())(const short* ptricmds, vec2_t &uv, float s, float t)
+{
+	if (g_nFaceFlags & STUDIO_NF_CHROME || (g_nForceFaceFlags & STUDIO_NF_CHROME))
+	{
+		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+			uv[0] = g_chrome[ptricmds[1]][0] * s;
+			uv[1] = g_chrome[ptricmds[1]][1] * t;
+		};
+	}
+	else if (g_nFaceFlags & STUDIO_NF_UV_COORDS)
+	{
+		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+			uv[0] = HalfToFloat(ptricmds[2]);
+			uv[1] = HalfToFloat(ptricmds[3]);
+		};
+	}
+	else [[likely]]
+	{
+		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+			uv[0] = ptricmds[2] * s;
+			uv[1] = ptricmds[3] * t;
+		};
+	}
+}
+
+static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], float alpha)
+{
+	if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
+	{
+		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+			cl[0] = alpha;
+			cl[1] = 0;
+			cl[2] = 0;
+			cl[3] = 255;
+		};
+	}
+	else if (g_iRenderMode == kRenderTransColor || (g_nForceFaceFlags & STUDIO_NF_CHROME))
+	{
+		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+			color24* clr;
+			clr = &RI.currententity->curstate.rendercolor;
+			cl[0] = clr->r;
+			cl[1] = clr->g;
+			cl[2] = clr->b;
+			cl[3] = alpha;
+		};
+	}
+	else if (g_iRenderMode == kRenderTransAdd || (g_nForceFaceFlags & STUDIO_NF_FULLBRIGHT))
+	{
+		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+			cl[0] = cl[1] = cl[2] = 255;
+			cl[3] = alpha;
+		};
+	}
+	else [[likely]]
+	{
+		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+			vec3_t lv = g_lightvalues[ptricmds[1]];
+			R_LightLambert(g_studiolight.lightpos[ptricmds[0]], g_xformnorms[ptricmds[1]], lv, cl);
+			cl[3] = alpha;
+		};
+	}
+}
+
 static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float scale )
 {
 	GLubyte alpha = 255 * a;
 	int i;
-	vec2_t uv;
-	vec3_t av, lv, nv;
 	uint startArrayVerts = g_nNumArrayVerts;
 	uint startArrayElems = g_nNumArrayElems;
+
+	const auto R_MeshColor = R_MeshColorFunc();
+	const auto R_MeshUV = R_MeshUVFunc();
 
 	while( ( i = *( ptricmds++ ) ) )
 	{
 		int	vertexState = 0;
-		qboolean	tri_strip;
+		bool tri_strip = i >= 0;
 
-		if( i < 0 )
+		if( !tri_strip )
 		{
-			tri_strip = false;
 			i = -i;
-		}
-		else
-		{
-			tri_strip = true;
 		}
 
 		r_stats.c_studio_polys += (i - 2);
@@ -2369,90 +2429,14 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
 				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
 			}
-			if( g_nFaceFlags & STUDIO_NF_CHROME || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
-			{
-				uv[0] = g_chrome[ptricmds[1]][0] * s;
-				uv[1] = g_chrome[ptricmds[1]][1] * t ;
-			}
-			else if( g_nFaceFlags & STUDIO_NF_UV_COORDS )
-			{
-				uv[0] = HalfToFloat( ptricmds[2] );
-				uv[1] = HalfToFloat( ptricmds[3] );
-			}
-			else
-			{
-				uv[0] = ptricmds[2] * s;
-				uv[1] = ptricmds[3] * t;
-			}
-			g_xarraycoord[g_nNumArrayVerts][0] = uv[0];
-			g_xarraycoord[g_nNumArrayVerts][1] = uv[1];
 
-			if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
-			{
-				if( g_iRenderMode == kRenderTransAdd )
-				{
-					cl[0] = cl[1] = cl[2] = 255;
-					cl[3] = alpha;
-					//pglColor4f( 1.0f, 1.0f, 1.0f, alpha );
-				}
-				else if( g_iRenderMode == kRenderTransColor )
-				{
-					color24	*clr;
-					clr = &RI.currententity->curstate.rendercolor;
-					cl[0] = clr->r;
-					cl[1] = clr->g;
-					cl[2] = clr->b;
-					cl[3] = alpha;
-					//pglColor4ub( clr->r, clr->g, clr->b, alpha * 255 );
-				}
-				else if( g_nFaceFlags & STUDIO_NF_FULLBRIGHT )
-				{
-					cl[0] = cl[1] = cl[2] = 255;
-					cl[3] = alpha;
-					//pglColor4f( 1.0f, 1.0f, 1.0f, alpha );
-				}
-				else
-				{
-					lv = g_lightvalues[ptricmds[1]];
-                    R_LightLambert( g_studiolight.lightpos[ptricmds[0]], g_xformnorms[ptricmds[1]], lv, cl );
-					//cl[0] = lv[0]*255;
-					//cl[1] = lv[1]*255;
-					//cl[2] = lv[2]*255;
-					cl[3] = alpha;
-				}
-			}
-			else
-			{
-				color24	*clr;
-				clr = &RI.currententity->curstate.rendercolor;
-				cl[0] = clr->r;
-				cl[1] = clr->g;
-				cl[2] = clr->b;
-				cl[3] = alpha;
-			}
+			R_MeshUV(ptricmds, g_xarraycoord[g_nNumArrayVerts], s, t);
+			R_MeshColor(ptricmds, g_xarraycolor[g_nNumArrayVerts], alpha);
 
-			if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
-			{
-				cl[0] = alpha;
-				cl[1] = 0;
-				cl[2] = 0;
-				cl[3] = 255;
-			}
-			if (g_nForceFaceFlags & STUDIO_NF_OUTLINE)
-			{
-				color24* clr;
-				clr = &RI.currententity->curstate.rendercolor;
-				cl[0] = clr->r;
-				cl[1] = clr->g;
-				cl[2] = clr->b;
-				cl[3] = alpha;
-			}
-			Q_memcpy( g_xarraycolor[g_nNumArrayVerts], cl, sizeof(cl) );
-
-			av = g_xformverts[ptricmds[0]];
+			vec3_t av = g_xformverts[ptricmds[0]];
 			if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 			{
-				nv = g_xformnorms[ptricmds[1]];
+				vec3_t nv = g_xformnorms[ptricmds[1]];
 				VectorMA( av, scale, nv, av );
 			}
 
