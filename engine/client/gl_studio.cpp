@@ -225,24 +225,6 @@ static void R_GenAlignedVertAndNormCache()
 }
 
 /*
-===============
-R_StudioTexName
-
-extract texture filename from modelname
-===============
-*/
-const char *R_StudioTexName( model_t *mod )
-{
-	static char	texname[64];
-
-	Q_strncpy( texname, mod->name, sizeof( texname ));
-	FS_StripExtension( texname );
-	Q_strncat( texname, "t.mdl", sizeof( texname ));
-
-	return texname;
-}
-
-/*
 ================
 R_StudioBodyVariations
 
