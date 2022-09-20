@@ -431,7 +431,10 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_spsg");
 	UTIL_PrecacheOtherWeapon("weapon_destroyer");
 	UTIL_PrecacheOtherWeapon("weapon_blockar");
-
+	UTIL_PrecacheOtherWeapon("weapon_blockmg");
+	UTIL_PrecacheOtherWeapon("weapon_blockas");
+	UTIL_PrecacheOtherWeapon("weapon_coilgun");
+	UTIL_PrecacheOtherWeapon("weapon_bouncer");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

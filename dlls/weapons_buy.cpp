@@ -143,11 +143,13 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "skull11",	WEAPON_SKULL11 },
 	{ "janus11",	WEAPON_JANUS11 },
 	{ "crow3",	WEAPON_CROW3 },
-	{ "m1887",	WEAPON_M1887G },
+	{ "m1887g",	WEAPON_M1887G },
 	{ "thanatos11",	WEAPON_THANATOS11 },
 	{ "m1887xmas",	WEAPON_M1887XMAS },
 	{ "rainbowgun",	WEAPON_RAINBOWGUN },
 	{ "spsg",	WEAPON_SPSG },
+	{ "blockas",	WEAPON_BLOCKAS },
+	{ "bouncer",	WEAPON_BOUNCER },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -168,6 +170,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "kronos3",	WEAPON_KRONOS3 },
 	{ "laserfist",	WEAPON_LASERFIST },
 	{ "laserfistex",	WEAPON_LASERFISTEX },
+	{ "coilgun",	WEAPON_COILGUN },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -277,6 +280,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "cameragun",	WEAPON_CAMERAGUN },
 	{ "mgsm",	WEAPON_MGSM },
 	{ "kronos7",	WEAPON_KRONOS7 },
+	{ "blockmg",	WEAPON_BLOCKMG },
+
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -527,6 +532,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "m1887xmas",	WEAPONCLASS_SHOTGUN },
 	{ "rainbowgun",	WEAPONCLASS_SHOTGUN },
 	{ "spsg",	WEAPONCLASS_SHOTGUN },
+	{ "blockas",	WEAPONCLASS_SHOTGUN },
+	{ "bouncer",	WEAPONCLASS_SHOTGUN },
 
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
@@ -550,6 +557,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "kronos3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "laserfist",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "laserfistex",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "coilgun",	WEAPONCLASS_SUBMACHINEGUN },
+
 
 	
 	{ "bow",	WEAPONCLASS_RIFLE },
@@ -659,6 +668,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "cameragun",	WEAPONCLASS_MACHINEGUN },
 	{ "mgsm",	WEAPONCLASS_MACHINEGUN },
 	{ "kronos7",	WEAPONCLASS_MACHINEGUN },
+	{ "blockmg",	WEAPONCLASS_MACHINEGUN },
 
 
 	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
@@ -1002,6 +1012,10 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_SPSG:
 	case WEAPON_DESTROYER:
 	case WEAPON_BLOCKAR:
+	case WEAPON_BLOCKMG:
+	case WEAPON_BLOCKAS:
+	case WEAPON_COILGUN:
+	case WEAPON_BOUNCER:
 		return true;
 	default:
 		break;

@@ -97,6 +97,18 @@ namespace sv {
 		m_pPlayer->m_iFOV = 90;
 		m_fInReload = 0;
 
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_ONE, gmsgFade, NULL, m_pPlayer->edict());
+		WRITE_SHORT(0);
+		WRITE_SHORT(0);
+		WRITE_SHORT(0x0000);
+		WRITE_BYTE(100);
+		WRITE_BYTE(100);
+		WRITE_BYTE(100);
+		WRITE_BYTE(0);
+		MESSAGE_END();
+#endif
+
 		return CBasePlayerWeapon::Holster(skiplocal);
 	}
 	void CBunkerBuster::GetHitPoint(Vector hOrigin)

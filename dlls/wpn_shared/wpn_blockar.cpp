@@ -231,7 +231,7 @@ namespace sv {
     {
         p->pszName = STRING(pev->classname);
         p->pszAmmo1 = "blockbullet";
-        p->iMaxAmmo1 = 120;
+        p->iMaxAmmo1 = 200;
         p->pszAmmo2 = "blockmissile";
         p->iMaxAmmo2 = 10;
         p->iMaxClip = 40;

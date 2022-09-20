@@ -45,10 +45,11 @@ namespace sv {
 			pev->rendermode = kRenderTransAdd; // 5;
 			pev->renderfx = kRenderFxNone;
 			pev->renderamt = 0.0;
-			pev->nextthink = gpGlobals->time + 0.95s;
+			pev->nextthink = gpGlobals->time + 0.1s;
 			pev->solid = SOLID_NOT; // 2
 			pev->movetype = MOVETYPE_NONE; // 9
 			pev->effects |= EF_NODRAW;
+			m_flExplodeTime = gpGlobals->time + 0.95s;
 
 		}
 
@@ -89,7 +90,7 @@ namespace sv {
 			float flRadius = GetRadius();
 			CBaseEntity* pEntity = NULL;
 
-			while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, flRadius)) != NULL)
+			while ((pEntity = UTIL_FindEntityInSphere(pEntity, m_vecOrigin, flRadius)) != NULL)
 			{
 				if (pEntity->IsDormant())
 					continue;
@@ -122,13 +123,29 @@ namespace sv {
 
 		void EXPORT ExplodeThink(void)
 		{
-			RadiusDamage();
+			pev->nextthink = gpGlobals->time + 0.1s;
 
+			if (!m_pEntity)
+			{
+				SetThink(nullptr);
+				UTIL_Remove(this);
+			}
 
-			SetThink(nullptr);
-			UTIL_Remove(this);
+			m_vecOrigin = m_pEntity->pev->origin;
+
+			if (!m_pEntity->IsAlive() || m_flExplodeTime < gpGlobals->time)
+			{
+				RadiusDamage();
+
+				SetThink(nullptr);
+				UTIL_Remove(this);
+			}
+			
 		}
 
+		Vector m_vecOrigin;
+		time_point_t m_flExplodeTime;
+		CBaseEntity* m_pEntity;
 		int m_iExpEffect;	
 	};
 
@@ -231,11 +248,18 @@ namespace sv {
 
 		if (iOriginalPenetration == iPenetration)
 		{
-			CDestroyerExplode* pEnt = static_cast<CDestroyerExplode*>(CBaseEntity::Create("destroyer_explode", tr->vecEndPos, g_vecZero, ENT(m_pPlayer->pev)));
-			if (pEnt)
+			if (CBaseEntity* pEntity = gMultiDamage.pEntity)
 			{
-				pEnt->m_iTeam = m_pPlayer->m_iTeam;
-			}
+				if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+				{
+					CDestroyerExplode* pEnt = static_cast<CDestroyerExplode*>(CBaseEntity::Create("destroyer_explode", tr->vecEndPos, g_vecZero, ENT(m_pPlayer->pev)));
+					if (pEnt)
+					{
+						pEnt->m_pEntity = pEntity;
+						pEnt->m_iTeam = m_pPlayer->m_iTeam;
+					}
+				}
+			}			
 		}
 	}
 #endif

@@ -572,11 +572,24 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 	for (int i = 0; i < sparkCount; ++i)
 		Create("spark_shower", pev->origin, pTrace->vecPlaneNormal, NULL);
 
-	CBasePlayer* player = GetClassPtr<CBasePlayer>(pevOwner);
-	if (player)
+	switch (type)
 	{
-		player->m_pModStrategy->GrenadeExploded(pev->origin);
+	case EXPTYPE_M79ROCKET:
+	case EXPTYPE_AT4ROCKET:
+	case EXPTYPE_FIRECRACKERROCKET:
+	case EXPTYPE_M32ROCKET:
+		break;
+	default:
+	{
+		CBasePlayer* player = GetClassPtr<CBasePlayer>(pevOwner);
+		if (player)
+		{
+			player->m_pModStrategy->GrenadeExploded(pev->origin);
+		}
+		break;
 	}
+	}
+	
 }
 
 NOXREF void CGrenade::SG_Explode(TraceResult *pTrace, int bitsDamageType)

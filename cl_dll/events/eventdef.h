@@ -235,3 +235,7 @@ HOOK_EVENT(kingcobra, FireKingcobra);
 HOOK_EVENT(spsg, FireSPSG);
 HOOK_EVENT(destroyer, FireDestroyer);
 HOOK_EVENT(blockar, FireBlockAR);
+HOOK_EVENT(blockmg, FireBlockMG);
+HOOK_EVENT(blockas, FireBlockAS);
+HOOK_EVENT(coilgun, FireCoilGun);
+HOOK_EVENT(bouncer, FireBouncer);

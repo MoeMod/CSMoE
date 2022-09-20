@@ -97,6 +97,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_M3DRAGON, "weapon_m3dragon",         "【天龙】m3",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_M3DRAGONM, "weapon_m3dragonm",         "巨齿鲲鲨",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_THANATOS11, "weapon_thanatos11",         "魄灭Thanatos-11",           6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+	{ WEAPON_BLOCKAS, "weapon_blockas",        "玩具魔兵M777",                  5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+	{ WEAPON_BOUNCER, "weapon_bouncer",       "破灭光雷",                 5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 
 	{ WEAPON_BUFFSG552EX, "weapon_buffsg552ex",         "熔火岩狼",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_QBARREL, "weapon_qbarrel",         "破碎炙燚",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
@@ -131,6 +133,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_Y20S2SCARD, "weapon_y20s2scard",         "绿野仙踪SCARD",           1500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_JANUS7XMAS, "weapon_janus7xmas",         "圣诞雷狱",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_SPSMG, "weapon_spsmg",	 "爆炎蒸汽",			  2500,  PRIMARY_WEAPON_SLOT,         UNASSIGNED, BUY_SMG },
+	{ WEAPON_COILGUN, "weapon_coilgun",	 "千针",			  4750,  PRIMARY_WEAPON_SLOT,         UNASSIGNED, BUY_SMG },
 
 	{ KNIFE_LANCE, "knife_lance",     "天罚龙枪",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
 	{ KNIFE_DUALSWORD, "knife_dualsword",    "弑神双剑",0, KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
@@ -218,6 +221,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     { WEAPON_K1A, "weapon_k1a",         "K1A",                   1850, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
     { WEAPON_THOMPSON, "weapon_thompson",    "汤姆逊",              2000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
     { WEAPON_M14EBR, "weapon_m14ebr",      "咆哮怒焰",               3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_BLOCKMG, "weapon_blockmg",        "玩具路霸Leopard-2",                  7500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+
 	{ WEAPON_M2, "weapon_m2",      "守护者",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
     { WEAPON_M134, "weapon_m134",      "终结者",               7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
     { WEAPON_M134EX, "weapon_m134ex",      "终结者EX",               7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
@@ -347,6 +352,12 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 1
+		{ WEAPON_BOUNCER, "weapon_bouncer",       "破灭光雷",                 5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+	{ WEAPON_COILGUN, "weapon_coilgun",	 "千针",			  4750,  PRIMARY_WEAPON_SLOT,         UNASSIGNED, BUY_SMG },
+
+		{ WEAPON_BLOCKAS, "weapon_blockas",        "玩具魔兵M777",                  5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+	{ WEAPON_BLOCKMG, "weapon_blockmg",        "玩具路霸Leopard-2",                  7500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+
 		{ WEAPON_BLOCKAR, "weapon_blockar",        "玩具奇兵V2",                  6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 		{ WEAPON_WINGGUN, "weapon_winggun",        "曙光辉翼",                  6100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 

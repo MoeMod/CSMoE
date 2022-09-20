@@ -1321,7 +1321,15 @@ void CBasePlayerWeapon::ReloadSound()
 				|| m_iId == WEAPON_Z4B_M1887SE
 				|| m_iId == WEAPON_BALROG11
 				|| m_iId == WEAPON_BALROG11B
-				|| m_iId == WEAPON_BALROG11WC)
+				|| m_iId == WEAPON_BALROG11WC
+				|| m_iId == WEAPON_JANUS11
+				|| m_iId == WEAPON_M3DRAGON
+				|| m_iId == WEAPON_M3DRAGONM
+				|| m_iId == WEAPON_BLOCKAS
+				|| m_iId == WEAPON_M1887G
+				|| m_iId == WEAPON_M1887XMAS
+				|| m_iId == WEAPON_RAINBOWGUN
+				|| m_iId == WEAPON_BOUNCER)
 				WRITE_BYTE(0);
 			else
 				WRITE_BYTE(1);

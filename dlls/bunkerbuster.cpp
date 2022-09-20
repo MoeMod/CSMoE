@@ -624,7 +624,6 @@ namespace sv {
 			vecReturn.z += 5.0;
 		}
 
-
 		pcCurrent = UTIL_PointContents(vecReturn);
 
 		auto bModiCheck = false;
@@ -632,13 +631,15 @@ namespace sv {
 		{
 			float flPlayerZ = (pAttackPlayer->pev->origin.z);
 
-			if (abs(flPlayerZ - ((pcCurrent == CONTENTS_SKY) ? vecReturn.z - 100.0 : vecReturn.z)) < 200.0)
+			if (abs(flPlayerZ - ((pcCurrent == CONTENTS_SKY) ? 
+				vecReturn.z - 100.0 : vecReturn.z)) < 200.0)
 			{
 				bModiCheck = true;
 			}
 		}
 
-		return ((pcCurrent == CONTENTS_SKY)) ? vecReturn.z - (bModiCheck ? 200.0 : 100.0) : vecReturn.z;
+		return ((pcCurrent == CONTENTS_SKY)) ? 
+			vecReturn.z - (bModiCheck ? 300.0 : 150.0) : vecReturn.z;
 	}
 
 

@@ -32,8 +32,12 @@ CHudZBZ_Skill::CHudZBZ_Skill(void)
 
 int CHudZBZ_Skill::VidInit(void)
 {
-	R_LoadTextureUnique("resource/hud/hud_character_bg_new_top");
+	m_iVKeyButton = R_LoadTextureUnique("resource/zombiez/zmode_vkey");
+	m_iLevelBarBg = R_LoadTextureUnique("resource/zombiez/zmode_level_bar_bg");
+	m_iLevelBar = R_LoadTextureUnique("resource/zombiez/zmode_level_bar");
+	m_iLevelBg = R_LoadTextureUnique("resource/zombiez/zmode_level_bg");
 
+	m_iSkillPointIcon = R_LoadTextureUnique("resource/zombiez/zmode_level_bg");
 	return 1;
 }
 
@@ -146,6 +150,33 @@ int CHudZBZ_Skill::Draw(float time)
 	int y = ScreenHeight * 0.75f;
 
 	static char text[128];
+
+	//key button
+	if (m_iSkillPoints)
+	{
+		const int iVKeyWidth = m_iVKeyButton->w();
+		const int iVKeyHeight = m_iVKeyButton->h();
+
+		sprintf(text, "开始进化");
+		DrawUtils::SetConsoleTextColor(g_ColorActive[0], g_ColorActive[1], g_ColorActive[2]);
+		int len = DrawUtils::ConsoleStringLen(text);
+		DrawUtils::DrawConsoleString((ScreenWidth / 2 - len / 2) + 10, y + iVKeyHeight / 2, text);
+
+		m_iVKeyButton->Draw2DQuadScaled((ScreenWidth - iVKeyWidth) / 2, y - iVKeyHeight / 2, (ScreenWidth - iVKeyWidth ) / 2 + iVKeyWidth, y - iVKeyHeight / 2 + iVKeyHeight);
+	}
+	//LevelBar
+	double BarWidth = 0.0f;
+	BarWidth = min(ScreenWidth * 1.0f, (m_iExp / ((m_iLevel + static_cast<double>(1)) * 2 * 50)) * ScreenWidth);
+	m_iLevelBarBg->Draw2DQuadScaled(0, ScreenHeight - m_iLevelBar->h() - 5, ScreenWidth, ScreenHeight - 5);
+	m_iLevelBar->Draw2DQuadScaled(0, ScreenHeight - m_iLevelBar->h() - 5, round(BarWidth), ScreenHeight - 5);
+
+	m_iLevelBg->Draw2DQuadScaled(0, ScreenHeight - m_iLevelBg->h() * 3, m_iLevelBg->w(), ScreenHeight - m_iLevelBg->h() * 2);
+
+	//Level Details and percent
+	sprintf(text, "Lv.%d  %.1f %.1f", m_iLevel,BarWidth,(m_iExp / ((m_iLevel + static_cast<double>(1)) * 2 * 50)));
+	DrawUtils::SetConsoleTextColor(1.0f, 1.0f, 1.0f);
+	DrawUtils::DrawConsoleString(15, ScreenHeight - m_iLevelBg->h() * 3 + 5, text);
+
 	sprintf(text, "Lv.%d Exp:%d/%d", m_iLevel, m_iExp, ((m_iLevel + 1) * 2 * 50));
 	DrawUtils::SetConsoleTextColor(g_ColorActive[0], g_ColorActive[1], g_ColorActive[2]);
 	int len = DrawUtils::ConsoleStringLen(text);

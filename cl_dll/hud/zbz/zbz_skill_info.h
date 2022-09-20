@@ -51,6 +51,9 @@ private:
 
 	UniqueTexture m_iVKeyButton;
 	UniqueTexture m_iLevelBar;
+	UniqueTexture m_iLevelBarBg;
+	UniqueTexture m_iLevelBg;
+
 	UniqueTexture m_iSkillPointIcon;
 
 	
