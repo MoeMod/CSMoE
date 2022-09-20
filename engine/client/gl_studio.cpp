@@ -30,19 +30,6 @@ GNU General Public License for more details.
 #include "physics.h"
 #endif
 
-// TBB and <execution> is only supported on win32
-#ifdef _WIN32
-#define XASH_RENDER_PAR 1
-#endif
-
-#ifdef XASH_RENDER_PAR
-#ifdef XASH_TBBMALLOC
-#include "tbb/parallel_for_each.h"
-#else
-#include <execution>
-#endif
-#endif
-
 // NOTE: enable this if you want merge both 'model' and 'modelT' files into one model slot.
 // otherwise it's uses two slots in models[] array for models with external textures
 // MoeMod : disabled due to crash in CSMoE win32
@@ -91,6 +78,7 @@ typedef struct studiolight_s
 	vec3_t		lightspot;		// potential coords where placed lightsource
 
 	vec3_t		blightvec[MAXSTUDIOBONES];	// ambient lightvectors per bone
+	vec3_t		lightval;
 
     // elights cache
     int		numlocallights;
@@ -1784,11 +1772,14 @@ void GAME_EXPORT R_StudioSetupLighting( alight_t *lightinfo )
 	for( i = 0; i < m_pStudioHeader->numbones; i++ )
     {
 		Matrix3x4_VectorIRotate( g_lighttransform[i], *lightinfo->plightvec, g_studiolight.blightvec[i] );
-        if( scale > 1.0f ) VectorNormalize( g_studiolight.blightvec[i] ); // in case model may be scaled
+        //if( scale > 1.0f ) VectorNormalize( g_studiolight.blightvec[i] ); // in case model may be scaled
     }
 
 	// copy custom alight color in case of mod-maker changed it
     g_studiolight.lightcolor = lightinfo->color;
+
+	float illum = std::clamp(g_studiolight.ambientlight + g_studiolight.shadelight * 0.8f, 0.0f, 255.0f);
+	g_studiolight.lightval = g_studiolight.lightcolor * (illum / 255.0f);
 }
 
 /*
@@ -1801,53 +1792,14 @@ void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 {
 	float		illum;
 
-	if( !RI.drawWorld || RI.currententity->curstate.effects & EF_FULLBRIGHT )
+	if( !RI.drawWorld || RI.currententity->curstate.effects & EF_FULLBRIGHT || flags & STUDIO_NF_FULLBRIGHT)
 	{
 		VectorSet( lv, 1.0f, 1.0f, 1.0f );
 		return;
 	}
 
-    illum = g_studiolight.ambientlight;
-
-	if( flags & STUDIO_NF_FLATSHADE )
-	{
-        illum += g_studiolight.shadelight * 0.8f;
-	}
-	else
-	{
-		float	r, lightcos;
-
-        if( bone != -1 ) lightcos = DotProduct( normal, g_studiolight.blightvec[bone] );
-        else lightcos = DotProduct( normal, g_studiolight.lightvec ); // -1 colinear, 1 opposite
-        if( lightcos > 1.0f ) lightcos = 1.0f;
-
-        illum += g_studiolight.shadelight;
-
-        r = SHADE_LAMBERT;
-
-        // do modified hemispherical lighting
-        if( r <= 1.0f )
-        {
-            r += 1.0f;
-            lightcos = (( r - 1.0f ) - lightcos) / r;
-            if( lightcos > 0.0f )
-                illum += g_studiolight.shadelight * lightcos;
-        }
-        else
-        {
-            lightcos = (lightcos + ( r - 1.0f )) / r;
-            if( lightcos > 0.0f )
-                illum -= g_studiolight.shadelight * lightcos;
-        }
-
-        illum = max( illum, 0.0f );
-	}
-
-    illum = min( illum, 255.0f );
-    lv = illum * vec3_t(1.0f / 255.0f, 1.0f / 255.0f, 1.0f / 255.0f);
+	lv = g_studiolight.lightval;
 }
-
-
 
 /*
 ====================
@@ -2699,7 +2651,7 @@ R_StudioDrawPoints
 */
 static void GAME_EXPORT R_StudioDrawPoints( void )
 {
-	int		i, j, m_skinnum;
+	int		m_skinnum;
 	byte		*pvertbone;
 	byte		*pnormbone;
 	mstudiotexture_t	*ptexture;
@@ -2744,77 +2696,51 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 #ifdef STUDIO_SKINNING_OMP_MIN
 #pragma omp parallel for private(i) if(m_pSubModel->numverts > STUDIO_SKINNING_OMP_MIN)
 #endif
-	auto vert_calc_fn = [pvertbone](vec3_t &v)
+	for (int i = 0; i < m_pSubModel->numverts; ++i)
 	{
-		int i = &v - g_xformverts;
 		Matrix3x4_VectorTransform(g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i]);
-		//scale multi by Rentro
-		if (RI.currententity->curstate.scale != 1.0f) {
-			vec3_t temp1, temp2;
-			float scale_offset = 0.0f;
+	}
 
-			scale_offset = -RI.currententity->curstate.mins[2];
-			VectorCopy(RI.currententity->origin, temp1);
-			VectorSubtract(g_xformverts[i], temp1, temp2);
-			VectorScale(temp2, RI.currententity->curstate.scale - 1.0f, temp2);
-			VectorAdd(g_xformverts[i], temp2, g_xformverts[i]);
-			g_xformverts[i][2] += scale_offset * (RI.currententity->curstate.scale - 1.0f);
+	if (RI.currententity->curstate.scale != 1.0f)
+	{
+		//scale multi by Rentro
+		float scale_offset = -RI.currententity->curstate.mins[2];
+		for (int i = 0; i < m_pSubModel->numverts; ++i) 
+		{
+			float temp = RI.currententity->curstate.scale - 1.0f;
+			g_xformverts[i] = (g_xformverts[i] - RI.currententity->origin) * (temp * 2);
+			g_xformverts[i][2] += scale_offset * temp;
 		}
 	};
-#ifdef XASH_RENDER_PAR
-#ifdef XASH_TBBMALLOC
-	tbb::parallel_for_each(g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
-#else
-	std::for_each(std::execution::par_unseq, g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
-#endif
-#else
-	std::for_each(g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
-#endif
 
 	if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 	{
 		scale = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
 
-		for( i = 0; i < m_pSubModel->numnorms; i++ )
+		for(int i = 0; i < m_pSubModel->numnorms; i++ )
 			Matrix3x4_VectorRotate( g_bonestransform[pnormbone[i]], pstudionorms[i], g_xformnorms[i] );
 	}
 
-	for( j = 0; j < m_pSubModel->nummesh; j++ )
+	for( int j = 0; j < m_pSubModel->nummesh; j++ )
 	{
-        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh[j].skinref]]);
 		g_nFaceFlags = attr.flags;
 
 		// fill in sortedmesh info
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
-		auto norm_calc_fn = [pnormbone](vec3_t& v)
+		for (int i = 0; i < pmesh[j].numnorms; ++i)
 		{
-			int i = &v - g_lightvalues;
 			R_StudioLighting(g_lightvalues[i], pnormbone[i], g_nFaceFlags, pstudionorms[i]);
 		};
 
-		auto chrome_calc_fn = [pnormbone](vec2_t& v)
+		if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
-			int i = &v - g_chrome;
-			
-			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
+			for (int i = 0; i < pmesh[j].numnorms; ++i)
 			{
 				R_StudioSetupChrome(g_chrome[i], pnormbone[i], pstudionorms[i]);
-			}
-		};
-
-#ifdef XASH_RENDER_PAR
-#ifdef XASH_TBBMALLOC
-		tbb::parallel_for_each(g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
-		tbb::parallel_for_each(g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
-#else
-		std::for_each(std::execution::par_unseq, g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
-		std::for_each(std::execution::par_unseq, g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
-#endif
-#else
-		std::for_each(g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
-		std::for_each(g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
-#endif
+			};
+		}
 	}
 
 	if( r_studio_sort_textures->integer )

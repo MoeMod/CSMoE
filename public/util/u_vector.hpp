@@ -205,13 +205,13 @@ static_assert(sizeof(VectorBase3f_SIMD_Data) == 16 && alignof(VectorBase3f_SIMD_
 template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 16, VectorBase3f_SIMD_Data>
 {
     using Base = VectorBase_Gen<float, 3, std::index_sequence<0, 1, 2>, 16, VectorBase3f_SIMD_Data>;
-    //using Base::Base;
+    using Base::Base;
 
     constexpr VectorBase_Storage() = default;
 
     constexpr VectorBase_Storage(float x1, float y1, float z1)
     {
-        if constexpr (std::is_constant_evaluated())
+        if (std::is_constant_evaluated())
         {
             this->x = x1;
             this->y = y1;
@@ -223,7 +223,7 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
 #if U_VECTOR_NEON
             this->m_xmm = { x1, y1, z1, 0 };
 #elif U_VECTOR_SSE
-            this->m_xmm = _mm_set_ps(x1, y1, z1, 0);
+            this->m_xmm = _mm_set_ps(0, z1, y1, x1);
 #endif
         }
     }
@@ -261,13 +261,13 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
 template<> struct VectorBase_Storage<float, 4, 16> : VectorBase_Gen<float, 4, std::index_sequence<0, 1, 2, 3>, 16, VectorBase4f_SIMD_Data>
 {
     using Base = VectorBase_Gen<float, 4, std::index_sequence<0, 1, 2, 3>, 16, VectorBase4f_SIMD_Data>;
-    //using Base::Base;
+    using Base::Base;
 
     constexpr VectorBase_Storage() = default;
 
     constexpr VectorBase_Storage(float x1, float y1, float z1, float w1)
     {
-        if constexpr (std::is_constant_evaluated())
+        if (std::is_constant_evaluated())
         {
             this->x = x1;
             this->y = y1;
@@ -279,7 +279,7 @@ template<> struct VectorBase_Storage<float, 4, 16> : VectorBase_Gen<float, 4, st
 #if U_VECTOR_NEON
             this->m_xmm = { x1, y1, z1, w1 };
 #elif U_VECTOR_SSE
-            this->m_xmm = _mm_set_ps(x1, y1, z1, w1);
+            this->m_xmm = _mm_set_ps(w1, z1, y1, x1);
 #endif
         }
     }
