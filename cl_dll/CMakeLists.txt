@@ -601,6 +601,12 @@ add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 	-D_CS16CLIENT_ALLOW_SPECIAL_SCRIPTING
 	 )
 
+if(MSVC)
+	add_compile_options(/fp:fast)
+else()
+	add_compile_options(-ffast-math)
+endif()
+
 target_link_libraries( ${CLIENT_LIBRARY} ${CMAKE_DL_LIBS} )
 
 if(XASH_IMGUI)

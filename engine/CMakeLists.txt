@@ -303,6 +303,11 @@ set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} client/physics.cpp)
 add_definitions(-DXASH_RAGDOLL=1)
 endif()
 
+if(MSVC)
+	add_compile_options(/fp:fast)
+else()
+	add_compile_options(-ffast-math)
+endif()
 
 include_directories(
 	.
