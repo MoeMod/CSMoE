@@ -519,6 +519,7 @@ bool isSniperRifle(CBasePlayerItem* item)
 	case WEAPON_ZGUN:
 	case WEAPON_Z4B_BARRETTD:
 	case WEAPON_DESTROYER:
+	case WEAPON_STARCHASERSR:
 		return true;
 
 	default:

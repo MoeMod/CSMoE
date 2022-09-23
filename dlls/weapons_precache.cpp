@@ -435,6 +435,20 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_blockas");
 	UTIL_PrecacheOtherWeapon("weapon_coilgun");
 	UTIL_PrecacheOtherWeapon("weapon_bouncer");
+	UTIL_PrecacheOtherWeapon("weapon_thanatos5");
+	UTIL_PrecacheOtherWeapon("weapon_oicw");
+	UTIL_PrecacheOtherWeapon("weapon_starchasersr");
+	UTIL_PrecacheOtherWeapon("weapon_m1garand");
+	UTIL_PrecacheOtherWeapon("weapon_dualkrisshero");
+	UTIL_PrecacheOtherWeapon("weapon_skull2");
+	UTIL_PrecacheOtherWeapon("weapon_dualuzi");
+	//UTIL_PrecacheOtherWeapon("knife_armtorch");
+	UTIL_PrecacheOtherWeapon("weapon_spas12");
+	UTIL_PrecacheOtherWeapon("weapon_spas12ex");
+	UTIL_PrecacheOtherWeapon("weapon_spas12ex2");
+	UTIL_PrecacheOtherWeapon("weapon_gilboaex");
+	UTIL_PrecacheOtherWeapon("weapon_musket");
+	UTIL_PrecacheOtherWeapon("weapon_buffng7");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

@@ -1538,7 +1538,7 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 		g_nStudioCount++;
 
 	// safety bounding the skinnum
-	m_skinnum = bound( 0, RI.currententity->curstate.skin, ( m_pTextureHeader->numskinfamilies - 1 ));
+	m_skinnum = RI.currententity->curstate.skin;
 	pvertbone = ((byte *)m_pStudioHeader + m_pSubModel->vertinfoindex);
 	pnormbone = ((byte *)m_pStudioHeader + m_pSubModel->norminfoindex);
 

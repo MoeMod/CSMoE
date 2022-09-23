@@ -1794,22 +1794,20 @@ namespace sv {
 			if (pAttack->m_flPlayerBuffData)
 			{
 
-					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_rgpPlayerItems[GRENADE_SLOT];
-					if (!pWeapon)
-					{
-						pAttack->m_flPlayerBuffData = 0;
-						this->m_pWeapon->m_flTimeholster = gpGlobals->time;
-						UTIL_Remove(this);
-						return;
-					}
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_rgpPlayerItems[GRENADE_SLOT];
+				if (!pWeapon)
+				{
+					pAttack->m_flPlayerBuffData = 0;
+					UTIL_Remove(this);
+					return;
+				}
 
-					if (pWeapon->m_iId != WEAPON_DIVINETITAN)
-					{
-						pAttack->m_flPlayerBuffData = 0;
-						this->m_pWeapon->m_flTimeholster = gpGlobals->time;
-						UTIL_Remove(this);
-						return;
-					}
+				if (pWeapon->m_iId != WEAPON_DIVINETITAN)
+				{
+					pAttack->m_flPlayerBuffData = 0;
+					UTIL_Remove(this);
+					return;
+				}
 				
 				if (m_iType == 1  && this->m_pWeapon)
 				{
@@ -1817,7 +1815,6 @@ namespace sv {
 
 					if (m_flTimeNextCharge <= gpGlobals->time)
 					{
-						this->m_pWeapon->m_flTimeholster = gpGlobals->time;
 						this->m_pWeapon->m_flTimeholster = invalid_time_point;
 
 						m_flTimeNextCharge = gpGlobals->time + 0.20s;

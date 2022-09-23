@@ -1329,7 +1329,10 @@ void CBasePlayerWeapon::ReloadSound()
 				|| m_iId == WEAPON_M1887G
 				|| m_iId == WEAPON_M1887XMAS
 				|| m_iId == WEAPON_RAINBOWGUN
-				|| m_iId == WEAPON_BOUNCER)
+				|| m_iId == WEAPON_BOUNCER
+				|| m_iId == WEAPON_SPAS12
+				|| m_iId == WEAPON_SPAS12EX
+				|| m_iId == WEAPON_SPAS12EX2)
 				WRITE_BYTE(0);
 			else
 				WRITE_BYTE(1);
@@ -1407,6 +1410,8 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_KRONOS1:
 		case WEAPON_KINGCOBRA:
 		case WEAPON_KINGCOBRAG:
+		case WEAPON_SKULL2:
+		case WEAPON_MUSKET:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

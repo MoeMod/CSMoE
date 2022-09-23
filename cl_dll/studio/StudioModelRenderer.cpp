@@ -57,6 +57,10 @@ struct model_s* CStudioModelRenderer::s_pMGSMViewModel;
 struct model_s* CStudioModelRenderer::s_pMGSMLauncherModel;
 struct model_s* CStudioModelRenderer::s_pM1887xmasViewModel;
 struct model_s* CStudioModelRenderer::s_pXmasEmptyModel;
+struct model_s* CStudioModelRenderer::s_pBUFFNG7ViewModel;
+struct model_s* CStudioModelRenderer::s_pBUFFNG7BModeModel;
+struct model_s* CStudioModelRenderer::s_pBUFFNG7BMode2Model;
+struct model_s* CStudioModelRenderer::s_pBUFFNG7BMode3Model;
 
 void CStudioModelRenderer::Init(void)
 {

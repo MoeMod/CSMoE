@@ -530,6 +530,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 	case EXPTYPE_AT4ROCKET:
 	case EXPTYPE_FIRECRACKERROCKET:
 	case EXPTYPE_M32ROCKET:
+	case EXPTYPE_OICWROCKET:
 		m_bHit = RadiusDamage(pev, pevOwner, flDamage, CLASS_NONE, bitsDamageType, iRadius);
 
 		break;
@@ -578,6 +579,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 	case EXPTYPE_AT4ROCKET:
 	case EXPTYPE_FIRECRACKERROCKET:
 	case EXPTYPE_M32ROCKET:
+	case EXPTYPE_OICWROCKET:
 		break;
 	default:
 	{

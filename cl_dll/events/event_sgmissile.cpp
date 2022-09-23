@@ -93,7 +93,7 @@ void EV_FireSGMissile(event_args_s *args)
 		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
 	}
 
-	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], shell, TE_BOUNCE_SHELL);
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], shell, TE_BOUNCE_SHOTSHELL);
 
 	EV_GetGunPosition( args, vecSrc, origin );
 

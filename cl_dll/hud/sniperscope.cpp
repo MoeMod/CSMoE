@@ -171,6 +171,12 @@ int CHudSniperScope::VidInit()
 	m_iDestroyer_Meter = gHUD.GetSpriteIndex("destroyer_countM");
 	m_rcDestroyer_Meter = gHUD.GetSpriteRect(m_iDestroyer_Meter);
 
+	R_InitTexture(m_iStarChaserSRScope, "sprites/starchasersr_scope.tga");
+	R_InitTexture(m_iStarChaserSRScope_BG, "sprites/starchasersr_scope_bg.tga");
+	R_InitTexture(m_iStarChaserSRScope_Light, "sprites/starchasersr_scope_light.tga");
+
+	m_flStarChaserSRAlpha = 255.0f;
+
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
@@ -328,14 +334,14 @@ void CHudSniperScope::FuncDrawScope(const CTextureRef& tex, int type, int x, int
 		int iX, iY;
 		iX = x - width;
 		iY = y - height;
-		tex.Draw2DQuadScaled(iX, iY, iX + iX + width, iY + iY + height);
+		tex.Draw2DQuadScaled(iX, iY, iX + width, iY + height);
 		iY = ScreenHeight / 2 + height;
-		tex.Draw2DQuadScaled(iX, iY, iX + iX + width, iY + iY - height);
+		tex.Draw2DQuadScaled(iX, iY, iX + width, iY - height);
 		iX = ScreenWidth / 2 + width;
 		iY = ScreenHeight / 2 - height;
-		tex.Draw2DQuadScaled(iX, iY, iX + iX - width, iY + iY + height);
+		tex.Draw2DQuadScaled(iX, iY, iX - width, iY + height);
 		iY = ScreenHeight / 2 + height;
-		tex.Draw2DQuadScaled(iX, iY, iX + iX - width, iY + iY - height);
+		tex.Draw2DQuadScaled(iX, iY, iX - width, iY - height);
 		break;
 	}
 	case 1:
@@ -378,6 +384,14 @@ int CHudSniperScope::Draw(float flTime)
 
 			DrawDestroyerScope(flTime);
 			return 0;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_STARCHASERSR)
+		{
+			if (gHUD.m_iFOV > 89)
+				return 1;
+
+			DrawStarChaserSRScope(flTime);
+			return 0;		
 		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_KRONOS12 || 
 			pActiveBTEWeapon->m_iId == WEAPON_KRONOS5 ||
@@ -1180,8 +1194,6 @@ int CHudSniperScope::CalculateDistance(void)
 
 void CHudSniperScope::DrawDestroyerScope(float flTime)
 {
-
-
 	float LENGTH_SCOPE = min(ScreenWidth, ScreenHeight) / 2 / 0.75;
 
 	int iX, iY, iWidth, iHeight;
@@ -1240,6 +1252,27 @@ void CHudSniperScope::DrawDestroyerScope(float flTime)
 	else
 		FuncDraw2DQuadScaled(*m_iDestroyer_Aim02, (ScreenWidth - m_iDestroyer_Aim02->w()) / 2, (ScreenHeight - m_iDestroyer_Aim02->h()) / 2, m_iDestroyer_Aim02->w(), m_iDestroyer_Aim02->h());
 }
+
+
+void CHudSniperScope::DrawStarChaserSRScope(float flTime)
+{
+	float SCOPE_LENGTH = min(ScreenWidth, ScreenHeight) * 0.45f;
+
+	gEngfuncs.pfnFillRGBABlend(0, 0, ScreenWidth / 2 - SCOPE_LENGTH + 1, ScreenHeight, 0, 12, 13, 190);
+	gEngfuncs.pfnFillRGBABlend(ScreenWidth / 2 + SCOPE_LENGTH - 1, 0, ScreenWidth / 2 - SCOPE_LENGTH + 1, ScreenHeight, 0, 12, 13, 190);
+	gEngfuncs.pfnFillRGBABlend(ScreenWidth / 2 - SCOPE_LENGTH + 1, 0, SCOPE_LENGTH * 2 - 1, ScreenHeight / 2 - SCOPE_LENGTH + 1, 0, 12, 13, 190);
+	gEngfuncs.pfnFillRGBABlend(ScreenWidth / 2 - SCOPE_LENGTH + 1, ScreenHeight / 2 + SCOPE_LENGTH - 1, SCOPE_LENGTH * 2 - 1, ScreenHeight / 2 - SCOPE_LENGTH + 1, 0, 12, 13, 190);
+
+	FuncDrawScope(*m_iStarChaserSRScope_BG, TYPE_QUADRD_SQUARE, ScreenWidth / 2, ScreenHeight / 2, SCOPE_LENGTH, SCOPE_LENGTH);
+
+	float SCOPE_BG_LENGTH = (float)ScreenHeight / 2.5f;
+	FuncDraw2DQuadScaled(*m_iStarChaserSRScope, (ScreenWidth - SCOPE_BG_LENGTH) / 2, (ScreenHeight - SCOPE_BG_LENGTH) / 2, SCOPE_BG_LENGTH, SCOPE_BG_LENGTH);
+
+	float SCOPE_LIGHT_LENGTH = m_iStarChaserSRScope_Light->w();
+
+	FuncDraw2DQuadScaled(*m_iStarChaserSRScope_Light, (ScreenWidth - SCOPE_LIGHT_LENGTH) / 2, (ScreenHeight - SCOPE_LIGHT_LENGTH) / 2, SCOPE_LIGHT_LENGTH, SCOPE_LIGHT_LENGTH, 0.0, 0.0, 1.0, 1.0, 255, 255, 255, m_flStarChaserSRAlpha);
+}
+
 
 void CHudSniperScope::Shutdown()
 {

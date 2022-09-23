@@ -363,6 +363,19 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_blockas.cpp
 	../dlls/wpn_shared/wpn_coilgun.cpp
 	../dlls/wpn_shared/wpn_bouncer.cpp
+	../dlls/wpn_shared/wpn_thanatos5.cpp
+	../dlls/wpn_shared/wpn_oicw.cpp
+	../dlls/wpn_shared/wpn_starchasersr.cpp
+	../dlls/wpn_shared/wpn_m1garand.cpp
+	../dlls/wpn_shared/wpn_dualkrisshero.cpp
+	../dlls/wpn_shared/wpn_skull2.cpp
+	../dlls/wpn_shared/wpn_dualuzi.cpp
+	../dlls/wpn_shared/wpn_spas12.cpp
+	../dlls/wpn_shared/wpn_spas12ex.cpp
+	../dlls/wpn_shared/wpn_spas12ex2.cpp
+	../dlls/wpn_shared/wpn_gilboaex.cpp
+	../dlls/wpn_shared/wpn_musket.cpp
+	../dlls/wpn_shared/wpn_buffng7.cpp
 	)
 
 set (HUD_SRCS

@@ -107,6 +107,10 @@ public:
 	static struct model_s* s_pMGSMLauncherModel;
 	static struct model_s* s_pM1887xmasViewModel;
 	static struct model_s* s_pXmasEmptyModel;
+	static struct model_s* s_pBUFFNG7ViewModel;
+	static struct model_s* s_pBUFFNG7BModeModel;
+	static struct model_s* s_pBUFFNG7BMode2Model;
+	static struct model_s* s_pBUFFNG7BMode3Model;
 };
 
 }

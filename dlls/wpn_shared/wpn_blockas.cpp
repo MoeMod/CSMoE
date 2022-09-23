@@ -344,6 +344,10 @@ namespace sv {
         else if (m_iWeaponState == 2)
             m_iWeaponState = 0;
 
+#ifndef CLIENT_DLL
+        m_pPlayer->UpdateShieldCrosshair(m_iWeaponState == 0);
+#endif
+
         if (m_iWeaponState != 0)
         {
             if (m_flRocketReloadTime == invalid_time_point && GetNumRockets() > 0)
@@ -489,9 +493,9 @@ namespace sv {
             m_fInSpecialReload = 0;
 
             if (m_pPlayer->pev->flags & FL_ONGROUND)
-                m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 7, 10);
+                m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 3, 5);           
             else
-                m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 3, 5);
+                m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 7, 10);
         }
         else if (m_iWeaponState == 3)
         {
@@ -548,7 +552,9 @@ namespace sv {
                     SendWeaponAnim(BLOCKAS2_CHANGE2);
                 else
                     SendWeaponAnim(BLOCKAS2_CHANGE2_EMPTY);
-
+#ifndef CLIENT_DLL
+                m_pPlayer->UpdateShieldCrosshair(FALSE);
+#endif
                 m_iWeaponState = 3;
                 m_flTimeWeaponIdle2 = invalid_time_point;
                 break;
@@ -560,7 +566,9 @@ namespace sv {
                 strcpy(m_pPlayer->m_szAnimExtention, "rifle");
 
                 SendWeaponAnim(BLOCKAS1_CHANGE2);
-
+#ifndef CLIENT_DLL
+                m_pPlayer->UpdateShieldCrosshair(TRUE);
+#endif
                 m_iWeaponState = 0;
                 m_flTimeWeaponIdle2 = invalid_time_point;
                 break;

@@ -836,6 +836,7 @@ public:
 	void DrawDestroyerScope(float flTime);
 	int DrawDestroyerSniperScopeNumbers(int x, int y, int iFlags, int iNumber, int r, int g, int b);
 	int CalculateDistance();
+	void DrawStarChaserSRScope(float flTime);
 private:
 
 	struct LockOnData
@@ -946,6 +947,13 @@ private:
 	int m_iDestroyer_NumberZero;
 	int m_iDestroyer_Meter;
 	wrect_t m_rcDestroyer_Meter;
+
+
+	UniqueTexture m_iStarChaserSRScope;
+	UniqueTexture m_iStarChaserSRScope_BG;
+	UniqueTexture m_iStarChaserSRScope_Light;
+
+	float m_flStarChaserSRAlpha;
 
 };
 

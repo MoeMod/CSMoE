@@ -78,7 +78,7 @@ void EV_FireXM1014(event_args_s *args)
 		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
 	}
 
-	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iShotgunShell, TE_BOUNCE_SHELL);
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iShotgunShell, TE_BOUNCE_SHOTSHELL);
 
 	PLAY_EVENT_SOUND( SOUNDS_NAME );
 

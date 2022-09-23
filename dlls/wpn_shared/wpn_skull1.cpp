@@ -88,7 +88,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_50aeaz" , 70 }; }
 #endif
-	float GetArmorRatioModifier() override { return 1.0; }
+	float GetArmorRatioModifier() override { return 1.5; }
 	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
 
 	int GetItemInfo(ItemInfo* p)

@@ -2214,4 +2214,77 @@ BOOL CBouncerAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_bouncer, CBouncerAmmo);
+
+
+void CBStarChaserSRAmmo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CBStarChaserSRAmmo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CBStarChaserSRAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(15, "StarChaserSR", 150) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_starchasersr, CBStarChaserSRAmmo);
+
+void CMusketAmmo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CMusketAmmo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CMusketAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(5, "MustketAmmo", 30) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_musket, CMusketAmmo);
+
+void CTurbulent1Ammo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CTurbulent1Ammo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CTurbulent1Ammo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(150, "Turbulent1Ammo", 150) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_turbulent1, CTurbulent1Ammo);
 }

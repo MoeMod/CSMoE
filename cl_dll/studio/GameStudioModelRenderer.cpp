@@ -78,6 +78,9 @@ static client_anim_state_t g_state;
 static client_anim_state_t g_clientstate;
 
 TEMPENTITY* g_BuffAugSmoke = NULL;
+TEMPENTITY* g_BUFFNG7BMode[2];
+TEMPENTITY* g_BUFFNG7BMode2[3];
+TEMPENTITY* g_BUFFNG7BMode3;
 
 float g_flBloodhunterAnimTime = 0.0;
 int g_iBloodhunterSecAnim = 0;
@@ -89,6 +92,8 @@ int g_iMGSMState = 0;
 
 float g_flM1887xmasAnimTime = 0.0;
 int g_iM1887xmasAnim = -1;
+
+int g_iBUFFNG7State = 0;
 
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {
@@ -1164,6 +1169,121 @@ int R_StudioDrawModel(int flags)
 			g_StudioRenderer.StudioDrawModel(flags);
 			*curent = saveent;
 		}
+
+		if (CStudioModelRenderer::s_pBUFFNG7ViewModel && curent->model == CStudioModelRenderer::s_pBUFFNG7ViewModel && CStudioModelRenderer::s_pBUFFNG7BModeModel && CStudioModelRenderer::s_pBUFFNG7BMode2Model && CStudioModelRenderer::s_pBUFFNG7BMode3Model && g_iBUFFNG7State)
+		{
+			for (int i = 0; i < 2; i++)
+			{
+				int iAttachment = i + 2;
+				if (!g_BUFFNG7BMode[i])
+				{
+					g_BUFFNG7BMode[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], CStudioModelRenderer::s_pBUFFNG7BModeModel);
+
+					g_BUFFNG7BMode[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_BUFFNG7BMode[i]->entity.curstate.aiment = curent->index;
+					g_BUFFNG7BMode[i]->entity.curstate.body = iAttachment + 1;
+					g_BUFFNG7BMode[i]->entity.curstate.rendermode = kRenderTransAdd;
+					g_BUFFNG7BMode[i]->entity.curstate.renderamt = 255;
+					g_BUFFNG7BMode[i]->entity.curstate.renderfx = 0;
+					g_BUFFNG7BMode[i]->entity.curstate.scale = 0.02;
+					g_BUFFNG7BMode[i]->entity.curstate.framerate = 24;
+					g_BUFFNG7BMode[i]->entity.curstate.rendercolor.r = g_BUFFNG7BMode[i]->entity.curstate.rendercolor.g = g_BUFFNG7BMode[i]->entity.curstate.rendercolor.b = 255;
+					g_BUFFNG7BMode[i]->frameMax = 28;
+					g_BUFFNG7BMode[i]->entity.curstate.frame = Com_RandomLong(0, 5);
+					g_BUFFNG7BMode[i]->die = gHUD.m_flTime + 9999.0f;
+					g_BUFFNG7BMode[i]->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_BUFFNG7BMode[i]->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_BUFFNG7BMode[i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+
+			for (int i = 0; i < 3; i++)
+			{
+				int iAttachment = i + 4;
+				if (!g_BUFFNG7BMode2[i])
+				{
+					g_BUFFNG7BMode2[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], CStudioModelRenderer::s_pBUFFNG7BMode2Model);
+
+					g_BUFFNG7BMode2[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_BUFFNG7BMode2[i]->entity.curstate.aiment = curent->index;
+					g_BUFFNG7BMode2[i]->entity.curstate.body = iAttachment + 1;
+					g_BUFFNG7BMode2[i]->entity.curstate.rendermode = kRenderTransAdd;
+					g_BUFFNG7BMode2[i]->entity.curstate.renderamt = 255;
+					g_BUFFNG7BMode2[i]->entity.curstate.renderfx = 0;
+					g_BUFFNG7BMode2[i]->entity.curstate.scale = 0.03;
+					g_BUFFNG7BMode2[i]->entity.curstate.framerate = 24;
+					g_BUFFNG7BMode2[i]->entity.curstate.rendercolor.r = g_BUFFNG7BMode2[i]->entity.curstate.rendercolor.g = g_BUFFNG7BMode2[i]->entity.curstate.rendercolor.b = 255;
+					g_BUFFNG7BMode2[i]->frameMax = 28;
+					g_BUFFNG7BMode2[i]->entity.curstate.frame = Com_RandomLong(0, 5);
+					g_BUFFNG7BMode2[i]->die = gHUD.m_flTime + 9999.0f;
+					g_BUFFNG7BMode2[i]->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_BUFFNG7BMode2[i]->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_BUFFNG7BMode2[i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+
+
+			if (g_iBUFFNG7State == 3)
+			{
+				if (!g_BUFFNG7BMode3)
+				{
+					g_BUFFNG7BMode3 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], CStudioModelRenderer::s_pBUFFNG7BMode3Model);
+
+					g_BUFFNG7BMode3->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_BUFFNG7BMode3->entity.curstate.aiment = curent->index;
+					g_BUFFNG7BMode3->entity.curstate.body = 1 + 1;
+					g_BUFFNG7BMode3->entity.curstate.rendermode = kRenderTransAdd;
+					g_BUFFNG7BMode3->entity.curstate.renderamt = 255;
+					g_BUFFNG7BMode3->entity.curstate.renderfx = 0;
+					g_BUFFNG7BMode3->entity.curstate.scale = 0.05;
+					g_BUFFNG7BMode3->entity.curstate.framerate = 24;
+					g_BUFFNG7BMode3->entity.curstate.rendercolor.r = g_BUFFNG7BMode3->entity.curstate.rendercolor.g = g_BUFFNG7BMode3->entity.curstate.rendercolor.b = 255;
+					g_BUFFNG7BMode3->frameMax = 23;
+					g_BUFFNG7BMode3->entity.curstate.frame = Com_RandomLong(0, 5);
+					g_BUFFNG7BMode3->die = gHUD.m_flTime + 9999.0f;
+					g_BUFFNG7BMode3->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_BUFFNG7BMode3->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_BUFFNG7BMode3->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+			else
+			{
+				if (g_BUFFNG7BMode3)
+				{
+					g_BUFFNG7BMode3->die = 0.0;
+					g_BUFFNG7BMode3 = NULL;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 2; i++)
+			{
+				if (g_BUFFNG7BMode[i])
+				{
+					g_BUFFNG7BMode[i]->die = 0.0;
+					g_BUFFNG7BMode[i] = NULL;
+				}
+			}
+
+			for (int i = 0; i < 3; i++)
+			{
+				if (g_BUFFNG7BMode2[i])
+				{
+					g_BUFFNG7BMode2[i]->die = 0.0;
+					g_BUFFNG7BMode2[i] = NULL;
+				}
+			}
+
+			if (g_BUFFNG7BMode3)
+			{
+				g_BUFFNG7BMode3->die = 0.0;
+				g_BUFFNG7BMode3 = NULL;
+			}
+		}
 	}
 
 	int iReturn = g_StudioRenderer.StudioDrawModel(flags);
@@ -1201,6 +1321,8 @@ int R_StudioDrawModel(int flags)
 				g_BuffAugSmoke = NULL;
 			}
 		}
+
+		
 	}
 
 	return iReturn;

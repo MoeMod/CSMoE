@@ -207,6 +207,11 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pMGSMLauncherModel = IEngineStudio.Mod_ForName("models/ef_mgsm_launcher.mdl", FALSE);
 	CStudioModelRenderer::s_pM1887xmasViewModel = IEngineStudio.Mod_ForName("models/v_m1887xmas.mdl", FALSE);
 	CStudioModelRenderer::s_pXmasEmptyModel = IEngineStudio.Mod_ForName("models/xmas_empty.mdl", FALSE);
+	CStudioModelRenderer::s_pBUFFNG7ViewModel = IEngineStudio.Mod_ForName("models/v_buffng7.mdl", FALSE);
+	CStudioModelRenderer::s_pBUFFNG7BModeModel = IEngineStudio.Mod_ForName("sprites/ef_buffng7_bmode.spr", FALSE);
+	CStudioModelRenderer::s_pBUFFNG7BMode2Model = IEngineStudio.Mod_ForName("sprites/ef_buffng7_bmode2.spr", FALSE);
+	CStudioModelRenderer::s_pBUFFNG7BMode3Model = IEngineStudio.Mod_ForName("sprites/ef_buffng7_bmode3.spr", FALSE);
+
 
 	//VGui_Startup();
 

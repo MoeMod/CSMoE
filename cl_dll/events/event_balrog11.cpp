@@ -97,7 +97,7 @@ void EV_FireBalrog11(event_args_s *args)
 		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
 	}
 
-	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], shell, TE_BOUNCE_SHELL);
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], shell, TE_BOUNCE_SHOTSHELL);
 
 	if (args->bparam1)
 		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/balrog11-2.wav", args->fparam1, 0.52, 0, 94 + Com_RandomLong(0, 0xf));

@@ -42,6 +42,8 @@ namespace cl {
 	extern float g_flM1887xmasAnimTime;
 	extern int g_iM1887xmasAnim;
 
+	extern int g_iBUFFNG7State;
+
 enum
 {
 	HUMAN_SKILL_KNIFE2X,
@@ -429,13 +431,28 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		m_SniperScope.InsertBunkerBusterData2(arg3);
 		break;
-
-
 	}
 	case 31:
 	{
 		g_iM1887xmasAnim = -1;
 		g_flM1887xmasAnimTime = 0.0;
+		break;
+	}
+	case 32:
+	{
+		arg1 = reader.ReadByte();
+		switch (arg1)
+		{
+		case 0:
+		{
+			//buffng7
+			arg2 = reader.ReadByte();
+			g_iBUFFNG7State = arg2;
+			break;
+		}
+		default:
+			break;
+		}
 		break;
 	}
 	case 42:

@@ -41,13 +41,6 @@ enum blockar1_e
 	BLOCKAR1_DRAW
 };
 
-
-static const char* SOUNDS_NAME[] =
-{
-	"weapons/m16a4-1.wav",
-	"weapons/m16a4-2.wav"
-};
-
 void EV_FireBlockAR(event_args_s *args)
 {
 	vec3_t ShellVelocity, ShellOrigin;

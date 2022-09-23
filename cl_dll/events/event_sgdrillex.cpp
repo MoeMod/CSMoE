@@ -173,7 +173,7 @@ namespace cl::event::sgdrillex {
 			}
 
 			int shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell_sgdrill.mdl");
-			EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
+			EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHOTSHELL);
 
 			PLAY_EVENT_SOUND(SOUNDS_NAME);
 

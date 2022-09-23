@@ -596,6 +596,8 @@ public:
 			|| m_iId == WEAPON_SAPIENTIA
 			|| m_iId == WEAPON_BLOODHUNTER
 			|| m_iId == WEAPON_KRONOS1
+			|| m_iId == WEAPON_SKULL2
+			|| m_iId == WEAPON_MUSKET
 			);
 	}
 	void SetPlayerShieldAnim();

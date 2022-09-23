@@ -6108,6 +6108,8 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/v_kingcobrag.mdl");
 		case WEAPON_DESTROYER:
 			pev->viewmodel = MAKE_STRING("models/v_destroyer.mdl");
+		case WEAPON_STARCHASERSR:
+			pev->viewmodel = MAKE_STRING("models/v_starchasersr.mdl");
 		default:
 			break;
 		}
@@ -9196,6 +9198,14 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_BLOCKMG:
 		case WEAPON_BLOCKAS:
 		case WEAPON_BOUNCER:
+		case WEAPON_STARCHASERSR:
+		case WEAPON_M1GARAND:
+		case WEAPON_SKULL1:
+		case WEAPON_SKULL2:
+		case WEAPON_DUALKRISSHERO:
+		case WEAPON_GILBOAEX:
+		case WEAPON_MUSKET:
+		case WEAPON_BUFFNG7:
 			return TRUE;
 		}
 	}

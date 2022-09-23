@@ -1055,11 +1055,45 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	CL_TEntAddEntity(&pTemp->entity);
 }
 
+TEMPENTITY* CL_AllocMuzzleFlash(vec3_t origin, struct model_s* model, float scale)
+{
+	TEMPENTITY* ent = CL_TempEntAlloc(origin, model);
+
+	if (ent)
+	{
+		ent->entity.curstate.scale = scale;
+		ent->entity.curstate.rendermode = kRenderTransAdd;
+		ent->entity.curstate.renderamt = 255;
+		ent->entity.curstate.renderfx = kRenderFxNone;
+		ent->entity.curstate.rendercolor.r = ent->entity.curstate.rendercolor.g = ent->entity.curstate.rendercolor.b = 255;
+		ent->entity.origin = origin;
+		ent->die = cl.time + 0.01;
+	}
+
+	return ent;
+}
+
+void MusicNoteCallback(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	float f = ent->tentOffset.z * currenttime + reinterpret_cast<int>(ent);
+
+	ent->entity.origin.x = ent->x + ent->tentOffset.x * sin(f);
+	ent->entity.origin.y = ent->y + ent->tentOffset.x * cos(f);
+	ent->entity.origin.z += ent->tentOffset.y * frametime;
+}
+
+void MusicNoteCallback2(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	ent->entity.origin.z += ent->tentOffset.x * frametime;
+}
+
 void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *type)
 {
 	// must set position for right culling on render
 	cl_entity_t* parent = CL_GetEntityByIndex(clientindex);
 	if (!parent) return;
+
+	vec3_t pos = parent->attachment[iAttachment];
 
 	if (type[0] == '#')
 	{
@@ -1113,7 +1147,49 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 	TEMPENTITY* pTemp;
 	switch (v6)
 	{
+	case 1:
+	{
+		unsigned __int64 v13 = (0x66666667i64 * (++iCounter)) >> 32;
+
+		if (iCounter != 5 * (((signed int)v13 >> 1) + (v13 >> 31)))
+			return;
+
+		pTemp = CL_AllocMuzzleFlash(pos, Mod_Handle(modelIndex), scale);
+
+		if (!pTemp)
+			return;
+
+		bAlreadyCreated = true;
+
+		pTemp->die = cl.time + 1.0;
+		pTemp->x = pos.x;
+		pTemp->y = pos.y;
+		pTemp->tentOffset[0] = 0.0;
+		pTemp->tentOffset[1] = 25.0;
+		pTemp->tentOffset[2] = 5.0;
+		pTemp->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_FADEOUT;
+		pTemp->callback = MusicNoteCallback;
+		pTemp->entity.curstate.framerate = 23;
+		break;
+	}
+	case 2:
+	{
+		pTemp = CL_AllocMuzzleFlash(pos, Mod_Handle(modelIndex), scale);
+
+		if (!pTemp)
+			return;
+
+		bAlreadyCreated = true;
+
+		pTemp->die = cl.time + 0.8;
+		pTemp->tentOffset.x = 15;
+		pTemp->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_FADEOUT;
+		pTemp->callback = MusicNoteCallback2;
+		pTemp->entity.curstate.framerate = 23;
+		break;
+	}
 	case 3:
+	{
 		pTemp = CL_TempEntAllocHigh(parent->attachment[iAttachment], Mod_Handle(modelIndex));
 
 		if (!pTemp)
@@ -1127,6 +1203,33 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 		life = 0.5f;
 
 		break;
+	}
+	case 4:
+	{
+		unsigned __int64 v13 = (0x66666667i64 * (++iCounter)) >> 32;
+
+		if (iCounter != 5 * (((signed int)v13 >> 1) + (v13 >> 31)))
+			return;
+
+		scale = 0.05;
+
+		pTemp = CL_AllocMuzzleFlash(pos, Mod_Handle(modelIndex), scale);
+
+		if (!pTemp)
+			return;
+
+		bAlreadyCreated = true;
+
+		pTemp->die = cl.time + 1.0;
+		pTemp->x = pos.x;
+		pTemp->y = pos.y;
+		pTemp->tentOffset[0] = 5.0;
+		pTemp->tentOffset[1] = 25.0;
+		pTemp->tentOffset[2] = 5.0;
+		pTemp->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_FADEOUT;
+		pTemp->callback = MusicNoteCallback;
+		pTemp->entity.curstate.framerate = 23;
+	}
 	default:
 		break;
 	}

@@ -124,6 +124,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "kronos1", WEAPON_KRONOS1 },
 	{ "kingcobra", WEAPON_KINGCOBRA },
 	{ "kingcobrag", WEAPON_KINGCOBRAG },
+	{ "skull2", WEAPON_SKULL2 },
+	{ "musket", WEAPON_MUSKET },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -150,6 +152,10 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "spsg",	WEAPON_SPSG },
 	{ "blockas",	WEAPON_BLOCKAS },
 	{ "bouncer",	WEAPON_BOUNCER },
+	{ "spas12",	WEAPON_SPAS12 },
+	{ "spas12ex",	WEAPON_SPAS12EX },
+	{ "spas12ex2",	WEAPON_SPAS12EX2 },
+
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -171,6 +177,9 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "laserfist",	WEAPON_LASERFIST },
 	{ "laserfistex",	WEAPON_LASERFISTEX },
 	{ "coilgun",	WEAPON_COILGUN },
+	{ "dualkrisshero",	WEAPON_DUALKRISSHERO },
+	{ "dualuzi",	WEAPON_DUALUZI },
+
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -214,6 +223,10 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "an94",	WEAPON_AN94 },
 	{ "m16a4",	WEAPON_M16A4 },
 	{ "blockar",	WEAPON_BLOCKAR },
+	{ "thanatos5",	WEAPON_THANATOS5 },
+	{ "oicw",	WEAPON_OICW },
+	{ "m1garand",	WEAPON_M1GARAND },
+	{ "gilboaex",	WEAPON_GILBOAEX },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -244,6 +257,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "freedom",	WEAPON_Z4B_FREEDOM },
 	{ "buffawp",	WEAPON_BUFFAWP },
 	{ "destroyer",	WEAPON_DESTROYER },
+	{ "starchasersr",	WEAPON_STARCHASERSR },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -281,7 +295,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "mgsm",	WEAPON_MGSM },
 	{ "kronos7",	WEAPON_KRONOS7 },
 	{ "blockmg",	WEAPON_BLOCKMG },
-
+	{ "buffng7",	WEAPON_BUFFNG7 },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -368,6 +382,7 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "z4b_dualstinger",	KNIFE_DUALSTINGER },
 	{ "z4b_heartstimulater",	KNIFE_HEARTSTIMULATER },
 	{ "knife_y22s2sfsword",	KNIFE_Y22S2SFSWORD },
+	{ "knife_armtorch",	KNIFE_ARMTORCH },
 	
 };
 
@@ -506,6 +521,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "thunderpistol", WEAPONCLASS_PISTOL },
 	{ "kingcobra", WEAPONCLASS_PISTOL },
 	{ "kingcobrag", WEAPONCLASS_PISTOL },
+	{ "skull2", WEAPONCLASS_PISTOL },
+	{ "musket", WEAPONCLASS_PISTOL },
+
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -534,6 +552,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "spsg",	WEAPONCLASS_SHOTGUN },
 	{ "blockas",	WEAPONCLASS_SHOTGUN },
 	{ "bouncer",	WEAPONCLASS_SHOTGUN },
+	{ "spas12",	WEAPONCLASS_SHOTGUN },
+	{ "spas12ex",	WEAPONCLASS_SHOTGUN },
+	{ "spas12ex2",	WEAPONCLASS_SHOTGUN },
 
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
@@ -558,9 +579,10 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "laserfist",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "laserfistex",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "coilgun",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "dualkrisshero",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "dualuzi",	WEAPONCLASS_SUBMACHINEGUN },
 
 
-	
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
 	{ "ak47l",	WEAPONCLASS_RIFLE },
@@ -607,6 +629,10 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "an94",	WEAPONCLASS_RIFLE },
 	{ "m16a4",	WEAPONCLASS_RIFLE },
 	{ "blockar",	WEAPONCLASS_RIFLE },
+	{ "thanatos5",	WEAPONCLASS_RIFLE },
+	{ "oicw",	WEAPONCLASS_RIFLE },
+	{ "m1garand",	WEAPONCLASS_RIFLE },
+	{ "gilboaex",	WEAPONCLASS_RIFLE },
 
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
@@ -638,6 +664,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "freedom",	WEAPONCLASS_SNIPERRIFLE },
 	{ "buffawp",	WEAPONCLASS_SNIPERRIFLE },
 	{ "destroyer",	WEAPONCLASS_SNIPERRIFLE },
+	{ "starchasersr",	WEAPONCLASS_SNIPERRIFLE },
 
 
 	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
@@ -669,6 +696,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "mgsm",	WEAPONCLASS_MACHINEGUN },
 	{ "kronos7",	WEAPONCLASS_MACHINEGUN },
 	{ "blockmg",	WEAPONCLASS_MACHINEGUN },
+	{ "buffng7",	WEAPONCLASS_MACHINEGUN },
 
 
 	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
@@ -1016,6 +1044,14 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_BLOCKAS:
 	case WEAPON_COILGUN:
 	case WEAPON_BOUNCER:
+	case WEAPON_THANATOS5:
+	case WEAPON_OICW:
+	case WEAPON_STARCHASERSR:
+	case WEAPON_M1GARAND:
+	case WEAPON_DUALKRISSHERO:
+	case WEAPON_DUALUZI:
+	case WEAPON_GILBOAEX:
+	case WEAPON_BUFFNG7:
 		return true;
 	default:
 		break;
@@ -1068,6 +1104,8 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_KRONOS1:
 	case WEAPON_KINGCOBRA:
 	case WEAPON_KINGCOBRAG:
+	case WEAPON_SKULL2:
+	case WEAPON_MUSKET:
 		return true;
 	default:
 		break;
