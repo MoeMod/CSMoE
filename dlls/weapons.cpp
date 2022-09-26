@@ -1412,6 +1412,7 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_KINGCOBRAG:
 		case WEAPON_SKULL2:
 		case WEAPON_MUSKET:
+		case WEAPON_BUFFFIVESEVEN:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

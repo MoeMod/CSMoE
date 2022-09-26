@@ -449,6 +449,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_gilboaex");
 	UTIL_PrecacheOtherWeapon("weapon_musket");
 	UTIL_PrecacheOtherWeapon("weapon_buffng7");
+	UTIL_PrecacheOtherWeapon("weapon_bufffiveseven");
+
 
 	if (g_pGameRules->IsDeathmatch())
 	{

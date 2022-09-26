@@ -194,6 +194,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_OICW, "weapon_oicw",      "尖端勇士OICW",    4850, PRIMARY_WEAPON_SLOT, UNASSIGNED,  BUY_RIFLE },
 
 	{ WEAPON_SPRIFLE, "weapon_sprifle",         "狂暴蒸汽",           5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_BUFFFIVESEVEN, "weapon_bufffiveseven",	 "【超兽】FiveSeven",			  1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_THUNDERPISTOL, "weapon_thunderpistol",	 "【幽影】Thunder.50",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_BLOODHUNTER, "weapon_bloodhunter",	 "【血契】D.Eagle",			  1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_KRONOS1, "weapon_kronos1",        "制御者X-45",                  550, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_PISTOL },
@@ -371,7 +372,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 };
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
-#if 0
+#if 1
+	{ WEAPON_BUFFFIVESEVEN, "weapon_bufffiveseven",	 "【超兽】FiveSeven",			 1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
+
 	{ WEAPON_BUFFNG7, "weapon_buffng7",        "【壁垒】NG7",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 
 	{ WEAPON_TURBULENT1, "weapon_turbulent1",	 "涌泉Turbulent-1",			  5000,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },

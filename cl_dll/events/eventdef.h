@@ -254,3 +254,4 @@ HOOK_EVENT(spas12ex, FireSPAS12EX);
 HOOK_EVENT(gilboaex, FireGilboaEX);
 HOOK_EVENT(musket, FireMusket);
 HOOK_EVENT(buffng7, FireBUFFNG7);
+HOOK_EVENT(bufffiveseven, FireBuffFiveSeven);

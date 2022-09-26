@@ -334,6 +334,7 @@ TL_ADD(CSPAS12EX2)
 TL_ADD(CGilboaEX)
 TL_ADD(CMusket)
 TL_ADD(CBUFFNG7)
+TL_ADD(CBuffFiveSeven)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
