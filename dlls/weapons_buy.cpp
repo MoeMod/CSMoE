@@ -228,6 +228,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "oicw",	WEAPON_OICW },
 	{ "m1garand",	WEAPON_M1GARAND },
 	{ "gilboaex",	WEAPON_GILBOAEX },
+	{ "guitar",	WEAPON_GUITAR },
+	{ "violingun",	WEAPON_VIOLINGUN },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -635,6 +637,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "oicw",	WEAPONCLASS_RIFLE },
 	{ "m1garand",	WEAPONCLASS_RIFLE },
 	{ "gilboaex",	WEAPONCLASS_RIFLE },
+	{ "guitar",	WEAPONCLASS_RIFLE },
+	{ "violingun",	WEAPONCLASS_RIFLE },
 
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
@@ -1054,6 +1058,8 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_DUALUZI:
 	case WEAPON_GILBOAEX:
 	case WEAPON_BUFFNG7:
+	case WEAPON_GUITAR:
+	case WEAPON_VIOLINGUN:
 		return true;
 	default:
 		break;

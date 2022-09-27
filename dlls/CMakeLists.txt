@@ -564,6 +564,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_musket.cpp
 	../dlls/wpn_shared/wpn_buffng7.cpp
 	../dlls/wpn_shared/wpn_bufffiveseven.cpp
+	../dlls/wpn_shared/wpn_guitar.cpp
+	../dlls/wpn_shared/wpn_violingun.cpp
 	)
 
 set(PM_SRCS

@@ -324,6 +324,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_CAMERAGUN, "weapon_cameragun",        "偶像大师",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_SFMG, "weapon_sfmg",         "赤色彗星",           5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_BISON, "weapon_bison",         "野牛PP-Bison",                  1400, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
+	{ WEAPON_GUITAR, "weapon_guitar",         "战乐灵弦",                  3200, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_VIOLINGUN, "weapon_violingun",         "D小调协奏曲",                  2600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_GILBOAEX, "weapon_gilboaex",         "蝰蛇勇士EX",                  4100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 
 	{ WEAPON_M4A1DRAGON, "weapon_m4a1dragon",         "青龙M4A1",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
@@ -631,6 +633,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_CAMERAGUN, "weapon_cameragun",        "偶像大师",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_SFMG, "weapon_sfmg",         "赤色彗星",           5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_BISON, "weapon_bison",         "野牛PP-Bison",                  1400, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
+	{ WEAPON_GUITAR, "weapon_guitar",         "战乐灵弦",                  3200, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_VIOLINGUN, "weapon_violingun",         "D小调协奏曲",                  2600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_M4A1DRAGON, "weapon_m4a1dragon",         "青龙M4A1",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_AK47DRAGON, "weapon_ak47dragon",         "赤龙AK47",                  2500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_AK47G, "weapon_ak47g",         "雅金AK",                  2500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },

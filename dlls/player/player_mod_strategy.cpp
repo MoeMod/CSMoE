@@ -192,7 +192,6 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
-		m_pPlayer->GiveNamedItem("weapon_m3dragon");
 		//m_pPlayer->GiveNamedItem("knife_y22s2sfsword");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
@@ -200,7 +199,6 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 
 		break;
 	case TERRORIST:
-		m_pPlayer->GiveNamedItem("weapon_m3dragonm");
 		//m_pPlayer->GiveNamedItem("weapon_y22s2sfpistol");
 		//m_pPlayer->GiveNamedItem("z4b_m60amethyst");
 		//m_pPlayer->GiveNamedItem("weapon_bunkerbuster");

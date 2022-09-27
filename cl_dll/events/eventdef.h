@@ -255,3 +255,5 @@ HOOK_EVENT(gilboaex, FireGilboaEX);
 HOOK_EVENT(musket, FireMusket);
 HOOK_EVENT(buffng7, FireBUFFNG7);
 HOOK_EVENT(bufffiveseven, FireBuffFiveSeven);
+HOOK_EVENT(guitar, FireGuitar);
+HOOK_EVENT(violingun, FireViolingun);

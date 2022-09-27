@@ -335,6 +335,8 @@ TL_ADD(CGilboaEX)
 TL_ADD(CMusket)
 TL_ADD(CBUFFNG7)
 TL_ADD(CBuffFiveSeven)
+TL_ADD(CGuitar)
+TL_ADD(CViolingun)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)

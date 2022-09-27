@@ -1236,6 +1236,29 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 
 	if(!bAlreadyCreated)
 		pTemp = CL_TempEntAllocHigh(parent->attachment[iAttachment], Mod_Handle( modelIndex ));
+	else
+	{
+		int frameMax;
+		Mod_GetFrames(modelIndex, &frameMax);
+
+		if (iStartFrame == -1)
+			pTemp->entity.curstate.frame = Com_RandomLong(0, frameMax - 1);
+		else
+			pTemp->entity.curstate.frame = iStartFrame;
+
+		pTemp->frameMax = frameMax;
+
+		if (rotate)
+		{
+			if (index > 1)
+				pTemp->entity.angles[2] = Com_RandomLong(0, 359);
+			else
+				pTemp->entity.angles[2] = Com_RandomLong(0, 20);
+		}
+
+		CL_TEntAddEntity(&pTemp->entity);
+		return;
+	}
 
 	if( !pTemp ) return;
 

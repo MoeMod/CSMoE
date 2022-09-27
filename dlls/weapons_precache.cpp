@@ -450,6 +450,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_musket");
 	UTIL_PrecacheOtherWeapon("weapon_buffng7");
 	UTIL_PrecacheOtherWeapon("weapon_bufffiveseven");
+	UTIL_PrecacheOtherWeapon("weapon_guitar");
+	UTIL_PrecacheOtherWeapon("weapon_violingun");
 
 
 	if (g_pGameRules->IsDeathmatch())
