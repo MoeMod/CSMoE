@@ -337,6 +337,7 @@ TL_ADD(CBUFFNG7)
 TL_ADD(CBuffFiveSeven)
 TL_ADD(CGuitar)
 TL_ADD(CViolingun)
+TL_ADD(CHolyBomb)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)

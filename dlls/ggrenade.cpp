@@ -1401,23 +1401,16 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 	pGrenade->pev->velocity = vecVelocity;
 	pGrenade->pev->angles = pevOwner->angles;
 	pGrenade->pev->owner = ENT(pevOwner);
-
 	pGrenade->m_usEvent = usEvent;
-
 	pGrenade->SetTouch(&CGrenade::BounceTouch);
-
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->SetThink(&CGrenade::TumbleThink);
 	pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
-
 	pGrenade->pev->sequence = RANDOM_LONG(3, 6);
 	pGrenade->pev->framerate = 1.0f;
-
 	pGrenade->m_bJustBlew = true;
-
 	pGrenade->pev->gravity = 0.55f;
 	pGrenade->pev->friction = 0.7f;
-
 	pGrenade->m_iTeam = iTeam;
 	pGrenade->m_bStaticFramerate = false;
 	CBasePlayer* pOwner = (CBasePlayer*)CBaseEntity::Instance(pevOwner);
@@ -1463,6 +1456,17 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 		pGrenade->m_bStaticFramerate = true;
 		pGrenade->pev->dmg = 766;
 		break;
+
+	case GRENADE_HOLYBOMB:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_holybomb.mdl");
+
+		pGrenade->m_bStaticFramerate = true;
+		pGrenade->pev->dmg = 100;
+
+		pGrenade->SetTouch(&CGrenade::HolyBombTouch);
+		pGrenade->SetThink(&CGrenade::HolyBombThink);
+		break;
+
 	default:
 		SET_MODEL(ENT(pGrenade->pev), "models/w_hegrenade.mdl");
 		pGrenade->pev->dmg = 100.0f;
@@ -2445,6 +2449,153 @@ void CGrenade::CalculateFramerate(void)
 			flSpeed = 100;
 
 		pev->framerate = flSpeed / 25.0;
+	}
+}
+
+void CGrenade::ExplodeTouchHolyBomb(void)
+{
+	pev->model = iStringNull;
+	pev->solid = SOLID_NOT;
+	pev->takedamage = DAMAGE_NO;
+
+	MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+	WRITE_BYTE(TE_EXPLOSION);
+	WRITE_COORD(pev->origin.x);
+	WRITE_COORD(pev->origin.y);
+	WRITE_COORD(pev->origin.z + 20.0);
+	WRITE_SHORT(g_sModelIndexHolyWater);
+	WRITE_BYTE(30);
+	WRITE_BYTE(30);
+	WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND | TE_EXPLFLAG_NOPARTICLES);
+	MESSAGE_END();
+
+	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3.0s);
+
+	entvars_t* pevOwner = VARS(pev->owner);
+	pev->owner = NULL;
+
+	EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "zombi/Zombi_Bomb_Exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+	HolyBombExplode(pev->origin, pev, pevOwner, 1100, 0.05, 325);
+
+	switch (RANDOM_LONG(0, 1))
+	{
+	case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris1.wav", 0.55, ATTN_NORM); break;
+	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris2.wav", 0.55, ATTN_NORM); break;
+	}
+
+	pev->effects |= EF_NODRAW;
+	UTIL_Remove(this);
+}
+
+void CGrenade::HolyBombThink(void)
+{
+	if (!IsInWorld())
+	{
+		UTIL_Remove(this);
+
+		return;
+	}
+
+	CalculateFramerate();
+	StudioFrameAdvance();
+
+	pev->nextthink = gpGlobals->time + 0.1s;
+
+	if (gpGlobals->time + 1.0s > pev->dmgtime)
+	{
+		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * ((pev->dmgtime - gpGlobals->time) / 1s), 400, 0.1s);
+	}
+
+	if (pev->waterlevel != 0)
+	{
+		pev->velocity = pev->velocity * 0.5;
+		pev->framerate = 0.2;
+	}
+}
+
+void CGrenade::HolyBombTouch(CBaseEntity* pOther)
+{
+	if (ENT(pOther->pev) != pev->owner)
+		ExplodeTouchHolyBomb();
+}
+
+void CGrenade::HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius)
+{
+	CBaseEntity* pEntity = NULL;
+	TraceResult tr;
+	Vector vecEnd;
+
+	float falloff;
+
+	if (flRadius)
+		falloff = flDamage / flRadius;
+	else
+		falloff = 1.0f;
+
+	bool bInWater = UTIL_PointContents(vecSrc) == CONTENTS_WATER;
+
+	vecSrc.z += 1.0;
+
+	entvars_t* pevAttack = pevAttacker ? pevAttacker : pevInflictor;
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (bInWater && pEntity->pev->waterlevel == 0)
+			continue;
+
+		if (!bInWater && pEntity->pev->waterlevel == 3)
+			continue;
+
+		if (pEntity->Classify() == CLASS_PLAYER)
+		{
+			if (!((CBasePlayer*)pEntity)->m_bIsZombie)
+				continue;
+
+			UTIL_TraceLine(vecSrc, pEntity->BodyTarget(vecSrc), dont_ignore_monsters, ENT(pevInflictor), &tr);
+
+			if (tr.flFraction < 1.0f && tr.pHit != pEntity->edict())
+				continue;
+
+			if (tr.fStartSolid)
+			{
+				tr.vecEndPos = vecSrc;
+				tr.flFraction = 0;
+			}
+
+			float flCurrentDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+
+			pEntity->TakeDamage(pevInflictor, pevAttack, flCurrentDamage, DMG_EXPLOSION);
+
+			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+
+			pPlayer->m_iHealthDecreaseCount = 8;
+			pPlayer->m_flHealthDecreaseAmount = pPlayer->pev->max_health * flBurnAmount;
+
+			for (int id = 1; id <= gpGlobals->maxClients; id++)
+			{
+				pPlayer = (CBasePlayer*)UTIL_PlayerByIndex(id);
+
+				if (!pPlayer)
+					continue;
+
+				if (FNullEnt(pPlayer->pev))
+					continue;
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
+				WRITE_BYTE(4);
+				WRITE_SHORT(pEntity->entindex());
+				WRITE_BYTE(28);
+				MESSAGE_END();
+			}
+		}
+		else if (pEntity->Classify() != CLASS_PLAYER_ALLY)
+			continue;
+
+		// ..
 	}
 }
 

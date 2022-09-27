@@ -303,7 +303,11 @@ public:
 	void EXPORT ZombiBomb2Touch(CBaseEntity* pOther);
 	void EXPORT SG_TumbleThink();
 	void EXPORT C4Think();
+	void EXPORT HolyBombThink(void);
+	void EXPORT HolyBombTouch(CBaseEntity* pOther);
+	static void HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
 
+	void ExplodeTouchHolyBomb(void);
 public:
 	static TYPEDESCRIPTION m_SaveData[15];
 

@@ -395,7 +395,6 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_hegrenade", GRENADE_HEGRENADE },
 	{ "weapon_pumpkin", GRENADE_PUMPKIN },
 	{ "weapon_holybomb", GRENADE_HOLYBOMB },
-	{ "weapon_patroldrone", GRENADE_PATROLDRONE }
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -1335,6 +1334,9 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 			{
 			CBasePlayerItem* pItem = pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
 
+			if (pItem == NULL)
+				pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+	
 			// have at least one weapon in this slot
 			while (pItem != NULL)
 			{
@@ -1428,7 +1430,33 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 							//remove and add
 							pPlayer->RemovePlayerItem(pGrenade);
 						}
-						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+
+						bool bGrenadeChanged = pPlayer->m_iGrenadeID != iter->iID;
+						bool bWasActiveItem = pPlayer->m_pActiveItem && pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE;
+
+						if (bGrenadeChanged)
+						{
+							CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+							std::vector<CBasePlayerWeapon*> GrenadesToRemove;
+
+							while (pGrenade)
+							{
+								if (pGrenade->m_iId == WEAPON_HEGRENADE)
+								{
+									pGrenade->Kill();
+
+									GrenadesToRemove.push_back(pGrenade);
+								}
+
+								pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
+							}
+
+							for (auto iter : GrenadesToRemove)
+							{
+								pPlayer->RemovePlayerItem(iter);
+							}
+						}
+						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);					
 						break;
 					}
 				}

@@ -194,10 +194,10 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_OICW, "weapon_oicw",      "尖端勇士OICW",    4850, PRIMARY_WEAPON_SLOT, UNASSIGNED,  BUY_RIFLE },
 
 	{ WEAPON_SPRIFLE, "weapon_sprifle",         "狂暴蒸汽",           5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
-	{ WEAPON_BUFFFIVESEVEN, "weapon_bufffiveseven",	 "【超兽】FiveSeven",			  1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
+	//{ WEAPON_BUFFFIVESEVEN, "weapon_bufffiveseven",	 "【超兽】FiveSeven",			  1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_THUNDERPISTOL, "weapon_thunderpistol",	 "【幽影】Thunder.50",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_BLOODHUNTER, "weapon_bloodhunter",	 "【血契】D.Eagle",			  1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
-	{ WEAPON_KRONOS1, "weapon_kronos1",        "制御者X-45",                  550, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_PISTOL },
+	//{ WEAPON_KRONOS1, "weapon_kronos1",        "制御者X-45",                  550, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_Z4B_RAGINGBULL, "z4b_ragingbull",         "破空枪刃",                  1200, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_INFINITY, "weapon_infinity",    "恒宇双星", 1500, PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
     { WEAPON_INFINITYEX1, "weapon_infinityex1", "星红双子",   1500, PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
@@ -208,7 +208,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     { WEAPON_ANACONDA, "weapon_anaconda",	 "左轮军魂",			  650,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_BALROG1, "weapon_balrog1",	 "红莲Balrog-Ⅰ",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_MUSKET, "weapon_musket",	 "神怒之炎",			  950,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
-	{ WEAPON_TURBULENT1, "weapon_turbulent1",	 "涌泉Turbulent-1",			  5000,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
+	//{ WEAPON_TURBULENT1, "weapon_turbulent1",	 "涌泉Turbulent-1",			  5000,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	
 	{ WEAPON_SAPIENTIA, "weapon_sapientia",	 "冰魄",			  1300,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_KINGCOBRA, "weapon_kingcobra",	 "眼镜王蛇Kingcobra",			  650,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
@@ -363,7 +363,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ GRENADE_HEGRENADE, "weapon_hegrenade",     "高爆手雷",               300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ WEAPON_CSGO_ZEUS, "csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, BUY_EQUIP },
-	//{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_BUNKERBUSTER, "weapon_bunkerbuster",      "天降正义LTD",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_PATROLDRONE, "weapon_patroldrone",      "【幽浮】控制核心",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_DIVINETITAN, "weapon_divinetitan",      "圣翼皓印",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -375,6 +375,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+		{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+
 	{ WEAPON_M3DRAGON, "weapon_m3dragon",         "【天龙】m3",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_M3DRAGONM, "weapon_m3dragonm",         "巨齿鲲鲨",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 
@@ -663,7 +665,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ GRENADE_HEGRENADE, "weapon_hegrenade",     "高爆手雷",               300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ WEAPON_CSGO_ZEUS, "csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, BUY_EQUIP },
-	//{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 #endif
 };
 

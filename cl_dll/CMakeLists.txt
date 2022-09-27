@@ -379,6 +379,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_bufffiveseven.cpp
 	../dlls/wpn_shared/wpn_guitar.cpp
 	../dlls/wpn_shared/wpn_violingun.cpp
+	../dlls/wpn_shared/wpn_holybomb.cpp
 	)
 
 set (HUD_SRCS
