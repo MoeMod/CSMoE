@@ -202,16 +202,50 @@ int DLLEXPORT HUD_VidInit( void )
 
 	CStudioModelRenderer::s_pBuffAugViewModel = IEngineStudio.Mod_ForName("models/v_buffaug.mdl", FALSE);
 	CStudioModelRenderer::s_pBuffAugSmokeModel = IEngineStudio.Mod_ForName("sprites/ef_buffaugsmoke.spr", FALSE);
+
 	CStudioModelRenderer::s_pBloodHunterViewModel = IEngineStudio.Mod_ForName("models/v_bloodhunter.mdl", FALSE);
+
 	CStudioModelRenderer::s_pMGSMViewModel = IEngineStudio.Mod_ForName("models/v_mgsm.mdl", FALSE);
 	CStudioModelRenderer::s_pMGSMLauncherModel = IEngineStudio.Mod_ForName("models/ef_mgsm_launcher.mdl", FALSE);
+
 	CStudioModelRenderer::s_pM1887xmasViewModel = IEngineStudio.Mod_ForName("models/v_m1887xmas.mdl", FALSE);
 	CStudioModelRenderer::s_pXmasEmptyModel = IEngineStudio.Mod_ForName("models/xmas_empty.mdl", FALSE);
+
 	CStudioModelRenderer::s_pBUFFNG7ViewModel = IEngineStudio.Mod_ForName("models/v_buffng7.mdl", FALSE);
 	CStudioModelRenderer::s_pBUFFNG7BModeModel = IEngineStudio.Mod_ForName("sprites/ef_buffng7_bmode.spr", FALSE);
 	CStudioModelRenderer::s_pBUFFNG7BMode2Model = IEngineStudio.Mod_ForName("sprites/ef_buffng7_bmode2.spr", FALSE);
 	CStudioModelRenderer::s_pBUFFNG7BMode3Model = IEngineStudio.Mod_ForName("sprites/ef_buffng7_bmode3.spr", FALSE);
 
+	CStudioModelRenderer::s_pDualSwordViewModel = IEngineStudio.Mod_ForName("models/v_dualsword.mdl", FALSE);
+	CStudioModelRenderer::s_pDualSwordLeftModel = IEngineStudio.Mod_ForName("sprites/ef_dualsword_left.spr", FALSE);
+	CStudioModelRenderer::s_pDualSwordRightModel = IEngineStudio.Mod_ForName("sprites/ef_dualsword_right.spr", FALSE);
+
+	CStudioModelRenderer::s_pReviveGunViewModel = IEngineStudio.Mod_ForName("models/v_revivegun.mdl", FALSE);
+	CStudioModelRenderer::s_pReviveGunIdle1Model = IEngineStudio.Mod_ForName("sprites/ef_revivegun_idle1.spr", FALSE);
+	CStudioModelRenderer::s_pReviveGunIdle1LeftModel = IEngineStudio.Mod_ForName("sprites/ef_revivegun_idle1_left.spr", FALSE);
+	CStudioModelRenderer::s_pReviveGunIdle2Model = IEngineStudio.Mod_ForName("sprites/ef_revivegun_idle2.spr", FALSE);
+	CStudioModelRenderer::s_pReviveGunIdle2LeftModel = IEngineStudio.Mod_ForName("sprites/ef_revivegun_idle2_left.spr", FALSE);
+	CStudioModelRenderer::s_pReviveGunDraw1Model = IEngineStudio.Mod_ForName("sprites/ef_revivegun_draw1.spr", FALSE);
+	CStudioModelRenderer::s_pReviveGunDraw1LeftModel = IEngineStudio.Mod_ForName("sprites/ef_revivegun_draw1_left.spr", FALSE);
+	CStudioModelRenderer::s_pReviveGunDraw2Model = IEngineStudio.Mod_ForName("sprites/ef_revivegun_draw2.spr", FALSE);
+	CStudioModelRenderer::s_pReviveGunDraw2LeftModel = IEngineStudio.Mod_ForName("sprites/ef_revivegun_draw2_left.spr", FALSE);
+
+	CStudioModelRenderer::s_pM95TigerViewModel = IEngineStudio.Mod_ForName("models/v_m95tiger.mdl", FALSE);
+	CStudioModelRenderer::s_pM95TigerEye1Model = IEngineStudio.Mod_ForName("sprites/ef_m95tiger_eye1.spr", FALSE);
+	CStudioModelRenderer::s_pM95TigerEye2Model = IEngineStudio.Mod_ForName("sprites/ef_m95tiger_eye2.spr", FALSE);
+
+	CStudioModelRenderer::s_pWonderCannonViewModel = IEngineStudio.Mod_ForName("models/v_wondercannon.mdl", FALSE);
+	CStudioModelRenderer::s_pWonderCannonBombSetModel = IEngineStudio.Mod_ForName("sprites/ef_wondercannon_bomb_set.spr", FALSE);
+	
+	CStudioModelRenderer::s_pM3DragonViewModel = IEngineStudio.Mod_ForName("models/v_m3dragon.mdl", FALSE);
+	CStudioModelRenderer::s_pM3DragonFlame1Model = IEngineStudio.Mod_ForName("sprites/m3dragon_flame.spr", FALSE);
+	CStudioModelRenderer::s_pM3DragonFlame2Model = IEngineStudio.Mod_ForName("sprites/m3dragon_flame2.spr", FALSE);
+
+	CStudioModelRenderer::s_pM3DragonmViewModel = IEngineStudio.Mod_ForName("models/v_m3dragonm.mdl", FALSE);
+	CStudioModelRenderer::s_pM3DragonmSmoke1Model = IEngineStudio.Mod_ForName("sprites/m3dragonm_smoke.spr", FALSE);
+	CStudioModelRenderer::s_pM3DragonmSmoke2Model = IEngineStudio.Mod_ForName("sprites/m3dragonm_smoke2.spr", FALSE);
+
+	CStudioModelRenderer::s_pSGDrillEXViewModel = IEngineStudio.Mod_ForName("models/v_sgdrillex.mdl", FALSE);
 
 	//VGui_Startup();
 

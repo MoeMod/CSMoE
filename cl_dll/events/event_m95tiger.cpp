@@ -51,7 +51,7 @@ static const char* SOUNDS_NAME[2] =
 	"weapons/m95tiger-2.wav",
 };
 
-TEMPENTITY* g_M95TigerEye = NULL;
+//TEMPENTITY* g_M95TigerEye = NULL;
 
 void EV_FireM95Tiger( event_args_t *args )
 {
@@ -79,7 +79,7 @@ void EV_FireM95Tiger( event_args_t *args )
 	if (EV_IsLocal(idx))
 	{
 		vecBeamStart = viewent->attachment[0];
-
+#if 0
 		if (args->bparam1)
 		{
 			model_s* pModel;
@@ -145,7 +145,7 @@ void EV_FireM95Tiger( event_args_t *args )
 			}
 			return;
 		}
-
+#endif
 		if (args->bparam2)
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(M95TIGER_SHOOTNET, 2);
 		else
@@ -206,7 +206,7 @@ void EV_FireM95Tiger( event_args_t *args )
 		0.5,
 		2.5,
 		0.0,
-		128.0,
+		500.0,
 		0.0,
 		0,
 		0,
@@ -216,7 +216,7 @@ void EV_FireM95Tiger( event_args_t *args )
 	);
 
 	if (pBeam)
-		pBeam->flags |= FBEAM_FADEIN;
+		pBeam->flags |= FBEAM_FADEIN | FBEAM_FADEOUT | FBEAM_SHADEOUT;
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );
@@ -228,7 +228,7 @@ void EV_FireM95Tiger( event_args_t *args )
 		forward, right,	up,
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_338MAG,
-		0 );
+		9 );
 }
 
 }

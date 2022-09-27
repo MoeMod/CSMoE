@@ -35,7 +35,7 @@ void CM3Dragon::Spawn(void)
 	Precache();
 	m_iId = WEAPON_M3DRAGON;
 	SET_MODEL(ENT(pev), "models/w_m3dragon.mdl");
-	m_iDefaultAmmo = 8;
+	m_iDefaultAmmo = 30;
 	m_flNextPlaySound = invalid_time_point;
 	FallInit();
 }
@@ -79,7 +79,7 @@ int CM3Dragon::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 
 BOOL CM3Dragon::Deploy(void)
 {
-	PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM3Dragon, 0, g_vecZero, g_vecZero, 0, 0, 1, 0, FALSE, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]);
+	//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM3Dragon, 0, g_vecZero, g_vecZero, 0, 0, 1, 0, FALSE, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]);
 	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType])
 		m_flNextPlaySound = gpGlobals->time + 0.1s;
 	return DefaultDeploy("models/v_m3dragon.mdl", "models/p_m3dragon.mdl", m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] > 0 ? M3DRAGON_SECONDARY_DRAW : M3DRAGON_DRAW, "shotgun", UseDecrement() != FALSE);
@@ -94,7 +94,7 @@ void CM3Dragon::SecondaryAttack(void)
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 
-	SendWeaponAnim(M3DRAGON_SECONDARY_SHOOT, UseDecrement() != FALSE);
+	SendWeaponAnim(M3DRAGON_FIRE2, UseDecrement() != FALSE);
 
 	EMIT_SOUND_DYN(ENT(this->pev), CHAN_AUTO, "weapons/m3dragon-2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
@@ -109,7 +109,7 @@ void CM3Dragon::SecondaryAttack(void)
 	else
 		m_flTimeWeaponIdle = 0.875s;
 
-	PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM3Dragon, 0, g_vecZero, g_vecZero, 0, 0, 1, 0, FALSE, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]);
+	//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM3Dragon, 0, g_vecZero, g_vecZero, 0, 0, 1, 0, FALSE, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]);
 	m_flNextPlaySound = invalid_time_point;
 #ifndef CLIENT_DLL
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
@@ -130,24 +130,7 @@ void CM3Dragon::ItemPostFrame(void)
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/m3dragon_fire_loop.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 		m_flNextPlaySound = gpGlobals->time + 1.0s;
 	}
-	
-	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0 && pev->iuser1 >= 8)
-	{
-		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 1;
-#ifndef CLIENT_DLL
-		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
-		WRITE_BYTE(CBasePlayer::GetAmmoIndex("m3dragonshot"));
-		WRITE_BYTE(1);
-		MESSAGE_END();
 
-		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-		WRITE_BYTE(1);
-		WRITE_BYTE(pev->iuser1);
-		MESSAGE_END();
-#endif
-		m_flNextPlaySound = gpGlobals->time + 0.1s;
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM3Dragon, 0, g_vecZero, g_vecZero, 0, 0, 1, 0, FALSE, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]);
-	}
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 
@@ -183,7 +166,42 @@ void CM3Dragon::PrimaryAttack(void)
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
 	m_pPlayer->FireBullets(10, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0, GetDamage());
+
+	if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+	{
+		if (!m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType])
+		{
+			if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+			{
+				pev->iuser1 += 1;
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+				WRITE_BYTE(1);
+				WRITE_BYTE(pev->iuser1);
+				MESSAGE_END();
+
+			}
+		}	
+	}
 #endif
+
+	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0 && pev->iuser1 >= 8)
+	{
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 1;
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
+		WRITE_BYTE(CBasePlayer::GetAmmoIndex("m3dragonshot"));
+		WRITE_BYTE(1);
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+		WRITE_BYTE(1);
+		WRITE_BYTE(pev->iuser1);
+		MESSAGE_END();
+#endif
+		m_flNextPlaySound = gpGlobals->time + 0.1s;
+		//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM3Dragon, 0, g_vecZero, g_vecZero, 0, 0, 1, 0, FALSE, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]);
+	}
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -192,7 +210,7 @@ void CM3Dragon::PrimaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireM3Dragon, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireM3Dragon, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, FALSE, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 1);
 
 	if (m_iClip)
 		m_flPumpTime = UTIL_WeaponTimeBase() + 0.5s;
@@ -313,7 +331,10 @@ void CM3Dragon::WeaponIdle(void)
 			}
 		}
 		else
+		{
 			SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] > 0 ? M3DRAGON_SECONDARY_READY : M3DRAGON_IDLE, UseDecrement() != FALSE);
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0s;
+		}
 	}
 }
 

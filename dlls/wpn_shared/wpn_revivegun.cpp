@@ -62,9 +62,9 @@ void CReviveGun::Precache(void)
 	PRECACHE_MODEL("models/v_revivegun.mdl");
 	PRECACHE_MODEL("models/w_revivegun.mdl");
 	PRECACHE_MODEL("models/p_revivegun.mdl");
-	/*PRECACHE_MODEL("models/ef_revivegun_field.mdl");
+	m_iFieldModelIndex = PRECACHE_MODEL("models/ef_revivegun_field.mdl");
 
-	PRECACHE_MODEL("sprites/ef_revivegun_idle1.spr");
+	/*PRECACHE_MODEL("sprites/ef_revivegun_idle1.spr");
 	PRECACHE_MODEL("sprites/ef_revivegun_idle1_left.spr");
 	PRECACHE_MODEL("sprites/ef_revivegun_idle2.spr");
 	PRECACHE_MODEL("sprites/ef_revivegun_idle2_left.spr");*/
@@ -128,10 +128,10 @@ BOOL CReviveGun::Deploy(void)
 	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 6)
 		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 6;
 
-	if (DefaultDeploy("models/v_revivegun.mdl", "models/p_revivegun.mdl", IsSignal() ? REVIVEGUN_REVIVE_DRAW : REVIVEGUN_DRAW, "m249", UseDecrement() != FALSE, 0.1s))
+	if (DefaultDeploy("models/v_revivegun.mdl", "models/p_revivegun.mdl", IsSignal() ? REVIVEGUN_REVIVE_DRAW : REVIVEGUN_DRAW, "m249", UseDecrement() != FALSE, 0.1s, 1.0s))
 	{
 #ifndef CLIENT_DLL
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 18, 1, IsSignal(), TRUE);
+		//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 18, 1, IsSignal(), TRUE);
 #endif
 		return TRUE;
 	}
@@ -534,9 +534,11 @@ void CReviveGun::PrimaryAttack(void)
 
 bool CReviveGun::IsSignal(void)
 {
-	if (m_pPlayer->m_iReviveGunShotsFired > 80)
+	if (!(m_pPlayer->m_iBuff & BUFF_REVIVE) && m_pPlayer->m_iReviveGunShotsFired > 80)
+	{
 		m_pPlayer->m_iBuff |= BUFF_REVIVE;
-
+	}
+	
 	return m_pPlayer->m_iBuff & BUFF_REVIVE ? true : false;
 }
 
@@ -608,7 +610,7 @@ void CReviveGun::ItemPostFrame()
 	if (gpGlobals->time > m_tNextPlayEvent && m_tNextPlayEvent != invalid_time_point)
 	{
 #ifndef CLIENT_DLL
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 18, 0, IsSignal(), TRUE);
+		//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 18, 0, IsSignal(), TRUE);
 		m_tNextPlayEvent = gpGlobals->time + (IsSignal() ? 1.57s : 1.5s);
 #endif
 		//m_tNextPlayEvent = gpGlobals->time + 10s;
@@ -803,9 +805,11 @@ void CReviveGun::WeaponCallBack(int iType)
 		m_pPlayer->m_iReviveGunShotsFired = 0;
 		SendWeaponAnim(REVIVEGUN_REVIVE, UseDecrement() != FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
-		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 18, 0, IsSignal(), FALSE);
+
+		UTIL_TempModel(Vector(0, 0, -32), g_vecZero, g_vecZero, m_iFieldModelIndex, 17, 0, 10, false, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 10, 50, 0);
 #endif
 		m_pPlayer->m_iBuff &= ~BUFF_REVIVE;
+
 		return;
 	}
 	IsSignal();

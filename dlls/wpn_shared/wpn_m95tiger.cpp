@@ -82,8 +82,6 @@ public:
 		m_flDamageTime = gpGlobals->time + 0.3s;
 		UTIL_SetSize(pev, g_vecZero, g_vecZero);
 
-		pev->classname = MAKE_STRING("weapon_m95tiger");
-
 		pev->nextthink = gpGlobals->time + 0.01s;
 
 		PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, g_vecZero, 0.0, 0.0, 24, 0, TRUE, FALSE);
@@ -119,10 +117,10 @@ public:
 			if (g_pGameRules->PlayerRelationship(pAttackPlayer, pEntity) == GR_TEAMMATE)
 				continue;
 
-			if (pev->iuser1 & (1 << pEntity->entindex()))
+			if (std::find(m_TargetVector.begin(), m_TargetVector.end(), pEntity->entindex()) != m_TargetVector.end())
 				continue;
 
-			pev->iuser1 |= (1 << pEntity->entindex());
+			m_TargetVector.push_back(pEntity->entindex());
 
 			pEntity->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NOMORALE);
 
@@ -175,6 +173,7 @@ public:
 
 	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
 
+	std::vector<int> m_TargetVector;
 	time_point_t m_flRemoveTime;
 	time_point_t m_flAnimTime;
 	time_point_t m_flDamageTime;
@@ -256,7 +255,10 @@ int CM95Tiger::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 BOOL CM95Tiger::Deploy(void)
 {
 #ifndef CLIENT_DLL
-	PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM95Tiger, 0, g_vecZero, g_vecZero, 0.0, 0.0, m_iHitCount >= M95TIGER_CHARGECOUNT ? 2 : 1, 0, TRUE, TRUE);
+
+
+
+	//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM95Tiger, 0, g_vecZero, g_vecZero, 0.0, 0.0, m_iHitCount >= M95TIGER_CHARGECOUNT ? 2 : 1, 0, TRUE, TRUE);
 
 	m_pPlayer->UpdateShieldCrosshair(false);
 #endif
@@ -378,8 +380,7 @@ void CM95Tiger::M95TigerFire(float flSpread, duration_t flCycleTime, BOOL fUseAu
 
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-	if(m_iHitCount < M95TIGER_CHARGECOUNT)
-		AddHitCountToLineTargets(m_pPlayer->GetGunPosition(), gpGlobals->v_forward);
+	m_bHit = false;
 #endif
 	
 	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 9, BULLET_PLAYER_338MAG, GetDamage(), M95TIGER_RANGE_MODIFER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
@@ -396,6 +397,50 @@ void CM95Tiger::M95TigerFire(float flSpread, duration_t flCycleTime, BOOL fUseAu
 }
 
 #ifndef CLIENT_DLL
+
+void CM95Tiger::FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace)
+{
+	if (!m_bHit)
+	{
+		if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+		{
+			if (pEntity && (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY))
+			{
+				if (pEntity->IsPlayer())
+				{
+					if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
+					{
+						m_iHitCount++;
+						if (m_iHitCount >= M95TIGER_CHARGECOUNT)
+						{
+							MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+							WRITE_BYTE(32);
+							WRITE_BYTE(1);
+							WRITE_BYTE(1);
+							MESSAGE_END();
+						}
+					}
+				}
+				else
+				{
+					m_iHitCount++;
+					if (m_iHitCount >= M95TIGER_CHARGECOUNT)
+					{
+						MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+						WRITE_BYTE(32);
+						WRITE_BYTE(1);
+						WRITE_BYTE(1);
+						MESSAGE_END();
+					}
+				}
+			}
+
+			m_bHit = true;
+		}
+	}
+
+}
+
 void CM95Tiger::AddHitCountToLineTargets(Vector vecSrc, Vector vecDir)
 {
 	TraceResult tr;
@@ -447,9 +492,10 @@ void CM95Tiger::ItemPostFrame(void)
 		}
 
 		m_iHitCount = 0;
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM95Tiger, 0, g_vecZero, g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
+		//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(m_pPlayer->pev), m_usFireM95Tiger, 0, g_vecZero, g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+		WRITE_BYTE(32);
 		WRITE_BYTE(1);
 		WRITE_BYTE(0);
 		MESSAGE_END();

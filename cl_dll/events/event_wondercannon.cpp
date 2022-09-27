@@ -34,6 +34,7 @@ namespace cl {
 }
 
 namespace cl::event::wondercannon {
+#if 0
 	TEMPENTITY* g_pWonderCannonParticles[4];
 
 	void ResetMuzz(struct tempent_s* ent, float frametime, float currenttime)
@@ -48,6 +49,7 @@ namespace cl::event::wondercannon {
 			g_pWonderCannonParticles[index] = nullptr;
 		}
 	}
+#endif
 
 	enum wondercannon_e
 	{
@@ -85,6 +87,7 @@ namespace cl::event::wondercannon {
 
 		if (EV_IsLocal(idx))
 		{
+#if 0
 			if (args->bparam2)
 			{
 				if (!args->bparam1)
@@ -116,7 +119,7 @@ namespace cl::event::wondercannon {
 				}
 				return;
 			}
-
+#endif
 			if (args->bparam1)
 			{
 				++g_iShotsFired;

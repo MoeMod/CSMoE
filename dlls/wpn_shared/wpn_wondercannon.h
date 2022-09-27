@@ -105,7 +105,6 @@
 
 		time_point_t m_tNextPlayEvent;	//phs[4]
 		time_point_t m_flSecondaryAttackTimer;
-		time_point_t m_flSecondaryAttackTimer2;
 	};
 
 }

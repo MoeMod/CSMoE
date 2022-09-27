@@ -46,7 +46,7 @@ namespace sv {
 		m_flAccuracy = 0.2;
 		m_iShotsFired = 0;
 
-		m_flSecondaryAttackTimer = m_flSecondaryAttackTimer2 = invalid_time_point;
+		m_flSecondaryAttackTimer = invalid_time_point;
 
 		FallInit();
 	};
@@ -104,9 +104,9 @@ namespace sv {
 		m_iShotsFired = 0;
 		m_tNextPlayEvent = invalid_time_point;
 		pev->skin = 0;
-		m_flSecondaryAttackTimer = m_flSecondaryAttackTimer2 = invalid_time_point;
+		m_flSecondaryAttackTimer = invalid_time_point;
 
-		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireWonderCannon, 0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, TRUE);
+		//PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireWonderCannon, 0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, TRUE);
 
 		if (DefaultDeploy("models/v_wondercannon.mdl", "models/p_wondercannon.mdl", WONDERCANNON_DRAW, "ak47", UseDecrement() != FALSE, 0.1s, 1.5s))
 		{
@@ -577,12 +577,6 @@ namespace sv {
 			m_tNextPlayEvent = invalid_time_point;
 		}
 
-		if (m_flSecondaryAttackTimer2 != invalid_time_point && m_flSecondaryAttackTimer2 < gpGlobals->time)
-		{
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireWonderCannon, 0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, TRUE);
-			m_flSecondaryAttackTimer2 = invalid_time_point;
-		}
-		
 		if (m_flSecondaryAttackTimer > invalid_time_point)
 		{
 			if (this->m_pPlayer->pev->button & IN_ATTACK2) // 0x800
@@ -617,9 +611,6 @@ namespace sv {
 					{
 						SendWeaponAnim(WONDERCANNON_BMOD_ON, UseDecrement() != FALSE);
 
-						m_flSecondaryAttackTimer2 = gpGlobals->time + 1.5s;
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireWonderCannon, 0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, TRUE);
-
 						SetThink(&CWonderCannon::ExpCurrentBomb);
 						pev->nextthink = gpGlobals->time + 1.0s;
 						m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5s;
@@ -642,9 +633,6 @@ namespace sv {
 					if (CheckBombActive())
 					{
 						SendWeaponAnim(WONDERCANNON_BMOD_ON, UseDecrement() != FALSE);
-
-						m_flSecondaryAttackTimer2 = gpGlobals->time + 1.5s;
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireWonderCannon, 0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, TRUE);
 
 						SetThink(&CWonderCannon::ExpCurrentBomb);
 						pev->nextthink = gpGlobals->time + 1.0s;

@@ -245,13 +245,13 @@ void CKnifeDualsword::WeaponIdle()
 	if (m_iLastAnim <= 5 || m_iLastAnim >= 14 || m_iLastAnim == 6)
 	{
 		SendWeaponAnim(0);
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 11, 0, TRUE, FALSE);
+		//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 11, 0, TRUE, FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
 	}
 	else if (m_iLastAnim >= 7 || m_iLastAnim <= 11)
 	{
 		SendWeaponAnim(7);
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 11, 0, FALSE, FALSE);
+		//PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 11, 0, FALSE, FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.0s;
 	}
 

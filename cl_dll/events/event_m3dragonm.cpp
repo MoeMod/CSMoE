@@ -52,8 +52,10 @@ enum m3_e
 	M3DRAGON_SECONDARY_DRAW,
 };
 
+#if 0
 TEMPENTITY* g_M3DragonmFlameLeft = NULL;
 TEMPENTITY* g_M3DragonmFlameRight = NULL;
+#endif
 
 static const char* SOUNDS_NAME[] =
 {
@@ -80,6 +82,7 @@ void EV_FireM3Dragonm( event_args_t *args )
 
 	if ( EV_IsLocal( idx ) )
 	{
+#if 0
 		if (args->iparam1)
 		{
 			if (args->bparam2)
@@ -211,12 +214,20 @@ void EV_FireM3Dragonm( event_args_t *args )
 				return;
 			}
 		}
-
+#endif
 		++g_iShotsFired;
 		EV_MuzzleFlash();
-		iAnim = Com_RandomLong(M3DRAGON_FIRE1, M3DRAGON_FIRE2);
-		PLAY_EVENT_SOUND(SOUNDS_NAME[iAnim - 1]);
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(iAnim, 2);
+		if (args->bparam2)
+		{
+			PLAY_EVENT_SOUND(SOUNDS_NAME[1]);
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(M3DRAGON_SECONDARY_SHOOT, 2);
+		}
+		else
+		{
+			iAnim = Com_RandomLong(M3DRAGON_FIRE1, M3DRAGON_FIRE2);
+			PLAY_EVENT_SOUND(SOUNDS_NAME[iAnim - 1]);
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(iAnim, 2);
+		}
 	}
 	else
 		PLAY_EVENT_SOUND(SOUNDS_NAME[Com_RandomLong(0, 1)]);

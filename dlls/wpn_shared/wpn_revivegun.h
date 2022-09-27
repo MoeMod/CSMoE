@@ -95,6 +95,7 @@ private:
 	int m_iDefaultAmmo2;
 	unsigned short m_usFireReviveGun;
 	time_point_t m_tNextThink;
+	int m_iFieldModelIndex;
 	
 
 };

@@ -1180,19 +1180,6 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
 
-				if (pWeapon->m_iId == WEAPON_M3DRAGON
-					|| pWeapon->m_iId == WEAPON_M3DRAGONM)
-				{
-					if (pevInflictor == pevAttacker)
-					{
-						pWeapon->pev->iuser1 += 1;
-
-						MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pAttacker->pev);
-						WRITE_BYTE(1);
-						WRITE_BYTE(pWeapon->pev->iuser1);
-						MESSAGE_END();
-					}
-				}
 				if (pWeapon->m_iId == WEAPON_Z4B_DBARRELAMETHYST)
 				{
 					if (pevInflictor == pevAttacker)

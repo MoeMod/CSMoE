@@ -44,6 +44,7 @@ namespace cl {
 
 	extern int g_iBUFFNG7State;
 
+	extern int g_iM95TigerState;
 enum
 {
 	HUMAN_SKILL_KNIFE2X,
@@ -448,6 +449,13 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 			//buffng7
 			arg2 = reader.ReadByte();
 			g_iBUFFNG7State = arg2;
+			break;
+		}
+		case 1:
+		{
+			//m95tiger
+			arg2 = reader.ReadByte();
+			g_iM95TigerState = arg2;
 			break;
 		}
 		default:

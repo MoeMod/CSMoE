@@ -111,6 +111,31 @@ public:
 	static struct model_s* s_pBUFFNG7BModeModel;
 	static struct model_s* s_pBUFFNG7BMode2Model;
 	static struct model_s* s_pBUFFNG7BMode3Model;
+	static struct model_s* s_pDualSwordViewModel;
+	static struct model_s* s_pDualSwordLeftModel;
+	static struct model_s* s_pDualSwordRightModel;
+	static struct model_s* s_pReviveGunViewModel;
+	static struct model_s* s_pReviveGunIdle1Model;
+	static struct model_s* s_pReviveGunIdle1LeftModel;
+	static struct model_s* s_pReviveGunIdle2Model;
+	static struct model_s* s_pReviveGunIdle2LeftModel;
+	static struct model_s* s_pReviveGunDraw1Model;
+	static struct model_s* s_pReviveGunDraw1LeftModel;
+	static struct model_s* s_pReviveGunDraw2Model;
+	static struct model_s* s_pReviveGunDraw2LeftModel;
+	static struct model_s* s_pM95TigerViewModel;
+	static struct model_s* s_pM95TigerEye1Model;
+	static struct model_s* s_pM95TigerEye2Model;
+	static struct model_s* s_pWonderCannonViewModel;
+	static struct model_s* s_pWonderCannonBombSetModel;
+	static struct model_s* s_pM3DragonViewModel;
+	static struct model_s* s_pM3DragonFlame1Model;
+	static struct model_s* s_pM3DragonFlame2Model;
+	static struct model_s* s_pM3DragonmViewModel;
+	static struct model_s* s_pM3DragonmSmoke1Model;
+	static struct model_s* s_pM3DragonmSmoke2Model;
+	static struct model_s* s_pSGDrillEXViewModel;
+	static struct model_s* s_pSGDrillEXSmokeModel;
 };
 
 }

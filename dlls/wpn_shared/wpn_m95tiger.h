@@ -51,7 +51,9 @@ public:
 	void ItemPostFrame() override;
 	
 #ifndef CLIENT_DLL
+	int m_bHit;
 	int m_iHitCount;
+	void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace) override;
 	void AddHitCountToLineTargets(Vector vecSrc, Vector vecDir);
 	time_point_t m_flNextCheckHitCount;
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_50bmg" , AMMO_50BMG_PRICE }; }

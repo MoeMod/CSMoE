@@ -52,15 +52,50 @@ typedef struct pmtrace_s pmtrace_t;
 
 struct model_s* CStudioModelRenderer::s_pBuffAugViewModel;
 struct model_s* CStudioModelRenderer::s_pBuffAugSmokeModel;
+
 struct model_s* CStudioModelRenderer::s_pBloodHunterViewModel;
+
 struct model_s* CStudioModelRenderer::s_pMGSMViewModel;
 struct model_s* CStudioModelRenderer::s_pMGSMLauncherModel;
+
 struct model_s* CStudioModelRenderer::s_pM1887xmasViewModel;
 struct model_s* CStudioModelRenderer::s_pXmasEmptyModel;
+
 struct model_s* CStudioModelRenderer::s_pBUFFNG7ViewModel;
 struct model_s* CStudioModelRenderer::s_pBUFFNG7BModeModel;
 struct model_s* CStudioModelRenderer::s_pBUFFNG7BMode2Model;
 struct model_s* CStudioModelRenderer::s_pBUFFNG7BMode3Model;
+
+struct model_s* CStudioModelRenderer::s_pDualSwordViewModel;
+struct model_s* CStudioModelRenderer::s_pDualSwordLeftModel;
+struct model_s* CStudioModelRenderer::s_pDualSwordRightModel;
+
+struct model_s* CStudioModelRenderer::s_pReviveGunViewModel;
+struct model_s* CStudioModelRenderer::s_pReviveGunIdle1Model;
+struct model_s* CStudioModelRenderer::s_pReviveGunIdle1LeftModel;
+struct model_s* CStudioModelRenderer::s_pReviveGunIdle2Model;
+struct model_s* CStudioModelRenderer::s_pReviveGunIdle2LeftModel;
+struct model_s* CStudioModelRenderer::s_pReviveGunDraw1Model;
+struct model_s* CStudioModelRenderer::s_pReviveGunDraw1LeftModel;
+struct model_s* CStudioModelRenderer::s_pReviveGunDraw2Model;
+struct model_s* CStudioModelRenderer::s_pReviveGunDraw2LeftModel;
+
+struct model_s* CStudioModelRenderer::s_pM95TigerViewModel;
+struct model_s* CStudioModelRenderer::s_pM95TigerEye1Model;
+struct model_s* CStudioModelRenderer::s_pM95TigerEye2Model;
+
+struct model_s* CStudioModelRenderer::s_pWonderCannonViewModel;
+struct model_s* CStudioModelRenderer::s_pWonderCannonBombSetModel;
+
+struct model_s* CStudioModelRenderer::s_pM3DragonViewModel;
+struct model_s* CStudioModelRenderer::s_pM3DragonFlame1Model;
+struct model_s* CStudioModelRenderer::s_pM3DragonFlame2Model;
+
+struct model_s* CStudioModelRenderer::s_pM3DragonmViewModel;
+struct model_s* CStudioModelRenderer::s_pM3DragonmSmoke1Model;
+struct model_s* CStudioModelRenderer::s_pM3DragonmSmoke2Model;
+
+struct model_s* CStudioModelRenderer::s_pSGDrillEXViewModel;
 
 void CStudioModelRenderer::Init(void)
 {

@@ -372,7 +372,14 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 };
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
-#if 1
+#if 0
+	{ WEAPON_M3DRAGON, "weapon_m3dragon",         "【天龙】m3",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+	{ WEAPON_M3DRAGONM, "weapon_m3dragonm",         "巨齿鲲鲨",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
+
+	{ WEAPON_REVIVEGUN, "weapon_revivegun",	 "逆界星轮",			  6000,  PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+
+	{ KNIFE_DUALSWORD, "knife_dualsword",    "弑神双剑",	0, KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
+
 	{ WEAPON_BUFFFIVESEVEN, "weapon_bufffiveseven",	 "【超兽】FiveSeven",			 1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 
 	{ WEAPON_BUFFNG7, "weapon_buffng7",        "【壁垒】NG7",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
