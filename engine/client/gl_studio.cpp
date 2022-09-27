@@ -1533,12 +1533,12 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 
 	g_nNumArrayVerts = g_nNumArrayElems = 0;
 
-	if( !m_pTextureHeader ) return;
+	if( !m_pTextureHeader || !m_pTextureHeader->numskinfamilies ) return;
 	if( RI.currententity->curstate.renderfx == kRenderFxGlowShell )
 		g_nStudioCount++;
 
 	// safety bounding the skinnum
-	m_skinnum = RI.currententity->curstate.skin;
+	m_skinnum = bound(0, RI.currententity->curstate.skin, (m_pTextureHeader->numskinfamilies - 1));
 	pvertbone = ((byte *)m_pStudioHeader + m_pSubModel->vertinfoindex);
 	pnormbone = ((byte *)m_pStudioHeader + m_pSubModel->norminfoindex);
 
