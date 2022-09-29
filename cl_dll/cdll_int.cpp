@@ -237,6 +237,9 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pWonderCannonViewModel = IEngineStudio.Mod_ForName("models/v_wondercannon.mdl", FALSE);
 	CStudioModelRenderer::s_pWonderCannonBombSetModel = IEngineStudio.Mod_ForName("sprites/ef_wondercannon_bomb_set.spr", FALSE);
 	
+	CStudioModelRenderer::s_pWonderCannonEXViewModel = IEngineStudio.Mod_ForName("models/v_wondercannonex.mdl", FALSE);
+	CStudioModelRenderer::s_pWonderCannonEXLightModel = IEngineStudio.Mod_ForName("sprites/ef_wondercannonex_light.spr", FALSE);
+
 	CStudioModelRenderer::s_pM3DragonViewModel = IEngineStudio.Mod_ForName("models/v_m3dragon.mdl", FALSE);
 	CStudioModelRenderer::s_pM3DragonFlame1Model = IEngineStudio.Mod_ForName("sprites/m3dragon_flame.spr", FALSE);
 	CStudioModelRenderer::s_pM3DragonFlame2Model = IEngineStudio.Mod_ForName("sprites/m3dragon_flame2.spr", FALSE);

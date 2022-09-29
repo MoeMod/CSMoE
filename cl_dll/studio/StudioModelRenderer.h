@@ -128,6 +128,8 @@ public:
 	static struct model_s* s_pM95TigerEye2Model;
 	static struct model_s* s_pWonderCannonViewModel;
 	static struct model_s* s_pWonderCannonBombSetModel;
+	static struct model_s* s_pWonderCannonEXViewModel;
+	static struct model_s* s_pWonderCannonEXLightModel;
 	static struct model_s* s_pM3DragonViewModel;
 	static struct model_s* s_pM3DragonFlame1Model;
 	static struct model_s* s_pM3DragonFlame2Model;

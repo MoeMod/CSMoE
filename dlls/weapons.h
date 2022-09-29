@@ -1126,6 +1126,7 @@ public:
 		m_tTimeRemove = gpGlobals->time + 5.0s;
 	}
 
+	static CWonderCannonChain* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner);
 	void Spawn();
 	void Precache();
 	
@@ -1134,11 +1135,12 @@ public:
 	void DoExpDamage(float flDamage, CBaseEntity* pAttachedEnt);
 	void Remove();
 	float GetArmorRatioModifier() { return 1.3; }
-	int GetWeaponsId(void) { return WEAPON_WONDERCANNON; }
+	int GetWeaponsId(void) { return m_iType ? WEAPON_WONDERCANNONEX : WEAPON_WONDERCANNON; }
 	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; }
 	int m_iAttachedEntCount;
 	int m_iExpTime;
 	int m_iCount;
+	int m_iType;
 
 private:
 	float GetDamage(DamageType iType) const;
@@ -1147,13 +1149,46 @@ private:
 	time_point_t m_tTimeRemove;
 	
 	int m_iCache_Exp[4];
-
+	int m_iTotalExpCount;
 	CUtlVector<CBaseEntity*>* m_pEnemyList;
 	CBasePlayer* m_pOwner;
 	CBaseEntity* m_pAttachedEnt;
 	CWonderCannon* m_pWeapon;
 };
 
+class CWonderCannonMine : public CGrenade
+{
+public:
+	CWonderCannonMine()
+	{
+		m_iState = 0;
+		m_iSequence = 0;
+		m_flNextAnim = invalid_time_point;
+	}
+
+	static CWonderCannonMine* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner);
+
+	void Spawn(void);
+	void Precache(void);
+	void EXPORT MineThink();
+	void Init(CBasePlayer* pOwner, CWonderCannon* pWeapon);
+	void Remove();
+	void Explode(bool IsManual);
+	void DoBombExp(bool IsManual);
+	float GetDamage(bool IsManual) const;
+	int GetWeaponsId(void) { return m_iType ? WEAPON_WONDERCANNONEX : WEAPON_WONDERCANNON; }
+public:
+
+	CBasePlayer* m_pOwner;
+	CWonderCannon* m_pWeapon;
+	int m_iState;
+	int m_iType;
+private:
+	int m_iExp[2];
+	int m_iSequence;
+	time_point_t m_flNextAnim;
+
+};
 
 class CLockOnGunMissile : public CGrenade
 {

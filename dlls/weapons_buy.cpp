@@ -337,7 +337,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "guillotine",	WEAPON_GUILLOTINE },
 	{ "guillotineex",	WEAPON_GUILLOTINEEX },
 	{ "speargunm",	WEAPON_SPEARGUNM },
-
+	{ "wondercannonex",	WEAPON_WONDERCANNONEX },
 
 	{ NULL,		WEAPON_NONE }
 };
@@ -740,7 +740,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "guillotine",	WEAPONCLASS_EQUIPMENT },
 	{ "guillotineex",	WEAPONCLASS_EQUIPMENT },
 	{ "speargunm",	WEAPONCLASS_EQUIPMENT },
-
+	{ "wondercannonex",	WEAPONCLASS_EQUIPMENT },
 
 	{ "syringe",	WEAPONCLASS_EQUIPMENT },
 	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
@@ -1062,6 +1062,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_BUFFNG7:
 	case WEAPON_GUITAR:
 	case WEAPON_VIOLINGUN:
+	case WEAPON_WONDERCANNONEX:
 		return true;
 	default:
 		break;

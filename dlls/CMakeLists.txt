@@ -232,6 +232,7 @@ set(HLDLL_SRCS
 	./m3dragoncannon.cpp
 	./m3dragoncannon_dragon.cpp
 	./wondercannonchain.cpp
+	./wondercannonmine.cpp
 	./y22s2sfpistolfield.cpp
 	./pianogunwave.cpp
 	./client/wdnmd.cpp
@@ -567,6 +568,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_guitar.cpp
 	../dlls/wpn_shared/wpn_violingun.cpp
 	../dlls/wpn_shared/wpn_holybomb.cpp
+	../dlls/wpn_shared/wpn_wondercannonex.cpp
 	)
 
 set(PM_SRCS

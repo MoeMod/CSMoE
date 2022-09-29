@@ -170,6 +170,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_SGMISSILEEX, "weapon_sgmissileex",        "撼宇碎星Zero",                  6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_WINGGUN, "weapon_winggun",        "曙光辉翼",                  6100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_WONDERCANNON, "weapon_wondercannon",        "炽麟煌焱",                  6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ WEAPON_WONDERCANNONEX, "weapon_wondercannonex",        "冰麟寒焱",                  6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_FLAMETHROWER, "weapon_airburster",        "风魔啸天破",                  5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_WATERCANNON, "weapon_watercannon",        "极冻水加农",                  5450, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_AIRBURSTER, "weapon_flamethrower",        "焚烬者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -375,6 +376,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+	{ WEAPON_WONDERCANNONEX, "weapon_wondercannonex",        "冰麟寒焱",                  6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+
 		{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 
 	{ WEAPON_M3DRAGON, "weapon_m3dragon",         "【天龙】m3",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },

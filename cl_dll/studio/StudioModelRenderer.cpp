@@ -87,6 +87,9 @@ struct model_s* CStudioModelRenderer::s_pM95TigerEye2Model;
 struct model_s* CStudioModelRenderer::s_pWonderCannonViewModel;
 struct model_s* CStudioModelRenderer::s_pWonderCannonBombSetModel;
 
+struct model_s* CStudioModelRenderer::s_pWonderCannonEXViewModel;
+struct model_s* CStudioModelRenderer::s_pWonderCannonEXLightModel;
+
 struct model_s* CStudioModelRenderer::s_pM3DragonViewModel;
 struct model_s* CStudioModelRenderer::s_pM3DragonFlame1Model;
 struct model_s* CStudioModelRenderer::s_pM3DragonFlame2Model;

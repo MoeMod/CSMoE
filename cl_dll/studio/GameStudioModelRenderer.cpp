@@ -92,6 +92,7 @@ TEMPENTITY* g_M95TigerEye1 = NULL;
 TEMPENTITY* g_M95TigerEye2 = NULL;
 
 TEMPENTITY* g_WonderCannonSpr[4];
+TEMPENTITY* g_WonderCannonEXSpr[4];
 
 TEMPENTITY* g_M3DragonFlame1 = NULL;
 TEMPENTITY* g_M3DragonFlame2 = NULL;
@@ -1678,6 +1679,44 @@ int R_StudioDrawModel(int flags)
 				{
 					g_WonderCannonSpr[i]->die = 0.0;
 					g_WonderCannonSpr[i] = NULL;
+				}
+			}
+		}
+
+		if (CStudioModelRenderer::s_pWonderCannonEXViewModel && CStudioModelRenderer::s_pWonderCannonEXLightModel && curent->model == CStudioModelRenderer::s_pWonderCannonEXViewModel && (curent->curstate.sequence != 1 && curent->curstate.sequence != 6))
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (!g_WonderCannonEXSpr[i])
+				{
+					g_WonderCannonEXSpr[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[8 + i], CStudioModelRenderer::s_pWonderCannonEXLightModel);
+
+					g_WonderCannonEXSpr[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_WonderCannonEXSpr[i]->entity.curstate.aiment = curent->index;
+					g_WonderCannonEXSpr[i]->entity.curstate.body = 9 + i;
+					g_WonderCannonEXSpr[i]->entity.curstate.rendermode = kRenderTransAdd;
+					g_WonderCannonEXSpr[i]->entity.curstate.renderamt = 210;
+					g_WonderCannonEXSpr[i]->entity.curstate.renderfx = 0;
+					g_WonderCannonEXSpr[i]->entity.curstate.scale = 0.01;
+					g_WonderCannonEXSpr[i]->entity.curstate.framerate = 24;
+					g_WonderCannonEXSpr[i]->entity.curstate.frame = Com_RandomLong(0, 5);
+					g_WonderCannonEXSpr[i]->frameMax = 22;
+					g_WonderCannonEXSpr[i]->die = gHUD.m_flTime + 9999.0f;
+					g_WonderCannonEXSpr[i]->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_WonderCannonEXSpr[i]->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_WonderCannonEXSpr[i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (g_WonderCannonEXSpr[i])
+				{
+					g_WonderCannonEXSpr[i]->die = 0.0;
+					g_WonderCannonEXSpr[i] = NULL;
 				}
 			}
 		}

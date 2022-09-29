@@ -1175,7 +1175,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_LASERFIST
 					|| pWeapon->m_iId == WEAPON_LASERFISTEX
 					|| pWeapon->m_iId == WEAPON_THUNDERPISTOL
-					|| pWeapon->m_iId == WEAPON_BUFFNG7)
+					|| pWeapon->m_iId == WEAPON_BUFFNG7
+					|| pWeapon->m_iId == WEAPON_WONDERCANNONEX)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -9197,6 +9198,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_BUFFFIVESEVEN:
 		case WEAPON_GUITAR:
 		case WEAPON_VIOLINGUN:
+		case WEAPON_WONDERCANNONEX:
 			return TRUE;
 		}
 	}
