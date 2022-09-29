@@ -164,6 +164,33 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 				p->m_iKnifeID = info.iID;
 			} else if (iSlot == GRENADE_SLOT) {
 
+				CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)p->m_rgpPlayerItems[GRENADE_SLOT];
+				std::vector<CBasePlayerWeapon*> GrenadesToRemove;
+
+				while (pGrenade)
+				{
+					if (pGrenade->m_iId == WEAPON_HEGRENADE ||
+						pGrenade->m_iId == WEAPON_PATROLDRONE ||
+						pGrenade->m_iId == WEAPON_DIVINETITAN ||
+						pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+					{
+						pGrenade->Kill();
+
+						GrenadesToRemove.push_back(pGrenade);
+					}
+
+					pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
+				}
+
+				for (auto iter : GrenadesToRemove)
+				{
+					p->RemovePlayerItem(iter);
+				}
+
+				p->GiveNamedItem(info.pszClassName);
+				p->m_iGrenadeID = AliasToGrenadeType(info.pszClassName);
+				weapon_names_view[iSlot] = info.pszDisplayName;
+#if 0
 				CBasePlayerItem* pItem = p->m_rgpPlayerItems[GRENADE_SLOT];
 
 				// have at least one weapon in this slot
@@ -188,11 +215,13 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 				{
 					//bad way
 					p->GiveNamedItem(info.pszClassName);
+					p->m_iGrenadeID = AliasToGrenadeType(info.pszClassName);
 					weapon_names_view[iSlot] = info.pszDisplayName;
 					continue;
 				}
 				else
 					p->m_iGrenadeID = info.iID;
+#endif
 			}
 			p->GiveNamedItem(info.pszClassName);
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);

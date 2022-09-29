@@ -395,6 +395,9 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_hegrenade", GRENADE_HEGRENADE },
 	{ "weapon_pumpkin", GRENADE_PUMPKIN },
 	{ "weapon_holybomb", GRENADE_HOLYBOMB },
+	{ "weapon_bunkerbuster", GRENADE_BUNKERBUSTER },
+	{ "weapon_patroldrone", GRENADE_PATROLDRONE },
+	{ "weapon_divinetitan", GRENADE_DIVINETITAN },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -1291,7 +1294,7 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 	}
 #endif // !XASH_DEDICATED
 
-	if (pPlayer->m_iAccount < iter->iCost) {
+	if (pPlayer->m_iAccount < iter->iCost && iter->iID != WEAPON_PATROLDRONE) {
 		ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");
 		BlinkAccount(pPlayer, 2);
 
@@ -1331,7 +1334,134 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 			}
 			break;
 		case GRENADE_SLOT:
-			{
+			{		
+					bool bGrenadeChanged = pPlayer->m_iGrenadeID != iter->iID;
+					bool bWasActiveItem = pPlayer->m_pActiveItem && 
+						(pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE || 
+						pPlayer->m_pActiveItem->m_iId == WEAPON_PATROLDRONE || 
+						pPlayer->m_pActiveItem->m_iId == WEAPON_DIVINETITAN || 
+						pPlayer->m_pActiveItem->m_iId == WEAPON_BUNKERBUSTER);
+
+					if (iter->iID == WEAPON_PATROLDRONE)
+					{
+						CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+						//buy patroldrone ammo
+						while (pGrenade)
+						{
+							if (pGrenade->m_iId == WEAPON_PATROLDRONE)
+							{
+								//add clip
+								if (pPlayer->m_iAccount < 500) {
+									ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");
+									BlinkAccount(pPlayer, 2);
+									return false;
+								}
+
+								if (pPlayer->m_rgAmmo[pGrenade->m_iPrimaryAmmoType] >= PATROLDRONE_MAX_CLIP)
+								{
+									//full ammo
+									ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
+									return false;
+								}
+
+								CPatrolDrone* pLinkWeapon = dynamic_cast<CPatrolDrone*>(pGrenade);
+								pPlayer->m_rgAmmo[pLinkWeapon->m_iPrimaryAmmoType]++;
+								for (int i = 0; i < PATROLDRONE_MAX_CLIP; i++)
+								{
+									if (pLinkWeapon->m_iClipAmmo[i] == -1)
+									{
+										pLinkWeapon->m_iClipAmmo[i] = 0;
+										MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
+										WRITE_BYTE(24);
+										WRITE_BYTE(i);
+										WRITE_SHORT(pLinkWeapon->m_iClipAmmo[i]);
+										WRITE_BYTE(PATROLDRONE_OFF);
+										MESSAGE_END();
+										break;
+									}
+								}
+								pPlayer->AddAccount(-500);
+								pPlayer->BuildRebuyStruct();
+
+								return true;
+							}
+
+							pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
+						}
+					}
+
+					if (bGrenadeChanged)
+					{
+						if (pPlayer->m_iAccount < iter->iCost) {
+							ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");
+							BlinkAccount(pPlayer, 2);
+
+							return false;
+						}
+
+						CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+						std::vector<CBasePlayerWeapon*> GrenadesToRemove;
+
+						while (pGrenade)
+						{
+							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
+								pGrenade->m_iId == WEAPON_PATROLDRONE ||
+								pGrenade->m_iId == WEAPON_DIVINETITAN ||
+								pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+							{
+								pGrenade->Kill();
+
+								GrenadesToRemove.push_back(pGrenade);
+							}
+
+							pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
+						}
+
+						for (auto iter : GrenadesToRemove)
+						{
+							pPlayer->RemovePlayerItem(iter);
+						}
+					}
+
+					/*switch (iter->iID)
+					{
+					case WEAPON_PATROLDRONE: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
+					case WEAPON_DIVINETITAN: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
+					case WEAPON_BUNKERBUSTER: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
+					default:
+						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+						break;
+					}*/
+
+					pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+
+					pPlayer->GiveNamedItem(iter->pszClassName);
+					pPlayer->AddAccount(-iter->iCost);
+					pPlayer->BuildRebuyStruct();
+
+					if (bGrenadeChanged && bWasActiveItem)
+					{
+						// client->SelectItem("weapon_hegrenade");
+						CBasePlayerItem* pGrenade = pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+
+						while (pGrenade)
+						{
+							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
+								pGrenade->m_iId == WEAPON_PATROLDRONE ||
+								pGrenade->m_iId == WEAPON_DIVINETITAN ||
+								pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+							{
+								pPlayer->m_pActiveItem = pGrenade;
+
+								break;
+							}
+
+							pGrenade = pGrenade->m_pNext;
+						}
+					}
+
+					return true;				
+#if 0
 			CBasePlayerItem* pItem = pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
 
 			if (pItem == NULL)
@@ -1461,7 +1591,8 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 					}
 				}
 				pItem = pItem->m_pNext;
-			}			
+			}		
+#endif
 			}
 
 			break;

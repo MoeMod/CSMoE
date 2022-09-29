@@ -4127,10 +4127,6 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							killer_weapon_name = "chaingren";
 							break;
 
-						case GRENADE_PATROLDRONE:
-							killer_weapon_name = "patroldrone";
-							break;
-
 						default:
 							killer_weapon_name = "grenade";
 							break;
@@ -4298,10 +4294,6 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 
 					case GRENADE_CHAINGRENADE:
 						killer_weapon_name = "chaingren";
-						break;
-
-					case GRENADE_PATROLDRONE:
-						killer_weapon_name = "patroldrone";
 						break;
 
 					default:

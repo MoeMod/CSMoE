@@ -99,6 +99,7 @@ enum patroldrone_e
 class CPatrolDroneGrenade : public CGrenade
 {
 public:
+	int GetWeaponsId(void) { return WEAPON_PATROLDRONE; }
 
 	CPatrolDroneGrenade()
 	{

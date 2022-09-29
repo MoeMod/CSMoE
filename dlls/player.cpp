@@ -10037,7 +10037,7 @@ void CBasePlayer::BuildRebuyStruct()
 	int iAmmoIndex = GetAmmoIndex("HEGrenade");
 
 	if (iAmmoIndex != -1)
-		m_rebuyStruct.m_heGrenade = m_rgAmmo[ iAmmoIndex ];
+		m_rebuyStruct.m_heGrenade = m_rgAmmo[iAmmoIndex];
 	else
 		m_rebuyStruct.m_heGrenade = 0;
 
@@ -10067,7 +10067,19 @@ void CBasePlayer::BuildRebuyStruct()
 		m_rebuyStruct.m_knifeID = KNIFE_NORMAL;
 
 	if (m_iGrenadeID > GRENADE_HEGRENADE && m_iGrenadeID < NUM_GRENADES)
+	{
 		m_rebuyStruct.m_grenadeID = m_iGrenadeID;
+
+		if (m_iGrenadeID == GRENADE_PATROLDRONE)
+		{
+			iAmmoIndex = GetAmmoIndex("patroldrone");
+
+			if (iAmmoIndex != -1)
+				m_rebuyStruct.m_heGrenade = m_rgAmmo[iAmmoIndex];
+			else
+				m_rebuyStruct.m_heGrenade = 0;
+		}
+	}	
 	else
 		m_rebuyStruct.m_grenadeID = GRENADE_HEGRENADE;
 }
@@ -10184,11 +10196,20 @@ void CBasePlayer::RebuyHEGrenade()
 
 	if (iAmmoIndex == -1)
 		return;
+	
+	if (m_rebuyStruct.m_grenadeID == GRENADE_PATROLDRONE)
+	{
+		iAmmoIndex = GetAmmoIndex("patroldrone");
+
+		if (iAmmoIndex == -1)
+			return;
+	}
 
 	int numToBuy = m_rebuyStruct.m_heGrenade - m_rgAmmo[ iAmmoIndex ];
 
 	for (int i = 0; i < numToBuy; ++i)
-		ClientCommand("hegren");
+		ClientCommand("moe_buy", GrenadeTypeToAlias(m_rebuyStruct.m_grenadeID));
+		//ClientCommand("hegren");
 }
 
 void CBasePlayer::RebuyFlashbang()

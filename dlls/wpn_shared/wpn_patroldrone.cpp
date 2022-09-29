@@ -30,7 +30,7 @@ void CPatrolDrone::Spawn(void)
 	m_iId = WEAPON_PATROLDRONE;
 	SET_MODEL(ENT(pev), "models/w_patroldrone.mdl");
 
-	m_iDefaultAmmo = 4;
+	m_iDefaultAmmo = PATROLDRONE_MAX_CLIP;
 
 	for (int i = 0; i < PATROLDRONE_MAX_CLIP; i++)
 	{
@@ -56,7 +56,7 @@ int CPatrolDrone::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "patroldrone";
-	p->iMaxAmmo1 = 4;
+	p->iMaxAmmo1 = PATROLDRONE_MAX_CLIP;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = WEAPON_NOCLIP;
@@ -439,7 +439,6 @@ CPatrolDroneGrenade* CPatrolDroneGrenade::CreatePatrolDrone(CBasePlayer* pOwner,
 	pPatrolDrone->pev->framerate = 1.0f;
 	pPatrolDrone->pev->nextthink = gpGlobals->time + 0.1s;
 	pPatrolDrone->m_iTeam = iTeam;
-	pPatrolDrone->m_iGrenadeID = GRENADE_PATROLDRONE;
 	pPatrolDrone->m_iState = PATROLDRONE_WANDER;
 	pPatrolDrone->m_flWanderThink = gpGlobals->time + 0.1s;
 	pPatrolDrone->m_flAttackThink = gpGlobals->time + 0.1s;
