@@ -387,7 +387,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 };
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
-#if 1
+#if 0
 	{ GRENADE_M24GRENADE, "weapon_m24grenade",     "M24柄式手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_FGRENADE2, "weapon_fgrenade2",     "破片高爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_FIREBOMB, "weapon_fgrenade",     "火焰高爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },

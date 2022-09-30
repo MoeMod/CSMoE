@@ -6,20 +6,37 @@ namespace cl {
 namespace sv {
 #endif
 
-class CSbmine : public CBasePlayerWeapon
+enum
 {
-	enum
-    {
-        SBMINE_IDLE,
-		SBMINE_SHOOT_READY,
-		SBMINE_READY_IDLE,
-		SBMINE_SHOOT1,
-		SBMINE_SHOOT2,
-		SBMINE_DRAW,
-		SBMINE_TRIGGER_IDLE,
-		SBMINE_TRIGGER_SHOOT,
-		SBMINE_TRIGGER_DRAW,
-    };
+	SBMINE_IDLE,
+	SBMINE_SHOOT_READY,
+	SBMINE_READY_IDLE,
+	SBMINE_SHOOT1,
+	SBMINE_SHOOT2,
+	SBMINE_DRAW,
+	SBMINE_TRIGGER_IDLE,
+	SBMINE_TRIGGER_SHOOT,
+	SBMINE_TRIGGER_DRAW,
+};
+
+enum
+{
+	CLAYMORE_IDLE,
+	CLAYMORE_SHOOT,
+	CLAYMORE_DRAW,
+	CLAYMORE_TRIGGER_IDLE_ON,
+	CLAYMORE_TRIGGER_IDLE_OFF,
+	CLAYMORE_TRIGGER_ON,
+	CLAYMORE_TRIGGER_OFF,
+	CLAYMORE_TRIGGER_SHOOT_ON,
+	CLAYMORE_TRIGGER_SHOOT_OFF,
+	CLAYMORE_TRIGGER_DRAW_ON,
+	CLAYMORE_TRIGGER_DRAW_OFF,
+};
+
+class CClaymore : public CBasePlayerWeapon
+{
+	
 public:
 	virtual void Spawn();
 	virtual void Precache();
@@ -47,7 +64,7 @@ public:
 	float GetDamage();
 	float GetRange();
 
-	EntityHandle <CSbmineGrenade> m_pSBMine;
+	EntityHandle <CSbmineGrenade> m_hClaymoreMine;
 };
 
 
