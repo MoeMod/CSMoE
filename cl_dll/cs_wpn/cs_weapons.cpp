@@ -209,7 +209,7 @@ BOOL CBasePlayerWeapon :: DefaultReload( int iClipSize, int iAnim, duration_t fD
 	//!!UNDONE -- reload sound goes here !!!
 
 	if (gHUD.m_ZBZ.CheckHasSkill(Skill_RapidReloader)) {
-		SendWeaponAnim(iAnim, UseDecrement(), 1 / max(0.0f, 1.0f - (0.32f + 0.022f * (gHUD.m_Scoreboard.m_iTeamScore_T + gHUD.m_Scoreboard.m_iTeamScore_CT))));
+		SendWeaponAnimEx(iAnim, UseDecrement(), 1 / max(0.0f, 1.0f - (0.32f + 0.022f * (gHUD.m_Scoreboard.m_iTeamScore_T + gHUD.m_Scoreboard.m_iTeamScore_CT))));
 	}
 	else {
 		SendWeaponAnim(iAnim, UseDecrement());
@@ -469,7 +469,7 @@ CBasePlayerWeapon::SendWeaponAnim
 Animate weapon model
 =====================
 */
-void CBasePlayerWeapon::SendWeaponAnim( int iAnim, int skiplocal, float framerate )
+void CBasePlayerWeapon::SendWeaponAnimEx( int iAnim, int skiplocal, float framerate )
 {
 	//gEngfuncs.Con_DPrintf( "Predict::SendWeaponAnim( %i )\n", iAnim );
 
