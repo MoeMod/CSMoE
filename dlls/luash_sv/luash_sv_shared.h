@@ -27,6 +27,7 @@ namespace cl {
 	void LuaSV_OnEntityRemove(CBaseEntity* p);
 
 	void LuaSV_PrintError(const char* msg);
+    int LuaSV_ExceptionHandler(lua_State* L);
 
 	template<class T> void LuaSetupRefTypeInterface(lua_State* L, CBaseEntity* ptr);
 	extern std::map<std::string, void (*)(lua_State* L, CBaseEntity* ptr)> g_pfnLuaSetupRefTypeInterfaceMap;

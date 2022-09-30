@@ -81,8 +81,6 @@ int DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 
 	g_iXash = (int)CVAR_GET_FLOAT("build");
 
-	Game_HookEvents();
-
 	FS_GetAPI(&gFileSystemAPI);
 
 	return 1;
@@ -273,6 +271,8 @@ void DLLEXPORT HUD_Init( void )
 	InitInput();
 	gHUD.Init();
 	//Scheme_Init();
+
+    Game_HookEvents();
 }
 
 

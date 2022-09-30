@@ -161,7 +161,7 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 			const MoEWeaponBuyInfo_s& info = candidate_list.front();
 			if (iSlot == KNIFE_SLOT) {
-				p->m_iKnifeID = info.iID;
+				p->m_iKnifeID = AliasToKnifeType(info.pszClassName);
 			} else if (iSlot == GRENADE_SLOT) {
 
 				CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)p->m_rgpPlayerItems[GRENADE_SLOT];

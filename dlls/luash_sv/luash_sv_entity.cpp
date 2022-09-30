@@ -233,7 +233,7 @@ namespace cl {
 			lua_pop(L, 1);
 			if (!strcmp("CBaseEntity", cppClassName))
 				return; // no more try
-			if (!strcmp("CCSBot", cppClassName))
+			if (!strcmp("CCSBot", cppClassName) || !strcmp("CMoePlayer", cppClassName))
 				return LuaNotifyCppEntityCreate("CBasePlayer", ptr);
 			return LuaNotifyCppEntityCreate("CBaseEntity", ptr);
 		}
