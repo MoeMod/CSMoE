@@ -1793,8 +1793,8 @@ namespace sv {
 		{
 			if (pAttack->m_flPlayerBuffData)
 			{
+				CBasePlayerItem* pWeapon = pAttack->m_rgpPlayerItems[GRENADE_SLOT];
 
-				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_rgpPlayerItems[GRENADE_SLOT];
 				if (!pWeapon)
 				{
 					pAttack->m_flPlayerBuffData = 0;
@@ -1802,13 +1802,18 @@ namespace sv {
 					return;
 				}
 
-				if (pWeapon->m_iId != WEAPON_DIVINETITAN)
+				while (pWeapon)
 				{
-					pAttack->m_flPlayerBuffData = 0;
-					UTIL_Remove(this);
-					return;
+					if (pWeapon->m_iId != WEAPON_DIVINETITAN)
+					{
+						pAttack->m_flPlayerBuffData = 0;
+						UTIL_Remove(this);
+						return;
+					}
+
+					pWeapon = pWeapon->m_pNext;
 				}
-				
+
 				if (m_iType == 1  && this->m_pWeapon)
 				{
 					//Redirect timepoint

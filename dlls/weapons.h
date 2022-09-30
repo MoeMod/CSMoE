@@ -226,6 +226,7 @@ public:
 		EXPTYPE_SFGRENADE,
 		EXPTYPE_THANATOS5ROCKET,
 		EXPTYPE_VULCANUS7ROCKET,
+		EXPTYPE_FIREBOMB,
 	};
 
 	void Spawn() override;
@@ -295,6 +296,7 @@ public:
 	void EXPORT DetonateCartFrag(void);
 	void EXPORT DetonateEventBomb(void);
 	void EXPORT DetonateMoonCake(void);
+	void EXPORT DetonateFireBomb(void);
 	void EXPORT ZombieBombExplosion();
 	void EXPORT DetonateUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 	void EXPORT TumbleThink();
@@ -305,13 +307,17 @@ public:
 	void EXPORT C4Think();
 	void EXPORT HolyBombThink(void);
 	void EXPORT HolyBombTouch(CBaseEntity* pOther);
-	static void HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
-
 	void ExplodeTouchHolyBomb(void);
+	static void HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
+	static void FireBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
+	void EXPORT SFGrenadeExplodeThink(void);
+	void EXPORT SFGrenadeTouch(CBaseEntity* pOther);
+
 public:
 	static TYPEDESCRIPTION m_SaveData[15];
 
 public:
+	EHANDLE m_pStickingObject;
 	bool m_bStaticFramerate;
 	int m_iGrenadeID;
 	bool m_bHit;

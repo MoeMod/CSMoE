@@ -108,7 +108,7 @@ namespace sv {
     void Precache()
     {
         m_iShellId = PRECACHE_MODEL("models/pshell.mdl");
-        PRECACHE_MODEL("models/p_skull2_2.mdl");
+        PRECACHE_MODEL("models/p_skull2dual.mdl");
 
 
         m_usFireSKULL2Left = PRECACHE_EVENT(1, "events/skull2_left.sc");
@@ -126,7 +126,7 @@ namespace sv {
             m_iWeaponState |= WPNSTATE_SKULL2_LEFT;
 
         if(!m_iState)
-            return DefaultDeploy("models/v_skull2.mdl", "models/p_skull2_2.mdl", SKULL2_DRAW2, m_pPlayer->m_bIsFemale ? "dualpistols" : "dualpistols_2", UseDecrement() != FALSE);
+            return DefaultDeploy("models/v_skull2.mdl", "models/p_skull2dual.mdl", SKULL2_DRAW2, m_pPlayer->m_bIsFemale ? "dualpistols" : "dualpistols_2", UseDecrement() != FALSE);
         else
             return DefaultDeploy("models/v_skull2.mdl", "models/p_skull2.mdl", SKULL2_DRAW1, AnimExtension, UseDecrement() != FALSE);
     }
@@ -179,7 +179,7 @@ namespace sv {
             else
             {
                 m_iState = 0;
-                m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_skull2_2.mdl");
+                m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_skull2dual.mdl");
 
                 strcpy(m_pPlayer->m_szAnimExtention, m_pPlayer->m_bIsFemale ? "dualpistols" : "dualpistols_2");
 

@@ -339,6 +339,15 @@ TL_ADD(CGuitar)
 TL_ADD(CViolingun)
 TL_ADD(CHolyBomb)
 TL_ADD(CWonderCannonEX)
+TL_ADD(CCake)
+TL_ADD(CCartfrag)
+TL_ADD(CFGrenade)
+TL_ADD(CFGrenade2)
+TL_ADD(CHeartBomb)
+TL_ADD(CM24Grenade)
+TL_ADD(CMoonCake)
+TL_ADD(CSFGrenade)
+TL_ADD(CChainGrenade)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
@@ -685,6 +694,7 @@ TL_ADD(COICWRocket)
 TL_ADD(CStarChaserSRAmmo)
 TL_ADD(CBuffNG7ForceField)
 TL_ADD(CBuffNG7Debuff)
+TL_ADD(ChainGrenade)
 //TL_ADD(CStunBeamEffect)
 
 #endif

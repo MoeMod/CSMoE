@@ -71,9 +71,6 @@ public:
 private:
 	duration_t GetExplosionTime() const { return 1.5s; }
 	float GetRange() const { return 350.0f; }
-
-private:
-	short m_sModelIndexExp;
 };
 
 }

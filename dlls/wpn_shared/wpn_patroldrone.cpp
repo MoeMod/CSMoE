@@ -463,18 +463,25 @@ void CPatrolDroneGrenade::OnThink()
 		return;
 	}
 
-	CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
-	if (!pWeapon)
-	{
-		UTIL_Remove(this);
-		return;
-	}
+	CBasePlayerItem* pWeapon = m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
 
-	if(pWeapon->m_iId != WEAPON_PATROLDRONE)
+	if (!pWeapon)
 	{
 		UTIL_Remove(pBeam);
 		UTIL_Remove(this);
 		return;
+	}
+
+	while (pWeapon)
+	{
+		if (pWeapon->m_iId != WEAPON_PATROLDRONE)
+		{
+			UTIL_Remove(pBeam);
+			UTIL_Remove(this);
+			return;
+		}
+
+		pWeapon = pWeapon->m_pNext;
 	}
 
 	StudioFrameAdvance();

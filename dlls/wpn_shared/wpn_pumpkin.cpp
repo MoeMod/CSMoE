@@ -284,7 +284,7 @@ LINK_ENTITY_TO_CLASS(grenade_pumpkin, CPumpkinGrenade);
 
 void CPumpkinGrenade::Precache(void)
 {
-	m_sModelIndexExp = PRECACHE_MODEL("sprites/heart_bombexp.spr");
+	PRECACHE_SOUND("weapons/pump_exp.wav");
 }
 
 void CPumpkinGrenade::Spawn()
@@ -405,26 +405,28 @@ void CPumpkinGrenade::Explode(TraceResult* pTrace, int bitsDamageType)
 	pev->takedamage = DAMAGE_NO;
 
 	MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
-	WRITE_BYTE(TE_EXPLOSION);	// This makes a dynamic light and the explosion sprites/sound
-	WRITE_COORD(pev->origin.x);		// Send to PAS because of the sound
+	WRITE_BYTE(TE_EXPLOSION);
+	WRITE_COORD(pev->origin.x);
 	WRITE_COORD(pev->origin.y);
-	WRITE_COORD(pev->origin.z + 20.0f);
+	WRITE_COORD(pev->origin.z + 20.0);
 	WRITE_SHORT(g_sModelIndexFireball3);
-	WRITE_BYTE(25);			// scale * 10
-	WRITE_BYTE(30);		// framerate
-	WRITE_BYTE(TE_EXPLFLAG_NONE);	// flags
+	WRITE_BYTE(25);
+	WRITE_BYTE(30);
+	WRITE_BYTE(TE_EXPLFLAG_NOSOUND);
 	MESSAGE_END();
 
 	MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
-	WRITE_BYTE(TE_EXPLOSION);	// This makes a dynamic light and the explosion sprites/sound
-	WRITE_COORD(pev->origin.x + RANDOM_FLOAT(-64, 64));	// Send to PAS because of the sound
-	WRITE_COORD(pev->origin.y + RANDOM_FLOAT(-64, 64));
-	WRITE_COORD(pev->origin.z + RANDOM_FLOAT(30, 35));
-	WRITE_SHORT(m_sModelIndexExp);
-	WRITE_BYTE(30);			// scale * 10
-	WRITE_BYTE(30);		// framerate
-	WRITE_BYTE(TE_EXPLFLAG_NONE);	// flags
+	WRITE_BYTE(TE_EXPLOSION);
+	WRITE_COORD(pev->origin.x + RANDOM_FLOAT(-64.0, 64.0));
+	WRITE_COORD(pev->origin.y + RANDOM_FLOAT(-64.0, 64.0));
+	WRITE_COORD(pev->origin.z + RANDOM_FLOAT(30.0, 35.0));
+	WRITE_SHORT(g_sModelIndexFireball2);
+	WRITE_BYTE(30);
+	WRITE_BYTE(30);
+	WRITE_BYTE(TE_EXPLFLAG_NOSOUND);
 	MESSAGE_END();
+
+	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/pump_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 	entvars_t* pevOwner;
 	if (pev->owner)

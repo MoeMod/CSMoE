@@ -569,6 +569,15 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_violingun.cpp
 	../dlls/wpn_shared/wpn_holybomb.cpp
 	../dlls/wpn_shared/wpn_wondercannonex.cpp
+	../dlls/wpn_shared/wpn_cake.cpp
+	../dlls/wpn_shared/wpn_mooncake.cpp
+	../dlls/wpn_shared/wpn_heartbomb.cpp
+	../dlls/wpn_shared/wpn_fgrenade.cpp
+	../dlls/wpn_shared/wpn_fgrenade2.cpp
+	../dlls/wpn_shared/wpn_m24grenade.cpp
+	../dlls/wpn_shared/wpn_cartfrag.cpp
+	../dlls/wpn_shared/wpn_sfgrenade.cpp
+	../dlls/wpn_shared/wpn_chaingren.cpp
 	)
 
 set(PM_SRCS

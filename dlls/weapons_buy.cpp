@@ -398,6 +398,15 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_bunkerbuster", GRENADE_BUNKERBUSTER },
 	{ "weapon_patroldrone", GRENADE_PATROLDRONE },
 	{ "weapon_divinetitan", GRENADE_DIVINETITAN },
+	{ "weapon_m24grenade", GRENADE_M24GRENADE },
+	{ "weapon_fgrenade2", GRENADE_FGRENADE2 },
+	{ "weapon_fgrenade", GRENADE_FIREBOMB },
+	{ "weapon_heartbomb", GRENADE_HEARTBOMB },
+	{ "weapon_cake", GRENADE_CAKEBOMB },
+	{ "weapon_mooncake", GRENADE_MOONCAKE },
+	{ "weapon_cartfrag", GRENADE_CARTFRAG },
+	{ "weapon_sfgrenade", GRENADE_SFGRENADE },
+	{ "weapon_chaingren", GRENADE_CHAINGRENADE },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =

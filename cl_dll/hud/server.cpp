@@ -65,6 +65,7 @@ enum
 	HOLYFIST_GLITCH_RING,
 	WINGGUN_WING,
 	DIVINETITAN_PARTICLE,
+	FIREBOMB_BURN,
 };
 
 TEMPENTITY *iHolyFistRingEffect[33];
@@ -752,6 +753,12 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 		flags = FTENT_PERSIST | FTENT_FADEOUT;
 		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_lance_hit.spr"),
 			Vector(0.0, 0.0, 0.0), 0.18, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
+		break;
+	}
+	case FIREBOMB_BURN:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/firebomb_burn.spr"),
+			Vector(0.0, 0.0, -5.0), 5.0, TRUE, flags, 0.7, kRenderTransAdd, 10.0);
 		break;
 	}
 

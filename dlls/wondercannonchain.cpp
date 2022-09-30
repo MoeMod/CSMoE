@@ -194,8 +194,7 @@ namespace sv {
 				WRITE_BYTE(19);
 				WRITE_SHORT(m_pEnemyList->Element(i)->entindex());
 				WRITE_SHORT(pNewEntity->entindex());
-				WRITE_BYTE(2);
-				WRITE_BYTE(3);
+				WRITE_BYTE(m_iType ? 1 : 0);
 				MESSAGE_END();			
 			}
 		}

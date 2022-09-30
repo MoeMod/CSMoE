@@ -271,10 +271,10 @@ namespace sv {
 
 			CBasePlayerItem* pWeapon = m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
 
-			if (pWeapon)
+			while (pWeapon != NULL)
 			{
 				if (pWeapon->m_iId == WEAPON_DIVINETITAN || 
-					pWeapon->m_iId == WEAPON_PATROLDRONE || 
+					pWeapon->m_iId == WEAPON_PATROLDRONE ||
 					pWeapon->m_iId == WEAPON_BUNKERBUSTER)
 					return;
 
@@ -283,16 +283,9 @@ namespace sv {
 					return;
 				}
 
-				while (pWeapon != NULL)
-				{
-					if (pWeapon->m_iId == WEAPON_DIVINETITAN || 
-						pWeapon->m_iId == WEAPON_PATROLDRONE ||
-						pWeapon->m_iId == WEAPON_BUNKERBUSTER)
-						return;
-					pWeapon = pWeapon->m_pNext;
-				}
+				pWeapon = pWeapon->m_pNext;
 			}
-
+			
 			if (amount >= GetAmountBonus())
 				return;
 
@@ -309,7 +302,11 @@ namespace sv {
 				}
 				return;
 			}
-			m_pPlayer->GiveNamedItem("weapon_hegrenade");
+			const char* szGrenade = GrenadeTypeToAlias(m_pPlayer->m_iGrenadeID);
+			if(szGrenade)
+				m_pPlayer->GiveNamedItem(szGrenade);
+			else
+				m_pPlayer->GiveNamedItem("weapon_hegrenade");
 		}
 		void OnGetSkill() override {
 			m_flNextThink = time_point_t();

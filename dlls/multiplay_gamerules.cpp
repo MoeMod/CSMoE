@@ -4092,7 +4092,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							break;
 
 						case GRENADE_FIREBOMB:
-							killer_weapon_name = "firebomb";
+							killer_weapon_name = "fgrenade";
 							break;
 
 						case GRENADE_HEARTBOMB:
@@ -4100,7 +4100,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							break;
 
 						case GRENADE_CAKEBOMB:
-							killer_weapon_name = "cakebomb";
+							killer_weapon_name = "cake";
 							break;
 
 						case GRENADE_MOONCAKE:
@@ -4263,7 +4263,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						break;
 
 					case GRENADE_FIREBOMB:
-						killer_weapon_name = "firebomb";
+						killer_weapon_name = "fgrenade";
 						break;
 
 					case GRENADE_HEARTBOMB:
@@ -4271,7 +4271,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						break;
 
 					case GRENADE_CAKEBOMB:
-						killer_weapon_name = "cakebomb";
+						killer_weapon_name = "cake";
 						break;
 
 					case GRENADE_MOONCAKE:

@@ -114,7 +114,6 @@ namespace sv {
         PRECACHE_SOUND("weapons/laserfist_shootb_exp.wav");
         PRECACHE_SOUND("weapons/laserfist_idle.wav");
 
-        PRECACHE_MODEL("sprites/ef_laserfistex_laserbeam.spr");
         PRECACHE_MODEL("sprites/ef_laserfistex_charge_left.spr");
         PRECACHE_MODEL("sprites/ef_laserfistex_charge.spr");
         PRECACHE_MODEL("sprites/ef_laserfistex_charge_left2.spr");

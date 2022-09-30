@@ -92,6 +92,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_HUNTBOW, "weapon_huntbow",      "魂狩猎弓",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_GUNGNIR, "weapon_gungnir",     "断狱雷魂",               6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SGDRILL, "weapon_sgdrill",         "怒海狂鲨",                 6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ WEAPON_SGDRILLEX, "weapon_sgdrillex",         "【电光】狂龙钻", 6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_GATLINGEX, "weapon_gatlingex",        "日冕加特林",                  4600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_LASERSG, "weapon_lasersg",         "【异噬】暗雷兽",                  4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_M3DRAGON, "weapon_m3dragon",         "【天龙】m3",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
@@ -362,20 +363,41 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_Z4B_AR57AMETHYST, "z4b_ar57amethyst",      "致命紫晶-ar57",    2750, PRIMARY_WEAPON_SLOT, UNASSIGNED,  BUY_RIFLE },
 	//{ WEAPON_ZOMBIELAW, "weapon_zombielaw",      "test",    100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_HEGRENADE, "weapon_hegrenade",     "高爆手雷",               300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
-	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ WEAPON_CSGO_ZEUS, "csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, BUY_EQUIP },
-	{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_BUNKERBUSTER, "weapon_bunkerbuster",      "天降正义LTD",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_PATROLDRONE, "weapon_patroldrone",      "【幽浮】控制核心",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_DIVINETITAN, "weapon_divinetitan",      "圣翼皓印",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
-	{ WEAPON_SGDRILLEX, "weapon_sgdrillex",         "【电光】狂龙钻", 6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_M24GRENADE, "weapon_m24grenade",     "M24柄式手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_FGRENADE2, "weapon_fgrenade2",     "破片高爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_FIREBOMB, "weapon_fgrenade",     "火焰高爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_HEARTBOMB, "weapon_heartbomb",     "心形手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_CAKEBOMB, "weapon_cake",     "周年纪念蛋糕手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_MOONCAKE, "weapon_mooncake",     "雷馅月饼",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_CARTFRAG, "weapon_cartfrag",     "皮蛋爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_SFGRENADE, "weapon_sfgrenade",     "电浆磁爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_CHAINGRENADE, "weapon_chaingren",     "狂鲨爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+
+
+
 	//{ WEAPON_FGLAUNCHER, "weapon_fglauncher",         "礼花发射器", 2000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 
 
 };
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
-#if 0
+#if 1
+	{ GRENADE_M24GRENADE, "weapon_m24grenade",     "M24柄式手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_FGRENADE2, "weapon_fgrenade2",     "破片高爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_FIREBOMB, "weapon_fgrenade",     "火焰高爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_HEARTBOMB, "weapon_heartbomb",     "心形手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_CAKEBOMB, "weapon_cake",     "周年纪念蛋糕手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_MOONCAKE, "weapon_mooncake",     "雷馅月饼",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_CARTFRAG, "weapon_cartfrag",     "皮蛋爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_SFGRENADE, "weapon_sfgrenade",     "电浆磁爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_CHAINGRENADE, "weapon_chaingren",     "狂鲨爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+
 	{ WEAPON_WONDERCANNONEX, "weapon_wondercannonex",        "冰麟寒焱",                  6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 
 		{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -666,9 +688,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_CANNON, "weapon_cannon",      "黑龙炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ WEAPON_ZOMBIELAW, "weapon_zombielaw",      "test",    100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_HEGRENADE, "weapon_hegrenade",     "高爆手雷",               300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
-	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ WEAPON_CSGO_ZEUS, "csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, BUY_EQUIP },
-	{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 #endif
 };
 

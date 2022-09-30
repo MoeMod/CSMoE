@@ -314,8 +314,8 @@ LINK_ENTITY_TO_CLASS(buffng7_debuff, CBuffNG7Debuff)
                 if (!pEntity->IsAlive())
                     continue;
 
-                //if (pEntity->edict() == pev->owner)
-                    //continue;
+                if (pEntity->edict() == pev->owner)
+                    continue;
 
                 vecEntityVel = pEntity->pev->velocity;
                 // #Non-Conflict situation 1 - non velocity

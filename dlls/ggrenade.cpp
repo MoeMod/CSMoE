@@ -534,7 +534,14 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 		m_bHit = RadiusDamage(pev, pevOwner, flDamage, CLASS_NONE, bitsDamageType, iRadius);
 
 		break;
+	case EXPTYPE_FIREBOMB:
 
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage *= 5.0f;
+
+		FireBombExplode(pev->origin, pev, pevOwner, flDamage, 0.05, 325);
+
+		break;
 	default:
 		
 		if (g_pModRunning->DamageTrack() == DT_ZB)
@@ -1248,17 +1255,23 @@ void CGrenade::TumbleThink()
 
 			SetThink(&CGrenade::DetonateMoonCake);
 		}
-		else if (pev->dmg == 788)
+		else if (pev->dmg == 156)
 		{
 			pev->dmg = 100;
 
-			SetThink(&CGrenade::DetonateMoonCake);
+			SetThink(&CGrenade::DetonateFireBomb);
 		}
 		else if (pev->dmg == 766)
 		{
 			pev->dmg = 100;
 
 			SetThink(&CGrenade::DetonateCartFrag);
+		}
+		else if (pev->dmg == 765)
+		{
+			pev->dmg = 100;
+
+			SetThink(&CGrenade::SFGrenadeExplodeThink);
 		}
 		else if (pev->dmg > 40.0f)
 		{
@@ -1433,6 +1446,10 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 		break;
 
 	case GRENADE_FIREBOMB:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_fgrenade.mdl");
+
+		pGrenade->m_bStaticFramerate = true;
+		pGrenade->pev->dmg = 156;
 		break;
 
 	case GRENADE_HEARTBOMB:
@@ -1465,6 +1482,18 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 
 		pGrenade->SetTouch(&CGrenade::HolyBombTouch);
 		pGrenade->SetThink(&CGrenade::HolyBombThink);
+		break;
+
+	case GRENADE_SFGRENADE:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_sfgrenade.mdl");
+
+		pGrenade->pev->movetype = MOVETYPE_TOSS;
+		pGrenade->m_bStaticFramerate = true;
+		pGrenade->pev->dmg = 765;
+		pGrenade->m_pStickingObject = NULL;
+
+		pGrenade->SetTouch(&CGrenade::SFGrenadeTouch);
+
 		break;
 
 	default:
@@ -2572,8 +2601,10 @@ void CGrenade::HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t
 
 			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
 
+			pPlayer->m_pBuffAttacker = pevAttacker;
 			pPlayer->m_iHealthDecreaseCount = 8;
 			pPlayer->m_flHealthDecreaseAmount = pPlayer->pev->max_health * flBurnAmount;
+			pPlayer->m_flHealthDecreaseInterval = 1.0s;
 
 			for (int id = 1; id <= gpGlobals->maxClients; id++)
 			{
@@ -2588,7 +2619,7 @@ void CGrenade::HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t
 				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
 				WRITE_BYTE(4);
 				WRITE_SHORT(pEntity->entindex());
-				WRITE_BYTE(28);
+				WRITE_BYTE(8);
 				MESSAGE_END();
 			}
 		}
@@ -2597,6 +2628,159 @@ void CGrenade::HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t
 
 		// ..
 	}
+}
+
+void CGrenade::DetonateFireBomb()
+{
+	TraceResult tr;
+	Vector vecStart = pev->origin - Vector(0, 0, 32);
+
+	UTIL_TraceLine(pev->origin + Vector(0, 0, 8), pev->origin - Vector(0, 0, 32), ignore_monsters, ENT(pev), &tr);
+	Explode3(&tr, DMG_EXPLOSION, EXPTYPE_FIREBOMB, 0.0);
+}
+
+void CGrenade::FireBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius)
+{
+	CBaseEntity* pEntity = NULL;
+	TraceResult tr;
+	Vector vecEnd;
+
+	float falloff;
+
+	if (flRadius)
+		falloff = flDamage / flRadius;
+	else
+		falloff = 1.0f;
+
+	bool bInWater = UTIL_PointContents(vecSrc) == CONTENTS_WATER;
+
+	vecSrc.z += 1.0;
+
+	entvars_t* pevAttack = pevAttacker ? pevAttacker : pevInflictor;
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (bInWater && pEntity->pev->waterlevel == 0)
+			continue;
+
+		if (!bInWater && pEntity->pev->waterlevel == 3)
+			continue;
+
+		if (pEntity->Classify() == CLASS_PLAYER)
+		{
+			UTIL_TraceLine(vecSrc, pEntity->BodyTarget(vecSrc), dont_ignore_monsters, ENT(pevInflictor), &tr);
+
+			if (tr.flFraction < 1.0f && tr.pHit != pEntity->edict())
+				continue;
+
+			if (tr.fStartSolid)
+			{
+				tr.vecEndPos = vecSrc;
+				tr.flFraction = 0;
+			}
+
+			float flCurrentDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+
+			pEntity->TakeDamage(pevInflictor, pevAttack, flCurrentDamage, DMG_EXPLOSION);
+
+			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+
+			pPlayer->m_pBuffAttacker = pevAttacker;
+			pPlayer->m_iHealthDecreaseCount = 5;
+			pPlayer->m_flHealthDecreaseAmount = pPlayer->pev->max_health * flBurnAmount;
+			pPlayer->m_flHealthDecreaseInterval = 1.0s;
+
+			for (int id = 1; id <= gpGlobals->maxClients; id++)
+			{
+				pPlayer = (CBasePlayer*)UTIL_PlayerByIndex(id);
+
+				if (!pPlayer)
+					continue;
+
+				if (FNullEnt(pPlayer->pev))
+					continue;
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
+				WRITE_BYTE(4);
+				WRITE_SHORT(pEntity->entindex());
+				WRITE_BYTE(18);
+				MESSAGE_END();
+			}
+		}
+		else if (pEntity->Classify() != CLASS_PLAYER_ALLY)
+			continue;
+
+		// ..
+	}
+}
+
+void CGrenade::SFGrenadeTouch(CBaseEntity * pOther)
+{
+	SetTouch(NULL);
+
+	if (pOther->pev->takedamage == DAMAGE_NO && /*pOther->Classify() == CLASS_BREAKABLE && */ pOther->pev->rendermode != kRenderNormal)
+	{
+		SetThink(NULL);
+
+		pev->dmg = 100;
+		SFGrenadeExplodeThink();
+
+		return;
+	}
+
+	if (pOther->IsBSPModel())
+	{
+		pev->movetype = MOVETYPE_NONE;
+
+		return;
+	}
+
+	if (!pOther->IsAlive())
+		return;
+
+	if (pOther->pev->takedamage == DAMAGE_NO)
+		return;
+
+	pev->effects |= EF_NODRAW;
+	pev->velocity = g_vecZero;
+	pev->solid = SOLID_NOT;
+
+	m_pStickingObject = pOther;
+
+	/*MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_FOLLOWINGGRENADE);
+	WRITE_SHORT(pOther->entindex());
+	WRITE_SHORT(pev->modelindex);
+	WRITE_COORD(pev->origin.x - pOther->pev->origin.x);
+	WRITE_COORD(pev->origin.y - pOther->pev->origin.y);
+	WRITE_COORD(pev->origin.z - pOther->pev->origin.z);
+	WRITE_COORD(0.0f);
+	WRITE_COORD(1.0f);
+	WRITE_COORD(0.0f);
+	WRITE_BYTE((int)(pev->dmgtime - gpGlobals->time + 1.0f));
+	MESSAGE_END();*/
+}
+
+
+void CGrenade::SFGrenadeExplodeThink(void)
+{
+	TraceResult tr;
+
+	if (m_pStickingObject.Get() != NULL)
+	{
+		CBaseEntity* pEntity = m_pStickingObject;
+
+		if (pEntity)
+		{
+			pev->origin = pEntity->pev->origin;
+		}
+	}
+
+	UTIL_TraceLine(pev->origin + Vector(0, 0, 8), pev->origin - Vector(0, 0, 32), ignore_monsters, ENT(pev), &tr);
+	Explode3(&tr, DMG_EXPLOSION, EXPTYPE_SFGRENADE, 0);
 }
 
 IMPLEMENT_SAVERESTORE(CGrenade, CBaseMonster);

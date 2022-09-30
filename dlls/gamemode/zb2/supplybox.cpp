@@ -190,6 +190,7 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 				p->GiveNamedItem(info.pszClassName);
 				p->m_iGrenadeID = AliasToGrenadeType(info.pszClassName);
 				weapon_names_view[iSlot] = info.pszDisplayName;
+				continue;
 #if 0
 				CBasePlayerItem* pItem = p->m_rgpPlayerItems[GRENADE_SLOT];
 

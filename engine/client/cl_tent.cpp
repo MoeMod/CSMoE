@@ -1075,7 +1075,7 @@ TEMPENTITY* CL_AllocMuzzleFlash(vec3_t origin, struct model_s* model, float scal
 
 void MusicNoteCallback(TEMPENTITY* ent, float frametime, float currenttime)
 {
-	float f = ent->tentOffset.z * currenttime + reinterpret_cast<int>(ent);
+	float f = ent->tentOffset.z * currenttime;
 
 	ent->entity.origin.x = ent->x + ent->tentOffset.x * sin(f);
 	ent->entity.origin.y = ent->y + ent->tentOffset.x * cos(f);
@@ -1149,10 +1149,16 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 	{
 	case 1:
 	{
-		unsigned __int64 v13 = (0x66666667i64 * (++iCounter)) >> 32;
+		iCounter++;
+
+		if (iCounter <= Com_RandomLong(7, 10))
+			return;
+
+		iCounter = 0;
+		/*unsigned __int64 v13 = (0x66666667i64 * (++iCounter)) >> 32;
 
 		if (iCounter != 5 * (((signed int)v13 >> 1) + (v13 >> 31)))
-			return;
+			return;*/
 
 		pTemp = CL_AllocMuzzleFlash(pos, Mod_Handle(modelIndex), scale);
 
@@ -1206,10 +1212,17 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 	}
 	case 4:
 	{
-		unsigned __int64 v13 = (0x66666667i64 * (++iCounter)) >> 32;
+		iCounter++;
+
+		if (iCounter <= Com_RandomLong(7, 10))
+			return;
+
+		iCounter = 0;
+
+		/*unsigned __int64 v13 = (0x66666667i64 * (++iCounter)) >> 32;
 
 		if (iCounter != 5 * (((signed int)v13 >> 1) + (v13 >> 31)))
-			return;
+			return;*/
 
 		scale = 0.05;
 
