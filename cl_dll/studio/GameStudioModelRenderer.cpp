@@ -92,7 +92,7 @@ TEMPENTITY* g_M95TigerEye1 = NULL;
 TEMPENTITY* g_M95TigerEye2 = NULL;
 
 TEMPENTITY* g_WonderCannonSpr[4];
-TEMPENTITY* g_WonderCannonEXSpr[4];
+TEMPENTITY* g_WonderCannonEXSpr[5];
 
 TEMPENTITY* g_M3DragonFlame1 = NULL;
 TEMPENTITY* g_M3DragonFlame2 = NULL;
@@ -1685,10 +1685,11 @@ int R_StudioDrawModel(int flags)
 
 		if (CStudioModelRenderer::s_pWonderCannonEXViewModel && CStudioModelRenderer::s_pWonderCannonEXLightModel && curent->model == CStudioModelRenderer::s_pWonderCannonEXViewModel && (curent->curstate.sequence != 1 && curent->curstate.sequence != 6))
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 5; i++)
 			{
 				if (!g_WonderCannonEXSpr[i])
 				{
+					
 					g_WonderCannonEXSpr[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[8 + i], CStudioModelRenderer::s_pWonderCannonEXLightModel);
 
 					g_WonderCannonEXSpr[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
@@ -1711,7 +1712,7 @@ int R_StudioDrawModel(int flags)
 		}
 		else
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 5; i++)
 			{
 				if (g_WonderCannonEXSpr[i])
 				{

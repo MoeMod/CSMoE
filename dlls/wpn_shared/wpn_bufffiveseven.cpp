@@ -79,7 +79,7 @@ namespace sv {
     KnockbackData KnockBack = { 400.0f, 300.0f, 350.0f, 150.0f, 0.8f };
 
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_50aeahe" , 90 }; }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_bufffiveseven" , 50 }; }
 #endif
 	float GetArmorRatioModifier() override { return 1.5; }
 	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
@@ -106,9 +106,9 @@ namespace sv {
 	int GetItemInfo(ItemInfo* p)
 	{
 		p->pszName = STRING(pev->classname);
-		p->pszAmmo1 = "50aeahe";
+		p->pszAmmo1 = "bufffiveseven";
 		p->iMaxAmmo1 = 90;
-		p->pszAmmo2 = "InfiniteAmmo";
+		p->pszAmmo2 = "bufffiveseven2";
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = 50;
 		p->iSlot = 1;

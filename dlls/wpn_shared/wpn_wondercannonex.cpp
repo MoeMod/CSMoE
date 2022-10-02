@@ -56,7 +56,7 @@ namespace sv {
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "wondercannon_ammo";
 		p->iMaxAmmo1 = 120;
-		p->pszAmmo2 = "wondercannonMineAmmo";
+		p->pszAmmo2 = "wondercannonexMineAmmo";
 		p->iMaxAmmo2 = 3;
 		p->iMaxClip = 30;
 		p->iSlot = 0;

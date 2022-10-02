@@ -157,6 +157,7 @@ public:
 	int DrawNEWHudAmmo(float flTime);
 	CHudMsgFunc(CurWeapon);
 	CHudMsgFunc(WeaponList);
+	CHudMsgFunc(WeaponList2);
 	CHudMsgFunc(AmmoX);
 	CHudMsgFunc(AmmoPickup);
 	CHudMsgFunc(WeapPickup);

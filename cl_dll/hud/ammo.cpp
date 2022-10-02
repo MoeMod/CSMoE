@@ -279,6 +279,7 @@ HSPRITE ghsprBuckets;					// Sprite for top row of weapons menu
 
 DECLARE_MESSAGE(m_Ammo, CurWeapon ) // Current weapon and clip
 DECLARE_MESSAGE(m_Ammo, WeaponList) // new weapon type
+DECLARE_MESSAGE(m_Ammo, WeaponList2) // new weapon type
 DECLARE_MESSAGE(m_Ammo, AmmoX)      // update known ammo type's count
 DECLARE_MESSAGE(m_Ammo, AmmoPickup) // flashes an ammo pickup record
 DECLARE_MESSAGE(m_Ammo, WeapPickup) // flashes a weapon pickup record
@@ -314,6 +315,7 @@ int CHudAmmo::Init(void)
 
 	HOOK_MESSAGE(CurWeapon);
 	HOOK_MESSAGE(WeaponList);
+	HOOK_MESSAGE(WeaponList2);
 	HOOK_MESSAGE(AmmoPickup);
 	HOOK_MESSAGE(WeapPickup);
 	HOOK_MESSAGE(ItemPickup);
@@ -790,7 +792,7 @@ int CHudAmmo::MsgFunc_WeaponList(const char *pszName, int iSize, void *pbuf )
 	WEAPON Weapon;
 
 	strncpy( Weapon.szName, reader.ReadString(), MAX_WEAPON_NAME );
-	Weapon.iAmmoType = (int)reader.ReadChar();
+	Weapon.iAmmoType = reader.ReadChar();
 
 	Weapon.iMax1 = reader.ReadByte();
 	if (Weapon.iMax1 == 255)
@@ -808,6 +810,36 @@ int CHudAmmo::MsgFunc_WeaponList(const char *pszName, int iSize, void *pbuf )
 	Weapon.iClip = 0;
 
 	gWR.AddWeapon( &Weapon );
+
+	return 1;
+
+}
+
+int CHudAmmo::MsgFunc_WeaponList2(const char* pszName, int iSize, void* pbuf)
+{
+	BufferReader reader(pszName, pbuf, iSize);
+
+	WEAPON Weapon;
+
+	strncpy(Weapon.szName, reader.ReadString(), MAX_WEAPON_NAME);
+	Weapon.iAmmoType = reader.ReadShort();
+
+	Weapon.iMax1 = reader.ReadByte();
+	if (Weapon.iMax1 == 255)
+		Weapon.iMax1 = -1;
+
+	Weapon.iAmmo2Type = reader.ReadShort();
+	Weapon.iMax2 = reader.ReadByte();
+	if (Weapon.iMax2 == 255)
+		Weapon.iMax2 = -1;
+
+	Weapon.iSlot = reader.ReadChar();
+	Weapon.iSlotPos = reader.ReadChar();
+	Weapon.iId = reader.ReadShort();
+	Weapon.iFlags = reader.ReadByte();
+	Weapon.iClip = 0;
+
+	gWR.AddWeapon(&Weapon);
 
 	return 1;
 

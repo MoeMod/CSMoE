@@ -80,6 +80,10 @@ public:
 
 	BOOL Deploy() override
 	{
+#if 0
+		SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "masterhunter");
+		m_pPlayer->SetNewPlayerModel("models/player/masterhunter/masterhunter.mdl");
+#endif
 		m_fMaxSpeed = 250;
 		m_iSwing = 0;
 		pev->iuser1 = 0;

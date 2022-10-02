@@ -186,6 +186,10 @@ int CZombieLaw::GetItemInfo(ItemInfo *p)
 
 BOOL CZombieLaw::Deploy(void)
 {
+#if 0
+	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "csmoe_nemesis");
+	m_pPlayer->SetNewPlayerModel("models/player/csmoe_nemesis/csmoe_nemesis.mdl");
+#endif
 	return DefaultDeploy("models/v_zombielaw.mdl", "models/p_zombielaw.mdl", ZOMBIELAW_DRAW, "at4", UseDecrement() != FALSE, 3.1s, 3.5s);
 }
 

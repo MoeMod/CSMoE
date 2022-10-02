@@ -2287,4 +2287,52 @@ BOOL CTurbulent1Ammo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_turbulent1, CTurbulent1Ammo);
+
+void CBuffNG7Ammo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CBuffNG7Ammo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CBuffNG7Ammo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(30, "buffng7", 200) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_buffng7, CBuffNG7Ammo);
+
+void CBuffFiveSevenAmmo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CBuffFiveSevenAmmo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CBuffFiveSevenAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(50, "bufffiveseven", 100) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_bufffiveseven, CBuffFiveSevenAmmo);
 }

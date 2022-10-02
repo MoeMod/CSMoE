@@ -657,7 +657,7 @@ LINK_ENTITY_TO_CLASS(buffng7_debuff, CBuffNG7Debuff)
     int GetItemInfo(ItemInfo* p)
     {
         p->pszName = STRING(pev->classname);
-        p->pszAmmo1 = "762NatoBox";
+        p->pszAmmo1 = "buffng7";
         p->iMaxAmmo1 = 200;
         p->pszAmmo2 = "BuffNG7Field";
         p->iMaxAmmo2 = 1;
@@ -673,7 +673,7 @@ LINK_ENTITY_TO_CLASS(buffng7_debuff, CBuffNG7Debuff)
 
     float GetArmorRatioModifier() override { return 1.5; }
 #ifndef CLIENT_DLL
-    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762natobox" , 100 }; }
+    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_buffng7" , 60 }; }
 #endif
     WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 195 }; }
 

@@ -379,7 +379,11 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ GRENADE_SFGRENADE, "weapon_sfgrenade",     "电浆磁爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_CHAINGRENADE, "weapon_chaingren",     "狂鲨爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 
-
+	//{ WEAPON_ZOMBIELAW, "weapon_zombielaw",      "追追的火箭筒",    100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
+	//{ KNIFE_DUALKUKRI, "z4b_dualkukri",      "幽灵猎手",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
+	//{ KNIFE_DUALSLAYER, "z4b_dualslayer",      "终极猎手",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
+	//{ KNIFE_DUALSTINGER, "z4b_dualstinger",      "灵巧猎手",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
+	//{ KNIFE_HOLYFIST, "z4b_holyfist",      "圣拳猎手",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
 
 	//{ WEAPON_FGLAUNCHER, "weapon_fglauncher",         "礼花发射器", 2000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 
