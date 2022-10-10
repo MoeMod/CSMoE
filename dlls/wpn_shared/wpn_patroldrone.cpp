@@ -465,23 +465,19 @@ void CPatrolDroneGrenade::OnThink()
 
 	CBasePlayerItem* pWeapon = m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
 
+	while (pWeapon)
+	{
+		if (pWeapon->m_iId == WEAPON_PATROLDRONE)
+			break;
+
+		pWeapon = pWeapon->m_pNext;
+	}
+
 	if (!pWeapon)
 	{
 		UTIL_Remove(pBeam);
 		UTIL_Remove(this);
 		return;
-	}
-
-	while (pWeapon)
-	{
-		if (pWeapon->m_iId != WEAPON_PATROLDRONE)
-		{
-			UTIL_Remove(pBeam);
-			UTIL_Remove(this);
-			return;
-		}
-
-		pWeapon = pWeapon->m_pNext;
 	}
 
 	StudioFrameAdvance();

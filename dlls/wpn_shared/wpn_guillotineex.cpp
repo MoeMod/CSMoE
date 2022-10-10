@@ -200,12 +200,12 @@ void CGuillotineex::SecondaryAttack(void)
 		return;
 
 	m_iHitCount = 0;
+#ifndef CLIENT_DLL
 	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
 
 	if (!m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType])
 		pev->skin = 0;
 
-#ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 	m_pPlayer->pev->effects &= ~EF_MUZZLEFLASH;

@@ -77,6 +77,10 @@ namespace sv {
 		m_fInReload = 0;
 		m_flLastEventCheck = gpGlobals->time + 0.2s;
 
+		m_bStartedAiming = false;
+		m_fAimedTime = invalid_time_point;
+		m_bSightMode = false;
+
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_ONE, gmsgFade, NULL, m_pPlayer->edict());
 		WRITE_SHORT(0);
@@ -96,6 +100,10 @@ namespace sv {
 	{
 		m_pPlayer->m_iFOV = 90;
 		m_fInReload = 0;
+
+		m_bStartedAiming = false;
+		m_fAimedTime = invalid_time_point;
+		m_bSightMode = false;
 
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_ONE, gmsgFade, NULL, m_pPlayer->edict());
@@ -383,6 +391,8 @@ namespace sv {
 		{
 			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 			m_bSightMode = 0;
+			m_bStartedAiming = false;
+			m_fAimedTime = invalid_time_point;
 
 			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_bunkerbuster.mdl");
 

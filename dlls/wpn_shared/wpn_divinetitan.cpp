@@ -158,7 +158,7 @@ namespace sv {
 				
 			else
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= (gpGlobals->time - m_flTimeholster) / 0.25s;
+				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= (gpGlobals->time - m_flTimeholster) / 0.20s;
 			}
 		}
 		else
@@ -1791,9 +1791,18 @@ namespace sv {
 		CBasePlayer* pAttack = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pev->owner));
 		if (pAttack)
 		{
+			pev->nextthink = gpGlobals->time + 0.01s;
 			if (pAttack->m_flPlayerBuffData)
 			{
 				CBasePlayerItem* pWeapon = pAttack->m_rgpPlayerItems[GRENADE_SLOT];
+
+				while (pWeapon)
+				{
+					if (pWeapon->m_iId == WEAPON_DIVINETITAN)
+						break;
+
+					pWeapon = pWeapon->m_pNext;
+				}
 
 				if (!pWeapon)
 				{
@@ -1801,19 +1810,6 @@ namespace sv {
 					UTIL_Remove(this);
 					return;
 				}
-
-				while (pWeapon)
-				{
-					if (pWeapon->m_iId != WEAPON_DIVINETITAN)
-					{
-						pAttack->m_flPlayerBuffData = 0;
-						UTIL_Remove(this);
-						return;
-					}
-
-					pWeapon = pWeapon->m_pNext;
-				}
-
 				if (m_iType == 1  && this->m_pWeapon)
 				{
 					//Redirect timepoint

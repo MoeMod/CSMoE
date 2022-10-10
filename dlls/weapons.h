@@ -1290,6 +1290,7 @@ public:
 };
 
 class CGuillotineex;
+class CBeam;
 class CGuillotineExAmmo : public CGuillotineAmmo
 {
 	void Spawn(void);
@@ -1333,9 +1334,12 @@ public:
 	void Fire(TraceResult* ptr, CBaseEntity* pOther, Vector vecAbsMins, Vector vecAbsMaxs);
 	void Attack(TraceResult* ptr, CBaseEntity* pOther);
 
+	void ClearBeam();
+
 	int m_iType;
 	CBaseEntity* m_pTarget;
 	CGuillotineex* m_pWeapon;
+	CBeam* pBeam;
 };
 
 #if 0

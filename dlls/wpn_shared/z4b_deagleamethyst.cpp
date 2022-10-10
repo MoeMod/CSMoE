@@ -24,15 +24,15 @@
 #include "gamemode/mods.h"
 #endif
 
-#ifdef CLIENT_DLL
+#ifdef CLIENT_DLL //if define CLIENT = define CLIENT  ; if not define CLIENT = define SERVER
 namespace cl {
 #else
 namespace sv {
 #endif
 
-	LINK_ENTITY_TO_CLASS(z4b_deagleamethyst, CDEAGLEAMETHYST)
+	LINK_ENTITY_TO_CLASS(z4b_deagleamethyst, CDEAGLEAMETHYST) //武器注册
 
-		void CDEAGLEAMETHYST::Spawn(void)
+		void CDEAGLEAMETHYST::Spawn(void) 
 	{
 		pev->classname = MAKE_STRING("z4b_deagleamethyst");
 
@@ -67,7 +67,7 @@ namespace sv {
 		m_usFireDEAGLEAMETHYST = PRECACHE_EVENT(1, "events/deagleamethyst.sc");
 	}
 
-	int CDEAGLEAMETHYST::GetItemInfo(ItemInfo* p)
+	int CDEAGLEAMETHYST::GetItemInfo(ItemInfo* p) //武器信息
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "ammo_amethyst";
@@ -81,7 +81,7 @@ namespace sv {
 		p->iFlags = 0;
 		p->iWeight = DEAGLE_WEIGHT;
 
-		return 1;
+		return 1; //“读取成功”的意思，就和int main()
 	}
 
 	BOOL CDEAGLEAMETHYST::Deploy(void)
@@ -122,7 +122,7 @@ namespace sv {
 	}
 
 
-	void CDEAGLEAMETHYST::DEAGLEAMETHYSTFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+	void CDEAGLEAMETHYST::DEAGLEAMETHYSTFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)		//弹丸散度   开一枪需要的时间   开启自动瞄准
 	{
 		flCycleTime -= 0.075s;
 		m_iShotsFired++;
@@ -165,15 +165,15 @@ namespace sv {
 		}
 
 #ifndef CLIENT_DLL
-		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1); //客户端播放动画
 #endif
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);//获取前，右，上三个正交方向向量的函数，计算子弹射线的终点，起始点是眼睛，也就是枪口位置。
 
-		m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
-		m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
+		m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME; //开枪音量传播距离
+		m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;   //开枪照亮周围环境
 
 		vecSrc = m_pPlayer->GetGunPosition();
-		Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(), 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+		Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(), 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);//武器射出去子弹，造成伤害
 
 		int flags;
 #ifdef CLIENT_WEAPONS

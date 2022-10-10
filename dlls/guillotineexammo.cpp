@@ -5,9 +5,10 @@
 #include "weapons.h"
 #include "studio.h"
 #include "wpn_shared/wpn_guillotine.h"
-#ifndef CLIENT_DLL
+
 #include "gamemode/mods.h"
-#endif
+#include "effects.h"
+#include "customentity.h"
 
 #define BTEVER 0
 
@@ -401,10 +402,10 @@ TL_ADD(CGuillotineexAmmo)
 
 #define GUILLOTINE_AMMO_MAX_DISTANCE	20.0 * 39.37
 #define GUILLOTINE_AMMO_HEADCUT_TIME	10
-#define GUILLOTINE_AMMO_RADIUS	55
+#define GUILLOTINE_AMMO_RADIUS	255
 #define GUILLOTINE_AMMO_SPEED	1000.0
 #define GUILLOTINE_AMMO2_HEADCUT_TIME	14
-#define GUILLOTINE_AMMO2_RADIUS	158
+#define GUILLOTINE_AMMO2_RADIUS	258
 
 LINK_ENTITY_TO_CLASS(guillotineexAmmo, CGuillotineExAmmo);
 
@@ -511,8 +512,29 @@ void CGuillotineExAmmo::Spawn(void)
 	m_hHeadCutting = NULL;
 	m_pTarget = NULL;
 
+	pBeam = CBeam::BeamCreate("sprites/lgtning.spr", 60);
+
 	if (m_iType)
 	{
+		pBeam->SetColor(255, 185, 0);
+		pBeam->SetScrollRate(60);
+		pBeam->SetBrightness(0);
+		pBeam->SetNoise(0);
+	}
+		
+	else
+	{
+		pBeam->SetColor(0, 100, 255);
+		pBeam->SetScrollRate(0);
+		pBeam->SetBrightness(0);
+		pBeam->SetNoise(60);
+	}
+
+	pBeam->pev->effects |= EF_NODRAW;
+
+
+	if (m_iType)
+	{	
 		float flMinDist = 9999.0f;
 		CBaseEntity* pEntity = NULL;
 		while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, GUILLOTINE_AMMO_MAX_DISTANCE)) != nullptr)
@@ -568,6 +590,12 @@ void CGuillotineExAmmo::Spawn(void)
 	pev->nextthink = gpGlobals->time;
 
 	SetAnimation(GUILLOTINEAMMO_IDLE, true);
+}
+
+void CGuillotineExAmmo::ClearBeam()
+{
+	pBeam->SetBrightness(0);
+	pBeam->pev->effects |= EF_NODRAW;
 }
 
 void CGuillotineExAmmo::ChargeAttackThink(void)
@@ -719,6 +747,7 @@ void CGuillotineExAmmo::Crash(void)
 	SetThink(NULL);
 	SetTouch(NULL);
 
+	UTIL_Remove(pBeam);
 	UTIL_Remove(this);
 }
 
@@ -875,6 +904,9 @@ void CGuillotineExAmmo::HeadCutThink(void)
 				if (g_pGameRules->PlayerRelationship(m_pOwner, pEntity) == GR_TEAMMATE)
 					continue;
 
+				if (pEntity == pCutting)
+					continue;
+
 				if (pEntity == m_pOwner)
 					continue;
 
@@ -889,27 +921,23 @@ void CGuillotineExAmmo::HeadCutThink(void)
 
 			if (pEntity)
 			{
-				MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
-				WRITE_BYTE(TE_BEAMPOINTS);
-				WRITE_COORD(pev->origin.x);
-				WRITE_COORD(pev->origin.y);
-				WRITE_COORD(pev->origin.z);
-				WRITE_COORD(pEntity->pev->origin.x);
-				WRITE_COORD(pEntity->pev->origin.y);
-				WRITE_COORD(pEntity->pev->origin.z);
-				WRITE_SHORT(g_sModelIndexLaser);
-				WRITE_BYTE(0);
-				WRITE_BYTE(0);
-				WRITE_BYTE(4);//Life
-				WRITE_BYTE(7);//Width
-				WRITE_BYTE(0);//Noise
-				WRITE_BYTE(0);
-				WRITE_BYTE(200);
-				WRITE_BYTE(255);
-				WRITE_BYTE(160);
-				WRITE_BYTE(10);
+				pBeam->SetType(BEAM_ENTS);
+				pBeam->SetStartEntity(this->entindex());
+				pBeam->SetEndEntity(pEntity->entindex());
+				pBeam->SetStartAttachment(0);
+				pBeam->SetEndAttachment(0);
+				pBeam->RelinkBeam();
+				pBeam->SetBrightness(230);
+				pBeam->pev->effects &= ~EF_NODRAW;
+
+				MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, nullptr, pEntity->pev);
+				WRITE_BYTE(4);
+				WRITE_SHORT(pEntity->entindex());
+				WRITE_BYTE(20);
 				MESSAGE_END();
 			}
+			else
+				ClearBeam();
 
 			if (flDamage > 0 && m_hHeadCutting.Get() && pCutting)
 			{
@@ -925,6 +953,7 @@ void CGuillotineExAmmo::HeadCutThink(void)
 		{
 			SetThink(NULL);
 
+			UTIL_Remove(pBeam);
 			UTIL_Remove(this);
 		}
 		else
@@ -980,6 +1009,9 @@ void CGuillotineExAmmo::HeadCutThink(void)
 				if (g_pGameRules->PlayerRelationship(m_pOwner, pEntity) == GR_TEAMMATE)
 					continue;
 
+				if (pEntity == pCutting)
+					continue;
+
 				if (pEntity == m_pOwner)
 					continue;
 
@@ -994,27 +1026,23 @@ void CGuillotineExAmmo::HeadCutThink(void)
 
 			if (pEntity)
 			{
-				MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
-				WRITE_BYTE(TE_BEAMPOINTS);
-				WRITE_COORD(pev->origin.x);
-				WRITE_COORD(pev->origin.y);
-				WRITE_COORD(pev->origin.z);
-				WRITE_COORD(pEntity->pev->origin.x);
-				WRITE_COORD(pEntity->pev->origin.y);
-				WRITE_COORD(pEntity->pev->origin.z);
-				WRITE_SHORT(g_sModelIndexLaser);
-				WRITE_BYTE(0);
-				WRITE_BYTE(0);
-				WRITE_BYTE(4);//Life
-				WRITE_BYTE(7);//Width
-				WRITE_BYTE(5);//Noise
-				WRITE_BYTE(0);
-				WRITE_BYTE(255);
-				WRITE_BYTE(185);
-				WRITE_BYTE(0);
-				WRITE_BYTE(10);
+				pBeam->SetType(BEAM_ENTS);
+				pBeam->SetStartEntity(this->entindex());
+				pBeam->SetEndEntity(pEntity->entindex());
+				pBeam->SetStartAttachment(0);
+				pBeam->SetEndAttachment(0);
+				pBeam->RelinkBeam();
+				pBeam->SetBrightness(230);
+				pBeam->pev->effects &= ~EF_NODRAW;
+
+				MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, nullptr, pEntity->pev);
+				WRITE_BYTE(4);
+				WRITE_SHORT(pEntity->entindex());
+				WRITE_BYTE(19);
 				MESSAGE_END();
 			}
+			else
+				ClearBeam();
 
 
 			if (flDamage > 0)
@@ -1365,6 +1393,7 @@ void CGuillotineExAmmo::ReturnTouch(CBaseEntity* pOther)
 		SetTouch(NULL);
 		SetThink(NULL);
 
+		UTIL_Remove(pBeam);
 		UTIL_Remove(this);
 
 		return;

@@ -758,7 +758,6 @@ void CHudSniperScope::DrawBunkerBusterScope(float flTime)
 {
 	float scale = 1.0;
 	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
-	;
 
 	float LENGTH_SCOPE_BB = ScreenHeight / 2 * 0.75f;
 	bool IsRed = false;
@@ -847,7 +846,7 @@ void CHudSniperScope::DrawBunkerBusterScope(float flTime)
 		if (0 <= iNum && iNum < 10)
 		{
 			gEngfuncs.pfnSPR_Set(gHUD.GetSprite(iBunkerSpriteNumber[iNum]), 170, 240, 0);
-			gEngfuncs.pfnSPR_DrawAdditive(0, (ScreenWidth - WIDTH_MID) / 2 - (strlen(sTime) - number) * 23.0f, (ScreenHeight - HEIGHT_TIMER / 2) / 2, &gHUD.GetSpriteRect(iBunkerSpriteNumber[iNum]));
+			gEngfuncs.pfnSPR_DrawAdditive(0, flScale *((ScreenWidth - WIDTH_MID) / 2 - (strlen(sTime) - number) * 23.0f), flScale * ((ScreenHeight - HEIGHT_TIMER / 2) / 2), &gHUD.GetSpriteRect(iBunkerSpriteNumber[iNum]));
 		}
 		number--;
 	}

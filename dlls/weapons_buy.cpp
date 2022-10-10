@@ -386,6 +386,7 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "z4b_heartstimulater",	KNIFE_HEARTSTIMULATER },
 	{ "knife_y22s2sfsword",	KNIFE_Y22S2SFSWORD },
 	{ "knife_armtorch",	KNIFE_ARMTORCH },
+	{ "z4b_tiga",	KNIFE_TIGA },
 	
 };
 

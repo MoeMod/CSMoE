@@ -12,8 +12,8 @@ namespace sv {
 #define BunkerBusterGlobalTime 100s
 
 
-#define BunkerBusterMode 0
-#define BunkerBusterMissileCounts 10
+#define BunkerBusterMode 1
+#define BunkerBusterMissileCounts 7
 //Just Think Rate ,Real Rate Depends On Distance Calculation.
 #define BunkerBuster_BombingInterval 0.2s
 #define BunkerBuster_BombingDistance 50.0

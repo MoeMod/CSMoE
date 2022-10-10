@@ -66,6 +66,8 @@ enum
 	WINGGUN_WING,
 	DIVINETITAN_PARTICLE,
 	FIREBOMB_BURN,
+	EF_ELEC_BLUE,
+	EF_ELEC_YELLOW,
 };
 
 TEMPENTITY *iHolyFistRingEffect[33];
@@ -73,7 +75,7 @@ TEMPENTITY *iWingGunEffect[33];
 TEMPENTITY* iDivinetitanParticle[33];
 
 void CreateAttachedEntitiesToPlayer(int entity, int type);
-void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
+void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate, int r = 0, int g = 0, int b = 0);
 void CreateFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 TEMPENTITY* AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
@@ -761,13 +763,27 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 			Vector(0.0, 0.0, -5.0), 5.0, TRUE, flags, 0.7, kRenderTransAdd, 10.0);
 		break;
 	}
+	case EF_ELEC_BLUE:
+	{
+		flags = FTENT_NONE;
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_elec.spr"),
+			Vector(0.0, 0.0, 0.0), 0.2, TRUE, flags, 0.7, kRenderTransAdd, 20.0, 0, 100, 255);
+		break;
+	}
+	case EF_ELEC_YELLOW:
+	{
+		flags = FTENT_NONE;
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_elec.spr"),
+			Vector(0.0, 0.0, 0.0), 0.2, TRUE, flags, 0.7, kRenderTransAdd, 20.0, 255, 185, 0);
+		break;
+	}
 
 	default:
 		break;
 	}
 }
 
-void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate)
+void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate, int r, int g, int b)
 {
 	if (!modelIndex)
 	{
@@ -804,6 +820,12 @@ void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life,
 	if (additive)
 		pTemp->entity.curstate.rendermode = kRenderTransAdd;
 	pTemp->die = gHUD.m_flTime + life;
+	if (r || g || b)
+	{
+		pTemp->entity.curstate.rendercolor.r = r;
+		pTemp->entity.curstate.rendercolor.g = g;
+		pTemp->entity.curstate.rendercolor.b = b;
+	}
 
 }
 

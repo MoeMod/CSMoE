@@ -29,6 +29,13 @@ namespace sv {
 			SetTouch(NULL);
 			UTIL_Remove(this);
 		}
+		if (pAttackPlayer->m_bIsZombie)
+		{
+			SetThink(NULL);
+			SetTouch(NULL);
+			UTIL_Remove(this);
+			return;
+		}
 
 		if (m_flRemoveTime != invalid_time_point && m_flRemoveTime < gpGlobals->time)
 		{
@@ -635,6 +642,7 @@ namespace sv {
 				vecReturn.z - 100.0 : vecReturn.z)) < 200.0)
 			{
 				bModiCheck = true;
+				return flPlayerZ + 150.0;
 			}
 		}
 
