@@ -579,6 +579,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfgrenade.cpp
 	../dlls/wpn_shared/wpn_chaingren.cpp
 	../dlls/wpn_shared/z4b_tiga.cpp
+	../dlls/wpn_shared/wpn_restrictionpistol.cpp
 	)
 
 set(PM_SRCS

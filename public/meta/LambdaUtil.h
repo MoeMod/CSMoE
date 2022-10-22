@@ -22,7 +22,12 @@ namespace detail
 	    template<class Value, class = decltype(DefiGen<T, N, Value>())> operator Value();
 	};
 
+#if _MSC_VER
+	template<class T, std::size_t N> struct GetParameterTypeImpl3 : decltype(loophole(DeclGen<T, N>{})) {};
+	template<class Ret, class T, std::size_t...I> struct GetParameterTypeImpl2 : detail::TypeIdentity < Ret(typename GetParameterTypeImpl3<T, I>::type...) > {};
+#else
 	template<class Ret, class T, std::size_t...I> struct GetParameterTypeImpl2 : detail::TypeIdentity < Ret(typename decltype(loophole(detail::DeclGen<T, I>{}))::type...) > {};
+#endif
 	template<class T, class Seq> struct GetParameterTypeImpl;
 	template<class T, std::size_t...I> struct GetParameterTypeImpl<T, std::index_sequence<I...>> : GetParameterTypeImpl2<decltype(std::declval<T>()(detail::Inspector<T, I>()...)), T, I...> {};
 }

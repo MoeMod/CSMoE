@@ -81,6 +81,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 //#ifdef XASH_DEDICATED
 	{ WEAPON_Z4B_INFINITYX, "z4b_infinityx", "英菲尼迪双枪",     1500, PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
+	{ WEAPON_RESTRICTIONPISTOL, "weapon_restrictionpistol",	 "wdnmd",			  2000,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_VOIDPISTOL, "weapon_voidpistol",         "黑曜审判",                  1700, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_GUNKATA, "weapon_gunkata",	 "深渊",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_DESPERADO, "weapon_desperado",         "永恒",                  1500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
@@ -392,6 +393,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+	{ WEAPON_RESTRICTIONPISTOL, "weapon_restrictionpistol",	 "wdnmd",			  2000,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ GRENADE_M24GRENADE, "weapon_m24grenade",     "M24柄式手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_FGRENADE2, "weapon_fgrenade2",     "破片高爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_FIREBOMB, "weapon_fgrenade",     "火焰高爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },

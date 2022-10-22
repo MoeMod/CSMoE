@@ -612,6 +612,7 @@ public:
 			|| m_iId == WEAPON_KINGCOBRA
 			|| m_iId == WEAPON_KINGCOBRAG
 			|| m_iId == WEAPON_BUFFFIVESEVEN
+			|| m_iId == WEAPON_RESTRICTIONPISTOL
 			);
 	}
 	void SetPlayerShieldAnim();
