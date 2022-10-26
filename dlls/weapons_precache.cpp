@@ -454,6 +454,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_violingun");
 	UTIL_PrecacheOtherWeapon("weapon_wondercannonex");
 	UTIL_PrecacheOtherWeapon("weapon_restrictionpistol");
+	UTIL_PrecacheOtherWeapon("knife_y22s3dragonsword");
+	UTIL_PrecacheOtherWeapon("weapon_janus7");
+	UTIL_PrecacheOtherWeapon("weapon_y22s3janus7");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

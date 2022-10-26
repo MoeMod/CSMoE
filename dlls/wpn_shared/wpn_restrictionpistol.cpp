@@ -370,7 +370,7 @@ namespace sv {
         else
             iAnim = ANIM_SHOOT2_CHARGING1;
 
-        SendWeaponAnim(ANIM_SHOOT2_CHARGING5, UseDecrement() != FALSE);
+        SendWeaponAnim(iAnim, UseDecrement() != FALSE);
 
         m_flTimeWeaponIdle = m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.125s;
         m_flTimeNextCharge = gpGlobals->time + 1.0s;

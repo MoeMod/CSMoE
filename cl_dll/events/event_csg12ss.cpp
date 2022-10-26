@@ -96,11 +96,11 @@ void EV_FireCSG12SS( event_args_t *args )
 		vSpread.y = 0.1;
 	}
 	
-	EV_HLDM_FireBullets( idx,
+	/*EV_HLDM_FireBullets( idx,
 		forward, right,	up,
 		9, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_BUCKSHOT,
-		1 );
+		1 );*/
 }
 
 }

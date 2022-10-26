@@ -349,6 +349,9 @@ TL_ADD(CMoonCake)
 TL_ADD(CSFGrenade)
 TL_ADD(CChainGrenade)
 TL_ADD(CRestrictionPistol)
+TL_ADD(CKnifeY22S3DragonSword)
+TL_ADD(CJANUS7)
+TL_ADD(CY22S3JANUS7)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)

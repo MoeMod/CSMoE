@@ -194,7 +194,8 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	case CT:
 		//m_pPlayer->GiveNamedItem("knife_y22s2sfsword");
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("weapon_usp");
+		m_pPlayer->GiveNamedItem("weapon_restrictionpistol");
+		m_pPlayer->GiveNamedItem("z4b_csg12ss");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;

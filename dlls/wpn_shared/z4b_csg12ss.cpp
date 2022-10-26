@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#include "decals.h"
 
 #include "weapons/KnifeAttack.h"
 #include "weapons/WeaponTemplate.hpp"
@@ -374,8 +375,8 @@ namespace sv {
 #endif
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
-		Vector vecSpread = m_iWeaponState ? Vector(0.03, 0.03, 0) : Vector(0.1, 0.1, 0);
-		m_pPlayer->FireBullets(9, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, vecSpread, 3000, BULLET_PLAYER_BUCKSHOT, GetDamageShotGun());
+		Vector vecSpread = m_iWeaponState ? Vector(0.02, 0.02, 0) : Vector(0.05, 0.05, 0);
+		FireBulletsEX(8, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, vecSpread, 3000, BULLET_PLAYER_BUCKSHOT, 0, GetDamageShotGun());
 #endif
 
 		int flags;
@@ -404,6 +405,114 @@ namespace sv {
 
 		m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.45s;
 	}
+
+#ifndef CLIENT_DLL
+	void FireBulletsEX(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance,
+		int iBulletType, int iTracerFreq = 4, int iDamage = 0, entvars_t* pevAttacker = NULL)
+	{
+		int DECAL_SHOT[5];
+		DECAL_SHOT[0] = DECAL_INDEX("{shot1");
+		DECAL_SHOT[1] = DECAL_INDEX("{shot2");
+		DECAL_SHOT[2] = DECAL_INDEX("{shot3");
+		DECAL_SHOT[3] = DECAL_INDEX("{shot4");
+		DECAL_SHOT[4] = DECAL_INDEX("{shot5");
+
+		static int tracerCount;
+		int tracer;
+
+		TraceResult tr;
+		Vector vecRight, vecUp;
+		bool m_bCreatedShotgunSpark = true;
+
+		vecRight = gpGlobals->v_right;
+		vecUp = gpGlobals->v_up;
+
+		if (!pevAttacker) {
+			// the default attacker is ourselves
+			pevAttacker = pev;
+		}
+
+		ClearMultiDamage();
+		gMultiDamage.type = (DMG_BULLET | DMG_NEVERGIB);
+
+		for (ULONG iShot = 1; iShot <= cShots; iShot++) {
+			int spark = 0;
+
+			// get circular gaussian spread
+			float x, y, z;
+
+			int mid = cShots / 2;
+
+			x = (iShot - mid);
+
+			Vector vecDir, vecEnd;
+
+			vecDir = vecDirShooting + x * vecSpread.x * vecRight;
+			vecEnd = vecSrc + vecDir * flDistance;
+
+			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+			tracer = 0;
+
+			if (iTracerFreq != 0 && !(tracerCount++ % iTracerFreq)) {
+				Vector vecTracerSrc;
+
+				if (IsPlayer()) {
+					// adjust tracer position for player
+					vecTracerSrc = vecSrc + Vector(0, 0, -4) + gpGlobals->v_right * 2 + gpGlobals->v_forward * 16;
+				}
+				else {
+					vecTracerSrc = vecSrc;
+				}
+
+				// guns that always trace also always decal
+				if (iTracerFreq != 1)
+					tracer = 1;
+
+				MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, vecTracerSrc);
+				WRITE_BYTE(TE_TRACER);
+				WRITE_COORD(vecTracerSrc.x);
+				WRITE_COORD(vecTracerSrc.y);
+				WRITE_COORD(vecTracerSrc.z);
+				WRITE_COORD(tr.vecEndPos.x);
+				WRITE_COORD(tr.vecEndPos.y);
+				WRITE_COORD(tr.vecEndPos.z);
+				MESSAGE_END();
+			}
+
+			// do damage, paint decals
+			if (tr.flFraction != 1.0f) {
+				CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+
+				float flDamage = ((1 - tr.flFraction) * iDamage);
+				pEntity->TraceAttack(pevAttacker, flDamage, vecDir, &tr,
+					DMG_BULLET);
+				TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
+
+				if (!FNullEnt(tr.pHit) && VARS(tr.pHit)->rendermode != kRenderNormal) {
+					UTIL_DecalTrace(&tr, DECAL_GLASSBREAK1 + RANDOM_LONG(0, 2));
+				}
+					
+				if(FNullEnt(tr.pHit))
+				{
+					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pev->origin);
+					WRITE_BYTE(TE_GUNSHOTDECAL);
+					WRITE_COORD(tr.vecEndPos.x);
+					WRITE_COORD(tr.vecEndPos.y);
+					WRITE_COORD(tr.vecEndPos.z);
+					WRITE_SHORT(0);
+					WRITE_BYTE(DECAL_SHOT[RANDOM_LONG(0, 4)]);
+					MESSAGE_END();
+
+				}
+			}
+
+			// make bullet trails
+			UTIL_BubbleTrail(vecSrc, tr.vecEndPos, (int)((flDistance * tr.flFraction) / 64));
+		}
+
+		ApplyMultiDamage(pev, pevAttacker);
+}
+#endif
 
 	float GetDamageShotGun()
 	{

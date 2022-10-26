@@ -300,6 +300,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "kronos7",	WEAPON_KRONOS7 },
 	{ "blockmg",	WEAPON_BLOCKMG },
 	{ "buffng7",	WEAPON_BUFFNG7 },
+	{ "janus7",	WEAPON_JANUS7 },
+	{ "y22s3janus7",	WEAPON_Y22S3JANUS7 },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -388,6 +390,7 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_y22s2sfsword",	KNIFE_Y22S2SFSWORD },
 	{ "knife_armtorch",	KNIFE_ARMTORCH },
 	{ "z4b_tiga",	KNIFE_TIGA },
+	{ "knife_y22s3dragonsword",	KNIFE_Y22S3DRAGONSWORD },
 	
 };
 
@@ -716,6 +719,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "kronos7",	WEAPONCLASS_MACHINEGUN },
 	{ "blockmg",	WEAPONCLASS_MACHINEGUN },
 	{ "buffng7",	WEAPONCLASS_MACHINEGUN },
+	{ "janus7",	WEAPONCLASS_MACHINEGUN },
+	{ "y22s3janus7",	WEAPONCLASS_MACHINEGUN },
 
 
 	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
@@ -1074,6 +1079,8 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_GUITAR:
 	case WEAPON_VIOLINGUN:
 	case WEAPON_WONDERCANNONEX:
+	case WEAPON_JANUS7:
+	case WEAPON_Y22S3JANUS7:
 		return true;
 	default:
 		break;

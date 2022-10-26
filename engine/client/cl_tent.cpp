@@ -37,7 +37,7 @@ TEMPENTS MANAGEMENT
 
 ==============================================================
 */
-#define MAX_MUZZLEFLASH		256
+#define MAX_MUZZLEFLASH		512
 #define SHARD_VOLUME		12.0f	// on shard ever n^3 units
 #define SF_FUNNEL_REVERSE		1
 
@@ -958,7 +958,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 			switch (cType) {
 			case 'I':
 				index = bound(0, atoi(value), MAX_MUZZLEFLASH - 1);
-				if (index >= 0x100 || index < 1) return;
+				if (index >= MAX_MUZZLEFLASH || index < 1) return;
 				break;
 			case 'S':
 				scale = atof(value);

@@ -133,6 +133,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ WEAPON_M32VENOM, "weapon_m32venom", "腐化重炮", 6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_M95TIGER, "weapon_m95tiger",         "【虎王】M95",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_Y20S2SCARD, "weapon_y20s2scard",         "绿野仙踪SCARD",           1500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	{ WEAPON_JANUS7, "weapon_janus7",         "雷狱Janus-7",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+	{ WEAPON_Y22S3JANUS7, "weapon_y22s3janus7",         "遗迹丛林•毁灭者",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_JANUS7XMAS, "weapon_janus7xmas",         "圣诞雷狱",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_SPSMG, "weapon_spsmg",	 "爆炎蒸汽",			  2500,  PRIMARY_WEAPON_SLOT,         UNASSIGNED, BUY_SMG },
 	{ WEAPON_COILGUN, "weapon_coilgun",	 "千针",			  4750,  PRIMARY_WEAPON_SLOT,         UNASSIGNED, BUY_SMG },
@@ -341,6 +343,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 	{ WEAPON_SKULL4, "weapon_skull4",         "死亡咆哮Skull-4",                  6150, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ KNIFE_DRAGONSWORD, "knife_dragonsword",     "青龙偃月刀",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
+	{ KNIFE_Y22S3DRAGONSWORD, "knife_y22s3dragonsword",     "遗迹丛林•狂暴者",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
 	{ KNIFE_DRAGON, "knife_knifedragon",         "龙吻",                  0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
 	{ KNIFE_STRONGKNIFE, "knife_nataknife",      "背刺银刃",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
 	{ KNIFE_JKNIFE, "knife_jknife",      "星芒蝶翼",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
@@ -393,6 +396,11 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+	{ KNIFE_Y22S3DRAGONSWORD, "knife_y22s3dragonsword",     "遗迹丛林•狂暴者",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
+
+	{ WEAPON_JANUS7, "weapon_janus7",         "雷狱Janus-7",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+	{ WEAPON_Y22S3JANUS7, "weapon_y22s3janus7",         "遗迹丛林•毁灭者",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+
 	{ WEAPON_RESTRICTIONPISTOL, "weapon_restrictionpistol",	 "wdnmd",			  2000,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ GRENADE_M24GRENADE, "weapon_m24grenade",     "M24柄式手雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ GRENADE_FGRENADE2, "weapon_fgrenade2",     "破片高爆雷",              300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -677,6 +685,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 
 	{ WEAPON_SKULL4, "weapon_skull4",         "死亡咆哮Skull-4",                  6150, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ KNIFE_DRAGONSWORD, "knife_dragonsword",     "青龙偃月刀",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
+	{ KNIFE_Y22S3DRAGONSWORD, "knife_y22s3dragonsword",     "遗迹丛林•狂暴者",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
 	{ KNIFE_DRAGON, "knife_knifedragon",         "龙吻",                  0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
 	{ KNIFE_STRONGKNIFE, "knife_nataknife",      "背刺银刃",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
 	{ KNIFE_JKNIFE, "knife_jknife",      "星芒蝶翼",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE },
