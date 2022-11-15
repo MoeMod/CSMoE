@@ -7,6 +7,7 @@
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
+#include "weapons_moe_buy.h"
 
 #include "luash.hpp"
 #include "luash_sv/luash_sv_extern.h"
@@ -87,4 +88,17 @@ namespace cl {
 	{
 		return 0;
 	}
+
+    int LuaSV_MOE_SETUP_BUY_INFO(lua_State *L)
+    {
+        // keep content in memory to save const char *
+        static int last_ref = 0;
+        if(last_ref)
+        {
+            luaL_unref(L, LUA_REGISTRYINDEX, last_ref);
+        }
+        luash::Get(L, 1, g_MoEWeaponBuyInfo);
+        last_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+        return 0;
+    }
 }

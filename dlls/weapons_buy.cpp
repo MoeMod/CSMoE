@@ -1294,16 +1294,6 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 		return false;
 	}
 
-#ifndef XASH_DEDICATED
-	auto iter = std::find_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal),
-		[pszCommand](const MoEWeaponBuyInfo_s& info) {
-			return !strcmp(info.pszClassName, pszCommand);
-		});
-
-	if (iter == std::end(g_MoEWeaponBuyInfoLocal)) {
-		return false;
-	}
-#else
 	auto iter = std::find_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo),
 		[pszCommand](const MoEWeaponBuyInfo_s& info) {
 			return !strcmp(info.pszClassName, pszCommand);
@@ -1312,7 +1302,6 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 	if (iter == std::end(g_MoEWeaponBuyInfo)) {
 		return false;
 	}
-#endif // !XASH_DEDICATED
 
 	if (pPlayer->m_iAccount < iter->iCost && iter->iID != WEAPON_PATROLDRONE) {
 		ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");

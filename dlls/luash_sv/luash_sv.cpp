@@ -68,6 +68,7 @@ namespace sv
 		lua_register(L, "STRING", LuaSV_STRING);
 		lua_register(L, "UTIL_WeaponTimeBase", LuaSV_UTIL_WeaponTimeBase);
 		lua_register(L, "MAKE_STRING", LuaSV_MAKE_STRING);
+		lua_register(L, "MOE_SETUP_BUY_INFO", LuaSV_MOE_SETUP_BUY_INFO);
 
 		ADD_SERVER_COMMAND("luasv", Cmd_LuaSV);
 
