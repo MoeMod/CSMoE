@@ -253,6 +253,7 @@ set(HLDLL_SRCS
 	./gamemode/zb3zp/zp_zclass_human.cpp
 	./guillotineammo.cpp
 	./guillotineexammo.cpp
+	./voidpistolblackhole.cpp
 	)
 
 set (HLWPN_SRCS
@@ -583,6 +584,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_y22s3dragonsword.cpp
 	../dlls/wpn_shared/wpn_janus7.cpp
 	../dlls/wpn_shared/wpn_y22s3janus7.cpp
+	../dlls/wpn_shared/wpn_voidpistolex.cpp
 	)
 
 set(PM_SRCS

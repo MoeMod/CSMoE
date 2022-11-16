@@ -128,6 +128,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "musket", WEAPON_MUSKET },
 	{ "bufffiveseven", WEAPON_BUFFFIVESEVEN },
 	{ "restrictionpistol", WEAPON_RESTRICTIONPISTOL },
+	{ "voidpistolex",	WEAPON_VOIDPISTOLEX },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -543,7 +544,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "skull2", WEAPONCLASS_PISTOL },
 	{ "musket", WEAPONCLASS_PISTOL },
 	{ "bufffiveseven", WEAPONCLASS_PISTOL },
-
+	{ "voidpistolex",	WEAPONCLASS_PISTOL },
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -1137,6 +1138,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_MUSKET:
 	case WEAPON_BUFFFIVESEVEN:
 	case WEAPON_RESTRICTIONPISTOL:
+	case WEAPON_VOIDPISTOLEX:
 		return true;
 	default:
 		break;

@@ -26,15 +26,18 @@
 *
 */
 #include "events.h"
-#include "studio.h"
 #include "r_studioint.h"
-#include <string>
+#include "studio.h"
 
 namespace cl {
-    extern engine_studio_api_t IEngineStudio;
+	extern engine_studio_api_t IEngineStudio;
 }
 
 namespace cl::event::voidpistol {
+
+#define WPNSTATE_VOIDPISTOLEX_MODEB	 (1 << 0)
+#define WPNSTATE_VOIDPISTOLEX_MODEC	 (1 << 1)
+#define WPNSTATE_VOIDPISTOLEX_SCAN_ON (1 << 2)
 
 enum voidpistol_e
 {
@@ -58,15 +61,14 @@ enum voidpistol_e
 	VOIDPISTOL_DRAWC
 };
 
-enum blackhole_anim
+static const char* SOUNDS_NAME[] =
 {
-	BLACKHOLE_START,
-	BLACKHOLE_LOOP,
-	BLACKHOLE_END
+	"weapons/voidpistol-1.wav",
+	"weapons/voidpistol-2.wav",
+	"weapons/voidpistol_beep.wav",
 };
 
-
-void EV_FireVoidpistol( event_args_t *args )
+void EV_FireVoidPistol( event_args_t *args )
 {
 	vec3_t ShellVelocity;
 	vec3_t ShellOrigin;
@@ -87,157 +89,33 @@ void EV_FireVoidpistol( event_args_t *args )
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
-		if((args->iparam2))
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(args->bparam1 ? VOIDPISTOL_SHOOTC : VOIDPISTOL_SHOOTA, 2);
+
+		int iAnim;
+		if (args->bparam2 & WPNSTATE_VOIDPISTOLEX_MODEC)
+			iAnim = VOIDPISTOL_SHOOTC;
+		else if (args->bparam2 & WPNSTATE_VOIDPISTOLEX_MODEB)
+			iAnim = VOIDPISTOL_SHOOTB;
 		else
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(args->bparam1 ? VOIDPISTOL_SHOOTC : VOIDPISTOL_SHOOTB, 2);
+			iAnim = VOIDPISTOL_SHOOTA;
 
-		if (args->iparam1)
-		{
-			EV_GetGunPosition(args, vecSrc, origin);
-			Vector vSpread(args->fparam1, args->fparam2, 0.0f);
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(iAnim, 2);
+	}
 
-			EV_HLDM_FireBullets(idx,
-				forward, right, up,
-				1, vecSrc, forward,
-				vSpread, 8192.0, BULLET_PLAYER_50AE,
-				2);
-		}
-		
+	PLAY_EVENT_SOUND(SOUNDS_NAME[0]);
+
+	if (!args->bparam1)
+	{
+		EV_GetGunPosition(args, vecSrc, origin);
+		Vector vSpread(args->fparam1, args->fparam2, 0.0f);
+
+		EV_HLDM_FireBullets(idx,
+			forward, right, up,
+			1, vecSrc, forward,
+			vSpread, 8192.0, BULLET_PLAYER_VOIDPISTOL,
+			3);
 	}
 	else
-	{
-		if (args->bparam2)
-		{
-			switch (args->iparam2)
-			{
-			case BLACKHOLE_START:
-			{
-				//blackhole_projectile spr
-				struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_blackhole_start.spr", false);
-				if (pModel)
-				{
-					gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol_blackhole_start.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					if (pEnt)
-					{
-						pEnt->entity.curstate.frame = 0;
-						pEnt->entity.curstate.framerate = 30.0;
-
-						pEnt->entity.curstate.rendermode = kRenderTransAdd;
-						pEnt->entity.curstate.scale = 0.5;
-						pEnt->entity.curstate.renderamt = 255;
-						pEnt->die = gHUD.m_flTime + 1.5;
-						pEnt->flags |= FTENT_SPRANIMATE;
-					}
-				}
-				break;
-			}
-			case BLACKHOLE_LOOP:
-			{
-				//blackhole_projectile spr
-				struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_blackhole_loop.spr", false);
-				if (pModel)
-				{
-					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					if (pEnt)
-					{
-						pEnt->entity.curstate.frame = 0;
-						pEnt->entity.curstate.framerate = 30.0;
-
-						pEnt->entity.curstate.rendermode = kRenderTransAdd;
-						pEnt->entity.curstate.scale = 0.5;
-						pEnt->entity.curstate.renderamt = 255;
-						pEnt->die = gHUD.m_flTime + 4.0;
-						pEnt->flags |= FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE;
-					}
-				}
-				break;
-			}
-			case BLACKHOLE_END:
-			{
-				struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_blackhole_end.spr", false);
-				if (pModel)
-				{
-					gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol_blackhole_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					if (pEnt)
-					{
-						pEnt->entity.curstate.frame = 0;
-						pEnt->entity.curstate.framerate = 30.0;
-
-						pEnt->entity.curstate.scale = 0.5;
-						pEnt->entity.curstate.rendermode = kRenderTransAdd;
-						pEnt->entity.curstate.renderamt = 255;
-						pEnt->die = gHUD.m_flTime + 1.53;
-						pEnt->flags |= FTENT_SPRANIMATE;
-					}
-
-				}
-				break;
-			}
-			default:
-			{
-				//blackhole_projectile spr
-				struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_blackhole_projectile.spr", false);
-				if (pModel)
-				{
-					
-					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					if (pEnt)
-					{
-						pEnt->entity.curstate.frame = 0;
-						pEnt->entity.curstate.framerate = 30.0;
-						pEnt->entity.curstate.vuser1 = { args->angles[0] ,args->angles[1] ,args->angles[2] };
-						pEnt->entity.curstate.scale = 0.1;
-						pEnt->clientIndex = idx;
-						pEnt->entity.curstate.rendermode = kRenderTransAdd;
-						pEnt->entity.curstate.renderamt = 255;
-
-						pEnt->frameMax = 30;
-						pEnt->tentOffset = Vector(0, 0, 0);
-						pEnt->die = gHUD.m_flTime + 4.0;
-						pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
-
-							float	traceFraction = 1;
-							vec3_t	traceNormal;
-							pmtrace_t pmtrace;
-							physent_t* pe;
-							Vector vecForward = ent->entity.curstate.vuser1;
-							gEngfuncs.pEventAPI->EV_SetTraceHull(2);
-							gEngfuncs.pEventAPI->EV_PlayerTrace(ent->entity.prevstate.origin, ent->entity.origin + vecForward * 40, PM_STUDIO_BOX, -1, &pmtrace);
-
-							if (pmtrace.fraction != 1)
-							{
-								pe = gEngfuncs.pEventAPI->EV_GetPhysent(pmtrace.ent);
-
-								if (!pmtrace.ent || (pe->info != ent->clientIndex))
-								{
-									traceFraction = pmtrace.fraction;
-									VectorCopy(pmtrace.plane.normal, traceNormal);
-
-									if (ent->hitcallback)
-									{
-										(*ent->hitcallback)(ent, &pmtrace);
-									}
-								}
-							}
-						};
-						pEnt->hitcallback = [](tempent_s* ent, pmtrace_t* tr)
-						{
-							ent->flags &= ~FTENT_FADEOUT;
-							ent->die = gHUD.m_flTime;
-						};
-
-						pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-					}
-				}
-				break;
-			}
-			}
-
-		}
-	}
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_ITEM, SOUNDS_NAME[2], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
 }

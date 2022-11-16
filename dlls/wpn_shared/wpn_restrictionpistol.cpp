@@ -255,7 +255,7 @@ namespace sv {
 
         EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/restrictionpistol-3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-        Data.RadiusDamageAmount = GetRadius(iState);
+        Data.RadiusDamageRadius = GetRadius(iState);
         Data.RadiusDamageBitsDamageType = DMG_BULLET;
         Data.RadiusDamageCanHeadshot = false;
         Data.RadiusDamageAmount = GetRadiusDamage(iState);

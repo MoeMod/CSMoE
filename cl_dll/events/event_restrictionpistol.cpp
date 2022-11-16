@@ -74,22 +74,7 @@ void EV_FireRestrictionPistol( event_args_t *args )
 		EV_MuzzleFlash();
 
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT1, 2 );
-
-		if( !gHUD.cl_righthand->value )
-		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, -16.0, 0);
-		}
-		else
-		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, 16.0, 0);
-		}
 	}
-	else
-	{
-		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
-	}
-
-	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iPShell, TE_BOUNCE_SHELL);
 
 	if (args->bparam2)
 		PLAY_EVENT_SOUND(SOUNDS_NAME[1]);

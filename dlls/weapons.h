@@ -613,6 +613,7 @@ public:
 			|| m_iId == WEAPON_KINGCOBRAG
 			|| m_iId == WEAPON_BUFFFIVESEVEN
 			|| m_iId == WEAPON_RESTRICTIONPISTOL
+			|| m_iId == WEAPON_VOIDPISTOLEX
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -1342,6 +1343,53 @@ public:
 	CGuillotineex* m_pWeapon;
 	CBeam* pBeam;
 };
+
+class CVoidPistolBlackHole : public CBaseAnimating
+{
+public:
+	CVoidPistolBlackHole()
+	{
+		m_iType = 0;
+		m_flSoundTime = invalid_time_point;
+	};
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+	float GetArmorRatioModifier() { return 1.5; }
+	KnockbackData GetKnockBackData() override { return { -1.0f, -1.0f, -1.0f, -1.0f, 1.0f }; }
+
+public:
+	void EXPORT FlyingThink(void);
+	void EXPORT FlyingTouch(CBaseEntity* pOther);
+	void EXPORT BlackHoleThink(void);
+	//void EXPORT BlackHoleTouch(CBaseEntity* pOther);
+
+public:
+	static CVoidPistolBlackHole* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	void Explode();
+	void RadiusDamage(bool IsExp, float flDamage, float flRadius);
+	void Remove();
+
+	CBasePlayer* m_pOwner;
+private:
+	float GetExpDamage();
+	float GetExpRadius();
+
+	float GetBlackHoleDamage();
+	float GetBlackHoleRadius();
+
+	int m_iType;
+	bool m_bIsExp;
+	time_point_t m_flDamageTime;
+	time_point_t m_flExplodeTime;
+	time_point_t m_flSoundTime;
+	
+	int m_iBlackHoleStartIndex[2];
+	int m_iBlackHoleLoopIndex[2];
+	int m_iBlackHoleEndIndex[2];
+	int m_iBlackHoleProjectileIndex[2];
+	
+};	
 
 #if 0
 class CGuillotineexAmmo : public CBaseAnimating

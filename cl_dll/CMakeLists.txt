@@ -395,6 +395,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_y22s3dragonsword.cpp
 	../dlls/wpn_shared/wpn_janus7.cpp
 	../dlls/wpn_shared/wpn_y22s3janus7.cpp
+	../dlls/wpn_shared/wpn_voidpistolex.cpp
 	)
 
 set (HUD_SRCS

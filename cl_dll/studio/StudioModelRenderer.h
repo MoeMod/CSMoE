@@ -138,6 +138,11 @@ public:
 	static struct model_s* s_pM3DragonmSmoke2Model;
 	static struct model_s* s_pSGDrillEXViewModel;
 	static struct model_s* s_pSGDrillEXSmokeModel;
+	static struct model_s* s_pVoidPistolViewModel;
+	static struct model_s* s_pVoidPistolEXViewModel;
+	static struct model_s* s_pVoidPistolBlackHoleModel;
+	static struct model_s* s_pVoidPistolEXBlackHoleModel;
+
 };
 
 }

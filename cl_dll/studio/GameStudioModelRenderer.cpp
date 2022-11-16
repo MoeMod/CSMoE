@@ -100,6 +100,9 @@ TEMPENTITY* g_M3DragonFlame2 = NULL;
 TEMPENTITY* g_M3DragonmSmoke1 = NULL;
 TEMPENTITY* g_M3DragonmSmoke2 = NULL;
 
+TEMPENTITY* g_VoidPistolBlackHole = NULL;
+TEMPENTITY* g_VoidPistolEXBlackHole = NULL;
+
 float g_flBloodhunterAnimTime = 0.0;
 int g_iBloodhunterSecAnim = 0;
 int g_iBloodhunterState = 0;
@@ -1837,6 +1840,72 @@ int R_StudioDrawModel(int flags)
 			{
 				g_M3DragonmSmoke2->die = 0.0;
 				g_M3DragonmSmoke2 = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pVoidPistolViewModel && curent->model == CStudioModelRenderer::s_pVoidPistolViewModel && CStudioModelRenderer::s_pVoidPistolBlackHoleModel && (curent->curstate.sequence == 2 || curent->curstate.sequence == 5))
+		{
+			int iAttachment = righthand ? 2 : 3;
+
+			if (!g_VoidPistolBlackHole)
+			{
+				g_VoidPistolBlackHole = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], CStudioModelRenderer::s_pVoidPistolBlackHoleModel);
+
+				g_VoidPistolBlackHole->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_VoidPistolBlackHole->entity.curstate.aiment = curent->index;
+				g_VoidPistolBlackHole->entity.curstate.body = 2;
+				g_VoidPistolBlackHole->entity.curstate.rendermode = kRenderTransAdd;
+				g_VoidPistolBlackHole->entity.curstate.renderamt = 255;
+				g_VoidPistolBlackHole->entity.curstate.renderfx = 0;
+				g_VoidPistolBlackHole->entity.curstate.scale = 0.06;
+				g_VoidPistolBlackHole->entity.curstate.framerate = 30.0f;
+				g_VoidPistolBlackHole->frameMax = 35;
+				g_VoidPistolBlackHole->die = gHUD.m_flTime + 9999.0f;
+				g_VoidPistolBlackHole->entity.curstate.eflags |=  EFLAG_DEPTH_CHANGED;
+				g_VoidPistolBlackHole->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+				g_VoidPistolBlackHole->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_PERSIST;
+			}
+
+		}
+		else
+		{
+			if (g_VoidPistolBlackHole)
+			{
+				g_VoidPistolBlackHole->die = 0.0;
+				g_VoidPistolBlackHole = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pVoidPistolEXViewModel && curent->model == CStudioModelRenderer::s_pVoidPistolEXViewModel && CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel && (curent->curstate.sequence == 2 || curent->curstate.sequence == 5))
+		{
+			int iAttachment = righthand ? 2 : 3;
+
+			if (!g_VoidPistolEXBlackHole)
+			{
+				g_VoidPistolEXBlackHole = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel);
+
+				g_VoidPistolEXBlackHole->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_VoidPistolEXBlackHole->entity.curstate.aiment = curent->index;
+				g_VoidPistolEXBlackHole->entity.curstate.body = 2;
+				g_VoidPistolEXBlackHole->entity.curstate.rendermode = kRenderTransAdd;
+				g_VoidPistolEXBlackHole->entity.curstate.renderamt = 255;
+				g_VoidPistolEXBlackHole->entity.curstate.renderfx = 0;
+				g_VoidPistolEXBlackHole->entity.curstate.scale = 0.06;
+				g_VoidPistolEXBlackHole->entity.curstate.framerate = 30.0f;
+				g_VoidPistolEXBlackHole->frameMax = 35;
+				g_VoidPistolEXBlackHole->die = gHUD.m_flTime + 9999.0f;
+				g_VoidPistolEXBlackHole->entity.curstate.eflags |=  EFLAG_DEPTH_CHANGED;
+				g_VoidPistolEXBlackHole->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+				g_VoidPistolEXBlackHole->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_PERSIST;
+			}
+
+		}
+		else
+		{
+			if (g_VoidPistolEXBlackHole)
+			{
+				g_VoidPistolEXBlackHole->die = 0.0;
+				g_VoidPistolEXBlackHole = NULL;
 			}
 		}
 	}

@@ -248,6 +248,14 @@ int DLLEXPORT HUD_VidInit( void )
 
 	CStudioModelRenderer::s_pSGDrillEXViewModel = IEngineStudio.Mod_ForName("models/v_sgdrillex.mdl", FALSE);
 
+	CStudioModelRenderer::s_pVoidPistolViewModel = IEngineStudio.Mod_ForName("models/v_voidpistol.mdl", FALSE);
+	CStudioModelRenderer::s_pVoidPistolBlackHoleModel = IEngineStudio.Mod_ForName("sprites/ef_blackhole04.spr", FALSE);
+	CStudioModelRenderer::s_pVoidPistolEXViewModel = IEngineStudio.Mod_ForName("models/v_voidpistolex.mdl", FALSE);
+	CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel = IEngineStudio.Mod_ForName("sprites/ef_voidpistolex04.spr", FALSE);
+
+
+
+
 	//VGui_Startup();
 
 	return 1;

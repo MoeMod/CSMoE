@@ -100,6 +100,11 @@ struct model_s* CStudioModelRenderer::s_pM3DragonmSmoke2Model;
 
 struct model_s* CStudioModelRenderer::s_pSGDrillEXViewModel;
 
+struct model_s* CStudioModelRenderer::s_pVoidPistolViewModel;
+struct model_s* CStudioModelRenderer::s_pVoidPistolEXViewModel;
+struct model_s* CStudioModelRenderer::s_pVoidPistolBlackHoleModel;
+struct model_s* CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel;
+
 void CStudioModelRenderer::Init(void)
 {
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");
