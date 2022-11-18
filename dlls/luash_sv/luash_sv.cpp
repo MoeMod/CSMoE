@@ -70,6 +70,9 @@ namespace sv
 		lua_register(L, "MAKE_STRING", LuaSV_MAKE_STRING);
 		lua_register(L, "MOE_SETUP_BUY_INFO", LuaSV_MOE_SETUP_BUY_INFO);
 
+        luash::RegisterGlobal(L, "UTIL_PrecacheOtherWeapon", UTIL_PrecacheOtherWeapon);
+        luash::RegisterGlobal(L, "UTIL_PrecacheOther", UTIL_PrecacheOther);
+
 		ADD_SERVER_COMMAND("luasv", Cmd_LuaSV);
 
 		lua_getglobal(L, "require");
