@@ -164,6 +164,7 @@ if (NOT CMAKE_CROSSCOMPILING)
 	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/oneTBB/ EXCLUDE_FROM_ALL)
 	target_include_directories(3rdparty-tbbmalloc INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/oneTBB/include)
 	target_link_libraries(3rdparty-tbbmalloc INTERFACE TBB::tbb TBB::tbbmalloc)
+	target_compile_definitions(3rdparty-tbbmalloc INTERFACE -DTBB_USE_PREVIEW_BINARY=1)
 endif()
 
 #add_library(3rdparty-gl4es INTERFACE)
