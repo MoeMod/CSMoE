@@ -7,7 +7,7 @@
 //=============================================================================//
 
 
-#if defined (__arm__) || defined (__arm64__) || defined (__aarch64__)
+#if defined (__arm__) || defined (__arm64__) || defined (__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
 bool CheckMMXTechnology(void) { return false; }
 bool CheckSSETechnology(void) { return false; }
 bool CheckSSE2Technology(void) { return false; }

@@ -60,10 +60,8 @@ AngleQuaternion
 #ifdef U_VECTOR_SSE
 const __m128 AngleQuaternion_sign1 = _mm_castsi128_ps(_mm_setr_epi32(0x80000000, 0x00000000, 0x00000000, 0x00000000));
 const __m128 AngleQuaternion_sign2 = _mm_castsi128_ps(_mm_setr_epi32(0x00000000, 0x00000000, 0x80000000, 0x00000000));
-const __m128 AngleQuaternion_sign1f = _mm_setr_ps(-1.0f, 1.0f, 1.0f, 1.0f);
-const __m128 AngleQuaternion_sign2f = _mm_setr_ps(1.0f, 1.0f, -1.0f, 1.0f);
 #elif defined U_VECTOR_NEON
-const float32x4_t AngleQuaternion_sign2 = uint32x4_t{ 0x80000000, 0x00000000, 0x80000000, 0x00000000 };
+const float32x4_t AngleQuaternion_sign2 = vzipq_f32(vdupq_n_u32(0x80000000), vdupq_n_u32(0x00000000)).val[0]; // { 0x80000000, 0x00000000, 0x80000000, 0x00000000 };
 #endif
 void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 {

@@ -58,10 +58,7 @@ option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OF
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
 option(XASH_SKIPCRTLIB "Use system CRT" ON)
 
-option(XASH_CPUINFO "Build with cpuinfo support" ON)
-if(IOS)
-	set(XASH_CPUINFO OFF)
-endif()
+option(XASH_CPUINFO "Build with cpuinfo support" OFF)
 set(XASH_ASTC ON)
 
 

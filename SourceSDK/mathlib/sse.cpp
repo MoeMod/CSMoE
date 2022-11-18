@@ -11,9 +11,6 @@
 #include "tier0/dbg.h"
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
-#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__)
-#include "sse2neon.h"
-#endif
 
 #include "sse.h"
 

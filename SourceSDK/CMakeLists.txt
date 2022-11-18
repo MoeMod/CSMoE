@@ -26,7 +26,7 @@ add_library(tier0 STATIC
         ${HL2SDK_PATH}/tier0/memvalidate.cpp
         ${HL2SDK_PATH}/tier0/minidump.cpp
         ${HL2SDK_PATH}/tier0/pch_tier0.cpp
-        ${HL2SDK_PATH}/tier0/PMELib.cpp
+        #${HL2SDK_PATH}/tier0/PMELib.cpp
         ${HL2SDK_PATH}/tier0/progressbar.cpp
         ${HL2SDK_PATH}/tier0/security.cpp
         ${HL2SDK_PATH}/tier0/systeminformation.cpp
@@ -40,7 +40,7 @@ add_library(tier0 STATIC
 if( WIN32 )
     target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/platform.cpp)
     target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/vcrmode.cpp)
-    target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/pme.cpp)
+    target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/pme_posix.cpp)
     #target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/etwprof.cpp)
 elseif( POSIX )
     target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/cpu_posix.cpp)

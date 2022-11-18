@@ -31,10 +31,10 @@ typedef float32x4_t v4sf;  // vector of 4 float
 typedef uint32x4_t v4su;  // vector of 4 uint32
 typedef int32x4_t v4si;  // vector of 4 uint32
 
-#define s4f_x(s4f) (s4f)[0]
-#define s4f_y(s4f) (s4f)[1]
-#define s4f_z(s4f) (s4f)[2]
-#define s4f_w(s4f) (s4f)[3]
+#define s4f_x(s4f) vgetq_lane_f32(s4f, 0)
+#define s4f_y(s4f) vgetq_lane_f32(s4f, 1)
+#define s4f_z(s4f) vgetq_lane_f32(s4f, 2)
+#define s4f_w(s4f) vgetq_lane_f32(s4f, 3)
 
 #define c_inv_mant_mask ~0x7f800000u
 #define c_cephes_SQRTHF 0.707106781186547524

@@ -28,7 +28,7 @@
 //using namespace std;
 
 // RDTSC Instruction macro
-#define RDTSC(var) var = __rdtsc()
+#define RDTSC(var) var = Plat_Rdtsc()
 
 // RDPMC Instruction macro
 #define RDPMC(counter, var) \

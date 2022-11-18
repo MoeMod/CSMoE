@@ -75,8 +75,9 @@ if(WIN32)
 	endif()
 	
 	target_link_libraries(${XASH_LAUNCHER} xash)
+	string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} XASH_ARCH)
 	set_target_properties(${XASH_LAUNCHER} PROPERTIES
-		OUTPUT_NAME csmoe_win32) # Change name to your gamedir, if you building a standalone game
+		OUTPUT_NAME csmoe_win32_${XASH_ARCH} ) # Change name to your gamedir, if you building a standalone game
 
 	set(CPACK_GENERATOR "NSIS")
 	set(CPACK_PACKAGE_NAME "CSMoE")

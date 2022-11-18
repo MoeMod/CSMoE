@@ -33,7 +33,7 @@ typedef struct lua_State lua_State;
 #define U_VECTOR_SIMD U_VECTOR_SSE
 #endif
 
-#if defined(__ARM_NEON) || defined(__ARM_NEON__)
+#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(_M_ARM) || defined(_M_ARM64)
 #include <arm_neon.h>
 #define U_VECTOR_NEON 2
 #define U_VECTOR_SIMD U_VECTOR_NEON
@@ -221,7 +221,10 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
         else
         {
 #if U_VECTOR_NEON
-            this->m_xmm = { x1, y1, z1, 0 };
+            this->x = x1;
+            this->y = y1;
+            this->z = z1;
+            this->w_ununsed = 0;
 #elif U_VECTOR_SSE
             this->m_xmm = _mm_set_ps(0, z1, y1, x1);
 #endif
@@ -277,7 +280,10 @@ template<> struct VectorBase_Storage<float, 4, 16> : VectorBase_Gen<float, 4, st
         else
         {
 #if U_VECTOR_NEON
-            this->m_xmm = { x1, y1, z1, w1 };
+            this->x = x1;
+            this->y = y1;
+            this->z = z1;
+            this->w = w1;
 #elif U_VECTOR_SSE
             this->m_xmm = _mm_set_ps(w1, z1, y1, x1);
 #endif
@@ -802,7 +808,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
     friend ThisClass abs(ThisClass a)
     {
 #if U_VECTOR_NEON
-        constexpr int32x4_t mask = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0};
+        static const int32x4_t mask = vsetq_lane_s32(0, vdupq_n_s32(0x7fffffff), 3); // {0x7fffffff, 0x7fffffff, 0x7fffffff, 0};
         return vreinterpretq_f32_s32(vandq_s32(vreinterpretq_s32_f32(a), mask));
 #elif U_VECTOR_SSE
         // 0x7fffffff = ~(-0.0f)

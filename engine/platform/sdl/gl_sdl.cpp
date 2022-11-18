@@ -806,7 +806,12 @@ void GL_InitExtensionsBigGL()
 	// occlusion queries
 	GL_CheckExtension( "GL_ARB_occlusion_query", occlusionfunc, "gl_occlusion_queries", GL_OCCLUSION_QUERIES_EXT );
 
+	// nobody implement ASTC with no bug on Win32
+#ifdef _WIN32
+	GL_SetExtension(GL_ASTC_EXT, false);
+#else
     GL_CheckExtension( "GL_KHR_texture_compression_astc_ldr", NULL, "gl_astc_format", GL_ASTC_EXT );
+#endif
 
 	if( GL_Support( GL_SHADER_GLSL100_EXT ))
 	{

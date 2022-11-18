@@ -42,8 +42,7 @@ void Matrix4x4_LoadIdentity( matrix4x4_ref mat ) { Matrix4x4_Copy( mat, matrix4x
 void Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
 #if U_VECTOR_NEON
-    float32x4_t v2 = v;
-    v2[3] = 1;
+    float32x4_t v2 = vsetq_lane_f32(1.0f, v, 3);
     VectorSet(out,
               vaddvq_f32(vmulq_f32(v2, in[0])),
               vaddvq_f32(vmulq_f32(v2, in[1])),
@@ -72,7 +71,7 @@ void Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
     auto c = vuzpq_f32(a.val[0], b.val[0]);
     auto d = vuzpq_f32(a.val[1], b.val[1]);
 
-    vec3_t dir = d.val[1] - v;
+    vec3_t dir = vec3_t(d.val[1]) - v;
 
     VectorSet(out,
               vaddvq_f32(vmulq_f32(dir, c.val[0])),

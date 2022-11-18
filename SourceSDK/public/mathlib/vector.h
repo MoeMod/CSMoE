@@ -2177,7 +2177,7 @@ inline void AngularImpulseToQAngle( const AngularImpulse &impulse, QAngle &angle
 
 FORCEINLINE vec_t InvRSquared( float const *v )
 {
-#if defined(__i386__) || defined(_M_IX86)
+#if defined(__i386__) || defined(_M_IX86) || defined( __x86_64__) || defined(_M_X64)
 	float sqrlen = v[0]*v[0]+v[1]*v[1]+v[2]*v[2] + 1.0e-10f, result;
 	_mm_store_ss(&result, _mm_rcp_ss( _mm_max_ss( _mm_set_ss(1.0f), _mm_load_ss(&sqrlen) ) ));
 	return result;
@@ -2191,7 +2191,7 @@ FORCEINLINE vec_t InvRSquared( const Vector &v )
 	return InvRSquared(&v.x);
 }
 
-#if defined(__i386__) || defined(_M_IX86)
+#if defined(__i386__) || defined(_M_IX86) || defined( __x86_64__) || defined(_M_X64)
 inline void _SSE_RSqrtInline( float a, float* out )
 {
 	__m128  xx = _mm_load_ss( &a );
@@ -2210,7 +2210,7 @@ inline void _SSE_RSqrtInline( float a, float* out )
 FORCEINLINE float VectorNormalize( Vector& vec )
 {
 #ifndef DEBUG // stop crashing my edit-and-continue!
-	#if defined(__i386__) || defined(_M_IX86)
+	#if defined(__i386__) || defined(_M_IX86) || defined( __x86_64__) || defined(_M_X64)
 		#define DO_SSE_OPTIMIZATION
 	#endif
 #endif

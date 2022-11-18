@@ -999,6 +999,11 @@ extern "C" unsigned char _InterlockedCompareExchange128( int64 volatile * Destin
 bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, const int128 &comperand )
 {
 	Assert( ( (size_t)pDest % 16 ) == 0 );
+#if defined( _M_ARM ) || defined( _M_ARM64 )
+	
+	int64 comperandInOut[2] = { comperand.n128_i64[0], comperand.n128_i64[1] };
+	return _InterlockedCompareExchange128((volatile int64*)pDest, comperand.n128_i64[1], comperand.n128_i64[0], comperandInOut);
+#else
 	// Must copy comperand to stack because the intrinsic uses it as an in/out param
 	int64 comperandInOut[2] = { comperand.m128i_i64[0], comperand.m128i_i64[1] };
 
@@ -1010,6 +1015,7 @@ bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, 
 
 	// _InterlockedCompareExchange128: http://msdn.microsoft.com/en-us/library/bb514094.aspx
 	return _InterlockedCompareExchange128((volatile int64*)pDest, value.m128i_i64[1], value.m128i_i64[0], comperandInOut);
+#endif
 }
 
 #endif // PLATFORM_64BITS
