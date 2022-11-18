@@ -260,3 +260,4 @@ HOOK_EVENT(violingun, FireViolingun);
 HOOK_EVENT(restrictionpistol, FireRestrictionPistol);
 HOOK_EVENT(janus7, FireJANUS7);
 HOOK_EVENT(voidpistolex, FireVoidPistolEX);
+HOOK_EVENT(waterpistol, FireWaterPistol);

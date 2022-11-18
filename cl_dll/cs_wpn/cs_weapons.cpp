@@ -661,6 +661,7 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 
 		m_fFireOnEmpty = FALSE;
 
+		//semiauto pistol
 		if (m_iId != WEAPON_USP
 			&& m_iId != WEAPON_GLOCK18
 			&& m_iId != WEAPON_P228
@@ -678,7 +679,19 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 			&& m_iId != WEAPON_INFINITYSS
 			&& m_iId != WEAPON_Z4B_INFINITYX
 			&& m_iId != WEAPON_CSGO_R8
-			&& m_iId != WEAPON_ANACONDA)
+			&& m_iId != WEAPON_ANACONDA
+			&& m_iId != WEAPON_MONKEYWPNSET2
+			&& m_iId != WEAPON_CSGO_TEC9
+			&& m_iId != WEAPON_Z4B_RAGINGBULL
+			&& m_iId != WEAPON_BALROG1
+			&& m_iId != WEAPON_SAPIENTIA
+			&& m_iId != WEAPON_BLOODHUNTER
+			&& m_iId != WEAPON_THUNDERPISTOL
+			&& m_iId != WEAPON_KRONOS1
+			&& m_iId != WEAPON_KINGCOBRA
+			&& m_iId != WEAPON_KINGCOBRAG
+			&& m_iId != WEAPON_SKULL2
+			&& m_iId != WEAPON_MUSKET)
 		{
 			if (m_iShotsFired > 0)
 			{

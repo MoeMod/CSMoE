@@ -1414,6 +1414,8 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_MUSKET:
 		case WEAPON_BUFFFIVESEVEN:
 		case WEAPON_VOIDPISTOLEX:
+		case WEAPON_WATERPISTOL:
+		case WEAPON_MONKEYWPNSET2:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

@@ -253,6 +253,9 @@ namespace sv {
 			if (!IsExp && !(pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY))
 				continue;
 
+			if (m_iTeam == pEntity->m_iTeam)
+				continue;
+
 			if (pEntity->IsDormant())
 				continue;
 

@@ -614,6 +614,8 @@ public:
 			|| m_iId == WEAPON_BUFFFIVESEVEN
 			|| m_iId == WEAPON_RESTRICTIONPISTOL
 			|| m_iId == WEAPON_VOIDPISTOLEX
+			|| m_iId == WEAPON_WATERPISTOL
+			|| m_iId == WEAPON_MONKEYWPNSET2
 			);
 	}
 	void SetPlayerShieldAnim();

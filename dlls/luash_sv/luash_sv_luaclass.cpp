@@ -72,11 +72,11 @@ namespace cl {
 
 	bool PostCall(lua_State *L, const char *FuncName, int ArgsNum)
 	{
-		if(int errc = lua_pcall(L, ArgsNum, 1, -ArgsNum -3)) // #1 = eh, #2 = ret
+		if(int errc = lua_pcall(L, ArgsNum, 1, -ArgsNum -2)) // #1 = eh, #2 = ret
 		{
 			const char *msg = lua_tostring(L, -1);
-			char buffer[256];
-			snprintf(buffer, 256, "LuaClass Vfunc %s Error: %s\n", FuncName, msg);
+			char buffer[16384];
+			snprintf(buffer, 16384, "LuaClass Vfunc %s Error: %s\n", FuncName, msg);
 			LuaSV_PrintError(buffer);
 			lua_pop(L, 2);
             return false;

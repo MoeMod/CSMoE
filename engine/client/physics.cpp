@@ -1291,7 +1291,7 @@ namespace physics
 		{
 			cfg->state = 2;
 
-			Con_DPrintf("LoadRagdollConfig: Failed to load config file for %s\n", name.c_str());
+			//Con_DPrintf("LoadRagdollConfig: Failed to load config file for %s\n", name.c_str());
 
 			return cfg;
 		}

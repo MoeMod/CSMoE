@@ -396,6 +396,10 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_janus7.cpp
 	../dlls/wpn_shared/wpn_y22s3janus7.cpp
 	../dlls/wpn_shared/wpn_voidpistolex.cpp
+	../dlls/wpn_shared/wpn_waterpistol.cpp
+	../dlls/wpn_shared/knife_monkeywpnset3.cpp
+	../dlls/wpn_shared/knife_ozwpnset3.cpp
+	../dlls/wpn_shared/wpn_monkeywpnset2.cpp
 	)
 
 set (HUD_SRCS

@@ -129,6 +129,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "bufffiveseven", WEAPON_BUFFFIVESEVEN },
 	{ "restrictionpistol", WEAPON_RESTRICTIONPISTOL },
 	{ "voidpistolex",	WEAPON_VOIDPISTOLEX },
+	{ "waterpistol",	WEAPON_WATERPISTOL },
+	{ "monkeywpnset2",	WEAPON_MONKEYWPNSET2 },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -392,6 +394,9 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_armtorch",	KNIFE_ARMTORCH },
 	{ "z4b_tiga",	KNIFE_TIGA },
 	{ "knife_y22s3dragonsword",	KNIFE_Y22S3DRAGONSWORD },
+	{ "knife_monkeywpnset3",	KNIFE_MONKEYWPNSET3 },
+	{ "knife_ozwpnset3",	KNIFE_OZWPNSET3 },
+
 	
 };
 
@@ -545,6 +550,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "musket", WEAPONCLASS_PISTOL },
 	{ "bufffiveseven", WEAPONCLASS_PISTOL },
 	{ "voidpistolex",	WEAPONCLASS_PISTOL },
+	{ "monkeywpnset2",	WEAPONCLASS_PISTOL },
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -1139,6 +1145,8 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_BUFFFIVESEVEN:
 	case WEAPON_RESTRICTIONPISTOL:
 	case WEAPON_VOIDPISTOLEX:
+	case WEAPON_WATERPISTOL:
+	case WEAPON_MONKEYWPNSET2:
 		return true;
 	default:
 		break;
