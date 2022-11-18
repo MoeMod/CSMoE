@@ -777,7 +777,7 @@ CSmallBlockHeap::CSmallBlockHeap()
 	CSmallBlockPool *pCurPool = NULL;
 	int iCurPool = 0;
 
-#if _M_X64
+#if PLATFORM_64BITS
 	// Blocks sized 0 - 256 are in pools in increments of 16
 	for ( ; i < 64 && i < MAX_TABLE; i++ )
 	{
