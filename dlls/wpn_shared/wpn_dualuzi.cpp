@@ -189,22 +189,22 @@ namespace sv {
         if (m_iState)
         {
             if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-                DualUIZFire((0.1) * m_flAccuracy, 0.06s, FALSE);
+                DualUZIFire((0.1) * m_flAccuracy, 0.06s, FALSE);
             else
-                DualUIZFire((0.015) * m_flAccuracy, 0.06s, FALSE);
+                DualUZIFire((0.015) * m_flAccuracy, 0.06s, FALSE);
         }
         else
         {
             if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-                DualUIZFire((0.2) * m_flAccuracy, 0.06s, FALSE);
+                DualUZIFire((0.2) * m_flAccuracy, 0.06s, FALSE);
             else
-                DualUIZFire((0.025) * m_flAccuracy, 0.06s, FALSE);
+                DualUZIFire((0.025) * m_flAccuracy, 0.06s, FALSE);
         }
        
 
     }
 
-    void DualUIZFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+    void DualUZIFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
         m_bDelayFire = true;
         m_iShotsFired++;
@@ -278,53 +278,43 @@ namespace sv {
 #endif
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
-        if (m_pPlayer->m_iFOV == 90)
+        if (m_iState)
         {
             if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-                KickBack(1.0, 0.45, 0.25, 0.075, 4.5, 3.0, 6);
+                KickBack(0.85, 0.4, 0.3, 0.04, 4.5, 3.0, 8);
             else if (m_pPlayer->pev->velocity.Length2D() > 0)
-                KickBack(0.5, 0.25, 0.0825, 0.0225, 3.5, 2.25, 7);
+                KickBack(0.3, 0.2, 0.15, 0.03, 3.0, 2.25, 7);
             else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-                KickBack(0.3, 0.15, 0.05, 0.015, 2.5, 0.8, 8);
+                KickBack(0.19, 0.09, 0.09, 0.009, 2.0, 1.0, 5);
             else
-                KickBack(0.4, 0.2, 0.0625, 0.0175, 3.0, 1.0, 7);
+                KickBack(0.21, 0.11, 0.11, 0.011, 2.1, 1.1, 6);
         }
-        else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-            KickBack(0.8, 0.45, 0.25, 0.075, 4.5, 3.0, 6);
-        else if (m_pPlayer->pev->velocity.Length2D() > 0)
-            KickBack(0.4, 0.25, 0.08, 0.0225, 3.5, 2.15, 7);
-        else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-            KickBack(0.2, 0.15, 0.05, 0.015, 2.5, 0.8, 8);
         else
-            KickBack(0.3, 0.2, 0.06, 0.0175, 3.0, 1.0, 7);
+        {
+            if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+                KickBack(0.9, 0.5, 0.4, 0.04, 4.75, 3.25, 8);
+            else if (m_pPlayer->pev->velocity.Length2D() > 0)
+                KickBack(0.35, 0.25, 0.2, 0.03, 3.25, 2.5, 7);
+            else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+                KickBack(0.23, 0.13, 0.13, 0.013, 2.2, 1.2, 5);
+            else
+                KickBack(0.25, 0.15, 0.15, 0.015, 2.3, 1.3, 6);
+        }    
     }
 
 
     float GetDamage(void)
     {
-        float flDamage;
-        if (m_pPlayer->m_iFOV == 90)
-        {
-            flDamage = 187.0f;
+        float flDamage; 
+        flDamage = 30.0f;
 #ifndef CLIENT_DLL
-            if (g_pModRunning->DamageTrack() == DT_ZB)
-                flDamage = 187.0f;
-            else if (g_pModRunning->DamageTrack() == DT_ZBS)
-                flDamage = 187.0f;
+        if (g_pModRunning->DamageTrack() == DT_ZB)
+            flDamage = 60.0f;
+        else if (g_pModRunning->DamageTrack() == DT_ZBS)
+            flDamage = 135.0f;
 #endif
-            return flDamage;
-        }
-        else
-        {
-            flDamage = 185.0f;
-#ifndef CLIENT_DLL
-            if (g_pModRunning->DamageTrack() == DT_ZB)
-                flDamage = 185.0f;
-            else if (g_pModRunning->DamageTrack() == DT_ZBS)
-                flDamage = 185.0f;
-#endif
-            return flDamage;
-        }
+        return flDamage;
+        
     }
 
     void Reload(void)

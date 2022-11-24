@@ -1519,7 +1519,8 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		|| weaponid == WEAPON_Z4B_BARRETTD
 		|| weaponid == WEAPON_BUFFAWP
 		|| weaponid == WEAPON_DESTROYER
-		|| weaponid == WEAPON_STARCHASERSR)
+		|| weaponid == WEAPON_STARCHASERSR
+		|| weaponid == WEAPON_MOSIN)
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )

@@ -103,12 +103,22 @@ namespace cl::event::infinity_left {
 using namespace cl::event::infinity;
 void EV_FireInfinity_Left(event_args_s *args)
 {
-	if(!args->bparam1)
-		EV_FireInfinity(args, ANIM_SHOOT_LEFT, 0);
-	else if(args->bparam2)
-		EV_FireInfinity(args, ANIM_SP_SHOOT_LEFT1, 0);
+	if (args->iparam2 > 1)
+	{
+		if (!args->bparam1)
+			EV_FireInfinity(args, ANIM_SHOOT_LEFT, 0);
+		else if (args->bparam2)
+			EV_FireInfinity(args, ANIM_SP_SHOOT_LEFT1, 0);
+		else
+			EV_FireInfinity(args, ANIM_SP_SHOOT_LEFT2, 0);
+	}
 	else
-		EV_FireInfinity(args, ANIM_SP_SHOOT_LEFT2, 0);
+	{
+		if (!args->bparam1)
+			EV_FireInfinity(args, ANIM_SHOOT_LEFTLAST, 0);
+		else
+			EV_FireInfinity(args, ANIM_SP_SHOOT_LEFTLAST, 0);
+	}
 }
 
 }
@@ -117,12 +127,22 @@ namespace cl::event::infinity_right {
 using namespace cl::event::infinity;
 void EV_FireInfinity_Right( event_args_s *args )
 {
-	if (!args->bparam1)
-		EV_FireInfinity(args, ANIM_SHOOT_RIGHT, 1);
-	else if (args->bparam2)
-		EV_FireInfinity(args, ANIM_SP_SHOOT_RIGHT1, 1);
+	if (args->iparam2 > 1)
+	{
+		if (!args->bparam1)
+			EV_FireInfinity(args, ANIM_SHOOT_RIGHT, 1);
+		else if (args->bparam2)
+			EV_FireInfinity(args, ANIM_SP_SHOOT_RIGHT1, 1);
+		else
+			EV_FireInfinity(args, ANIM_SP_SHOOT_RIGHT2, 1);
+	}
 	else
-		EV_FireInfinity(args, ANIM_SP_SHOOT_RIGHT2, 1);
+	{
+		if (!args->bparam1)
+			EV_FireInfinity(args, ANIM_SHOOT_RIGHTLAST, 0);
+		else
+			EV_FireInfinity(args, ANIM_SP_SHOOT_RIGHTLAST, 0);
+	}
 }
 
 }

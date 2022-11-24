@@ -6101,6 +6101,8 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/v_destroyer.mdl");
 		case WEAPON_STARCHASERSR:
 			pev->viewmodel = MAKE_STRING("models/v_starchasersr.mdl");
+		case WEAPON_MOSIN:
+			pev->viewmodel = MAKE_STRING("models/v_mosin.mdl");
 		default:
 			break;
 		}
@@ -9204,6 +9206,8 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_JANUS7:
 		case WEAPON_Y22S3JANUS7:
 		case WEAPON_VOIDPISTOLEX:
+		case WEAPON_DUALKRISS:
+		case WEAPON_MOSIN:
 			return TRUE;
 		}
 	}

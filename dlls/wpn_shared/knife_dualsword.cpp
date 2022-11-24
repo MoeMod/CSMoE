@@ -96,6 +96,9 @@ public:
 		
 		PRECACHE_MODEL("models/p_dualsword_a.mdl");
 		PRECACHE_MODEL("models/p_dualsword_b.mdl");
+
+		PRECACHE_MODEL("sprites/ef_dualsword_left.spr");
+		PRECACHE_MODEL("sprites/ef_dualsword_right.spr");
 		
 		//m_iModelLeaf1 = PRECACHE_MODEL("sprites/leaf01_dualsword.spr");
 		//m_iModelLeaf2 = PRECACHE_MODEL("sprites/leaf02_dualsword.spr");

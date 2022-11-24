@@ -14,10 +14,7 @@ namespace cl
 		auto index = gEngfuncs.pEventAPI->EV_GetCurrentEventIndex();
 		const char* name = gEngfuncs.pEventAPI->EV_EventForIndex(index);
         xpeval(LuaCL_Get(), LuaCL_ExceptionHandler, (
-                _local(v1) = _G[_S("_LUAEVENT")][_1],
-                _if(v1)._then(
-                        v1(_2)
-                )._end
+			_G[_S("_LUAEVENT")][_1](_2)
         ), name, args);
 	}
 	
@@ -34,7 +31,7 @@ namespace cl
         lua_getglobal(L, "_LUAEVENT"); // #3 = _G._LUAEVENT
         lua_pushvalue(L, 1);
         lua_pushvalue(L, 2);
-        lua_settable(L, -2);
+        lua_settable(L, -3);
         gEngfuncs.pfnHookEvent(name, EV_Lua);
         gEngfuncs.Con_Printf("%s: %s\n", __FUNCTION__, name);
         return 0;

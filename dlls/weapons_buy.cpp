@@ -131,6 +131,10 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "voidpistolex",	WEAPON_VOIDPISTOLEX },
 	{ "waterpistol",	WEAPON_WATERPISTOL },
 	{ "monkeywpnset2",	WEAPON_MONKEYWPNSET2 },
+	{ "tknife",	WEAPON_TKNIFE },
+	{ "tknifeex",	WEAPON_TKNIFEEX },
+	{ "tknifeex2",	WEAPON_TKNIFEEX2 },
+	{ "tknifedx",	WEAPON_Z4B_TKNIFEDX },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -184,7 +188,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "coilgun",	WEAPON_COILGUN },
 	{ "dualkrisshero",	WEAPON_DUALKRISSHERO },
 	{ "dualuzi",	WEAPON_DUALUZI },
-
+	{ "dualkriss",	WEAPON_DUALKRISS },
+	{ "steyrtmpd",	WEAPON_Z4B_STEYRTMPD },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -265,6 +270,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "buffawp",	WEAPON_BUFFAWP },
 	{ "destroyer",	WEAPON_DESTROYER },
 	{ "starchasersr",	WEAPON_STARCHASERSR },
+	{ "mosin",	WEAPON_MOSIN },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -551,6 +557,10 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "bufffiveseven", WEAPONCLASS_PISTOL },
 	{ "voidpistolex",	WEAPONCLASS_PISTOL },
 	{ "monkeywpnset2",	WEAPONCLASS_PISTOL },
+	{ "tknife",	WEAPONCLASS_PISTOL },
+	{ "tknifeex",	WEAPONCLASS_PISTOL },
+	{ "tknifeex2",	WEAPONCLASS_PISTOL },
+	{ "tknifedx",	WEAPONCLASS_PISTOL },
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -608,6 +618,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "coilgun",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "dualkrisshero",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "dualuzi",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "dualkriss",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "steyrtmpd",	WEAPONCLASS_SUBMACHINEGUN },
 
 
 	{ "bow",	WEAPONCLASS_RIFLE },
@@ -694,6 +706,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "buffawp",	WEAPONCLASS_SNIPERRIFLE },
 	{ "destroyer",	WEAPONCLASS_SNIPERRIFLE },
 	{ "starchasersr",	WEAPONCLASS_SNIPERRIFLE },
+	{ "mosin",	WEAPONCLASS_SNIPERRIFLE },
 
 
 	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
@@ -1088,6 +1101,9 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_WONDERCANNONEX:
 	case WEAPON_JANUS7:
 	case WEAPON_Y22S3JANUS7:
+	case WEAPON_DUALKRISS:
+	case WEAPON_MOSIN:
+	case WEAPON_Z4B_STEYRTMPD:
 		return true;
 	default:
 		break;
@@ -1147,6 +1163,10 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_VOIDPISTOLEX:
 	case WEAPON_WATERPISTOL:
 	case WEAPON_MONKEYWPNSET2:
+	case WEAPON_TKNIFE:
+	case WEAPON_TKNIFEEX:
+	case WEAPON_TKNIFEEX2:
+	case WEAPON_Z4B_TKNIFEDX:
 		return true;
 	default:
 		break;

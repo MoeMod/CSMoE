@@ -400,6 +400,12 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_monkeywpnset3.cpp
 	../dlls/wpn_shared/knife_ozwpnset3.cpp
 	../dlls/wpn_shared/wpn_monkeywpnset2.cpp
+	../dlls/wpn_shared/wpn_dualkriss.cpp
+	../dlls/wpn_shared/wpn_mosin.cpp
+	../dlls/wpn_shared/z4b_steyrtmpd.cpp
+	../dlls/wpn_shared/wpn_tknife.cpp
+	../dlls/wpn_shared/wpn_tknifeex.cpp
+	../dlls/wpn_shared/wpn_tknifeex2.cpp
 	)
 
 set (HUD_SRCS

@@ -2384,4 +2384,28 @@ BOOL CWaterPistolAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_waterpistol, CWaterPistolAmmo);
+
+void CTKnifeAmmo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CTKnifeAmmo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CTKnifeAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(1, "tknife", 30) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_tknife, CTKnifeAmmo);
 }

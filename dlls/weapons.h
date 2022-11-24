@@ -616,6 +616,10 @@ public:
 			|| m_iId == WEAPON_VOIDPISTOLEX
 			|| m_iId == WEAPON_WATERPISTOL
 			|| m_iId == WEAPON_MONKEYWPNSET2
+			|| m_iId == WEAPON_TKNIFE
+			|| m_iId == WEAPON_TKNIFEEX
+			|| m_iId == WEAPON_TKNIFEEX2
+			|| m_iId == WEAPON_Z4B_TKNIFEDX
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -1227,7 +1231,6 @@ private:
 	float GetDirectDamage();
 	float GetExplodeDamage();
 	int m_iType;
-	int m_iM3DragonmExp;
 	int m_iHitGroup;
 	CBaseEntity* m_pEntity;
 	int m_iTail;
@@ -1392,6 +1395,34 @@ private:
 	int m_iBlackHoleProjectileIndex[2];
 	
 };	
+
+class CThrowingKnifeEntity : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+	KnockbackData GetKnockBackData(void) override;
+	float GetArmorRatioModifier(void);
+
+public:
+	void EXPORT FlyingThink(void);
+	void EXPORT FlyingTouch(CBaseEntity* pOther);
+
+	//void EXPORT RemoveThink(void);
+	//void EXPORT StuckInTheWallThink(void);
+	void StuckInTheWallTouch(CBaseEntity* pOther);
+
+public:
+	static CThrowingKnifeEntity* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+
+private:
+	Vector vecStart;
+	time_point_t m_flStartTime;
+	float GetDamage();
+	int m_iType;
+	int m_iTrail;
+};
 
 #if 0
 class CGuillotineexAmmo : public CBaseAnimating
