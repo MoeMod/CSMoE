@@ -596,6 +596,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_tknife.cpp
 	../dlls/wpn_shared/wpn_tknifeex.cpp
 	../dlls/wpn_shared/wpn_tknifeex2.cpp
+	../dlls/wpn_shared/wpn_laserminigun.cpp
 	)
 
 set(PM_SRCS

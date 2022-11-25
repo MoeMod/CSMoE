@@ -72,13 +72,13 @@ public:
 
 	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
 
-	const char* GetCSModelName() override { return "models/w_tknifeex2.mdl"; }
+	const char* GetCSModelName() override { return "models/w_tknifeex.mdl"; }
 public:
 	
 	int m_iKnifeHas;
 	void ThrowingKnifeFire(float flSpread, duration_t flCycleTime);
 #ifndef CLIENT_DLL
-	void ThrowingKnife(float flSpread);
+	void ThrowingKnife(int iType, float flSpread);
 #endif
 };
 

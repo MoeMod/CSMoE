@@ -96,7 +96,7 @@ void CTKnifeEX::PrimaryAttack(void)
 }
 
 #ifndef CLIENT_DLL
-void CTKnifeEX::ThrowingKnife(float flSpread)
+void CTKnifeEX::ThrowingKnife(int iType, float flSpread)
 {
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
@@ -106,7 +106,7 @@ void CTKnifeEX::ThrowingKnife(float flSpread)
 	Vector vecKnifeDir = gpGlobals->v_forward + gpGlobals->v_right * vecDir.x + gpGlobals->v_up * vecDir.y;
 	Vector vecAngles = UTIL_VecToAngles(vecKnifeDir);
 
-	CThrowingKnifeEntity* pKnife = CThrowingKnifeEntity::Create(0, vecSrc, vecAngles, ENT(m_pPlayer->pev), m_pPlayer->m_iTeam);
+	CThrowingKnifeEntity* pKnife = CThrowingKnifeEntity::Create(iType, vecSrc, vecAngles, ENT(m_pPlayer->pev), m_pPlayer->m_iTeam);
 
 	if (pKnife)
 	{
@@ -142,7 +142,7 @@ void CTKnifeEX::ThrowingKnifeFire(float flSpread, duration_t flCycleTime)
 	SendWeaponAnim(ANIM_SHOOT1, UseDecrement() != FALSE);
 
 #ifndef CLIENT_DLL
-	ThrowingKnife(flSpread);
+	ThrowingKnife(1, flSpread);
 #endif
 	m_iKnifeHas = 1;
 	m_flStartThrow = gpGlobals->time + 0.05s;
@@ -179,7 +179,7 @@ void CTKnifeEX::ItemPostFrame(void)
 			else
 				flSpread = 0.05;
 
-			ThrowingKnife(flSpread);
+			ThrowingKnife(1, flSpread);
 #endif
 			m_iKnifeHas--;
 

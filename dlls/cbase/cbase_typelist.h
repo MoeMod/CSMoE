@@ -363,7 +363,7 @@ TL_ADD(CSteyrTMPD)
 TL_ADD(CTKnife)
 TL_ADD(CTKnifeEX)
 TL_ADD(CTKnifeEX2)
-
+TL_ADD(CLaserMiniGun)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -716,6 +716,7 @@ TL_ADD(ChainGrenade)
 //TL_ADD(CStunBeamEffect)
 TL_ADD(CVoidPistolBlackHole)
 TL_ADD(CThrowingKnifeEntity)
+TL_ADD(CLasermingunChargeAmmo)
 #endif
 
 TL_END(AllEntityTypeList)

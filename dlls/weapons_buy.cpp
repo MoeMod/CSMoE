@@ -311,6 +311,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "buffng7",	WEAPON_BUFFNG7 },
 	{ "janus7",	WEAPON_JANUS7 },
 	{ "y22s3janus7",	WEAPON_Y22S3JANUS7 },
+	{ "laserminigun",	WEAPON_LASERMINIGUN },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -620,6 +621,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "dualuzi",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "dualkriss",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "steyrtmpd",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "laserminigun",	WEAPONCLASS_SUBMACHINEGUN },
 
 
 	{ "bow",	WEAPONCLASS_RIFLE },

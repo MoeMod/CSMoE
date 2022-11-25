@@ -115,7 +115,7 @@ void CTKnifeEX2::ThrowingKnifeFire(float flSpread, duration_t flCycleTime)
 	SendWeaponAnim(ANIM_SHOOT1, UseDecrement() != FALSE);
 
 #ifndef CLIENT_DLL
-	ThrowingKnife(flSpread);
+	ThrowingKnife(2, flSpread);
 #endif
 	m_iKnifeHas = 2;
 	m_flStartThrow = gpGlobals->time + 0.05s;
@@ -166,7 +166,7 @@ void CTKnifeEX2::ItemPostFrame(void)
 					flSpread = 0.05;
 			}
 
-			ThrowingKnife(flSpread);
+			ThrowingKnife(2, flSpread);
 #endif
 			m_iKnifeHas--;
 
