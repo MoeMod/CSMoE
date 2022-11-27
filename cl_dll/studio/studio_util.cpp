@@ -22,6 +22,24 @@ ConcatTransforms
 */
 void ConcatTransforms(cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out)
 {
+#if U_VECTOR_NEON
+	memset(&out, 0, sizeof(out)); // out = {};
+
+	out[0] = vcopyq_laneq_f32(out[0], 3, in1[0], 3); // out[0][3] = in[0][3]
+	out[0] = vfmaq_laneq_f32(out[0], in2[0], in1[0], 0); // out[0][n] += in2[0][n] * in1[0][0]
+	out[0] = vfmaq_laneq_f32(out[0], in2[1], in1[0], 1); // out[0][n] += in2[1][n] * in1[0][1]
+	out[0] = vfmaq_laneq_f32(out[0], in2[2], in1[0], 2); // out[0][n] += in2[2][n] * in1[0][2]
+
+	out[1] = vcopyq_laneq_f32(out[1], 3, in1[1], 3);
+	out[1] = vfmaq_laneq_f32(out[1], in2[0], in1[1], 0);
+	out[1] = vfmaq_laneq_f32(out[1], in2[1], in1[1], 1);
+	out[1] = vfmaq_laneq_f32(out[1], in2[2], in1[1], 2);
+
+	out[2] = vcopyq_laneq_f32(out[2], 3, in1[2], 3);
+	out[2] = vfmaq_laneq_f32(out[2], in2[0], in1[2], 0);
+	out[2] = vfmaq_laneq_f32(out[2], in2[1], in1[2], 1);
+	out[2] = vfmaq_laneq_f32(out[2], in2[2], in1[2], 2);
+#else
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] +
 		in1[0][2] * in2[2][0];
 	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] +
@@ -46,6 +64,7 @@ void ConcatTransforms(cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out)
 		in1[2][2] * in2[2][2];
 	out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] +
 		in1[2][2] * in2[2][3] + in1[2][3];
+#endif
 }
 
 // angles index are not the same as ROLL, PITCH, YAW
@@ -57,15 +76,15 @@ AngleQuaternion
 ====================
 */
 
-#ifdef U_VECTOR_SSE
+#if defined __SSE__ || defined __x86_64__ || defined _M_X64 || defined _M_AMD64 || defined _M_IX86_FP
 const __m128 AngleQuaternion_sign1 = _mm_castsi128_ps(_mm_setr_epi32(0x80000000, 0x00000000, 0x00000000, 0x00000000));
 const __m128 AngleQuaternion_sign2 = _mm_castsi128_ps(_mm_setr_epi32(0x00000000, 0x00000000, 0x80000000, 0x00000000));
-#elif defined U_VECTOR_NEON
+#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
 const float32x4_t AngleQuaternion_sign2 = vzipq_f32(vdupq_n_u32(0x80000000), vdupq_n_u32(0x00000000)).val[0]; // { 0x80000000, 0x00000000, 0x80000000, 0x00000000 };
 #endif
 void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 {
-#ifdef U_VECTOR_SSE
+#if defined __SSE__ || defined __x86_64__ || defined _M_X64 || defined _M_AMD64 || defined _M_IX86_FP
 	__m128 sina, cosa;
 	sincos_ps(angles * 0.5, &sina, &cosa);
 	auto sr_sr_sr_sr = _mm_shuffle_ps(sina, sina, _MM_SHUFFLE(0, 0, 0, 0));
@@ -85,7 +104,7 @@ void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 	//quaternion[1] =   cr * sp * cy + sr * cp * sy; // Y
 	//quaternion[2] =   cr * cp * sy - sr * sp * cy; // Z
 	//quaternion[3] =   cr * cp * cy + sr * sp * sy; // W
-#elif defined U_VECTOR_NEON
+#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
     float32x4x2_t sr_sp_sy_0_cr_cp_cy_1;
     sincos_ps(angles * 0.5, &sr_sp_sy_0_cr_cp_cy_1.val[0], &sr_sp_sy_0_cr_cp_cy_1.val[1]);
 
