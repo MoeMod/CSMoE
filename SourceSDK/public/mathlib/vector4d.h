@@ -19,6 +19,9 @@
 #if defined(__SSE__) || defined(_M_IX86_FP)
 #include <xmmintrin.h>	// For SSE
 #endif
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+#include <arm_neon.h>
+#endif
 #include "basetypes.h"	// For vec_t, put this somewhere else?
 #include "tier0/dbg.h"
 #include "mathlib/math_pfns.h"

@@ -9209,6 +9209,9 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_DUALKRISS:
 		case WEAPON_MOSIN:
 		case WEAPON_LASERMINIGUN:
+		case WEAPON_MK3A1:
+		case WEAPON_MK3A1SE:
+		case WEAPON_DRILLGUN:
 			return TRUE;
 		}
 	}

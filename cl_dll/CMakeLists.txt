@@ -407,6 +407,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_tknifeex.cpp
 	../dlls/wpn_shared/wpn_tknifeex2.cpp
 	../dlls/wpn_shared/wpn_laserminigun.cpp
+	../dlls/wpn_shared/wpn_mk3a1.cpp
+	../dlls/wpn_shared/wpn_mk3a1se.cpp
+	../dlls/wpn_shared/wpn_drillgun.cpp
 	)
 
 set (HUD_SRCS

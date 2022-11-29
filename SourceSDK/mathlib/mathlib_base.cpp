@@ -3367,7 +3367,7 @@ void MathLib_Init( float gamma, float texGamma, float brightness, int overbright
 	{
 		s_bSSEEnabled = true;
 
-#ifndef PLATFORM_WINDOWS_PC64
+#ifdef PLATFORM_WINDOWS_PC32
 		// These are not yet available.
 		// Select the SSE specific routines if available
 		pfVectorNormalize = _VectorNormalize;

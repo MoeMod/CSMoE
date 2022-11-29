@@ -185,10 +185,9 @@ namespace sv {
 			{
 				UTIL_GunshotDecalTrace(&tr, DamageDecal(DMG_BULLET | DMG_NEVERGIB), false, NULL);
 
-				if (m_flStartTime != invalid_time_point && m_flStartTime + 0.3s > gpGlobals->time)
+				if (m_flStartTime + 0.3s > gpGlobals->time)
 				{
 					pev->velocity *= 0.4;
-					m_flStartTime = invalid_time_point;
 					return;
 				}
 				else
@@ -212,8 +211,8 @@ namespace sv {
 			entvars_t* pevOwner = VARS(pev->owner);
 
 			ClearMultiDamage();
-
-			flDamage *= (1.0 - (pOther->pev->origin - vecStart).Length() / 4096.0);
+			flDamage -= (gpGlobals->time - m_flStartTime) / 1s * 10;
+			//flDamage *= (1.0 - (pOther->pev->origin - vecStart).Length() / 4096.0);
 
 			pOther->TraceAttack(pevOwner, flDamage, pev->velocity.Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
 

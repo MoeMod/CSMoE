@@ -264,3 +264,5 @@ HOOK_EVENT(waterpistol, FireWaterPistol);
 HOOK_EVENT(mosin, FireMosin);
 HOOK_EVENT(steyrtmpd, FireSteyrTMPD);
 HOOK_EVENT(laserminigun, FireLaserMiniGun);
+HOOK_EVENT(mk3a1, FireMK3A1);
+HOOK_EVENT(drillgun, FireDrillGun);

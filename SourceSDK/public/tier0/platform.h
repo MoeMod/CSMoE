@@ -1183,7 +1183,7 @@ PLATFORM_INTERFACE struct tm *		Plat_gmtime( const time_t *timep, struct tm *res
 PLATFORM_INTERFACE time_t			Plat_timegm( struct tm *timeptr );
 PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *result );
 
-uint64 Plat_Rdtsc();
+PLATFORM_INTERFACE uint64 Plat_Rdtsc();
 
 // b/w compatibility
 #define Sys_FloatTime Plat_FloatTime

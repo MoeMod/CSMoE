@@ -814,6 +814,23 @@ public:
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
 
+class CLaserMiniGunAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class CDrillGunAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+
 }
 
 #endif // AMMO_H

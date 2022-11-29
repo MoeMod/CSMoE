@@ -674,6 +674,31 @@ PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFun
 	s_pWatchDogHandlerFunction = function;
 }
 
+PLATFORM_INTERFACE uint64 Plat_Rdtsc()
+{
+#if (defined( __arm__ ) || defined( __arm64__ ) || defined( __aarch64__ ) || defined( _M_ARM ) || defined( _M_ARM64 )) && defined (POSIX)
+	struct timespec t;
+	clock_gettime(CLOCK_REALTIME, &t);
+	return t.tv_sec * 1000000000ULL + t.tv_nsec;
+#elif defined( _X360 )
+	return (uint64)__mftb32();
+#elif defined( _WIN32 )
+	LARGE_INTEGER ret;
+	QueryPerformanceCounter(&ret);
+	return ret.QuadPart;
+#elif defined( __i386__ )
+	uint64 val;
+	__asm__ __volatile__("rdtsc" : "=A" (val));
+	return val;
+#elif defined( __x86_64__ )
+	uint32 lo, hi;
+	__asm__ __volatile__("rdtsc" : "=a" (lo), "=d" (hi));
+	return (((uint64)hi) << 32) | lo;
+#else
+#error
+#endif
+}
+
 #ifndef NO_HOOK_MALLOC
 
 // memory logging this functionality is portable code, except for the way in which it hooks

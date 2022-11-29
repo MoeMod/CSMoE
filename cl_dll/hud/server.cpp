@@ -68,6 +68,7 @@ enum
 	FIREBOMB_BURN,
 	EF_ELEC_BLUE,
 	EF_ELEC_YELLOW,
+	MK3A1SE_BURN,
 };
 
 TEMPENTITY *iHolyFistRingEffect[33];
@@ -775,6 +776,12 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 		flags = FTENT_NONE;
 		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_elec.spr"),
 			Vector(0.0, 0.0, 0.0), 0.2, TRUE, flags, 0.7, kRenderTransAdd, 20.0, 255, 185, 0);
+		break;
+	}
+	case MK3A1SE_BURN:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_mk3a1seburn.spr"),
+			Vector(0.0, 0.0, -5.0), 5.0, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
 		break;
 	}
 

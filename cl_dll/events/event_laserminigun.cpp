@@ -64,33 +64,13 @@ void EV_FireLaserMiniGun(event_args_s *args)
 	if ( EV_IsLocal( args->entindex ) )
 	{
 		++g_iShotsFired;
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1, ANIM_SHOOT2), 2);
+		int iAnim = ANIM_SHOOT1;
+
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(iAnim + args->bparam1, 2);
 		EV_MuzzleFlash();
-		if( !gHUD.cl_righthand->value )
-		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -10.0, -13.0, 0);
-		}
-		else
-		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -10.0, 13.0, 0);
-		}
-
-		if (ent)
-		{
-			ShellOrigin = ent->attachment[1];
-			ShellVelocity *= 1.2;
-			ShellVelocity[2] -= 75;
-		}
-	}
-	else
-	{
-		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
 	}
 
-
-	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iRShell, TE_BOUNCE_SHELL);
-
-	PLAY_EVENT_SOUND("weapons/skull8-1.wav");
+	PLAY_EVENT_SOUND("weapons/laserminigun-1.wav");
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );
@@ -98,11 +78,27 @@ void EV_FireLaserMiniGun(event_args_s *args)
 	
 	vSpread.x = args->fparam1;
 	vSpread.y = args->fparam2;
+
+	int iModelLaser;
+
+	if(args->bparam1 > 1)
+		iModelLaser = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_laser3.spr");
+	else if (args->bparam1 > 0)
+		iModelLaser = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_laser2.spr");
+	else
+		iModelLaser = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_laser1.spr");
+
+	Vector vecStart = ent->attachment[0];
+	Vector vecBeamEnd = vecStart + (forward + right * args->fparam1 + up * args->fparam2) * 50;
+
+	BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Tracer(vecStart, vecBeamEnd, iModelLaser, 0.2, 1, 50.0f, 0.0f, 255.0f, 360.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+
+
 	EV_HLDM_FireBullets( idx,
 		forward, right,	up,
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_556MM,
-		6 );
+		1 );
 }
 
 }

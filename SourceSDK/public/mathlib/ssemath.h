@@ -1738,7 +1738,7 @@ FORCEINLINE void StoreAlignedSIMD( float * RESTRICT pSIMD, const fltx4 & a )
 FORCEINLINE void StoreUnalignedSIMD( float * RESTRICT pSIMD, const fltx4 & a )
 {
 #if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
-	vst1q_u32(pSIMD, a);
+	vst1q_f32(pSIMD, a);
 #else
 	_mm_storeu_ps( pSIMD, a );
 #endif
@@ -1770,7 +1770,7 @@ FORCEINLINE void StoreAligned3SIMD( VectorAligned * RESTRICT pSIMD, const fltx4 
 FORCEINLINE fltx4 LoadAlignedSIMD( const void *pSIMD )
 {
 #if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
-	return vld1q_f32(pSIMD);
+	return vld1q_f32( reinterpret_cast< const float *> ( pSIMD ) );
 #else
 	return _mm_load_ps( reinterpret_cast< const float *> ( pSIMD ) );
 #endif
@@ -1828,7 +1828,7 @@ FORCEINLINE fltx4 LoadAlignedSIMD( const VectorAligned & pSIMD )
 FORCEINLINE fltx4 LoadUnalignedSIMD( const void *pSIMD )
 {
 #if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
-	return vld1q_f32(pSIMD);
+	return vld1q_f32( reinterpret_cast< const float *> ( pSIMD ) );
 #else
 	return _mm_loadu_ps( reinterpret_cast<const float *>( pSIMD ) );
 #endif
@@ -1837,7 +1837,7 @@ FORCEINLINE fltx4 LoadUnalignedSIMD( const void *pSIMD )
 FORCEINLINE fltx4 LoadUnaligned3SIMD( const void *pSIMD )
 {
 #if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
-	return vld1q_f32(pSIMD);
+	return vld1q_f32( reinterpret_cast< const float *> ( pSIMD ) );
 #else
 	return _mm_loadu_ps( reinterpret_cast<const float *>( pSIMD ) );
 #endif
@@ -1894,7 +1894,7 @@ FORCEINLINE uint32 SubFloatConvertToInt( const fltx4 & a, int idx )
 	return (uint32)SubFloat(a,idx);
 }
 
-FORCEINLINE uint32 SubInt( const fltx4 & a, int idx )
+FORCEINLINE uint32 SubInt( const i32x4 & a, int idx )
 {
 #if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
 	return (reinterpret_cast<uint32 const*>(&a))[idx];
@@ -1905,7 +1905,7 @@ FORCEINLINE uint32 SubInt( const fltx4 & a, int idx )
 #endif
 }
 
-FORCEINLINE uint32 & SubInt( fltx4 & a, int idx )
+FORCEINLINE uint32 & SubInt( i32x4 & a, int idx )
 {
 #if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
 	return (reinterpret_cast<uint32*>(&a))[idx];
@@ -2493,7 +2493,7 @@ FORCEINLINE fltx4 IntSetImmediateSIMD(int to)
 FORCEINLINE i32x4 LoadAlignedIntSIMD( const void * RESTRICT pSIMD)
 {
 #if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
-	return vld1q_s32(pSIMD);
+	return vld1q_s32( reinterpret_cast<const int *> (pSIMD) );
 #else
 	return _mm_load_ps( reinterpret_cast<const float *>(pSIMD) );
 #endif
@@ -2503,7 +2503,7 @@ FORCEINLINE i32x4 LoadAlignedIntSIMD( const void * RESTRICT pSIMD)
 FORCEINLINE i32x4 LoadUnalignedIntSIMD( const void * RESTRICT pSIMD)
 {
 #if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
-	return vld1q_s32(pSIMD);
+	return vld1q_s32( reinterpret_cast<const int *> (pSIMD));
 #else
 	return _mm_loadu_ps( reinterpret_cast<const float *>(pSIMD) );
 #endif
@@ -2599,7 +2599,9 @@ FORCEINLINE i32x4 IntShiftLeftWordSIMD(const i32x4 &vSrcA, const i32x4 &vSrcB)
 // like this.
 FORCEINLINE void ConvertStoreAsIntsSIMD(intx4 * RESTRICT pDest, const fltx4 &vSrc)
 {
-#if defined( COMPILER_MSVC64 )
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	*reinterpret_cast<int32x4_t *>(pDest) = vcvtq_s32_f32(vSrc);
+#elif defined( COMPILER_MSVC64 )
 
 	(*pDest)[0] = SubFloat( vSrc, 0 );
 	(*pDest)[1] = SubFloat( vSrc, 1 );

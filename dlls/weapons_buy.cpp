@@ -164,6 +164,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "spas12",	WEAPON_SPAS12 },
 	{ "spas12ex",	WEAPON_SPAS12EX },
 	{ "spas12ex2",	WEAPON_SPAS12EX2 },
+	{ "mk3a1",	WEAPON_MK3A1 },
+	{ "mk3a1se",	WEAPON_MK3A1SE },
 
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
@@ -351,6 +353,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "guillotineex",	WEAPON_GUILLOTINEEX },
 	{ "speargunm",	WEAPON_SPEARGUNM },
 	{ "wondercannonex",	WEAPON_WONDERCANNONEX },
+	{ "drillgun",	WEAPON_DRILLGUN },
 
 	{ NULL,		WEAPON_NONE }
 };
@@ -593,7 +596,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "spas12",	WEAPONCLASS_SHOTGUN },
 	{ "spas12ex",	WEAPONCLASS_SHOTGUN },
 	{ "spas12ex2",	WEAPONCLASS_SHOTGUN },
-
+	{ "mk3a1",	WEAPONCLASS_SHOTGUN },
+	{ "mk3a1se",	WEAPONCLASS_SHOTGUN },
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -779,6 +783,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "guillotineex",	WEAPONCLASS_EQUIPMENT },
 	{ "speargunm",	WEAPONCLASS_EQUIPMENT },
 	{ "wondercannonex",	WEAPONCLASS_EQUIPMENT },
+	{ "drillgun",	WEAPONCLASS_EQUIPMENT },
 
 	{ "syringe",	WEAPONCLASS_EQUIPMENT },
 	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
@@ -1106,6 +1111,9 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_DUALKRISS:
 	case WEAPON_MOSIN:
 	case WEAPON_Z4B_STEYRTMPD:
+	case WEAPON_MK3A1:
+	case WEAPON_MK3A1SE:
+	case WEAPON_DRILLGUN:
 		return true;
 	default:
 		break;
