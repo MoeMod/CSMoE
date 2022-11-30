@@ -369,6 +369,7 @@ TL_ADD(CMK3A1SE)
 TL_ADD(CDrillGun)
 TL_ADD(CVulcanus3)
 TL_ADD(CVulcanus11)
+TL_ADD(CVulcanus7)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)

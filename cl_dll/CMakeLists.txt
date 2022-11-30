@@ -412,6 +412,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_drillgun.cpp
 	../dlls/wpn_shared/wpn_vulcanus3.cpp
 	../dlls/wpn_shared/wpn_vulcanus11.cpp
+	../dlls/wpn_shared/wpn_vulcanus7.cpp
 	)
 
 set (HUD_SRCS

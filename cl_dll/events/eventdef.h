@@ -268,3 +268,4 @@ HOOK_EVENT(mk3a1, FireMK3A1);
 HOOK_EVENT(drillgun, FireDrillGun);
 HOOK_EVENT(vulcanus3, FireVulcanus3);
 HOOK_EVENT(vulcanus11, FireVulcanus11);
+HOOK_EVENT(vulcanus7, FireVulcanus7);
