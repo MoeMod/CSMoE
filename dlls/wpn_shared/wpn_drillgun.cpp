@@ -27,7 +27,7 @@ namespace sv {
 	class CDrillAmmo : public CBaseEntity
 	{
 	public:
-		KnockbackData GetKnockBackData() override { return { 700.0f, 450.0f, 600.0f, 450.0f, 0.9f }; }
+		KnockbackData GetKnockBackData() override { return { 700.0f, 450.0f, 600.0f, 450.0f, 0.6f }; }
 		int GetWeaponsId(void) override { return WEAPON_DRILLGUN; }
 		float GetArmorRatioModifier() override { return 1.7; }
 
@@ -72,7 +72,7 @@ namespace sv {
 		void Precache(void)
 		{
 			PRECACHE_MODEL("models/drillgun_nail.mdl");
-			PRECACHE_SOUND("weapons/xbow_hitbod1.wav");
+
 			PRECACHE_SOUND("weapons/xbow_hit1.wav");
 
 			PRECACHE_SOUND("weapons/knife_hitwall1.wav");
@@ -87,7 +87,7 @@ namespace sv {
 				SetThink(NULL);
 				SetTouch(NULL);
 
-				EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "weapons/xbow_hit1.wav", RANDOM_FLOAT(0.95, 1.0), ATTN_NORM, 0, 98 + RANDOM_LONG(0, 7));
+				EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "weapons/knife_hitwall1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 				SetThink(&CBaseEntity::SUB_Remove);
 				pev->nextthink = gpGlobals->time;
@@ -126,8 +126,8 @@ namespace sv {
 
 				ApplyMultiDamage(pev, pevOwner);
 
-				EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "weapons/knife_hitwall1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				
+				EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "weapons/xbow_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
 				if (m_iPenetration && (pOther->IsPlayer() || pOther->Classify() == CLASS_PLAYER_ALLY))
 				{
 					pev->origin += m_vecDirection * 0.5 * 39.37;
@@ -201,12 +201,12 @@ namespace sv {
 				WRITE_BYTE(TE_BEAMFOLLOW);
 				WRITE_SHORT(entindex());
 				WRITE_SHORT(m_iTrail);
+				WRITE_BYTE(4);
 				WRITE_BYTE(2);
-				WRITE_BYTE(2);
+				WRITE_BYTE(42);
 				WRITE_BYTE(255);
-				WRITE_BYTE(255);
-				WRITE_BYTE(255);
-				WRITE_BYTE(200);
+				WRITE_BYTE(170);
+				WRITE_BYTE(150);
 				MESSAGE_END();
 
 				SetThink(&CDrillAmmo::FollowThink);
@@ -404,7 +404,7 @@ namespace sv {
 
 		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 0, 0, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], FALSE, FALSE);
 
-		m_flNextPrimaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.05s;
+		m_flNextPrimaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.8s;
 
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 			KickBack(15.0, 10.0, 0.6, 0.35, 9.0, 6.0, 5);

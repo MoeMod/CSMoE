@@ -600,6 +600,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_mk3a1.cpp
 	../dlls/wpn_shared/wpn_mk3a1se.cpp
 	../dlls/wpn_shared/wpn_drillgun.cpp
+	../dlls/wpn_shared/wpn_vulcanus3.cpp
 	)
 
 set(PM_SRCS

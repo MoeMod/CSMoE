@@ -367,6 +367,7 @@ TL_ADD(CLaserMiniGun)
 TL_ADD(CMK3A1)
 TL_ADD(CMK3A1SE)
 TL_ADD(CDrillGun)
+TL_ADD(CVulcanus3)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)

@@ -781,7 +781,7 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 	case MK3A1SE_BURN:
 	{
 		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_mk3a1seburn.spr"),
-			Vector(0.0, 0.0, -5.0), 5.0, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
+			Vector(0.0, 0.0, -5.0), 2.0, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
 		break;
 	}
 

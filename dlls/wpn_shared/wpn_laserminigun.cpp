@@ -81,7 +81,7 @@ namespace sv {
 
 			m_iChargeTime = 4;
 
-			UTIL_SetSize(pev, g_vecZero, g_vecZero);
+			UTIL_SetSize(pev, { -2.0, -2.0, -2.0 }, { 2.0, 2.0, 2.0 });
 
 			pev->nextthink = gpGlobals->time + 0.1s;
 			m_flChargeTime = gpGlobals->time + 0.5s;
@@ -502,9 +502,9 @@ namespace sv {
 			m_flTimeCheckAmmo2 = gpGlobals->time + 0.1s;
 		}
 
-		if (m_iAmmo2 > 50)
+		if (m_iAmmo2 > 45)
 			m_iWeaponState = 2;
-		else if (m_iAmmo2 > 15)
+		else if (m_iAmmo2 > 10)
 			m_iWeaponState = 1;
 		else
 			m_iWeaponState = 0;
