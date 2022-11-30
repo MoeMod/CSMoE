@@ -83,6 +83,9 @@ inline std::vector<MoEWeaponBuyInfo_s> g_MoEWeaponBuyInfo = {
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 #if 0
+	{ WEAPON_VULCANUS11, "weapon_vulcanus11",       "逆天行Vulcanus-11",                 4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
+
+
 	{ WEAPON_VULCANUS3, "weapon_vulcanus3",       "逆天行Vulcanus-3",                 4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 
 	{ KNIFE_Y22S3DRAGONSWORD, "knife_y22s3dragonsword",     "遗迹丛林•狂暴者",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },

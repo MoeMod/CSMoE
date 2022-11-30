@@ -166,6 +166,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "spas12ex2",	WEAPON_SPAS12EX2 },
 	{ "mk3a1",	WEAPON_MK3A1 },
 	{ "mk3a1se",	WEAPON_MK3A1SE },
+	{ "vulcanus11",	WEAPON_VULCANUS11 },
 
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
@@ -315,6 +316,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "janus7",	WEAPON_JANUS7 },
 	{ "y22s3janus7",	WEAPON_Y22S3JANUS7 },
 	{ "laserminigun",	WEAPON_LASERMINIGUN },
+	{ "vulcanus7",	WEAPON_VULCANUS7 },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -599,6 +601,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "spas12ex2",	WEAPONCLASS_SHOTGUN },
 	{ "mk3a1",	WEAPONCLASS_SHOTGUN },
 	{ "mk3a1se",	WEAPONCLASS_SHOTGUN },
+	{ "vulcanus11",	WEAPONCLASS_SHOTGUN },
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -749,7 +752,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "janus7",	WEAPONCLASS_MACHINEGUN },
 	{ "y22s3janus7",	WEAPONCLASS_MACHINEGUN },
 	{ "laserminigun",	WEAPONCLASS_MACHINEGUN },
-
+	{ "vulcanus7",	WEAPONCLASS_MACHINEGUN },
 
 	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },

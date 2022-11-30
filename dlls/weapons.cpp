@@ -1332,7 +1332,8 @@ void CBasePlayerWeapon::ReloadSound()
 				|| m_iId == WEAPON_BOUNCER
 				|| m_iId == WEAPON_SPAS12
 				|| m_iId == WEAPON_SPAS12EX
-				|| m_iId == WEAPON_SPAS12EX2)
+				|| m_iId == WEAPON_SPAS12EX2
+				|| m_iId == WEAPON_VULCANUS11)
 				WRITE_BYTE(0);
 			else
 				WRITE_BYTE(1);
