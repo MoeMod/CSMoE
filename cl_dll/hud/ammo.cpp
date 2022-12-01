@@ -1520,7 +1520,8 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		|| weaponid == WEAPON_BUFFAWP
 		|| weaponid == WEAPON_DESTROYER
 		|| weaponid == WEAPON_STARCHASERSR
-		|| weaponid == WEAPON_MOSIN)
+		|| weaponid == WEAPON_MOSIN
+		|| weaponid == WEAPON_CARTBLUES)
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )
@@ -1612,7 +1613,7 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	}*/
 	if (data.iAccuracyFlags & CROSSHAIR_COLOR_CUSTOM)
 	{
-		if(weaponid == WEAPON_JANUS11 || weaponid == WEAPON_JANUS3)
+		if(weaponid == WEAPON_JANUS11 || weaponid == WEAPON_JANUS3 || weaponid == Z4B_WEAPON_DEATHRAY)
 			DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, m_bAdditive, 170, 83, 196, m_iAlpha);
 	}
 	else

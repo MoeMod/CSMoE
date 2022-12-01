@@ -194,6 +194,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "dualkriss",	WEAPON_DUALKRISS },
 	{ "steyrtmpd",	WEAPON_Z4B_STEYRTMPD },
 	{ "vulcanus3",	WEAPON_VULCANUS3 },
+	{ "skull3",	WEAPON_SKULL3 },
+	{ "skull3d",	WEAPON_SKULL3D },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -243,6 +245,10 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "gilboaex",	WEAPON_GILBOAEX },
 	{ "guitar",	WEAPON_GUITAR },
 	{ "violingun",	WEAPON_VIOLINGUN },
+	{ "cartbluec",	WEAPON_CARTBLUEC },
+	{ "cartblues",	WEAPON_CARTBLUES },
+	{ "cartredl",	WEAPON_CARTREDL },
+	{ "cartredh",	WEAPON_CARTREDH },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -275,6 +281,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "destroyer",	WEAPON_DESTROYER },
 	{ "starchasersr",	WEAPON_STARCHASERSR },
 	{ "mosin",	WEAPON_MOSIN },
+	{ "deathray",	Z4B_WEAPON_DEATHRAY },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -616,8 +623,6 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "bison",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "tmpdragon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "spsmg",	WEAPONCLASS_SUBMACHINEGUN },
-	{ "thanatos7",	WEAPONCLASS_SUBMACHINEGUN },
-	{ "crow7",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "janus3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "crow3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "balrog3", WEAPONCLASS_SUBMACHINEGUN },
@@ -630,7 +635,10 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "dualkriss",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "steyrtmpd",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "vulcanus3",	WEAPONCLASS_SUBMACHINEGUN },
-
+	{ "thanatos3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "sterlingbayonet",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "skull3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "skull3d",	WEAPONCLASS_SUBMACHINEGUN },
 
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
@@ -684,7 +692,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "gilboaex",	WEAPONCLASS_RIFLE },
 	{ "guitar",	WEAPONCLASS_RIFLE },
 	{ "violingun",	WEAPONCLASS_RIFLE },
-
+	{ "cartbluec",	WEAPONCLASS_RIFLE },
+	{ "cartredl",	WEAPONCLASS_RIFLE },
+	{ "cartredh",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -717,6 +727,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "destroyer",	WEAPONCLASS_SNIPERRIFLE },
 	{ "starchasersr",	WEAPONCLASS_SNIPERRIFLE },
 	{ "mosin",	WEAPONCLASS_SNIPERRIFLE },
+	{ "deathray",	WEAPONCLASS_SNIPERRIFLE },
+	{ "cartblues",	WEAPONCLASS_SNIPERRIFLE },
 
 
 	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
@@ -742,6 +754,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "charger7",	WEAPONCLASS_MACHINEGUN },
 	{ "z4b_m60amethyst",	WEAPONCLASS_MACHINEGUN },
 	{ "broad",	WEAPONCLASS_MACHINEGUN },
+	{ "thanatos7",	WEAPONCLASS_MACHINEGUN },
+	{ "crow7",	WEAPONCLASS_MACHINEGUN },
 	{ "coilmg",	WEAPONCLASS_MACHINEGUN },
 	{ "spmg",	WEAPONCLASS_MACHINEGUN },
 	{ "cameragun",	WEAPONCLASS_MACHINEGUN },
@@ -970,7 +984,6 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_LIGHTZG:
 	case WEAPON_HEAVYZG:
 	case WEAPON_AK47G:
-	case WEAPON_CARTBLUE:
 	case WEAPON_AS50:
 	case WEAPON_Z4B_AWPNVIDIA:
 	case WEAPON_BENDITA:
@@ -1120,6 +1133,13 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_MK3A1SE:
 	case WEAPON_DRILLGUN:
 	case WEAPON_VULCANUS3:
+	case WEAPON_SKULL3:
+	case WEAPON_SKULL3D:
+	case Z4B_WEAPON_DEATHRAY:
+	case WEAPON_CARTBLUEC:
+	case WEAPON_CARTBLUES:
+	case WEAPON_CARTREDL:
+	case WEAPON_CARTREDH:
 		return true;
 	default:
 		break;

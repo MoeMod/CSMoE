@@ -60,6 +60,7 @@ void EV_FireLaserMiniGun(event_args_s *args)
 	Vector forward, right, up;
 	AngleVectors( angles, forward, right, up );
 	cl_entity_t* ent = gEngfuncs.GetViewModel();
+	Vector vecBeamStart, vecBeamEnd;
 
 	if ( EV_IsLocal( args->entindex ) )
 	{
@@ -68,6 +69,24 @@ void EV_FireLaserMiniGun(event_args_s *args)
 
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(iAnim + args->bparam1, 2);
 		EV_MuzzleFlash();
+
+		vecBeamStart = ent->attachment[0];
+
+		vecBeamEnd = vecBeamStart + (forward + right * args->fparam1 + up * args->fparam2) * 40;
+
+	}
+	else
+	{
+		if (args->ducking)
+		{
+			vecBeamStart = vecSrc + forward * 40 - up * 3;
+		}
+		else
+		{
+			vecBeamStart = vecSrc + forward * 40 - up * 9;
+		}
+
+		vecBeamEnd = vecBeamStart + forward * 8192;
 	}
 
 	PLAY_EVENT_SOUND("weapons/laserminigun-1.wav");
@@ -88,10 +107,8 @@ void EV_FireLaserMiniGun(event_args_s *args)
 	else
 		iModelLaser = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_laser1.spr");
 
-	Vector vecStart = ent->attachment[0];
-	Vector vecBeamEnd = vecStart + (forward + right * args->fparam1 + up * args->fparam2) * 40;
-
-	BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Tracer(vecStart, vecBeamEnd, iModelLaser, 0.2, 2, 40.0f, 0.0f, 255.0f, 360.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+	
+	BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Tracer(vecBeamStart, vecBeamEnd, iModelLaser, 0.2, 2, 40.0f, 0.0f, 255.0f, 360.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 
 
 	EV_HLDM_FireBullets( idx,

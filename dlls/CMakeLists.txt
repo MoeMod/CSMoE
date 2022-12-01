@@ -603,6 +603,13 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_vulcanus3.cpp
 	../dlls/wpn_shared/wpn_vulcanus11.cpp
 	../dlls/wpn_shared/wpn_vulcanus7.cpp
+	../dlls/wpn_shared/wpn_skull3.cpp
+	../dlls/wpn_shared/wpn_skull3d.cpp
+	../dlls/wpn_shared/z4b_deathray.cpp
+	../dlls/wpn_shared/wpn_cartredl.cpp
+	../dlls/wpn_shared/wpn_cartredh.cpp
+	../dlls/wpn_shared/wpn_cartbluec.cpp
+	../dlls/wpn_shared/wpn_cartblues.cpp
 	)
 
 set(PM_SRCS
