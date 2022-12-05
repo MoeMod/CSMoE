@@ -2089,9 +2089,22 @@ namespace xe {
 			return m_map.empty();
 		}
 
-		bool contains(const key_type &key)
+		bool contains(const key_type &key) const
 		{
 			return m_map.find(key) != m_map.end();
+		}
+
+		bool contains_and_make_first(const key_type& key)
+		{
+			auto i = m_map.find(key);
+			if (i == m_map.end())
+				return false;
+			auto i2 = i->second.second;
+			m_list.erase(i2);
+			m_list.push_front(key);
+			auto i3 = m_list.begin();
+			i->second.second = i3;
+			return true;
 		}
 
 		void insert(const key_type &key, const value_type &value)
@@ -2183,7 +2196,7 @@ namespace xe {
 		if(!tex->texlru_extdata)
 			return false; // unknown texture
 
-		if (textureCache.contains((GLuint)texnum)) {
+		if (textureCache.contains_and_make_first((GLuint)texnum)) {
 			return false; // already present
 		}
 
