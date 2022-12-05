@@ -2115,7 +2115,7 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 		file->handle = AAsset_openFileDescriptor(asset, &file->offset, &file->real_length);
 #endif
 		*/
-		file->handle = 0;
+		file->handle = xe::fs::invalid_file;
 		file->offset = 0;
 		file->asset = asset;
 #ifdef XASH_64BIT
@@ -2621,7 +2621,7 @@ int FS_Close( file_t *file )
 		file->asset = NULL;
 	}
 #endif
-	if( file->handle && xe::fs::fclose( file->handle ))
+	if( file->handle != xe::fs::invalid_file && xe::fs::fclose( file->handle ))
 		return EOF;
 
 	Mem_Free( file );
@@ -3066,13 +3066,14 @@ static ResultType FS_MapFileImpl(const char* path, fs_offset_t* filesizeptr, qbo
 #if __ANDROID__
     if(auto asset = file->asset)
     {
+#if 0 // mmap doesnt work correctly anyway
         off_t offset, filesize;
     #ifdef XASH_64BIT
         auto fd = AAsset_openFileDescriptor64(asset, &offset, &filesize);
     #else
         auto fd = AAsset_openFileDescriptor(asset, &offset, &filesize);
     #endif
-        if (fd > 0)
+        if (fd >= 0)
         {
             auto buf = (ResultType)(pmmap(fd, filesize, offset, nullptr));
             if (filesizeptr)
@@ -3081,8 +3082,20 @@ static ResultType FS_MapFileImpl(const char* path, fs_offset_t* filesizeptr, qbo
             FS_Close(file);
             return buf;
         }
+#else
+		if (auto buf2 = AAsset_getBuffer(file->asset))
+		{
+			if (void* buf = xe::fs::mmap_anon(filesize))
+			{
+				Mem_VirtualCopy(buf, buf2, filesize);
+				if (filesizeptr)
+					*filesizeptr = filesize;
+				return (ResultType)buf;
+			}
+		}
+#endif
     }
-    #endif
+#endif
     // plain copy
     if(void *buf = xe::fs::mmap_anon(filesize))
     {
