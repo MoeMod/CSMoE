@@ -281,7 +281,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "destroyer",	WEAPON_DESTROYER },
 	{ "starchasersr",	WEAPON_STARCHASERSR },
 	{ "mosin",	WEAPON_MOSIN },
-	{ "deathray",	Z4B_WEAPON_DEATHRAY },
+	{ "deathray",	WEAPON_Z4B_DEATHRAY },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -416,6 +416,13 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_y22s3dragonsword",	KNIFE_Y22S3DRAGONSWORD },
 	{ "knife_monkeywpnset3",	KNIFE_MONKEYWPNSET3 },
 	{ "knife_ozwpnset3",	KNIFE_OZWPNSET3 },
+	{ "knife_tomahawk",	KNIFE_TOMAHAWK },
+	{ "knife_crowbarcraft",	KNIFE_CROWBARCRAFT },
+	{ "knife_dragontail",	KNIFE_DRAGONTAIL },
+	{ "knife_katanad",	KNIFE_KATANAD },
+	{ "knife_vulcanus9",	KNIFE_VULCANUS9 },
+
+
 
 	
 };
@@ -1135,7 +1142,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_VULCANUS3:
 	case WEAPON_SKULL3:
 	case WEAPON_SKULL3D:
-	case Z4B_WEAPON_DEATHRAY:
+	case WEAPON_Z4B_DEATHRAY:
 	case WEAPON_CARTBLUEC:
 	case WEAPON_CARTBLUES:
 	case WEAPON_CARTREDL:

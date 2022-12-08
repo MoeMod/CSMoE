@@ -420,6 +420,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_cartredh.cpp
 	../dlls/wpn_shared/wpn_cartbluec.cpp
 	../dlls/wpn_shared/wpn_cartblues.cpp
+	../dlls/wpn_shared/knife_tomahawk.cpp
+	../dlls/wpn_shared/knife_crowbarcraft.cpp
+	../dlls/wpn_shared/knife_vulcanus9.cpp
 	)
 
 set (HUD_SRCS

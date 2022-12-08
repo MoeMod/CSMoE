@@ -168,7 +168,7 @@ void Matrix3x4_FromOriginQuat( matrix3x4_ref out, const vec4_t quaternion, const
 	out[1][2] = 2.0f * quaternion[1] * quaternion[2] - 2.0f * quaternion[3] * quaternion[0];
 	out[2][2] = 1.0f - 2.0f * quaternion[0] * quaternion[0] - 2.0f * quaternion[1] * quaternion[1];
 	
-	out[0][3] = origin[0];
+	out[0][3] = origin[0]; 
 	out[1][3] = origin[1];
 	out[2][3] = origin[2];
 }

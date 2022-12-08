@@ -36,8 +36,8 @@ namespace sv {
     public:
 
     static constexpr const char *V_Model = "models/z4b/v_deathray.mdl";
-    static constexpr const char *P_Model = "models/p_sfsniper.mdl";
-    static constexpr const char *W_Model = "models/w_sfsniper.mdl";
+    static constexpr const char *P_Model = "models/p_deathray.mdl";
+    static constexpr const char *W_Model = "models/w_deathray.mdl";
     static constexpr const char *EventFile = "events/deathray.sc";
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
     static constexpr const char *ClassName = "z4b_deathray";
@@ -49,6 +49,7 @@ namespace sv {
         ANIM_SHOOT1,
         ANIM_SHOOT2,
         ANIM_DRAW,
+        ANIM_DRAW1,
        
 	};
     static constexpr float PlayerMaxSpeed = 230;
@@ -111,7 +112,7 @@ namespace sv {
         p->iMaxClip = -1;
         p->iSlot = 0;
         p->iPosition = 4;
-        p->iId = m_iId = Z4B_WEAPON_DEATHRAY;
+        p->iId = m_iId = WEAPON_Z4B_DEATHRAY;
         p->iFlags = 0;
         p->iWeight = AWP_WEIGHT;
 
@@ -253,7 +254,7 @@ namespace sv {
             {
                 m_iWeaponState = WPNSTATE_DEATHRAY_SIGNAL;
                 m_flNextReset = gpGlobals->time + 9.0s;
-                EMIT_SOUND_DYN(edict(), CHAN_ITEM, "weapons/change1_ready.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
+                EMIT_SOUND_DYN(edict(), CHAN_ITEM, "weapons/stunrifle_lowbattery.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
                 pev->iuser1 = 0;
                 
                 m_pPlayer->ResetMaxSpeed();
@@ -311,11 +312,11 @@ namespace sv {
         {
             m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 255;
             m_iWeaponState = WPNSTATE_DEATHRAY_USING;
-            SendWeaponAnim(ANIM_DRAW, UseDecrement() != FALSE);
+            SendWeaponAnim(ANIM_DRAW1, UseDecrement() != FALSE);
             m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
             m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
-
             m_flNextReset = gpGlobals->time + 8.0s;
+
         }
         else
         {

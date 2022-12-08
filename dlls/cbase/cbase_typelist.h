@@ -377,6 +377,8 @@ TL_ADD(CCartBlueC)
 TL_ADD(CCartBlueS)
 TL_ADD(CCartRedL)
 TL_ADD(CCartRedH)
+TL_ADD(CKnifeTomaHawk)
+TL_ADD(CKnifeCrowbarCraft)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)

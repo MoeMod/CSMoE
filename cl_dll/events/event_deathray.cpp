@@ -34,7 +34,8 @@ enum deathray_e
 	ANIM_IDLE = 0,
 	ANIM_SHOOT,
 	ANIM_SHOOT2,
-	ANIM_DRAW
+	ANIM_DRAW,
+	ANIM_DRAW1
 };
 
 void EV_FireDeathRay( event_args_t *args )
@@ -109,9 +110,9 @@ void EV_FireDeathRay( event_args_t *args )
 	}
 	else
 	{
-		r = 0.0;
-		g = 0.0;
-		b = 1.0;
+		r = 0.8;
+		g = 0.2;
+		b = 0.2;
 	}
 
 	pBeam = gEngfuncs.pEfxAPI->R_BeamPoints(vecBeamStart, vecBeamEnd,
@@ -131,7 +132,7 @@ void EV_FireDeathRay( event_args_t *args )
 	if (pBeam)
 		pBeam->flags |= FBEAM_FADEIN | FBEAM_FADEOUT | FBEAM_SHADEOUT;
 
-	PLAY_EVENT_SOUND("weapons/sfsniper-1.wav");
+	PLAY_EVENT_SOUND("weapons/crossbowex21-1.wav");
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );

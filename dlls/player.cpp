@@ -6103,7 +6103,7 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/v_starchasersr.mdl");
 		case WEAPON_MOSIN:
 			pev->viewmodel = MAKE_STRING("models/v_mosin.mdl");
-		case Z4B_WEAPON_DEATHRAY:
+		case WEAPON_Z4B_DEATHRAY:
 			pev->viewmodel = MAKE_STRING("models/z4b/v_deathray.mdl");
 		case WEAPON_CARTBLUES:
 			pev->viewmodel = MAKE_STRING("models/v_cartblue.mdl");
@@ -9217,7 +9217,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_MK3A1SE:
 		case WEAPON_DRILLGUN:
 		case WEAPON_VULCANUS7:
-		case Z4B_WEAPON_DEATHRAY:
+		case WEAPON_Z4B_DEATHRAY:
 		case WEAPON_CARTBLUEC:
 		case WEAPON_CARTBLUES:
 		case WEAPON_CARTREDL:
