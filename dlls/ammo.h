@@ -837,7 +837,13 @@ public:
 	virtual void Precache();
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
-
+class CMagicSgAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
 
 
 }

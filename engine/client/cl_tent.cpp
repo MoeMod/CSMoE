@@ -1809,6 +1809,239 @@ void GAME_EXPORT CL_Sprite_Trail( int type, const vec3_t vecStart, const vec3_t 
 
 /*
 ===============
+CL_Sprite_TrailEx
+
+Line of moving glow sprites with gravity,
+fadeout, and collisions
+===============
+*/
+void CL_Sprite_TrailExCallBack(TEMPENTITY* pEnt, float frametime, float currenttime)
+{
+
+	if (pEnt->entity.curstate.movetype != MOVETYPE_NONE && (pEnt->entity.baseline.origin[2] != 0))
+	{
+		pEnt->entity.baseline.origin[0] *= 0.99;
+		pEnt->entity.baseline.origin[1] *= 0.99;
+
+		if (pEnt->entity.baseline.origin[2] > -200)
+			pEnt->entity.baseline.origin[2] -= pEnt->entity.curstate.gravity * 2.5;
+
+		//CanRoll?
+		if (pEnt->entity.curstate.iuser3 == 1)
+		{
+			if (++pEnt->entity.angles[2] >= 360.0)
+				pEnt->entity.angles[2] = 0;
+		}
+		else if (pEnt->entity.curstate.iuser3 == 2)
+		{
+			if (!pEnt->entity.curstate.iuser1)
+			{
+				pEnt->entity.angles[2] += 3.0;
+				pEnt->entity.angles[2] = pEnt->entity.angles[2] >= 360.0 ? 0.0 : pEnt->entity.angles[2];
+			}
+			else
+			{
+				pEnt->entity.angles[2] -= 3.0;
+				pEnt->entity.angles[2] = pEnt->entity.angles[2] <= 0.0 ? 360.0 : pEnt->entity.angles[2];
+			}
+		}
+	}
+	else
+	{
+		//Force Stop
+		if (!pEnt->entity.curstate.iuser2)
+		{
+			//CanRoll?
+			if (pEnt->entity.curstate.iuser3 == 1)
+			{
+				if (++pEnt->entity.angles[2] >= 360.0)
+					pEnt->entity.angles[2] = 0;
+			}
+			else if (pEnt->entity.curstate.iuser3 == 2)
+			{
+				if (!pEnt->entity.curstate.iuser1)
+				{
+					pEnt->entity.angles[2] += 3.0;
+					pEnt->entity.angles[2] = pEnt->entity.angles[2] >= 360.0 ? 0.0 : pEnt->entity.angles[2];
+				}
+				else
+				{
+					pEnt->entity.angles[2] -= 3.0;
+					pEnt->entity.angles[2] = pEnt->entity.angles[2] <= 0.0 ? 360.0 : pEnt->entity.angles[2];
+				}
+			}
+		}
+
+	}
+}
+void CL_Sprite_TrailExHitCallBack(TEMPENTITY* pEnt, struct pmtrace_s* ptr)
+{
+	if (!pEnt->entity.curstate.iuser4)
+	{
+		if (!pEnt->entity.curstate.fuser1)
+		{
+			pEnt->entity.curstate.fuser1++;
+
+			if (pEnt->entity.baseline.origin[2] <= 0.0)
+			{
+				pEnt->entity.baseline.origin[2] = pEnt->entity.baseline.origin[2] + Com_RandomFloat(5.0, 10.0);
+			}
+		}
+		if (!ptr->ent)
+		{
+			if (ptr->plane.normal[2]) // ground
+			{
+
+				if (pEnt->entity.curstate.iuser2)
+					pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+
+				pEnt->entity.curstate.solid = SOLID_NOT;
+				pEnt->entity.baseline.origin[0] = 0.0;
+				pEnt->entity.baseline.origin[1] = 0.0;
+				pEnt->entity.baseline.origin[2] = 0.0;
+				pEnt->die = cl.time + Com_RandomFloat(0.5, 1.0);
+
+				pEnt->flags &= ~FTENT_COLLIDEWORLD;
+				pEnt->hitcallback = nullptr;
+			}
+		}
+	}
+	else
+	{
+
+		if (!ptr->ent)
+		{
+			if (ptr->plane.normal[2]) // ground
+			{
+
+
+				if (!pEnt->entity.curstate.fuser1)
+				{
+					pEnt->entity.curstate.movetype = MOVETYPE_BOUNCE;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.friction = 0.5 * pEnt->entity.curstate.gravity;
+					pEnt->entity.curstate.fuser1++;
+
+					if (pEnt->entity.baseline.origin[2] <= 5.0)
+					{
+						pEnt->entity.baseline.origin[2] += Com_RandomFloat(5.0, 10.0);
+					}
+				}
+			}
+		}
+		if (pEnt->entity.curstate.movetype == MOVETYPE_BOUNCE)
+		{
+			pEnt->entity.curstate.fuser1++;
+			pEnt->entity.curstate.friction += 0.3;
+			pEnt->entity.curstate.gravity += pEnt->entity.curstate.gravity / 2.0;
+
+
+			if (pEnt->entity.curstate.fuser1 >= 4 || abs(pEnt->entity.baseline.origin[2]) < 50.0 * pEnt->entity.curstate.scale)
+			{
+				if (pEnt->entity.curstate.fuser1 <= 4)
+					pEnt->entity.baseline.origin[2] -= pEnt->entity.baseline.origin[2] / 2;
+
+				pEnt->entity.curstate.movetype = MOVETYPE_TOSS;
+				pEnt->entity.baseline.origin[0] = 0.0;
+				pEnt->entity.baseline.origin[1] = 0.0;
+				pEnt->entity.baseline.origin[2] = 0.0;
+				pEnt->die = cl.time + Com_RandomFloat(0.5, 1.0);
+
+				pEnt->flags &= ~FTENT_COLLIDEWORLD;
+				pEnt->hitcallback = nullptr;
+				pEnt->entity.curstate.fuser1 = 0;
+			}
+		}
+
+	}
+
+}
+void GAME_EXPORT CL_Sprite_TrailEx(int type, const vec3_t end, int modelIndex, int r, int g, int b, int count, float life, float size, int renderamt, int CanRoll, int ForceStop, int FadeOut, int CanBounce, float Gravity)
+{
+	TEMPENTITY* pTemp;
+	vec3_t		vecDelta, vecDir;
+	int		i, flFrameCount;
+
+	if (Mod_GetType(modelIndex) == mod_bad)
+	{
+		MsgDev(D_INFO, "No model %d!\n", modelIndex);
+		return;
+	}
+
+	Mod_GetFrames(modelIndex, &flFrameCount);
+
+	for (i = 0; i < count; i++)
+	{
+		vec3_t	vecPos;
+
+		// Be careful of divide by 0 when using 'count' here...
+		vecPos = end;
+		vecPos.z += Com_RandomFloat(-size * 25, size * 25);
+
+		pTemp = CL_TempEntAlloc(vecPos, Mod_Handle(modelIndex));
+		if (!pTemp) return;
+
+
+		pTemp->entity.curstate.movetype = MOVETYPE_TOSS;
+
+
+		pTemp->entity.curstate.iuser1 = Com_RandomLong(0, 1);
+		pTemp->entity.curstate.iuser2 = ForceStop;
+		pTemp->entity.curstate.iuser3 = CanRoll;
+		pTemp->entity.curstate.iuser4 = CanBounce;
+
+		pTemp->entity.angles[2] = Com_RandomLong(0, 360);
+
+		vec3_t angles;
+		vec3_t forward, right, up;
+		if (CanRoll)
+		{
+			angles[0] = Com_RandomFloat(-90, 90);
+			angles[1] = Com_RandomFloat(-90, 90);
+			angles[2] = Com_RandomFloat(-90, 90);
+		}
+		AngleVectors(angles, forward, right, up);
+
+		pTemp->entity.baseline.origin[0] = forward[0] * Com_RandomFloat(50.0, 75.0) + Com_RandomFloat(-100.0, 100.0);
+		pTemp->entity.baseline.origin[1] = forward[1] * Com_RandomFloat(50.0, 75.0) + Com_RandomFloat(-100.0, 100.0);
+		if (forward[2] > 0)
+			pTemp->entity.baseline.origin[2] = forward[2] * Com_RandomFloat(1.0, 100.0) + Com_RandomFloat(0.0, 50.0);
+		else
+			pTemp->entity.baseline.origin[2] = forward[2] * Com_RandomFloat(1.0, 100.0);
+
+
+		pTemp->entity.curstate.scale = size;
+		pTemp->entity.curstate.gravity = Gravity;
+		pTemp->entity.curstate.rendermode = kRenderTransAdd;
+		pTemp->entity.curstate.renderamt = 255;
+		pTemp->entity.curstate.renderamt = pTemp->entity.baseline.renderamt = renderamt;
+
+		pTemp->entity.curstate.rendercolor.r = r;
+		pTemp->entity.curstate.rendercolor.g = g;
+		pTemp->entity.curstate.rendercolor.b = b;
+
+		pTemp->tentOffset[0] = 0.0;
+		pTemp->tentOffset[1] = 0.0;
+		pTemp->tentOffset[2] = 0.0;
+
+		pTemp->entity.curstate.frame = Com_RandomLong(0, flFrameCount - 1);
+		pTemp->frameMax = flFrameCount - 1;
+		pTemp->die = cl.time + life + Com_RandomFloat(0.5, 1.0);
+
+		pTemp->callback = CL_Sprite_TrailExCallBack;
+		pTemp->hitcallback = CL_Sprite_TrailExHitCallBack;
+
+		pTemp->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
+		if (FadeOut)
+			pTemp->flags |= FTENT_FADEOUT;
+		/*if(Gravity >=1.0)
+			pTemp->flags |= FTENT_GRAVITY;
+		else
+			pTemp->flags |= FTENT_SLOWGRAVITY;*/
+	}
+}
+/*
+===============
 CL_Large_Funnel
 
 Create a funnel effect (particles only)

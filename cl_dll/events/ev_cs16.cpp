@@ -30,6 +30,7 @@ GNU General Public License for more details.
 #include "com_model.h"
 
 #include <assert.h>
+#include <Color.h>
 
 namespace cl {
 
@@ -897,7 +898,7 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 
 		while (iShots > 0)
 		{
-			if (iBulletType == BULLET_PLAYER_BUCKSHOT || iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT || iBulletType == BULLET_PLAYER_DEPLETEDALLOY)
+			if (iBulletType == BULLET_PLAYER_BUCKSHOT || iBulletType == BULLET_PLAYER_WINGGUN_BUCKSHOT || iBulletType == BULLET_PLAYER_DEPLETEDALLOY || iBulletType == BULLET_PLAYER_MAGICSG_BUCKSHOT)
 			{
 				do
 				{
@@ -1044,6 +1045,39 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 						VectorSubtract(tr.endpos, forward, fwd);
 						gEngfuncs.pEfxAPI->R_Sprite_Trail(TE_SPRITETRAIL, tr.endpos, fwd, sModelIndexParticle, 2, 0.5, 0.04, 100,
 							255, 10);
+						break;
+					}
+					case BULLET_PLAYER_MAGICSG_BUCKSHOT:
+					{
+						int sModelIndexParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_magicsg_star.spr");
+
+						for (int i = 0; i <= 1; i++)
+						{
+							int iR = Com_RandomLong(0, 4);
+							Color color;
+							switch (iR)
+							{
+							case 0:
+								color = Color(100, 255, 0);
+								break;
+							case 1:
+								color = Color(255, 255, 100);
+								break;
+							case 2:
+								color = Color(255, 50, 50);
+								break;
+							case 3:
+								color = Color(100, 100, 255);
+								break;
+							case 4:
+								color = Color(255, 100, 255);
+								break;
+							}
+							//类型 / 坐标 / 模型名 / r /g /b /一次创建多少个 / 存在时间 /大小 / 渲染度 /能否旋转（0不转 1循环转动 2随即转动）/落地后不能动？0能动 1 不能动/淡出/能否弹起来？/重力
+							gEngfuncs.pEfxAPI->R_Sprite_TrailEx(TE_FALLPARTICLE, tr.endpos - 6.0 * vecDir, sModelIndexParticle, color.r(), color.g(), color.b(), 1, 3.0, 0.03, 255, 1, 1, 0, 0, 0.8);
+
+						}
+
 						break;
 					}
 					case BULLET_PLAYER_BUFFNG7_762MM:

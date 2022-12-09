@@ -168,6 +168,11 @@ void CBaseZombieClass_ZB2::InitHUD() const
 
 void CBaseZombieClass_ZB2::ActivateSkill(ZombieSkillSlot which)
 {
+	if (!m_bCanUseSkills)
+	{
+		ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "Cannot Use Skill Currently.");
+		return;
+	}
 	if (m_pZombieSkill && which == SKILL_SLOT_1 && GetSkillStatus(SKILL_SLOT_2) != SKILL_STATUS_USING)
 	{
 		m_pZombieSkill->Activate();
@@ -180,6 +185,10 @@ void CBaseZombieClass_ZB2::ActivateSkill(ZombieSkillSlot which)
 
 void CBaseZombieClass_ZB2::Think()
 {
+	if (!m_bCanUseSkills && m_bForceStopSkills)
+	{
+		m_bForceStopSkills = false;
+	}
 	if (m_pZombieSkill)
 		m_pZombieSkill->Think();
 	if (m_pZombieSkill2)

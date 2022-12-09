@@ -29,6 +29,7 @@
 #include "studio.h"
 #include "r_studioint.h"
 #include <string>
+#include <Color.h>
 
 
 namespace cl {
@@ -66,6 +67,7 @@ enum event_effect
 	EVENT_M95TIGER,
 	EVENT_MAGICKNIFE,
 	EVENT_DEATHKNIGHT,
+	EVENT_MAGICSG,
 };
 
 enum buffsg552ex_slash_e
@@ -76,6 +78,41 @@ enum buffsg552ex_slash_e
 	EF_SLASH_BIG,
 };
 
+void EV_MagicSgCallBack(struct tempent_s* pEnt, float frametime, float currenttime)
+{
+	if (pEnt->entity.curstate.iuser1 == 2)
+	{
+		if (pEnt->die >= currenttime)
+		{
+			float percentage = (pEnt->die - gHUD.m_flTime) / pEnt->entity.curstate.fuser1;
+			pEnt->entity.curstate.frame = pEnt->frameMax * (1.0f - percentage);
+		}
+	}
+	else if (pEnt->entity.curstate.iuser1 == 1)
+	{
+		if (++pEnt->entity.angles[2] >= 360.0)
+			pEnt->entity.angles[2] = 0;
+
+		cl_entity_t* pAttach = gEngfuncs.GetEntityByIndex(pEnt->clientIndex);
+		if (!pAttach)
+		{
+			pEnt->die = currenttime;
+			return;
+		}
+
+		Vector origin = pAttach->origin;
+		Vector oldorigin = pEnt->entity.curstate.vuser1;
+
+		if (origin == oldorigin)
+		{
+			pEnt->die = currenttime;
+			return;
+		}
+
+		VectorCopy(origin, pEnt->entity.curstate.vuser1);
+	}
+
+}
 void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType)
 {
 	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iAimingEntity);
@@ -2062,6 +2099,121 @@ void EV_WpnEffects(event_args_s* args)
 		}
 
 		}
+		break;
+	}
+	case EVENT_MAGICSG:
+	{
+		if (args->fparam2 == 1.0)
+		{
+			static Vector vecDir = args->angles;
+			static Vector vecAngle;
+			VectorAngles(vecDir, vecAngle);
+
+			//TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempSprite(origin, vecDir, 0.2, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_magicsg_star.spr"), kRenderTransAdd, kRenderFxNone, 255, 10.0, 0);
+			struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_magicsg_star.spr", false);
+			if (pModel)
+			{
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+				if (pEnt)
+				{
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.scale = 0.2;
+
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
+					pEnt->flags |= FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_PERSIST;
+
+					Color color;
+
+					switch ((int)args->fparam1)
+					{
+					case 0:
+						color = Color(100, 255, 0);
+						break;
+					case 1:
+						color = Color(255, 255, 100);
+						break;
+					case 2:
+						color = Color(255, 50, 50);
+						break;
+					case 3:
+						color = Color(100, 100, 255);
+						break;
+					case 4:
+						color = Color(255, 100, 255);
+						break;
+					}
+
+					pEnt->entity.curstate.rendercolor.r = color.r();
+					pEnt->entity.curstate.rendercolor.g = color.g();
+					pEnt->entity.curstate.rendercolor.b = color.b();
+
+					pEnt->die = gHUD.m_flTime + 999.0;
+
+					pEnt->entity.angles[2] = gEngfuncs.pfnRandomLong(0, 360);
+
+					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_PLYRATTACHMENT;
+
+					pEnt->clientIndex = idx;
+					pEnt->tentOffset[0] = 0.0;
+					pEnt->tentOffset[1] = 0.0;
+					pEnt->tentOffset[2] = 0.0;
+					pEnt->entity.curstate.iuser1 = 1;
+
+					VectorCopy(origin, pEnt->entity.curstate.vuser1);
+
+
+					pEnt->callback = EV_MagicSgCallBack;
+				}
+			}
+		}
+		else if (args->fparam2 == 2.0)
+		{
+			std::string str("sprites/ef_magicsg_hit_");
+
+			switch ((int)args->fparam1)
+			{
+			case 0:
+				str.append("green.spr");
+				break;
+			case 1:
+				str.append("yellow.spr");
+				break;
+			case 2:
+				str.append("red.spr");
+				break;
+			case 3:
+				str.append("blue.spr");
+				break;
+			case 4:
+				str.append("fink.spr");
+				break;
+			}
+
+			if (struct model_s* pModel = IEngineStudio.Mod_ForName(str.c_str(), 0))
+			{
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+				if (pEnt)
+				{
+					int framecount = ((msprite_t*)pModel->cache.data)->numframes - 1;
+
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderamt = 255;
+
+					float displaytime = (float)framecount / 20.0f;
+
+					pEnt->die = gHUD.m_flTime + displaytime;
+					pEnt->entity.curstate.scale = 100 / 200.0; //Entity Range / 200.0
+					pEnt->entity.curstate.iuser1 = 2;
+					pEnt->entity.curstate.fuser1 = displaytime;
+					pEnt->frameMax = framecount;
+					pEnt->callback = EV_MagicSgCallBack;
+
+					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_PERSIST;
+				}
+			}
+		}
+
 		break;
 	}
 

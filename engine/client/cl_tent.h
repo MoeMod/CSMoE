@@ -73,6 +73,7 @@ void CL_Sprite_Smoke( struct tempent_s *pTemp, float scale );
 void CL_Spray( const vec3_t pos, const vec3_t dir, int modelIndex, int count, int speed, int iRand, int renderMode );
 void CL_Sprite_Spray( const vec3_t pos, const vec3_t dir, int modelIndex, int count, int speed, int iRand );
 void CL_Sprite_Trail( int type, const vec3_t vecStart, const vec3_t vecEnd, int modelIndex, int nCount, float flLife, float flSize, float flAmplitude, int nRenderamt, float flSpeed );
+void CL_Sprite_TrailEx(int type, const vec3_t end, int modelIndex, int r, int g, int b, int count, float life, float size, int renderamt, int CanRoll, int ForceStop, int FadeOut, int CanBounce, float Gravity);
 void CL_FunnelSprite( const vec3_t pos, int spriteIndex, int flags );
 void CL_Large_Funnel( const vec3_t pos, int flags );
 void CL_SparkEffect( const vec3_t pos, int count, int velocityMin, int velocityMax );

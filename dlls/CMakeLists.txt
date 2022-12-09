@@ -255,6 +255,7 @@ set(HLDLL_SRCS
 	./guillotineexammo.cpp
 	./voidpistolblackhole.cpp
 	./throwingknifeentity.cpp
+	./magicsgcannon.cpp
 	)
 
 set (HLWPN_SRCS
@@ -613,6 +614,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_tomahawk.cpp
 	../dlls/wpn_shared/knife_crowbarcraft.cpp
 	../dlls/wpn_shared/knife_vulcanus9.cpp
+	../dlls/wpn_shared/wpn_magicsg.cpp
 	)
 
 set(PM_SRCS

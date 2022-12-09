@@ -3924,6 +3924,7 @@ static efx_api_t gEfxApi =
 	CL_Sprite_Smoke,
 	CL_Sprite_Spray,
 	CL_Sprite_Trail,
+	CL_Sprite_TrailEx,
 	CL_Sprite_WallPuff,
 	CL_StreakSplash,
 	CL_TracerEffect,

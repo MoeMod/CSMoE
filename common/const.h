@@ -688,7 +688,7 @@
 // byte (scroll speed in 0.1's)
 // byte (flags)
 
-
+#define TE_FALLPARTICLE 138
 
 #define MSG_BROADCAST		0	// unreliable to all
 #define MSG_ONE			1	// reliable to one (msg_entity)

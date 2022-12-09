@@ -423,6 +423,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_tomahawk.cpp
 	../dlls/wpn_shared/knife_crowbarcraft.cpp
 	../dlls/wpn_shared/knife_vulcanus9.cpp
+	../dlls/wpn_shared/wpn_magicsg.cpp
 	)
 
 set (HUD_SRCS

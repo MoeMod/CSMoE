@@ -164,6 +164,7 @@ struct efx_api_s
 	void		(*R_Sprite_Smoke)			(TEMPENTITY* pTemp, float scale);
 	void		(*R_Sprite_Spray)			(const vec3_t pos, const vec3_t dir, int modelIndex, int count, int speed, int iRand);
 	void		(*R_Sprite_Trail)			(int type, const vec3_t start, const vec3_t end, int modelIndex, int count, float life, float size, float amplitude, int renderamt, float speed);
+	void		(*R_Sprite_TrailEx)			(int type, const vec3_t end, int modelIndex, int r, int g, int b, int count, float life, float size, int renderamt, int CanRoll, int ForceStop, int FadeOut, int CanBounce, float Gravity);
 	void		(*R_Sprite_WallPuff)		(TEMPENTITY* pTemp, float scale);
 	void		(*R_StreakSplash)			(const vec3_t pos, const vec3_t dir, int color, int count, float speed, int velocityMin, int velocityMax);
 	void		(*R_TracerEffect)			(const vec3_t start, const vec3_t end);

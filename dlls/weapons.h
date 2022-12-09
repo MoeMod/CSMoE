@@ -726,6 +726,7 @@ private:
 	CUtlVector<CBaseEntity*>* m_pGroupList;
 
 	friend class CSGMissileCannon;
+	friend class CMagicSgCannon;
 };
 
 class CHolySwordCannon : public CBaseEntity
@@ -990,6 +991,7 @@ private:
 
 	int m_iEffectSprite;
 	int m_iExplosionSprite;
+	friend class CMagicSgCannon;
 };
 
 class CM3DragonCannon : public CGrenade
@@ -1422,6 +1424,30 @@ private:
 	float GetDamage();
 	int m_iType;
 	int m_iTrail;
+};
+class CMagicSgCannon : public CSGMissileCannon
+{
+	//From CS:AE
+public:
+	void Spawn();
+	void Precache();
+	void EXPORT MagicSgBcsTouch(CBaseEntity* pOther);
+
+	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList, float flExplodeDamage, float flExplodeRadius, float flDirectForce, int iType, int iBuffType);
+	void Remove();
+	void Explode(void);
+
+private:
+	float m_flExplodeDamage;
+	float m_flExplodeRadius;
+	float m_flDirectForce;
+
+	int m_iEffectSprite;
+	int m_iExplosionSprite;
+	int m_iSprIndex[8];
+
+	int m_iColor;
+	int m_iBuffType;
 };
 
 #if 0

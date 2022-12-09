@@ -2482,4 +2482,31 @@ BOOL C45ACPAZAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_45acpaz, C45ACPAZAmmo);
+
+void CMagicSgAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CMagicSgAmmo::Precache()
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CMagicSgAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(15, "magicsg_buckshot", 144) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_magicsg_buckshot, CMagicSgAmmo);
+
+
 }
