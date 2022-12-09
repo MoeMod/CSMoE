@@ -277,3 +277,4 @@ HOOK_EVENT(cartbluec, FireCartBlueC);
 HOOK_EVENT(cartblues, FireCartBlueS);
 HOOK_EVENT(cartredl, FireCartRedL);
 HOOK_EVENT(cartredh, FireCartRedH);
+HOOK_EVENT(vulcanus9, FireVulcanus9LightMove);

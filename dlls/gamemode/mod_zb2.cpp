@@ -268,8 +268,73 @@ CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieM
 
 bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 {
+	if (!Q_stricmp(pcmd, "openselector"))
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
+		WRITE_COORD(20.0);
+		MESSAGE_END();
+	}
+
 	if (m_pPlayer->m_bIsZombie)
 	{
+		//判断字符串是否含有指定目标，若返回NULL则没有
+		if (Q_strstr(pcmd, "BTE_Zb_Select_Zombie") != NULL)
+		{
+			int iCmd = 0;
+			char pCmdString[32];
+
+			//(将字符串里的字母和下划线去掉)仅保留数字.
+			sscanf(pcmd, "%*[A-Za-z_]%31[0-9]", pCmdString);
+			//将（string）“数字”转为（int） 数字
+			iCmd = StrToInt(pCmdString);
+
+			int iZombieType = 0;
+
+			//如果选择的是随机  iZombieType = -1 ，否则 iZombieType = 人物序号（参见zb2_const.h）
+			if (iCmd <= ((int)ZOMBIE_CLASS_BOOMER))
+			{
+				iZombieType = (iCmd == int((ZOMBIE_CLASS_BOOMER))) ? -1 : iCmd;
+			}
+			//如果是随机选择
+			if (iZombieType == -1)
+			{
+				m_pPlayer->m_ZombieClass = "random";
+				auto RandomZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, m_pPlayer->m_ZombieClass);
+
+				m_pCharacter_ZB2 = RandomZombie;
+				m_pCharacter = RandomZombie;
+				RandomZombie->InitHUD();
+			}
+			//如果不是随机，根据用户选定的 ZombieClassType 找到对应的僵尸名
+			else
+			{
+				m_pPlayer->m_ZombieClass = ZombieNameByClass((ZombieClassType)iZombieType);
+				auto AbsZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, m_pPlayer->m_ZombieClass);
+
+				m_pCharacter_ZB2 = AbsZombie;
+				m_pCharacter = AbsZombie;
+				AbsZombie->InitHUD();
+			}
+
+			float flMaxHealth = m_pPlayer->pev->max_health;
+
+			m_pPlayer->pev->sequence = 0;
+			m_pPlayer->m_iCustomSequence = -1;
+
+			//如果使用这个函数，会导致无敌时间叠加
+			//BecomeZombie(m_pPlayer->m_iZombieLevel);
+
+			if (m_pPlayer->m_pActiveItem)
+			{
+				m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
+			}
+
+			m_pPlayer->pev->max_health = flMaxHealth;
+			m_pPlayer->pev->health = flMaxHealth;
+
+			return true;
+		}
 		if (!Q_stricmp(pcmd, "BTE_ZombieSkill1"))
 		{
 			if (CanUseZombieSkill())
@@ -414,6 +479,11 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 
 	m_iZombieInfections = 0;
 	UpdatePlayerEvolutionHUD();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
+	WRITE_COORD(20.0);
+	MESSAGE_END();
 }
 
 void CPlayerModStrategy_ZB2::BecomeHuman()
@@ -437,6 +507,11 @@ void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer 
 	m_iZombieInfections++;
 
 	CheckEvolution();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, victim->pev);
+	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
+	WRITE_COORD(20.0);
+	MESSAGE_END();
 }
 
 void CPlayerModStrategy_ZB2::Event_AdjustHumanDamage(CBasePlayer * attacker, float &flDamage)

@@ -105,6 +105,9 @@ struct model_s* CStudioModelRenderer::s_pVoidPistolEXViewModel;
 struct model_s* CStudioModelRenderer::s_pVoidPistolBlackHoleModel;
 struct model_s* CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel;
 
+struct model_s* CStudioModelRenderer::s_pVulcanus9ViewModel;
+struct model_s* CStudioModelRenderer::s_pVulcanus9FlameModel;
+
 void CStudioModelRenderer::Init(void)
 {
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");
@@ -954,7 +957,9 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 	StudioSetUpTransform(0);
 
-	if(m_pCurrentEntity == gEngfuncs.GetViewModel())
+	cl_entity_s* viewent = gEngfuncs.GetViewModel();
+
+	if(m_pCurrentEntity == viewent)
 	{
 		if (gHUD.cl_righthand->value)
 		{

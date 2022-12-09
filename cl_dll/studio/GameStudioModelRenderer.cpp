@@ -103,6 +103,8 @@ TEMPENTITY* g_M3DragonmSmoke2 = NULL;
 TEMPENTITY* g_VoidPistolBlackHole = NULL;
 TEMPENTITY* g_VoidPistolEXBlackHole = NULL;
 
+TEMPENTITY* g_Vulcanus9Flame[8];
+
 float g_flBloodhunterAnimTime = 0.0;
 int g_iBloodhunterSecAnim = 0;
 int g_iBloodhunterState = 0;
@@ -119,6 +121,8 @@ int g_iBUFFNG7State = 0;
 int g_iReviveGunSeq = 0;
 
 int g_iM95TigerState = 0;
+
+int g_iVulcanus9State = 0;
 
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {
@@ -1146,6 +1150,14 @@ int R_StudioDrawPlayer(int flags, entity_state_t *pplayer)
 
 int R_StudioDrawModel(int flags)
 {
+	int idx;
+	cl_entity_t* pLocalPlayer = gEngfuncs.GetLocalPlayer();
+
+	if (g_iUser1 == OBS_IN_EYE)
+		pLocalPlayer = gEngfuncs.GetEntityByIndex(g_iUser2);
+
+	idx = pLocalPlayer->index;
+
 	int righthand = gHUD.cl_righthand->value;
 	cl_entity_s* viewent = IEngineStudio.GetViewEntity();
 	cl_entity_s* curent = IEngineStudio.GetCurrentEntity();
@@ -1908,6 +1920,46 @@ int R_StudioDrawModel(int flags)
 				g_VoidPistolEXBlackHole = NULL;
 			}
 		}
+
+
+		if (g_iVulcanus9State & (1 << idx) && CStudioModelRenderer::s_pVulcanus9ViewModel && CStudioModelRenderer::s_pVulcanus9FlameModel && curent->model == CStudioModelRenderer::s_pVulcanus9ViewModel && (curent->curstate.sequence == 0 || (curent->curstate.sequence > 3 && curent->curstate.sequence < 8)))
+		{
+			for (int i = 2; i < 8; i++)
+			{
+				if (!g_Vulcanus9Flame[i])
+				{
+					g_Vulcanus9Flame[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[i], CStudioModelRenderer::s_pVulcanus9FlameModel);
+
+					g_Vulcanus9Flame[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_Vulcanus9Flame[i]->entity.curstate.aiment = curent->index;
+					g_Vulcanus9Flame[i]->entity.curstate.body = i + 1;
+					g_Vulcanus9Flame[i]->entity.curstate.rendermode = kRenderTransAdd;
+					g_Vulcanus9Flame[i]->entity.curstate.renderamt = 255;
+					g_Vulcanus9Flame[i]->entity.curstate.renderfx = 0;
+					g_Vulcanus9Flame[i]->entity.curstate.scale = 0.07;
+					g_Vulcanus9Flame[i]->entity.curstate.framerate = 24;
+					g_Vulcanus9Flame[i]->entity.curstate.rendercolor.r = g_Vulcanus9Flame[i]->entity.curstate.rendercolor.g = g_Vulcanus9Flame[i]->entity.curstate.rendercolor.b = 255;
+					g_Vulcanus9Flame[i]->frameMax = 16;
+					g_Vulcanus9Flame[i]->die = gHUD.m_flTime + 9999.0f;
+					g_Vulcanus9Flame[i]->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_Vulcanus9Flame[i]->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_Vulcanus9Flame[i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				if (g_Vulcanus9Flame[i])
+				{
+					g_Vulcanus9Flame[i]->die = 0.0;
+					g_Vulcanus9Flame[i] = NULL;
+				}
+			}
+		}
+
 	}
 
 	return iReturn;

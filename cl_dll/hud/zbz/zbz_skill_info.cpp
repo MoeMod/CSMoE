@@ -120,7 +120,6 @@ const std::map<ZombieZSkillSkillId, std::pair<ZombieZSkillType, const char*>> g_
 	{Skill_RapidReloaderII, {TYPE_HUMAN, "高速填装II"}},
 	{Skill_ZombieS, {TYPE_ZOMBIE, "生化超越"}},
 	{Skill_GhostHunter, {TYPE_HUMAN, "幽灵猎手"}},
-	{Skill_ZombiBombGiveaway, {TYPE_ZOMBIE, "兽颅增殖"}},
 	{Skill_SwordMaster, {TYPE_HUMAN, "刀剑将领"}},
 	{Skill_Knife2X, {TYPE_HUMAN, "屠戮之刃"}},
 	{Skill_GoldClip, {TYPE_HUMAN, "金色弹夹"}},

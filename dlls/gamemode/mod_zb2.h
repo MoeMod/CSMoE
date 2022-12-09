@@ -81,6 +81,7 @@ public:
 	BOOL DeployWeapon(CBasePlayerItem *item) override;
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
 
+	const char* ZombieNameByClass(ZombieClassType i);
 protected:
 	virtual bool CanUseZombieSkill();
 	virtual void Zombie_HealthRecoveryThink();

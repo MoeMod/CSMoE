@@ -219,7 +219,16 @@ int CHudZB2_Skill::VidInit(void)
 	{
 		if (Config::ZOMBIE_CLASS_HUD_ICON_NEW[i] && Config::ZOMBIE_CLASS_HUD_ICON_NEW[i][0] != '\0')
 			if (!m_pTexture_NewClassIcons[i])
-				m_pTexture_NewClassIcons[i] = R_LoadTextureUnique(Config::ZOMBIE_CLASS_HUD_ICON_NEW[i]);
+				m_pTexture_NewClassIcons[i] = R_LoadTextureShared(Config::ZOMBIE_CLASS_HUD_ICON_NEW[i]);
+		if (i == 0 || i > ((int)ZOMBIE_CLASS_BOOMER + 1))
+			continue;
+		if (i == ((int)ZOMBIE_CLASS_BOOMER + 1))
+		{
+			m_pTexture_RandomZbClass = R_LoadTextureShared("resource\\hud\\zombie\\zombietype_random");
+			gHUD.m_ZB2.SetSelectorIcon(i - 1, "resource\\hud\\zombie\\zombietype_random");
+		}
+		else
+			gHUD.m_ZB2.SetSelectorIcon(i - 1, Config::ZOMBIE_CLASS_HUD_ICON_NEW[i]);
 	}
 
 	return 1;

@@ -111,7 +111,12 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 	pWeapon->hAmmo2 = 0;
 
 	sprintf(sz, "sprites/%s.txt", pWeapon->szName);
-	if (strncmp(pWeapon->szName, "knife_dgaxe", 11) && strncmp(pWeapon->szName, "knife_skullt9", 13) && strncmp(pWeapon->szName, "knife_summonknife", 17) && strncmp(pWeapon->szName, "knife_y22s1holyswordmb", 22) && strncmp(pWeapon->szName, "knife_y22s2sfsword", 18))
+	if (strncmp(pWeapon->szName, "knife_dgaxe", 11) && 
+		strncmp(pWeapon->szName, "knife_skullt9", 13) && 
+		strncmp(pWeapon->szName, "knife_summonknife", 17) && 
+		strncmp(pWeapon->szName, "knife_y22s1holyswordmb", 22) && 
+		strncmp(pWeapon->szName, "knife_y22s2sfsword", 18) && 
+		strncmp(pWeapon->szName, "knife_vulcanus9", 15))
 	{
 		if (!strncmp(pWeapon->szName, "knife_", 6))
 		{
@@ -536,7 +541,12 @@ void WeaponsResource :: SelectSlot( int iSlot, int fAdvance, int iDirection )
 
 	if ((gHUD.m_ZB2.m_iFlags & HUD_ACTIVE) && (fAdvance == FALSE) && (iDirection == 1))
 	{
-		if(gHUD.m_ZB2.ActivateSkill(iSlot + 1))
+		if (gHUD.m_ZB2.SelectorCanDraw())
+		{
+			if (gHUD.m_ZB2.Selector((iSlot + 1)) == 10 ? 0 : (iSlot + 1))
+				return;
+		}
+		if (gHUD.m_ZB2.ActivateSkill(iSlot + 1))
 			return;
 	}
 
