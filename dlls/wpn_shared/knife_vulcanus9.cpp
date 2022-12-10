@@ -440,7 +440,7 @@ hit_result_t CKnifeVulcanus9::KnifeAttack(float flDamage, float flRadius, float 
 
 void CKnifeVulcanus9::SetSkin()
 {
-	float flRatio = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] / VULCANUS9_MAXAMMO;
+	float flRatio = float(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]) / float(VULCANUS9_MAXAMMO);
 
 	if (flRatio >= 0.8)
 		pev->skin = 4;

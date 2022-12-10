@@ -89,25 +89,7 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 #else
 const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
 	{"tank", 100, MakeZombieClass<CZombieClass_Default>},
-		{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
-		{"heavy", 100, MakeZombieClass<CZombieClass_Heavy> },
-		{"pc", 100, MakeZombieClass<CZombieClass_Pc> },
-		{"heal", 100, MakeZombieClass<CZombieClass_Heal> },
-		{"deimos", 100, MakeZombieClass<CZombieClass_Deimos> },
-		{"deimos2", 100, MakeZombieClass<CZombieClass_Deimos2> },
-		{"teleport", 100, MakeZombieClass<CZombieClass_Teleport> },
-		{"booster", 100, MakeZombieClass<CZombieClass_Booster> },
-		{"china", 100, MakeZombieClass<CZombieClass_China> },
-		{"pass", 100, MakeZombieClass<CZombieClass_Pass> },
-		{"flying", 100, MakeZombieClass<CZombieClass_Flying> },
-		{"revival", 50, MakeZombieClass<CZombieClass_Revival> },
-		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
-		{"resident", 100, MakeZombieClass<CZombieClass_Resident> },
-		{"witch", 100, MakeZombieClass<CZombieClass_Witch> },
-		//{"zbs_deimos2", 100, MakeZombieClass<CZombieClass_ZBS_Deimos2> },
-		{"aksha", 100, MakeZombieClass<CZombieClass_Aksha> },
-		{"boomer", 100, MakeZombieClass<CZombieClass_Boomer> },
-
+	{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
 };
 #endif
 

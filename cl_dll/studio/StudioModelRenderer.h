@@ -142,6 +142,7 @@ public:
 	static struct model_s* s_pVoidPistolEXViewModel;
 	static struct model_s* s_pVoidPistolBlackHoleModel;
 	static struct model_s* s_pVoidPistolEXBlackHoleModel;
+	static struct model_s* s_pVulcanus9PModel;
 	static struct model_s* s_pVulcanus9ViewModel;
 	static struct model_s* s_pVulcanus9FlameModel;
 

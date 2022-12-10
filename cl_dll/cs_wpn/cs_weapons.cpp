@@ -694,7 +694,8 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 			&& m_iId != WEAPON_KINGCOBRA
 			&& m_iId != WEAPON_KINGCOBRAG
 			&& m_iId != WEAPON_SKULL2
-			&& m_iId != WEAPON_MUSKET)
+			&& m_iId != WEAPON_MUSKET
+			&& m_iId != WEAPON_Z4B_MALORIAN3516)
 		{
 			if (m_iShotsFired > 0)
 			{

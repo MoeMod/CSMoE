@@ -253,6 +253,7 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pVoidPistolEXViewModel = IEngineStudio.Mod_ForName("models/v_voidpistolex.mdl", FALSE);
 	CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel = IEngineStudio.Mod_ForName("sprites/ef_voidpistolex04.spr", FALSE);
 
+	CStudioModelRenderer::s_pVulcanus9PModel = IEngineStudio.Mod_ForName("models/p_vulcanus92.mdl", FALSE);
 	CStudioModelRenderer::s_pVulcanus9ViewModel = IEngineStudio.Mod_ForName("models/v_vulcanus9.mdl", FALSE);
 	CStudioModelRenderer::s_pVulcanus9FlameModel = IEngineStudio.Mod_ForName("sprites/flame3.spr", FALSE);
 

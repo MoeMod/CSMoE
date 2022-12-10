@@ -34,6 +34,16 @@ namespace cl::event::vulcanus9 {
 			{
 				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_ITEM, "weapons/vulcanus9_idle.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 0xf));
 			}
+
+			dlight_t* dl = gEngfuncs.pEfxAPI->CL_AllocDlight(0);
+
+			dl->origin = origin;
+			dl->radius = 800;
+			dl->decay = 0;
+			dl->color.r = 200;
+			dl->color.g = 200;
+			dl->color.b = 50;
+			dl->die = gHUD.m_flTime + 1.0;
 		}
 		else
 			g_iVulcanus9State &= ~(1 << idx);

@@ -620,6 +620,7 @@ public:
 			|| m_iId == WEAPON_TKNIFEEX
 			|| m_iId == WEAPON_TKNIFEEX2
 			|| m_iId == WEAPON_Z4B_TKNIFEDX
+			|| m_iId == WEAPON_Z4B_MALORIAN3516
 			);
 	}
 	void SetPlayerShieldAnim();

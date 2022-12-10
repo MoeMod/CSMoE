@@ -104,6 +104,7 @@ TEMPENTITY* g_VoidPistolBlackHole = NULL;
 TEMPENTITY* g_VoidPistolEXBlackHole = NULL;
 
 TEMPENTITY* g_Vulcanus9Flame[8];
+TEMPENTITY* g_Vulcanus9PFlame[33][3];
 
 float g_flBloodhunterAnimTime = 0.0;
 int g_iBloodhunterSecAnim = 0;
@@ -1075,6 +1076,49 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 			if (flags & STUDIO_EVENTS)
 				IEngineStudio.StudioClientEvents();
+
+			//HOOK pModel
+			int idx = pplayer->number;
+
+			if (idx > 0 && idx < 33)
+			{
+				if (g_iVulcanus9State & (1 << idx) && CStudioModelRenderer::s_pVulcanus9PModel && CStudioModelRenderer::s_pVulcanus9FlameModel && pweaponmodel == CStudioModelRenderer::s_pVulcanus9PModel)
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						if (!g_Vulcanus9PFlame[idx][i])
+						{
+							g_Vulcanus9PFlame[idx][i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(m_pCurrentEntity->attachment[i + 1], CStudioModelRenderer::s_pVulcanus9FlameModel);
+
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.aiment = idx;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.body = i + 2;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.rendermode = kRenderTransAdd;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.renderamt = 255;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.renderfx = 0;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.scale = 0.22;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.framerate = 24;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.rendercolor.r = g_Vulcanus9PFlame[idx][i]->entity.curstate.rendercolor.g = g_Vulcanus9PFlame[idx][i]->entity.curstate.rendercolor.b = 255;
+							g_Vulcanus9PFlame[idx][i]->frameMax = 16;
+							g_Vulcanus9PFlame[idx][i]->die = gHUD.m_flTime + 9999.0f;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.weaponmodel = pplayer->weaponmodel;
+
+							g_Vulcanus9PFlame[idx][i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+						}
+					}
+				}
+				else
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						if (g_Vulcanus9PFlame[idx][i])
+						{
+							g_Vulcanus9PFlame[idx][i]->die = 0.0;
+							g_Vulcanus9PFlame[idx][i] = NULL;
+						}
+					}
+				}
+			}
 		}
 	}
 

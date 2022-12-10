@@ -268,13 +268,14 @@ CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieM
 
 bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 {
-	if (!Q_stricmp(pcmd, "openselector"))
-	{
-		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-		WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
-		WRITE_COORD(20.0);
-		MESSAGE_END();
-	}
+	//DEBUG MENU
+	//if (!Q_stricmp(pcmd, "openselector"))
+	//{
+	//	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+	//	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
+	//	WRITE_COORD(20.0);
+	//	MESSAGE_END();
+	//}
 
 	if (m_pPlayer->m_bIsZombie)
 	{
@@ -287,7 +288,7 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 			//(将字符串里的字母和下划线去掉)仅保留数字.
 			sscanf(pcmd, "%*[A-Za-z_]%31[0-9]", pCmdString);
 			//将（string）“数字”转为（int） 数字
-			iCmd = StrToInt(pCmdString);
+			iCmd = std::stoi(pCmdString);
 
 			int iZombieType = 0;
 
@@ -480,10 +481,15 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	m_iZombieInfections = 0;
 	UpdatePlayerEvolutionHUD();
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
-	WRITE_COORD(20.0);
-	MESSAGE_END();
+#ifdef XASH_DEDICATED
+	if (m_pPlayer->IsUsingPC())
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
+		WRITE_COORD(20.0);
+		MESSAGE_END();
+	}
+#endif
 }
 
 void CPlayerModStrategy_ZB2::BecomeHuman()
@@ -508,10 +514,15 @@ void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer 
 
 	CheckEvolution();
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, victim->pev);
-	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
-	WRITE_COORD(20.0);
-	MESSAGE_END();
+#ifdef XASH_DEDICATED
+	if (victim->IsUsingPC())
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, victim->pev);
+		WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
+		WRITE_COORD(20.0);
+		MESSAGE_END();
+	}
+#endif
 }
 
 void CPlayerModStrategy_ZB2::Event_AdjustHumanDamage(CBasePlayer * attacker, float &flDamage)

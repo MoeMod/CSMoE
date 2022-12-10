@@ -135,6 +135,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "tknifeex",	WEAPON_TKNIFEEX },
 	{ "tknifeex2",	WEAPON_TKNIFEEX2 },
 	{ "tknifedx",	WEAPON_Z4B_TKNIFEDX },
+	{ "malorian3516" , WEAPON_Z4B_MALORIAN3516},
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -582,6 +583,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "tknifeex",	WEAPONCLASS_PISTOL },
 	{ "tknifeex2",	WEAPONCLASS_PISTOL },
 	{ "tknifedx",	WEAPONCLASS_PISTOL },
+	{ "malorian3516" , WEAPONCLASS_PISTOL},
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -1210,6 +1212,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_TKNIFEEX:
 	case WEAPON_TKNIFEEX2:
 	case WEAPON_Z4B_TKNIFEDX:
+	case WEAPON_Z4B_MALORIAN3516:
 		return true;
 	default:
 		break;

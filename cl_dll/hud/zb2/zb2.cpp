@@ -413,7 +413,7 @@ int CHudZB2::Draw(float time)
 			int iHeightMax = (m_iType == 1) ? (80 + 59 * (m_iMax % 2 ? (m_iMax / 2) + 1 : (m_iMax / 2))) : 434;
 			iY = ScreenHeight / 2 - iHeight / 2 + iHeightMax;
 
-			sprintf(SzText, "取消(ESC)");
+			sprintf(SzText, "取消(TAB)");
 			gEngfuncs.pfnDrawSetTextColor(255 / 255.0f, 255 / 255.0f, 255 / 255.0f);
 			iTextlen = DrawUtils::ConsoleStringLen(SzText);
 			DrawUtils::DrawConsoleString(iWidth / 2 - iTextlen / 4, iY + 10, SzText);

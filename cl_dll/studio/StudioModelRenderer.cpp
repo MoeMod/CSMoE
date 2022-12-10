@@ -105,6 +105,7 @@ struct model_s* CStudioModelRenderer::s_pVoidPistolEXViewModel;
 struct model_s* CStudioModelRenderer::s_pVoidPistolBlackHoleModel;
 struct model_s* CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel;
 
+struct model_s* CStudioModelRenderer::s_pVulcanus9PModel;
 struct model_s* CStudioModelRenderer::s_pVulcanus9ViewModel;
 struct model_s* CStudioModelRenderer::s_pVulcanus9FlameModel;
 
