@@ -194,7 +194,7 @@ void EV_FireCannonCommon(struct event_args_s* args, const char* szSound, int mod
 		dl->die = gHUD.m_flTime + 0.05;
 	}
 
-	//gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, szSound, VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 15));
+	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, szSound, 1.5, ATTN_NORM, 0, 94 + Com_RandomLong(0, 15));
 }
 
 void EV_FireMalorian3516(event_args_s *args)
@@ -270,7 +270,10 @@ void EV_FireMalorian3516(event_args_s *args)
 
 		gEngfuncs.pEfxAPI->R_TempCustomModel(ent->attachment[4], {0, 0, 0}, {0, 0, 0}, 1.0, iMuzzModelIndex, 0, framerate, false, brightness, kRenderTransAdd, 0, 0, false, 0, scale, 30, FTENT_SPRANIMATE);
 		
-		PLAY_EVENT_SOUND("weapons/malorian-1.wav");
+		if(args->bparam2)
+			PLAY_EVENT_SOUND("weapons/malorian_arms_3516/malorian-1.wav");
+		else
+			PLAY_EVENT_SOUND("weapons/malorian_arms_3516/malorian-2.wav");
 
 		EV_GetGunPosition(args, vecSrc, origin);
 		VectorCopy(forward, vecAiming);

@@ -352,6 +352,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_SL8G, "weapon_sl8g",        "猎魂金骑(装弹强化)",                  4600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_SL8EX, "weapon_sl8ex",        "猎魂骑士EX",                  4600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_ZGUN, "weapon_zgun",        "异变之源AWP-Z",                  4800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
+	//{ WEAPON_Z4B_MALORIAN3516, "z4b_malorian3516",      "马洛里安武器公司 3516",    1500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_STG44, "weapon_stg44",        "咆哮飓风",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_CARTBLUEC, "weapon_cartbluec",        "皮蛋特制版突击步枪",                  4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_CARTREDL, "weapon_cartredl",        "宝宝特制版突击步枪",                  4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },

@@ -2523,7 +2523,7 @@ void C14MMAmmo::Precache()
 
 BOOL C14MMAmmo::AddAmmo(CBaseEntity* pOther)
 {
-	if (pOther->GiveAmmo(8, "14mm", 40) == -1) {
+	if (pOther->GiveAmmo(10, "14mm", 50) == -1) {
 		return FALSE;
 	}
 

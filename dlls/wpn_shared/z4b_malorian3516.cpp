@@ -38,7 +38,7 @@ using WeaponTemplate::Varibles::T;
 struct CMalorian3516_WeaponData
 {
 public:
-	static constexpr const auto &DefaultDeployTime = 1.0s;
+	static constexpr const auto &DefaultDeployTime = 0.8s;
 	static constexpr InventorySlotType ItemSlot = PISTOL_SLOT;
 	static constexpr const char *V_Model = "models/z4b/v_malorian3516.mdl";
 	static constexpr const char *P_Model = "models/z4b/pw_malorian3516.mdl";
@@ -46,7 +46,7 @@ public:
 	static constexpr const char *EventFile = "events/malorian3516.sc";
 	static constexpr const char *ClassName = "z4b_malorian3516";
 	static constexpr const char *AnimExtension = "onehanded";
-	static constexpr int MaxClip = 8;
+	static constexpr int MaxClip = 10;
 	static constexpr float ArmorRatioModifier = 1.5f;
 	enum
 	{
@@ -72,8 +72,8 @@ public:
 	static constexpr const auto & SpreadCalcDefault = 0.13 * (1 - A);
 	static constexpr const auto &CycleTime = 0.45s;
 	static constexpr int DamageDefault = 61;
-	static constexpr int DamageZB = 270;
-	static constexpr int DamageZBS = 270;
+	static constexpr int DamageZB = 790;
+	static constexpr int DamageZBS = 1350;
 	static constexpr float AccuracyDefault = 0.9f;
 	static constexpr const auto & AccuracyCalc = A - (0.4 - T) * 0.35;
 	static constexpr float AccuracyMin = 0.0;
@@ -106,6 +106,7 @@ public:
 
 	duration_t m_flNextRunIdle;
 	duration_t m_flNextIdle;
+	time_point_t m_flNextReload;
 
 	KnockbackData GetKnockBackData() override
 	{
@@ -119,10 +120,10 @@ public:
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "14mm";
-		p->iMaxAmmo1 = 40;
+		p->iMaxAmmo1 = 50;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = 8;
+		p->iMaxClip = 10;
 		p->iSlot = 1;
 		p->iPosition = 1;
 		p->iId = m_iId = WEAPON_Z4B_MALORIAN3516;
@@ -149,6 +150,7 @@ public:
 
 	BOOL Deploy() override
 	{
+		m_flNextReload = invalid_time_point;
 		ResetRunIdle();
 		return Base::Deploy();
 	}
@@ -168,13 +170,18 @@ public:
 #else
 		flags = 0;
 #endif
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), FALSE, m_iClip != 0);
 		
 		ResetRunIdle();
 	}
 
 	void SecondaryAttack() override
 	{
+		if (m_fInReload && m_flNextReload != invalid_time_point && m_flNextReload > gpGlobals->time)
+		{
+			m_fInReload = FALSE;
+			m_flNextReload = invalid_time_point;
+		}
 		m_iWeaponState = 1;
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
@@ -203,7 +210,7 @@ public:
 #ifndef CLIENT_DLL
 		m_pPlayer->m_iExtraSoundTypes = bits_SOUND_DANGER;
 #endif
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.3s;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
 
 #ifndef CLIENT_DLL
 		if (!m_iClip)
@@ -221,6 +228,41 @@ public:
 			KickBack(13.0, 3.2, 1.5, 0.5, 15.0, 10.0, 2);
 
 		ResetRunIdle();
+	}
+
+	void ItemPostFrame() override
+	{
+		int usableButtons = m_pPlayer->pev->button;
+
+		if (m_fInReload && m_flNextReload != invalid_time_point && m_flNextReload < gpGlobals->time)
+		{
+			// complete the reload.
+			int j = Q_min(MaxClip - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+#ifndef CLIENT_DLL
+			j = m_pPlayer->m_pModStrategy->AdjustDefaultReloadClip(this, j);
+#endif
+
+			// Add them to the clip
+			m_iClip += j;
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+#ifndef CLIENT_DLL
+			m_pPlayer->TabulateAmmo();
+#endif
+			m_fInReload = FALSE;
+			m_flNextReload = invalid_time_point;
+		}
+
+		if ((usableButtons & IN_ATTACK2) && m_flNextSecondaryAttack < UTIL_WeaponTimeBase())
+		{
+			SecondaryAttack();
+			m_pPlayer->pev->button &= ~IN_ATTACK2;
+			return;
+		}
+
+		if (m_fInReload)
+			return;
+
+		return CBasePlayerWeapon::ItemPostFrame();
 	}
 
 	void Reload() override
@@ -241,10 +283,16 @@ public:
 		if (m_iClip <= 0)
 			iAnim += 1;
 
-		if (DefaultReload(MaxClip, iAnim, flDelay))
+		if (DefaultReload(MaxClip, iAnim, flDelay, 1))
 		{
+#ifndef CLIENT_DLL         
+			m_pPlayer->SetAnimation(PLAYER_RELOAD);
+#endif
+			m_flNextReload = gpGlobals->time + (m_iClip > 0 ? 1.7s : 3.6s);
 			ResetRunIdle();
 			m_flAccuracy = AccuracyDefault;
+			m_flNextSecondaryAttack = UTIL_WeaponTimeBase();
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + flDelay;
 		}
 	}
 
