@@ -31,6 +31,9 @@
 
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
+
+	extern int g_iWingGunIdleB;
+	extern int g_iWingGunShootB;
 }
 
 namespace cl::event::winggun {
@@ -129,6 +132,27 @@ void EV_FireWingGun(event_args_s *args)
 	angles[1] += args->iparam2 / 100.0;
 
 	AngleVectors(angles, forward, right, up);
+
+	if (args->iparam1 == 2)
+	{
+		if (args->iparam2 == 1)
+		{
+			g_iWingGunShootB &= ~(1 << idx);
+			g_iWingGunIdleB |= (1 << idx);
+		}
+		else if (args->iparam2 == 2)
+		{
+			g_iWingGunIdleB &= ~(1 << idx);
+			g_iWingGunShootB |= (1 << idx);
+		}
+		else
+		{
+			g_iWingGunIdleB &= ~(1 << idx);
+			g_iWingGunShootB &= ~(1 << idx);
+		}
+	
+		return;
+	}
 
 	if (EV_IsLocal(idx))
 	{
@@ -238,6 +262,10 @@ void EV_FireWingGun(event_args_s *args)
 		vecBeamEnd = vecBeamStart + forward * 8192;
 
 		gEngfuncs.pEfxAPI->R_BeamPoints_Stretch(vecBeamStart, vecBeamEnd, iBeamIndex, 1.0, 20.0, 255, 0, 50.0, 255, 255, 255);
+
+		g_iWingGunIdleB &= ~(1 << idx);
+		g_iWingGunShootB |= (1 << idx);
+
 		return;
 	}
 

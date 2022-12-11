@@ -125,6 +125,9 @@ int g_iM95TigerState = 0;
 
 int g_iVulcanus9State = 0;
 
+int g_iWingGunIdleB = 0;
+int g_iWingGunShootB = 0;
+
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {
 	m_bLocal = false;
@@ -1050,38 +1053,33 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 			model_t *pweaponmodel = IEngineStudio.GetModelByIndex(pplayer->weaponmodel);
 
-			m_pStudioHeader = (studiohdr_t *)IEngineStudio.Mod_Extradata(pweaponmodel);
-			if( !m_pStudioHeader )
-				return 0;
-
-			IEngineStudio.StudioSetHeader(m_pStudioHeader);
-
-			StudioMergeBones(pweaponmodel);
-
-			IEngineStudio.StudioSetupLighting(&lighting);
-
-			if (DrawOutLineCheck(0)) DrawOutLineBegin(0);
-			StudioRenderModel(dir);
-			if (DrawOutLineCheck(0))DrawOutLine(0);
-			if (DrawOutLineCheck(0))DrawOutLineEnd(0);
-
-			StudioCalcAttachments();
-
-			if (m_pCurrentEntity->index > 0)
-				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
-
-			*m_pCurrentEntity = saveent;
-			m_pStudioHeader = saveheader;
-			IEngineStudio.StudioSetHeader(m_pStudioHeader);
-
-			if (flags & STUDIO_EVENTS)
-				IEngineStudio.StudioClientEvents();
-
 			//HOOK pModel
 			int idx = pplayer->number;
 
 			if (idx > 0 && idx < 33)
 			{
+				if (CStudioModelRenderer::s_pWingGunPModel && pweaponmodel == CStudioModelRenderer::s_pWingGunPModel)
+				{
+					if ((g_iWingGunShootB & (1 << idx) || g_iWingGunIdleB & (1 << idx)))
+					{
+						if (g_iWingGunShootB & (1 << idx))
+						{
+							m_pCurrentEntity->curstate.sequence = 2;
+							m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+							m_pCurrentEntity->curstate.framerate = 1.0;
+						}
+
+						if (g_iWingGunIdleB & (1 << idx))
+							m_pCurrentEntity->curstate.sequence = 1;
+					}
+					else
+					{
+						m_pCurrentEntity->curstate.sequence = 0;
+						m_pCurrentEntity->curstate.animtime = 0.0;
+						m_pCurrentEntity->curstate.framerate = 0.0;
+					}
+				}
+
 				if (g_iVulcanus9State & (1 << idx) && CStudioModelRenderer::s_pVulcanus9PModel && CStudioModelRenderer::s_pVulcanus9FlameModel && pweaponmodel == CStudioModelRenderer::s_pVulcanus9PModel)
 				{
 					for (int i = 0; i < 3; i++)
@@ -1119,6 +1117,33 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 					}
 				}
 			}
+
+			m_pStudioHeader = (studiohdr_t *)IEngineStudio.Mod_Extradata(pweaponmodel);
+			if( !m_pStudioHeader )
+				return 0;
+
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			StudioMergeBones(pweaponmodel);
+
+			IEngineStudio.StudioSetupLighting(&lighting);
+
+			if (DrawOutLineCheck(0)) DrawOutLineBegin(0);
+			StudioRenderModel(dir);
+			if (DrawOutLineCheck(0))DrawOutLine(0);
+			if (DrawOutLineCheck(0))DrawOutLineEnd(0);
+
+			StudioCalcAttachments();
+
+			if (m_pCurrentEntity->index > 0)
+				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
+
+			*m_pCurrentEntity = saveent;
+			m_pStudioHeader = saveheader;
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			if (flags & STUDIO_EVENTS)
+				IEngineStudio.StudioClientEvents();
 		}
 	}
 
@@ -1224,7 +1249,7 @@ int R_StudioDrawModel(int flags)
 			*curent = saveent;
 		}
 
-		if (CStudioModelRenderer::s_pMGSMViewModel && curent->model == CStudioModelRenderer::s_pMGSMViewModel && g_iMGSMSecAnim)
+		if (CStudioModelRenderer::s_pMGSMViewModel && CStudioModelRenderer::s_pMGSMLauncherModel && curent->model == CStudioModelRenderer::s_pMGSMViewModel && g_iMGSMSecAnim)
 		{
 			static cl_entity_t saveent;
 			saveent = *curent;

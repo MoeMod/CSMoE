@@ -257,6 +257,10 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pVulcanus9ViewModel = IEngineStudio.Mod_ForName("models/v_vulcanus9.mdl", FALSE);
 	CStudioModelRenderer::s_pVulcanus9FlameModel = IEngineStudio.Mod_ForName("sprites/flame3.spr", FALSE);
 
+	CStudioModelRenderer::s_pWingGunPModel = IEngineStudio.Mod_ForName("models/p_winggun.mdl", FALSE);
+
+	CStudioModelRenderer::s_pLaserSGPModel = IEngineStudio.Mod_ForName("models/p_lasersg.mdl", FALSE);
+
 
 
 

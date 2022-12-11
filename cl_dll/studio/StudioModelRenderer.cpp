@@ -109,6 +109,11 @@ struct model_s* CStudioModelRenderer::s_pVulcanus9PModel;
 struct model_s* CStudioModelRenderer::s_pVulcanus9ViewModel;
 struct model_s* CStudioModelRenderer::s_pVulcanus9FlameModel;
 
+struct model_s* CStudioModelRenderer::s_pWingGunPModel;
+
+struct model_s* CStudioModelRenderer::s_pLaserSGPModel;
+
+
 void CStudioModelRenderer::Init(void)
 {
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");

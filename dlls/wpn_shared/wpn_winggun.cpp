@@ -533,6 +533,7 @@ namespace sv {
 	EntityHandle<CWingGunWingParticle> m_pWingParticle;
 #endif
 
+	time_point_t m_flTimeResetModel;
 	time_point_t m_flTimePlayIdleSound;
 	time_point_t m_flTimeHolster;
 	time_point_t m_flTimeNextCharge;
@@ -577,6 +578,7 @@ namespace sv {
 		m_iDefaultAmmo2 = 0;
 		m_flTimeHolster = gpGlobals->time;
 		m_flTimePlayIdleSound = invalid_time_point;
+		m_flTimeResetModel = invalid_time_point;
 		Base::Spawn();
 	}
 
@@ -658,12 +660,22 @@ namespace sv {
 		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 100)
 			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 100;
 #endif
+		//reset model
+		ResetModel();
+		m_flTimeResetModel = invalid_time_point;
+
 		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75s;
 		return DefaultDeploy("models/v_winggun.mdl", "models/p_winggun.mdl", ANIM_DRAW, "shotgun", UseDecrement() != FALSE, 0.1s, 1.0s);
 	}
 
 	void ItemPostFrame() override
 	{
+		if (m_flTimeResetModel != invalid_time_point && m_flTimeResetModel < gpGlobals->time)
+		{
+			ResetModel();
+			m_flTimeResetModel = invalid_time_point;
+		}
+
 		if (m_iWeaponState & WPNSTATE_WINGGUN_WINGON)
 		{
 			if (m_flTimeNextCharge <= gpGlobals->time)
@@ -753,6 +765,11 @@ namespace sv {
 #endif
 	}
 
+	void ResetModel()
+	{
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFire, 0, g_vecZero, g_vecZero, 0.0, 0.0, 2, 0, FALSE, FALSE);
+	}
+
 	void SecondaryAttack(void)
 	{
 		if (m_iWeaponState & WPNSTATE_WINGGUN_WINGON)
@@ -776,6 +793,9 @@ namespace sv {
 			else
 			{
 				SendWeaponAnim(ANIM_WINGEND, UseDecrement() != FALSE);
+
+				ResetModel();
+
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 #ifndef CLIENT_DLL
@@ -807,6 +827,9 @@ namespace sv {
 #ifndef CLIENT_DLL
 			UTIL_TempModel({ 0, 0, 50 }, pev->angles, g_vecZero, m_iSummonModelIndex01, 20, 0, 255, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 5, 30, 0);
 #endif
+			//change model
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFire, 0, g_vecZero, g_vecZero, 0.0, 0.0, 2, 1, FALSE, FALSE);
+
 			SetThink(&CWingGun::CreateWing);
 			pev->nextthink = gpGlobals->time + 1.0s;
 			m_pPlayer->m_tLockBuffTime = invalid_time_point;
@@ -983,6 +1006,8 @@ namespace sv {
 		MESSAGE_END();
 
 		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFire, 0, g_vecZero, g_vecZero, 0.0, 0.0, 1, m_vVecAiming.x * 100, TRUE, FALSE);
+
+		m_flTimeResetModel = gpGlobals->time + 2.4s;
 
 #ifndef CLIENT_DLL
 		UTIL_TempModel(vecSrc, vecDir.Normalize(), g_vecZero, m_iExpModelIndex, 15, 0, 10, false, 0, 255, kRenderTransAdd, NULL, false, 0, 0, 46, 0);
