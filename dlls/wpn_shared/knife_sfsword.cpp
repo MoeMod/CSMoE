@@ -39,7 +39,8 @@ class CKnifeSFSword: public LinkWeaponTemplate<CKnifeSFSword,
 public:
 	static constexpr const char *ClassName = "knife_sfsword";
 	static constexpr const char *V_Model = "models/v_sfsword.mdl";
-	static constexpr const char *P_Model = "models/p_sfsword.mdl";
+	static constexpr const char *P_Model = "models/p_sfsword_on.mdl";
+	static constexpr const char* P_Model_1 = "models/p_sfsword_off.mdl";
 	static constexpr const char *W_Model = "models/w_knife.mdl";
 
 	static constexpr int MaxClip = -1;
@@ -47,8 +48,9 @@ public:
 	static constexpr const char *AnimExtension = "knife";
 	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
-public:
+	int m_iSlash;
 
+public:
 	enum
 	{
 		SFSWORD_IDLE,
@@ -63,24 +65,27 @@ public:
 		SFSWORD_OFF_IDLE,
 		SFSWORD_OFF_SLASH,
 	};
+
 	void Precache() override
 	{
 		Base::Precache();
 	
-		PRECACHE_SOUND("weapons/sfsword_draw.wav");
-		PRECACHE_SOUND("weapons/sfsword_hit_slash.wav");
-		PRECACHE_SOUND("weapons/sfsword_hit_stab.wav");
-		PRECACHE_SOUND("weapons/sfsword_swing.wav");
+		PRECACHE_SOUND("weapons/skullaxe_wall.wav");
+		PRECACHE_SOUND("weapons/sfsword_off_hit.wav");
+		PRECACHE_SOUND("weapons/sfsword_hit1.wav");
+		PRECACHE_SOUND("weapons/sfsword_hit2.wav");
+		PRECACHE_SOUND("weapons/sfsword_wall1.wav");
+		PRECACHE_SOUND("weapons/sfsword_wall2.wav");
 	}
 
 	BOOL Deploy() override
 	{
-		m_fMaxSpeed = m_iWeaponState ? 251 : 250;
+		m_fMaxSpeed = 250;
 		m_iSwing = 0;
-		m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
-		m_pPlayer->m_bShieldDrawn = false;
+		m_iSlash = 0;
+		m_iWeaponState = 0;
 
-		return DefaultDeploy("models/v_sfsword.mdl", "models/p_sfsword.mdl", SFSWORD_DRAW, "sfsword", UseDecrement() != FALSE);
+		return DefaultDeploy(V_Model, P_Model, SFSWORD_DRAW, "sfsword", UseDecrement() != FALSE, 1.5s);
 	}
 
 	void Spawn() override;
@@ -90,10 +95,13 @@ public:
 	void SecondaryAttack() override;
 	BOOL CanDrop() override { return false; }
 	void DelayPrimaryAttack();
+	void DelayOffAttack();
+	void DelayMidslash();
+
 public:
 	float GetPrimaryAttackDamage() const
 	{
-		float flDamage = 34;
+		float flDamage = m_iSlash ? 65 : 39;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 			flDamage *= 9.5f;
@@ -102,6 +110,19 @@ public:
 #endif
 		return flDamage;
 	}
+
+	float GetMidslashDamage() const
+	{
+		float flDamage = 65;
+#ifndef CLIENT_DLL
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage *= 9.5f;
+		else if (g_pModRunning->DamageTrack() == DT_ZBS)
+			flDamage *= 5.5f;
+#endif
+		return flDamage;
+	}
+
 	float GetSecondaryAttackDamage() const
 	{
 		float flDamage = 60;
@@ -127,124 +148,127 @@ void CKnifeSFSword::Spawn()
 	FallInit();
 }
 
-void CKnifeSFSword::PrimaryAttack(void)
+void CKnifeSFSword::DelayOffAttack(void)
 {
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+	Vector vecSrc = m_pPlayer->GetGunPosition();
+
+	switch (KnifeAttack(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 40, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	{
+	case HIT_NONE:
+	{
+		break;
+
+	}
+	case HIT_PLAYER:
+	{
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/sfsword_off_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+		break;
+	}
+	case HIT_WALL:
+	{
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/skullaxe_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+		break;
+
+	}
+	}
 #endif
-	if (!m_iWeaponState)
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+}
+
+void CKnifeSFSword::PrimaryAttack(void)
+{
+	if (m_iWeaponState)
 	{
 		SendWeaponAnim(SFSWORD_OFF_SLASH, UseDecrement() != FALSE);
 
-		SetThink(&CKnifeSFSword::DelayPrimaryAttack);
-		pev->nextthink = gpGlobals->time + 0.9s;
+		SetThink(&CKnifeSFSword::DelayOffAttack);
+		pev->nextthink = gpGlobals->time + 0.1s;
 
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.8s;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s + 0.5s;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.4s;
 
 		return;
 	}
 
-	SendWeaponAnim(SFSWORD_OFF_SLASH, UseDecrement() != FALSE);
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s + 0.5s;
-
-#ifndef CLIENT_DLL
-	Vector vecSrc, vecEnd;
-	TraceResult tr;
-
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-
-	vecSrc = m_pPlayer->GetGunPosition();
-	vecEnd = vecSrc + gpGlobals->v_forward * 80;
-
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
-	if (tr.flFraction >= 1.0)
+	switch (m_iSwing)
 	{
-		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(m_pPlayer->pev), &tr);
+	case 0:
+	{
+		SendWeaponAnim(SFSWORD_SLASH1, UseDecrement() != FALSE);
 
-		if (tr.flFraction >= 1.0)
-		{
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/sfsword_swing.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		SetThink(&CKnifeSFSword::DelayMidslash);
+		pev->nextthink = gpGlobals->time + 0.1s;
 
-			return;
-		}
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.71s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+		break;
+	}
+	case 1:
+	{
+		SendWeaponAnim(SFSWORD_STAB, UseDecrement() != FALSE);
+		m_iSlash = 0;
+		SetThink(&CKnifeSFSword::DelayPrimaryAttack);
+		pev->nextthink = gpGlobals->time + 0.1s;
 
-		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+		break;
+	}
+	case 2:
+	{
+		SendWeaponAnim(SFSWORD_SLASH2, UseDecrement() != FALSE);
 
-		if (!pHit || pHit->IsBSPModel())
-		{
-			FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(m_pPlayer->pev));
-		}
+		SetThink(&CKnifeSFSword::DelayMidslash);
+		pev->nextthink = gpGlobals->time + 0.1s;
 
-		vecEnd = tr.vecEndPos;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.71s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+		break;
+	}
+	case 3:
+	{
+		SendWeaponAnim(SFSWORD_STAB, UseDecrement() != FALSE);
+		m_iSlash = 0;
+		SetThink(&CKnifeSFSword::DelayPrimaryAttack);
+		pev->nextthink = gpGlobals->time + 0.1s;
+
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+		break;
+	}
 	}
 
-	if (tr.flFraction < 1.0)
-	{
-		CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+	m_iSwing++;
+	m_iSwing %= 4;
 
-		ClearMultiDamage();
-
-		float flRatio = 1.0;
-
-		if (pEntity && pEntity->IsPlayer())
-		{
-			Vector2D vec2LOS;
-			Vector vecForward = gpGlobals->v_forward;
-
-			UTIL_MakeVectors(pEntity->pev->angles);
-
-			vec2LOS = vecForward.Make2D();
-			vec2LOS = vec2LOS.Normalize();
-
-			if (DotProduct(vec2LOS, gpGlobals->v_forward.Make2D()) > 0.8)
-				flRatio = 3.0;
-		}
-
-		pEntity->TraceAttack(m_pPlayer->pev, 500 * flRatio, gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
-
-		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
-
-		CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
-		if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
-		{
-			Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
-
-			pPlayer->pev->velocity.x = vecDir2D.x * 800;
-			pPlayer->pev->velocity.y = vecDir2D.y * 800;
-			pPlayer->pev->velocity.z = 400;
-		}
-
-		if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/sfsword_hit_stab.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/sfsword_swing.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-	}
-	else
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/sfsword_swing.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-#endif
 }
 
 void CKnifeSFSword::SecondaryAttack(void)
 {
-	m_iWeaponState = m_iWeaponState ? 0 : 1;
-
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.53s;
 
 	if (m_iWeaponState)
 	{
+		m_iWeaponState = 0;
 		SendWeaponAnim(SFSWORD_ON, UseDecrement() != FALSE);
-
 		m_fMaxSpeed = 250;
+
+		m_pPlayer->pev->weaponmodel = MAKE_STRING(P_Model);
 	}
 	else
 	{
+		m_iWeaponState = 1;
 		SendWeaponAnim(SFSWORD_OFF, UseDecrement() != FALSE);
-
 		m_fMaxSpeed = 251;
+
+		m_pPlayer->pev->weaponmodel = MAKE_STRING(P_Model_1);
 	}
 
 	m_pPlayer->ResetMaxSpeed();
@@ -254,73 +278,67 @@ void CKnifeSFSword::SecondaryAttack(void)
 void CKnifeSFSword::DelayPrimaryAttack()
 {
 #ifndef CLIENT_DLL
-	Vector vecSrc, vecEnd;
-	TraceResult tr;
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-
-	vecSrc = m_pPlayer->GetGunPosition();
-	vecEnd = vecSrc + gpGlobals->v_forward * 75;
-
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
-	if (tr.flFraction >= 1.0)
+	switch (KnifeAttack5(GetPrimaryAttackDamage(), 65, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
-		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(m_pPlayer->pev), &tr);
-
-		if (tr.flFraction >= 1.0)
-		{
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/sfsword_swing.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-
-			return;
-		}
-
-		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
-
-		if (!pHit || pHit->IsBSPModel())
-		{
-			FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(m_pPlayer->pev));
-		}
-
-		vecEnd = tr.vecEndPos;
-	}
-
-	if (tr.flFraction < 1.0)
+	case HIT_PLAYER:
 	{
-		CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-
-		ClearMultiDamage();
-
-		float flRatio = 1.0;
-
-		if (pEntity && pEntity->IsPlayer())
-		{
-			Vector2D vec2LOS;
-			Vector vecForward = gpGlobals->v_forward;
-
-			UTIL_MakeVectors(pEntity->pev->angles);
-
-			vec2LOS = vecForward.Make2D();
-			vec2LOS = vec2LOS.Normalize();
-
-			if (DotProduct(vec2LOS, gpGlobals->v_forward.Make2D()) > 0.8)
-				flRatio = 3.0;
-		}
-
-		pEntity->TraceAttack(m_pPlayer->pev, 800 * flRatio, gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
-
-		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
-
-		if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/sfsword_hit_slash.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		if (RANDOM_LONG(0, 1))
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/sfsword_wall1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/sfsword_swing.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/sfsword_wall2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		break;
 	}
-	else
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/sfsword_swing.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	case HIT_WALL:
+	{
+		if (RANDOM_LONG(0, 1))
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/sfsword_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/sfsword_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		break;
+	}
+	}
 #endif
 
-	SetThink(NULL);
+	if (++m_iSlash & 1)
+	{
+		pev->nextthink = gpGlobals->time + 0.57s;
+		SetThink(&CKnifeSFSword::DelayPrimaryAttack);
+	}
+	else
+	{
+		SetThink(nullptr);
+	}
+}
+
+
+void CKnifeSFSword::DelayMidslash()
+{
+#ifndef CLIENT_DLL
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+
+	switch (KnifeAttack5(GetMidslashDamage(), 65, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	{
+	case HIT_PLAYER:
+	{
+		if (RANDOM_LONG(0, 1))
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/sfsword_wall1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/sfsword_wall2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		break;
+	}
+	case HIT_WALL:
+	{
+		if (RANDOM_LONG(0, 1))
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/sfsword_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/sfsword_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		break;
+	}
+	}
+#endif
+	SetThink(nullptr);
 }
 
 void CKnifeSFSword::WeaponIdle()
@@ -331,7 +349,7 @@ void CKnifeSFSword::WeaponIdle()
 		return;
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
-	SendWeaponAnim(m_iWeaponState ? sfsword_IDLE_STAB : sfsword_IDLE, UseDecrement() != FALSE);
+	SendWeaponAnim(m_iWeaponState ? SFSWORD_OFF_IDLE : SFSWORD_IDLE, UseDecrement() != FALSE);
 }
 
 }

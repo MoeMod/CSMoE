@@ -616,6 +616,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_vulcanus9.cpp
 	../dlls/wpn_shared/wpn_magicsg.cpp
 	../dlls/wpn_shared/z4b_malorian3516.cpp
+	../dlls/wpn_shared/knife_sfsword.cpp
+	../dlls/wpn_shared/knife_dragontail.cpp
+	../dlls/wpn_shared/knife_katanad.cpp
 	)
 
 set(PM_SRCS

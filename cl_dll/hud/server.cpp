@@ -81,6 +81,7 @@ void CreateFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iTy
 void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 TEMPENTITY* AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
 //void EnableWallHack(int enable, int iTarget);
+void EV_DragonTailFX(int iDidHit, int iType);
 
 int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 {
@@ -483,6 +484,15 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		}
 		break;
 	}
+	case 33:
+	{
+		int iDidHit = reader.ReadByte();
+		int iType = reader.ReadByte();
+
+		EV_DragonTailFX(iDidHit, iType);
+
+		break;
+	}
 	case 42:
 	{
 		arg1 = reader.ReadShort();
@@ -503,6 +513,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		break;
 	}
+	
 	return 1;
 }
 
@@ -876,6 +887,41 @@ TEMPENTITY *AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float 
 	pTemp->die = gHUD.m_flTime + life;
 
 	return pTemp;
+}
+
+
+void DragonTailFXLock(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	cl_entity_t* viewent = gEngfuncs.GetViewModel();
+	ent->entity.origin = viewent->origin;
+	ent->entity.angles = viewent->angles;
+}
+
+void EV_DragonTailFX(int iDidHit, int iType)
+{
+	cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+	if (!viewent)
+		return;
+
+	TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->R_TempModel(viewent->origin + Vector(0, 0, 16), Vector(0, 0, 0), Vector(0, 0, 0), 0.2, gEngfuncs.pEventAPI->EV_FindModelIndex("models/ef_dragontail.mdl"), 0);
+
+	if (!pTemp)
+		return;
+
+	pTemp->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+	pTemp->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATE | FTENT_FADEOUT;
+	pTemp->callback = DragonTailFXLock;
+	pTemp->entity.angles = viewent->angles;
+	pTemp->tentOffset.z = 16;
+	pTemp->clientIndex = viewent->index;
+	pTemp->entity.curstate.frame = 0;
+	pTemp->fadeSpeed = 16;
+	pTemp->entity.curstate.renderamt = iDidHit ? 128 : 48;
+	pTemp->entity.curstate.rendermode = kRenderTransAdd;
+	pTemp->frameMax = 256;
+	pTemp->entity.curstate.skin = iDidHit ? 0 : 1;
+	pTemp->entity.curstate.sequence = gHUD.cl_righthand->value > 0 ? iType : iType + 4;
 }
 
 }

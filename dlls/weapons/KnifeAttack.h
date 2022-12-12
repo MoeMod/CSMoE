@@ -381,7 +381,7 @@ bool AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vec
 }
 
 inline hit_result_t
- KnifeAttack5(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer)
+ KnifeAttack5(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsPrimaryAttack = false)
 {
 	CBaseEntity* pEntity = NULL;
 	hit_result_t result = HIT_NONE;
@@ -414,7 +414,7 @@ inline hit_result_t
 
 		float flRatio = 1.0;
 
-		if (pEntity && pEntity->IsPlayer())
+		if (pEntity && pEntity->IsPlayer() && !IsPrimaryAttack)
 		{
 			UTIL_MakeVectors(pEntity->pev->angles);
 
