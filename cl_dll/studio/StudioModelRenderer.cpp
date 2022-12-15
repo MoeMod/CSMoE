@@ -113,6 +113,7 @@ struct model_s* CStudioModelRenderer::s_pWingGunPModel;
 
 struct model_s* CStudioModelRenderer::s_pLaserSGPModel;
 
+struct model_s* CStudioModelRenderer::s_pSPKnifeViewModel;
 
 void CStudioModelRenderer::Init(void)
 {
@@ -503,8 +504,16 @@ void CStudioModelRenderer::StudioSetUpTransform(int trivial_accept)
 	(*m_protationmatrix)[2][3] = modelpos[2];
 }
 
+void CGameStudioModelRenderer::SetFixInterpolant(bool value)
+{
+	m_bSetFixDadt = value;
+}
+
 float CStudioModelRenderer::StudioEstimateInterpolant(void)
 {
+	if (m_bSetFixDadt)
+		return 2.0;
+
 	float dadt = 1.0;
 
 	if (m_fDoInterp && (m_pCurrentEntity->curstate.animtime >= m_pCurrentEntity->latched.prevanimtime + 0.01))

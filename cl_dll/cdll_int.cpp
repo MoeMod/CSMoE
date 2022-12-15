@@ -261,7 +261,7 @@ int DLLEXPORT HUD_VidInit( void )
 
 	CStudioModelRenderer::s_pLaserSGPModel = IEngineStudio.Mod_ForName("models/p_lasersg.mdl", FALSE);
 
-
+	CStudioModelRenderer::s_pSPKnifeViewModel = IEngineStudio.Mod_ForName("models/v_spknife.mdl", FALSE);
 
 
 	//VGui_Startup();

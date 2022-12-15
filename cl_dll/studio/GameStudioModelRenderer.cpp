@@ -128,6 +128,8 @@ int g_iVulcanus9State = 0;
 int g_iWingGunIdleB = 0;
 int g_iWingGunShootB = 0;
 
+int g_iSPKnifeAmmo = 0;
+
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {
 	m_bLocal = false;
@@ -1276,6 +1278,25 @@ int R_StudioDrawModel(int flags)
 			g_StudioRenderer.StudioDrawModel(flags);
 			*curent = saveent;
 		}
+
+		if (CStudioModelRenderer::s_pSPKnifeViewModel && curent->model == CStudioModelRenderer::s_pSPKnifeViewModel && g_iSPKnifeAmmo)
+		{
+			float flState = 1.0 - ((float)g_iSPKnifeAmmo / 60.0);
+			
+			int body = curent->curstate.body;
+			byte control = byte(flState * 255);
+
+			g_StudioRenderer.SetFixInterpolant(true);
+
+			int iReturn = g_StudioRenderer.StudioDrawModel(flags);
+
+			curent->curstate.body = body;
+			curent->curstate.controller[0] = curent->latched.prevcontroller[0] = control;
+
+			g_StudioRenderer.SetFixInterpolant(false);
+
+			return iReturn;
+		}
 	}
 
 	int iReturn = g_StudioRenderer.StudioDrawModel(flags);
@@ -2028,7 +2049,6 @@ int R_StudioDrawModel(int flags)
 				}
 			}
 		}
-
 	}
 
 	return iReturn;

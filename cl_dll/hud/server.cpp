@@ -45,6 +45,8 @@ namespace cl {
 	extern int g_iBUFFNG7State;
 
 	extern int g_iM95TigerState;
+
+	extern int g_iSPKnifeAmmo;
 enum
 {
 	HUMAN_SKILL_KNIFE2X,
@@ -490,6 +492,14 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		int iType = reader.ReadByte();
 
 		EV_DragonTailFX(iDidHit, iType);
+
+		break;
+	}
+	case 44:
+	{
+		arg1 = reader.ReadByte();
+
+		g_iSPKnifeAmmo = arg1;
 
 		break;
 	}

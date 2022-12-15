@@ -70,6 +70,7 @@ public:
 	virtual void StudioPlayerBlend(mstudioseqdesc_t *pseqdesc, int *pBlend, float *pPitch);
 	virtual void CalculateYawBlend(entity_state_t *pplayer);
 	virtual void CalculatePitchBlend(entity_state_t *pplayer);
+	void SetFixInterpolant(bool value);
 
 private:
 	void SavePlayerState(entity_state_t *pplayer);

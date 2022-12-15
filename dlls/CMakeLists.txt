@@ -619,6 +619,10 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_sfsword.cpp
 	../dlls/wpn_shared/knife_dragontail.cpp
 	../dlls/wpn_shared/knife_katanad.cpp
+	../dlls/wpn_shared/knife_crow9.cpp
+	../dlls/wpn_shared/knife_turbulent9.cpp
+	../dlls/wpn_shared/knife_spknife.cpp
+	../dlls/wpn_shared/knife_swordbombard.cpp
 	)
 
 set(PM_SRCS

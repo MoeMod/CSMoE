@@ -572,9 +572,12 @@ bool CHudZB2::Selector(int item)
 }
 void CHudZB2::SetSelectorIcon(int slot, const char* name)
 {
-
 	m_iIcon[slot] = R_LoadTextureShared(name);
 	m_bDraw[slot] = true;
+}
+void CHudZB2::SetSelectorIconBan(int slot)
+{
+	m_bBanned[slot] = true;
 }
 void CHudZB2::ClearSelector()
 {
@@ -588,7 +591,7 @@ void CHudZB2::SetSelectorDrawTime(float flTime, float flDisplayTime)
 	m_flTimeEnd = flTime + flDisplayTime;
 	m_iTimeRemaining = (int)flDisplayTime;
 	m_iPage = 0;
-	m_iMax = ZOMBIE_CLASS_BOOMER + 1;//ZOMBIE_CLASS_BOOMER+1
+	m_iMax = ZOMBIE_CLASS_MEATWALL + 1;//ZOMBIE_CLASS_BOOMER+1
 
 	m_bCanDraw = true;
 }

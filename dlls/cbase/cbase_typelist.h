@@ -385,6 +385,10 @@ TL_ADD(CMalorian3516)
 TL_ADD(CKnifeSFSword)
 TL_ADD(CKnifeDragonTail)
 TL_ADD(CKnifeKatanaD)
+TL_ADD(CKnifeCrow9)
+TL_ADD(CKnifeTurbulent9)
+TL_ADD(CKnifeSPKnife)
+TL_ADD(CKnifeSwordBombard)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -745,6 +749,7 @@ TL_ADD(CThrowingKnifeEntity)
 TL_ADD(CLasermingunChargeAmmo)
 TL_ADD(CDrillAmmo)
 TL_ADD(CMagicSgCannon)
+TL_ADD(CPetrolMine)
 #endif
 
 TL_END(AllEntityTypeList)

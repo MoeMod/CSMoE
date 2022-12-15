@@ -268,14 +268,14 @@ CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieM
 
 bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 {
-	//DEBUG MENU
-	//if (!Q_stricmp(pcmd, "openselector"))
-	//{
-	//	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	//	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
-	//	WRITE_COORD(20.0);
-	//	MESSAGE_END();
-	//}
+
+	if (!Q_stricmp(pcmd, "openselector"))
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
+		WRITE_COORD(20.0);
+		MESSAGE_END();
+	}
 
 	if (m_pPlayer->m_bIsZombie)
 	{

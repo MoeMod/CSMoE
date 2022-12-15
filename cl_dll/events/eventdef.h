@@ -280,3 +280,4 @@ HOOK_EVENT(cartredh, FireCartRedH);
 HOOK_EVENT(vulcanus9, FireVulcanus9LightMove);
 HOOK_EVENT(magicsg, FireMagicSg);
 HOOK_EVENT(malorian3516, FireMalorian3516);
+HOOK_EVENT(spknife, FireSPKnife);

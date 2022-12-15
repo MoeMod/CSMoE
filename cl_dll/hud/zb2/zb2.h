@@ -35,6 +35,7 @@ public:
 	void ClearSelector();
 	void SetSelectorDrawTime(float flTime, float flDisplayTime);
 	void SetSelectorIcon(int slot, const char* name);
+	void SetSelectorIconBan(int slot);
 	bool Selector(int i);
 	bool SelectorCanDraw();
 

@@ -192,7 +192,7 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
-		m_pPlayer->GiveNamedItem("knife_katanad");
+		m_pPlayer->GiveNamedItem("knife_spknife");
 		//m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		//m_pPlayer->GiveNamedItem("z4b_malorian3516");
@@ -203,7 +203,7 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 		//m_pPlayer->GiveNamedItem("weapon_y22s2sfpistol");
 		//m_pPlayer->GiveNamedItem("z4b_m60amethyst");
 		//m_pPlayer->GiveNamedItem("weapon_bunkerbuster");
-		m_pPlayer->GiveNamedItem("knife_dragontail");
+		m_pPlayer->GiveNamedItem("knife_swordbombard");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 

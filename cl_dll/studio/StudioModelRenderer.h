@@ -99,6 +99,7 @@ public:
     matrix3x4 (*m_paliastransform);
     matrix3x4 (*m_pbonetransform)[MAXSTUDIOBONES];
     matrix3x4 (*m_plighttransform)[MAXSTUDIOBONES];
+	bool m_bSetFixDadt;
 
 	static struct model_s* s_pBuffAugViewModel;
 	static struct model_s* s_pBuffAugSmokeModel;
@@ -147,7 +148,7 @@ public:
 	static struct model_s* s_pVulcanus9FlameModel;
 	static struct model_s* s_pWingGunPModel;
 	static struct model_s* s_pLaserSGPModel;
-
+	static struct model_s* s_pSPKnifeViewModel;
 };
 
 }
