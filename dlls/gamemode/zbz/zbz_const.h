@@ -102,11 +102,14 @@ enum ZBZMessageType : byte
 	ZBZ_MESSAGE_LEVEL_INFO, // { byte msg_type, byte lv, byte exp, byte point }
 	ZBZ_MESSAGE_SKILL_ADD, // { byte msg_type, byte id }
 	ZBZ_MESSAGE_SKILL_REMOVE, // { byte msg_type, byte id }
+	ZBZ_MESSAGE_HUD_INFO, // { byte msg_type, byte id }
 	ZBZ_MESSAGE_BURN, // { byte msg_type, byte player, byte time(in 0.1s) }
 	ZBZ_MESSAGE_CONTACT_INFECTION_RING, // { byte msg_type, byte player }
 	ZBZ_MESSAGE_CLAW, // { byte msg_type, byte player }
 	ZBZ_MESSAGE_WING, // { byte msg_type, byte player }
 	ZBZ_MESSAGE_GHOSTHUNTER, // { byte msg_type, byte player }
+	ZBZ_MESSAGE_SENDMAXLEVEL, // { byte msg_type, byte maxlevel }
+
 };
 const int MAX_SKILL = { 80 };
 /*

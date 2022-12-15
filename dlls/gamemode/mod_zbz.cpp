@@ -424,7 +424,7 @@ void CPlayerModStrategy_ZBZ::SetLevel(int lv)
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
 	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 	WRITE_BYTE(m_iLevel);
-	WRITE_BYTE(m_iExp);
+	WRITE_SHORT(m_iExp);
 	WRITE_BYTE(m_iPoint);
 	MESSAGE_END();
 }
@@ -440,7 +440,7 @@ void CPlayerModStrategy_ZBZ::AddLevel(int lv)
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
 	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 	WRITE_BYTE(m_iLevel);
-	WRITE_BYTE(m_iExp);
+	WRITE_SHORT(m_iExp);
 	WRITE_BYTE(m_iPoint);
 	MESSAGE_END();
 }
@@ -477,7 +477,7 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
 	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 	WRITE_BYTE(m_iLevel);
-	WRITE_BYTE(m_iExp);
+	WRITE_SHORT(m_iExp);
 	WRITE_BYTE(m_iPoint);
 	MESSAGE_END();
 }
@@ -575,6 +575,21 @@ bool CPlayerModStrategy_ZBZ::UpgradeSkill()
 		MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
 		WRITE_BYTE(ZBZ_MESSAGE_SKILL_ADD);
 		WRITE_BYTE(data.first);
+		MESSAGE_END();
+
+		//Fix vKey Show
+		MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+		WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
+		WRITE_BYTE(m_iLevel);
+		WRITE_SHORT(m_iExp);
+		WRITE_BYTE(m_iPoint);
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+		WRITE_BYTE(ZBZ_MESSAGE_HUD_INFO);
+		WRITE_SHORT(data.first);
+		WRITE_BYTE(1);
+		WRITE_COORD(0.2);
 		MESSAGE_END();
 	}
 
