@@ -438,6 +438,7 @@ void UTIL_UnsetGroupTrace();
 Vector UTIL_VecToAngles(const Vector &vec);
 //NOXREF void UTIL_MoveToOrigin(edict_t *pent, const Vector &vecGoal, float flDist, int iMoveType);
 int UTIL_EntitiesInBox(CBaseEntity **pList, int listMax, const Vector &mins, const Vector &maxs, int flagMask);
+int UTIL_EntitiesInRotatedBox(CBaseEntity** pList, int listMax, Vector vecBoxOrigin, Vector vecBoxAngle, float flLength, float flWidth, float flHeight, int flagMask);
 //NOXREF int UTIL_MonstersInSphere(CBaseEntity **pList, int listMax, const Vector &center, float radius);
 CBaseEntity *UTIL_FindEntityInSphere(CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius);
 CBaseEntity *UTIL_FindEntityByString_Old(CBaseEntity *pStartEntity, const char *szKeyword, const char *szValue);

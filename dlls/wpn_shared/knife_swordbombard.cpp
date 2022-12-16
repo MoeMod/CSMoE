@@ -64,7 +64,7 @@ namespace sv {
 
 	public:
 		time_point_t m_fLaunchTime;
-		int m_iPartEmitCount;
+		Vector m_vecAngle;
 
 	private:
 		float GetRadiusDamage() const
@@ -123,10 +123,12 @@ namespace sv {
 
 		vecStart = pev->origin + Vector(0.0, 0.0, 1.0);
 
-		const float flLength = 8 * 39.37;
-		const float flWidth = 3 * 39.37;
+		const float flWidth = 8 * 39.37;
+		const float flLength = 3 * 39.37;
 		const float flHeight = 4 * 39.37;
-		int iCount = UTIL_EntitiesInBox(pList, 100, vecStart - Vector(flLength, flWidth, 0.0), vecStart + Vector(flLength, flWidth, flHeight), FL_CLIENT | FL_MONSTER);
+		//int iCount = UTIL_EntitiesInBox(pList, 100, vecStart - Vector(flLength, flWidth, 0.0), vecStart + Vector(flLength, flWidth, flHeight), FL_CLIENT | FL_MONSTER);
+
+		int iCount = UTIL_EntitiesInRotatedBox(pList, 100, pev->origin, m_vecAngle, flLength, flWidth, flHeight, FL_CLIENT | FL_MONSTER);
 
 		if (pev->owner)
 		{
@@ -180,7 +182,6 @@ namespace sv {
 
 		SetTouch(NULL);
 		m_fLaunchTime = gpGlobals->time;
-		m_iPartEmitCount = 0;
 	}
 }
 #endif
@@ -229,7 +230,7 @@ namespace sv {
 			PRECACHE_MODEL("models/v_swordbombard.mdl");
 			PRECACHE_MODEL("models/p_swordbombard.mdl");
 
-			PRECACHE_MODEL("models/ef_swordbombard_slashb.mdl");
+			m_iSlashModelIndex = PRECACHE_MODEL("models/ef_swordbombard_slashb.mdl");
 			PRECACHE_MODEL("models/ef_swordbombard_potal.mdl");
 			PRECACHE_MODEL("models/ef_swordbombard_big.mdl");
 			PRECACHE_MODEL("models/ef_swordbombard.mdl");
@@ -292,6 +293,7 @@ namespace sv {
 		int m_iCheck;
 		int m_iSKillState;
 		int m_iLastAnim;
+		int m_iSlashModelIndex;
 	};
 
 	LINK_ENTITY_TO_CLASS(knife_swordbombard, CKnifeSwordBombard)
@@ -428,6 +430,7 @@ namespace sv {
 
 			pMine->m_iTeam = m_iTeam;
 			pMine->Attack();
+			pMine->m_vecAngle = m_pPlayer->pev->v_angle;
 #endif
 			m_iSKillState = 2;
 			SetThink(&CKnifeSwordBombard::ComboAttack);
@@ -484,9 +487,16 @@ namespace sv {
 	void CKnifeSwordBombard::DelaySecondaryAttack(void)
 	{
 #ifndef CLIENT_DLL		
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-		Vector vecSrc = m_pPlayer->GetGunPosition();
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+
+		Vector vecForward = gpGlobals->v_forward;
+
+
+		Vector vecAngle = UTIL_VecToAngles(vecForward);
+
+		UTIL_TempModel(m_pPlayer->pev->origin, vecAngle, vecForward * 270, m_iSlashModelIndex, 40, 0, 10, 0, 0, 255, kRenderTransAdd, NULL, false, 0, 0, 255, 0);
 
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/swordbombard_snd_attack.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
