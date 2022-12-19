@@ -26,7 +26,7 @@ project (MAINUI)
 # By default we require C++11 support.
 # But it can be overriden with -DMY_COMPILER_SUCKS compiler option
 # It's not recommended and may not work(as it's done only for MSVC6 support)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 
 set(MAINUI_LIBRARY xashmenu)
 option(MAINUI_USE_CUSTOM_FONT_RENDER "Use custom font rendering" ON)

@@ -39,6 +39,8 @@ typedef struct lua_State lua_State;
 #define U_VECTOR_SIMD U_VECTOR_NEON
 #endif
 
+#include "meta/TypeIdentity.h"
+
 namespace moe {
 
 template<class T, std::size_t N, std::size_t Align = alignof(T)>
@@ -54,12 +56,13 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align, Base> : Base
 	{
 	}
 	template<class U = std::nullptr_t>
-	constexpr VectorBase_Gen(typename std::type_identity<U>::type ) : Base()
+	constexpr VectorBase_Gen(typename TypeIdentity<U>::type ) : Base()
 	{
         std::fill_n(this->m_data, N, NAN);
 	}
-	constexpr VectorBase_Gen(std::initializer_list<T> il) : VectorBase_Gen(il.begin())
+	constexpr VectorBase_Gen(std::initializer_list<T> il)
 	{
+        (..., (this->m_data[I] = il.begin()[I]));
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
 	template<class InputIter>
@@ -211,24 +214,10 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
 
     constexpr VectorBase_Storage(float x1, float y1, float z1)
     {
-        if (std::is_constant_evaluated())
-        {
-            this->x = x1;
-            this->y = y1;
-            this->z = z1;
-            this->w_ununsed = 0;
-        }
-        else
-        {
-#if U_VECTOR_NEON
-            this->x = x1;
-            this->y = y1;
-            this->z = z1;
-            this->w_ununsed = 0;
-#elif U_VECTOR_SSE
-            this->m_xmm = _mm_set_ps(0, z1, y1, x1);
-#endif
-        }
+        this->x = x1;
+        this->y = y1;
+        this->z = z1;
+        this->w_ununsed = 0;
     }
 
     VectorBase_Storage(std::nullptr_t)
@@ -270,24 +259,10 @@ template<> struct VectorBase_Storage<float, 4, 16> : VectorBase_Gen<float, 4, st
 
     constexpr VectorBase_Storage(float x1, float y1, float z1, float w1)
     {
-        if (std::is_constant_evaluated())
-        {
-            this->x = x1;
-            this->y = y1;
-            this->z = z1;
-            this->w = w1;
-        }
-        else
-        {
-#if U_VECTOR_NEON
-            this->x = x1;
-            this->y = y1;
-            this->z = z1;
-            this->w = w1;
-#elif U_VECTOR_SSE
-            this->m_xmm = _mm_set_ps(w1, z1, y1, x1);
-#endif
-        }
+        this->x = x1;
+        this->y = y1;
+        this->z = z1;
+        this->w = w1;
     }
 
     VectorBase_Storage(std::nullptr_t)
@@ -361,6 +336,14 @@ template<class...Args> inline auto hypot(Args...args) -> typename std::common_ty
 template<class T> inline auto rsqrt(T x) -> decltype(1 / sqrt(x)) {
 	return 1 / sqrt(x);
 }
+#if __cpp_lib_interpolate
+using std::lerp;
+#else
+inline float lerp(float a, float b, float t)
+{
+    return a + t * (b - a);
+}
+#endif
 
 }
 
@@ -426,6 +409,12 @@ struct VectorBase : VectorBase_Storage<T, N, Align>
 	{
 		return equal_impl(*this, v, std::make_index_sequence<N>());
 	}
+#if !__cpp_impl_three_way_comparison
+    constexpr bool operator!=(VectorBase v) const
+    {
+        return !operator==(v);
+    }
+#endif
 	constexpr VectorBase operator+(VectorBase v) const
 	{
 		return add_impl(*this, v, std::make_index_sequence<N>());
@@ -637,6 +626,12 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return 0xF == _mm_movemask_ps(_mm_cmpeq_ps(*this, v.m_xmm));
 #endif
     }
+#if !__cpp_impl_three_way_comparison
+    bool operator!=(ThisClass v) const
+    {
+        return !operator==(v);
+    }
+#endif
     ThisClass operator+(ThisClass v) const
     {
 #if U_VECTOR_NEON
@@ -921,6 +916,12 @@ template<class T, std::size_t N, std::size_t Align1, std::size_t Align2> constex
 {
     return equal_impl(a, b, std::make_index_sequence<N>());
 }
+#if !__cpp_impl_three_way_comparison
+template<class T, std::size_t N, std::size_t Align1, std::size_t Align2> constexpr bool operator!=(VectorBase<T, N, Align1> a, VectorBase<T, N, Align2> b)
+{
+    return !operator==(a, b);
+}
+#endif
 
 template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorAdd(VectorBase<T, N, Align> a, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
@@ -932,7 +933,7 @@ template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) Vec
 	return out = a - b;
 }
 
-template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorScale(VectorBase<T, N, Align> a, typename std::type_identity<T>::type b, VectorBase<T, N, Align> &out)
+template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorScale(VectorBase<T, N, Align> a, typename TypeIdentity<T>::type b, VectorBase<T, N, Align> &out)
 {
 	return out = a * b;
 }
@@ -1011,7 +1012,7 @@ template<class T, std::size_t N, std::size_t Align, std::size_t Align2> constexp
 	return out = in;
 }
 
-template<class T, std::size_t N, std::size_t Align> inline void VectorMA(VectorBase<T, N, Align> a, typename std::type_identity<T>::type scale, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
+template<class T, std::size_t N, std::size_t Align> inline void VectorMA(VectorBase<T, N, Align> a, typename TypeIdentity<T>::type scale, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
 	out = fma(b, scale, a);
 }

@@ -7,6 +7,7 @@
 #include "sprite.h"
 
 #include <boost/asio.hpp>
+#include <boost/asio/spawn.hpp>
 #include <optional>
 
 struct astcenc_context;
@@ -41,7 +42,7 @@ namespace xe {
     {
         if(g_cook_ctx)
         {
-            g_cook_ctx->ioc_cook.run_for(duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(host.realframetime / 2)));
+            g_cook_ctx->ioc_cook.run_for(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(host.realframetime / 2)));
         }
     }
 
@@ -260,12 +261,12 @@ namespace xe {
         }
     }
 
-    boost::asio::awaitable<void> Cook_YieldCurrentFrame()
+    void Cook_YieldCurrentFrame(boost::asio::yield_context await)
     {
-        co_await boost::asio::post(g_cook_ctx->ioc_cook, boost::asio::use_awaitable);
+        boost::asio::post(g_cook_ctx->ioc_cook, await);
     }
 
-    boost::asio::awaitable<void> Cook_CheckFrameSmooth()
+    void Cook_CheckFrameSmooth(boost::asio::yield_context await)
     {
         static std::chrono::high_resolution_clock::time_point last_frame_time;
         auto now = std::chrono::high_resolution_clock::now();
@@ -273,13 +274,12 @@ namespace xe {
         {
             last_frame_time = now;
             // yield for next frame
-            co_await Cook_YieldCurrentFrame();
+            Cook_YieldCurrentFrame(await);
         }
-        co_return;
     }
 
     template<class OutFn = void(*)(const char *)>
-    boost::asio::awaitable<void> Cook_SearchResursive(const char *start_dir, const char *pattern, OutFn out)
+    void Cook_SearchResursive(boost::asio::yield_context await, const char *start_dir, const char *pattern, OutFn out)
     {
         std::unique_ptr<search_t, void(*)(void*)> t(FS_Search( va("%s/*", start_dir), true, false ), Mem_Free);
         for( int i = 0; t && i < t->numfilenames; i++ )
@@ -300,35 +300,35 @@ namespace xe {
             }
             else
             {
-                co_await Cook_SearchResursive(t->filenames[i], pattern, out);
+                Cook_SearchResursive(await, t->filenames[i], pattern, out);
             }
-            co_await Cook_CheckFrameSmooth();
+            Cook_CheckFrameSmooth(await);
         }
     }
 
-    boost::asio::awaitable<void> Cook_Initiate()
+    void Cook_Initiate(boost::asio::yield_context await)
     {
         try {
             Msg(  "Cook: loading cook context\n" );
 
             auto local_cook_ctx = g_cook_ctx;
             local_cook_ctx->start_time = std::chrono::high_resolution_clock::now();
-            co_await boost::asio::post(g_cook_ctx->ioc_cook, boost::asio::use_awaitable);
+            boost::asio::post(g_cook_ctx->ioc_cook, await);
 
             // search for files
-            co_await Cook_SearchResursive( "models", "*.mdl", std::bind(Cook_SubmitMDL, local_cook_ctx, std::placeholders::_1));
-            co_await Cook_SearchResursive("models/texture", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
-            co_await Cook_SearchResursive("models/texture", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
-            co_await Cook_SearchResursive("gfx/env", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
-            co_await Cook_SearchResursive("gfx/env", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
-            co_await Cook_SearchResursive("overviews", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
-            co_await Cook_SearchResursive("overviews", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
-            co_await Cook_SearchResursive("resource", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
-            co_await Cook_SearchResursive("sprites", "*.spr", std::bind(Cook_SubmitSPR, local_cook_ctx, std::placeholders::_1));
+            Cook_SearchResursive(await, "models", "*.mdl", std::bind(Cook_SubmitMDL, local_cook_ctx, std::placeholders::_1));
+            Cook_SearchResursive(await, "models/texture", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            Cook_SearchResursive(await, "models/texture", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            Cook_SearchResursive(await, "gfx/env", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            Cook_SearchResursive(await, "gfx/env", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            Cook_SearchResursive(await, "overviews", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            Cook_SearchResursive(await, "overviews", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            Cook_SearchResursive(await, "resource", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            Cook_SearchResursive(await, "sprites", "*.spr", std::bind(Cook_SubmitSPR, local_cook_ctx, std::placeholders::_1));
 
             while(g_cook_ctx->cur_num < g_cook_ctx->total_num)
             {
-                co_await Cook_YieldCurrentFrame();
+                Cook_YieldCurrentFrame(await);
             }
             Cook_End();
         }
@@ -357,7 +357,7 @@ namespace xe {
         g_cook_ctx = std::make_shared<CookContext>();
         g_cook_ctx->ioc_cook_work_guard.emplace(boost::asio::make_work_guard(g_cook_ctx->ioc_cook));
         g_cook_ctx->ioc_cook_worker_work_guard.emplace(boost::asio::make_work_guard(g_cook_ctx->ioc_cook_worker));
-        boost::asio::co_spawn(g_cook_ctx->ioc_cook, Cook_Initiate(), boost::asio::detached);
+        boost::asio::spawn(g_cook_ctx->ioc_cook, Cook_Initiate);
     }
 
     void Con_Cook_f()

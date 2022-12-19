@@ -264,8 +264,9 @@ static qboolean R_RecursiveLightPoint( model_t *model, mnode_t *node, float p1f,
 
 	frac = front / ( front - back );
 
+	using namespace moe::moe_math_util;
     mid = lerp( start, end, frac );
-    midf = std::lerp( p1f, p2f, frac );
+    midf = lerp( p1f, p2f, frac );
 
 	// co down front side	
 	if( R_RecursiveLightPoint( model, node->children[side], p1f, midf, start, mid ))

@@ -18,8 +18,7 @@ GNU General Public License for more details.
 #include <regex>
 
 #include <boost/asio.hpp>
-#include <boost/asio/use_awaitable.hpp>
-#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/spawn.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/asio/ssl.hpp>
 
@@ -69,11 +68,11 @@ namespace ui {
 		return (s.sys == Q_buildos()) && (std::find(s.arch.begin(), s.arch.end(), Q_buildarch()) != s.arch.end());
 	}
 
-	boost::asio::awaitable<void> UpdateModel_AsyncRefresh()
+	void UpdateModel_AsyncRefresh(boost::asio::yield_context await)
 	{
 		// https://api.moemod.com/csmoe/version
 		try {
-			std::string result = co_await HTTPS_RequestAsync(s_update_ioc, "GET", "apiv2.moemod.com", "443", "/csmoe/version", boost::asio::use_awaitable);
+			std::string result = HTTPS_RequestAsync(s_update_ioc, "GET", "apiv2.moemod.com", "443", "/csmoe/version", await);
 			auto j = nlohmann::json::parse(result);
 
 			std::vector<VersionInfo_s> all_infos;
@@ -91,7 +90,7 @@ namespace ui {
 				{
 					while(ImGui::GetTopMostPopupModal())
 					{
-						co_await boost::asio::post(boost::asio::use_awaitable);
+						boost::asio::post(await);
 					}
 					MsgBox_Open(std::string("发现新版本") + std::to_string(info.ver) + std::string("，更新内容：\n") + info.desc + std::string("\n是否立即更新？"), [info](){
 						Sys_ShellExecute(info.url.c_str(), NULL, true);
@@ -105,7 +104,7 @@ namespace ui {
 				{
 					while (ImGui::GetTopMostPopupModal())
 					{
-						co_await boost::asio::post(boost::asio::use_awaitable);
+						boost::asio::post(await);
 					}
 					MsgBox_Open(iter->desc, {}, 3.0f);
 				}
@@ -119,7 +118,7 @@ namespace ui {
 	void UpdateModel_Refresh()
 	{
 		s_update_ioc.reset();
-		boost::asio::co_spawn(s_update_ioc, UpdateModel_AsyncRefresh(), boost::asio::detached);
+		boost::asio::spawn(s_update_ioc, UpdateModel_AsyncRefresh);
 		s_update_ioc.restart();
 	}
 

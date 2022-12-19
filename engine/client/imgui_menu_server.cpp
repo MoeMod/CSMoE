@@ -20,8 +20,7 @@ GNU General Public License for more details.
 #include <regex>
 
 #include <boost/asio.hpp>
-#include <boost/asio/use_awaitable.hpp>
-#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/spawn.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/asio/ssl.hpp>
 
@@ -57,14 +56,14 @@ namespace ui {
 	static std::set<boost::asio::ip::udp::endpoint> s_serverinfo_open;
 
 	// model
-	boost::asio::awaitable<void> ServerModel_AsyncRefreshSingleServer(boost::asio::ip::udp::endpoint ep)
+	void ServerModel_AsyncRefreshSingleServer(boost::asio::yield_context await, boost::asio::ip::udp::endpoint ep)
 	{
 		try {
 			auto start_req = std::chrono::high_resolution_clock::now();
-			auto info = co_await TSourceEngineQuery::Co_GetServerInfoDataAsync(s_server_ioc, ep, 1s);
+			auto info = TSourceEngineQuery::Co_GetServerInfoDataAsync(s_server_ioc, ep, 1s, await);
 			auto ping = (std::chrono::high_resolution_clock::now() - start_req) / 2;
 			s_servers_list.erase(std::remove_if(s_servers_list.begin(), s_servers_list.end(),
-			                                    [ep](auto &entry) { return get<1>(entry) == ep; }),
+			                                    [ep](auto &entry) { return std::get<1>(entry) == ep; }),
 			                     s_servers_list.end());
 			s_servers_list.emplace_back(ping, ep, info);
 			s_serverinfos[ep] = info;
@@ -75,13 +74,13 @@ namespace ui {
 		}
 	}
 
-	boost::asio::awaitable<void> ServerModel_AsyncRefreshSingleServer(std::string host, std::string port)
+	void ServerModel_AsyncRefreshSingleServerURL(boost::asio::yield_context await, std::string host, std::string port)
 	{
 		try {
 			boost::asio::ip::udp::resolver resolver(s_server_ioc);
-			auto desc_endpoints = co_await resolver.async_resolve(host.c_str(), port.c_str(), boost::asio::use_awaitable);
+			auto desc_endpoints = resolver.async_resolve(host.c_str(), port.c_str(), await);
 			for (const auto &ep: desc_endpoints) {
-				co_await ServerModel_AsyncRefreshSingleServer(ep);
+				ServerModel_AsyncRefreshSingleServer(await, ep);
 			}
 		} catch(const std::exception &e)
 		{
@@ -89,18 +88,18 @@ namespace ui {
 		}
 	}
 
-	boost::asio::awaitable<void> ServerModel_AsyncRefresh()
+	void ServerModel_AsyncRefresh(boost::asio::yield_context await)
 	{
 		// https://api.moemod.com/csmoe/masterserver
 		try {
-			std::string result = co_await HTTPS_RequestAsync(s_server_ioc, "GET", "apiv2.moemod.com", "443", "/csmoe/masterserver", boost::asio::use_awaitable);
+			std::string result = HTTPS_RequestAsync(s_server_ioc, "GET", "apiv2.moemod.com", "443", "/csmoe/masterserver", await);
             auto j = nlohmann::json::parse(result);
             auto j2 = j["servers"];
 
             for(std::string srv : j2)
             {
 				if (auto [host, port] = ParseHostPort(srv); !host.empty()) {
-					boost::asio::co_spawn(s_server_ioc, ServerModel_AsyncRefreshSingleServer(host, port), boost::asio::detached);
+					boost::asio::spawn(s_server_ioc, std::bind(ServerModel_AsyncRefreshSingleServerURL, std::placeholders::_1, host, port));
 				}
             }
 		} catch(const std::exception &e)
@@ -112,7 +111,7 @@ namespace ui {
 	void ServerModel_Refresh()
 	{
 		s_server_ioc.reset();
-		boost::asio::co_spawn(s_server_ioc, ServerModel_AsyncRefresh(), boost::asio::detached);
+		boost::asio::spawn(s_server_ioc, ServerModel_AsyncRefresh);
 		s_server_ioc.restart();
 	}
 
@@ -126,10 +125,10 @@ namespace ui {
 		Cbuf_AddText(cmd);
 	}
 
-	boost::asio::awaitable<void> ServerDetailInfoModel_AsyncRefresh(boost::asio::ip::udp::endpoint ep)
+	void ServerDetailInfoModel_AsyncRefresh(boost::asio::yield_context await, boost::asio::ip::udp::endpoint ep)
 	{
 		try {
-			auto info = co_await TSourceEngineQuery::Co_GetPlayerListDataAsync(s_server_ioc, ep,1s);
+			auto info = TSourceEngineQuery::Co_GetPlayerListDataAsync(s_server_ioc, ep,1s, await);
 			s_playerlists[ep] = info;
 		} catch(const std::exception &e)
 		{
@@ -140,8 +139,8 @@ namespace ui {
 	void ServerDetailInfoModel_Refresh(boost::asio::ip::udp::endpoint ep)
 	{
 		s_server_ioc.reset();
-		boost::asio::co_spawn(s_server_ioc, ServerModel_AsyncRefreshSingleServer(ep), boost::asio::detached);
-		boost::asio::co_spawn(s_server_ioc, ServerDetailInfoModel_AsyncRefresh(ep), boost::asio::detached);
+		boost::asio::spawn(s_server_ioc, std::bind(ServerModel_AsyncRefreshSingleServer, std::placeholders::_1, ep));
+		boost::asio::spawn(s_server_ioc, std::bind(ServerDetailInfoModel_AsyncRefresh, std::placeholders::_1, ep));
 		s_server_ioc.restart();
 	}
 
@@ -209,7 +208,7 @@ namespace ui {
 				auto playerlist = s_playerlists[ep];
 				if(playerlist.Results.index() == 1)
 				{
-					for(const auto &info : get<std::vector<TSourceEngineQuery::PlayerListQueryResult::PlayerInfo_s>>(playerlist.Results))
+					for(const auto &info : std::get<std::vector<TSourceEngineQuery::PlayerListQueryResult::PlayerInfo_s>>(playerlist.Results))
 					{
 						if(ImGui::Selectable(info.Name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick))
 						{
@@ -370,7 +369,7 @@ namespace ui {
 			ImGui::NewLine();
 
 			std::sort(s_servers_list.begin(), s_servers_list.end(), [](const auto &lhs, const auto &rhs){
-				return get<0>(lhs) < get<0>(rhs);
+				return std::get<0>(lhs) < std::get<0>(rhs);
 			});
 
 			ImGui::Columns(4, "serverColumns", false);

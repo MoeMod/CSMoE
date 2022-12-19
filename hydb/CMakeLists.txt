@@ -1,5 +1,5 @@
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 add_library(hydb STATIC
         DatabaseConfig.cpp
         DatabaseConfig.h

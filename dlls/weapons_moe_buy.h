@@ -17,6 +17,7 @@ GNU General Public License for more details.
 #define WEAPONS_MOE_BUY_H
 
 #include "player/player_const.h"
+#include <vector>
 
 #ifdef _WIN32
 #pragma once

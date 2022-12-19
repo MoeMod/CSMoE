@@ -243,7 +243,7 @@ std::size_t TSourceEngineQuery::WritePlayerListQueryResultToBuffer(const PlayerL
 }
 
 // Reference: https://developer.valvesoftware.com/wiki/Server_queries#A2S_INFO
-auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout) -> boost::asio::awaitable<ServerInfoQueryResult>
+auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout, boost::asio::yield_context await) -> ServerInfoQueryResult
 {
 	udp::socket socket(ioc, udp::endpoint(endpoint.protocol(), 0));
 
@@ -251,9 +251,9 @@ auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc,
 	static constexpr char request1[] = "\xFF\xFF\xFF\xFF" "TSource Engine Query"; // Source / GoldSrc Steam
 	static constexpr char request2[] = "\xFF\xFF\xFF\xFF" "details"; // GoldSrc WON
 	static constexpr char request3[] = "\xFF\xFF\xFF\xFF" "info"; // Xash3D
-	co_await socket.async_send_to(boost::asio::buffer(request1, sizeof(request1)), endpoint, boost::asio::use_awaitable);
-	co_await socket.async_send_to(boost::asio::buffer(request2, sizeof(request2)), endpoint, boost::asio::use_awaitable);
-	co_await socket.async_send_to(boost::asio::buffer(request3, sizeof(request3)), endpoint, boost::asio::use_awaitable);
+	socket.async_send_to(boost::asio::buffer(request1, sizeof(request1)), endpoint, await);
+	socket.async_send_to(boost::asio::buffer(request2, sizeof(request2)), endpoint, await);
+	socket.async_send_to(boost::asio::buffer(request3, sizeof(request3)), endpoint, await);
 
 	boost::asio::system_timer ddl(ioc, timeout);
     ddl.async_wait([&socket](boost::system::error_code e) mutable {
@@ -268,11 +268,11 @@ auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc,
 		try {
 			udp::endpoint sender_endpoint;
 			char buffer[4096];
-			std::size_t reply_length = co_await socket.async_receive_from(boost::asio::buffer(buffer, 4096), sender_endpoint, boost::asio::use_awaitable);
+			std::size_t reply_length = socket.async_receive_from(boost::asio::buffer(buffer, 4096), sender_endpoint, await);
 			if (sender_endpoint == endpoint && reply_length > 5)
 			{
 				ddl.cancel();
-				co_return TSourceEngineQuery::MakeServerInfoQueryResultFromBuffer(buffer, reply_length);
+				return TSourceEngineQuery::MakeServerInfoQueryResultFromBuffer(buffer, reply_length);
 			}
 		}
 		catch (const std::invalid_argument& e) {
@@ -285,7 +285,7 @@ auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc,
 	}
 }
 
-auto TSourceEngineQuery::Co_GetPlayerListDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout) -> boost::asio::awaitable<PlayerListQueryResult>
+auto TSourceEngineQuery::Co_GetPlayerListDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout, boost::asio::yield_context await) -> PlayerListQueryResult
 {
 	udp::socket socket(ioc, udp::endpoint(endpoint.protocol(), 0));
 
@@ -300,22 +300,22 @@ auto TSourceEngineQuery::Co_GetPlayerListDataAsync(boost::asio::io_context &ioc,
 
 	// first attempt
 	constexpr char request_challenge[] = "\xFF\xFF\xFF\xFF" "U" "\xFF\xFF\xFF\xFF";
-	std::size_t bytes_transferred = co_await socket.async_send_to(boost::asio::buffer(request_challenge, sizeof(request_challenge)), endpoint, boost::asio::use_awaitable);
+	std::size_t bytes_transferred = socket.async_send_to(boost::asio::buffer(request_challenge, sizeof(request_challenge)), endpoint, await);
 
 	udp::endpoint sender_endpoint;
-	std::size_t reply_length = co_await socket.async_receive_from(boost::asio::buffer(buffer, 4096), sender_endpoint, boost::asio::use_awaitable);
+	std::size_t reply_length = socket.async_receive_from(boost::asio::buffer(buffer, 4096), sender_endpoint, await);
 
 	TSourceEngineQuery::PlayerListQueryResult first_result = TSourceEngineQuery::MakePlayerListQueryResultFromBuffer(buffer, reply_length);
 	if (first_result.Results.index() == 1)
-		co_return first_result;
+		return first_result;
 
 	// second attempt
 	const int32_t challenge = std::get<int32_t>(first_result.Results);
 	const char(&accessor)[4] = reinterpret_cast<const char(&)[4]>(challenge);
 	char request3[10] = { '\xFF', '\xFF', '\xFF', '\xFF', 'U', accessor[0], accessor[1], accessor[2], accessor[3], '\0' };
-	bytes_transferred = co_await socket.async_send_to(boost::asio::buffer(request3, sizeof(request3)), endpoint, boost::asio::use_awaitable);
-	reply_length = co_await socket.async_receive_from(boost::asio::buffer(buffer, 4096), sender_endpoint, boost::asio::use_awaitable);
+	bytes_transferred = socket.async_send_to(boost::asio::buffer(request3, sizeof(request3)), endpoint, await);
+	reply_length = socket.async_receive_from(boost::asio::buffer(buffer, 4096), sender_endpoint, await);
 
 	ddl.cancel();
-	co_return TSourceEngineQuery::MakePlayerListQueryResultFromBuffer(buffer, reply_length);
+	return TSourceEngineQuery::MakePlayerListQueryResultFromBuffer(buffer, reply_length);
 }

@@ -1,5 +1,5 @@
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 
 add_library(vgui2_interfaces INTERFACE)
 target_include_directories(vgui2_interfaces INTERFACE 

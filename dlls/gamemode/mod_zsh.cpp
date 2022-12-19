@@ -20,8 +20,7 @@
 #include "player/player_human_level.h"
 
 #include <boost/asio.hpp>
-#include <boost/asio/use_awaitable.hpp>
-#include <boost/asio/awaitable.hpp>
+#include <boost/asio/spawn.hpp>
 #include <boost/asio/detached.hpp>
 
 #include <random>
@@ -64,7 +63,7 @@ namespace sv {
 			m_iSkyColor[1] = CVAR_GET_FLOAT("sv_skycolor_g");
 			m_iSkyColor[2] = CVAR_GET_FLOAT("sv_skycolor_b");
 			m_iMaxResource[RT_EPOWER] = 300;
-			boost::asio::co_spawn(ioc, Task_Night(), boost::asio::detached);
+			boost::asio::spawn(ioc, std::bind(&round_t::Task_Night, this, std::placeholders::_1));
 		}
 
 		CMod_ZombieShelter* const mod;
@@ -91,7 +90,7 @@ namespace sv {
 			ioc.poll();
 		}
 
-		boost::asio::awaitable<void> Task_Night()
+		void Task_Night(boost::asio::yield_context await)
 		{
 			try
 			{
@@ -107,14 +106,14 @@ namespace sv {
 				{
 					Update_Environment(iLight);
 					timer.expires_after(10s);
-					co_await timer.async_wait(boost::asio::use_awaitable);
+					timer.async_wait(await);
 				}
 				Set_Light(0, 0, 0.0f);
 
 				// day to night
 				auto wait_time = 90s;
 				timer.expires_after(wait_time);
-				co_await timer.async_wait(boost::asio::use_awaitable);
+				timer.async_wait(await);
 
 				// night pre start
 				Set_Light(0, 6, 70.0f);
@@ -122,7 +121,7 @@ namespace sv {
 				{
 					Update_Environment(iLight);
 					timer.expires_after(10s);
-					co_await timer.async_wait(boost::asio::use_awaitable);
+					timer.async_wait(await);
 				}
 
 				// night start
@@ -131,7 +130,7 @@ namespace sv {
 				UTIL_BroadcastStuffText("spk %s\n", SOUND_NIGHT);
 
 				timer.expires_after(wait_time);
-				co_await timer.async_wait(boost::asio::use_awaitable);
+				timer.async_wait(await);
 			}
 			catch (const boost::system::system_error& e)
 			{
