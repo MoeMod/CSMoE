@@ -1171,24 +1171,18 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_BUFFAWP
 					|| pWeapon->m_iId == WEAPON_LOCKONGUN
 					|| pWeapon->m_iId == WEAPON_BLOODHUNTER
-					|| pWeapon->m_iId == WEAPON_MGSM)
+					|| pWeapon->m_iId == WEAPON_MGSM
+					|| pWeapon->m_iId == WEAPON_LASERFIST
+					|| pWeapon->m_iId == WEAPON_LASERFISTEX
+					|| pWeapon->m_iId == WEAPON_THUNDERPISTOL
+					|| pWeapon->m_iId == WEAPON_BUFFNG7
+					|| pWeapon->m_iId == WEAPON_WONDERCANNONEX
+					|| pWeapon->m_iId == WEAPON_RESTRICTIONPISTOL
+					|| pWeapon->m_iId == WEAPON_VOIDPISTOLEX)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
 
-				if (pWeapon->m_iId == WEAPON_M3DRAGON
-					|| pWeapon->m_iId == WEAPON_M3DRAGONM)
-				{
-					if (pevInflictor == pevAttacker)
-					{
-						pWeapon->pev->iuser1 += 1;
-
-						MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pAttacker->pev);
-						WRITE_BYTE(1);
-						WRITE_BYTE(pWeapon->pev->iuser1);
-						MESSAGE_END();
-					}
-				}
 				if (pWeapon->m_iId == WEAPON_Z4B_DBARRELAMETHYST)
 				{
 					if (pevInflictor == pevAttacker)
@@ -6097,6 +6091,23 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/v_buffawp.mdl");
 		case WEAPON_CROSSBOW:
 			pev->viewmodel = MAKE_STRING("models/v_crossbow.mdl");
+		case WEAPON_SKULL6:
+			pev->viewmodel = MAKE_STRING("models/v_skull6.mdl");
+		case WEAPON_KINGCOBRA:
+			pev->viewmodel = MAKE_STRING("models/v_kingcobra.mdl");
+		case WEAPON_KINGCOBRAG:
+			pev->viewmodel = MAKE_STRING("models/v_kingcobrag.mdl");
+		case WEAPON_DESTROYER:
+			pev->viewmodel = MAKE_STRING("models/v_destroyer.mdl");
+		case WEAPON_STARCHASERSR:
+			pev->viewmodel = MAKE_STRING("models/v_starchasersr.mdl");
+		case WEAPON_MOSIN:
+			pev->viewmodel = MAKE_STRING("models/v_mosin.mdl");
+		case WEAPON_Z4B_DEATHRAY:
+			pev->viewmodel = MAKE_STRING("models/z4b/v_deathray.mdl");
+		case WEAPON_CARTBLUES:
+			pev->viewmodel = MAKE_STRING("models/v_cartblue.mdl");
+
 		default:
 			break;
 		}
@@ -9075,7 +9086,6 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_LIGHTZG:
 		case WEAPON_HEAVYZG:
 		case WEAPON_AK47G:
-		case WEAPON_CARTBLUE:
 		case WEAPON_AS50:
 		case WEAPON_Z4B_AWPNVIDIA:
 		case WEAPON_BENDITA:
@@ -9178,6 +9188,41 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_RAINBOWGUN:
 		case WEAPON_GUILLOTINE:
 		case WEAPON_GUILLOTINEEX:
+		case WEAPON_SPEARGUNM:
+		case WEAPON_SPSG:
+		case WEAPON_DESTROYER:
+		case WEAPON_BLOCKAR:
+		case WEAPON_BLOCKMG:
+		case WEAPON_BLOCKAS:
+		case WEAPON_BOUNCER:
+		case WEAPON_STARCHASERSR:
+		case WEAPON_M1GARAND:
+		case WEAPON_SKULL1:
+		case WEAPON_SKULL2:
+		case WEAPON_DUALKRISSHERO:
+		case WEAPON_GILBOAEX:
+		case WEAPON_MUSKET:
+		case WEAPON_BUFFNG7:
+		case WEAPON_BUFFFIVESEVEN:
+		case WEAPON_GUITAR:
+		case WEAPON_VIOLINGUN:
+		case WEAPON_WONDERCANNONEX:
+		case WEAPON_JANUS7:
+		case WEAPON_Y22S3JANUS7:
+		case WEAPON_VOIDPISTOLEX:
+		case WEAPON_DUALKRISS:
+		case WEAPON_MOSIN:
+		case WEAPON_LASERMINIGUN:
+		case WEAPON_MK3A1:
+		case WEAPON_MK3A1SE:
+		case WEAPON_DRILLGUN:
+		case WEAPON_VULCANUS7:
+		case WEAPON_Z4B_DEATHRAY:
+		case WEAPON_CARTBLUEC:
+		case WEAPON_CARTBLUES:
+		case WEAPON_CARTREDL:
+		case WEAPON_CARTREDH:
+		case WEAPON_Z4B_MALORIAN3516:
 			return TRUE;
 		}
 	}
@@ -10018,7 +10063,7 @@ void CBasePlayer::BuildRebuyStruct()
 	int iAmmoIndex = GetAmmoIndex("HEGrenade");
 
 	if (iAmmoIndex != -1)
-		m_rebuyStruct.m_heGrenade = m_rgAmmo[ iAmmoIndex ];
+		m_rebuyStruct.m_heGrenade = m_rgAmmo[iAmmoIndex];
 	else
 		m_rebuyStruct.m_heGrenade = 0;
 
@@ -10048,7 +10093,19 @@ void CBasePlayer::BuildRebuyStruct()
 		m_rebuyStruct.m_knifeID = KNIFE_NORMAL;
 
 	if (m_iGrenadeID > GRENADE_HEGRENADE && m_iGrenadeID < NUM_GRENADES)
+	{
 		m_rebuyStruct.m_grenadeID = m_iGrenadeID;
+
+		if (m_iGrenadeID == GRENADE_PATROLDRONE)
+		{
+			iAmmoIndex = GetAmmoIndex("patroldrone");
+
+			if (iAmmoIndex != -1)
+				m_rebuyStruct.m_heGrenade = m_rgAmmo[iAmmoIndex];
+			else
+				m_rebuyStruct.m_heGrenade = 0;
+		}
+	}	
 	else
 		m_rebuyStruct.m_grenadeID = GRENADE_HEGRENADE;
 }
@@ -10165,11 +10222,20 @@ void CBasePlayer::RebuyHEGrenade()
 
 	if (iAmmoIndex == -1)
 		return;
+	
+	if (m_rebuyStruct.m_grenadeID == GRENADE_PATROLDRONE)
+	{
+		iAmmoIndex = GetAmmoIndex("patroldrone");
+
+		if (iAmmoIndex == -1)
+			return;
+	}
 
 	int numToBuy = m_rebuyStruct.m_heGrenade - m_rgAmmo[ iAmmoIndex ];
 
 	for (int i = 0; i < numToBuy; ++i)
-		ClientCommand("hegren");
+		ClientCommand("moe_buy", GrenadeTypeToAlias(m_rebuyStruct.m_grenadeID));
+		//ClientCommand("hegren");
 }
 
 void CBasePlayer::RebuyFlashbang()

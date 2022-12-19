@@ -273,7 +273,7 @@ inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float f
 						CBasePlayer* pVictim = dynamic_cast<CBasePlayer*>(pEntity);
 						if (pVictim->m_bIsZombie) // fire burn
 						{
-							MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, pVictim->pev);
+							MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, nullptr, pVictim->pev);
 							WRITE_BYTE(4);
 							WRITE_SHORT(pVictim->entindex());
 							WRITE_BYTE(4);
@@ -381,7 +381,7 @@ bool AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vec
 }
 
 inline hit_result_t
- KnifeAttack5(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer)
+ KnifeAttack5(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsPrimaryAttack = false)
 {
 	CBaseEntity* pEntity = NULL;
 	hit_result_t result = HIT_NONE;
@@ -414,7 +414,7 @@ inline hit_result_t
 
 		float flRatio = 1.0;
 
-		if (pEntity && pEntity->IsPlayer())
+		if (pEntity && pEntity->IsPlayer() && !IsPrimaryAttack)
 		{
 			UTIL_MakeVectors(pEntity->pev->angles);
 

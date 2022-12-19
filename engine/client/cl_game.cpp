@@ -2695,9 +2695,10 @@ static model_t *GAME_EXPORT pfnLoadMapSprite( const char *filename )
 	COM_FixSlashes( name );
 
     // try to use ddc first
+	// MoeMod : texture scaling will crash here, DO NOT enable it
     if(false)
     {
-        char name2[64];
+        char name2[PATH_MAX];
         Q_snprintf(name2, PATH_MAX, "ddc/%s", name);
         FS_StripExtension(name2);
         Q_strcat(name2, ".astc");
@@ -3923,6 +3924,7 @@ static efx_api_t gEfxApi =
 	CL_Sprite_Smoke,
 	CL_Sprite_Spray,
 	CL_Sprite_Trail,
+	CL_Sprite_TrailEx,
 	CL_Sprite_WallPuff,
 	CL_StreakSplash,
 	CL_TracerEffect,

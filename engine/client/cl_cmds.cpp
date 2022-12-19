@@ -249,7 +249,7 @@ void CL_ScreenShot_f( void )
 		cls.scrshot_action = scrshot_normal; // build new frame for screenshot
 	}
 
-	cls.envshot_vieworg = NULL; // no custom view
+	cls.envshot_vieworg = nullptr; // no custom view
 	cls.envshot_viewsize = 0;
 }
 

@@ -124,6 +124,18 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "kronos1", WEAPON_KRONOS1 },
 	{ "kingcobra", WEAPON_KINGCOBRA },
 	{ "kingcobrag", WEAPON_KINGCOBRAG },
+	{ "skull2", WEAPON_SKULL2 },
+	{ "musket", WEAPON_MUSKET },
+	{ "bufffiveseven", WEAPON_BUFFFIVESEVEN },
+	{ "restrictionpistol", WEAPON_RESTRICTIONPISTOL },
+	{ "voidpistolex",	WEAPON_VOIDPISTOLEX },
+	{ "waterpistol",	WEAPON_WATERPISTOL },
+	{ "monkeywpnset2",	WEAPON_MONKEYWPNSET2 },
+	{ "tknife",	WEAPON_TKNIFE },
+	{ "tknifeex",	WEAPON_TKNIFEEX },
+	{ "tknifeex2",	WEAPON_TKNIFEEX2 },
+	{ "tknifedx",	WEAPON_Z4B_TKNIFEDX },
+	{ "malorian3516" , WEAPON_Z4B_MALORIAN3516},
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -143,10 +155,20 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "skull11",	WEAPON_SKULL11 },
 	{ "janus11",	WEAPON_JANUS11 },
 	{ "crow3",	WEAPON_CROW3 },
-	{ "m1887",	WEAPON_M1887G },
+	{ "m1887g",	WEAPON_M1887G },
 	{ "thanatos11",	WEAPON_THANATOS11 },
 	{ "m1887xmas",	WEAPON_M1887XMAS },
 	{ "rainbowgun",	WEAPON_RAINBOWGUN },
+	{ "spsg",	WEAPON_SPSG },
+	{ "blockas",	WEAPON_BLOCKAS },
+	{ "bouncer",	WEAPON_BOUNCER },
+	{ "spas12",	WEAPON_SPAS12 },
+	{ "spas12ex",	WEAPON_SPAS12EX },
+	{ "spas12ex2",	WEAPON_SPAS12EX2 },
+	{ "mk3a1",	WEAPON_MK3A1 },
+	{ "mk3a1se",	WEAPON_MK3A1SE },
+	{ "vulcanus11",	WEAPON_VULCANUS11 },
+
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -167,6 +189,14 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "kronos3",	WEAPON_KRONOS3 },
 	{ "laserfist",	WEAPON_LASERFIST },
 	{ "laserfistex",	WEAPON_LASERFISTEX },
+	{ "coilgun",	WEAPON_COILGUN },
+	{ "dualkrisshero",	WEAPON_DUALKRISSHERO },
+	{ "dualuzi",	WEAPON_DUALUZI },
+	{ "dualkriss",	WEAPON_DUALKRISS },
+	{ "steyrtmpd",	WEAPON_Z4B_STEYRTMPD },
+	{ "vulcanus3",	WEAPON_VULCANUS3 },
+	{ "skull3",	WEAPON_SKULL3 },
+	{ "skull3d",	WEAPON_SKULL3D },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -209,6 +239,17 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "kronos5",	WEAPON_KRONOS5 },
 	{ "an94",	WEAPON_AN94 },
 	{ "m16a4",	WEAPON_M16A4 },
+	{ "blockar",	WEAPON_BLOCKAR },
+	{ "thanatos5",	WEAPON_THANATOS5 },
+	{ "oicw",	WEAPON_OICW },
+	{ "m1garand",	WEAPON_M1GARAND },
+	{ "gilboaex",	WEAPON_GILBOAEX },
+	{ "guitar",	WEAPON_GUITAR },
+	{ "violingun",	WEAPON_VIOLINGUN },
+	{ "cartbluec",	WEAPON_CARTBLUEC },
+	{ "cartblues",	WEAPON_CARTBLUES },
+	{ "cartredl",	WEAPON_CARTREDL },
+	{ "cartredh",	WEAPON_CARTREDH },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -238,6 +279,10 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "barrettd",	WEAPON_Z4B_BARRETTD },
 	{ "freedom",	WEAPON_Z4B_FREEDOM },
 	{ "buffawp",	WEAPON_BUFFAWP },
+	{ "destroyer",	WEAPON_DESTROYER },
+	{ "starchasersr",	WEAPON_STARCHASERSR },
+	{ "mosin",	WEAPON_MOSIN },
+	{ "deathray",	WEAPON_Z4B_DEATHRAY },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -274,6 +319,12 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "cameragun",	WEAPON_CAMERAGUN },
 	{ "mgsm",	WEAPON_MGSM },
 	{ "kronos7",	WEAPON_KRONOS7 },
+	{ "blockmg",	WEAPON_BLOCKMG },
+	{ "buffng7",	WEAPON_BUFFNG7 },
+	{ "janus7",	WEAPON_JANUS7 },
+	{ "y22s3janus7",	WEAPON_Y22S3JANUS7 },
+	{ "laserminigun",	WEAPON_LASERMINIGUN },
+	{ "vulcanus7",	WEAPON_VULCANUS7 },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -311,7 +362,9 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "fglauncher",	WEAPON_FGLAUNCHER },
 	{ "guillotine",	WEAPON_GUILLOTINE },
 	{ "guillotineex",	WEAPON_GUILLOTINEEX },
-
+	{ "speargunm",	WEAPON_SPEARGUNM },
+	{ "wondercannonex",	WEAPON_WONDERCANNONEX },
+	{ "drillgun",	WEAPON_DRILLGUN },
 
 	{ NULL,		WEAPON_NONE }
 };
@@ -347,8 +400,8 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_y22s1holyswordmb",	KNIFE_Y22S1HOLYSWORDMB },
 	{ "knife_magicknife",	KNIFE_MAGICKNIFE },
 	{ "knife_whipsword",	KNIFE_WHIPSWORD },
-	{ "knife_dualkukri",	KNIFE_DUALKUKRI },
-	{ "knife_dualslayer",	KNIFE_DUALSLAYER },
+	{ "z4b_dualkukri",	KNIFE_DUALKUKRI },
+	{ "z4b_dualslayer",	KNIFE_DUALSLAYER },
 	{ "knife_jknife",	KNIFE_JKNIFE },
 	{ "knife_combat",	KNIFE_COMBAT },
 	{ "knife_mastercombat",	KNIFE_MASTERCOMBAT },
@@ -359,6 +412,24 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "z4b_dualstinger",	KNIFE_DUALSTINGER },
 	{ "z4b_heartstimulater",	KNIFE_HEARTSTIMULATER },
 	{ "knife_y22s2sfsword",	KNIFE_Y22S2SFSWORD },
+	{ "knife_armtorch",	KNIFE_ARMTORCH },
+	{ "z4b_tiga",	KNIFE_TIGA },
+	{ "knife_y22s3dragonsword",	KNIFE_Y22S3DRAGONSWORD },
+	{ "knife_monkeywpnset3",	KNIFE_MONKEYWPNSET3 },
+	{ "knife_ozwpnset3",	KNIFE_OZWPNSET3 },
+	{ "knife_tomahawk",	KNIFE_TOMAHAWK },
+	{ "knife_crowbarcraft",	KNIFE_CROWBARCRAFT },
+	{ "knife_dragontail",	KNIFE_DRAGONTAIL },
+	{ "knife_katanad",	KNIFE_KATANAD },
+	{ "knife_vulcanus9",	KNIFE_VULCANUS9 },
+	{ "knife_sfsword",	KNIFE_SFSWORD },
+	{ "knife_spknife",	KNIFE_SPKNIFE },
+	{ "knife_crow9",	KNIFE_CROW9 },
+	{ "knife_turbulent9",	KNIFE_TURBULENT9 },
+	{ "knife_ironfan",	KNIFE_IRONFAN },
+	{ "knife_swordbombard",	KNIFE_SWORDBOMBARD },
+
+
 	
 };
 
@@ -368,7 +439,18 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_hegrenade", GRENADE_HEGRENADE },
 	{ "weapon_pumpkin", GRENADE_PUMPKIN },
 	{ "weapon_holybomb", GRENADE_HOLYBOMB },
-	{ "weapon_patroldrone", GRENADE_PATROLDRONE }
+	{ "weapon_bunkerbuster", GRENADE_BUNKERBUSTER },
+	{ "weapon_patroldrone", GRENADE_PATROLDRONE },
+	{ "weapon_divinetitan", GRENADE_DIVINETITAN },
+	{ "weapon_m24grenade", GRENADE_M24GRENADE },
+	{ "weapon_fgrenade2", GRENADE_FGRENADE2 },
+	{ "weapon_fgrenade", GRENADE_FIREBOMB },
+	{ "weapon_heartbomb", GRENADE_HEARTBOMB },
+	{ "weapon_cake", GRENADE_CAKEBOMB },
+	{ "weapon_mooncake", GRENADE_MOONCAKE },
+	{ "weapon_cartfrag", GRENADE_CARTFRAG },
+	{ "weapon_sfgrenade", GRENADE_SFGRENADE },
+	{ "weapon_chaingren", GRENADE_CHAINGRENADE },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -497,6 +579,16 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "thunderpistol", WEAPONCLASS_PISTOL },
 	{ "kingcobra", WEAPONCLASS_PISTOL },
 	{ "kingcobrag", WEAPONCLASS_PISTOL },
+	{ "skull2", WEAPONCLASS_PISTOL },
+	{ "musket", WEAPONCLASS_PISTOL },
+	{ "bufffiveseven", WEAPONCLASS_PISTOL },
+	{ "voidpistolex",	WEAPONCLASS_PISTOL },
+	{ "monkeywpnset2",	WEAPONCLASS_PISTOL },
+	{ "tknife",	WEAPONCLASS_PISTOL },
+	{ "tknifeex",	WEAPONCLASS_PISTOL },
+	{ "tknifeex2",	WEAPONCLASS_PISTOL },
+	{ "tknifedx",	WEAPONCLASS_PISTOL },
+	{ "malorian3516" , WEAPONCLASS_PISTOL},
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -522,7 +614,15 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "thanatos11",	WEAPONCLASS_SHOTGUN },
 	{ "m1887xmas",	WEAPONCLASS_SHOTGUN },
 	{ "rainbowgun",	WEAPONCLASS_SHOTGUN },
-
+	{ "spsg",	WEAPONCLASS_SHOTGUN },
+	{ "blockas",	WEAPONCLASS_SHOTGUN },
+	{ "bouncer",	WEAPONCLASS_SHOTGUN },
+	{ "spas12",	WEAPONCLASS_SHOTGUN },
+	{ "spas12ex",	WEAPONCLASS_SHOTGUN },
+	{ "spas12ex2",	WEAPONCLASS_SHOTGUN },
+	{ "mk3a1",	WEAPONCLASS_SHOTGUN },
+	{ "mk3a1se",	WEAPONCLASS_SHOTGUN },
+	{ "vulcanus11",	WEAPONCLASS_SHOTGUN },
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -537,16 +637,23 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "bison",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "tmpdragon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "spsmg",	WEAPONCLASS_SUBMACHINEGUN },
-	{ "thanatos7",	WEAPONCLASS_SUBMACHINEGUN },
-	{ "crow7",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "janus3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "crow3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "balrog3", WEAPONCLASS_SUBMACHINEGUN },
 	{ "kronos3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "laserfist",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "laserfistex",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "coilgun",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "dualkrisshero",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "dualuzi",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "dualkriss",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "steyrtmpd",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "vulcanus3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "thanatos3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "sterlingbayonet",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "skull3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "skull3d",	WEAPONCLASS_SUBMACHINEGUN },
 
-	
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
 	{ "ak47l",	WEAPONCLASS_RIFLE },
@@ -592,7 +699,16 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "kronos5",	WEAPONCLASS_RIFLE },
 	{ "an94",	WEAPONCLASS_RIFLE },
 	{ "m16a4",	WEAPONCLASS_RIFLE },
-
+	{ "blockar",	WEAPONCLASS_RIFLE },
+	{ "thanatos5",	WEAPONCLASS_RIFLE },
+	{ "oicw",	WEAPONCLASS_RIFLE },
+	{ "m1garand",	WEAPONCLASS_RIFLE },
+	{ "gilboaex",	WEAPONCLASS_RIFLE },
+	{ "guitar",	WEAPONCLASS_RIFLE },
+	{ "violingun",	WEAPONCLASS_RIFLE },
+	{ "cartbluec",	WEAPONCLASS_RIFLE },
+	{ "cartredl",	WEAPONCLASS_RIFLE },
+	{ "cartredh",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -622,6 +738,12 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "barrettd",	WEAPONCLASS_SNIPERRIFLE },
 	{ "freedom",	WEAPONCLASS_SNIPERRIFLE },
 	{ "buffawp",	WEAPONCLASS_SNIPERRIFLE },
+	{ "destroyer",	WEAPONCLASS_SNIPERRIFLE },
+	{ "starchasersr",	WEAPONCLASS_SNIPERRIFLE },
+	{ "mosin",	WEAPONCLASS_SNIPERRIFLE },
+	{ "deathray",	WEAPONCLASS_SNIPERRIFLE },
+	{ "cartblues",	WEAPONCLASS_SNIPERRIFLE },
+
 
 	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
 	{ "buffm249",	WEAPONCLASS_MACHINEGUN },
@@ -646,12 +768,19 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "charger7",	WEAPONCLASS_MACHINEGUN },
 	{ "z4b_m60amethyst",	WEAPONCLASS_MACHINEGUN },
 	{ "broad",	WEAPONCLASS_MACHINEGUN },
+	{ "thanatos7",	WEAPONCLASS_MACHINEGUN },
+	{ "crow7",	WEAPONCLASS_MACHINEGUN },
 	{ "coilmg",	WEAPONCLASS_MACHINEGUN },
 	{ "spmg",	WEAPONCLASS_MACHINEGUN },
 	{ "cameragun",	WEAPONCLASS_MACHINEGUN },
 	{ "mgsm",	WEAPONCLASS_MACHINEGUN },
 	{ "kronos7",	WEAPONCLASS_MACHINEGUN },
-
+	{ "blockmg",	WEAPONCLASS_MACHINEGUN },
+	{ "buffng7",	WEAPONCLASS_MACHINEGUN },
+	{ "janus7",	WEAPONCLASS_MACHINEGUN },
+	{ "y22s3janus7",	WEAPONCLASS_MACHINEGUN },
+	{ "laserminigun",	WEAPONCLASS_MACHINEGUN },
+	{ "vulcanus7",	WEAPONCLASS_MACHINEGUN },
 
 	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
@@ -685,8 +814,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "fglauncher",	WEAPONCLASS_EQUIPMENT },
 	{ "guillotine",	WEAPONCLASS_EQUIPMENT },
 	{ "guillotineex",	WEAPONCLASS_EQUIPMENT },
-
-
+	{ "speargunm",	WEAPONCLASS_EQUIPMENT },
+	{ "wondercannonex",	WEAPONCLASS_EQUIPMENT },
+	{ "drillgun",	WEAPONCLASS_EQUIPMENT },
 
 	{ "syringe",	WEAPONCLASS_EQUIPMENT },
 	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
@@ -868,7 +998,6 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_LIGHTZG:
 	case WEAPON_HEAVYZG:
 	case WEAPON_AK47G:
-	case WEAPON_CARTBLUE:
 	case WEAPON_AS50:
 	case WEAPON_Z4B_AWPNVIDIA:
 	case WEAPON_BENDITA:
@@ -990,6 +1119,41 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_RAINBOWGUN:
 	case WEAPON_GUILLOTINE:
 	case WEAPON_GUILLOTINEEX:
+	case WEAPON_SPEARGUNM:
+	case WEAPON_SPSG:
+	case WEAPON_DESTROYER:
+	case WEAPON_BLOCKAR:
+	case WEAPON_BLOCKMG:
+	case WEAPON_BLOCKAS:
+	case WEAPON_COILGUN:
+	case WEAPON_BOUNCER:
+	case WEAPON_THANATOS5:
+	case WEAPON_OICW:
+	case WEAPON_STARCHASERSR:
+	case WEAPON_M1GARAND:
+	case WEAPON_DUALKRISSHERO:
+	case WEAPON_DUALUZI:
+	case WEAPON_GILBOAEX:
+	case WEAPON_BUFFNG7:
+	case WEAPON_GUITAR:
+	case WEAPON_VIOLINGUN:
+	case WEAPON_WONDERCANNONEX:
+	case WEAPON_JANUS7:
+	case WEAPON_Y22S3JANUS7:
+	case WEAPON_DUALKRISS:
+	case WEAPON_MOSIN:
+	case WEAPON_Z4B_STEYRTMPD:
+	case WEAPON_MK3A1:
+	case WEAPON_MK3A1SE:
+	case WEAPON_DRILLGUN:
+	case WEAPON_VULCANUS3:
+	case WEAPON_SKULL3:
+	case WEAPON_SKULL3D:
+	case WEAPON_Z4B_DEATHRAY:
+	case WEAPON_CARTBLUEC:
+	case WEAPON_CARTBLUES:
+	case WEAPON_CARTREDL:
+	case WEAPON_CARTREDH:
 		return true;
 	default:
 		break;
@@ -1042,6 +1206,18 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_KRONOS1:
 	case WEAPON_KINGCOBRA:
 	case WEAPON_KINGCOBRAG:
+	case WEAPON_SKULL2:
+	case WEAPON_MUSKET:
+	case WEAPON_BUFFFIVESEVEN:
+	case WEAPON_RESTRICTIONPISTOL:
+	case WEAPON_VOIDPISTOLEX:
+	case WEAPON_WATERPISTOL:
+	case WEAPON_MONKEYWPNSET2:
+	case WEAPON_TKNIFE:
+	case WEAPON_TKNIFEEX:
+	case WEAPON_TKNIFEEX2:
+	case WEAPON_Z4B_TKNIFEDX:
+	case WEAPON_Z4B_MALORIAN3516:
 		return true;
 	default:
 		break;
@@ -1198,7 +1374,6 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 		ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
 		return false;
 	}
-
 #ifndef XASH_DEDICATED
 	auto iter = std::find_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal),
 		[pszCommand](const MoEWeaponBuyInfo_s& info) {
@@ -1217,9 +1392,9 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 	if (iter == std::end(g_MoEWeaponBuyInfo)) {
 		return false;
 	}
-#endif // !XASH_DEDICATED
+#endif
 
-	if (pPlayer->m_iAccount < iter->iCost) {
+	if (pPlayer->m_iAccount < iter->iCost && iter->iID != WEAPON_PATROLDRONE) {
 		ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");
 		BlinkAccount(pPlayer, 2);
 
@@ -1259,9 +1434,139 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 			}
 			break;
 		case GRENADE_SLOT:
-			{
+			{		
+					bool bGrenadeChanged = pPlayer->m_iGrenadeID != iter->iID;
+					bool bWasActiveItem = pPlayer->m_pActiveItem && 
+						(pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE || 
+						pPlayer->m_pActiveItem->m_iId == WEAPON_PATROLDRONE || 
+						pPlayer->m_pActiveItem->m_iId == WEAPON_DIVINETITAN || 
+						pPlayer->m_pActiveItem->m_iId == WEAPON_BUNKERBUSTER);
+
+					if (iter->iID == WEAPON_PATROLDRONE)
+					{
+						CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+						//buy patroldrone ammo
+						while (pGrenade)
+						{
+							if (pGrenade->m_iId == WEAPON_PATROLDRONE)
+							{
+								//add clip
+								if (pPlayer->m_iAccount < 500) {
+									ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");
+									BlinkAccount(pPlayer, 2);
+									return false;
+								}
+
+								if (pPlayer->m_rgAmmo[pGrenade->m_iPrimaryAmmoType] >= PATROLDRONE_MAX_CLIP)
+								{
+									//full ammo
+									ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
+									return false;
+								}
+
+								CPatrolDrone* pLinkWeapon = dynamic_cast<CPatrolDrone*>(pGrenade);
+								pPlayer->m_rgAmmo[pLinkWeapon->m_iPrimaryAmmoType]++;
+								for (int i = 0; i < PATROLDRONE_MAX_CLIP; i++)
+								{
+									if (pLinkWeapon->m_iClipAmmo[i] == -1)
+									{
+										pLinkWeapon->m_iClipAmmo[i] = 0;
+										MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
+										WRITE_BYTE(24);
+										WRITE_BYTE(i);
+										WRITE_SHORT(pLinkWeapon->m_iClipAmmo[i]);
+										WRITE_BYTE(PATROLDRONE_OFF);
+										MESSAGE_END();
+										break;
+									}
+								}
+								pPlayer->AddAccount(-500);
+								pPlayer->BuildRebuyStruct();
+
+								return true;
+							}
+
+							pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
+						}
+					}
+
+					if (bGrenadeChanged)
+					{
+						if (pPlayer->m_iAccount < iter->iCost) {
+							ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");
+							BlinkAccount(pPlayer, 2);
+
+							return false;
+						}
+
+						CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+						std::vector<CBasePlayerWeapon*> GrenadesToRemove;
+
+						while (pGrenade)
+						{
+							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
+								pGrenade->m_iId == WEAPON_PATROLDRONE ||
+								pGrenade->m_iId == WEAPON_DIVINETITAN ||
+								pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+							{
+								pGrenade->Kill();
+
+								GrenadesToRemove.push_back(pGrenade);
+							}
+
+							pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
+						}
+
+						for (auto iter : GrenadesToRemove)
+						{
+							pPlayer->RemovePlayerItem(iter);
+						}
+					}
+
+					/*switch (iter->iID)
+					{
+					case WEAPON_PATROLDRONE: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
+					case WEAPON_DIVINETITAN: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
+					case WEAPON_BUNKERBUSTER: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
+					default:
+						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+						break;
+					}*/
+
+					pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+
+					pPlayer->GiveNamedItem(iter->pszClassName);
+					pPlayer->AddAccount(-iter->iCost);
+					pPlayer->BuildRebuyStruct();
+
+					if (bGrenadeChanged && bWasActiveItem)
+					{
+						// client->SelectItem("weapon_hegrenade");
+						CBasePlayerItem* pGrenade = pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+
+						while (pGrenade)
+						{
+							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
+								pGrenade->m_iId == WEAPON_PATROLDRONE ||
+								pGrenade->m_iId == WEAPON_DIVINETITAN ||
+								pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+							{
+								pPlayer->m_pActiveItem = pGrenade;
+
+								break;
+							}
+
+							pGrenade = pGrenade->m_pNext;
+						}
+					}
+
+					return true;				
+#if 0
 			CBasePlayerItem* pItem = pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
 
+			if (pItem == NULL)
+				pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+	
 			// have at least one weapon in this slot
 			while (pItem != NULL)
 			{
@@ -1355,12 +1660,39 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 							//remove and add
 							pPlayer->RemovePlayerItem(pGrenade);
 						}
-						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+
+						bool bGrenadeChanged = pPlayer->m_iGrenadeID != iter->iID;
+						bool bWasActiveItem = pPlayer->m_pActiveItem && pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE;
+
+						if (bGrenadeChanged)
+						{
+							CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+							std::vector<CBasePlayerWeapon*> GrenadesToRemove;
+
+							while (pGrenade)
+							{
+								if (pGrenade->m_iId == WEAPON_HEGRENADE)
+								{
+									pGrenade->Kill();
+
+									GrenadesToRemove.push_back(pGrenade);
+								}
+
+								pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
+							}
+
+							for (auto iter : GrenadesToRemove)
+							{
+								pPlayer->RemovePlayerItem(iter);
+							}
+						}
+						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);					
 						break;
 					}
 				}
 				pItem = pItem->m_pNext;
-			}			
+			}		
+#endif
 			}
 
 			break;

@@ -121,28 +121,7 @@ namespace sv {
 
 		TraceResult tr;
 
-		UTIL_TraceLine(pev->origin, pev->origin + pev->velocity.Normalize() * 50, missile, pev->owner, &tr);
-
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_BEAMPOINTS);
-		WRITE_COORD(pev->origin.x);
-		WRITE_COORD(pev->origin.y);
-		WRITE_COORD(pev->origin.z);
-		WRITE_COORD(tr.vecEndPos.x);
-		WRITE_COORD(tr.vecEndPos.y);
-		WRITE_COORD(tr.vecEndPos.z); // coord coord coord (end position) 
-		WRITE_SHORT(g_sModelIndexLaser); // short (sprite index) 
-		WRITE_BYTE(0); // byte (starting frame) 
-		WRITE_BYTE(0); // byte (frame rate in 0.1's) 
-		WRITE_BYTE(50); // byte (life in 0.1's) 
-		WRITE_BYTE(10); // byte (line width in 0.1's) 
-		WRITE_BYTE(0); // byte (noise amplitude in 0.01's) 
-		WRITE_BYTE(0); // byte,byte,byte (color)
-		WRITE_BYTE(0);
-		WRITE_BYTE(255);
-		WRITE_BYTE(255); // byte (brightness)
-		WRITE_BYTE(15); // byte (scroll speed in 0.1's)
-		MESSAGE_END();
+		UTIL_TraceLine(pev->origin, pev->origin + pev->velocity.Normalize() * 10, dont_ignore_monsters, pev->owner, &tr);
 
 		if (CanAttack(pOther))
 		{
@@ -258,7 +237,7 @@ namespace sv {
 			Vector vecStart = vecPositions[i];
 			Vector vecEnd = vecStart + pev->velocity.Normalize() * delta;
 
-			UTIL_TraceLine(vecStart, vecEnd, missile, pentIgnore, &tr);
+			UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, pentIgnore, &tr);
 
 			if (tr.flFraction < 1.0 && tr.pHit && tr.pHit != ENT(pev))
 			{
@@ -457,8 +436,7 @@ namespace sv {
 		if (UTIL_IsZombieScenario())
 			return false;
 		*/
-
-		if (g_pGameRules->PlayerRelationship(((CBasePlayer*)pev->owner), pOther) == GR_TEAMMATE && !friendlyfire.value)
+		if (g_pGameRules->PlayerRelationship(m_pOwner, pOther) == GR_TEAMMATE && !friendlyfire.value)
 			return false;
 
 		/*if (!friendlyfire.value && m_iTeam == pOther->m_iTeam)
@@ -672,7 +650,7 @@ namespace sv {
 
 		TraceResult tr;
 
-		UTIL_TraceLine(pev->origin, pev->origin + pev->velocity.Normalize() * 50, missile, pev->owner, &tr);
+		UTIL_TraceLine(pev->origin, pev->origin + pev->velocity.Normalize() * 10, dont_ignore_monsters, pev->owner, &tr);
 
 		if (!CanAttack(pOther))
 		{

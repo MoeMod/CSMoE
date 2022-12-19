@@ -4,6 +4,7 @@
 #include "studio.h"
 #include "mod_decryptor.h"
 #include "mod_extend_seq.h"
+#include "sprite.h"
 
 #include <boost/asio.hpp>
 #include <optional>
@@ -40,11 +41,7 @@ namespace xe {
     {
         if(g_cook_ctx)
         {
-            g_cook_ctx->ioc_cook.poll();
-            if(g_cook_ctx->cur_num >= g_cook_ctx->total_num)
-            {
-                Cook_End();
-            }
+            g_cook_ctx->ioc_cook.run_for(duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(host.realframetime / 2)));
         }
     }
 
@@ -138,6 +135,7 @@ namespace xe {
                     Cook_SubmitPic(cook_ctx, pic, destpath);
                 }
             }
+            FS_MapFree(buf, filesize);
         }
 
     }
@@ -157,16 +155,140 @@ namespace xe {
 
     }
 
-    void Cook_SearchResursive(std::vector<std::string> &out, const char *start_dir, const char *pattern)
+    const byte *Cook_SubmitSPR_Frame(std::shared_ptr<CookContext> cook_ctx, const std::string &spr, const dsprite_t *psprite, const byte *pin, const char *group_suffix, int num)
     {
-        auto t = FS_Search( va("%s/*", start_dir), true, false );
+        auto pinframe = reinterpret_cast<const dspriteframe_t *>(pin);
+        char		texname[128];
+        Q_snprintf(texname, sizeof(texname), "#%s_%s_%i%i.spr", spr.c_str(), group_suffix, num / 10, num % 10);
+        if(auto size = psprite->bounds[0] * psprite->bounds[1])
+        {
+            if(auto pic = FS_LoadImage(texname, pin, size))
+            {
+                char destpath[128];
+                Q_snprintf( destpath, sizeof( destpath ), "ddc/%s/%s_%i%i.astc", spr.c_str(), group_suffix, num / 10, num % 10 );
+                Cook_SubmitPic(cook_ctx, pic, destpath);
+            }
+        }
+        return (pin + sizeof(dspriteframe_t) + pinframe->width * pinframe->height);
+    }
+
+    const byte *Cook_SubmitSPR_Group(std::shared_ptr<CookContext> cook_ctx, const std::string &spr, const dsprite_t *psprite, const byte *pin, const char *group_suffix, int framenum)
+    {
+        // TODO : not really used
+        auto pingroup = reinterpret_cast<const dspritegroup_t *>(pin);
+        pin += sizeof(dspritegroup_t);
+        pin += sizeof(dspriteinterval_t) * pingroup->numframes;
+        for( int i = 0; i < pingroup->numframes; i++ )
+        {
+            pin = Cook_SubmitSPR_Frame(cook_ctx, spr, psprite, pin, group_suffix, framenum * 10 + i);
+        }
+        return pin;
+    }
+
+    void Cook_SubmitSPR(std::shared_ptr<CookContext> cook_ctx, const std::string &spr)
+    {
+        fs_offset_t filesize;
+        auto buffer = FS_MapFile(spr.c_str(), &filesize, true);
+        if(buffer)
+        {
+            auto pin = reinterpret_cast<const dsprite_t *>(buffer);
+            if( LittleLong(pin->ident) != IDSPRITEHEADER || LittleLong(pin->version) != SPRITE_VERSION )
+            {
+                // ignored invalid file
+                FS_MapFree(buffer, filesize);
+                return;
+            }
+            buffer += sizeof(dsprite_t);
+            short numi = *reinterpret_cast<const short *>(buffer);
+
+            if (numi == 256)
+            {
+                image_ref pal;
+
+                buffer += sizeof(short);
+
+                // install palette
+                switch (pin->texFormat)
+                {
+                    case SPR_ADDITIVE:
+                        pal = FS_LoadImage("#normal.pal", buffer, 768);
+                        break;
+                    case SPR_INDEXALPHA:
+                        pal = FS_LoadImage("#decal.pal", buffer, 768);
+                        break;
+                    case SPR_ALPHTEST:
+                        pal = FS_LoadImage("#transparent.pal", buffer, 768);
+                        break;
+                    case SPR_NORMAL:
+                    default:
+                        pal = FS_LoadImage("#normal.pal", buffer, 768);
+                        break;
+                }
+
+                buffer += 768; //读下一个数据块
+                pal = nullptr; // palette installed, no reason to keep this data
+            }
+            else
+            {
+                MsgDev(D_ERROR, "%s has wrong number of palette colors %i (should be 256)\n", spr.c_str(), numi);
+                FS_MapFree( buffer, filesize );
+                return;
+            }
+
+            for( int i = 0; i < pin->numframes; i++ ) //依次读取每一帧的数据
+            {
+                frametype_t frametype = (frametype_t)*buffer;
+                char		group_suffix[8];
+
+                switch (frametype)
+                {
+                    case FRAME_SINGLE:
+                        Q_strncpy(group_suffix, "one", sizeof(group_suffix));
+                        buffer = Cook_SubmitSPR_Frame(cook_ctx, spr, pin, buffer + sizeof(int), group_suffix, i);
+                        break;
+                    case FRAME_GROUP:
+                        Q_strncpy(group_suffix, "grp", sizeof(group_suffix));
+                        buffer = Cook_SubmitSPR_Group(cook_ctx, spr, pin, buffer + sizeof(int), group_suffix, i);
+                        break;
+                    case FRAME_ANGLED:
+                        Q_strncpy(group_suffix, "ang", sizeof(group_suffix));
+                        buffer = Cook_SubmitSPR_Group(cook_ctx, spr, pin, buffer + sizeof(int), group_suffix, i);
+                        break;
+                }
+            }
+            FS_MapFree(buffer, filesize);
+        }
+    }
+
+    boost::asio::awaitable<void> Cook_YieldCurrentFrame()
+    {
+        co_await boost::asio::post(g_cook_ctx->ioc_cook, boost::asio::use_awaitable);
+    }
+
+    boost::asio::awaitable<void> Cook_CheckFrameSmooth()
+    {
+        static std::chrono::high_resolution_clock::time_point last_frame_time;
+        auto now = std::chrono::high_resolution_clock::now();
+        if(now - last_frame_time > std::chrono::duration<double>(host.realframetime))
+        {
+            last_frame_time = now;
+            // yield for next frame
+            co_await Cook_YieldCurrentFrame();
+        }
+        co_return;
+    }
+
+    template<class OutFn = void(*)(const char *)>
+    boost::asio::awaitable<void> Cook_SearchResursive(const char *start_dir, const char *pattern, OutFn out)
+    {
+        std::unique_ptr<search_t, void(*)(void*)> t(FS_Search( va("%s/*", start_dir), true, false ), Mem_Free);
         for( int i = 0; t && i < t->numfilenames; i++ )
         {
-            auto filename = t->filenames[i];
+            const char *filename = t->filenames[i];
 
             if(matchpattern(FS_FileWithoutPath(filename), pattern, true))
             {
-                out.push_back(filename);
+                out(filename);
             }
             else if(!Q_stricmp(t->filenames[i], va("%s/.", start_dir)))
             {
@@ -178,50 +300,42 @@ namespace xe {
             }
             else
             {
-                Cook_SearchResursive(out, t->filenames[i], pattern);
+                co_await Cook_SearchResursive(t->filenames[i], pattern, out);
             }
+            co_await Cook_CheckFrameSmooth();
         }
-        if( t ) Mem_Free( t );
     }
 
-    void Cook_Initiate()
+    boost::asio::awaitable<void> Cook_Initiate()
     {
         try {
-            Msg(  "Cook: start\n" );
-
-            std::vector<std::string> mdl_files;
-            std::vector<std::string> tex_files;
-
-            // search for files
-            Cook_SearchResursive(mdl_files, "models", "*.mdl");
-
-            Msg(  "Cook: found %d mdl files\n", (int)mdl_files.size() );
-
-            Cook_SearchResursive(tex_files, "models/texture", "*.bmp");
-            Cook_SearchResursive(tex_files, "models/texture", "*.tga");
-            Cook_SearchResursive(tex_files, "gfx/env", "*.bmp");
-            Cook_SearchResursive(tex_files, "gfx/env", "*.tga");
-            Cook_SearchResursive(tex_files, "overviews", "*.bmp");
-            Cook_SearchResursive(tex_files, "overviews", "*.tga");
-
-            Msg(  "Cook: found %d texture files\n", (int)tex_files.size() );
+            Msg(  "Cook: loading cook context\n" );
 
             auto local_cook_ctx = g_cook_ctx;
             local_cook_ctx->start_time = std::chrono::high_resolution_clock::now();
+            co_await boost::asio::post(g_cook_ctx->ioc_cook, boost::asio::use_awaitable);
 
-            for(auto mdl : mdl_files)
-            {
-                Cook_SubmitMDL(local_cook_ctx, mdl) ;
-            }
+            // search for files
+            co_await Cook_SearchResursive( "models", "*.mdl", std::bind(Cook_SubmitMDL, local_cook_ctx, std::placeholders::_1));
+            co_await Cook_SearchResursive("models/texture", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            co_await Cook_SearchResursive("models/texture", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            co_await Cook_SearchResursive("gfx/env", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            co_await Cook_SearchResursive("gfx/env", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            co_await Cook_SearchResursive("overviews", "*.bmp", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            co_await Cook_SearchResursive("overviews", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            co_await Cook_SearchResursive("resource", "*.tga", std::bind(Cook_SubmitTex, local_cook_ctx, std::placeholders::_1));
+            co_await Cook_SearchResursive("sprites", "*.spr", std::bind(Cook_SubmitSPR, local_cook_ctx, std::placeholders::_1));
 
-            for(auto file : tex_files)
+            while(g_cook_ctx->cur_num < g_cook_ctx->total_num)
             {
-                Cook_SubmitTex(local_cook_ctx, file);
+                co_await Cook_YieldCurrentFrame();
             }
+            Cook_End();
         }
         catch(const std::exception &e)
         {
             Msg(  "Cook error: %s\n", e.what() );
+            Cook_Stop();
         }
     }
 
@@ -243,7 +357,7 @@ namespace xe {
         g_cook_ctx = std::make_shared<CookContext>();
         g_cook_ctx->ioc_cook_work_guard.emplace(boost::asio::make_work_guard(g_cook_ctx->ioc_cook));
         g_cook_ctx->ioc_cook_worker_work_guard.emplace(boost::asio::make_work_guard(g_cook_ctx->ioc_cook_worker));
-        Cook_Initiate();
+        boost::asio::co_spawn(g_cook_ctx->ioc_cook, Cook_Initiate(), boost::asio::detached);
     }
 
     void Con_Cook_f()

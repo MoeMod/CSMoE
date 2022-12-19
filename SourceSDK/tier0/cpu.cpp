@@ -22,7 +22,7 @@ const tchar* GetProcessorVendorId();
 
 static bool cpuid(unsigned long function, unsigned long& out_eax, unsigned long& out_ebx, unsigned long& out_ecx, unsigned long& out_edx)
 {
-#if defined (__arm__) || defined (__arm64__) || defined (__aarch64__) || defined( _X360 )
+#if defined (__arm__) || defined (__arm64__) || defined (__aarch64__) || defined( _X360 ) || defined(_M_ARM) || defined(_M_ARM64)
 	return false;
 #elif defined(GNUC)
 	asm("mov %%ebx, %%esi\n\t"

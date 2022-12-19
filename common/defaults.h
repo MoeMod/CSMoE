@@ -67,6 +67,10 @@ SETUP BACKENDS DEFINITIONS
 		#endif
 	#endif // android case
 
+    #if defined XASH_ANGLE
+        #define XASH_EGL
+    #endif
+
 #endif // XASH_DEDICATED
 
 // select crashhandler based on defines

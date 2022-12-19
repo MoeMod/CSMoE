@@ -1699,7 +1699,6 @@ int GL_LoadTextureInternal( const char *name, image_ref pic, texFlags_t flags, q
 namespace xe {
 	struct texlru_src_external_s {
 		std::string path;
-		const mstudiotexture_t *texture;
 	};
 	struct texlru_src_internal_s {
 		std::string texture_name;
@@ -1765,7 +1764,7 @@ namespace xe {
         return UpdateAttr(ptexture, iter->second);
     }
 
-	int TexLru_LoadTextureExternal(const char *name, const mstudiotexture_t *ptexture, int flags, imgfilter_t *filter)
+	int TexLru_LoadTextureExternal(const char *name, int flags, imgfilter_t *filter)
 	{
 		uint		picFlags = 0;
 
@@ -1813,7 +1812,7 @@ namespace xe {
 		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
 
 		// add to lru
-		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_external_s{ name, ptexture } });
+		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_external_s{ name } });
 
 		// NOTE: always return texnum as index in array or engine will stop work !!!
 		return i;
@@ -1981,7 +1980,7 @@ namespace xe {
 		std::shared_ptr<gltexture_t> operator()(texlru_src_external_s &src) const
 		{
 			int flags = tex->flags;
-			auto pic = FS_LoadImage( src.path.c_str(), (byte*)src.texture, 0 );
+			auto pic = FS_LoadImage( src.path.c_str(), nullptr, 0 );
 			if( !pic )
 			{
 				MsgDev(D_ERROR, "TexLru : fail to load load external texture %s\n", src.path.c_str());
@@ -2090,9 +2089,22 @@ namespace xe {
 			return m_map.empty();
 		}
 
-		bool contains(const key_type &key)
+		bool contains(const key_type &key) const
 		{
 			return m_map.find(key) != m_map.end();
+		}
+
+		bool contains_and_make_first(const key_type& key)
+		{
+			auto i = m_map.find(key);
+			if (i == m_map.end())
+				return false;
+			auto i2 = i->second.second;
+			m_list.erase(i2);
+			m_list.push_front(key);
+			auto i3 = m_list.begin();
+			i->second.second = i3;
+			return true;
 		}
 
 		void insert(const key_type &key, const value_type &value)
@@ -2184,7 +2196,7 @@ namespace xe {
 		if(!tex->texlru_extdata)
 			return false; // unknown texture
 
-		if (textureCache.contains((GLuint)texnum)) {
+		if (textureCache.contains_and_make_first((GLuint)texnum)) {
 			return false; // already present
 		}
 

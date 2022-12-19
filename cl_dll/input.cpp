@@ -43,6 +43,7 @@ namespace cl {
 
 extern int g_weaponselect;
 extern cl_enginefunc_t gEngfuncs;
+float g_Next_Key_CanUse = 0.0;
 
 #ifdef XASH_STATIC_GAMELIB
 void IN_Init_CL (void);
@@ -389,6 +390,38 @@ int DLLEXPORT HUD_Key_Event( int down, int keynum, const char *pszCurrentBinding
         return 0;
     }
 #endif
+	if ((gHUD.m_ZB2.m_iFlags & HUD_ACTIVE))
+	{
+		if (gHUD.m_ZB2.SelectorCanDraw())
+		{
+			if (g_Next_Key_CanUse < gHUD.m_flTime)
+			{
+				if ('0' < keynum && keynum < '9')
+				{
+					return 1;
+				}
+				// - & +
+				else if (keynum == 45 || keynum == 61)
+				{
+
+					gHUD.m_ZB2.Selector(keynum == 45 ? 11 : 12);
+					g_Next_Key_CanUse = gHUD.m_flTime + 0.15;
+
+					return 0;
+				}
+				//0x08?
+				else if (keynum == 0x09)
+				{
+
+					gHUD.m_ZB2.Selector(13);
+					g_Next_Key_CanUse = gHUD.m_flTime + 0.15;
+
+					return 0;
+				}
+			}
+		}
+
+	}
 	return 1;
 }
 

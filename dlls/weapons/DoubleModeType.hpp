@@ -124,7 +124,7 @@ public:
 		}
 		else
 		{
-			BOOL result = wpn.DefaultDeploy(df::V_Model::Get(data), df::P_Model::Get(data), df::ANIM_CHANGE::Get(data), df::AnimExtension::Get(data), wpn.UseDecrement() != FALSE);
+			BOOL result = wpn.DefaultDeploy(df::V_Model::Get(data), df::P_Model::Get(data), df::ANIM_DRAW::Get(data), df::AnimExtension::Get(data), wpn.UseDecrement() != FALSE);
 			CBase::m_pPlayer->m_flNextAttack = df::DefaultDeployTime::Try(wpn, 0.75s);
 		}
 

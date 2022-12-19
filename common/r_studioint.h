@@ -116,7 +116,7 @@ typedef struct engine_studio_api_s
 	void (*StudioDrawBones)(void);
 	// Loads in appropriate texture for model
 
-	void (*StudioSetupSkin)(void *ptexturehdr, int index);
+	void (*StudioSetupSkin)(mstudiotexture_t *ptexturehdr, int index);
 
 	// Sets up for remapped colors
 	void (*StudioSetRemapColors)(int top, int bottom);
@@ -132,7 +132,7 @@ typedef struct engine_studio_api_s
 	void (*SetForceFaceFlags)(int flags);
 
 	// Tell engine the value of the studio model header
-	void (*StudioSetHeader)(void *header);
+	void (*StudioSetHeader)(studiohdr_t *header);
 
 	// Tell engine which model_t * is being renderered
 	void (*SetRenderModel)(struct model_s *model);

@@ -39,6 +39,13 @@ static SDL_GameController *gamecontroller;
 
 void R_ChangeDisplaySettingsFast( int w, int h );
 
+#ifdef XASH_LUASH
+extern "C" {
+void LuaSV_AutoReload();
+void LuaCL_AutoReload();
+}
+#endif
+
 /*
 =============
 SDLash_KeyEvent
@@ -488,6 +495,10 @@ static void SDLash_EventFilter( SDL_Event *event )
 			host.force_draw_version_time = host.realtime + 2;
 			if( vid_fullscreen->integer )
 				VID_SetMode();
+#ifdef XASH_LUASH
+            LuaSV_AutoReload();
+            LuaCL_AutoReload();
+#endif
 			break;
 		case SDL_WINDOWEVENT_MINIMIZED:
 			host.state = HOST_SLEEP;

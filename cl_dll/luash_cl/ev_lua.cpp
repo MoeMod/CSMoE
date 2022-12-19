@@ -7,99 +7,39 @@
 
 namespace cl
 {
-	std::string_view LuaCLStripLuaPath(std::string_view sv)
-	{
-		if (sv.size() < 10)
-			return {};
-		if (strnicmp(sv.data(), "addons/luash/", 13) != 0)
-			return {};
-		if (stricmp(sv.data() + sv.size() - 4, ".lua") != 0)
-			return {};
-		return sv.substr(13, sv.size() - 13 - 4);
-	}
 	static_assert(StructMemberCount<event_args_t>::value == 12);
 	void EV_Lua(event_args_t* args)
 	{
-		if (!gEngfuncs.pEventAPI->EV_GetCurrentEventIndex)
-		{
-			// API unsupported
-			return;
-		}
-		
+        using namespace luash;
 		auto index = gEngfuncs.pEventAPI->EV_GetCurrentEventIndex();
-		if(!index)
-		{
-			// assert false
-			return;
-		}
-
 		const char* name = gEngfuncs.pEventAPI->EV_EventForIndex(index);
-		std::string path(LuaCLStripLuaPath(name));
-		if(path.empty())
-		{
-			// assert false
-			return;
-		}
-
-		lua_State* L = LuaCL_Get();
-
-		lua_getglobal(L, "require");
-		// #1 = require
-
-		luash::PushString(L, path);
-		// #2 = path
-
-		lua_call(L, 1, 1);
-		// #1 = function EV_FireXXX
-
-		if (lua_isnil(L, -1))
-		{
-			gEngfuncs.Con_Printf("%s Error: lua event (%s) load failed\n", __FUNCTION__, path.c_str());
-			lua_pop(L, 1);
-			return;
-		}
-		
-		luash::Push(L, args);
-		
-		int errc = lua_pcall(L, 1, 0, 0);
-		if(errc)
-		{
-			// #1 = errmsg
-			const char* msg = lua_tostring(L, -1);
-			gEngfuncs.Con_Printf("%s Error: lua event (%s) error: %s\n", __FUNCTION__, path.c_str(), msg);
-			lua_pop(L, 1);
-		}
-
-		// #0
+        xpeval(LuaCL_Get(), LuaCL_ExceptionHandler, (
+			_G[_S("_LUAEVENT")][_1](_2)
+        ), name, args);
 	}
 	
 	void LuaCL_HookEvents(void)
 	{
-		
-		
+        using namespace luash;
+        xpeval(LuaCL_Get(), LuaCL_ExceptionHandler, (_G[_S("Game_HookEvents")]()));
 	}
+
+    int LuaCL_HookEvent(lua_State *L)
+    {
+        // 1=path, 2=func
+        const char *name = lua_tostring(L, 1);
+        lua_getglobal(L, "_LUAEVENT"); // #3 = _G._LUAEVENT
+        lua_pushvalue(L, 1);
+        lua_pushvalue(L, 2);
+        lua_settable(L, -3);
+        gEngfuncs.pfnHookEvent(name, EV_Lua);
+        gEngfuncs.Con_Printf("%s: %s\n", __FUNCTION__, name);
+        return 0;
+    }
 
 	void LuaCL_OnPrecacheEvent(const char *name, int index)
 	{
-		auto path = LuaCLStripLuaPath(name);
-		if (path.empty())
-			return;
-
-		lua_State* L = LuaCL_Get();
-
-		lua_getglobal(L, "require");
-		// #1 = require
-
-		luash::PushString(L, path);
-		// #2 = path
-
-		lua_call(L, 1, 1);
-		// #1 = function EV_FireXXX
-
-		if(!lua_isnil(L, -1))
-			gEngfuncs.pfnHookEvent(name, EV_Lua);
-
-		lua_pop(L, 1);
+        // removed
 	}
 	
 	int LucCL_EV_IsLocal(lua_State *L)
@@ -256,6 +196,10 @@ namespace cl
 
 	int LuaCL_OpenEventScripts(lua_State *L)
 	{
+        lua_newtable(L);
+        lua_setglobal(L, "_LUAEVENT");
+
+        lua_register(L, "HookEvent", LuaCL_HookEvent);
 		luash::RegisterGlobal(L, "EV_IsLocal", EV_IsLocal);
 		luash::RegisterGlobal(L, "EV_IsPlayer", EV_IsPlayer);
 		luash::RegisterGlobal(L, "EV_MuzzleFlash", EV_MuzzleFlash);

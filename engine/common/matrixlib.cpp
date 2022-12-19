@@ -42,8 +42,7 @@ void Matrix4x4_LoadIdentity( matrix4x4_ref mat ) { Matrix4x4_Copy( mat, matrix4x
 void Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
 #if U_VECTOR_NEON
-    float32x4_t v2 = v;
-    v2[3] = 1;
+    float32x4_t v2 = vsetq_lane_f32(1.0f, v, 3);
     VectorSet(out,
               vaddvq_f32(vmulq_f32(v2, in[0])),
               vaddvq_f32(vmulq_f32(v2, in[1])),
@@ -61,34 +60,17 @@ void Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 void Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
 #if U_VECTOR_NEON
-    // a(uzp) = { x0, z0, x1, z1 }, { y0, w0, y1, w1 }
-    // b(uzp) = { x2, z2, 0, 0 }, { y2, w2, 0, 0 }
-
-    // c(uzp) = { x0, x1, x2, 0 }, { z0, z1, z2, 0 }
-    // d(uzp) = { y0, y1, y2, 0 }, { w0, w1, w2, 0 }
-
-    auto a = vuzpq_f32(in[0], in[1]);
-    auto b = vuzpq_f32(in[1], vdupq_n_f32(0));
-    auto c = vuzpq_f32(a.val[0], b.val[0]);
-    auto d = vuzpq_f32(a.val[1], b.val[1]);
-
-    vec3_t dir = d.val[1] - v;
-
-    VectorSet(out,
-              vaddvq_f32(vmulq_f32(dir, c.val[0])),
-              vaddvq_f32(vmulq_f32(dir, d.val[0])),
-              vaddvq_f32(vmulq_f32(dir, c.val[1]))
-    );
+	out = vmulq_laneq_f32(in[0], v, 0);
+	out = vfmaq_laneq_f32(out, in[1], v, 1);
+	out = vfmaq_laneq_f32(out, in[2], v, 2);
+	out = vfmsq_laneq_f32(out, in[0], in[0], 3);
+	out = vfmsq_laneq_f32(out, in[1], in[1], 3);
+	out = vfmsq_laneq_f32(out, in[2], in[2], 3);
 #else
-	vec3_t dir;
-	vec3_t in3;
-	VectorSet(in3, in[0][3], in[1][3], in[2][3]);
-	VectorSubtract(v, in3, dir);
-
 	VectorSet(out,
-		dir[0] * in[0][0] + dir[1] * in[1][0] + dir[2] * in[2][0],
-		dir[0] * in[0][1] + dir[1] * in[1][1] + dir[2] * in[2][1],
-		dir[0] * in[0][2] + dir[1] * in[1][2] + dir[2] * in[2][2]
+		(v[0] - in[0][3]) * in[0][0] + (v[1] - in[1][3]) * in[1][0] + (v[2] - in[2][3]) * in[2][0],
+		(v[0] - in[0][3]) * in[0][1] + (v[1] - in[1][3]) * in[1][1] + (v[2] - in[2][3]) * in[2][1],
+		(v[0] - in[0][3]) * in[0][2] + (v[1] - in[1][3]) * in[1][2] + (v[2] - in[2][3]) * in[2][2]
 		);
 #endif
 }
@@ -113,21 +95,9 @@ void Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 void Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
 #if U_VECTOR_NEON
-    // a(uzp) = { x0, z0, x1, z1 }, { y0, w0, y1, w1 }
-    // b(uzp) = { x2, z2, 0, 0 }, { y2, w2, 0, 0 }
-    // c(uzp) = { x0, x1, x2, 0 }, { z0, z1, z2, 0 }
-    // d(uzp) = { y0, y1, y2, 0 }, { w0, w1, w2, 0 }
-
-    auto a = vuzpq_f32(in[0], in[1]);
-    auto b = vuzpq_f32(in[1], vdupq_n_f32(0));
-    auto c = vuzpq_f32(a.val[0], b.val[0]);
-    auto d = vuzpq_f32(a.val[1], b.val[1]);
-
-    VectorSet(out,
-            vaddvq_f32(vmulq_f32(v, c.val[0])),
-            vaddvq_f32(vmulq_f32(v, d.val[0])),
-            vaddvq_f32(vmulq_f32(v, c.val[1]))
-    );
+	out = vmulq_laneq_f32(in[0], v, 0);
+	out = vfmaq_laneq_f32(out, in[1], v, 1);
+	out = vfmaq_laneq_f32(out, in[2], v, 2);
 #else
 	VectorSet(out,
 		v[0] * in[0][0] + v[1] * in[1][0] + v[2] * in[2][0],
@@ -139,6 +109,24 @@ void Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 
 void Matrix3x4_ConcatTransforms( matrix3x4_ref out, cmatrix3x4 in1, cmatrix3x4 in2 )
 {
+#if U_VECTOR_NEON
+	memset(&out, 0, sizeof(out)); // out = {};
+
+	out[0] = vcopyq_laneq_f32(out[0], 3, in1[0], 3); // out[0][3] = in[0][3]
+	out[0] = vfmaq_laneq_f32(out[0], in2[0], in1[0], 0); // out[0][n] += in2[0][n] * in1[0][0]
+	out[0] = vfmaq_laneq_f32(out[0], in2[1], in1[0], 1); // out[0][n] += in2[1][n] * in1[0][1]
+	out[0] = vfmaq_laneq_f32(out[0], in2[2], in1[0], 2); // out[0][n] += in2[2][n] * in1[0][2]
+
+	out[1] = vcopyq_laneq_f32(out[1], 3, in1[1], 3);
+	out[1] = vfmaq_laneq_f32(out[1], in2[0], in1[1], 0);
+	out[1] = vfmaq_laneq_f32(out[1], in2[1], in1[1], 1);
+	out[1] = vfmaq_laneq_f32(out[1], in2[2], in1[1], 2);
+
+	out[2] = vcopyq_laneq_f32(out[2], 3, in1[2], 3);
+	out[2] = vfmaq_laneq_f32(out[2], in2[0], in1[2], 0);
+	out[2] = vfmaq_laneq_f32(out[2], in2[1], in1[2], 1);
+	out[2] = vfmaq_laneq_f32(out[2], in2[2], in1[2], 2);
+#else
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] + in1[0][2] * in2[2][0];
 	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] + in1[0][2] * in2[2][1];
 	out[0][2] = in1[0][0] * in2[0][2] + in1[0][1] * in2[1][2] + in1[0][2] * in2[2][2];
@@ -151,6 +139,7 @@ void Matrix3x4_ConcatTransforms( matrix3x4_ref out, cmatrix3x4 in1, cmatrix3x4 i
 	out[2][1] = in1[2][0] * in2[0][1] + in1[2][1] * in2[1][1] + in1[2][2] * in2[2][1];
 	out[2][2] = in1[2][0] * in2[0][2] + in1[2][1] * in2[1][2] + in1[2][2] * in2[2][2];
 	out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] + in1[2][2] * in2[2][3] + in1[2][3];
+#endif
 }
 
 void Matrix3x4_SetOrigin( matrix3x4_ref out, float x, float y, float z )
@@ -179,7 +168,7 @@ void Matrix3x4_FromOriginQuat( matrix3x4_ref out, const vec4_t quaternion, const
 	out[1][2] = 2.0f * quaternion[1] * quaternion[2] - 2.0f * quaternion[3] * quaternion[0];
 	out[2][2] = 1.0f - 2.0f * quaternion[0] * quaternion[0] - 2.0f * quaternion[1] * quaternion[1];
 	
-	out[0][3] = origin[0];
+	out[0][3] = origin[0]; 
 	out[1][3] = origin[1];
 	out[2][3] = origin[2];
 }
@@ -324,47 +313,99 @@ void Matrix3x4_Invert_Simple( matrix3x4_ref out, cmatrix3x4 in1 )
 */
 void Matrix4x4_VectorTransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
+#if U_VECTOR_NEON
+	auto v2 = vsetq_lane_f32(1, v, 3);
+	VectorSet(out,
+		vaddvq_f32(vmulq_f32(v2, in[0])),
+		vaddvq_f32(vmulq_f32(v2, in[1])),
+		vaddvq_f32(vmulq_f32(v2, in[2]))
+	);
+#else
 	VectorSet(out,
 		v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2] + in[0][3],
 		v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2] + in[1][3],
 		v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2] + in[2][3]
 		);
+#endif
 }
 
 void Matrix4x4_VectorITransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
+#if U_VECTOR_NEON
+	out = vmulq_laneq_f32(in[0], v, 0);
+	out = vfmaq_laneq_f32(out, in[1], v, 1);
+	out = vfmaq_laneq_f32(out, in[2], v, 2);
+	out = vfmsq_laneq_f32(out, in[0], in[0], 3);
+	out = vfmsq_laneq_f32(out, in[1], in[1], 3);
+	out = vfmsq_laneq_f32(out, in[2], in[2], 3);
+#else
 	vec3_t dir;
 	vec3_t in3;
 	VectorSet(in3, in[0][3], in[1][3], in[2][3]);
 	VectorSubtract(v, in3, dir);
 
 	VectorSet(out,
-		dir[0] * in[0][0] + dir[1] * in[1][0] + dir[2] * in[2][0],
-		dir[0] * in[0][1] + dir[1] * in[1][1] + dir[2] * in[2][1],
-		dir[0] * in[0][2] + dir[1] * in[1][2] + dir[2] * in[2][2]
+		(v[0] - in[0][3]) * in[0][0] + (v[1] - in[1][3]) * in[1][0] + (v[2] - in[2][3]) * in[2][0],
+		(v[0] - in[0][3]) * in[0][1] + (v[1] - in[1][3]) * in[1][1] + (v[2] - in[2][3]) * in[2][1],
+		(v[0] - in[0][3]) * in[0][2] + (v[1] - in[1][3]) * in[1][2] + (v[2] - in[2][3]) * in[2][2]
 		);
+#endif
 }
 
 void Matrix4x4_VectorRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
+#if U_VECTOR_NEON
+	VectorSet(out,
+		vaddvq_f32(vmulq_f32(v, in[0])),
+		vaddvq_f32(vmulq_f32(v, in[1])),
+		vaddvq_f32(vmulq_f32(v, in[2]))
+	);
+#else
 	VectorSet(out,
 		v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2],
 		v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2],
 		v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2]
 	);
+#endif
 }
 
 void Matrix4x4_VectorIRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
+#if U_VECTOR_NEON
+	out = vmulq_laneq_f32(in[0], v, 0);
+	out = vfmaq_laneq_f32(out, in[1], v, 1);
+	out = vfmaq_laneq_f32(out, in[2], v, 2);
+#else
 	VectorSet(out,
 		v[0] * in[0][0] + v[1] * in[1][0] + v[2] * in[2][0],
 		v[0] * in[0][1] + v[1] * in[1][1] + v[2] * in[2][1],
 		v[0] * in[0][2] + v[1] * in[1][2] + v[2] * in[2][2]
 	);
+#endif
 }
 
 void Matrix4x4_ConcatTransforms( matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 in2 )
 {
+#if U_VECTOR_NEON
+	memset(&out, 0, sizeof(out)); // out = {};
+
+	out[0] = vcopyq_laneq_f32(out[0], 3, in1[0], 3); // out[0][3] = in[0][3]
+	out[0] = vfmaq_laneq_f32(out[0], in2[0], in1[0], 0); // out[0][n] += in2[0][n] * in1[0][0]
+	out[0] = vfmaq_laneq_f32(out[0], in2[1], in1[0], 1); // out[0][n] += in2[1][n] * in1[0][1]
+	out[0] = vfmaq_laneq_f32(out[0], in2[2], in1[0], 2); // out[0][n] += in2[2][n] * in1[0][2]
+
+	out[1] = vcopyq_laneq_f32(out[1], 3, in1[1], 3);
+	out[1] = vfmaq_laneq_f32(out[1], in2[0], in1[1], 0);
+	out[1] = vfmaq_laneq_f32(out[1], in2[1], in1[1], 1);
+	out[1] = vfmaq_laneq_f32(out[1], in2[2], in1[1], 2);
+
+	out[2] = vcopyq_laneq_f32(out[2], 3, in1[2], 3);
+	out[2] = vfmaq_laneq_f32(out[2], in2[0], in1[2], 0);
+	out[2] = vfmaq_laneq_f32(out[2], in2[1], in1[2], 1);
+	out[2] = vfmaq_laneq_f32(out[2], in2[2], in1[2], 2);
+
+	out[3] = vcopyq_laneq_f32(out[3], 3, in1[3], 3);
+#else
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] + in1[0][2] * in2[2][0];
 	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] + in1[0][2] * in2[2][1];
 	out[0][2] = in1[0][0] * in2[0][2] + in1[0][1] * in2[1][2] + in1[0][2] * in2[2][2];
@@ -377,6 +418,7 @@ void Matrix4x4_ConcatTransforms( matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 i
 	out[2][1] = in1[2][0] * in2[0][1] + in1[2][1] * in2[1][1] + in1[2][2] * in2[2][1];
 	out[2][2] = in1[2][0] * in2[0][2] + in1[2][1] * in2[1][2] + in1[2][2] * in2[2][2];
 	out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] + in1[2][2] * in2[2][3] + in1[2][3];
+#endif
 }
 
 void Matrix4x4_SetOrigin( matrix4x4_ref out, float x, float y, float z )
@@ -553,19 +595,44 @@ void Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t_ref angles, vec3_t_ref ori
 
 void Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist )
 {
+#if U_VECTOR_NEON
+	float32x4x4_t in_t = vld4q_f32((const float*)&in);
+
+	out = vmulq_laneq_f32(in_t.val[0], normal, 0);
+	out = vfmaq_laneq_f32(out, in_t.val[1], normal, 1);
+	out = vfmaq_laneq_f32(out, in_t.val[2], normal, 2);
+
+	float	iscale = vrsqrtes_f32(vaddvq_f32(vmulq_f32(in[0], in[0])));
+	out = vmulq_n_f32(out, iscale);
+
+	*dist = d / iscale + vaddvq_f32(vmulq_f32(out, in_t.val[3]));
+#else
 	float	scale = sqrt( in[0][0] * in[0][0] + in[0][1] * in[0][1] + in[0][2] * in[0][2] );
 	float	iscale = 1.0f / scale;
-	
+
 	VectorSet(out,
 		(normal[0] * in[0][0] + normal[1] * in[0][1] + normal[2] * in[0][2]) * iscale,
 		(normal[0] * in[1][0] + normal[1] * in[1][1] + normal[2] * in[1][2]) * iscale,
 		(normal[0] * in[2][0] + normal[1] * in[2][1] + normal[2] * in[2][2]) * iscale
 	);
 	*dist = d * scale + ( out[0] * in[0][3] + out[1] * in[1][3] + out[2] * in[2][3] );
+#endif
 }
 
 void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist )
 {
+#if U_VECTOR_NEON
+	float32x4x4_t in_t = vld4q_f32((const float*)&in);
+
+	out = vmulq_laneq_f32(in_t.val[0], normal, 0);
+	out = vfmaq_laneq_f32(out, in_t.val[1], normal, 1);
+	out = vfmaq_laneq_f32(out, in_t.val[2], normal, 2);
+
+	float	iscale = vrsqrtes_f32(vaddvq_f32(vmulq_f32(in[0], in[0])));
+	out = vmulq_n_f32(out, iscale);
+
+	*dist = d / iscale - vaddvq_f32(vmulq_f32(out, in_t.val[3]));
+#else
 	float scale = sqrt( in[0][0] * in[0][0] + in[0][1] * in[0][1] + in[0][2] * in[0][2] );
 	float iscale = 1.0f / scale;
 	
@@ -575,6 +642,7 @@ void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float
 		(normal[0] * in[2][0] + normal[1] * in[2][1] + normal[2] * in[2][2]) * iscale
 	);
 	*dist = d * scale - ( out[0] * in[0][3] + out[1] * in[1][3] + out[2] * in[2][3] );
+#endif
 }
 
 vec3_t Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, float *dist )
@@ -586,6 +654,21 @@ vec3_t Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, flo
 
 void Matrix4x4_Invert_Simple( matrix4x4_ref out, cmatrix4x4 in1 )
 {
+#if U_VECTOR_NEON
+	auto scale_v = vsetq_lane_f32(0, in1[0], 3);
+	float scale = 1 / (vaddvq_f32(vmulq_f32(scale_v, scale_v)));
+	
+	out[0] = vmulq_n_f32(in1[0], scale);
+	out[1] = vmulq_n_f32(in1[1], scale);
+	out[2] = vmulq_n_f32(in1[2], scale);
+
+	out[3] = vmulq_laneq_f32(out[0], in1[0], 3);
+	out[3] = vfmaq_laneq_f32(out[3], out[1], in1[1], 3);
+	out[3] = vfmaq_laneq_f32(out[3], out[2], in1[2], 3);
+
+	*(float32x4x4_t*)&out = vld4q_f32((const float*)&out); // invert
+	out[3] = in1[3]; // {0,0,0,1}
+#else
 	// we only support uniform scaling, so assume the first row is enough
 	// (note the lack of sqrt here, because we're trying to undo the scaling,
 	// this means multiplying by the inverse scale twice - squaring it, which
@@ -614,10 +697,14 @@ void Matrix4x4_Invert_Simple( matrix4x4_ref out, cmatrix4x4 in1 )
 	out[3][1] = 0.0f;
 	out[3][2] = 0.0f;
 	out[3][3] = 1.0f;
+#endif
 }
 
 void Matrix4x4_Transpose( matrix4x4_ref out, cmatrix4x4 in1 )
 {
+#if U_VECTOR_NEON
+	*(float32x4x4_t *)&out = vld4q_f32((const float *)&in1);
+#else
 	out[0][0] = in1[0][0];
 	out[0][1] = in1[1][0];
 	out[0][2] = in1[2][0];
@@ -634,6 +721,7 @@ void Matrix4x4_Transpose( matrix4x4_ref out, cmatrix4x4 in1 )
 	out[3][1] = in1[1][3];
 	out[3][2] = in1[2][3];
 	out[3][3] = in1[3][3];
+#endif
 }
 
 qboolean Matrix4x4_Invert_Full( matrix4x4_ref out, cmatrix4x4 in1 )

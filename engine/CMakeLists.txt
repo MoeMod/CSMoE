@@ -58,10 +58,7 @@ option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OF
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
 option(XASH_SKIPCRTLIB "Use system CRT" ON)
 
-option(XASH_CPUINFO "Build with cpuinfo support" ON)
-if(IOS)
-	set(XASH_CPUINFO OFF)
-endif()
+option(XASH_CPUINFO "Build with cpuinfo support" OFF)
 set(XASH_ASTC ON)
 
 
@@ -303,6 +300,11 @@ set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} client/physics.cpp)
 add_definitions(-DXASH_RAGDOLL=1)
 endif()
 
+if(MSVC)
+	add_compile_options(/fp:fast)
+else()
+	add_compile_options(-ffast-math)
+endif()
 
 include_directories(
 	.
@@ -583,7 +585,7 @@ if(XASH_USE_STB_SPRINTF)
 endif()
 
 if(ANDROID)
-	target_link_libraries(${XASH_ENGINE} PUBLIC -ldl -llog -landroid)
+	target_link_libraries(${XASH_ENGINE} PUBLIC -ldl -llog -landroid -lEGL)
 elseif(NOT WIN32)
 	if(NOT HAIKU)
 		target_link_libraries(${XASH_ENGINE} PUBLIC -lm -lpthread)

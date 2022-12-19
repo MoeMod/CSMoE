@@ -7,35 +7,35 @@
 #include "mathlib/ssemath.h"
 #include "mathlib/ssequaternion.h"
 
-const fltx4 Four_PointFives={0.5,0.5,0.5,0.5};
+const fltx4 Four_PointFives = ReplicateX4(0.5);
 #ifndef _X360
-const fltx4 Four_Zeros={0.0,0.0,0.0,0.0};
-const fltx4 Four_Ones={1.0,1.0,1.0,1.0};
+const fltx4 Four_Zeros = ReplicateX4(0);
+const fltx4 Four_Ones= ReplicateX4(1);
 #endif
-const fltx4 Four_Twos={2.0,2.0,2.0,2.0};
-const fltx4 Four_Threes={3.0,3.0,3.0,3.0};
-const fltx4 Four_Fours={4.0,4.0,4.0,4.0};
-const fltx4 Four_Origin={0,0,0,1};
-const fltx4 Four_NegativeOnes={-1,-1,-1,-1};
+const fltx4 Four_Twos = ReplicateX4(2);
+const fltx4 Four_Threes= ReplicateX4(3);
+const fltx4 Four_Fours = ReplicateX4(4);
+const fltx4 Four_Origin = SetWSIMD(Four_Zeros, Four_Ones); // {0,0,0,1}
+const fltx4 Four_NegativeOnes=ReplicateX4(-1);
 
-const fltx4 Four_2ToThe21s={ (float) (1<<21), (float) (1<<21), (float) (1<<21), (float)(1<<21) };
-const fltx4 Four_2ToThe22s={ (float) (1<<22), (float) (1<<22), (float) (1<<22), (float)(1<<22) };
-const fltx4 Four_2ToThe23s={ (float) (1<<23), (float) (1<<23), (float) (1<<23), (float)(1<<23) };
-const fltx4 Four_2ToThe24s={ (float) (1<<24), (float) (1<<24), (float) (1<<24), (float)(1<<24) };
+const fltx4 Four_2ToThe21s = ReplicateX4((float) (1<<21));
+const fltx4 Four_2ToThe22s = ReplicateX4((float) (1<<22));
+const fltx4 Four_2ToThe23s = ReplicateX4((float) (1<<23));
+const fltx4 Four_2ToThe24s = ReplicateX4((float) (1<<24));
 
-const fltx4 Four_Point225s={ .225, .225, .225, .225 };
-const fltx4 Four_Epsilons={FLT_EPSILON,FLT_EPSILON,FLT_EPSILON,FLT_EPSILON};
+const fltx4 Four_Point225s = ReplicateX4(0.255f);
+const fltx4 Four_Epsilons = ReplicateX4(FLT_EPSILON);
 
-const fltx4 Four_FLT_MAX={FLT_MAX,FLT_MAX,FLT_MAX,FLT_MAX};
-const fltx4 Four_Negative_FLT_MAX={-FLT_MAX,-FLT_MAX,-FLT_MAX,-FLT_MAX};
-const fltx4 g_SIMD_0123 = { 0., 1., 2., 3. };
+const fltx4 Four_FLT_MAX = ReplicateX4(FLT_MAX);
+const fltx4 Four_Negative_FLT_MAX = ReplicateX4(-FLT_MAX);
+const fltx4 g_SIMD_0123 = SetXSIMD(SetYSIMD(SetZSIMD(Four_Threes, Four_Twos), Four_Ones), Four_Zeros);
 
 const fltx4 g_QuatMultRowSign[4] =
 {
-	{  1.0f,  1.0f, -1.0f, 1.0f },
-	{ -1.0f,  1.0f,  1.0f, 1.0f },
-	{  1.0f, -1.0f,  1.0f, 1.0f },
-	{ -1.0f, -1.0f, -1.0f, 1.0f }
+	SetZSIMD(Four_Ones, Four_NegativeOnes),  // {  1.0f,  1.0f, -1.0f, 1.0f },
+	SetXSIMD(Four_Ones, Four_NegativeOnes),  // { -1.0f,  1.0f,  1.0f, 1.0f },
+	SetYSIMD(Four_Ones, Four_NegativeOnes),  // {  1.0f, -1.0f,  1.0f, 1.0f },
+	SetWSIMD(Four_NegativeOnes, Four_Ones)   // { -1.0f, -1.0f, -1.0f, 1.0f }
 };
 
 const uint32 ALIGN16 g_SIMD_clear_signmask[4] ALIGN16_POST = {0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff};

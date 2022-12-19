@@ -226,6 +226,7 @@ public:
 		EXPTYPE_SFGRENADE,
 		EXPTYPE_THANATOS5ROCKET,
 		EXPTYPE_VULCANUS7ROCKET,
+		EXPTYPE_FIREBOMB,
 	};
 
 	void Spawn() override;
@@ -282,6 +283,7 @@ public:
 	void EXPORT BounceTouch(CBaseEntity *pOther);
 	void EXPORT SlideTouch(CBaseEntity *pOther);
 	void EXPORT C4Touch(CBaseEntity *pOther);
+	void EXPORT ExplodeTouch3(CBaseEntity* pOther, int radius, E_EXPLODE_TYPE type, bool bBoost);
 	void EXPORT ExplodeTouch(CBaseEntity *pOther);
 	void EXPORT DangerSoundThink();
 	void EXPORT PreDetonate();
@@ -294,6 +296,7 @@ public:
 	void EXPORT DetonateCartFrag(void);
 	void EXPORT DetonateEventBomb(void);
 	void EXPORT DetonateMoonCake(void);
+	void EXPORT DetonateFireBomb(void);
 	void EXPORT ZombieBombExplosion();
 	void EXPORT DetonateUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 	void EXPORT TumbleThink();
@@ -302,11 +305,19 @@ public:
 	void EXPORT ZombiBomb2Touch(CBaseEntity* pOther);
 	void EXPORT SG_TumbleThink();
 	void EXPORT C4Think();
+	void EXPORT HolyBombThink(void);
+	void EXPORT HolyBombTouch(CBaseEntity* pOther);
+	void ExplodeTouchHolyBomb(void);
+	static void HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
+	static void FireBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
+	void EXPORT SFGrenadeExplodeThink(void);
+	void EXPORT SFGrenadeTouch(CBaseEntity* pOther);
 
 public:
 	static TYPEDESCRIPTION m_SaveData[15];
 
 public:
+	EHANDLE m_pStickingObject;
 	bool m_bStaticFramerate;
 	int m_iGrenadeID;
 	bool m_bHit;
@@ -520,7 +531,8 @@ public:
 	}
 	virtual BOOL PlayEmptySound();
 	virtual void ResetEmptySound();
-	virtual void SendWeaponAnim(int iAnim, int skiplocal = 0, float framerate = 1.0f);
+	virtual void SendWeaponAnim(int iAnim, int skiplocal = 0) { SendWeaponAnimEx(iAnim, skiplocal); }
+    void SendWeaponAnimEx(int iAnim, int skiplocal = 0, float framerate = 1.0f);
 #ifdef CLIENT_DLL
 	virtual BOOL IsUseable(void) { return true; }
 #else
@@ -595,6 +607,20 @@ public:
 			|| m_iId == WEAPON_SAPIENTIA
 			|| m_iId == WEAPON_BLOODHUNTER
 			|| m_iId == WEAPON_KRONOS1
+			|| m_iId == WEAPON_SKULL2
+			|| m_iId == WEAPON_MUSKET
+			|| m_iId == WEAPON_KINGCOBRA
+			|| m_iId == WEAPON_KINGCOBRAG
+			|| m_iId == WEAPON_BUFFFIVESEVEN
+			|| m_iId == WEAPON_RESTRICTIONPISTOL
+			|| m_iId == WEAPON_VOIDPISTOLEX
+			|| m_iId == WEAPON_WATERPISTOL
+			|| m_iId == WEAPON_MONKEYWPNSET2
+			|| m_iId == WEAPON_TKNIFE
+			|| m_iId == WEAPON_TKNIFEEX
+			|| m_iId == WEAPON_TKNIFEEX2
+			|| m_iId == WEAPON_Z4B_TKNIFEDX
+			|| m_iId == WEAPON_Z4B_MALORIAN3516
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -701,6 +727,7 @@ private:
 	CUtlVector<CBaseEntity*>* m_pGroupList;
 
 	friend class CSGMissileCannon;
+	friend class CMagicSgCannon;
 };
 
 class CHolySwordCannon : public CBaseEntity
@@ -849,8 +876,8 @@ class CSpear : public CBaseEntity
 {
 public:
 	float GetArmorRatioModifier() { return 1.85; }
-	int GetWeaponsId(void) { return WEAPON_SPEARGUN; }
-	static CSpear* Create(void);
+	int GetWeaponsId(void) { return m_iType ? WEAPON_SPEARGUNM : WEAPON_SPEARGUN; }
+	static CSpear* Create(int iType = 0);
 
 public:
 	void CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind);
@@ -914,6 +941,7 @@ public:
 	float m_flCrowdDamage;
 	float m_flExplodeForce;
 	int m_iExplosionCount;
+	int m_iType;
 };
 
 
@@ -964,6 +992,7 @@ private:
 
 	int m_iEffectSprite;
 	int m_iExplosionSprite;
+	friend class CMagicSgCannon;
 };
 
 class CM3DragonCannon : public CGrenade
@@ -1115,6 +1144,7 @@ public:
 		m_tTimeRemove = gpGlobals->time + 5.0s;
 	}
 
+	static CWonderCannonChain* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner);
 	void Spawn();
 	void Precache();
 	
@@ -1123,11 +1153,12 @@ public:
 	void DoExpDamage(float flDamage, CBaseEntity* pAttachedEnt);
 	void Remove();
 	float GetArmorRatioModifier() { return 1.3; }
-	int GetWeaponsId(void) { return WEAPON_WONDERCANNON; }
+	int GetWeaponsId(void) { return m_iType ? WEAPON_WONDERCANNONEX : WEAPON_WONDERCANNON; }
 	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; }
 	int m_iAttachedEntCount;
 	int m_iExpTime;
 	int m_iCount;
+	int m_iType;
 
 private:
 	float GetDamage(DamageType iType) const;
@@ -1136,13 +1167,46 @@ private:
 	time_point_t m_tTimeRemove;
 	
 	int m_iCache_Exp[4];
-
+	int m_iTotalExpCount;
 	CUtlVector<CBaseEntity*>* m_pEnemyList;
 	CBasePlayer* m_pOwner;
 	CBaseEntity* m_pAttachedEnt;
 	CWonderCannon* m_pWeapon;
 };
 
+class CWonderCannonMine : public CGrenade
+{
+public:
+	CWonderCannonMine()
+	{
+		m_iState = 0;
+		m_iSequence = 0;
+		m_flNextAnim = invalid_time_point;
+	}
+
+	static CWonderCannonMine* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner);
+
+	void Spawn(void);
+	void Precache(void);
+	void EXPORT MineThink();
+	void Init(CBasePlayer* pOwner, CWonderCannon* pWeapon);
+	void Remove();
+	void Explode(bool IsManual);
+	void DoBombExp(bool IsManual);
+	float GetDamage(bool IsManual) const;
+	int GetWeaponsId(void) { return m_iType ? WEAPON_WONDERCANNONEX : WEAPON_WONDERCANNON; }
+public:
+
+	CBasePlayer* m_pOwner;
+	CWonderCannon* m_pWeapon;
+	int m_iState;
+	int m_iType;
+private:
+	int m_iExp[2];
+	int m_iSequence;
+	time_point_t m_flNextAnim;
+
+};
 
 class CLockOnGunMissile : public CGrenade
 {
@@ -1170,7 +1234,6 @@ private:
 	float GetDirectDamage();
 	float GetExplodeDamage();
 	int m_iType;
-	int m_iM3DragonmExp;
 	int m_iHitGroup;
 	CBaseEntity* m_pEntity;
 	int m_iTail;
@@ -1233,8 +1296,162 @@ public:
 
 	EHANDLE m_hHeadCutting;
 	std::vector<int> m_TargetVector;
+	CBasePlayer* m_pOwner;
 };
 
+class CGuillotineex;
+class CBeam;
+class CGuillotineExAmmo : public CGuillotineAmmo
+{
+	void Spawn(void);
+	void Precache(void);
+
+	int GetWeaponsId(void)
+	{
+		return WEAPON_GUILLOTINEEX;
+	}
+
+	float GetArmorRatio(void)
+	{
+		return 1.8;
+	}
+
+	KnockbackData GetKnockBackData() override { return { 450.0f, 350.0f, 400.0f, 300.0f, 1.0f }; }
+
+public:
+	static CGuillotineExAmmo* CreateAmmo(const Vector& vecOrigin, const Vector& vecAngles, CBasePlayer* pOwner, int iType);
+
+	void EXPORT FireThink(void);
+	void EXPORT FireTouch(CBaseEntity* pOther);
+	void EXPORT ReturnThink(void);
+	void EXPORT ReturnTouch(CBaseEntity* pOther);
+	void EXPORT HeadCutThink(void);
+	void EXPORT ChargeAttackThink(void);
+
+public:
+	bool ShouldCrashHalfway(void);
+	bool RecursiveWorldTrace(float delta, Vector vecOrigin, edict_t* pentIgnore, bool bWorldSound);
+	void Crash(void);
+	void StartHeadCut(CBaseEntity* pOther);
+	bool IsHeadCutting(void);
+	bool ShouldHeadCut(TraceResult* ptr, CBaseEntity* pEntity, Vector vecAbsMins, Vector vecAbsMaxs);
+	bool CanAttack(CBaseEntity* pOther);
+	void MaterialSound(TraceResult* ptr);
+	bool RangeAttack(TraceResult* ptr, Vector vecTraceDelta);
+	void Return(bool bResetFrame);
+	void SetAnimation(int sequence, bool bResetFrame);
+
+	void Fire(TraceResult* ptr, CBaseEntity* pOther, Vector vecAbsMins, Vector vecAbsMaxs);
+	void Attack(TraceResult* ptr, CBaseEntity* pOther);
+
+	void ClearBeam();
+
+	int m_iType;
+	CBaseEntity* m_pTarget;
+	CGuillotineex* m_pWeapon;
+	CBeam* pBeam;
+};
+
+class CVoidPistolBlackHole : public CBaseAnimating
+{
+public:
+	CVoidPistolBlackHole()
+	{
+		m_iType = 0;
+		m_flSoundTime = invalid_time_point;
+	};
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+	float GetArmorRatioModifier() { return 1.5; }
+	KnockbackData GetKnockBackData() override { return { -1.0f, -1.0f, -1.0f, -1.0f, 1.0f }; }
+
+public:
+	void EXPORT FlyingThink(void);
+	void EXPORT FlyingTouch(CBaseEntity* pOther);
+	void EXPORT BlackHoleThink(void);
+	//void EXPORT BlackHoleTouch(CBaseEntity* pOther);
+
+public:
+	static CVoidPistolBlackHole* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+	void Explode();
+	void RadiusDamage(bool IsExp, float flDamage, float flRadius);
+	void Remove();
+
+	CBasePlayer* m_pOwner;
+private:
+	float GetExpDamage();
+	float GetExpRadius();
+
+	float GetBlackHoleDamage();
+	float GetBlackHoleRadius();
+
+	int m_iType;
+	bool m_bIsExp;
+	time_point_t m_flDamageTime;
+	time_point_t m_flExplodeTime;
+	time_point_t m_flSoundTime;
+	
+	int m_iBlackHoleStartIndex[2];
+	int m_iBlackHoleLoopIndex[2];
+	int m_iBlackHoleEndIndex[2];
+	int m_iBlackHoleProjectileIndex[2];
+	
+};	
+
+class CThrowingKnifeEntity : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+	KnockbackData GetKnockBackData(void) override;
+	float GetArmorRatioModifier(void);
+
+public:
+	void EXPORT FlyingThink(void);
+	void EXPORT FlyingTouch(CBaseEntity* pOther);
+
+	//void EXPORT RemoveThink(void);
+	//void EXPORT StuckInTheWallThink(void);
+	void StuckInTheWallTouch(CBaseEntity* pOther);
+
+public:
+	static CThrowingKnifeEntity* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+
+private:
+	Vector vecStart;
+	time_point_t m_flStartTime;
+	float GetDamage();
+	int m_iType;
+	int m_iTrail;
+};
+class CMagicSgCannon : public CSGMissileCannon
+{
+	//From CS:AE
+public:
+	void Spawn();
+	void Precache();
+	void EXPORT MagicSgBcsTouch(CBaseEntity* pOther);
+
+	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList, float flExplodeDamage, float flExplodeRadius, float flDirectForce, int iType, int iBuffType);
+	void Remove();
+	void Explode(void);
+
+private:
+	float m_flExplodeDamage;
+	float m_flExplodeRadius;
+	float m_flDirectForce;
+
+	int m_iEffectSprite;
+	int m_iExplosionSprite;
+	int m_iSprIndex[8];
+
+	int m_iColor;
+	int m_iBuffType;
+};
+
+#if 0
 class CGuillotineexAmmo : public CBaseAnimating
 {
 public:
@@ -1281,10 +1498,12 @@ public:
 	time_point_t m_flHeadCutTime;
 	float m_flDirectDamage;
 	float m_flHeadCutDamage;
+	CBasePlayer* m_pOwner;
 	
 	int m_iModelIndex;
 	short m_iLostSpriteIndex;
 };
+#endif
 #endif
 
 #ifdef ENABLE_SHIELD

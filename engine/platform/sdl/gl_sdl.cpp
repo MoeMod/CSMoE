@@ -27,7 +27,7 @@ GNU General Public License for more details.
 #include "gl4esinit.h"
 #include "gl4eshint.h"
 #endif
-#ifdef XASH_ANGLE
+#ifdef XASH_EGL
 #include <EGL/egl.h>
 #endif
 
@@ -496,7 +496,7 @@ void GL_UpdateSwapInterval( void )
 	if( gl_swapInterval->modified )
 	{
 		gl_swapInterval->modified = false;
-#if defined(XASH_ANGLE)
+#if defined(XASH_EGL)
         eglSwapInterval(eglGetCurrentDisplay(), gl_swapInterval->integer);
 #elif defined(XASH_QINDIEGL)
         BOOL wglSwapInterval(int interval);
@@ -522,7 +522,7 @@ GL_SetupAttributes
 */
 void GL_SetupAttributes()
 {
-#if defined XASH_QINDIEGL || defined XASH_ANGLE
+#if defined XASH_QINDIEGL || defined XASH_EGL
 	// stub
 #else
 	int samples;
@@ -806,7 +806,12 @@ void GL_InitExtensionsBigGL()
 	// occlusion queries
 	GL_CheckExtension( "GL_ARB_occlusion_query", occlusionfunc, "gl_occlusion_queries", GL_OCCLUSION_QUERIES_EXT );
 
+	// nobody implement ASTC with no bug on Win32
+#ifdef _WIN32
+	GL_SetExtension(GL_ASTC_EXT, false);
+#else
     GL_CheckExtension( "GL_KHR_texture_compression_astc_ldr", NULL, "gl_astc_format", GL_ASTC_EXT );
+#endif
 
 	if( GL_Support( GL_SHADER_GLSL100_EXT ))
 	{
@@ -932,9 +937,8 @@ qboolean GL_CreateContext( void )
 	int colorBits[3];
 #ifdef XASH_NANOGL
 	nanoGL_Init();
-	nanoGL_Init();
 #endif
-#ifdef XASH_ANGLE
+#ifdef XASH_EGL
     // empty
     EGLDisplay dpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if(dpy == nullptr)
@@ -978,7 +982,12 @@ qboolean GL_CreateContext( void )
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
     SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
-#ifdef __APPLE__
+#if ( TARGET_OS_IOS || TARGET_OS_IPHONE )
+    auto hwnd = wmInfo.info.uikit.window;
+#elif __ANDROID__
+    auto hwnd = wmInfo.info.android.window;
+#elif defined XASH_ANGLE && defined __APPLE__
+    // macOS with Angle (metal backend)
     auto metalView = SDL_Metal_CreateView(host.hWnd);
     auto hwnd = SDL_Metal_GetLayer(metalView);
 #elif defined _WIN32
@@ -991,7 +1000,7 @@ qboolean GL_CreateContext( void )
     if(surface == EGL_NO_SURFACE)
     {
         MsgDev(D_ERROR, "GL_CreateContext: ANGLE eglCreateWindowSurface failed\n");
-#ifdef __APPLE__
+#if defined XASH_ANGLE && defined __APPLE__
         SDL_Metal_DestroyView(hwnd);
 #endif
         eglDestroyContext(dpy, ctx);
@@ -1000,7 +1009,7 @@ qboolean GL_CreateContext( void )
     if(!eglMakeCurrent(dpy, surface, surface, ctx))
     {
         MsgDev(D_ERROR, "GL_CreateContext: ANGLE eglMakeCurrent failed\n");
-#ifdef __APPLE__
+#if defined XASH_ANGLE && defined __APPLE__
         SDL_Metal_DestroyView(hwnd);
 #endif
         eglDestroySurface(dpy, surface);
@@ -1079,7 +1088,7 @@ GL_UpdateContext
 */
 qboolean GL_UpdateContext( void )
 {
-#ifdef XASH_ANGLE
+#ifdef XASH_EGL
     eglMakeCurrent(eglGetCurrentDisplay(), glw_state.surface, glw_state.surface, glw_state.context);
 #elif defined XASH_QINDIEGL
 	BOOL wrap_wglMakeCurrent(HDC hdc, HGLRC hglrc);
@@ -1114,7 +1123,7 @@ GL_DeleteContext
 */
 qboolean GL_DeleteContext( void )
 {
-#ifdef XASH_ANGLE
+#ifdef XASH_EGL
     eglDestroySurface(eglGetCurrentDisplay(), glw_state.surface);
     eglDestroyContext(eglGetCurrentDisplay(), glw_state.context);
 #elif defined XASH_QINDIEGL
@@ -1164,7 +1173,7 @@ qboolean R_Init_OpenGL( void )
 		return false;
 
 
-#if defined XASH_QINDIEGL || defined XASH_ANGLE
+#if defined XASH_QINDIEGL || defined XASH_EGL
 	
 #else
 	GL_SetupAttributes();
@@ -1191,7 +1200,7 @@ void R_Free_OpenGL( void )
 
 	VID_DestroyWindow ();
 
-#if defined XASH_QINDIEGL || defined XASH_ANGLE
+#if defined XASH_QINDIEGL || defined XASH_EGL
 
 #else
 	SDL_GL_UnloadLibrary ();

@@ -33,7 +33,7 @@ typedef struct lua_State lua_State;
 #define U_VECTOR_SIMD U_VECTOR_SSE
 #endif
 
-#if defined(__ARM_NEON) || defined(__ARM_NEON__)
+#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(_M_ARM) || defined(_M_ARM64)
 #include <arm_neon.h>
 #define U_VECTOR_NEON 2
 #define U_VECTOR_SIMD U_VECTOR_NEON
@@ -209,9 +209,38 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
 
     constexpr VectorBase_Storage() = default;
 
-    constexpr VectorBase_Storage(float x1, float y1, float z1) : Base{ x1, y1, z1 }
+    constexpr VectorBase_Storage(float x1, float y1, float z1)
     {
+        if (std::is_constant_evaluated())
+        {
+            this->x = x1;
+            this->y = y1;
+            this->z = z1;
+            this->w_ununsed = 0;
+        }
+        else
+        {
+#if U_VECTOR_NEON
+            this->x = x1;
+            this->y = y1;
+            this->z = z1;
+            this->w_ununsed = 0;
+#elif U_VECTOR_SSE
+            this->m_xmm = _mm_set_ps(0, z1, y1, x1);
+#endif
+        }
     }
+
+    VectorBase_Storage(std::nullptr_t)
+    {
+#if U_VECTOR_NEON
+        this->m_xmm = vdupq_n_f32(NAN);
+#elif U_VECTOR_SSE
+        this->m_xmm = _mm_set1_ps(NAN);
+#endif
+    }
+
+    explicit VectorBase_Storage(const float *p) : VectorBase_Storage(p[0], p[1], p[2]) {}
 
     VectorBase_Storage(xmm_t xmm)
     {
@@ -237,8 +266,46 @@ template<> struct VectorBase_Storage<float, 4, 16> : VectorBase_Gen<float, 4, st
     using Base = VectorBase_Gen<float, 4, std::index_sequence<0, 1, 2, 3>, 16, VectorBase4f_SIMD_Data>;
     using Base::Base;
 
-    constexpr VectorBase_Storage(float x1, float y1, float z1, float w1) : Base{ x1, y1, z1, w1 }
+    constexpr VectorBase_Storage() = default;
+
+    constexpr VectorBase_Storage(float x1, float y1, float z1, float w1)
     {
+        if (std::is_constant_evaluated())
+        {
+            this->x = x1;
+            this->y = y1;
+            this->z = z1;
+            this->w = w1;
+        }
+        else
+        {
+#if U_VECTOR_NEON
+            this->x = x1;
+            this->y = y1;
+            this->z = z1;
+            this->w = w1;
+#elif U_VECTOR_SSE
+            this->m_xmm = _mm_set_ps(w1, z1, y1, x1);
+#endif
+        }
+    }
+
+    VectorBase_Storage(std::nullptr_t)
+    {
+#if U_VECTOR_NEON
+        this->m_xmm = vdupq_n_f32(NAN);
+#elif U_VECTOR_SSE
+        this->m_xmm = _mm_set1_ps(NAN);
+#endif
+    }
+
+    explicit VectorBase_Storage(const float *p)
+    {
+#if U_VECTOR_NEON
+        this->m_xmm = vld1q_f32(p);
+#elif U_VECTOR_SSE
+        this->m_xmm = _mm_loadu_ps(p);
+#endif
     }
 
     VectorBase_Storage(xmm_t xmm)
@@ -448,6 +515,16 @@ struct VectorBase : VectorBase_Storage<T, N, Align>
     friend T reduce(VectorBase a)
     {
         return std::reduce(a.data(), a.data() + N);
+    }
+
+    friend T max_element(VectorBase in)
+    {
+        return *std::max_element(in.data(), in.data() + N);
+    }
+
+    friend T min_element(VectorBase in)
+    {
+        return *std::min_element(in.data(), in.data() + N);
     }
 
     friend VectorBase abs(VectorBase a)
@@ -700,10 +777,38 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
+    friend T max_element(ThisClass a)
+    {
+        // warning: zero a.w can affect the result
+#if U_VECTOR_NEON
+        return vmaxvq_f32(a);
+#elif U_VECTOR_SSE
+        __m128 shuf = _mm_movehdup_ps(a);        // broadcast elements 3,1 to 2,0
+        __m128 sums = _mm_max_ps(a, shuf);
+        shuf = _mm_movehl_ps(shuf, sums); // high half -> low half
+        sums = _mm_max_ss(sums, shuf);
+        return _mm_cvtss_f32(sums);
+#endif
+    }
+
+    friend T min_element(ThisClass a)
+    {
+        // warning: zero a.w can affect the result
+#if U_VECTOR_NEON
+        return vminvq_f32(a);
+#elif U_VECTOR_SSE
+        __m128 shuf = _mm_movehdup_ps(a);        // broadcast elements 3,1 to 2,0
+        __m128 sums = _mm_min_ps(a, shuf);
+        shuf = _mm_movehl_ps(shuf, sums); // high half -> low half
+        sums = _mm_min_ss(sums, shuf);
+        return _mm_cvtss_f32(sums);
+#endif
+    }
+
     friend ThisClass abs(ThisClass a)
     {
 #if U_VECTOR_NEON
-        constexpr int32x4_t mask = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0};
+        static const int32x4_t mask = vsetq_lane_s32(0, vdupq_n_s32(0x7fffffff), 3); // {0x7fffffff, 0x7fffffff, 0x7fffffff, 0};
         return vreinterpretq_f32_s32(vandq_s32(vreinterpretq_s32_f32(a), mask));
 #elif U_VECTOR_SSE
         // 0x7fffffff = ~(-0.0f)
@@ -919,11 +1024,6 @@ template<class T, std::size_t N, std::size_t Align> inline void VectorMA(T scale
 template<class T, std::size_t N, std::size_t Align> inline void VectorLerp(VectorBase<T, N, Align> a, T t, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
 	out = lerp(a, b, t);
-}
-
-template<class T, std::size_t N, std::size_t Align> constexpr T VectorMaxElement(VectorBase<T, N, Align> in)
-{
-    return *std::max_element(in.data(), in.data() + N);
 }
 
 template<class T, std::size_t N, std::size_t Align> constexpr bool VectorIsNull(VectorBase<T, N, Align> in)

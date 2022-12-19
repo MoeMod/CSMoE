@@ -37,7 +37,7 @@ TEMPENTS MANAGEMENT
 
 ==============================================================
 */
-#define MAX_MUZZLEFLASH		256
+#define MAX_MUZZLEFLASH		512
 #define SHARD_VOLUME		12.0f	// on shard ever n^3 units
 #define SF_FUNNEL_REVERSE		1
 
@@ -958,7 +958,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 			switch (cType) {
 			case 'I':
 				index = bound(0, atoi(value), MAX_MUZZLEFLASH - 1);
-				if (index >= 0x100 || index < 1) return;
+				if (index >= MAX_MUZZLEFLASH || index < 1) return;
 				break;
 			case 'S':
 				scale = atof(value);
@@ -1055,11 +1055,45 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	CL_TEntAddEntity(&pTemp->entity);
 }
 
+TEMPENTITY* CL_AllocMuzzleFlash(vec3_t origin, struct model_s* model, float scale)
+{
+	TEMPENTITY* ent = CL_TempEntAlloc(origin, model);
+
+	if (ent)
+	{
+		ent->entity.curstate.scale = scale;
+		ent->entity.curstate.rendermode = kRenderTransAdd;
+		ent->entity.curstate.renderamt = 255;
+		ent->entity.curstate.renderfx = kRenderFxNone;
+		ent->entity.curstate.rendercolor.r = ent->entity.curstate.rendercolor.g = ent->entity.curstate.rendercolor.b = 255;
+		ent->entity.origin = origin;
+		ent->die = cl.time + 0.01;
+	}
+
+	return ent;
+}
+
+void MusicNoteCallback(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	float f = ent->tentOffset.z * currenttime;
+
+	ent->entity.origin.x = ent->x + ent->tentOffset.x * sin(f);
+	ent->entity.origin.y = ent->y + ent->tentOffset.x * cos(f);
+	ent->entity.origin.z += ent->tentOffset.y * frametime;
+}
+
+void MusicNoteCallback2(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	ent->entity.origin.z += ent->tentOffset.x * frametime;
+}
+
 void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *type)
 {
 	// must set position for right culling on render
 	cl_entity_t* parent = CL_GetEntityByIndex(clientindex);
 	if (!parent) return;
+
+	vec3_t pos = parent->attachment[iAttachment];
 
 	if (type[0] == '#')
 	{
@@ -1113,7 +1147,55 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 	TEMPENTITY* pTemp;
 	switch (v6)
 	{
+	case 1:
+	{
+		iCounter++;
+
+		if (iCounter <= Com_RandomLong(7, 10))
+			return;
+
+		iCounter = 0;
+		/*unsigned __int64 v13 = (0x66666667i64 * (++iCounter)) >> 32;
+
+		if (iCounter != 5 * (((signed int)v13 >> 1) + (v13 >> 31)))
+			return;*/
+
+		pTemp = CL_AllocMuzzleFlash(pos, Mod_Handle(modelIndex), scale);
+
+		if (!pTemp)
+			return;
+
+		bAlreadyCreated = true;
+
+		pTemp->die = cl.time + 1.0;
+		pTemp->x = pos.x;
+		pTemp->y = pos.y;
+		pTemp->tentOffset[0] = 0.0;
+		pTemp->tentOffset[1] = 25.0;
+		pTemp->tentOffset[2] = 5.0;
+		pTemp->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_FADEOUT;
+		pTemp->callback = MusicNoteCallback;
+		pTemp->entity.curstate.framerate = 23;
+		break;
+	}
+	case 2:
+	{
+		pTemp = CL_AllocMuzzleFlash(pos, Mod_Handle(modelIndex), scale);
+
+		if (!pTemp)
+			return;
+
+		bAlreadyCreated = true;
+
+		pTemp->die = cl.time + 0.8;
+		pTemp->tentOffset.x = 15;
+		pTemp->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_FADEOUT;
+		pTemp->callback = MusicNoteCallback2;
+		pTemp->entity.curstate.framerate = 23;
+		break;
+	}
 	case 3:
+	{
 		pTemp = CL_TempEntAllocHigh(parent->attachment[iAttachment], Mod_Handle(modelIndex));
 
 		if (!pTemp)
@@ -1127,12 +1209,69 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 		life = 0.5f;
 
 		break;
+	}
+	case 4:
+	{
+		iCounter++;
+
+		if (iCounter <= Com_RandomLong(7, 10))
+			return;
+
+		iCounter = 0;
+
+		/*unsigned __int64 v13 = (0x66666667i64 * (++iCounter)) >> 32;
+
+		if (iCounter != 5 * (((signed int)v13 >> 1) + (v13 >> 31)))
+			return;*/
+
+		scale = 0.05;
+
+		pTemp = CL_AllocMuzzleFlash(pos, Mod_Handle(modelIndex), scale);
+
+		if (!pTemp)
+			return;
+
+		bAlreadyCreated = true;
+
+		pTemp->die = cl.time + 1.0;
+		pTemp->x = pos.x;
+		pTemp->y = pos.y;
+		pTemp->tentOffset[0] = 5.0;
+		pTemp->tentOffset[1] = 25.0;
+		pTemp->tentOffset[2] = 5.0;
+		pTemp->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_FADEOUT;
+		pTemp->callback = MusicNoteCallback;
+		pTemp->entity.curstate.framerate = 23;
+	}
 	default:
 		break;
 	}
 
 	if(!bAlreadyCreated)
 		pTemp = CL_TempEntAllocHigh(parent->attachment[iAttachment], Mod_Handle( modelIndex ));
+	else
+	{
+		int frameMax;
+		Mod_GetFrames(modelIndex, &frameMax);
+
+		if (iStartFrame == -1)
+			pTemp->entity.curstate.frame = Com_RandomLong(0, frameMax - 1);
+		else
+			pTemp->entity.curstate.frame = iStartFrame;
+
+		pTemp->frameMax = frameMax;
+
+		if (rotate)
+		{
+			if (index > 1)
+				pTemp->entity.angles[2] = Com_RandomLong(0, 359);
+			else
+				pTemp->entity.angles[2] = Com_RandomLong(0, 20);
+		}
+
+		CL_TEntAddEntity(&pTemp->entity);
+		return;
+	}
 
 	if( !pTemp ) return;
 
@@ -1668,6 +1807,239 @@ void GAME_EXPORT CL_Sprite_Trail( int type, const vec3_t vecStart, const vec3_t 
 	}
 }
 
+/*
+===============
+CL_Sprite_TrailEx
+
+Line of moving glow sprites with gravity,
+fadeout, and collisions
+===============
+*/
+void CL_Sprite_TrailExCallBack(TEMPENTITY* pEnt, float frametime, float currenttime)
+{
+
+	if (pEnt->entity.curstate.movetype != MOVETYPE_NONE && (pEnt->entity.baseline.origin[2] != 0))
+	{
+		pEnt->entity.baseline.origin[0] *= 0.99;
+		pEnt->entity.baseline.origin[1] *= 0.99;
+
+		if (pEnt->entity.baseline.origin[2] > -200)
+			pEnt->entity.baseline.origin[2] -= pEnt->entity.curstate.gravity * 2.5;
+
+		//CanRoll?
+		if (pEnt->entity.curstate.iuser3 == 1)
+		{
+			if (++pEnt->entity.angles[2] >= 360.0)
+				pEnt->entity.angles[2] = 0;
+		}
+		else if (pEnt->entity.curstate.iuser3 == 2)
+		{
+			if (!pEnt->entity.curstate.iuser1)
+			{
+				pEnt->entity.angles[2] += 3.0;
+				pEnt->entity.angles[2] = pEnt->entity.angles[2] >= 360.0 ? 0.0 : pEnt->entity.angles[2];
+			}
+			else
+			{
+				pEnt->entity.angles[2] -= 3.0;
+				pEnt->entity.angles[2] = pEnt->entity.angles[2] <= 0.0 ? 360.0 : pEnt->entity.angles[2];
+			}
+		}
+	}
+	else
+	{
+		//Force Stop
+		if (!pEnt->entity.curstate.iuser2)
+		{
+			//CanRoll?
+			if (pEnt->entity.curstate.iuser3 == 1)
+			{
+				if (++pEnt->entity.angles[2] >= 360.0)
+					pEnt->entity.angles[2] = 0;
+			}
+			else if (pEnt->entity.curstate.iuser3 == 2)
+			{
+				if (!pEnt->entity.curstate.iuser1)
+				{
+					pEnt->entity.angles[2] += 3.0;
+					pEnt->entity.angles[2] = pEnt->entity.angles[2] >= 360.0 ? 0.0 : pEnt->entity.angles[2];
+				}
+				else
+				{
+					pEnt->entity.angles[2] -= 3.0;
+					pEnt->entity.angles[2] = pEnt->entity.angles[2] <= 0.0 ? 360.0 : pEnt->entity.angles[2];
+				}
+			}
+		}
+
+	}
+}
+void CL_Sprite_TrailExHitCallBack(TEMPENTITY* pEnt, struct pmtrace_s* ptr)
+{
+	if (!pEnt->entity.curstate.iuser4)
+	{
+		if (!pEnt->entity.curstate.fuser1)
+		{
+			pEnt->entity.curstate.fuser1++;
+
+			if (pEnt->entity.baseline.origin[2] <= 0.0)
+			{
+				pEnt->entity.baseline.origin[2] = pEnt->entity.baseline.origin[2] + Com_RandomFloat(5.0, 10.0);
+			}
+		}
+		if (!ptr->ent)
+		{
+			if (ptr->plane.normal[2]) // ground
+			{
+
+				if (pEnt->entity.curstate.iuser2)
+					pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+
+				pEnt->entity.curstate.solid = SOLID_NOT;
+				pEnt->entity.baseline.origin[0] = 0.0;
+				pEnt->entity.baseline.origin[1] = 0.0;
+				pEnt->entity.baseline.origin[2] = 0.0;
+				pEnt->die = cl.time + Com_RandomFloat(0.5, 1.0);
+
+				pEnt->flags &= ~FTENT_COLLIDEWORLD;
+				pEnt->hitcallback = nullptr;
+			}
+		}
+	}
+	else
+	{
+
+		if (!ptr->ent)
+		{
+			if (ptr->plane.normal[2]) // ground
+			{
+
+
+				if (!pEnt->entity.curstate.fuser1)
+				{
+					pEnt->entity.curstate.movetype = MOVETYPE_BOUNCE;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.friction = 0.5 * pEnt->entity.curstate.gravity;
+					pEnt->entity.curstate.fuser1++;
+
+					if (pEnt->entity.baseline.origin[2] <= 5.0)
+					{
+						pEnt->entity.baseline.origin[2] += Com_RandomFloat(5.0, 10.0);
+					}
+				}
+			}
+		}
+		if (pEnt->entity.curstate.movetype == MOVETYPE_BOUNCE)
+		{
+			pEnt->entity.curstate.fuser1++;
+			pEnt->entity.curstate.friction += 0.3;
+			pEnt->entity.curstate.gravity += pEnt->entity.curstate.gravity / 2.0;
+
+
+			if (pEnt->entity.curstate.fuser1 >= 4 || abs(pEnt->entity.baseline.origin[2]) < 50.0 * pEnt->entity.curstate.scale)
+			{
+				if (pEnt->entity.curstate.fuser1 <= 4)
+					pEnt->entity.baseline.origin[2] -= pEnt->entity.baseline.origin[2] / 2;
+
+				pEnt->entity.curstate.movetype = MOVETYPE_TOSS;
+				pEnt->entity.baseline.origin[0] = 0.0;
+				pEnt->entity.baseline.origin[1] = 0.0;
+				pEnt->entity.baseline.origin[2] = 0.0;
+				pEnt->die = cl.time + Com_RandomFloat(0.5, 1.0);
+
+				pEnt->flags &= ~FTENT_COLLIDEWORLD;
+				pEnt->hitcallback = nullptr;
+				pEnt->entity.curstate.fuser1 = 0;
+			}
+		}
+
+	}
+
+}
+void GAME_EXPORT CL_Sprite_TrailEx(int type, const vec3_t end, int modelIndex, int r, int g, int b, int count, float life, float size, int renderamt, int CanRoll, int ForceStop, int FadeOut, int CanBounce, float Gravity)
+{
+	TEMPENTITY* pTemp;
+	vec3_t		vecDelta, vecDir;
+	int		i, flFrameCount;
+
+	if (Mod_GetType(modelIndex) == mod_bad)
+	{
+		MsgDev(D_INFO, "No model %d!\n", modelIndex);
+		return;
+	}
+
+	Mod_GetFrames(modelIndex, &flFrameCount);
+
+	for (i = 0; i < count; i++)
+	{
+		vec3_t	vecPos;
+
+		// Be careful of divide by 0 when using 'count' here...
+		vecPos = end;
+		vecPos.z += Com_RandomFloat(-size * 25, size * 25);
+
+		pTemp = CL_TempEntAlloc(vecPos, Mod_Handle(modelIndex));
+		if (!pTemp) return;
+
+
+		pTemp->entity.curstate.movetype = MOVETYPE_TOSS;
+
+
+		pTemp->entity.curstate.iuser1 = Com_RandomLong(0, 1);
+		pTemp->entity.curstate.iuser2 = ForceStop;
+		pTemp->entity.curstate.iuser3 = CanRoll;
+		pTemp->entity.curstate.iuser4 = CanBounce;
+
+		pTemp->entity.angles[2] = Com_RandomLong(0, 360);
+
+		vec3_t angles;
+		vec3_t forward, right, up;
+		if (CanRoll)
+		{
+			angles[0] = Com_RandomFloat(-90, 90);
+			angles[1] = Com_RandomFloat(-90, 90);
+			angles[2] = Com_RandomFloat(-90, 90);
+		}
+		AngleVectors(angles, forward, right, up);
+
+		pTemp->entity.baseline.origin[0] = forward[0] * Com_RandomFloat(50.0, 75.0) + Com_RandomFloat(-100.0, 100.0);
+		pTemp->entity.baseline.origin[1] = forward[1] * Com_RandomFloat(50.0, 75.0) + Com_RandomFloat(-100.0, 100.0);
+		if (forward[2] > 0)
+			pTemp->entity.baseline.origin[2] = forward[2] * Com_RandomFloat(1.0, 100.0) + Com_RandomFloat(0.0, 50.0);
+		else
+			pTemp->entity.baseline.origin[2] = forward[2] * Com_RandomFloat(1.0, 100.0);
+
+
+		pTemp->entity.curstate.scale = size;
+		pTemp->entity.curstate.gravity = Gravity;
+		pTemp->entity.curstate.rendermode = kRenderTransAdd;
+		pTemp->entity.curstate.renderamt = 255;
+		pTemp->entity.curstate.renderamt = pTemp->entity.baseline.renderamt = renderamt;
+
+		pTemp->entity.curstate.rendercolor.r = r;
+		pTemp->entity.curstate.rendercolor.g = g;
+		pTemp->entity.curstate.rendercolor.b = b;
+
+		pTemp->tentOffset[0] = 0.0;
+		pTemp->tentOffset[1] = 0.0;
+		pTemp->tentOffset[2] = 0.0;
+
+		pTemp->entity.curstate.frame = Com_RandomLong(0, flFrameCount - 1);
+		pTemp->frameMax = flFrameCount - 1;
+		pTemp->die = cl.time + life + Com_RandomFloat(0.5, 1.0);
+
+		pTemp->callback = CL_Sprite_TrailExCallBack;
+		pTemp->hitcallback = CL_Sprite_TrailExHitCallBack;
+
+		pTemp->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
+		if (FadeOut)
+			pTemp->flags |= FTENT_FADEOUT;
+		/*if(Gravity >=1.0)
+			pTemp->flags |= FTENT_GRAVITY;
+		else
+			pTemp->flags |= FTENT_SLOWGRAVITY;*/
+	}
+}
 /*
 ===============
 CL_Large_Funnel

@@ -82,6 +82,10 @@ namespace luash
 			SetupRefTypeInterface(L, (void*)ptr, CreateTypeInterface<T>());
 		}
 	}
+    inline void PushPointer(lua_State *L, lua_CFunction p)
+    {
+        lua_pushcfunction(L, p);
+    }
 	// just unsupported
 	template<class T, class U> void PushMemberPointer(lua_State* L, U T::* mem_ptr)
 	{

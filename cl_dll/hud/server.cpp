@@ -42,6 +42,11 @@ namespace cl {
 	extern float g_flM1887xmasAnimTime;
 	extern int g_iM1887xmasAnim;
 
+	extern int g_iBUFFNG7State;
+
+	extern int g_iM95TigerState;
+
+	extern int g_iSPKnifeAmmo;
 enum
 {
 	HUMAN_SKILL_KNIFE2X,
@@ -62,6 +67,10 @@ enum
 	HOLYFIST_GLITCH_RING,
 	WINGGUN_WING,
 	DIVINETITAN_PARTICLE,
+	FIREBOMB_BURN,
+	EF_ELEC_BLUE,
+	EF_ELEC_YELLOW,
+	MK3A1SE_BURN,
 };
 
 TEMPENTITY *iHolyFistRingEffect[33];
@@ -69,11 +78,12 @@ TEMPENTITY *iWingGunEffect[33];
 TEMPENTITY* iDivinetitanParticle[33];
 
 void CreateAttachedEntitiesToPlayer(int entity, int type);
-void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
+void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate, int r = 0, int g = 0, int b = 0);
 void CreateFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 TEMPENTITY* AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
 //void EnableWallHack(int enable, int iTarget);
+void EV_DragonTailFX(int iDidHit, int iType);
 
 int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 {
@@ -206,20 +216,6 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		switch (arg2)
 		{
-		case DIVINETITAN_PARTICLE:
-		{
-			if (iDivinetitanParticle[arg1])
-			{
-				iDivinetitanParticle[arg1]->die = gHUD.m_flTime;
-				iDivinetitanParticle[arg1] = nullptr;
-				break;
-			}
-
-			if (!iDivinetitanParticle[arg1])
-				iDivinetitanParticle[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_particle.spr"),
-					Vector(0.0, 0.0, 5.0), 5.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.8, kRenderTransAdd, 30.0);
-			break;
-		}
 		case WINGGUN_WING:
 		{
 			if (iWingGunEffect[arg1])
@@ -280,6 +276,16 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel({ 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, 999, gEngfuncs.pEventAPI->EV_FindModelIndex("models/ef_wondercannon_area.mdl"), 0, 1.0, false, 255, kRenderTransAdd, arg2, 0, false, 0, 1.0, 200, FTENT_PERSIST | FTENT_PLYRATTACHMENT);
 			break;
 		}
+		case 2:
+		{
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel({ 0, 0, 10 }, { 0, 0, 0 }, { 0, 0, 0 }, 999, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_wondercannonex_bomb_set.spr"), 0, 15, false, 255, kRenderTransAdd, arg2, 0, false, 0, 0.2, 21, FTENT_PERSIST | FTENT_SPRANIMATELOOP | FTENT_PLYRATTACHMENT);
+			break;
+		}
+		case 3:
+		{
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel({ 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, 999, gEngfuncs.pEventAPI->EV_FindModelIndex("models/ef_wondercannonex_area.mdl"), 0, 1.0, false, 255, kRenderTransAdd, arg2, 0, false, 0, 1.0, 200, FTENT_PERSIST | FTENT_PLYRATTACHMENT);
+			break;
+		}
 		default:
 			break;
 		}
@@ -290,6 +296,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	{
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadShort();
+		int arg3 = reader.ReadByte();
 
 		cl_entity_t* pEnt = gEngfuncs.GetEntityByIndex(arg1);
 		cl_entity_t* pLinkEnt = gEngfuncs.GetEntityByIndex(arg2);
@@ -298,7 +305,12 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		vecBeamStart = pEnt->origin;
 		vecBeamEnd = pLinkEnt->origin;
 
-		int iBeamIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_wondercannon_chain.spr");
+		int iBeamIndex;
+
+		if(arg3)
+			iBeamIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_wondercannonex_chain.spr");
+		else
+			iBeamIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_wondercannon_chain.spr");
 
 		BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Stretch(vecBeamStart, vecBeamEnd, iBeamIndex, 1.0, 30.0, 255, 0, 30.0, 255, 255, 255);
 
@@ -443,13 +455,52 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		m_SniperScope.InsertBunkerBusterData2(arg3);
 		break;
-
-
 	}
 	case 31:
 	{
 		g_iM1887xmasAnim = -1;
 		g_flM1887xmasAnimTime = 0.0;
+		break;
+	}
+	case 32:
+	{
+		arg1 = reader.ReadByte();
+		switch (arg1)
+		{
+		case 0:
+		{
+			//buffng7
+			arg2 = reader.ReadByte();
+			g_iBUFFNG7State = arg2;
+			break;
+		}
+		case 1:
+		{
+			//m95tiger
+			arg2 = reader.ReadByte();
+			g_iM95TigerState = arg2;
+			break;
+		}
+		default:
+			break;
+		}
+		break;
+	}
+	case 33:
+	{
+		int iDidHit = reader.ReadByte();
+		int iType = reader.ReadByte();
+
+		EV_DragonTailFX(iDidHit, iType);
+
+		break;
+	}
+	case 44:
+	{
+		arg1 = reader.ReadByte();
+
+		g_iSPKnifeAmmo = arg1;
+
 		break;
 	}
 	case 42:
@@ -472,6 +523,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		break;
 	}
+	
 	return 1;
 }
 
@@ -727,13 +779,39 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 			Vector(0.0, 0.0, 0.0), 0.18, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
 		break;
 	}
+	case FIREBOMB_BURN:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/firebomb_burn.spr"),
+			Vector(0.0, 0.0, -5.0), 5.0, TRUE, flags, 0.7, kRenderTransAdd, 10.0);
+		break;
+	}
+	case EF_ELEC_BLUE:
+	{
+		flags = FTENT_NONE;
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_elec.spr"),
+			Vector(0.0, 0.0, 0.0), 0.2, TRUE, flags, 0.7, kRenderTransAdd, 20.0, 0, 100, 255);
+		break;
+	}
+	case EF_ELEC_YELLOW:
+	{
+		flags = FTENT_NONE;
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_elec.spr"),
+			Vector(0.0, 0.0, 0.0), 0.2, TRUE, flags, 0.7, kRenderTransAdd, 20.0, 255, 185, 0);
+		break;
+	}
+	case MK3A1SE_BURN:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_mk3a1seburn.spr"),
+			Vector(0.0, 0.0, -5.0), 2.0, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
+		break;
+	}
 
 	default:
 		break;
 	}
 }
 
-void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate)
+void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate, int r, int g, int b)
 {
 	if (!modelIndex)
 	{
@@ -770,6 +848,12 @@ void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life,
 	if (additive)
 		pTemp->entity.curstate.rendermode = kRenderTransAdd;
 	pTemp->die = gHUD.m_flTime + life;
+	if (r || g || b)
+	{
+		pTemp->entity.curstate.rendercolor.r = r;
+		pTemp->entity.curstate.rendercolor.g = g;
+		pTemp->entity.curstate.rendercolor.b = b;
+	}
 
 }
 
@@ -813,6 +897,41 @@ TEMPENTITY *AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float 
 	pTemp->die = gHUD.m_flTime + life;
 
 	return pTemp;
+}
+
+
+void DragonTailFXLock(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	cl_entity_t* viewent = gEngfuncs.GetViewModel();
+	ent->entity.origin = viewent->origin;
+	ent->entity.angles = viewent->angles;
+}
+
+void EV_DragonTailFX(int iDidHit, int iType)
+{
+	cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+	if (!viewent)
+		return;
+
+	TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->R_TempModel(viewent->origin + Vector(0, 0, 16), Vector(0, 0, 0), Vector(0, 0, 0), 0.2, gEngfuncs.pEventAPI->EV_FindModelIndex("models/ef_dragontail.mdl"), 0);
+
+	if (!pTemp)
+		return;
+
+	pTemp->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+	pTemp->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATE | FTENT_FADEOUT;
+	pTemp->callback = DragonTailFXLock;
+	pTemp->entity.angles = viewent->angles;
+	pTemp->tentOffset.z = 16;
+	pTemp->clientIndex = viewent->index;
+	pTemp->entity.curstate.frame = 0;
+	pTemp->fadeSpeed = 16;
+	pTemp->entity.curstate.renderamt = iDidHit ? 128 : 48;
+	pTemp->entity.curstate.rendermode = kRenderTransAdd;
+	pTemp->frameMax = 256;
+	pTemp->entity.curstate.skin = iDidHit ? 0 : 1;
+	pTemp->entity.curstate.sequence = gHUD.cl_righthand->value > 0 ? iType : iType + 4;
 }
 
 }

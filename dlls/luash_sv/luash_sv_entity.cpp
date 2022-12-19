@@ -196,27 +196,27 @@ namespace cl {
 		if (!L)
 			return;
 
-		lua_getglobal(L, "class_delete"); // #1 = class_delete
+        lua_pushcfunction(L, LuaSV_ExceptionHandler);    // #1 = eh
+		lua_getglobal(L, "class_delete"); // #2 = class_delete
 		assert(!lua_isnil(L, -1));
-		luash::PushLuaObjectByPtr(L, p); // #2 = LuaObject
+		luash::PushLuaObjectByPtr(L, p); // #3 = LuaObject
 		if (lua_islightuserdata(L, -1) || lua_isnil(L, -1))
 		{
-			lua_pop(L, 2);
+			lua_pop(L, 3);
 			// LuaObject not found
 			return;
 		}
-		lua_pushlightuserdata(L, p); // #3 = This
-		int errc = lua_pcall(L, 2, 0, 0); // #0
-
-		if (errc)
+		lua_pushlightuserdata(L, p); // #4 = This
+		if (int errc = lua_pcall(L, 2, 0, -4)) // #1 = eh
 		{
 			const char* msg = lua_tostring(L, -1);
 			char buffer[256];
 			snprintf(buffer, 256, "%s Error: CBaseEntity (%d) delete failed: %s\n", __FUNCTION__, p->entindex(), msg);
 			LuaSV_PrintError(buffer);
-			lua_pop(L, 1);
+			lua_pop(L, 2);  // #0
 			return;
 		}
+        lua_pop(L, 1);  // #0
 
 		luash::RemoveLuaObject(L, p);
 		luash::ReleaseRefTypeInterface(L, p);
@@ -233,7 +233,7 @@ namespace cl {
 			lua_pop(L, 1);
 			if (!strcmp("CBaseEntity", cppClassName))
 				return; // no more try
-			if (!strcmp("CCSBot", cppClassName))
+			if (!strcmp("CCSBot", cppClassName) || !strcmp("CMoePlayer", cppClassName))
 				return LuaNotifyCppEntityCreate("CBasePlayer", ptr);
 			return LuaNotifyCppEntityCreate("CBaseEntity", ptr);
 		}
@@ -244,14 +244,14 @@ namespace cl {
 			iter->second(L, ptr);
 		}
 
-		lua_getglobal(L, "class_new"); // #2 = class_new
+        lua_pushcfunction(L, LuaSV_ExceptionHandler);    // #2 = eh
+		lua_getglobal(L, "class_new"); // #3 = class_new
 		assert(!lua_isnil(L, -1));
-		lua_pushvalue(L, -2); // #3 = LuaClass
+		lua_rotate(L, -3, -1); // #1 = eh, #2 = class_new,  #3 = LuaClass
 		lua_pushlightuserdata(L, ptr); // #4 = this
 
 		lua_checkstack(L, 256);
-		int errc = lua_pcall(L, 2, 1, 0); // #2 = LuaObject
-		if (errc)
+		if (int errc = lua_pcall(L, 2, 1, -4)) // #2 = LuaObject
 		{
 			const char* msg = lua_tostring(L, -1);
 			char buffer[256];
@@ -261,7 +261,7 @@ namespace cl {
 			return;
 		}
 
-		luash::LinkPtrToLuaObject(L, ptr); // #4 = LuaObject
+		luash::LinkPtrToLuaObject(L, ptr); // #2 = LuaObject
 		lua_pop(L, 2);
 		return;
 	}

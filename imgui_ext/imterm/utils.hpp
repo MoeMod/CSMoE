@@ -23,6 +23,7 @@
 #include <array>
 #include <optional>
 #include <array>
+#include <functional>
 #include <imgui.h>
 
 #include "misc.hpp"
@@ -42,14 +43,14 @@ namespace ImTerm {
 	// structure used to represent a command
 	template<typename Terminal>
 	struct command_t {
-		using command_function = void (*)(argument_t<Terminal>&);
+		using command_function = std::function<void(argument_t<Terminal>&)>;
 		using further_completion_function = std::vector<std::string> (*)(argument_t<Terminal>& argument_line);
 
-		std::string_view name{}; // name of the command
-		std::string_view description{}; // short description
-		command_function call{}; // function doing whatever you want
+		std::string_view name; // name of the command
+		std::string_view description; // short description
+		command_function call; // function doing whatever you want
 
-		further_completion_function complete{}; // function called when users starts typing in arguments for your command
+		further_completion_function complete; // function called when users starts typing in arguments for your command
 		// return a vector of strings containing possible completions.
 
 		friend constexpr bool operator<(const command_t& lhs, const command_t& rhs) {

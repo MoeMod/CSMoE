@@ -24,7 +24,7 @@ GNU General Public License for more details.
 #include <SDL.h>
 #include <SDL_syswm.h>
 
-#ifdef XASH_ANGLE
+#ifdef XASH_EGL
 #include <EGL/egl.h>
 #endif
 
@@ -57,7 +57,7 @@ void *SDL_GetVideoDevice( void );
 
 static void SDLCALL GL_GetDrawableSize(SDL_Window* window, int* w, int* h)
 {
-#if defined(XASH_ANGLE)
+#if defined(XASH_EGL)
     SDL_GetRendererOutputSize(SDL_GetRenderer(window), w, h);
     // TODO macos hidpi
 #ifdef __APPLE__

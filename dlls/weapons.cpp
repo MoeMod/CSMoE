@@ -1160,7 +1160,7 @@ int CBasePlayerWeapon::UpdateClientData(CBasePlayer *pPlayer)
 	return 1;
 }
 
-void CBasePlayerWeapon::SendWeaponAnim(int iAnim, int skiplocal, float framerate)
+void CBasePlayerWeapon::SendWeaponAnimEx(int iAnim, int skiplocal, float framerate)
 {
 	m_pPlayer->pev->weaponanim = iAnim;
 
@@ -1321,7 +1321,19 @@ void CBasePlayerWeapon::ReloadSound()
 				|| m_iId == WEAPON_Z4B_M1887SE
 				|| m_iId == WEAPON_BALROG11
 				|| m_iId == WEAPON_BALROG11B
-				|| m_iId == WEAPON_BALROG11WC)
+				|| m_iId == WEAPON_BALROG11WC
+				|| m_iId == WEAPON_JANUS11
+				|| m_iId == WEAPON_M3DRAGON
+				|| m_iId == WEAPON_M3DRAGONM
+				|| m_iId == WEAPON_BLOCKAS
+				|| m_iId == WEAPON_M1887G
+				|| m_iId == WEAPON_M1887XMAS
+				|| m_iId == WEAPON_RAINBOWGUN
+				|| m_iId == WEAPON_BOUNCER
+				|| m_iId == WEAPON_SPAS12
+				|| m_iId == WEAPON_SPAS12EX
+				|| m_iId == WEAPON_SPAS12EX2
+				|| m_iId == WEAPON_VULCANUS11)
 				WRITE_BYTE(0);
 			else
 				WRITE_BYTE(1);
@@ -1348,7 +1360,7 @@ int CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, duration_t fDelay
 	else
 		m_pPlayer->m_flNextAttack = fNewDelay;
 	ReloadSound();
-	SendWeaponAnim(iAnim, UseDecrement() ? 1 : 0, fDelay / fNewDelay);
+	SendWeaponAnimEx(iAnim, UseDecrement() ? 1 : 0, fDelay / fNewDelay);
 
 	m_fInReload = TRUE;
 	m_flTimeWeaponIdle = fDelay + 0.5s;
@@ -1399,6 +1411,13 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_KRONOS1:
 		case WEAPON_KINGCOBRA:
 		case WEAPON_KINGCOBRAG:
+		case WEAPON_SKULL2:
+		case WEAPON_MUSKET:
+		case WEAPON_BUFFFIVESEVEN:
+		case WEAPON_VOIDPISTOLEX:
+		case WEAPON_WATERPISTOL:
+		case WEAPON_MONKEYWPNSET2:
+		case WEAPON_Z4B_MALORIAN3516:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

@@ -9,7 +9,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#if defined(__x86_64__) || defined(_WIN64) || defined(__arm64__) || defined(__aarch64__)
+#if defined(__x86_64__)|| defined(__arm64__) || defined(__aarch64__) || defined(__arm64__) || defined(_M_ARM64) || defined(_M_X64)
 #define PLATFORM_64BITS 1
 #endif
 
@@ -853,7 +853,7 @@ static FORCEINLINE double fsel(double fComparand, double fValGE, double fLT)
 
 		#endif
 	#endif
-#elif defined (__arm__) || defined (__arm64__) || defined (__aarch64__)
+#elif defined (__arm__) || defined (__arm64__) || defined (__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
 	inline void SetupFPUControlWord() {}
 #else
 	inline void SetupFPUControlWord()
@@ -1183,40 +1183,7 @@ PLATFORM_INTERFACE struct tm *		Plat_gmtime( const time_t *timep, struct tm *res
 PLATFORM_INTERFACE time_t			Plat_timegm( struct tm *timeptr );
 PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *result );
 
-#if defined( _WIN32 ) && defined( _MSC_VER ) && ( _MSC_VER >= 1400 )
-	extern "C" unsigned __int64 __rdtsc();
-	#pragma intrinsic(__rdtsc)
-#endif
-
-inline uint64 Plat_Rdtsc()
-{
-#if (defined( __arm__ ) || defined( __arm64__ ) || defined( __aarch64__ )) && defined (POSIX)
-	struct timespec t;
-	clock_gettime( CLOCK_REALTIME, &t);
-	return t.tv_sec * 1000000000ULL + t.tv_nsec;
-#elif defined( _X360 )
-	return ( uint64 )__mftb32();
-#elif defined( _WIN64 )
-	return ( uint64 )__rdtsc();
-#elif defined( _WIN32 )
-  #if defined( _MSC_VER ) && ( _MSC_VER >= 1400 )
-	return ( uint64 )__rdtsc();
-  #else
-    __asm rdtsc;
-	__asm ret;
-  #endif
-#elif defined( __i386__ )
-	uint64 val;
-	__asm__ __volatile__ ( "rdtsc" : "=A" (val) );
-	return val;
-#elif defined( __x86_64__ )
-	uint32 lo, hi;
-	__asm__ __volatile__ ( "rdtsc" : "=a" (lo), "=d" (hi));
-	return ( ( ( uint64 )hi ) << 32 ) | lo;
-#else
-	#error
-#endif
-}
+PLATFORM_INTERFACE uint64 Plat_Rdtsc();
 
 // b/w compatibility
 #define Sys_FloatTime Plat_FloatTime

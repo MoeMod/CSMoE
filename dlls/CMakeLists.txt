@@ -232,6 +232,7 @@ set(HLDLL_SRCS
 	./m3dragoncannon.cpp
 	./m3dragoncannon_dragon.cpp
 	./wondercannonchain.cpp
+	./wondercannonmine.cpp
 	./y22s2sfpistolfield.cpp
 	./pianogunwave.cpp
 	./client/wdnmd.cpp
@@ -252,6 +253,9 @@ set(HLDLL_SRCS
 	./gamemode/zb3zp/zp_zclass_human.cpp
 	./guillotineammo.cpp
 	./guillotineexammo.cpp
+	./voidpistolblackhole.cpp
+	./throwingknifeentity.cpp
+	./magicsgcannon.cpp
 	)
 
 set (HLWPN_SRCS
@@ -541,6 +545,84 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_rainbowgun.cpp
 	../dlls/wpn_shared/wpn_guillotine.cpp
 	../dlls/wpn_shared/wpn_guillotineex.cpp
+	../dlls/wpn_shared/wpn_speargunm.cpp
+	../dlls/wpn_shared/wpn_kingcobra.cpp
+	../dlls/wpn_shared/wpn_spsg.cpp
+	../dlls/wpn_shared/wpn_destroyer.cpp
+	../dlls/wpn_shared/wpn_blockar.cpp
+	../dlls/wpn_shared/wpn_blockmg.cpp
+	../dlls/wpn_shared/wpn_blockas.cpp
+	../dlls/wpn_shared/wpn_coilgun.cpp
+	../dlls/wpn_shared/wpn_bouncer.cpp
+	../dlls/wpn_shared/wpn_thanatos5.cpp
+	../dlls/wpn_shared/wpn_oicw.cpp
+	../dlls/wpn_shared/wpn_starchasersr.cpp
+	../dlls/wpn_shared/wpn_m1garand.cpp
+	../dlls/wpn_shared/wpn_dualkrisshero.cpp
+	../dlls/wpn_shared/wpn_skull2.cpp
+	../dlls/wpn_shared/wpn_dualuzi.cpp
+	../dlls/wpn_shared/wpn_spas12.cpp
+	../dlls/wpn_shared/wpn_spas12ex.cpp
+	../dlls/wpn_shared/wpn_spas12ex2.cpp
+	../dlls/wpn_shared/wpn_gilboaex.cpp
+	../dlls/wpn_shared/wpn_musket.cpp
+	../dlls/wpn_shared/wpn_buffng7.cpp
+	../dlls/wpn_shared/wpn_bufffiveseven.cpp
+	../dlls/wpn_shared/wpn_guitar.cpp
+	../dlls/wpn_shared/wpn_violingun.cpp
+	../dlls/wpn_shared/wpn_holybomb.cpp
+	../dlls/wpn_shared/wpn_wondercannonex.cpp
+	../dlls/wpn_shared/wpn_cake.cpp
+	../dlls/wpn_shared/wpn_mooncake.cpp
+	../dlls/wpn_shared/wpn_heartbomb.cpp
+	../dlls/wpn_shared/wpn_fgrenade.cpp
+	../dlls/wpn_shared/wpn_fgrenade2.cpp
+	../dlls/wpn_shared/wpn_m24grenade.cpp
+	../dlls/wpn_shared/wpn_cartfrag.cpp
+	../dlls/wpn_shared/wpn_sfgrenade.cpp
+	../dlls/wpn_shared/wpn_chaingren.cpp
+	../dlls/wpn_shared/z4b_tiga.cpp
+	../dlls/wpn_shared/wpn_restrictionpistol.cpp
+	../dlls/wpn_shared/knife_y22s3dragonsword.cpp
+	../dlls/wpn_shared/wpn_janus7.cpp
+	../dlls/wpn_shared/wpn_y22s3janus7.cpp
+	../dlls/wpn_shared/wpn_voidpistolex.cpp
+	../dlls/wpn_shared/wpn_waterpistol.cpp
+	../dlls/wpn_shared/knife_monkeywpnset3.cpp
+	../dlls/wpn_shared/knife_ozwpnset3.cpp
+	../dlls/wpn_shared/wpn_monkeywpnset2.cpp
+	../dlls/wpn_shared/wpn_dualkriss.cpp
+	../dlls/wpn_shared/wpn_mosin.cpp
+	../dlls/wpn_shared/z4b_steyrtmpd.cpp
+	../dlls/wpn_shared/wpn_tknife.cpp
+	../dlls/wpn_shared/wpn_tknifeex.cpp
+	../dlls/wpn_shared/wpn_tknifeex2.cpp
+	../dlls/wpn_shared/wpn_laserminigun.cpp
+	../dlls/wpn_shared/wpn_mk3a1.cpp
+	../dlls/wpn_shared/wpn_mk3a1se.cpp
+	../dlls/wpn_shared/wpn_drillgun.cpp
+	../dlls/wpn_shared/wpn_vulcanus3.cpp
+	../dlls/wpn_shared/wpn_vulcanus11.cpp
+	../dlls/wpn_shared/wpn_vulcanus7.cpp
+	../dlls/wpn_shared/wpn_skull3.cpp
+	../dlls/wpn_shared/wpn_skull3d.cpp
+	../dlls/wpn_shared/z4b_deathray.cpp
+	../dlls/wpn_shared/wpn_cartredl.cpp
+	../dlls/wpn_shared/wpn_cartredh.cpp
+	../dlls/wpn_shared/wpn_cartbluec.cpp
+	../dlls/wpn_shared/wpn_cartblues.cpp
+	../dlls/wpn_shared/knife_tomahawk.cpp
+	../dlls/wpn_shared/knife_crowbarcraft.cpp
+	../dlls/wpn_shared/knife_vulcanus9.cpp
+	../dlls/wpn_shared/wpn_magicsg.cpp
+	../dlls/wpn_shared/z4b_malorian3516.cpp
+	../dlls/wpn_shared/knife_sfsword.cpp
+	../dlls/wpn_shared/knife_dragontail.cpp
+	../dlls/wpn_shared/knife_katanad.cpp
+	../dlls/wpn_shared/knife_crow9.cpp
+	../dlls/wpn_shared/knife_turbulent9.cpp
+	../dlls/wpn_shared/knife_spknife.cpp
+	../dlls/wpn_shared/knife_swordbombard.cpp
 	)
 
 set(PM_SRCS

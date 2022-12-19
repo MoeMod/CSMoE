@@ -47,20 +47,21 @@ namespace cl {
 
 	bool PreCall(lua_State *L, const char *FuncName, void *CppObject)
 	{
-		luash::PushLuaObjectByPtr(L, CppObject);
+        lua_pushcfunction(L, LuaSV_ExceptionHandler);    // #1 = eh
+		luash::PushLuaObjectByPtr(L, CppObject);    // #2 = self
 		if(!lua_istable(L, -1))
 		{
-			assert(false && "unable to get luaobject");
-			lua_pop(L, 1);
-			return false;
-		}
-		lua_getfield(L, -1, FuncName);
-		if(!(lua_isfunction(L, -1) && !lua_iscfunction(L, -1)))
-		{
+			assert(lua_istable(L, -1) && "unable to get luaobject");
 			lua_pop(L, 2);
 			return false;
 		}
-		lua_pushvalue(L, -2);
+		lua_getfield(L, -1, FuncName);  // #3 = memfun
+		if(!(lua_isfunction(L, -1) && !lua_iscfunction(L, -1)))
+		{
+			lua_pop(L, 3);
+			return false;
+		}
+        lua_rotate(L, -2, -1); // #1=eh, #2=memfun, #3=self
 		return true;
 	}
 
@@ -71,14 +72,16 @@ namespace cl {
 
 	bool PostCall(lua_State *L, const char *FuncName, int ArgsNum)
 	{
-		if(int errc = lua_pcall(L, ArgsNum, 1, 0))
+		if(int errc = lua_pcall(L, ArgsNum, 1, -ArgsNum -2)) // #1 = eh, #2 = ret
 		{
 			const char *msg = lua_tostring(L, -1);
-			char buffer[256];
-			snprintf(buffer, 256, "LuaClass Vfunc %s Error: %s\n", FuncName, msg);
+			char buffer[16384];
+			snprintf(buffer, 16384, "LuaClass Vfunc %s Error: %s\n", FuncName, msg);
 			LuaSV_PrintError(buffer);
 			lua_pop(L, 2);
+            return false;
 		}
+        lua_remove(L, -2); // #1 = ret
 		return true;
 	}
 

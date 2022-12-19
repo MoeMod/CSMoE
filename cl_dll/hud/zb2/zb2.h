@@ -31,9 +31,45 @@ public:
 	CHudMsgFunc(ZB2Msg);
 	int DrawBuffHP();
 
+	//zombie selector
+	void ClearSelector();
+	void SetSelectorDrawTime(float flTime, float flDisplayTime);
+	void SetSelectorIcon(int slot, const char* name);
+	void SetSelectorIconBan(int slot);
+	bool Selector(int i);
+	bool SelectorCanDraw();
+
 public:
 	class CHudZB2_impl_t *pimpl = nullptr;
 	float m_flBuffHealth;
 	int m_BuffHealthCross;
+
+	//zombie selector
+	bool m_bCanDraw;
+	int m_iType;
+	int m_iPage;
+	int m_iMax;
+	bool m_bBanned[64];
+
+private:
+	//zombie selector
+	HSPRITE m_iBackGround;
+	model_t* m_pBackGroundSprite;
+
+	SharedTexture m_iIcon[64];
+
+	bool m_bDraw[64];
+
+	float m_flTimeEnd;
+
+	int m_iTimeRemaining;
+
+	UniqueTexture m_iPrevOn;
+	UniqueTexture m_iPrevOff;
+	UniqueTexture m_iNextOn;
+	UniqueTexture m_iNextOff;
+	UniqueTexture m_iBlank;
+	UniqueTexture m_iBanned;
+	UniqueTexture m_iCancel;
 };
 }

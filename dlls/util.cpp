@@ -357,6 +357,58 @@ int UTIL_EntitiesInBox(CBaseEntity **pList, int listMax, const Vector &mins, con
 	return count;
 }
 
+
+int UTIL_EntitiesInRotatedBox(CBaseEntity** pList, int listMax, Vector vecBoxOrigin, Vector vecBoxAngle, float flLength, float flWidth, float flHeight, int flagMask)
+{
+	UTIL_MakeVectors(vecBoxAngle);
+
+	Vector vecForward, vecRight, vecUp;
+	float flUp, flRight, flForward;
+
+	vecForward = gpGlobals->v_forward;
+	vecRight = gpGlobals->v_right;
+	vecUp = gpGlobals->v_up;
+
+
+	edict_t* pEdict = INDEXENT(1);
+	CBaseEntity* pEntity;
+	int count = 0;
+
+	if (!pEdict)
+		return 0;
+
+	for (int i = 1; i < gpGlobals->maxEntities; ++i, ++pEdict)
+	{
+		if (pEdict->free)
+			continue;
+
+		if (flagMask && !(pEdict->v.flags & flagMask))
+			continue;
+
+		Vector vecDelta = pEdict->v.origin - vecBoxOrigin;
+
+		flForward = DotProductAbs(vecDelta, vecForward);
+		flRight = DotProductAbs(vecDelta, vecRight);
+		flUp = DotProductAbs(vecDelta, vecUp);
+
+		if (flUp > flHeight
+			|| flForward > flWidth
+			|| flRight > flLength)
+			continue;
+
+		pEntity = CBaseEntity::Instance(pEdict);
+		if (!pEntity)
+			continue;
+
+		pList[count++] = pEntity;
+
+		if (count >= listMax)
+			break;
+	}
+
+	return count;
+}
+
 NOXREF int UTIL_MonstersInSphere(CBaseEntity ** pList, int listMax, const Vector &center, float radius)
 {
 	edict_t *pEdict;
@@ -2846,6 +2898,27 @@ bool UTIL_IsWallBetweenEntity(CBaseEntity* pEntity, CBaseEntity* pAttackPlayer)
 		return true;
 	}
 	return false;
+}
+
+void UTIL_BreakModel(const Vector& pos, const Vector& size, const Vector& velocity, int random_velocity, int modelindex, int flags, int count, float life)
+{
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pos);
+	WRITE_BYTE(TE_BREAKMODEL);
+	WRITE_COORD(pos.x);
+	WRITE_COORD(pos.y);
+	WRITE_COORD(pos.z);
+	WRITE_COORD(size.x);
+	WRITE_COORD(size.y);
+	WRITE_COORD(size.z);
+	WRITE_COORD(velocity.x);
+	WRITE_COORD(velocity.y);
+	WRITE_COORD(velocity.z);
+	WRITE_BYTE(random_velocity);
+	WRITE_SHORT(modelindex);
+	WRITE_BYTE(count);
+	WRITE_BYTE(int(life * 10));
+	WRITE_BYTE(flags);
+	MESSAGE_END();
 }
 
 }

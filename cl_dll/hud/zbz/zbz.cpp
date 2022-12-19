@@ -47,7 +47,7 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 	case ZBZ_MESSAGE_LEVEL_INFO:
 	{
 		int lv = buf.ReadByte();
-		int exp = buf.ReadByte();
+		int exp = buf.ReadShort();
 		int point = buf.ReadByte();
 		pimpl->get<CHudZBZ_Skill>().UpdateLevel(lv, exp, point);
 		break;
@@ -62,6 +62,16 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 	{
 		ZombieZSkillSkillId id = static_cast<ZombieZSkillSkillId>(buf.ReadByte());
 		pimpl->get<CHudZBZ_Skill>().RemoveSkill(id);
+		break;
+	}
+	case ZBZ_MESSAGE_HUD_INFO:
+	{
+		ZombieZSkillSkillId skillindex = static_cast<ZombieZSkillSkillId>(buf.ReadShort());
+
+		int showtype = buf.ReadByte();
+		float showtime = buf.ReadCoord();
+
+		pimpl->get<CHudZBZ_Skill>().SendHudInfo((int)skillindex, showtype, showtime);
 		break;
 	}
 	case ZBZ_MESSAGE_BURN:

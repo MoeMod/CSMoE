@@ -209,7 +209,7 @@ BOOL CBasePlayerWeapon :: DefaultReload( int iClipSize, int iAnim, duration_t fD
 	//!!UNDONE -- reload sound goes here !!!
 
 	if (gHUD.m_ZBZ.CheckHasSkill(Skill_RapidReloader)) {
-		SendWeaponAnim(iAnim, UseDecrement(), 1 / max(0.0f, 1.0f - (0.32f + 0.022f * (gHUD.m_Scoreboard.m_iTeamScore_T + gHUD.m_Scoreboard.m_iTeamScore_CT))));
+		SendWeaponAnimEx(iAnim, UseDecrement(), 1 / max(0.0f, 1.0f - (0.32f + 0.022f * (gHUD.m_Scoreboard.m_iTeamScore_T + gHUD.m_Scoreboard.m_iTeamScore_CT))));
 	}
 	else {
 		SendWeaponAnim(iAnim, UseDecrement());
@@ -469,7 +469,7 @@ CBasePlayerWeapon::SendWeaponAnim
 Animate weapon model
 =====================
 */
-void CBasePlayerWeapon::SendWeaponAnim( int iAnim, int skiplocal, float framerate )
+void CBasePlayerWeapon::SendWeaponAnimEx( int iAnim, int skiplocal, float framerate )
 {
 	//gEngfuncs.Con_DPrintf( "Predict::SendWeaponAnim( %i )\n", iAnim );
 
@@ -518,6 +518,11 @@ bool isSniperRifle(CBasePlayerItem* item)
 	case WEAPON_BPGM:
 	case WEAPON_ZGUN:
 	case WEAPON_Z4B_BARRETTD:
+	case WEAPON_DESTROYER:
+	case WEAPON_STARCHASERSR:
+	case WEAPON_MOSIN:
+	case WEAPON_Z4B_DEATHRAY:
+	case WEAPON_CARTBLUES:
 		return true;
 
 	default:
@@ -659,6 +664,7 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 
 		m_fFireOnEmpty = FALSE;
 
+		//semiauto pistol
 		if (m_iId != WEAPON_USP
 			&& m_iId != WEAPON_GLOCK18
 			&& m_iId != WEAPON_P228
@@ -676,7 +682,20 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 			&& m_iId != WEAPON_INFINITYSS
 			&& m_iId != WEAPON_Z4B_INFINITYX
 			&& m_iId != WEAPON_CSGO_R8
-			&& m_iId != WEAPON_ANACONDA)
+			&& m_iId != WEAPON_ANACONDA
+			&& m_iId != WEAPON_MONKEYWPNSET2
+			&& m_iId != WEAPON_CSGO_TEC9
+			&& m_iId != WEAPON_Z4B_RAGINGBULL
+			&& m_iId != WEAPON_BALROG1
+			&& m_iId != WEAPON_SAPIENTIA
+			&& m_iId != WEAPON_BLOODHUNTER
+			&& m_iId != WEAPON_THUNDERPISTOL
+			&& m_iId != WEAPON_KRONOS1
+			&& m_iId != WEAPON_KINGCOBRA
+			&& m_iId != WEAPON_KINGCOBRAG
+			&& m_iId != WEAPON_SKULL2
+			&& m_iId != WEAPON_MUSKET
+			&& m_iId != WEAPON_Z4B_MALORIAN3516)
 		{
 			if (m_iShotsFired > 0)
 			{

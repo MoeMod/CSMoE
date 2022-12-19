@@ -19,6 +19,9 @@
 #if defined(__SSE__) || defined(_M_IX86_FP)
 #include <xmmintrin.h>	// For SSE
 #endif
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+#include <arm_neon.h>
+#endif
 #include "basetypes.h"	// For vec_t, put this somewhere else?
 #include "tier0/dbg.h"
 #include "mathlib/math_pfns.h"
@@ -141,7 +144,10 @@ public:
 	inline void Set( vec_t X, vec_t Y, vec_t Z, vec_t W );
 	inline void InitZero( void );
 
-#if !defined(__arm__) && !defined(__arm64__) && !defined(__aarch64__)
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	inline float32x4_t& AsM128() { return *(float32x4_t*) & x; }
+	inline const float32x4_t& AsM128() const { return *(const float32x4_t*) & x; }
+#else
     inline __m128 &AsM128() { return *(__m128*)&x; }
 	inline const __m128 &AsM128() const { return *(const __m128*)&x; } 
 #endif
@@ -616,8 +622,8 @@ inline void Vector4DAligned::Set( vec_t X, vec_t Y, vec_t Z, vec_t W )
 
 inline void Vector4DAligned::InitZero( void )
 {
-#if defined (__arm__) || defined(__arm64__) || defined(__aarch64__)
-	x = y = z = w = 0;
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	this->AsM128() = vdupq_n_f32(0.0f);
 #elif !defined( _X360 )
 	this->AsM128() = _mm_set1_ps( 0.0f );
 #else
@@ -643,7 +649,10 @@ inline void Vector4DWeightMAD( vec_t w, Vector4DAligned const& vInA, Vector4DAli
 {
 	Assert( vInA.IsValid() && vInB.IsValid() && IsFinite(w) );
 
-#if !defined( _X360 ) || defined (__arm__) || defined(__arm64__) || defined(__aarch64__)
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	vOutA.AsM128() = vfmaq_n_f32(vOutA.AsM128(), vInA.AsM128(), w);
+	vOutB.AsM128() = vfmaq_n_f32(vOutB.AsM128(), vInB.AsM128(), w);
+#elif !defined( _X360 )
 	vOutA.x += vInA.x * w;
 	vOutA.y += vInA.y * w;
 	vOutA.z += vInA.z * w;
@@ -664,12 +673,14 @@ inline void Vector4DWeightMAD( vec_t w, Vector4DAligned const& vInA, Vector4DAli
 #endif
 }
 
-#if !defined(__arm__) && !defined(__arm64__) && !defined(__aarch64__)
 inline void Vector4DWeightMADSSE( vec_t w, Vector4DAligned const& vInA, Vector4DAligned& vOutA, Vector4DAligned const& vInB, Vector4DAligned& vOutB )
 {
 	Assert( vInA.IsValid() && vInB.IsValid() && IsFinite(w) );
 
-#if !defined( _X360 )
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	vOutA.AsM128() = vfmaq_n_f32(vOutA.AsM128(), vInA.AsM128(), w);
+	vOutB.AsM128() = vfmaq_n_f32(vOutB.AsM128(), vInB.AsM128(), w);
+#elif !defined( _X360 )
 	// Replicate scalar float out to 4 components
     __m128 packed = _mm_set1_ps( w );
 
@@ -686,7 +697,6 @@ inline void Vector4DWeightMADSSE( vec_t w, Vector4DAligned const& vInA, Vector4D
 	vOutB.AsM128() = __vmaddfp( vInB.AsM128(), temp, vOutB.AsM128() );
 #endif
 }
-#endif
 
 #endif // VECTOR4D_H
 

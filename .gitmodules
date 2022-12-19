@@ -37,9 +37,6 @@
 [submodule "3rdparty/gl4es"]
 	path = 3rdparty/gl4es
 	url = https://github.com/ptitSeb/gl4es
-[submodule "3rdparty/tbb"]
-	path = 3rdparty/tbb
-	url = https://github.com/wjakob/tbb
 [submodule "3rdparty/opus"]
 	path = 3rdparty/opus
 	url = https://github.com/xiph/opus
@@ -97,3 +94,6 @@
 [submodule "3rdparty/glslang"]
 	path = 3rdparty/glslang
 	url = https://github.com/KhronosGroup/glslang
+[submodule "3rdparty/oneTBB"]
+	path = 3rdparty/oneTBB
+	url = https://github.com/oneapi-src/oneTBB

@@ -14,6 +14,7 @@ namespace cl
 	void LuaCL_Shutdown();
 	lua_State* LuaCL_Get();
 	void LuaCL_Exec(const char* str);
+    int LuaCL_ExceptionHandler(lua_State* L);
 	
 	int LuaUI_GlobalReload(lua_State* L);
 	int LuaCL_GlobalRequire(lua_State* L);

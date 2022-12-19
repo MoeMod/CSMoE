@@ -157,6 +157,7 @@ public:
 	int DrawNEWHudAmmo(float flTime);
 	CHudMsgFunc(CurWeapon);
 	CHudMsgFunc(WeaponList);
+	CHudMsgFunc(WeaponList2);
 	CHudMsgFunc(AmmoX);
 	CHudMsgFunc(AmmoPickup);
 	CHudMsgFunc(WeapPickup);
@@ -833,6 +834,10 @@ public:
 	void DrawBunkerBusterScope(float flTime);
 	void InsertBunkerBusterData(int iGauge, float iCoolDown, float gCoolDown);
 	void InsertBunkerBusterData2(float ShootTime);
+	void DrawDestroyerScope(float flTime);
+	int DrawDestroyerSniperScopeNumbers(int x, int y, int iFlags, int iNumber, int r, int g, int b);
+	int CalculateDistance();
+	void DrawStarChaserSRScope(float flTime);
 private:
 
 	struct LockOnData
@@ -932,6 +937,24 @@ private:
 
 	float m_flMGSMTimeChargeStart;
 	float m_flMGSMFinishTime;
+
+	bool m_bDestroyerInSight;
+	UniqueTexture m_iDestroyer_Aim01;
+	UniqueTexture m_iDestroyer_Aim02;
+	UniqueTexture m_iDestroyer_Frame01;
+	UniqueTexture m_iDestroyer_Frame02;
+	UniqueTexture m_iDestroyer_Range;
+
+	int m_iDestroyer_NumberZero;
+	int m_iDestroyer_Meter;
+	wrect_t m_rcDestroyer_Meter;
+
+
+	UniqueTexture m_iStarChaserSRScope;
+	UniqueTexture m_iStarChaserSRScope_BG;
+	UniqueTexture m_iStarChaserSRScope_Light;
+
+	float m_flStarChaserSRAlpha;
 
 };
 

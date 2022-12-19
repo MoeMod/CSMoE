@@ -42,7 +42,8 @@ protected:
 	UniqueTexture m_pTexture_skillslotkeybg;
 	UniqueTexture m_pTexture_skillslotbg;
 	UniqueTexture m_pTexture_NewSkillIcons[MAX_ZOMBIE_SKILL];
-	UniqueTexture m_pTexture_NewClassIcons[MAX_ZOMBIE_CLASS];
+	SharedTexture m_pTexture_NewClassIcons[MAX_ZOMBIE_CLASS];
+	SharedTexture m_pTexture_RandomZbClass;
 
 protected:
 	float m_flRecoveryBeginTime;

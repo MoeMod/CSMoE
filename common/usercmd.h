@@ -45,7 +45,7 @@ typedef struct usercmd_s
 	byte lightlevel;		// Light level at spot where we are standing.
 	unsigned short buttons;		// Attack buttons
 	byte impulse;			// Impulse command issued.
-	byte weaponselect;		// Current weapon id
+	unsigned short weaponselect;		// Current weapon id
 
 	// Experimental player impact stuff.
 	int impact_index;

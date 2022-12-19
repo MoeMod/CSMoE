@@ -75,13 +75,15 @@ if(WIN32)
 	endif()
 	
 	target_link_libraries(${XASH_LAUNCHER} xash)
+	string(REGEX REPLACE "/machine:(.+)" "\\1" XASH_ARCH "${CMAKE_EXE_LINKER_FLAGS}")
+	string(TOLOWER ${XASH_ARCH} XASH_ARCH)
 	set_target_properties(${XASH_LAUNCHER} PROPERTIES
-		OUTPUT_NAME csmoe_win32) # Change name to your gamedir, if you building a standalone game
+		OUTPUT_NAME csmoe_win32_${XASH_ARCH} ) # Change name to your gamedir, if you building a standalone game
 
 	set(CPACK_GENERATOR "NSIS")
 	set(CPACK_PACKAGE_NAME "CSMoE")
 	set(CPACK_PACKAGE_VENDOR "MoeMod")
-	set(CPACK_PACKAGE_FILE_NAME "CSMoE-Win32-${CMAKE_SYSTEM_PROCESSOR}")
+	set(CPACK_PACKAGE_FILE_NAME "CSMoE-Win32-${XASH_ARCH}")
 	set(CPACK_PACKAGE_INSTALL_DIRECTORY "CSMoE")
 	set(CPACK_PACKAGE_EXECUTABLES "..\\\\csmoe_win32" "${CPACK_PACKAGE_NAME}")
 	set(CPACK_CREATE_DESKTOP_LINKS ${XASH_LAUNCHER})

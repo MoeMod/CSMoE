@@ -1441,9 +1441,9 @@ void CL_UpdateBeam( BEAM *pbeam, float frametime )
 			break;
 		case TE_BEAMPOINTS_TRACER:
 		{
-			float timepassd = (1.0 - ((pbeam->die - float(cl.time)) / pbeam->extra));
+			float timepassd = (1.0 - ((pbeam->die - float(cl.time)) / pbeam->extra));	//life
 			vec3_t vecSrc = pbeam->source + timepassd * pbeam->delta;
-			vec3_t vecEnd = vecSrc + pbeam->delta.Normalize() * pbeam->extra2;
+			vec3_t vecEnd = vecSrc + pbeam->delta.Normalize() * pbeam->extra2;	//length
 
 			VectorCopy(vecSrc, pbeam->source);
 			VectorCopy(vecEnd, pbeam->target);

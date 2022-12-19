@@ -1,4 +1,4 @@
-/*
+﻿/*
 zb2.cpp - CSMoE Client HUD : Zombie Mod 2
 Copyright (C) 2019 Moemod Yanase
 
@@ -168,6 +168,13 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		m_flBuffHealth = buf.ReadShort();		
 		break;
 	}
+	case ZB2_MESSAGE_ZOMBIESELECTOR:
+	{
+
+		float flHoldTime = buf.ReadCoord();
+		SetSelectorDrawTime(gHUD.m_flTime, flHoldTime);
+		break;
+	}
 	}
 
 	return 1;
@@ -205,6 +212,22 @@ int CHudZB2::VidInit()
 	R_InitTexture(pimpl->m_pTexture_SheildBlushRetina, "resource/zombi/masterasceticeffect_blush");
 
 	m_BuffHealthCross = gHUD.GetSpriteIndex("crosstime");
+
+	m_iBackGround = SPR_Load("sprites/zbselectbg.spr");
+	m_pBackGroundSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iBackGround);
+
+
+	R_InitTexture(m_iPrevOn, "resource\\hud\\zombie\\zbselect_prev_nor");
+	R_InitTexture(m_iPrevOff, "resource\\hud\\zombie\\zbselect_prev_dim");
+	R_InitTexture(m_iNextOn, "resource\\hud\\zombie\\zbselect_next_nor");
+	R_InitTexture(m_iNextOff, "resource\\hud\\zombie\\zbselect_next_dim");
+	R_InitTexture(m_iCancel, "resource\\hud\\zombie\\zbselect_close");
+	R_InitTexture(m_iBlank, "resource\\hud\\zombie\\zmrewalk_box");
+	R_InitTexture(m_iBanned, "resource\\hud\\zombie\\zombietype_cancel");
+
+	m_flTimeEnd = 0.0f;
+	m_bCanDraw = false;
+
 	return 1;
 }
 
@@ -212,6 +235,192 @@ int CHudZB2::Draw(float time)
 {
 	pimpl->for_each(&IBaseHudSub::Draw, time);
 	DrawBuffHP();
+
+	if (!m_bCanDraw)
+		return 0;
+
+	if (time > m_flTimeEnd)
+	{
+		m_bCanDraw = false;
+		return 0;
+	}
+
+	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
+
+	static int m_iBackGroundSpriteFrame = 0;
+	static float m_flLastFrameTime;
+
+	int iX = 0 + 15;
+	int iY = 0;
+	int iWidth = 181;
+	int iHeight = 490;
+	if (m_pBackGroundSprite)
+	{
+		//Zb
+		if (m_iType != 1)
+		{
+			iHeight = 490;
+		}
+		//Wpn
+		else
+		{
+			iHeight = 490;
+			int iHeight2 = m_iCancel->h() + 100 + 59 * (m_iMax % 2 ? (m_iMax / 2) + 1 : (m_iMax / 2));
+
+			if (iHeight2 < iHeight)
+				iHeight = iHeight2;
+		}
+
+		iY = ScreenHeight / 2 - iHeight / 2;
+
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
+
+		gEngfuncs.pTriAPI->SpriteTexture(m_pBackGroundSprite, m_iBackGroundSpriteFrame);
+		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+		gEngfuncs.pTriAPI->CullFace(TRI_FRONT);
+		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+		gEngfuncs.pTriAPI->Brightness(2.0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->End();
+
+		if (1.0 / (45.0 * 1.0) <= gHUD.m_flTime - m_flLastFrameTime)
+		{
+			m_iBackGroundSpriteFrame++;
+			m_flLastFrameTime = gHUD.m_flTime;
+		}
+
+		if (m_iBackGroundSpriteFrame > 25)
+		{
+			m_iBackGroundSpriteFrame = 0;
+		}
+	}
+
+	static char SzText[64]; sprintf(SzText, "僵尸选择");
+
+
+	gEngfuncs.pfnDrawSetTextColor(255 / 255.0f, 255 / 255.0f, 255 / 255.0f);
+	int iTextlen = DrawUtils::ConsoleStringLen(SzText);
+
+	if (m_iType != 1)
+		DrawUtils::DrawConsoleString(max(((iWidth - iTextlen) / 2), 0) + 15, iY + 45, SzText);
+	else
+		DrawUtils::DrawConsoleString(max(((iWidth - iTextlen) / 2), 0) + 15, iY + 45, SzText);
+
+
+	static char SzTimer[32];
+	if (m_iTimeRemaining != int(m_flTimeEnd - time))
+	{
+		m_iTimeRemaining = int(m_flTimeEnd - time);
+
+		sprintf(SzTimer, "剩余时间: %d秒", m_iTimeRemaining);
+	}
+
+	gEngfuncs.pfnDrawSetTextColor(255 / 255.0f, 255 / 255.0f, 255 / 255.0f);
+	iTextlen = DrawUtils::ConsoleStringLen(SzTimer);
+	DrawUtils::DrawConsoleString(max(((iWidth - iTextlen) / 2), 0) + 15, iY + 65, SzTimer);
+
+	iX = 60 + 15;
+	iY += 140;
+
+	for (int i = 0; i < 10; i++)
+	{
+		iX = 24 + 69 * (i % 2) + 15;
+		iY += 59 * ((i - 1) % 2);
+
+		if (m_iType != 1)
+			m_iBlank->Draw2DQuadScaled(iX, iY, (iX + m_iBlank->w()), (iY + m_iBlank->h()));
+
+		int index = m_iPage * 10 + i;
+		if (index >= m_iMax && m_iType == 1)
+			break;
+
+		if (index < m_iMax)
+		{
+			if (m_bDraw[index])
+			{
+				if (m_iIcon[index])
+				{
+					m_iIcon[index]->Draw2DQuadScaled(iX, iY, (iX + m_iIcon[index]->w()), (iY + m_iIcon[index]->h()));
+				}
+
+				if (m_bBanned[index])
+				{
+					m_iBanned->Draw2DQuadScaled(iX, iY, (iX + m_iBanned->w()), (iY + m_iBanned->h()));
+				}
+			}
+		}
+
+		char p[2];
+		p[0] = '0' + (i + 1) % 10;
+		p[1] = 0;
+
+		gEngfuncs.pfnDrawSetTextColor(255 / 255.0f, 255 / 255.0f, 255 / 255.0f);
+		DrawUtils::DrawConsoleString(iX + 4, iY + 15, p);
+	}
+
+	iY = ScreenHeight / 2 - iHeight / 2 + 385;
+	for (int i = 0; i < 3; i++)
+	{
+		if (i < 2)
+		{
+			if (m_iType == 1)
+				continue;
+
+			iX = 24 + 69 * i + 15;
+
+			UniqueTexture(*texid) = nullptr;
+			if (i == 0)
+			{
+				if (m_iPage > 0)
+					texid = &m_iPrevOn;
+				else
+					texid = &m_iPrevOff;
+			}
+			else
+			{
+				if ((m_iPage + 1) * 10 < m_iMax)
+					texid = &m_iNextOn;
+				else
+					texid = &m_iNextOff;
+			}
+
+			if (texid)
+			{
+				char p[3];
+				sprintf(p, "%s", i == 0 ? "-" : "+");
+				gEngfuncs.pfnDrawSetTextColor(255 / 255.0f, 255 / 255.0f, 255 / 255.0f);
+				DrawUtils::DrawConsoleString(iX + 4, iY + 15, p);
+
+				(*texid)->Draw2DQuadScaled(iX, iY, (iX + (*texid)->w()), (iY + (*texid)->h()));
+			}
+		}
+		else
+		{
+			iX = 24 + 15;
+			int iHeightMax = (m_iType == 1) ? (80 + 59 * (m_iMax % 2 ? (m_iMax / 2) + 1 : (m_iMax / 2))) : 434;
+			iY = ScreenHeight / 2 - iHeight / 2 + iHeightMax;
+
+			sprintf(SzText, "取消(TAB)");
+			gEngfuncs.pfnDrawSetTextColor(255 / 255.0f, 255 / 255.0f, 255 / 255.0f);
+			iTextlen = DrawUtils::ConsoleStringLen(SzText);
+			DrawUtils::DrawConsoleString(iWidth / 2 - iTextlen / 4, iY + 10, SzText);
+
+			m_iCancel->Draw2DQuadScaled(iX, iY, (iX + m_iCancel->w()), (iY + m_iCancel->h()));
+		}
+	}
 
 	return 1;
 }
@@ -304,6 +513,92 @@ bool CHudZB2::ActivateSkill(int iSlot)
 	}
 
 	return false;
+}
+
+//ZombieSelector For Pc
+bool CHudZB2::Selector(int item)
+{
+	if (!SelectorCanDraw())
+		return false;
+
+	if (item > 10)
+	{
+		if (item == 11)
+		{
+			if (m_iPage > 0)
+				m_iPage--;
+			else
+				return false;
+		}
+		else if (item == 12)
+		{
+			if ((m_iPage + 1) * 10 < m_iMax)
+				m_iPage++;
+			else
+				return false;
+		}
+		else if (item == 13)
+		{
+			m_bCanDraw = false;
+			return true;
+		}
+	}
+	else
+	{
+		char ch[64];
+
+		int iNum = item;
+		if (item == 0) iNum = 10;
+		iNum += m_iPage * 10 - 1;
+
+		if (iNum >= 0 && iNum <= m_iMax)
+		{
+			//iNum -= 1;
+			if (!m_bDraw[iNum] || m_bBanned[iNum])
+				return false;
+
+			sprintf(ch, "BTE_Zb_Select_Zombie%d\n", iNum);
+			gEngfuncs.pfnClientCmd(ch);
+
+			/*char SzText[128]; sprintf(SzText, "Choose %d || Current Choice %d  \n", item, iNum);
+			gEngfuncs.pfnConsolePrint(SzText);*/
+
+			m_bCanDraw = false;
+			return true;
+		}
+	}
+
+	return false;
+}
+void CHudZB2::SetSelectorIcon(int slot, const char* name)
+{
+	m_iIcon[slot] = R_LoadTextureShared(name);
+	m_bDraw[slot] = true;
+}
+void CHudZB2::SetSelectorIconBan(int slot)
+{
+	m_bBanned[slot] = true;
+}
+void CHudZB2::ClearSelector()
+{
+	memset(m_bDraw, false, sizeof(m_bDraw));
+	memset(m_bBanned, false, sizeof(m_bBanned));
+	//memset(m_iIcon, NULL, sizeof(m_iIcon));
+}
+
+void CHudZB2::SetSelectorDrawTime(float flTime, float flDisplayTime)
+{
+	m_flTimeEnd = flTime + flDisplayTime;
+	m_iTimeRemaining = (int)flDisplayTime;
+	m_iPage = 0;
+	m_iMax = ZOMBIE_CLASS_MEATWALL + 1;//ZOMBIE_CLASS_BOOMER+1
+
+	m_bCanDraw = true;
+}
+bool CHudZB2::SelectorCanDraw()
+{
+	return m_bCanDraw;
+
 }
 
 }

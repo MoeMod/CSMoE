@@ -138,6 +138,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_doctorzb", // ZOMBIE_CLASS_HEAL,
 		"resource/zombi/zombietype_deimoszb", // ZOMBIE_CLASS_DEIMOS,
 		"resource/zombi/zombietype_deimos2zb", // ZOMBIE_CLASS_DEIMOS2,
+		"resource/zombi/zombietype_deimos2zb", // ZOMBIE_CLASS_ZBS_DEIMOS2,
 		"resource/zombi/zombietype_teleportzb",//ZOMBIE_CLASS_TELEPORT,
 		"resource/zombi/zombietype_boosterzb",//ZOMBIE_CLASS_BOOSTER,
 		"resource/zombi/zombietype_chinazb",//ZOMBIE_CLASS_CHINA,
@@ -218,8 +219,34 @@ int CHudZB2_Skill::VidInit(void)
 	for (int i = 0; i < MAX_ZOMBIE_CLASS; ++i)
 	{
 		if (Config::ZOMBIE_CLASS_HUD_ICON_NEW[i] && Config::ZOMBIE_CLASS_HUD_ICON_NEW[i][0] != '\0')
+		{
 			if (!m_pTexture_NewClassIcons[i])
-				m_pTexture_NewClassIcons[i] = R_LoadTextureUnique(Config::ZOMBIE_CLASS_HUD_ICON_NEW[i]);
+			{
+				m_pTexture_NewClassIcons[i] = R_LoadTextureShared(Config::ZOMBIE_CLASS_HUD_ICON_NEW[i]);
+
+				if (i == 0 || i > ((int)ZOMBIE_CLASS_MEATWALL + 1))
+					continue;
+
+				if (i == ((int)ZOMBIE_CLASS_MEATWALL + 1))
+				{
+					//PreInit SharedTexture
+					m_pTexture_RandomZbClass = R_LoadTextureShared("resource\\hud\\zombie\\zombietype_random");
+					gHUD.m_ZB2.SetSelectorIcon(i - 1, "resource\\hud\\zombie\\zombietype_random");
+				}
+				else if (i == ((int)ZOMBIE_CLASS_MEATWALL))
+				{
+					//ZOMBIE_CLASS_SIREN
+					gHUD.m_ZB2.SetSelectorIcon(i - 1, Config::ZOMBIE_CLASS_HUD_ICON_NEW[ZOMBIE_CLASS_SIREN]);
+				}
+				else
+				{
+					gHUD.m_ZB2.SetSelectorIcon(i - 1, Config::ZOMBIE_CLASS_HUD_ICON_NEW[i]);
+
+					if (i == ((int)ZOMBIE_CLASS_TELEPORT) || i == ((int)ZOMBIE_CLASS_REVIVAL) || i == ((int)ZOMBIE_CLASS_NEMESIS) || i == ((int)ZOMBIE_CLASS_SPIDER) || i == ((int)ZOMBIE_CLASS_DEATHKNIGHT))
+						gHUD.m_ZB2.SetSelectorIconBan(i - 1);
+				}
+			}
+		}
 	}
 
 	return 1;

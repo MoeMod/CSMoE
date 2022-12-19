@@ -505,7 +505,7 @@ void pfnDrawConsoleStringLen( const char *pText, int *length, int *height )
 R_StudioLoadHeader
 =================
 */
-const studiohdr_t *R_StudioLoadHeader( model_t *mod, void *buffer )
+const studiohdr_t *R_StudioLoadHeader( model_t *mod, const void *buffer )
 {
 	const byte		*pin;
 	const studiohdr_t	*phdr;
@@ -562,7 +562,7 @@ static int R_StudioBodyVariations( model_t *mod )
 Mod_LoadStudioModel
 =================
 */
-void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
+void Mod_LoadStudioModel(model_t* mod, const byte* buffer, size_t filesize, qboolean* loaded)
 {
     const studiohdr_t	*phdr;
 
@@ -575,7 +575,8 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 
 	// just copy model into memory
 	loadmodel->cache.data = (void *)buffer; // Mem_Alloc( loadmodel->mempool, phdr->length );
-    loadmodel->cache_size = filesize;
+	loadmodel->buffer = buffer;
+    loadmodel->buffer_size = filesize;
 	phdr = (const studiohdr_t *)loadmodel->cache.data;
 
 	// setup bounding box
@@ -587,6 +588,7 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	loadmodel->flags = phdr->flags; // copy header flags
 
 	// check for static model
+#if 0
 	if( phdr->numseqgroups == 1 && phdr->numseq == 1 && phdr->numbones == 1 )
 	{
 		mstudioseqdesc_t	*pseqdesc = (mstudioseqdesc_t *)((byte *)phdr + phdr->seqindex);
@@ -597,7 +599,7 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 		if( pseqdesc->numframes == 1 || pseqdesc->numframes == 30 )
 			pseqdesc->flags |= STUDIO_STATIC;
 	}
-
+#endif
 	if( loaded ) *loaded = true;
 }
 
@@ -633,52 +635,57 @@ Mod_LoadSpriteModel
 load sprite model
 ====================
 */
-void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, qboolean *loaded, uint texFlags )
+void Mod_LoadSpriteModel(model_t* mod, const byte* buffer, size_t filesize, qboolean* loaded, uint texFlags)
 {
-	dsprite_t		pin;
+	const dsprite_t		*pin;
 	short		numi;
 	msprite_t		*psprite;
 	int		i, size;
 
 	if( loaded ) *loaded = false;
-	Q_memcpy(&pin, buffer, sizeof(dsprite_t));
+	pin = reinterpret_cast<const dsprite_t*>(buffer);
 	mod->type = mod_sprite;
-	i = LittleLong(pin.version);
+	i = LittleLong(pin->version);
 
-	if( LittleLong(pin.ident) != IDSPRITEHEADER )
+	if( LittleLong(pin->ident) != IDSPRITEHEADER )
 	{
-		MsgDev( D_ERROR, "%s has wrong id (%x should be %x)\n", mod->name, pin.ident, IDSPRITEHEADER );
+		MsgDev( D_ERROR, "%s has wrong id (%x should be %x)\n", mod->name, pin->ident, IDSPRITEHEADER );
+		FS_MapFree(buffer, filesize);
 		return;
 	}
 
 	if( i != SPRITE_VERSION )
 	{
 		MsgDev( D_ERROR, "%s has wrong version number (%i should be %i)\n", mod->name, i, SPRITE_VERSION );
+		FS_MapFree(buffer, filesize);
 		return;
 	}
 
 	mod->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", mod->name ));
-	size = sizeof( msprite_t ) + ( LittleLong(pin.numframes) - 1 ) * sizeof( psprite->frames );
+	size = sizeof( msprite_t ) + ( LittleLong(pin->numframes) - 1 ) * sizeof( psprite->frames );
 	psprite = (msprite_t *)Mem_ZeroAlloc( mod->mempool, size );
 	mod->cache.data = psprite;	// make link to extradata
 
-	psprite->type = LittleLong(pin.type);
-	psprite->texFormat = LittleLong(pin.texFormat);
-	psprite->numframes = mod->numframes = LittleLong(pin.numframes);
-	psprite->facecull = LittleLong(pin.facetype);
-	psprite->radius = LittleLong(pin.boundingradius);
-	psprite->synctype = LittleLong(pin.synctype);
+	psprite->type = LittleLong(pin->type);
+	psprite->texFormat = LittleLong(pin->texFormat);
+	psprite->numframes = mod->numframes = LittleLong(pin->numframes);
+	psprite->facecull = LittleLong(pin->facetype);
+	psprite->radius = LittleLong(pin->boundingradius);
+	psprite->synctype = LittleLong(pin->synctype);
 
-	mod->mins[0] = mod->mins[1] = -LittleLong(pin.bounds[0]) / 2;
-	mod->maxs[0] = mod->maxs[1] = LittleLong(pin.bounds[0]) / 2;
-	mod->mins[2] = -LittleLong(pin.bounds[1]) / 2;
-	mod->maxs[2] = LittleLong(pin.bounds[1]) / 2;
+	mod->mins[0] = mod->mins[1] = -LittleLong(pin->bounds[0]) / 2;
+	mod->maxs[0] = mod->maxs[1] = LittleLong(pin->bounds[0]) / 2;
+	mod->mins[2] = -LittleLong(pin->bounds[1]) / 2;
+	mod->maxs[2] = LittleLong(pin->bounds[1]) / 2;
 	buffer += sizeof(dsprite_t);
 	Q_memcpy(&numi, buffer, sizeof(short));
 
 	// skip frames loading
 	if( loaded ) *loaded = true;	// done
 	psprite->numframes = 0;
+
+	mod->buffer = buffer;
+	mod->buffer_size = filesize;
 }
 /*
 ====================

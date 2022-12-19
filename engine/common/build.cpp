@@ -155,7 +155,7 @@ const char *Q_buildarch( void )
 	archname = "amd64";
 #elif defined(__i386__) || defined(_X86_) || defined(_M_IX86)
 	archname = "i386";
-#elif defined(__aarch64__) || defined(_M_ARM64)
+#elif defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64)
 	archname = "arm64";
 #elif defined __arm__ || defined _M_ARM
 	archname = "arm";

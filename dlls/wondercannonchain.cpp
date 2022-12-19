@@ -13,8 +13,33 @@ namespace sv {
 #define WONDERCANNON_CHAIN_DISTANCE 39.37 * 3.5
 #define WONDERCANNON_TOTAL_EXP_COUNT	12
 #define WONDERCANNON_CSO_DAMAGEDATA	0
+#define WONDERCANNONEX_TOTAL_EXP_COUNT	8
 
 	LINK_ENTITY_TO_CLASS(wondercannon_chain, CWonderCannonChain)
+
+	CWonderCannonChain* CWonderCannonChain::Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner)
+	{
+		edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("wondercannon_chain"));
+
+		if (FNullEnt(pent))
+		{
+			ALERT(at_console, "NULL Ent in Create!\n");
+			return NULL;
+		}
+
+		CWonderCannonChain* pChain = (CWonderCannonChain*)Instance(pent);
+
+		if (pChain)
+		{
+			pChain->m_iType = iType;
+			pChain->pev->owner = pentOwner;
+			pChain->pev->origin = vecOrigin;
+			pChain->pev->angles = vecAngles;
+			pChain->Spawn();
+		}
+
+		return pChain;
+	}
 
 	void CWonderCannonChain::Spawn()
 	{
@@ -26,6 +51,7 @@ namespace sv {
 
 		SetThink(&CWonderCannonChain::OnThink);
 		
+		m_iTotalExpCount = m_iType ? WONDERCANNONEX_TOTAL_EXP_COUNT : WONDERCANNON_TOTAL_EXP_COUNT;
 		m_flNextDamage = gpGlobals->time + 0.1s;
 		pev->nextthink = gpGlobals->time + 0.1s;
 		m_tTimeRemove = gpGlobals->time + 5.0s;
@@ -50,12 +76,18 @@ namespace sv {
 		for (int i = 0; i < 4; i++)
 		{
 			char SzSpr[4][64]{};
-			sprintf(SzSpr[i], "sprites/ef_wondercannon_hit%d.spr", i + 1);
+			if(m_iType)
+				sprintf(SzSpr[i], "sprites/ef_wondercannonex_hit%d.spr", i + 1);
+			else
+				sprintf(SzSpr[i], "sprites/ef_wondercannon_hit%d.spr", i + 1);
 
 			m_iCache_Exp[i] = PRECACHE_MODEL(SzSpr[i]);
 		}
 		PRECACHE_MODEL("sprites/ef_wondercannon_chain.spr");
+		PRECACHE_MODEL("sprites/ef_wondercannonex_chain.spr");
+		PRECACHE_MODEL("sprites/ef_wondercannonex_light.spr");
 
+		PRECACHE_SOUND("weapons/wondercannonex_bomd_exp.wav");
 		PRECACHE_SOUND("weapons/wondercannon_bomd_exp.wav");
 		PRECACHE_SOUND("weapons/wondercannon_bomd_exp2.wav");
 	}
@@ -99,7 +131,7 @@ namespace sv {
 			return;
 		}
 
-		if (pWeapon->m_iId != WEAPON_WONDERCANNON)
+		if (pWeapon->m_iId != GetWeaponsId())
 		{
 			Remove();
 			return;
@@ -134,10 +166,10 @@ namespace sv {
 				if (g_pGameRules->PlayerRelationship(m_pOwner, pNewEntity) == GR_TEAMMATE)
 					continue;
 
-				if(m_pEnemyList->Count() >= 12)
+				if(m_pEnemyList->Count() >= m_iTotalExpCount)
 					continue;
 
-				if (m_pAttachedEnt->m_iTeam != pNewEntity->m_iTeam && !pev->iuser1)
+				if (!m_iType && m_pAttachedEnt->m_iTeam != pNewEntity->m_iTeam && !pev->iuser1)
 				{
 					m_pEnemyList->RemoveMultipleFromHead(1);
 					m_pEnemyList->AddToTail(pNewEntity);
@@ -162,7 +194,7 @@ namespace sv {
 				WRITE_BYTE(19);
 				WRITE_SHORT(m_pEnemyList->Element(i)->entindex());
 				WRITE_SHORT(pNewEntity->entindex());
-				WRITE_BYTE(2);
+				WRITE_BYTE(m_iType ? 1 : 0);
 				MESSAGE_END();			
 			}
 		}
@@ -174,16 +206,35 @@ namespace sv {
 
 			m_iAttachedEntCount = m_pEnemyList->Count();
 
-			if (m_iAttachedEntCount <= 1)
-				m_iExpTime = WONDERCANNON_TOTAL_EXP_COUNT - 1;
-			else if (m_iAttachedEntCount < 5)
-				m_iExpTime = WONDERCANNON_TOTAL_EXP_COUNT / m_iAttachedEntCount;
-			else if (m_iAttachedEntCount < 6)
-				m_iExpTime = 3;
-			else if (m_iAttachedEntCount < 10)
-				m_iExpTime = floor(double(WONDERCANNON_TOTAL_EXP_COUNT - 2) / double(m_iAttachedEntCount)) + 1;
-			else if (m_iAttachedEntCount <= 12)
-				m_iExpTime = 1;
+			if (m_iType)
+			{
+				if (m_iAttachedEntCount <= 1)
+					m_iExpTime = m_iTotalExpCount - 1;
+				else if (m_iAttachedEntCount < 3)
+					m_iExpTime = m_iTotalExpCount / m_iAttachedEntCount;
+				else if (m_iAttachedEntCount < 4)
+					m_iExpTime = 3;	//3 people
+				else if (m_iAttachedEntCount < 5)
+					m_iExpTime = m_iTotalExpCount / m_iAttachedEntCount;	//4 people
+				else if (m_iAttachedEntCount < 8)
+					m_iExpTime = floor(double(m_iTotalExpCount) / double(m_iAttachedEntCount)) + 1;
+				else if (m_iAttachedEntCount <= m_iTotalExpCount)
+					m_iExpTime = 1;
+			}
+			else
+			{
+				if (m_iAttachedEntCount <= 1)
+					m_iExpTime = m_iTotalExpCount - 1;
+				else if (m_iAttachedEntCount < 5)
+					m_iExpTime = m_iTotalExpCount / m_iAttachedEntCount;
+				else if (m_iAttachedEntCount < 6)
+					m_iExpTime = 3;
+				else if (m_iAttachedEntCount < 10)
+					m_iExpTime = floor(double(m_iTotalExpCount - 2) / double(m_iAttachedEntCount)) + 1;
+				else if (m_iAttachedEntCount <= m_iTotalExpCount)
+					m_iExpTime = 1;
+			}
+			
 			
 			int iMultiDamage = m_iCount * m_iAttachedEntCount;
 				
@@ -203,30 +254,59 @@ namespace sv {
 				if (m_iCount < m_iExpTime)
 				{
 					int iHalfExpTime = floor(double(m_iExpTime) / 2);
-					if (m_iCount < iHalfExpTime)
+
+					if (m_iType)
 					{
 						if (m_iCount % 2)
 						{
 							//2 time is spr 4
-							UTIL_TempModel(Vector(0, 0, RANDOM_LONG(-7, 7)), pev->angles, g_vecZero, m_iCache_Exp[3], 30, 0, 200, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
+							UTIL_TempModel(Vector(0, 0, RANDOM_LONG(-15, 15)), pev->angles, g_vecZero, m_iCache_Exp[3], 30, 0, 200, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
 						}
 						else
 						{
-							UTIL_TempModel(Vector(0, 0, RANDOM_LONG(-7, 7)), pev->angles, g_vecZero, m_iCache_Exp[0], 30, 0, 200, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
+							UTIL_TempModel(Vector(0, 0, RANDOM_LONG(-15, 15)), pev->angles, g_vecZero, m_iCache_Exp[0], 30, 0, 200, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
 						}
+
+						EMIT_SOUND_DYN(ENT(m_pEnemyList->Element(i)->pev), CHAN_ITEM, "weapons/wondercannon_bomd_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 					}
 					else
 					{
-						UTIL_TempModel(Vector(0, 0, -18), pev->angles, g_vecZero, m_iCache_Exp[1], 30, 0, 230, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
-					}
+						if (m_iCount < iHalfExpTime)
+						{
+							if (m_iCount % 2)
+							{
+								//2 time is spr 4
+								UTIL_TempModel(Vector(0, 0, RANDOM_LONG(-7, 7)), pev->angles, g_vecZero, m_iCache_Exp[3], 30, 0, 200, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
+							}
+							else
+							{
+								UTIL_TempModel(Vector(0, 0, RANDOM_LONG(-7, 7)), pev->angles, g_vecZero, m_iCache_Exp[0], 30, 0, 200, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
+							}
+						}
+						else
+						{
+							UTIL_TempModel(Vector(0, 0, -18), pev->angles, g_vecZero, m_iCache_Exp[1], 30, 0, 230, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
+						}
 
-					EMIT_SOUND_DYN(ENT(m_pEnemyList->Element(i)->pev), CHAN_ITEM, "weapons/wondercannon_bomd_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+						EMIT_SOUND_DYN(ENT(m_pEnemyList->Element(i)->pev), CHAN_ITEM, "weapons/wondercannon_bomd_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					}		
 				}
 				else
 				{
-					UTIL_TempModel(Vector(0, 0, -18), pev->angles, g_vecZero, m_iCache_Exp[2], 30, 0, 230, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
+					if (m_iType)
+					{
+						UTIL_TempModel(Vector(0, 0, -18), pev->angles, g_vecZero, m_iCache_Exp[2], 30, 0, 230, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
 
-					EMIT_SOUND_DYN(ENT(m_pEnemyList->Element(i)->pev), CHAN_ITEM, "weapons/wondercannon_bomd_exp2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+						EMIT_SOUND_DYN(ENT(m_pEnemyList->Element(i)->pev), CHAN_ITEM, "weapons/wondercannonex_bmod_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					}
+					
+					else
+					{
+						UTIL_TempModel(Vector(0, 0, -18), pev->angles, g_vecZero, m_iCache_Exp[2], 30, 0, 230, 0, 0, 195, kRenderTransAdd, m_pEnemyList->Element(i), false, 0, 8, 0, 0);
+
+						EMIT_SOUND_DYN(ENT(m_pEnemyList->Element(i)->pev), CHAN_ITEM, "weapons/wondercannon_bomd_exp2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					}
+						
 				}
 					
 			}
@@ -316,38 +396,77 @@ namespace sv {
 			break;
 		}
 #else
-		switch (iType)
+		if (m_iType)
 		{
-		case sv::CWonderCannonChain::EXPTYPE_BASE:
-			flDamage = 0.35;
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 13;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 38;
-			break;
-		case sv::CWonderCannonChain::EXPTYPE_SINGLE:
-			flDamage = 0.5;
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 24;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 39;
-			break;
-		case sv::CWonderCannonChain::EXPTYPE_MULTI:
-			flDamage = 0.35;
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 16;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 38;
-			break;
-		case sv::CWonderCannonChain::EXPTYPE_FINAL:
-			flDamage = 0.35;
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 65;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 120;
-			break;
-		default:
-			break;
+			switch (iType)
+			{
+			case sv::CWonderCannonChain::EXPTYPE_BASE:
+				flDamage = 0.35;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 19;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 38;
+				break;
+			case sv::CWonderCannonChain::EXPTYPE_SINGLE:
+				flDamage = 0.5;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 69;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 101;
+				break;
+			case sv::CWonderCannonChain::EXPTYPE_MULTI:
+				flDamage = 0.35;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 37;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 64;
+				break;
+			case sv::CWonderCannonChain::EXPTYPE_FINAL:
+				flDamage = 0.35;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 99;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 165;
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			switch (iType)
+			{
+			case sv::CWonderCannonChain::EXPTYPE_BASE:
+				flDamage = 0.35;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 13;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 38;
+				break;
+			case sv::CWonderCannonChain::EXPTYPE_SINGLE:
+				flDamage = 0.5;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 24;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 39;
+				break;
+			case sv::CWonderCannonChain::EXPTYPE_MULTI:
+				flDamage = 0.35;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 16;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 38;
+				break;
+			case sv::CWonderCannonChain::EXPTYPE_FINAL:
+				flDamage = 0.35;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 65;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 120;
+				break;
+			default:
+				break;
+			}
 		}
 #endif
 		return flDamage;

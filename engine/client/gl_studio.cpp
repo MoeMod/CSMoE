@@ -30,27 +30,10 @@ GNU General Public License for more details.
 #include "physics.h"
 #endif
 
-// TBB and <execution> is only supported on win32
-#ifdef _WIN32
-#define XASH_RENDER_PAR 1
-#endif
-
-#ifdef XASH_RENDER_PAR
-#ifdef XASH_TBBMALLOC
-#include "tbb/parallel_for_each.h"
-#else
-#include <execution>
-#endif
-#endif
-
-// NOTE: enable this if you want merge both 'model' and 'modelT' files into one model slot.
-// otherwise it's uses two slots in models[] array for models with external textures
-// MoeMod : disabled due to crash in CSMoE win32
-// #define STUDIO_MERGE_TEXTURES
-
 #define EVENT_CLIENT	5000	// less than this value it's a server-side studio events
 #define MAXARRAYVERTS	20000	// used for draw shadows
 #define LEGS_BONES_COUNT	8
+#define MAX_LOCALLIGHTS	4
 
 static vec3_t hullcolor[8] = 
 {
@@ -90,10 +73,19 @@ typedef struct studiolight_s
 	vec3_t		lightspot;		// potential coords where placed lightsource
 
 	vec3_t		blightvec[MAXSTUDIOBONES];	// ambient lightvectors per bone
-	studiolight_item_t	dlight[MAX_DLIGHTS];
-	studiolight_item_t	elight[MAX_ELIGHTS];
-	int		numdlights;
-	int		numelights;
+	vec3_t		lightval;
+
+    // elights cache
+    int		numlocallights;
+    int		lightage[MAXSTUDIOBONES];
+    dlight_t		*locallight[MAX_LOCALLIGHTS];
+    color24		locallightcolor[MAX_LOCALLIGHTS];
+    vec4_t		lightpos[MAXSTUDIOVERTS][MAX_LOCALLIGHTS];
+    vec3_t		lightbonepos[MAXSTUDIOBONES][MAX_LOCALLIGHTS];
+    float		locallightR2[MAX_LOCALLIGHTS];
+
+    int			ambientlight;	// clip at 128
+    int			shadelight;		// clip at 192 - ambientlight
 } studiolight_t;
 
 typedef struct sortedmesh_s
@@ -159,6 +151,11 @@ vec3_t			g_mvShadowVec;
 int			g_nTopColor, g_nBottomColor;	// remap colors
 int			g_nFaceFlags, g_nForceFaceFlags;
 
+// quick cache aligned
+vec3_t pstudioverts[MAXSTUDIOVERTS]; // copied from m_pStudioHeader + m_pSubModel->vertindex
+vec3_t pstudionorms[MAXSTUDIOVERTS]; // copied from m_pStudioHeader + m_pSubModel->normindex
+
+
 /*
 ====================
 R_StudioInit
@@ -200,31 +197,31 @@ void R_StudioInit( void )
 
 /*
 ===============
-R_LeftHand
+R_GenAlignedVertAndNormCache
 
 ===============
 */
-_inline qboolean R_LeftHand( void )
+static void R_GenAlignedVertAndNormCache()
 {
-	return r_lefthand->integer == 1 && !g_bCustomStudioRenderer;
-}
-
-/*
-===============
-R_StudioTexName
-
-extract texture filename from modelname
-===============
-*/
-const char *R_StudioTexName( model_t *mod )
-{
-	static char	texname[64];
-
-	Q_strncpy( texname, mod->name, sizeof( texname ));
-	FS_StripExtension( texname );
-	Q_strncat( texname, "t.mdl", sizeof( texname ));
-
-	return texname;
+    // for cache friendly
+    const float* pstudioverts_unaligned = (const float*)((const byte*)m_pStudioHeader + m_pSubModel->vertindex);
+    const float* pstudionorms_unaligned = (const float*)((const byte*)m_pStudioHeader + m_pSubModel->normindex);
+    float *pstudioverts_out = (float *)pstudioverts;
+    float *pstudionorms_out = (float *)pstudionorms;
+    for(int i = 0; i < m_pSubModel->numverts; ++i)
+    {
+        pstudioverts_out[i * 4 + 0] = pstudioverts_unaligned[i * 3 + 0];
+        pstudioverts_out[i * 4 + 1] = pstudioverts_unaligned[i * 3 + 1];
+        pstudioverts_out[i * 4 + 2] = pstudioverts_unaligned[i * 3 + 2];
+        pstudioverts_out[i * 4 + 3] = 0;
+    }
+    for(int i = 0; i < m_pSubModel->numnorms; ++i)
+    {
+        pstudionorms_out[i * 4 + 0] = pstudionorms_unaligned[i * 3 + 0];
+        pstudionorms_out[i * 4 + 1] = pstudionorms_unaligned[i * 3 + 1];
+        pstudionorms_out[i * 4 + 2] = pstudionorms_unaligned[i * 3 + 2];
+        pstudionorms_out[i * 4 + 3] = 0;
+    }
 }
 
 /*
@@ -535,97 +532,6 @@ qboolean R_CullStudioModel( cl_entity_t *e )
 
 /*
 ====================
-StudioPlayerBlend
-
-====================
-*/
-void R_StudioPlayerBlend( mstudioseqdesc_t *pseqdesc, int *pBlend, float *pPitch )
-{
-	// calc up/down pointing
-	if( RI.params & RP_MIRRORVIEW )
-		*pBlend = (*pPitch * -6.0f);
-	else *pBlend = (*pPitch * 3.0f);
-
-	if( *pBlend < pseqdesc->blendstart[0] )
-	{
-		*pPitch -= pseqdesc->blendstart[0] / 3.0f;
-		*pBlend = 0;
-	}
-	else if( *pBlend > pseqdesc->blendend[0] )
-	{
-		*pPitch -= pseqdesc->blendend[0] / 3.0f;
-		*pBlend = 255;
-	}
-	else
-	{
-		if( pseqdesc->blendend[0] - pseqdesc->blendstart[0] < 0.1f ) // catch qc error
-			*pBlend = 127;
-		else *pBlend = 255 * (*pBlend - pseqdesc->blendstart[0]) / (pseqdesc->blendend[0] - pseqdesc->blendstart[0]);
-		*pPitch = 0.0f;
-	}
-}
-
-/*
-====================
-StudioSetUpTransform
-
-====================
-*/
-void R_StudioSetUpTransform( cl_entity_t *e )
-{
-	vec3_t	origin, angles;
-
-	VectorCopy( e->origin, origin );
-	VectorCopy( e->angles, angles );
-
-	// interpolate monsters position (moved into UpdateEntityFields by user request)
-	if( e->curstate.movetype == MOVETYPE_STEP && !( host.features & ENGINE_COMPUTE_STUDIO_LERP )) 
-	{
-		float	d, f = 0.0f;
-		int	i;
-
-		// don't do it if the goalstarttime hasn't updated in a while.
-		// NOTE: Because we need to interpolate multiplayer characters, the interpolation time limit
-		// was increased to 1.0 s., which is 2x the max lag we are accounting for.
-		if( m_fDoInterp && ( RI.refdef.time < e->curstate.animtime + 1.0f ) && ( e->curstate.animtime != e->latched.prevanimtime ))
-		{
-			f = ( RI.refdef.time - e->curstate.animtime ) / ( e->curstate.animtime - e->latched.prevanimtime );
-			// Msg( "%4.2f %.2f %.2f\n", f, e->curstate.animtime, RI.refdef.time );
-		}
-
-		if( m_fDoInterp )
-		{
-			// ugly hack to interpolate angle, position.
-			// current is reached 0.1 seconds after being set
-			f = f - 1.0f;
-		}
-
-		origin[0] += ( e->origin[0] - e->latched.prevorigin[0] ) * f;
-		origin[1] += ( e->origin[1] - e->latched.prevorigin[1] ) * f;
-		origin[2] += ( e->origin[2] - e->latched.prevorigin[2] ) * f;
-
-		InterpolateAngles( e->angles, e->latched.prevangles, angles, f );
-	}
-
-	if( !( host.features & ENGINE_COMPENSATE_QUAKE_BUG ))
-		angles[PITCH] = -angles[PITCH]; // stupid quake bug
-
-	// don't rotate clients, only aim
-	if( e->player ) angles[PITCH] = 0.0f;
-
-	Matrix3x4_CreateFromEntity( g_rotationmatrix, angles, origin, 1.0f );
-
-	if( tr.fFlipViewModel )
-	{
-		// inverse the right vector (should work in Opposing Force)
-		g_rotationmatrix[0][1] = -g_rotationmatrix[0][1];
-		g_rotationmatrix[1][1] = -g_rotationmatrix[1][1];
-		g_rotationmatrix[2][1] = -g_rotationmatrix[2][1];
-	}
-}
-
-/*
-====================
 StudioEstimateFrame
 
 ====================
@@ -659,662 +565,6 @@ float R_StudioEstimateFrame( cl_entity_t *e, mstudioseqdesc_t *pseqdesc )
 		if( f < 0.0 )  f = 0.0;
 	}
 	return f;
-}
-
-/*
-====================
-StudioEstimateInterpolant
-
-====================
-*/
-float R_StudioEstimateInterpolant( cl_entity_t *e )
-{
-	float	dadt = 1.0f;
-
-	if( m_fDoInterp && ( e->curstate.animtime >= e->latched.prevanimtime + 0.01f ))
-	{
-		dadt = ( RI.refdef.time - e->curstate.animtime ) / 0.1f;
-		if( dadt > 2.0f ) dadt = 2.0f;
-	}
-	return dadt;
-}
-
-/*
-====================
-StudioGetAnim
-
-====================
-*/
-mstudioanim_t *R_StudioGetAnim( model_t *m_pSubModel, mstudioseqdesc_t *pseqdesc )
-{
-	mstudioseqgroup_t	*pseqgroup;
-	fs_offset_t		filesize;
-	byte		*buf;
-	cache_user_t	*paSequences;
-
-	ASSERT( m_pSubModel );	
-
-	pseqgroup = (mstudioseqgroup_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqgroupindex) + pseqdesc->seqgroup;
-	if( pseqdesc->seqgroup == 0 )
-#ifdef XASH_64BIT
-		return (mstudioanim_t *)((byte *)m_pStudioHeader + pseqdesc->animindex);
-#else
-		return (mstudioanim_t *)((byte *)m_pStudioHeader + pseqgroup->data + pseqdesc->animindex);
-#endif
-
-	paSequences = (cache_user_t *)m_pSubModel->submodels;
-
-	if( paSequences == NULL )
-	{
-		paSequences = (cache_user_t *)Mem_ZeroAlloc( com_studiocache, MAXSTUDIOGROUPS * sizeof( cache_user_t ));
-		m_pSubModel->submodels = (dmodel_t*)paSequences;
-	}
-
-	// check for already loaded
-	if( !paSequences[pseqdesc->seqgroup].data )
-	{
-		string	filepath, modelname, modelpath;
-
-		FS_FileBase( m_pSubModel->name, modelname );
-		FS_ExtractFilePath( m_pSubModel->name, modelpath );
-
-		// NOTE: here we build real sub-animation filename because stupid user may rename model without recompile
-		Q_snprintf( filepath, sizeof( filepath ), "%s/%s%i%i.mdl", modelpath, modelname, pseqdesc->seqgroup / 10, pseqdesc->seqgroup % 10 );
-
-		buf = FS_LoadFile( filepath, &filesize, false );
-		if( !buf || !filesize )
-			Host_Error( "StudioGetAnim: can't load %s\n", filepath );
-		else if( IDSEQGRPHEADER != *(uint *)buf )
-			Host_Error( "StudioGetAnim: %s is corrupted\n", filepath );
-
-		MsgDev( D_INFO, "loading: %s\n", filepath );
-			
-		paSequences[pseqdesc->seqgroup].data = Mem_Alloc( com_studiocache, filesize );
-        Mem_VirtualCopy( paSequences[pseqdesc->seqgroup].data, buf, (size_t)filesize );
-		Mem_Free( buf );
-	}
-
-	return (mstudioanim_t *)((byte *)paSequences[pseqdesc->seqgroup].data + pseqdesc->animindex);
-}
-
-/*
-====================
-StudioFxTransform
-
-====================
-*/
-void R_StudioFxTransform( cl_entity_t *ent, matrix3x4_ref transform )
-{
-	switch( ent->curstate.renderfx )
-	{
-	case kRenderFxDistort:
-	case kRenderFxHologram:
-		if( !Com_RandomLong( 0, 49 ))
-		{
-			int	axis = Com_RandomLong( 0, 1 );
-
-			if( axis == 1 ) axis = 2; // choose between x & z
-			VectorScale( transform[axis], Com_RandomFloat( 1.0f, 1.484f ), transform[axis] );
-		}
-		else if( !Com_RandomLong( 0, 49 ))
-		{
-			float	offset;
-			int	axis = Com_RandomLong( 0, 1 );
-
-			if( axis == 1 ) axis = 2; // choose between x & z
-			offset = Com_RandomFloat( -10.0f, 10.0f );
-			transform[Com_RandomLong( 0, 2 )][3] += offset;
-		}
-		break;
-	case kRenderFxExplode:
-		{
-			float	scale;
-
-			scale = 1.0f + ( RI.refdef.time - ent->curstate.animtime ) * 10.0f;
-			if( scale > 2.0f ) scale = 2.0f; // don't blow up more than 200%
-
-			transform[0][1] *= scale;
-			transform[1][1] *= scale;
-			transform[2][1] *= scale;
-		}
-		break;
-	}
-}
-
-/*
-====================
-StudioCalcBoneAdj
-
-====================
-*/
-void R_StudioCalcBoneAdj( float dadt, float *adj, const byte *pcontroller1, const byte *pcontroller2, byte mouthopen )
-{
-	mstudiobonecontroller_t	*pbonecontroller;
-	float			value = 0.0f;
-	int			i, j;
-
-	pbonecontroller = (mstudiobonecontroller_t *)((byte *)m_pStudioHeader + m_pStudioHeader->bonecontrollerindex);
-
-	for (j = 0; j < m_pStudioHeader->numbonecontrollers; j++)
-	{
-		i = pbonecontroller[j].index;
-
-		if( i == STUDIO_MOUTH )
-		{
-			// mouth hardcoded at controller 4
-			value = (float)mouthopen / 64.0f;
-			if( value > 1.0f ) value = 1.0f;				
-			value = (1.0f - value) * pbonecontroller[j].start + value * pbonecontroller[j].end;
-		}
-		else if( i <= MAXSTUDIOCONTROLLERS )
-		{
-			// check for 360% wrapping
-			if( pbonecontroller[j].type & STUDIO_RLOOP )
-			{
-				if( abs( pcontroller1[i] - pcontroller2[i] ) > 128 )
-				{
-					float	a, b;
-
-					a = fmod(( pcontroller1[j] + 128.0f ), 256.0f );
-					b = fmod(( pcontroller2[j] + 128.0f ), 256.0f );
-					value = ((a * dadt) + (b * (1 - dadt)) - 128.0f) * (360.0f / 256.0f) + pbonecontroller[j].start;
-				}
-				else 
-				{
-					value = (pcontroller1[i] * dadt + (pcontroller2[i]) * (1.0f - dadt)) * (360.0f / 256.0f) + pbonecontroller[j].start;
-				}
-			}
-			else 
-			{
-				value = (pcontroller1[i] * dadt + pcontroller2[i] * (1.0f - dadt)) / 255.0f;
-				value = bound( 0.0f, value, 1.0f );
-				value = (1.0f - value) * pbonecontroller[j].start + value * pbonecontroller[j].end;
-			}
-		}
-
-		switch( pbonecontroller[j].type & STUDIO_TYPES )
-		{
-		case STUDIO_XR:
-		case STUDIO_YR:
-		case STUDIO_ZR:
-			adj[j] = value * (M_PI / 180.0f);
-			break;
-		case STUDIO_X:
-		case STUDIO_Y:
-		case STUDIO_Z:
-			adj[j] = value;
-			break;
-		}
-	}
-}
-
-/*
-====================
-StudioCalcBoneQuaterion
-
-====================
-*/
-void R_StudioCalcBoneQuaterion( int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec4_t_ref q )
-{
-	int		j, k;
-	vec4_t		q1, q2;
-	vec3_t		angle1, angle2;
-	mstudioanimvalue_t	*panimvalue;
-
-	for( j = 0; j < 3; j++ )
-	{
-		if( panim->offset[j+3] == 0 )
-		{
-			angle2[j] = angle1[j] = pbone->value[j+3]; // default;
-		}
-		else
-		{
-			panimvalue = (mstudioanimvalue_t *)((byte *)panim + panim->offset[j+3]);
-			k = frame;
-			
-			// debug
-			if( panimvalue->num.total < panimvalue->num.valid )
-				k = 0;
-			
-			while( panimvalue->num.total <= k )
-			{
-				k -= panimvalue->num.total;
-				panimvalue += panimvalue->num.valid + 1;
-
-				// debug
-				if( panimvalue->num.total < panimvalue->num.valid )
-					k = 0;
-			}
-
-			// bah, missing blend!
-			if( panimvalue->num.valid > k )
-			{
-				angle1[j] = panimvalue[k+1].value;
-
-				if( panimvalue->num.valid > k + 1 )
-				{
-					angle2[j] = panimvalue[k+2].value;
-				}
-				else
-				{
-					if( panimvalue->num.total > k + 1 )
-						angle2[j] = angle1[j];
-					else angle2[j] = panimvalue[panimvalue->num.valid+2].value;
-				}
-			}
-			else
-			{
-				angle1[j] = panimvalue[panimvalue->num.valid].value;
-
-				if( panimvalue->num.total > k + 1 )
-				{
-					angle2[j] = angle1[j];
-				}
-				else
-				{
-					angle2[j] = panimvalue[panimvalue->num.valid + 2].value;
-				}
-			}
-
-			angle1[j] = pbone->value[j+3] + angle1[j] * pbone->scale[j+3];
-			angle2[j] = pbone->value[j+3] + angle2[j] * pbone->scale[j+3];
-		}
-
-		if( pbone->bonecontroller[j+3] != -1 )
-		{
-			angle1[j] += adj[pbone->bonecontroller[j+3]];
-			angle2[j] += adj[pbone->bonecontroller[j+3]];
-		}
-	}
-
-	if( !VectorCompare( angle1, angle2 ))
-	{
-		AngleQuaternion( angle1, q1 );
-		AngleQuaternion( angle2, q2 );
-		QuaternionSlerp( q1, q2, s, q );
-	}
-	else
-	{
-		AngleQuaternion( angle1, q );
-	}
-}
-
-/*
-====================
-StudioCalcBonePosition
-
-====================
-*/
-void R_StudioCalcBonePosition( int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos )
-{
-	mstudioanimvalue_t	*panimvalue;
-	int		j, k;
-
-	for( j = 0; j < 3; j++ )
-	{
-		pos[j] = pbone->value[j]; // default;
-
-		if( panim->offset[j] != 0 )
-		{
-			panimvalue = (mstudioanimvalue_t *)((byte *)panim + panim->offset[j]);
-			k = frame;
-
-			// debug
-			if( panimvalue->num.total < panimvalue->num.valid )
-				k = 0;
-
-			// find span of values that includes the frame we want
-			while( panimvalue->num.total <= k )
-			{
-				k -= panimvalue->num.total;
-				panimvalue += panimvalue->num.valid + 1;
-
-  				// debug
-				if( panimvalue->num.total < panimvalue->num.valid )
-					k = 0;
-			}
-
-			// if we're inside the span
-			if( panimvalue->num.valid > k )
-			{
-				// and there's more data in the span
-				if( panimvalue->num.valid > k + 1 )
-					pos[j] += (panimvalue[k+1].value * (1.0f - s) + s * panimvalue[k+2].value) * pbone->scale[j];
-				else pos[j] += panimvalue[k+1].value * pbone->scale[j];
-			}
-			else
-			{
-				// are we at the end of the repeating values section and there's another section with data?
-				if( panimvalue->num.total <= k + 1 )
-					pos[j] += (panimvalue[panimvalue->num.valid].value * (1.0f - s) + s * panimvalue[panimvalue->num.valid + 2].value) * pbone->scale[j];
-				else pos[j] += panimvalue[panimvalue->num.valid].value * pbone->scale[j];
-			}
-		}
-
-		if( pbone->bonecontroller[j] != -1 && adj )
-			pos[j] += adj[pbone->bonecontroller[j]];
-	}
-}
-
-/*
-====================
-StudioSlerpBones
-
-====================
-*/
-void R_StudioSlerpBones( vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s )
-{
-	int	i;
-	vec4_t	q3;
-	float	s1;
-
-	s = bound( 0.0f, s, 1.0f );
-	s1 = 1.0f - s; // backlerp
-
-	for( i = 0; i < m_pStudioHeader->numbones; i++ )
-	{
-		QuaternionSlerp( q1[i], q2[i], s, q3 );
-		q1[i][0] = q3[0];
-		q1[i][1] = q3[1];
-		q1[i][2] = q3[2];
-		q1[i][3] = q3[3];
-		pos1[i][0] = pos1[i][0] * s1 + pos2[i][0] * s;
-		pos1[i][1] = pos1[i][1] * s1 + pos2[i][1] * s;
-		pos1[i][2] = pos1[i][2] * s1 + pos2[i][2] * s;
-	}
-}
-
-/*
-====================
-StudioCalcRotations
-
-====================
-*/
-void R_StudioCalcRotations( cl_entity_t *e, vec3_t pos[], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f )
-{
-	int		i, frame;
-	mstudiobone_t	*pbone;
-	float		adj[MAXSTUDIOCONTROLLERS];
-	float		s, dadt;
-
-	if( f > pseqdesc->numframes - 1 )
-	{
-		f = 0.0f; // bah, fix this bug with changing sequences too fast
-	}
-	else if( f < -0.01f )
-	{
-		// this could cause a crash if the frame # is negative, so we'll go ahead
-		// and clamp it here
-		MsgDev( D_ERROR, "StudioCalcRotations: f = %g\n", f );
-		f = -0.01f;
-	}
-
-	frame = (int)f;
-
-	dadt = R_StudioEstimateInterpolant( e );
-	s = (f - frame);
-
-	// add in programtic controllers
-	pbone = (mstudiobone_t *)((byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
-
-	R_StudioCalcBoneAdj( dadt, adj, e->curstate.controller, e->latched.prevcontroller, e->mouth.mouthopen );
-
-	for( i = 0; i < m_pStudioHeader->numbones; i++, pbone++, panim++ ) 
-	{
-		R_StudioCalcBoneQuaterion( frame, s, pbone, panim, adj, q[i] );
-		R_StudioCalcBonePosition( frame, s, pbone, panim, adj, pos[i] );
-	}
-
-	if( pseqdesc->motiontype & STUDIO_X ) pos[pseqdesc->motionbone][0] = 0.0f;
-	if( pseqdesc->motiontype & STUDIO_Y ) pos[pseqdesc->motionbone][1] = 0.0f;
-	if( pseqdesc->motiontype & STUDIO_Z ) pos[pseqdesc->motionbone][2] = 0.0f;
-#if 0
-	s = 1.0f * ((1.0f - (f - (int)(f))) / (pseqdesc->numframes)) * e->curstate.framerate;
-
-	if( pseqdesc->motiontype & STUDIO_LX ) pos[pseqdesc->motionbone][0] += s * pseqdesc->linearmovement[0];
-	if( pseqdesc->motiontype & STUDIO_LY ) pos[pseqdesc->motionbone][1] += s * pseqdesc->linearmovement[1];
-	if( pseqdesc->motiontype & STUDIO_LZ ) pos[pseqdesc->motionbone][2] += s * pseqdesc->linearmovement[2];
-#endif
-}
-
-/*
-====================
-StudioMergeBones
-
-====================
-*/
-void R_StudioMergeBones( cl_entity_t *e, model_t *m_pSubModel )
-{
-	int		i, j;
-	mstudiobone_t	*pbones;
-	mstudioseqdesc_t	*pseqdesc;
-	mstudioanim_t	*panim;
-	matrix3x4		bonematrix;
-	static vec4_t	q[MAXSTUDIOBONES];
-	static vec3_t	pos[MAXSTUDIOBONES];
-	double		f;
-
-	if( e->curstate.sequence >=  m_pStudioHeader->numseq )
-		e->curstate.sequence = 0;
-
-	pseqdesc = (mstudioseqdesc_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqindex) + e->curstate.sequence;
-
-	f = R_StudioEstimateFrame( e, pseqdesc );
-
-	panim = R_StudioGetAnim( m_pSubModel, pseqdesc );
-	R_StudioCalcRotations( e, pos, q, pseqdesc, panim, f );
-	pbones = (mstudiobone_t *)((byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
-
-	for( i = 0; i < m_pStudioHeader->numbones; i++ ) 
-	{
-		for( j = 0; j < g_nCachedBones; j++ )
-		{
-			if( !Q_stricmp( pbones[i].name, g_nCachedBoneNames[j] ))
-			{
-				Matrix3x4_Copy( g_bonestransform[i], g_rgCachedBonesTransform[j] );
-				Matrix3x4_Copy( g_lighttransform[i], g_rgCachedLightTransform[j] );
-				break;
-			}
-		}
-
-		if( j >= g_nCachedBones )
-		{
-			Matrix3x4_FromOriginQuat( bonematrix, q[i], pos[i] );
-			if( pbones[i].parent == -1 ) 
-			{
-				Matrix3x4_ConcatTransforms( g_bonestransform[i], g_rotationmatrix, bonematrix );
-				Matrix3x4_Copy( g_lighttransform[i], g_bonestransform[i] );
-
-				// apply client-side effects to the transformation matrix
-				R_StudioFxTransform( e, g_bonestransform[i] );
-			} 
-			else 
-			{
-				Matrix3x4_ConcatTransforms( g_bonestransform[i], g_bonestransform[pbones[i].parent], bonematrix );
-				Matrix3x4_ConcatTransforms( g_lighttransform[i], g_lighttransform[pbones[i].parent], bonematrix );
-			}
-		}
-	}
-}
-
-/*
-====================
-StudioSetupBones
-
-====================
-*/
-void R_StudioSetupBones( cl_entity_t *e )
-{
-	double		f;
-	mstudiobone_t	*pbones;
-	mstudioseqdesc_t	*pseqdesc;
-	mstudioanim_t	*panim;
-	matrix3x4		bonematrix;
-	static vec3_t	pos[MAXSTUDIOBONES];
-	static vec4_t	q[MAXSTUDIOBONES];
-	static vec3_t	pos2[MAXSTUDIOBONES];
-	static vec4_t	q2[MAXSTUDIOBONES];
-	static vec3_t	pos3[MAXSTUDIOBONES];
-	static vec4_t	q3[MAXSTUDIOBONES];
-	static vec3_t	pos4[MAXSTUDIOBONES];
-	static vec4_t	q4[MAXSTUDIOBONES];
-	int		i, j;
-
-	if( e->curstate.sequence >= m_pStudioHeader->numseq )
-		e->curstate.sequence = 0;
-
-	pseqdesc = (mstudioseqdesc_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqindex) + e->curstate.sequence;
-
-	f = R_StudioEstimateFrame( e, pseqdesc );
-
-	panim = R_StudioGetAnim( e->model, pseqdesc );
-	R_StudioCalcRotations( e, pos, q, pseqdesc, panim, f );
-
-	if( pseqdesc->numblends > 1 )
-	{
-		float	s;
-		float	dadt;
-
-		panim += m_pStudioHeader->numbones;
-		R_StudioCalcRotations( e, pos2, q2, pseqdesc, panim, f );
-
-		dadt = R_StudioEstimateInterpolant( e );
-		s = (e->curstate.blending[0] * dadt + e->latched.prevblending[0] * (1.0f - dadt)) / 255.0f;
-
-		R_StudioSlerpBones( q, pos, q2, pos2, s );
-
-		if( pseqdesc->numblends == 4 )
-		{
-			panim += m_pStudioHeader->numbones;
-			R_StudioCalcRotations( e, pos3, q3, pseqdesc, panim, f );
-
-			panim += m_pStudioHeader->numbones;
-			R_StudioCalcRotations( e, pos4, q4, pseqdesc, panim, f );
-
-			s = (e->curstate.blending[0] * dadt + e->latched.prevblending[0] * (1.0f - dadt)) / 255.0f;
-			R_StudioSlerpBones( q3, pos3, q4, pos4, s );
-
-			s = (e->curstate.blending[1] * dadt + e->latched.prevblending[1] * (1.0f - dadt)) / 255.0f;
-			R_StudioSlerpBones( q, pos, q3, pos3, s );
-		}
-	}
-
-	if( m_fDoInterp && e->latched.sequencetime && ( e->latched.sequencetime + 0.2f > RI.refdef.time) && ( e->latched.prevsequence < m_pStudioHeader->numseq ))
-	{
-		// blend from last sequence
-		static vec3_t	pos1b[MAXSTUDIOBONES];
-		static vec4_t	q1b[MAXSTUDIOBONES];
-		float		s;
-
-		pseqdesc = (mstudioseqdesc_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqindex) + e->latched.prevsequence;
-		panim = R_StudioGetAnim( e->model, pseqdesc );
-
-		// clip prevframe
-		R_StudioCalcRotations( e, pos1b, q1b, pseqdesc, panim, e->latched.prevframe );
-
-		if( pseqdesc->numblends > 1 )
-		{
-			panim += m_pStudioHeader->numbones;
-			R_StudioCalcRotations( e, pos2, q2, pseqdesc, panim, e->latched.prevframe );
-
-			s = (e->latched.prevseqblending[0]) / 255.0f;
-			R_StudioSlerpBones( q1b, pos1b, q2, pos2, s );
-
-			if( pseqdesc->numblends == 4 )
-			{
-				panim += m_pStudioHeader->numbones;
-				R_StudioCalcRotations( e, pos3, q3, pseqdesc, panim, e->latched.prevframe );
-
-				panim += m_pStudioHeader->numbones;
-				R_StudioCalcRotations( e, pos4, q4, pseqdesc, panim, e->latched.prevframe );
-
-				s = (e->latched.prevseqblending[0]) / 255.0f;
-				R_StudioSlerpBones( q3, pos3, q4, pos4, s );
-
-				s = (e->latched.prevseqblending[1]) / 255.0f;
-				R_StudioSlerpBones( q1b, pos1b, q3, pos3, s );
-			}
-		}
-
-		s = 1.0f - ( RI.refdef.time - e->latched.sequencetime ) / 0.2f;
-		R_StudioSlerpBones( q, pos, q1b, pos1b, s );
-	}
-	else
-	{
-		// store prevframe otherwise
-		e->latched.prevframe = f;
-	}
-
-	pbones = (mstudiobone_t *)((byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
-
-	// calc gait animation
-	if( m_pPlayerInfo && m_pPlayerInfo->gaitsequence != 0 )
-	{
-		if( m_pPlayerInfo->gaitsequence >= m_pStudioHeader->numseq ) 
-			m_pPlayerInfo->gaitsequence = 0;
-
-		pseqdesc = (mstudioseqdesc_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqindex) + m_pPlayerInfo->gaitsequence;
-
-		panim = R_StudioGetAnim( e->model, pseqdesc );
-		R_StudioCalcRotations( e, pos2, q2, pseqdesc, panim, m_pPlayerInfo->gaitframe );
-
-		for( i = 0; i < m_pStudioHeader->numbones; i++ )
-		{
-			for( j = 0; j < LEGS_BONES_COUNT; j++ )
-			{
-				if( !Q_strcmp( pbones[i].name, legs_bones[j] ))
-					break;
-			}
-
-			if( j == LEGS_BONES_COUNT )
-				continue;	// not used for legs
-
-			VectorCopy( pos2[i], pos[i] );
-			Vector4Copy( q2[i], q[i] );
-		}
-	}
-
-	for( i = 0; i < m_pStudioHeader->numbones; i++ ) 
-	{
-		Matrix3x4_FromOriginQuat( bonematrix, q[i], pos[i] );
-
-		if( pbones[i].parent == -1 ) 
-		{
-			Matrix3x4_ConcatTransforms( g_bonestransform[i], g_rotationmatrix, bonematrix );
-			Matrix3x4_Copy( g_lighttransform[i], g_bonestransform[i] );
-
-			// apply client-side effects to the transformation matrix
-			R_StudioFxTransform( e, g_bonestransform[i] );
-		} 
-		else
-		{
-			Matrix3x4_ConcatTransforms( g_bonestransform[i], g_bonestransform[pbones[i].parent], bonematrix );
-			Matrix3x4_ConcatTransforms( g_lighttransform[i], g_lighttransform[pbones[i].parent], bonematrix );
-		}
-	}
-}
-
-/*
-====================
-StudioSaveBones
-
-====================
-*/
-static void R_StudioSaveBones( void )
-{
-	mstudiobone_t	*pbones;
-	int		i;
-
-	pbones = (mstudiobone_t *)((byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
-
-	g_nCachedBones = m_pStudioHeader->numbones;
-
-	for( i = 0; i < m_pStudioHeader->numbones; i++ ) 
-	{
-		Q_strcpy( g_nCachedBoneNames[i], pbones[i].name );
-		Matrix3x4_Copy( g_rgCachedBonesTransform[i], g_bonestransform[i] );
-		Matrix3x4_Copy( g_rgCachedLightTransform[i], g_lighttransform[i] );
-	}
 }
 
 /*
@@ -1380,45 +630,6 @@ void R_StudioSetupChrome( vec2_t_ref pchrome, int bone, const vec3_t normal )
 }
 
 /*
-====================
-StudioCalcAttachments
-
-====================
-*/
-static void R_StudioCalcAttachments( void )
-{
-	mstudioattachment_t	*pAtt;
-	vec3_t		forward, bonepos;
-	vec3_t		localOrg, localAng;
-	int		i;
-
-	if( m_pStudioHeader->numattachments <= 0 )
-	{
-		// clear attachments
-		for( i = 0; i < MAXSTUDIOATTACHMENTS; i++ )
-			VectorClear( RI.currententity->attachment[i] );
-		return;
-	}
-	else if( m_pStudioHeader->numattachments > MAXSTUDIOATTACHMENTS )
-	{
-		m_pStudioHeader->numattachments = MAXSTUDIOATTACHMENTS; // reduce it
-		MsgDev( D_WARN, "R_StudioCalcAttahments: too many attachments on %s\n", RI.currentmodel->name );
-	}
-
-	// calculate attachment points
-	pAtt = (mstudioattachment_t *)((byte *)m_pStudioHeader + m_pStudioHeader->attachmentindex);
-
-	for( i = 0; i < m_pStudioHeader->numattachments; i++ )
-	{
-		Matrix3x4_VectorTransform( g_lighttransform[pAtt[i].bone], pAtt[i].org, RI.currententity->attachment[i] );
-		VectorSubtract( RI.currententity->attachment[i], RI.currententity->origin, localOrg ); //gr2
-		Matrix3x4_OriginFromMatrix( g_lighttransform[pAtt[i].bone], bonepos );
-        forward = (localOrg - bonepos).Normalize();
-		VectorAngles( forward, localAng );
-	}
-}
-
-/*
 ===============
 pfnStudioSetupModel
 
@@ -1447,6 +658,7 @@ static void GAME_EXPORT R_StudioSetupModel( int bodypart, void **ppbodypart, voi
 	index = index % m_pBodyPart->nummodels;
 
 	m_pSubModel = (mstudiomodel_t *)((byte *)m_pStudioHeader + m_pBodyPart->modelindex) + index;
+    R_GenAlignedVertAndNormCache();
 
 	if( ppbodypart ) *ppbodypart = m_pBodyPart;
 	if( ppsubmodel ) *ppsubmodel = m_pSubModel;
@@ -1467,148 +679,183 @@ static int GAME_EXPORT R_StudioCheckBBox( void )
 
 /*
 ===============
-R_StudioGetShadowImpactAndDir
-===============
-*/
-void R_StudioGetShadowImpactAndDir( void )
-{
-	float		angle;
-	vec3_t		skyAngles, origin, end;
-
-	if( !cl.refdef.movevars ) return; // e.g. in menu
-
-	// convert skyvec into angles then back into vector to avoid 0 0 0 direction
-	vec3_t skyvec = { cl.refdef.movevars->skyvec_x, cl.refdef.movevars->skyvec_y, cl.refdef.movevars->skyvec_z };
-	VectorAngles( skyvec, skyAngles );
-	angle = skyAngles[YAW] / 180 * M_PI;
-
-	Matrix3x4_OriginFromMatrix( g_bonestransform[0], origin );
-	SinCos( angle, &g_mvShadowVec[1], &g_mvShadowVec[0] );
-
-	R_LightDir( origin, g_mvShadowVec, 256.0f );
-
-	VectorSet( g_mvShadowVec, -g_mvShadowVec[0], -g_mvShadowVec[1], -1.0f );
-	VectorNormalize( g_mvShadowVec );
-
-	VectorMA( origin, 256.0f, g_mvShadowVec, end );
-
-	g_shadowTrace = CL_TraceLine( origin, end, PM_WORLD_ONLY );
-}
-
-/*
-===============
 R_StudioDynamicLight
 
 ===============
 */
 void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
 {
-	uint		lnum, i;
-	studiolight_t	*plight;
-	qboolean		invLight;
-	color24		ambient;
-	float		dist, radius2;
-	vec3_t		direction, origin;
-	dlight_t		*dl;
+    movevars_t	*mv = cl.refdef.movevars;
+    vec3_t		lightDir, vecSrc, vecEnd;
+    vec3_t		origin, dist, finalLight;
+    float		add, radius, total;
+    colorVec		light;
+    uint		lnum;
+    dlight_t		*dl;
 
-	if( !lightinfo ) return;
+    if( !lightinfo || !ent || !ent->model )
+        return;
 
-	plight = &g_studiolight;
-	plight->numdlights = 0;	// clear previous dlights
+    if( !RI.drawWorld || r_fullbright->value || ( ent->curstate.effects & EF_FULLBRIGHT ))
+    {
+        lightinfo->shadelight = 0;
+        lightinfo->ambientlight = 192;
 
-	if( r_studio_lighting->integer == 2 )
-	{
-		Matrix3x4_OriginFromMatrix( g_lighttransform[0], origin );
+        VectorSet( *lightinfo->plightvec, 0.0f, 0.0f, -1.0f );
+        VectorSet( lightinfo->color, 1.0f, 1.0f, 1.0f );
+        return;
+    }
 
-		// NOTE: in some cases bone origin may be stuck in the geometry
-		// and produced completely black model. Run additional check for this case
-		if( CL_PointContents( origin ) == CONTENTS_SOLID )
-			Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
-	}
-	else Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
+    // determine plane to get lightvalues from: ceil or floor
+    if(  ent->curstate.effects & EF_INVLIGHT )
+        VectorSet( lightDir, 0.0f, 0.0f, 1.0f );
+    else VectorSet( lightDir, 0.0f, 0.0f, -1.0f );
 
-	// setup light dir
-	if( cl.refdef.movevars )
-	{
-		// pre-defined light vector
-		plight->lightvec[0] = cl.refdef.movevars->skyvec_x;
-		plight->lightvec[1] = cl.refdef.movevars->skyvec_y;
-		plight->lightvec[2] = cl.refdef.movevars->skyvec_z;
-	}
-	else VectorSet( plight->lightvec, 0.0f, 0.0f, -1.0f );
+    VectorCopy( ent->origin, origin );
 
-	if( VectorIsNull( plight->lightvec ))
-		VectorSet( plight->lightvec, 0.0f, 0.0f, -1.0f );
+    VectorSet( vecSrc, origin[0], origin[1], origin[2] - lightDir[2] * 8.0f );
+    light.r = light.g = light.b = light.a = 0;
 
-	VectorCopy( plight->lightvec, *lightinfo->plightvec );
+    if(( mv->skycolor_r + mv->skycolor_g + mv->skycolor_b ) != 0 )
+    {
+        msurface_t	*psurf = NULL;
+        pmtrace_t		trace;
 
-	// setup ambient lighting
-	invLight = (ent && ent->curstate.effects & EF_INVLIGHT) ? true : false;
-	R_LightForPoint( origin, &ambient, invLight, true, 0.0f ); // ignore dlights
+        if( host.features & ENGINE_WRITE_LARGE_COORD )
+        {
+            vecEnd[0] = origin[0] - mv->skyvec_x * 65536.0f;
+            vecEnd[1] = origin[1] - mv->skyvec_y * 65536.0f;
+            vecEnd[2] = origin[2] - mv->skyvec_z * 65536.0f;
+        }
+        else
+        {
+            vecEnd[0] = origin[0] - mv->skyvec_x * 8192.0f;
+            vecEnd[1] = origin[1] - mv->skyvec_y * 8192.0f;
+            vecEnd[2] = origin[2] - mv->skyvec_z * 8192.0f;
+        }
 
-	R_GetLightSpot( plight->lightspot );	// shadow stuff
+        trace = CL_TraceLine( vecSrc, vecEnd, PM_WORLD_ONLY );
+        if( trace.ent > 0 ) psurf = PM_TraceSurface( &clgame.pmove->physents[trace.ent], vecSrc, vecEnd );
+        else psurf = PM_TraceSurface( clgame.pmove->physents, vecSrc, vecEnd );
 
-	plight->lightcolor[0] = lightinfo->color[0] = ambient.r * (1.0f / 255.0f);
-	plight->lightcolor[1] = lightinfo->color[1] = ambient.g * (1.0f / 255.0f);
-	plight->lightcolor[2] = lightinfo->color[2] = ambient.b * (1.0f / 255.0f);
+        if( ( psurf && (psurf->flags & SURF_DRAWSKY )))
+        {
+            VectorSet( lightDir, mv->skyvec_x, mv->skyvec_y, mv->skyvec_z );
 
-	VectorCopy( plight->lightcolor, lightinfo->color );
-	lightinfo->shadelight = (ambient.r + ambient.g + ambient.b) / 3;
-	lightinfo->ambientlight = lightinfo->shadelight;
+            light.r = ( bound( 0, mv->skycolor_r, 255 ));
+            light.g = ( bound( 0, mv->skycolor_g, 255 ));
+            light.b = ( bound( 0, mv->skycolor_b, 255 ));
+        }
+    }
 
-	if( !ent || !ent->model || !r_dynamic->integer )
-		return;
+    if(( light.r + light.g + light.b ) < 16 ) // TESTTEST
+    {
+        colorVec	gcolor;
+        float	grad[4];
 
-	for( lnum = 0, dl = cl_dlights; lnum < MAX_DLIGHTS; lnum++, dl++ )
-	{
-		if( dl->die < RI.refdef.time || !dl->radius )
-			continue;
+        VectorScale( lightDir, 2048.0f, vecEnd );
+        VectorAdd( vecEnd, vecSrc, vecEnd );
 
-		VectorSubtract( dl->origin, origin, direction );
-		dist = VectorLength( direction );
+        light = R_LightVec( vecSrc, vecEnd, g_studiolight.lightspot, g_studiolight.lightvec );
 
-		if( !dist || dist > dl->radius + studio_radius )
-			continue;
+        if( VectorIsNull( g_studiolight.lightvec ))
+        {
+            vec3_t spot, vec;
+            vecSrc[0] -= 16.0f;
+            vecSrc[1] -= 16.0f;
+            vecEnd[0] -= 16.0f;
+            vecEnd[1] -= 16.0f;
 
-		radius2 = dl->radius * dl->radius; // squared radius
+            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+            grad[0] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-		for( i = 0; i < m_pStudioHeader->numbones; i++ )
-		{
-			vec3_t	vec, org;
-			float	atten;
+            vecSrc[0] += 32.0f;
+            vecEnd[0] += 32.0f;
 
-			Matrix3x4_OriginFromMatrix( g_lighttransform[i], org );
-			VectorSubtract( org, dl->origin, vec );
+            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+            grad[1] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-			dist = DotProduct( vec, vec );
-			atten = (dist / radius2 - 1) * -1;
-			if( atten < 0 ) atten = 0;
-			dist = sqrt( dist );
+            vecSrc[1] += 32.0f;
+            vecEnd[1] += 32.0f;
 
-			if( dist )
-			{
-				dist = 1.0f / dist;
-				VectorScale( vec, dist, vec );
-				lightinfo->ambientlight += atten;
-				lightinfo->shadelight += atten;
-			}
+            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+            grad[2] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->dlight[plight->numdlights].vec[i] );
-			VectorScale( plight->dlight[plight->numdlights].vec[i], atten, plight->dlight[plight->numdlights].vec[i] );
-		}
+            vecSrc[0] -= 32.0f;
+            vecEnd[0] -= 32.0f;
 
-		plight->dlight[plight->numdlights].color[0] = dl->color.r * (1.0f / 255.0f);
-		plight->dlight[plight->numdlights].color[1] = dl->color.g * (1.0f / 255.0f);
-		plight->dlight[plight->numdlights].color[2] = dl->color.b * (1.0f / 255.0f);
-		plight->numdlights++;
-	}
+            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+            grad[3] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-	// clamp lighting so it doesn't overbright as much
-	if( lightinfo->ambientlight > 128 )
-		lightinfo->ambientlight = 128;
+            lightDir[0] = grad[0] - grad[1] - grad[2] + grad[3];
+            lightDir[1] = grad[1] + grad[0] - grad[2] - grad[3];
+            VectorNormalize( lightDir );
+        }
+        else
+        {
+            VectorCopy( g_studiolight.lightvec, lightDir );
+        }
+    }
 
-	if( lightinfo->ambientlight + lightinfo->shadelight > 192 )
-		lightinfo->shadelight = 192 - lightinfo->ambientlight;
+    VectorSet( finalLight, light.r, light.g, light.b );
+    ent->cvFloorColor = light;
+
+    total = max( max( light.r, light.g ), light.b );
+    if( total == 0.0f ) total = 1.0f;
+
+    // scale lightdir by light intentsity
+    VectorScale( lightDir, total, lightDir );
+
+    for( lnum = 0, dl = cl_dlights; lnum < MAX_DLIGHTS; lnum++, dl++ )
+    {
+        if( dl->die < RI.refdef.time || !r_dynamic->value )
+            continue;
+
+        VectorSubtract( ent->origin, dl->origin, dist );
+
+        radius = VectorLength( dist );
+        add = (dl->radius - radius);
+
+        if( add > 0.0f )
+        {
+            total += add;
+
+            if( radius > 1.0f )
+                VectorScale( dist, ( add / radius ), dist );
+            else VectorScale( dist, add, dist );
+
+            VectorAdd( lightDir, dist, lightDir );
+
+            finalLight[0] += ( dl->color.r ) * ( add / 256.0f ) * 2.0f;
+            finalLight[1] += ( dl->color.g ) * ( add / 256.0f ) * 2.0f;
+            finalLight[2] += ( dl->color.b ) * ( add / 256.0f ) * 2.0f;
+        }
+    }
+
+    add = 0.9f;
+
+    VectorScale( lightDir, add, lightDir );
+
+    lightinfo->shadelight = VectorLength( lightDir );
+    lightinfo->ambientlight = total - g_studiolight.shadelight;
+
+    total = max_element(finalLight);
+
+    if( total > 0.0f )
+    {
+        lightinfo->color[0] = finalLight[0] * ( 1.0f / total );
+        lightinfo->color[1] = finalLight[1] * ( 1.0f / total );
+        lightinfo->color[2] = finalLight[2] * ( 1.0f / total );
+    }
+    else VectorSet( lightinfo->color, 1.0f, 1.0f, 1.0f );
+
+    if( lightinfo->ambientlight > 128 )
+        lightinfo->ambientlight = 128;
+
+    if( lightinfo->ambientlight + g_studiolight.shadelight > 255 )
+        lightinfo->shadelight = 255 - g_studiolight.ambientlight;
+
+    *lightinfo->plightvec = lightDir.Normalize();
 }
 
 /*
@@ -1619,82 +866,76 @@ pfnStudioEntityLight
 */
 void GAME_EXPORT R_StudioEntityLight( alight_t *lightinfo )
 {
-	uint		lnum, i;
-	studiolight_t	*plight;
-	float		dist, radius2;
-	vec3_t		direction, origin;
-	cl_entity_t	*ent;
-	dlight_t		*el;
+    int		lnum, i, j, k;
+    float		minstrength, dist2, f, r2;
+    float		lstrength[MAX_LOCALLIGHTS];
+    cl_entity_t	*ent = RI.currententity;
+    vec3_t		mid, origin, pos;
+    dlight_t		*el;
 
-	ent = RI.currententity;
+    g_studiolight.numlocallights = 0;
 
-	if( !ent || !ent->model || !r_dynamic->integer )
-		return;
+    if( !ent || !r_dynamic->value )
+        return;
 
-	plight = &g_studiolight;
-	plight->numelights = 0;	// clear previous elights
+    for( i = 0; i < MAX_LOCALLIGHTS; i++ )
+        lstrength[i] = 0;
 
-	if( r_studio_lighting->integer == 2 )
-	{
-		Matrix3x4_OriginFromMatrix( g_lighttransform[0], origin );
+    Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
+    dist2 = 1000000.0f;
+    k = 0;
 
-		// NOTE: in some cases bone origin may be stuck in the geometry
-		// and produced completely black model. Run additional check for this case
-		if( CL_PointContents( origin ) == CONTENTS_SOLID )
-			Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
-	}
-	else Matrix3x4_OriginFromMatrix( g_rotationmatrix, origin );
+    for( lnum = 0, el = cl_elights; lnum < MAX_ELIGHTS; lnum++, el++ )
+    {
+        if( el->die < RI.refdef.time || el->radius <= 0.0f )
+            continue;
 
-	for( lnum = 0, el = cl_elights; lnum < MAX_ELIGHTS; lnum++, el++ )
-	{
-		if( el->die < RI.refdef.time || !el->radius )
-			continue;
+        if(( el->key & 0xFFF ) == ent->index )
+        {
+            int	att = (el->key >> 12) & 0xF;
 
-		VectorSubtract( el->origin, origin, direction );
-		dist = VectorLength( direction );
+            if( att ) VectorCopy( ent->attachment[att], el->origin );
+            else VectorCopy( ent->origin, el->origin );
+        }
 
-		if( !dist || dist > el->radius + studio_radius )
-			continue;
+        VectorCopy( el->origin, pos );
+        VectorSubtract( origin, el->origin, mid );
 
-		radius2 = el->radius * el->radius; // squared radius
+        f = DotProduct( mid, mid );
+        r2 = el->radius * el->radius;
 
-		for( i = 0; i < m_pStudioHeader->numbones; i++ )
-		{
-			vec3_t	vec, org;
-			float	atten;
+        if( f > r2 ) minstrength = r2 / f;
+        else minstrength = 1.0f;
 
-			Matrix3x4_OriginFromMatrix( g_lighttransform[i], org );
-			VectorSubtract( org, origin, vec );
+        if( minstrength > 0.05f )
+        {
+            if( g_studiolight.numlocallights >= MAX_LOCALLIGHTS )
+            {
+                for( j = 0, k = -1; j < g_studiolight.numlocallights; j++ )
+                {
+                    if( lstrength[j] < dist2 && lstrength[j] < minstrength )
+                    {
+                        dist2 = lstrength[j];
+                        k = j;
+                    }
+                }
+            }
+            else k = g_studiolight.numlocallights;
 
-			dist = DotProduct( vec, vec );
-			atten = (dist / radius2 - 1) * -1;
-			if( atten < 0 ) atten = 0;
-			dist = sqrt( dist );
+            if( k != -1 )
+            {
+                g_studiolight.locallightcolor[k].r = ( el->color.r ) * (1.0f / 255.0f);
+                g_studiolight.locallightcolor[k].g = ( el->color.g ) * (1.0f / 255.0f);
+                g_studiolight.locallightcolor[k].b = ( el->color.b ) * (1.0f / 255.0f);
+                g_studiolight.locallightR2[k] = r2;
+                g_studiolight.locallight[k] = el;
+                lstrength[k] = minstrength;
 
-			if( dist )
-			{
-				dist = 1.0f / dist;
-				VectorScale( vec, dist, vec );
-				lightinfo->ambientlight += atten;
-				lightinfo->shadelight += atten;
-			}
-
-			Matrix3x4_VectorIRotate( g_lighttransform[i], vec, plight->elight[plight->numelights].vec[i] );
-			VectorScale( plight->elight[plight->numelights].vec[i], atten, plight->elight[plight->numelights].vec[i] );
-		}
-
-		plight->elight[plight->numelights].color[0] = el->color.r * (1.0f / 255.0f);
-		plight->elight[plight->numelights].color[1] = el->color.g * (1.0f / 255.0f);
-		plight->elight[plight->numelights].color[2] = el->color.b * (1.0f / 255.0f);
-		plight->numelights++;
-	}
-
-	// clamp lighting so it doesn't overbright as much
-	if( lightinfo->ambientlight > 128 )
-		lightinfo->ambientlight = 128;
-
-	if( lightinfo->ambientlight + lightinfo->shadelight > 192 )
-		lightinfo->shadelight = 192 - lightinfo->ambientlight;
+                if( k >= g_studiolight.numlocallights )
+                    g_studiolight.numlocallights = k + 1;
+            }
+        }
+    }
 }
 
 /*
@@ -1705,23 +946,31 @@ R_StudioSetupLighting
 */
 void GAME_EXPORT R_StudioSetupLighting( alight_t *lightinfo )
 {
-	studiolight_t	*plight;
+    float	scale = 1.0f;
 	int		i;
 
 	if( !m_pStudioHeader || !lightinfo )
 		return;
 
-	plight = &g_studiolight;
+
+    if( RI.currententity != NULL )
+        scale = RI.currententity->curstate.scale;
+
+    g_studiolight.ambientlight = lightinfo->ambientlight;
+    g_studiolight.shadelight = lightinfo->shadelight;
+    VectorCopy( *lightinfo->plightvec, g_studiolight.lightvec );
 
 	for( i = 0; i < m_pStudioHeader->numbones; i++ )
-		Matrix3x4_VectorIRotate( g_lighttransform[i], *lightinfo->plightvec, plight->blightvec[i] );
+    {
+		Matrix3x4_VectorIRotate( g_lighttransform[i], *lightinfo->plightvec, g_studiolight.blightvec[i] );
+        //if( scale > 1.0f ) VectorNormalize( g_studiolight.blightvec[i] ); // in case model may be scaled
+    }
 
 	// copy custom alight color in case of mod-maker changed it
-	plight->lightcolor[0] = lightinfo->color[0];
-	plight->lightcolor[1] = lightinfo->color[1];
-	plight->lightcolor[2] = lightinfo->color[2];
+    g_studiolight.lightcolor = lightinfo->color;
 
-	R_StudioGetShadowImpactAndDir();
+	float illum = std::clamp(g_studiolight.ambientlight + g_studiolight.shadelight * 0.8f, 0.0f, 255.0f);
+	g_studiolight.lightval = g_studiolight.lightcolor * (illum / 255.0f);
 }
 
 /*
@@ -1732,63 +981,82 @@ R_StudioLighting
 */
 void R_StudioLighting( vec3_t_ref lv, int bone, int flags, const vec3_t normal )
 {
-	float		_max, ambient;
-	vec3_t		illum;
-	studiolight_t	*plight;
+	float		illum;
 
-	if( !RI.drawWorld || RI.currententity->curstate.effects & EF_FULLBRIGHT )
+	if( !RI.drawWorld || RI.currententity->curstate.effects & EF_FULLBRIGHT || flags & STUDIO_NF_FULLBRIGHT)
 	{
 		VectorSet( lv, 1.0f, 1.0f, 1.0f );
 		return;
 	}
 
-	plight = &g_studiolight;
-	ambient = max( 0.1f, r_lighting_ambient->value ); // to avoid divison by zero
-	VectorScale( plight->lightcolor, ambient, illum );
+	lv = g_studiolight.lightval;
+}
 
-	if( flags & STUDIO_NF_FLATSHADE )
-	{
-		VectorMA( illum, 0.8f, plight->lightcolor, illum );
-	}
-	else
-	{
-		float	r, lightcos;
-		int	i;
+/*
+====================
+R_LightLambert
+====================
+*/
+void R_LightLambert( vec4_t light[MAX_LOCALLIGHTS], const vec3_t normal, const vec3_t color, byte *out )
+{
+    vec3_t	finalLight = color;
 
-		lightcos = DotProduct( normal, plight->blightvec[bone] ); // -1 colinear, 1 opposite
+    for( int i = 0; i < g_studiolight.numlocallights; i++ )
+    {
+        float	r, r2;
 
-		if( lightcos > 1.0f ) lightcos = 1;
-		VectorAdd( illum, plight->lightcolor, illum );
+        if( tr.fFlipViewModel )
+            r = DotProduct( normal, light[i] );
+        else r = -DotProduct( normal, light[i] );
 
-		r = max(r_studio_lambert->value, 1.0f);
-		lightcos = (lightcos + ( r - 1.0f )) / r; // do modified hemispherical lighting
-		if( lightcos > 0.0f ) VectorMA( illum, -lightcos, plight->lightcolor, illum );
+        if( r > 0.0f )
+        {
+            if( light[i][3] == 0.0f )
+            {
+                r2 = DotProduct( light[i], light[i] );
 
-		illum = maxs(illum, {});
+                if( r2 > 0.0f )
+                    light[i][3] = g_studiolight.locallightR2[i] / ( r2 * sqrt( r2 ));
+                else light[i][3] = 0.0001f;
+            }
 
-		// now add all dynamic lights
-	//	#pragma omp parallel for
-		for( i = 0; i < plight->numdlights; i++)
-		{
-			lightcos = -DotProduct( normal, plight->dlight[i].vec[bone] );
-			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->dlight[i].color, illum );
-		}
+            constexpr vec3_t ones = { 1.0f, 1.0f, 1.0f };
+            vec3_t col = vec3_t( g_studiolight.locallightcolor[i].r, g_studiolight.locallightcolor[i].g, g_studiolight.locallightcolor[i].b )  / 255.0f;
+            vec3_t localLight = col * r * light[i][3];
+            finalLight = mins( finalLight + localLight, ones );
+        }
+    }
 
-		// now add all entity lights
-		//#pragma omp parallel for
-		for( i = 0; i < plight->numelights; i++)
-		{
-			lightcos = -DotProduct( normal, plight->elight[i].vec[bone] );
-			if( lightcos > 0.0f ) VectorMA( illum, lightcos, plight->elight[i].color, illum );
-		}
-	}
+    out[0] = finalLight[0] * 255;
+    out[1] = finalLight[1] * 255;
+    out[2] = finalLight[2] * 255;
+}
 
-	_max = VectorMaxElement( illum );
+/*
+====================
+R_LightStrength
+====================
+*/
+void R_LightStrength( int bone, const vec3_t localpos, vec4_t light[MAX_LOCALLIGHTS] )
+{
+    int	i;
 
-	if( _max > 1.0f )
-		VectorScale( illum, ( 1.0f / _max ), lv );
-	else VectorCopy( illum, lv );
+    if( g_studiolight.lightage[bone] != tr.framecount )
+    {
+        for( i = 0; i < g_studiolight.numlocallights; i++ )
+        {
+            dlight_t *el = g_studiolight.locallight[i];
+            Matrix3x4_VectorITransform( g_lighttransform[bone], el->origin, g_studiolight.lightbonepos[bone][i] );
+        }
 
+        g_studiolight.lightage[bone] = tr.framecount;
+    }
+
+    for( i = 0; i < g_studiolight.numlocallights; i++ )
+    {
+        VectorSubtract( localpos, g_studiolight.lightbonepos[bone][i], light[i] );
+        light[i][3] = 0.0f;
+    }
 }
 
 /*
@@ -1799,31 +1067,7 @@ R_StudioSetupTextureHeader
 */
 void R_StudioSetupTextureHeader( void )
 {
-#ifndef STUDIO_MERGE_TEXTURES
-	if( !m_pStudioHeader->numtextures || !m_pStudioHeader->textureindex )
-	{
-		string	texturename;		
-		model_t	*textures = NULL;
-
-		Q_strncpy( texturename, R_StudioTexName( RI.currentmodel ), sizeof( texturename ));
-		COM_FixSlashes( texturename );
-
-		if( FS_FileExists( texturename, false ))
-			textures = Mod_ForName( texturename, false );
-
-		if( !textures )
-		{
-			m_pTextureHeader = NULL;
-			return;
-		}
-
-		m_pTextureHeader = (studiohdr_t *)Mod_Extradata( textures );
-	}
-	else
-#endif
-	{
-		m_pTextureHeader = m_pStudioHeader;
-	}
+	m_pTextureHeader = m_pStudioHeader;
 }
 
 /*
@@ -1868,28 +1112,7 @@ mstudiotexture_t *R_StudioGetTexture( cl_entity_t *e )
 	if(( phdr = (studiohdr_t *)Mod_Extradata( e->model )) == NULL )
 		return NULL;
 
-#ifndef STUDIO_MERGE_TEXTURES
-	if( !m_pStudioHeader->numtextures || !m_pStudioHeader->textureindex )
-	{
-		string	texturename;		
-		model_t	*textures = NULL;
-
-		Q_strncpy( texturename, R_StudioTexName( RI.currentmodel ), sizeof( texturename ));
-		COM_FixSlashes( texturename );
-
-		if( FS_FileExists( texturename, false ))
-			textures = Mod_ForName( texturename, false );
-
-		if( !textures )
-			return NULL;
-
-		thdr = (studiohdr_t *)Mod_Extradata( textures );
-	}
-	else
-#endif
-	{
-		thdr = m_pStudioHeader;
-	}
+	thdr = m_pStudioHeader;
 
 	if( !thdr ) return NULL;	
 
@@ -1969,291 +1192,92 @@ static bool R_StudioMeshCompare( const sortedmesh_t &a, const sortedmesh_t &b )
 
 /*
 ===============
-R_StudioDrawPoints
-
-===============
-*/
-static void R_StudioDrawPoints_legacy( void )
-{
-	int		i, j, m_skinnum;
-	byte		*pvertbone;
-	byte		*pnormbone;
-	vec3_c		*pstudioverts;
-	vec3_c		*pstudionorms;
-	mstudiotexture_t	*ptexture;
-	mstudiomesh_t	*pmesh;
-	short		*pskinref;
-	float		scale = 0.0f;
-    vec3_t      av, lv, nv;
-
-	R_StudioSetupTextureHeader ();
-
-	g_nNumArrayVerts = g_nNumArrayElems = 0;
-
-	if( !m_pTextureHeader ) return;
-	if( RI.currententity->curstate.renderfx == kRenderFxGlowShell )
-		g_nStudioCount++;
-
-	// safety bounding the skinnum
-	m_skinnum = bound( 0, RI.currententity->curstate.skin, ( m_pTextureHeader->numskinfamilies - 1 ));
-	pvertbone = ((byte *)m_pStudioHeader + m_pSubModel->vertinfoindex);
-	pnormbone = ((byte *)m_pStudioHeader + m_pSubModel->norminfoindex);
-
-	// NOTE: user can comment call StudioRemapColors and remap_info will be unavailable
-	if( m_fDoRemap ) ptexture = CL_GetRemapInfoForEntity( RI.currententity )->ptexture;
-	else ptexture = (mstudiotexture_t *)((byte *)m_pTextureHeader + m_pTextureHeader->textureindex);
-
-	ASSERT( ptexture != NULL );
-
-	pmesh = (mstudiomesh_t *)((byte *)m_pStudioHeader + m_pSubModel->meshindex);
-	pstudioverts = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->vertindex);
-	pstudionorms = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->normindex);
-
-	pskinref = (short *)((byte *)m_pTextureHeader + m_pTextureHeader->skinindex);
-	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
-		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
-
-	for( i = 0; i < m_pSubModel->numverts; i++ )
-		Matrix3x4_VectorTransform( g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i] );
-
-	if( g_nForceFaceFlags & STUDIO_NF_CHROME )
-	{
-		scale = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
-
-		for( i = 0; i < m_pSubModel->numnorms; i++ )
-			Matrix3x4_VectorRotate( g_bonestransform[pnormbone[i]], pstudionorms[i], g_xformnorms[i] );
-	}
-
-	for( j = 0; j < m_pSubModel->nummesh; j++ )
-	{
-		g_nFaceFlags = ptexture[pskinref[pmesh[j].skinref]].flags;
-
-		// fill in sortedmesh info
-		g_sortedMeshes[j].mesh = &pmesh[j];
-		g_sortedMeshes[j].flags = g_nFaceFlags;
-
-		for( i = 0; i < pmesh[j].numnorms; i++, pstudionorms++, pnormbone++ )
-		{
-			R_StudioLighting( g_lightvalues[i], *pnormbone, g_nFaceFlags, *pstudionorms );
-
-			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
-				R_StudioSetupChrome( g_chrome[i], *pnormbone, *pstudionorms );
-		}
-	}
-
-	if( r_studio_sort_textures->integer )
-	{
-		// sort opaque and translucent for right results
-		std::sort( g_sortedMeshes, g_sortedMeshes + m_pSubModel->nummesh, R_StudioMeshCompare );
-	}
-
-	for( j = 0; j < m_pSubModel->nummesh; j++ )
-	{
-		float	s, t, alpha;
-		short	*ptricmds;
-
-		pmesh = g_sortedMeshes[j].mesh;
-		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
-
-        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
-		g_nFaceFlags = attr.flags;
-		s = 1.0f / (float)attr.width;
-		t = 1.0f / (float)attr.height;
-
-		if( g_iRenderMode != kRenderTransAdd )
-			pglDepthMask( GL_TRUE );
-		else pglDepthMask( GL_FALSE );
-
-		if( g_nForceFaceFlags & STUDIO_NF_CHROME )
-		{
-			color24	*clr;
-			clr = &RI.currententity->curstate.rendercolor;
-			pglColor4ub( clr->r, clr->g, clr->b, 255 );
-			alpha = 1.0f;
-		}
-		else if( g_nFaceFlags & STUDIO_NF_TRANSPARENT && R_StudioOpaque( RI.currententity ))
-		{
-			GL_SetRenderMode( kRenderTransAlpha );
-			pglAlphaFunc( GL_GREATER, 0.0f );
-			if (RI.currententity->curstate.rendermode == kRenderTransAlpha)
-				alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
-			else
-				alpha = 1.0f;
-		}
-		else if( g_nFaceFlags & STUDIO_NF_ADDITIVE )
-		{
-			GL_SetRenderMode( kRenderTransAdd );
-			alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
-			pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
-			pglDepthMask( GL_FALSE );
-		}
-		else if( g_nFaceFlags & STUDIO_NF_ALPHA && !( host.features & ENGINE_DISABLE_HDTEXTURES )) // Paranoia2 collision flag
-		{
-			GL_SetRenderMode( kRenderTransTexture );
-			alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
-			pglDepthMask( GL_FALSE );
-		}
-		else
-		{
-			GL_SetRenderMode( g_iRenderMode );
-
-			if( g_iRenderMode == kRenderNormal )
-			{
-				if( gl_overbright_studio->integer )
-				{
-					pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );
-
-				}
-				else
-					pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-				alpha = 1.0f;
-			}
-			else alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
-		}
-
-		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
-		{
-            xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
-		}
-
-		while( ( i = *( ptricmds++ ) ) )
-		{
-			int	vertexState = 0;
-			qboolean	tri_strip;
-
-			if( i < 0 )
-			{
-				pglBegin( GL_TRIANGLE_FAN );
-				tri_strip = false;
-				i = -i;
-			}
-			else
-			{
-				pglBegin( GL_TRIANGLE_STRIP );
-				tri_strip = true;
-			}
-
-			r_stats.c_studio_polys += (i - 2);
-
-			for( ; i > 0; i--, ptricmds += 4 )
-			{
-				// build in indices
-				if( vertexState++ < 3 )
-				{
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
-				}
-				else if( tri_strip )
-				{
-					// flip triangles between clockwise and counter clockwise
-					if( vertexState & 1 )
-					{
-						// draw triangle [n-2 n-1 n]
-						g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
-						g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-						g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
-					}
-					else
-					{
-						// draw triangle [n-1 n-2 n]
-						g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-						g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
-						g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
-					}
-				}
-				else
-				{
-					// draw triangle fan [0 n-1 n]
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - ( vertexState - 1 );
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
-				}
-
-				if( g_nFaceFlags & STUDIO_NF_CHROME || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
-					pglTexCoord2f( g_chrome[ptricmds[1]][0] * s, g_chrome[ptricmds[1]][1] * t );
-				else if( g_nFaceFlags & STUDIO_NF_UV_COORDS )
-					pglTexCoord2f( HalfToFloat( ptricmds[2] ), HalfToFloat( ptricmds[3] ));
-				else pglTexCoord2f( ptricmds[2] * s, ptricmds[3] * t );
-
-				if(!( g_nForceFaceFlags & STUDIO_NF_CHROME ))
-				{
-					if( g_iRenderMode == kRenderTransAdd )
-					{
-						pglColor4f( 1.0f, 1.0f, 1.0f, alpha );
-					}
-					else if( g_iRenderMode == kRenderTransColor )
-					{
-						color24	*clr;
-						clr = &RI.currententity->curstate.rendercolor;
-						pglColor4ub( clr->r, clr->g, clr->b, alpha * 255 );
-					}
-					else if( g_nFaceFlags & STUDIO_NF_FULLBRIGHT )
-					{
-						pglColor4f( 1.0f, 1.0f, 1.0f, alpha );
-					}
-					else
-					{
-						lv = g_lightvalues[ptricmds[1]];
-						pglColor4f( lv[0], lv[1], lv[2], alpha );
-					}
-				}
-
-				av = g_xformverts[ptricmds[0]];
-
-				if( g_nForceFaceFlags & STUDIO_NF_CHROME )
-				{
-					nv = g_xformnorms[ptricmds[1]];
-                    vec3_t	scaled_vertex = fma( av, scale, nv );
-					pglVertex3fv( scaled_vertex.data() );
-				}
-				else
-				{
-					pglVertex3fv( av.data() );
-					ASSERT( g_nNumArrayVerts < MAXARRAYVERTS );
-                    g_xarrayverts[g_nNumArrayVerts] = av; // store off vertex
-					g_nNumArrayVerts++;
-				}
-			}
-			pglEnd();
-		}
-	}
-
-	// restore depthmask for next call StudioDrawPoints
-	if( g_iRenderMode != kRenderTransAdd )
-		pglDepthMask( GL_TRUE );
-}
-
-/*
-===============
 R_StudioDrawMesh
 
 ===============
 */
+static void (*R_MeshUVFunc())(const short* ptricmds, vec2_t &uv, float s, float t)
+{
+	if (g_nFaceFlags & STUDIO_NF_CHROME || (g_nForceFaceFlags & STUDIO_NF_CHROME))
+	{
+		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+			uv[0] = g_chrome[ptricmds[1]][0] * s;
+			uv[1] = g_chrome[ptricmds[1]][1] * t;
+		};
+	}
+	else if (g_nFaceFlags & STUDIO_NF_UV_COORDS)
+	{
+		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+			uv[0] = HalfToFloat(ptricmds[2]);
+			uv[1] = HalfToFloat(ptricmds[3]);
+		};
+	}
+	else [[likely]]
+	{
+		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+			uv[0] = ptricmds[2] * s;
+			uv[1] = ptricmds[3] * t;
+		};
+	}
+}
+
+static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], float alpha)
+{
+	if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
+	{
+		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+			cl[0] = alpha;
+			cl[1] = 0;
+			cl[2] = 0;
+			cl[3] = 255;
+		};
+	}
+	else if (g_iRenderMode == kRenderTransColor || (g_nForceFaceFlags & STUDIO_NF_CHROME))
+	{
+		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+			color24* clr;
+			clr = &RI.currententity->curstate.rendercolor;
+			cl[0] = clr->r;
+			cl[1] = clr->g;
+			cl[2] = clr->b;
+			cl[3] = alpha;
+		};
+	}
+	else if (g_iRenderMode == kRenderTransAdd || (g_nForceFaceFlags & STUDIO_NF_FULLBRIGHT))
+	{
+		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+			cl[0] = cl[1] = cl[2] = 255;
+			cl[3] = alpha;
+		};
+	}
+	else [[likely]]
+	{
+		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+			vec3_t lv = g_lightvalues[ptricmds[1]];
+			R_LightLambert(g_studiolight.lightpos[ptricmds[0]], g_xformnorms[ptricmds[1]], lv, cl);
+			cl[3] = alpha;
+		};
+	}
+}
+
 static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float scale )
 {
 	GLubyte alpha = 255 * a;
 	int i;
-	vec2_t uv;
-	vec3_t av, lv, nv;
 	uint startArrayVerts = g_nNumArrayVerts;
 	uint startArrayElems = g_nNumArrayElems;
+
+	const auto R_MeshColor = R_MeshColorFunc();
+	const auto R_MeshUV = R_MeshUVFunc();
 
 	while( ( i = *( ptricmds++ ) ) )
 	{
 		int	vertexState = 0;
-		qboolean	tri_strip;
+		bool tri_strip = i >= 0;
 
-		if( i < 0 )
+		if( !tri_strip )
 		{
-			tri_strip = false;
 			i = -i;
-		}
-		else
-		{
-			tri_strip = true;
 		}
 
 		r_stats.c_studio_polys += (i - 2);
@@ -2291,89 +1315,14 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
 				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
 			}
-			if( g_nFaceFlags & STUDIO_NF_CHROME || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
-			{
-				uv[0] = g_chrome[ptricmds[1]][0] * s;
-				uv[1] = g_chrome[ptricmds[1]][1] * t ;
-			}
-			else if( g_nFaceFlags & STUDIO_NF_UV_COORDS )
-			{
-				uv[0] = HalfToFloat( ptricmds[2] );
-				uv[1] = HalfToFloat( ptricmds[3] );
-			}
-			else
-			{
-				uv[0] = ptricmds[2] * s;
-				uv[1] = ptricmds[3] * t;
-			}
-			g_xarraycoord[g_nNumArrayVerts][0] = uv[0];
-			g_xarraycoord[g_nNumArrayVerts][1] = uv[1];
 
-			if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
-			{
-				if( g_iRenderMode == kRenderTransAdd )
-				{
-					cl[0] = cl[1] = cl[2] = 255;
-					cl[3] = alpha;
-					//pglColor4f( 1.0f, 1.0f, 1.0f, alpha );
-				}
-				else if( g_iRenderMode == kRenderTransColor )
-				{
-					color24	*clr;
-					clr = &RI.currententity->curstate.rendercolor;
-					cl[0] = clr->r;
-					cl[1] = clr->g;
-					cl[2] = clr->b;
-					cl[3] = alpha;
-					//pglColor4ub( clr->r, clr->g, clr->b, alpha * 255 );
-				}
-				else if( g_nFaceFlags & STUDIO_NF_FULLBRIGHT )
-				{
-					cl[0] = cl[1] = cl[2] = 255;
-					cl[3] = alpha;
-					//pglColor4f( 1.0f, 1.0f, 1.0f, alpha );
-				}
-				else
-				{
-					lv = g_lightvalues[ptricmds[1]];
-					cl[0] = lv[0]*255;
-					cl[1] = lv[1]*255;
-					cl[2] = lv[2]*255;
-					cl[3] = alpha;
-				}
-			}
-			else
-			{
-				color24	*clr;
-				clr = &RI.currententity->curstate.rendercolor;
-				cl[0] = clr->r;
-				cl[1] = clr->g;
-				cl[2] = clr->b;
-				cl[3] = alpha;
-			}
+			R_MeshUV(ptricmds, g_xarraycoord[g_nNumArrayVerts], s, t);
+			R_MeshColor(ptricmds, g_xarraycolor[g_nNumArrayVerts], alpha);
 
-			if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
-			{
-				cl[0] = alpha;
-				cl[1] = 0;
-				cl[2] = 0;
-				cl[3] = 255;
-			}
-			if (g_nForceFaceFlags & STUDIO_NF_OUTLINE)
-			{
-				color24* clr;
-				clr = &RI.currententity->curstate.rendercolor;
-				cl[0] = clr->r;
-				cl[1] = clr->g;
-				cl[2] = clr->b;
-				cl[3] = alpha;
-			}
-			Q_memcpy( g_xarraycolor[g_nNumArrayVerts], cl, sizeof(cl) );
-
-			av = g_xformverts[ptricmds[0]];
+			vec3_t av = g_xformverts[ptricmds[0]];
 			if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 			{
-				nv = g_xformnorms[ptricmds[1]];
+				vec3_t nv = g_xformnorms[ptricmds[1]];
 				VectorMA( av, scale, nv, av );
 			}
 
@@ -2572,32 +1521,24 @@ R_StudioDrawPoints
 */
 static void GAME_EXPORT R_StudioDrawPoints( void )
 {
-	int		i, j, m_skinnum;
+	int		m_skinnum;
 	byte		*pvertbone;
 	byte		*pnormbone;
-	vec3_c		*pstudioverts;
-	vec3_c		*pstudionorms;
 	mstudiotexture_t	*ptexture;
 	mstudiomesh_t	*pmesh;
 	short		*pskinref;
 	float		*lv, scale = 0.0f;
 
-	if( !r_studio_drawelements->integer )
-	{
-		R_StudioDrawPoints_legacy();
-		return;
-	}
-
 	R_StudioSetupTextureHeader ();
 
 	g_nNumArrayVerts = g_nNumArrayElems = 0;
 
-	if( !m_pTextureHeader ) return;
+	if( !m_pTextureHeader || !m_pTextureHeader->numskinfamilies ) return;
 	if( RI.currententity->curstate.renderfx == kRenderFxGlowShell )
 		g_nStudioCount++;
 
 	// safety bounding the skinnum
-	m_skinnum = bound( 0, RI.currententity->curstate.skin, ( m_pTextureHeader->numskinfamilies - 1 ));
+	m_skinnum = bound(0, RI.currententity->curstate.skin, (m_pTextureHeader->numskinfamilies - 1));
 	pvertbone = ((byte *)m_pStudioHeader + m_pSubModel->vertinfoindex);
 	pnormbone = ((byte *)m_pStudioHeader + m_pSubModel->norminfoindex);
 
@@ -2608,8 +1549,6 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	ASSERT( ptexture != NULL );
 
 	pmesh = (mstudiomesh_t *)((byte *)m_pStudioHeader + m_pSubModel->meshindex);
-	pstudioverts = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->vertindex);
-	pstudionorms = (vec3_c *)((byte *)m_pStudioHeader + m_pSubModel->normindex);
 
 	pskinref = (short *)((byte *)m_pTextureHeader + m_pTextureHeader->skinindex);
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
@@ -2621,77 +1560,51 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 #ifdef STUDIO_SKINNING_OMP_MIN
 #pragma omp parallel for private(i) if(m_pSubModel->numverts > STUDIO_SKINNING_OMP_MIN)
 #endif
-	auto vert_calc_fn = [pvertbone, pstudioverts](vec3_t &v)
+	for (int i = 0; i < m_pSubModel->numverts; ++i)
 	{
-		int i = &v - g_xformverts;
 		Matrix3x4_VectorTransform(g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i]);
-		//scale multi by Rentro
-		if (RI.currententity->curstate.scale != 1.0f) {
-			vec3_t temp1, temp2;
-			float scale_offset = 0.0f;
+	}
 
-			scale_offset = -RI.currententity->curstate.mins[2];
-			VectorCopy(RI.currententity->origin, temp1);
-			VectorSubtract(g_xformverts[i], temp1, temp2);
-			VectorScale(temp2, RI.currententity->curstate.scale - 1.0f, temp2);
-			VectorAdd(g_xformverts[i], temp2, g_xformverts[i]);
-			g_xformverts[i][2] += scale_offset * (RI.currententity->curstate.scale - 1.0f);
+	if (RI.currententity->curstate.scale != 1.0f)
+	{
+		//scale multi by Rentro
+		float scale_offset = -RI.currententity->curstate.mins[2];
+		for (int i = 0; i < m_pSubModel->numverts; ++i) 
+		{
+			float temp = RI.currententity->curstate.scale - 1.0f;
+			g_xformverts[i] = (g_xformverts[i] - RI.currententity->origin) * (temp * 2);
+			g_xformverts[i][2] += scale_offset * temp;
 		}
 	};
-#ifdef XASH_RENDER_PAR
-#ifdef XASH_TBBMALLOC
-	tbb::parallel_for_each(g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
-#else
-	std::for_each(std::execution::par_unseq, g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
-#endif
-#else
-	std::for_each(g_xformverts, g_xformverts + m_pSubModel->numverts, vert_calc_fn);
-#endif
 
 	if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 	{
 		scale = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
 
-		for( i = 0; i < m_pSubModel->numnorms; i++ )
+		for(int i = 0; i < m_pSubModel->numnorms; i++ )
 			Matrix3x4_VectorRotate( g_bonestransform[pnormbone[i]], pstudionorms[i], g_xformnorms[i] );
 	}
 
-	for( j = 0; j < m_pSubModel->nummesh; j++ )
+	for( int j = 0; j < m_pSubModel->nummesh; j++ )
 	{
-        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh[j].skinref]]);
 		g_nFaceFlags = attr.flags;
 
 		// fill in sortedmesh info
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
-		auto norm_calc_fn = [pnormbone, pstudionorms](vec3_t& v)
+		for (int i = 0; i < pmesh[j].numnorms; ++i)
 		{
-			int i = &v - g_lightvalues;
 			R_StudioLighting(g_lightvalues[i], pnormbone[i], g_nFaceFlags, pstudionorms[i]);
 		};
 
-		auto chrome_calc_fn = [pnormbone, pstudionorms](vec2_t& v)
+		if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
-			int i = &v - g_chrome;
-			
-			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
+			for (int i = 0; i < pmesh[j].numnorms; ++i)
 			{
 				R_StudioSetupChrome(g_chrome[i], pnormbone[i], pstudionorms[i]);
-			}
-		};
-
-#ifdef XASH_RENDER_PAR
-#ifdef XASH_TBBMALLOC
-		tbb::parallel_for_each(g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
-		tbb::parallel_for_each(g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
-#else
-		std::for_each(std::execution::par_unseq, g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
-		std::for_each(std::execution::par_unseq, g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
-#endif
-#else
-		std::for_each(g_lightvalues, g_lightvalues + pmesh[j].numnorms, norm_calc_fn);
-		std::for_each(g_chrome, g_chrome + pmesh[j].numnorms, chrome_calc_fn);
-#endif
+			};
+		}
 	}
 
 	if( r_studio_sort_textures->integer )
@@ -3522,492 +2435,6 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 }
 
 /*
-====================
-StudioRenderFinal
-
-====================
-*/
-void R_StudioRenderFinal( void )
-{
-	int	i, rendermode;
-
-	rendermode = R_StudioGetForceFaceFlags() ? kRenderTransAdd : RI.currententity->curstate.rendermode;
-	R_StudioSetupRenderer( rendermode );
-	
-	if( r_drawentities->integer == 2 )
-	{
-		R_StudioDrawBones();
-	}
-	else if( r_drawentities->integer == 3 )
-	{
-		R_StudioDrawHulls();
-	}
-	else
-	{
-		for( i = 0; i < m_pStudioHeader->numbodyparts; i++ )
-		{
-			R_StudioSetupModel( i, (void **)&m_pBodyPart, (void **)&m_pSubModel );
-
-			GL_SetRenderMode( rendermode );
-			R_StudioDrawPoints();
-			GL_StudioDrawShadow();
-		}
-	}
-
-	if( r_drawentities->integer == 4 )
-	{
-		GL_SetRenderMode( kRenderTransAdd );
-		R_StudioDrawHulls( );
-		GL_SetRenderMode( kRenderNormal );
-	}
-
-	if( r_drawentities->integer == 5 )
-	{
-		R_StudioDrawAbsBBox( );
-	}
-
-	if( r_drawentities->integer == 6 )
-	{
-		R_StudioDrawAttachments();
-	}
-
-	R_StudioRestoreRenderer();
-}
-
-/*
-====================
-StudioRenderModel
-
-====================
-*/
-void R_StudioRenderModel( void )
-{
-	R_StudioSetChromeOrigin();
-	R_StudioSetForceFaceFlags( 0 );
-
-	if( RI.currententity->curstate.renderfx == kRenderFxGlowShell )
-	{
-		RI.currententity->curstate.renderfx = kRenderFxNone;
-
-		R_StudioRenderFinal( );
-
-		R_StudioSetForceFaceFlags( STUDIO_NF_CHROME );
-		TriSpriteTexture( R_GetChromeSprite(), 0 );
-		RI.currententity->curstate.renderfx = kRenderFxGlowShell;
-
-		R_StudioRenderFinal( );
-	}
-	else
-	{
-		R_StudioRenderFinal( );
-	}
-}
-
-/*
-====================
-StudioEstimateGait
-
-====================
-*/
-void R_StudioEstimateGait( entity_state_t *pplayer )
-{
-	vec3_t	est_velocity;
-	float	dt;
-
-	dt = bound( 0.0f, (RI.refdef.time - cl.oldtime), 1.0f );
-
-	if( dt == 0.0f || m_pPlayerInfo->renderframe == tr.framecount )
-	{
-		m_flGaitMovement = 0;
-		return;
-	}
-
-	VectorSubtract( RI.currententity->origin, m_pPlayerInfo->prevgaitorigin, est_velocity );
-	VectorCopy( RI.currententity->origin, m_pPlayerInfo->prevgaitorigin );
-	m_flGaitMovement = VectorLength( est_velocity );
-
-	if( dt <= 0.0f || m_flGaitMovement / dt < 5.0f )
-	{
-		m_flGaitMovement = 0.0f;
-		est_velocity[0] = 0.0f;
-		est_velocity[1] = 0.0f;
-	}
-
-	if( est_velocity[1] == 0.0f && est_velocity[0] == 0.0f )
-	{
-		float	flYawDiff = RI.currententity->angles[YAW] - m_pPlayerInfo->gaityaw;
-
-		flYawDiff = flYawDiff - (int)(flYawDiff / 360) * 360;
-		if( flYawDiff > 180.0f ) flYawDiff -= 360.0f;
-		if( flYawDiff < -180.0f ) flYawDiff += 360.0f;
-
-		if( dt < 0.25f )
-			flYawDiff *= dt * 4.0f;
-		else flYawDiff *= dt;
-
-		m_pPlayerInfo->gaityaw += flYawDiff;
-		m_pPlayerInfo->gaityaw = m_pPlayerInfo->gaityaw - (int)(m_pPlayerInfo->gaityaw / 360) * 360;
-
-		m_flGaitMovement = 0.0f;
-	}
-	else
-	{
-		m_pPlayerInfo->gaityaw = ( atan2( est_velocity[1], est_velocity[0] ) * 180 / M_PI );
-		if( m_pPlayerInfo->gaityaw > 180.0f ) m_pPlayerInfo->gaityaw = 180.0f;
-		if( m_pPlayerInfo->gaityaw < -180.0f ) m_pPlayerInfo->gaityaw = -180.0f;
-	}
-
-}
-
-/*
-====================
-StudioProcessGait
-
-====================
-*/
-void R_StudioProcessGait( entity_state_t *pplayer )
-{
-	mstudioseqdesc_t	*pseqdesc;
-	int		iBlend;
-	float		dt, flYaw; // view direction relative to movement
-
-	if( RI.currententity->curstate.sequence >= m_pStudioHeader->numseq ) 
-		RI.currententity->curstate.sequence = 0;
-
-	pseqdesc = (mstudioseqdesc_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
-
-	R_StudioPlayerBlend( pseqdesc, &iBlend, &RI.currententity->angles[PITCH] );
-
-	RI.currententity->latched.prevangles[PITCH] = RI.currententity->angles[PITCH];
-	RI.currententity->curstate.blending[0] = iBlend;
-	RI.currententity->latched.prevblending[0] = RI.currententity->curstate.blending[0];
-	RI.currententity->latched.prevseqblending[0] = RI.currententity->curstate.blending[0];
-
-	dt = bound( 0.0f, (RI.refdef.time - cl.oldtime), 1.0f );
-	R_StudioEstimateGait( pplayer );
-
-	// calc side to side turning
-	flYaw = RI.currententity->angles[YAW] - m_pPlayerInfo->gaityaw;
-	flYaw = flYaw - (int)(flYaw / 360) * 360;
-	if( flYaw < -180.0f ) flYaw = flYaw + 360.0f;
-	if( flYaw > 180.0f ) flYaw = flYaw - 360.0f;
-
-	if( flYaw > 120.0f )
-	{
-		m_pPlayerInfo->gaityaw = m_pPlayerInfo->gaityaw - 180.0f;
-		m_flGaitMovement = -m_flGaitMovement;
-		flYaw = flYaw - 180.0f;
-	}
-	else if( flYaw < -120.0f )
-	{
-		m_pPlayerInfo->gaityaw = m_pPlayerInfo->gaityaw + 180.0f;
-		m_flGaitMovement = -m_flGaitMovement;
-		flYaw = flYaw + 180.0f;
-	}
-
-	// adjust torso
-	RI.currententity->curstate.controller[0] = ((flYaw / 4.0f) + 30.0f) / (60.0f / 255.0f);
-	RI.currententity->curstate.controller[1] = ((flYaw / 4.0f) + 30.0f) / (60.0f / 255.0f);
-	RI.currententity->curstate.controller[2] = ((flYaw / 4.0f) + 30.0f) / (60.0f / 255.0f);
-	RI.currententity->curstate.controller[3] = ((flYaw / 4.0f) + 30.0f) / (60.0f / 255.0f);
-	RI.currententity->latched.prevcontroller[0] = RI.currententity->curstate.controller[0];
-	RI.currententity->latched.prevcontroller[1] = RI.currententity->curstate.controller[1];
-	RI.currententity->latched.prevcontroller[2] = RI.currententity->curstate.controller[2];
-	RI.currententity->latched.prevcontroller[3] = RI.currententity->curstate.controller[3];
-
-	RI.currententity->angles[YAW] = m_pPlayerInfo->gaityaw;
-	if( RI.currententity->angles[YAW] < -0 ) RI.currententity->angles[YAW] += 360.0f;
-	RI.currententity->latched.prevangles[YAW] = RI.currententity->angles[YAW];
-
-	if( pplayer->gaitsequence >= m_pStudioHeader->numseq ) 
-		pplayer->gaitsequence = 0;
-
-	pseqdesc = (mstudioseqdesc_t *)((byte *)m_pStudioHeader + m_pStudioHeader->seqindex) + pplayer->gaitsequence;
-
-	// calc gait frame
-	if( pseqdesc->linearmovement[0] > 0 )
-		m_pPlayerInfo->gaitframe += (m_flGaitMovement / pseqdesc->linearmovement[0]) * pseqdesc->numframes;
-	else m_pPlayerInfo->gaitframe += pseqdesc->fps * dt;
-
-	// do modulo
-	m_pPlayerInfo->gaitframe = m_pPlayerInfo->gaitframe - (int)(m_pPlayerInfo->gaitframe / pseqdesc->numframes) * pseqdesc->numframes;
-	if( m_pPlayerInfo->gaitframe < 0 ) m_pPlayerInfo->gaitframe += pseqdesc->numframes;
-}
-
-/*
-===============
-R_StudioDrawPlayer
-
-===============
-*/
-static int GAME_EXPORT R_StudioDrawPlayer( int flags, entity_state_t *pplayer )
-{
-	int	m_nPlayerIndex;
-	float	gaitframe = 0.0f, gaityaw = 0.0f;
-	vec3_t	dir, prevgaitorigin = { };
-	alight_t	lighting;
-
-	m_nPlayerIndex = pplayer->number - 1;
-
-	if( m_nPlayerIndex < 0 || m_nPlayerIndex >= cl.maxclients )
-		return 0;
-
-	RI.currentmodel = R_StudioSetupPlayerModel( m_nPlayerIndex );
-	if( RI.currentmodel == NULL )
-		return 0;
-
-	R_StudioSetHeader((studiohdr_t *)Mod_Extradata( RI.currentmodel ));
-
-	if( !RP_NORMALPASS() )
-	{
-		m_pPlayerInfo = pfnPlayerInfo( m_nPlayerIndex );
-		VectorCopy( m_pPlayerInfo->prevgaitorigin, prevgaitorigin );
-		gaitframe = m_pPlayerInfo->gaitframe;
-		gaityaw = m_pPlayerInfo->gaityaw;
-		m_pPlayerInfo = NULL;
-	}
-
-	if( pplayer->gaitsequence )
-	{
-		vec3_t orig_angles;
-
-		m_pPlayerInfo = pfnPlayerInfo( m_nPlayerIndex );
-		VectorCopy( RI.currententity->angles, orig_angles );
-	
-		R_StudioProcessGait( pplayer );
-
-		m_pPlayerInfo->gaitsequence = pplayer->gaitsequence;
-		m_pPlayerInfo = NULL;
-
-		R_StudioSetUpTransform( RI.currententity );
-		VectorCopy( orig_angles, RI.currententity->angles );
-	}
-	else
-	{
-		RI.currententity->curstate.controller[0] = 127;
-		RI.currententity->curstate.controller[1] = 127;
-		RI.currententity->curstate.controller[2] = 127;
-		RI.currententity->curstate.controller[3] = 127;
-		RI.currententity->latched.prevcontroller[0] = RI.currententity->curstate.controller[0];
-		RI.currententity->latched.prevcontroller[1] = RI.currententity->curstate.controller[1];
-		RI.currententity->latched.prevcontroller[2] = RI.currententity->curstate.controller[2];
-		RI.currententity->latched.prevcontroller[3] = RI.currententity->curstate.controller[3];
-		
-		m_pPlayerInfo = pfnPlayerInfo( m_nPlayerIndex );
-		m_pPlayerInfo->gaitsequence = 0;
-
-		R_StudioSetUpTransform( RI.currententity );
-	}
-
-	if( flags & STUDIO_RENDER )
-	{
-		// see if the bounding box lets us trivially reject, also sets
-		if( !R_StudioCheckBBox( ))
-		{
-			if( !RP_NORMALPASS() )
-			{
-				m_pPlayerInfo = pfnPlayerInfo( m_nPlayerIndex );
-				VectorCopy( prevgaitorigin, m_pPlayerInfo->prevgaitorigin );
-				m_pPlayerInfo->gaitframe = gaitframe;
-				m_pPlayerInfo->gaityaw = gaityaw;
-				m_pPlayerInfo = NULL;
-			}
-			return 0;
-		}
-
-		r_stats.c_studio_models_drawn++;
-		g_nStudioCount++; // render data cache cookie
-
-		if( m_pStudioHeader->numbodyparts == 0 )
-			return 1;
-	}
-
-	m_pPlayerInfo = pfnPlayerInfo( m_nPlayerIndex );
-	R_StudioSetupBones( RI.currententity );
-	R_StudioSaveBones( );
-
-	m_pPlayerInfo->renderframe = tr.framecount;
-	m_pPlayerInfo = NULL;
-
-	if( flags & STUDIO_EVENTS )
-	{
-		R_StudioCalcAttachments( );
-		R_StudioClientEvents( );
-
-		// copy attachments into global entity array
-		if( RI.currententity->index > 0 )
-		{
-			cl_entity_t *ent = CL_GetEntityByIndex( RI.currententity->index );
-			Q_memcpy( ent->attachment, RI.currententity->attachment, sizeof( vec3_t ) * 16 );
-		}
-	}
-
-	if( flags & STUDIO_RENDER )
-	{
-		if( cl_himodels->integer && RI.currentmodel != RI.currententity->model  )
-		{
-			// show highest resolution multiplayer model
-			RI.currententity->curstate.body = 255;
-		}
-
-		if(!( host.developer == 0 && cl.maxclients == 1 ) && ( RI.currentmodel == RI.currententity->model ))
-		{
-			RI.currententity->curstate.body = 1; // force helmet
-		}
-
-		lighting.plightvec = &dir;
-		R_StudioDynamicLight( RI.currententity, &lighting );
-
-		R_StudioEntityLight( &lighting );
-
-		// model and frame independant
-		R_StudioSetupLighting( &lighting );
-
-		m_pPlayerInfo = pfnPlayerInfo( m_nPlayerIndex );
-
-		// get remap colors
-		g_nTopColor = m_pPlayerInfo->topcolor;
-		g_nBottomColor = m_pPlayerInfo->bottomcolor;
-
-		if( g_nTopColor < 0 ) g_nTopColor = 0;
-		if( g_nTopColor > 360 ) g_nTopColor = 360;
-		if( g_nBottomColor < 0 ) g_nBottomColor = 0;
-		if( g_nBottomColor > 360 ) g_nBottomColor = 360;
-
-		R_StudioSetRemapColors( g_nTopColor, g_nBottomColor );
-
-		R_StudioRenderModel( );
-		m_pPlayerInfo = NULL;
-
-		if( pplayer->weaponmodel )
-		{
-			cl_entity_t	saveent = *RI.currententity;
-			model_t		*pweaponmodel = Mod_Handle( pplayer->weaponmodel );
-
-			m_pStudioHeader = (studiohdr_t *)Mod_Extradata( pweaponmodel );
-
-			R_StudioMergeBones( RI.currententity, pweaponmodel );
-			R_StudioSetupLighting( &lighting );
-			R_StudioRenderModel( );
-			R_StudioCalcAttachments( );
-
-			*RI.currententity = saveent;
-		}
-	}
-
-	if( !RP_NORMALPASS() )
-	{
-		m_pPlayerInfo = pfnPlayerInfo( m_nPlayerIndex );
-		VectorCopy( prevgaitorigin, m_pPlayerInfo->prevgaitorigin );
-		m_pPlayerInfo->gaitframe = gaitframe;
-		m_pPlayerInfo->gaityaw = gaityaw;
-		m_pPlayerInfo = NULL;
-	}
-
-	return 1;
-}
-
-/*
-===============
-R_StudioDrawModel
-
-===============
-*/
-static int GAME_EXPORT R_StudioDrawModel( int flags )
-{
-	alight_t	lighting;
-	vec3_t	dir;
-
-	if( RI.currententity->curstate.renderfx == kRenderFxDeadPlayer )
-	{
-		entity_state_t	deadplayer;
-		int		save_interp;
-		int		result;
-
-		if( RI.currententity->curstate.renderamt <= 0 || RI.currententity->curstate.renderamt > cl.maxclients )
-			return 0;
-
-		// get copy of player
-		deadplayer = *R_StudioGetPlayerState( RI.currententity->curstate.renderamt - 1 );
-
-		// clear weapon, movement state
-		deadplayer.number = RI.currententity->curstate.renderamt;
-		deadplayer.weaponmodel = 0;
-		deadplayer.gaitsequence = 0;
-
-		deadplayer.movetype = MOVETYPE_NONE;
-		VectorCopy( RI.currententity->curstate.angles, deadplayer.angles );
-		VectorCopy( RI.currententity->curstate.origin, deadplayer.origin );
-
-		save_interp = m_fDoInterp;
-		m_fDoInterp = 0;
-		
-		// draw as though it were a player
-		result = R_StudioDrawPlayer( flags, &deadplayer );
-		
-		m_fDoInterp = save_interp;
-		return result;
-	}
-
-	R_StudioSetHeader((studiohdr_t *)Mod_Extradata( RI.currentmodel ));
-
-	R_StudioSetUpTransform( RI.currententity );
-
-	if( flags & STUDIO_RENDER )
-	{
-		// see if the bounding box lets us trivially reject, also sets
-		if( !R_StudioCheckBBox( ))
-			return 0;
-
-		r_stats.c_studio_models_drawn++;
-		g_nStudioCount++; // render data cache cookie
-
-		if( m_pStudioHeader->numbodyparts == 0 )
-			return 1;
-	}
-
-	if( RI.currententity->curstate.movetype == MOVETYPE_FOLLOW )
-		R_StudioMergeBones( RI.currententity, RI.currentmodel );
-	else R_StudioSetupBones( RI.currententity );
-
-	R_StudioSaveBones();
-
-	if( flags & STUDIO_EVENTS )
-	{
-		R_StudioCalcAttachments( );
-		R_StudioClientEvents( );
-
-		// copy attachments into global entity array
-		if( RI.currententity->index > 0 )
-		{
-			cl_entity_t *ent = CL_GetEntityByIndex( RI.currententity->index );
-			Q_memcpy( ent->attachment, RI.currententity->attachment, sizeof( vec3_t ) * 16 );
-		}
-	}
-
-	if( flags & STUDIO_RENDER )
-	{
-		lighting.plightvec = &dir;
-		R_StudioDynamicLight( RI.currententity, &lighting );
-
-		R_StudioEntityLight( &lighting );
-
-		// model and frame independant
-		R_StudioSetupLighting( &lighting );
-
-		// get remap colors
-		g_nTopColor = RI.currententity->curstate.colormap & 0xFF;
-		g_nBottomColor = (RI.currententity->curstate.colormap & 0xFF00) >> 8;
-
-		R_StudioSetRemapColors( g_nTopColor, g_nBottomColor );
-
-		R_StudioRenderModel();
-	}
-
-	return 1;
-}
-
-/*
 =================
 R_DrawStudioModel
 =================
@@ -4037,20 +2464,17 @@ void R_DrawStudioModelInternal( cl_entity_t *e, qboolean follow_entity )
 
 	prevFrame = e->latched.prevframe;
 
-	// prevent to crash some mods like HLFX in menu Customize
-	if( !RI.drawWorld && !r_customdraw_playermodel->integer )
-	{
-		if( e->player )
-			result = R_StudioDrawPlayer( flags, &e->curstate );
-		else result = R_StudioDrawModel( flags );
-	}
-	else
-	{
+#ifdef XASH_RAGDOLL
 		// select the properly method
 		if (e->player)
 			result = GameStudioRenderer_StudioDrawPlayer(flags, &e->curstate);
 		else result = GameStudioRenderer_StudioDrawModel(flags);
-	}
+#else
+		// select the properly method
+		if (e->player)
+			result = pStudioDraw->StudioDrawPlayer(flags, &e->curstate);
+		else result = pStudioDraw->StudioDrawModel(flags);
+#endif
 	
 	// old frame must be restored
 	if( !RP_NORMALPASS( )) e->latched.prevframe = prevFrame;
@@ -4195,7 +2619,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 	imgfilter_t	*filter = NULL;
 	texture_t		*tx = NULL;
     int	gl_texturenum = 0;
-	
+
 	if( ptexture->flags & STUDIO_NF_NORMALMAP )
 		flags |= (TF_NORMALMAP);
 
@@ -4270,7 +2694,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 
 		if( FS_FileExists( texname, false ))
 		{
-            gl_texturenum = xe::TexLru_LoadTextureExternal(texname, NULL, flags, filter);
+            gl_texturenum = xe::TexLru_LoadTextureExternal(texname,  flags, filter);
 		}
 
 		if( gl_texturenum )
@@ -4289,7 +2713,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 				sprintf(texname, "models/texture/%s%s.bmp", mod->suffix, name);
 				if (FS_FileExists(texname, false))
 				{
-                    gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+                    gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 					break;
 				}
 			}
@@ -4300,7 +2724,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 				Q_snprintf(texname, sizeof(texname), "ddc/models/texture/%s.astc", name);
 				if (FS_FileExists(texname, false))
 				{
-					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 					break;
 				}
 			}
@@ -4309,14 +2733,14 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
 			if (FS_FileExists(texname, false))
 			{
-                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 				break;
 			}
 
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.bmp", name);
 			if (FS_FileExists(texname, false))
 			{
-                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 				break;
 			}
 			break;
@@ -4328,7 +2752,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
         {
             Q_snprintf(texname, sizeof(texname), "ddc/%s.mdl/%s.astc", mdlname, name);
             if (FS_FileExists(texname, false)) {
-                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
                 break;
             }
         }
@@ -4424,57 +2848,11 @@ void Mod_LoadStudioModel( model_t *mod, const byte *buffer, size_t filesize, qbo
 	phdr = R_StudioLoadHeader( mod, buffer );
 	if( !phdr ) return;	// bad model
 
-#ifdef STUDIO_MERGE_TEXTURES
-	if( phdr->numtextures == 0 )
-	{
-        const studiohdr_t	*thdr;
-		byte		*in, *out;
-		void		*buffer2 = NULL;
-		size_t		size1, size2;
-
-		buffer2 = FS_LoadFile( R_StudioTexName( mod ), NULL, false );
-		thdr = R_StudioLoadHeader( mod, buffer2 );
-
-		if( !thdr )
-		{
-			MsgDev( D_WARN, "Mod_LoadStudioModel: %s missing textures file\n", mod->name ); 
-			if( buffer2 ) Mem_Free( buffer2 );
-		}
-		else
-		{
-			// give space for textures and skinrefs
-			size1 = thdr->numtextures * sizeof( mstudiotexture_t );
-			size2 = thdr->numskinfamilies * thdr->numskinref * sizeof( short );
-			mod->cache.data = Mem_Alloc( loadmodel->mempool, phdr->length + size1 + size2 );
-            Mem_VirtualCopy( loadmodel->cache.data, buffer, phdr->length ); // copy main mdl buffer
-			phdr = (studiohdr_t *)loadmodel->cache.data; // get the new pointer on studiohdr
-			phdr->numskinfamilies = thdr->numskinfamilies;
-			phdr->numtextures = thdr->numtextures;
-			phdr->numskinref = thdr->numskinref;
-			phdr->textureindex = phdr->length;
-			phdr->skinindex = phdr->textureindex + size1;
-
-			in = (byte *)thdr + thdr->textureindex;
-			out = (byte *)phdr + phdr->textureindex;
-            Mem_VirtualCopy( out, in, size1 + size2 );	// copy textures + skinrefs
-			phdr->length += size1 + size2;
-			Mem_Free( buffer2 ); // release T.mdl
-		}
-	}
-	else
-	{
-		// NOTE: we wan't keep raw textures in memory. just cutoff model pointer above texture base
-		loadmodel->cache.data = Mem_Alloc( loadmodel->mempool, phdr->texturedataindex );
-        Mem_VirtualCopy( loadmodel->cache.data, buffer, phdr->texturedataindex );
-		phdr->length = phdr->texturedataindex;	// update model size
-	}
-#else
 	// just copy model into memory
 	loadmodel->cache.data = (void *)buffer; // Mem_Alloc( loadmodel->mempool, phdr->length );
     loadmodel->buffer = buffer;
     loadmodel->buffer_size = filesize;
     phdr = (const studiohdr_t *)loadmodel->cache.data;
-#endif
 
     // load model
     if( !Host_IsDedicated() )
@@ -4495,19 +2873,6 @@ void Mod_LoadStudioModel( model_t *mod, const byte *buffer, size_t filesize, qbo
 	loadmodel->radius = RadiusFromBounds( loadmodel->mins, loadmodel->maxs );
 	loadmodel->flags = phdr->flags; // copy header flags
 
-	// check for static model
-#if 0
-	if( phdr->numseqgroups == 1 && phdr->numseq == 1 && phdr->numbones == 1 )
-	{
-		mstudioseqdesc_t	*pseqdesc = (mstudioseqdesc_t *)((byte *)phdr + phdr->seqindex);
-
-		// HACKHACK: MilkShape created a default animations with 30 frames
-		// TODO: analyze real frames for more predicatable results
-		// TODO: analyze all the sequences
-		if( pseqdesc->numframes == 1 || pseqdesc->numframes == 30 )
-			pseqdesc->flags |= STUDIO_STATIC;
-	}
-#endif
 	if( loaded ) *loaded = true;
 }
 
@@ -4618,13 +2983,13 @@ static engine_studio_api_t gStudioAPI =
 	R_StudioDrawHulls,
 	R_StudioDrawAbsBBox,
 	R_StudioDrawBones,
-	(void(*)(void*, int))R_StudioSetupSkin,
+	R_StudioSetupSkin,
 	R_StudioSetRemapColors,
 	R_StudioSetupPlayerModel,
 	R_StudioClientEvents,
 	R_StudioGetForceFaceFlags,
 	R_StudioSetForceFaceFlags,
-	(void(*)(void*))R_StudioSetHeader,
+	R_StudioSetHeader,
 	R_StudioSetRenderModel,
 	R_StudioSetupRenderer,
 	R_StudioRestoreRenderer,
@@ -4642,8 +3007,8 @@ static engine_studio_api_t gStudioAPI =
 static r_studio_interface_t gStudioDraw =
 {
 	STUDIO_INTERFACE_VERSION,
-	R_StudioDrawModel,
-	R_StudioDrawPlayer,
+	nullptr,
+	nullptr,
 };
 
 /*

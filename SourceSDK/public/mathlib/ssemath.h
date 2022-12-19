@@ -8,8 +8,8 @@
 
 #if defined( _X360 )
 #include <xboxmath.h>
-#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__)
-#include "sse2neon.h"
+#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+#include <arm_neon.h>
 #else
 #include <xmmintrin.h>
 #endif
@@ -57,6 +57,10 @@ typedef __vector4 fltx4;
 typedef __vector4 i32x4; // a VMX register; just a way of making it explicit that we're doing integer ops.
 typedef __vector4 u32x4; // a VMX register; just a way of making it explicit that we're doing unsigned integer ops.
 
+#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+typedef float32x4_t fltx4;
+typedef int32x4_t i32x4;
+typedef uint32x4_t u32x4;
 #else
 
 typedef __m128 fltx4;
@@ -1724,12 +1728,20 @@ FORCEINLINE uint32 & SubInt( fltx4 & a, int idx )
 
 FORCEINLINE void StoreAlignedSIMD( float * RESTRICT pSIMD, const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	vst1q_f32(pSIMD, a);
+#else
 	_mm_store_ps( pSIMD, a );
+#endif
 }
 
 FORCEINLINE void StoreUnalignedSIMD( float * RESTRICT pSIMD, const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	vst1q_f32(pSIMD, a);
+#else
 	_mm_storeu_ps( pSIMD, a );
+#endif
 }
 
 
@@ -1738,9 +1750,15 @@ FORCEINLINE fltx4 RotateLeft2( const fltx4 & a );
 
 FORCEINLINE void StoreUnaligned3SIMD( float *pSIMD, const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	vst1q_lane_f32(pSIMD, a, 0);
+	vst1q_lane_f32(pSIMD+1, a, 1);
+	vst1q_lane_f32(pSIMD+2, a, 2);
+#else
 	_mm_store_ss(pSIMD, a);
 	_mm_store_ss(pSIMD+1, RotateLeft(a));
 	_mm_store_ss(pSIMD+2, RotateLeft2(a));
+#endif
 }
 
 // strongly typed -- syntactic castor oil used for typechecking as we transition to SIMD
@@ -1751,27 +1769,47 @@ FORCEINLINE void StoreAligned3SIMD( VectorAligned * RESTRICT pSIMD, const fltx4 
 
 FORCEINLINE fltx4 LoadAlignedSIMD( const void *pSIMD )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vld1q_f32( reinterpret_cast< const float *> ( pSIMD ) );
+#else
 	return _mm_load_ps( reinterpret_cast< const float *> ( pSIMD ) );
+#endif
 }
 
 FORCEINLINE fltx4 AndSIMD( const fltx4 & a, const fltx4 & b )				// a & b
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vandq_s32(a, b);
+#else
 	return _mm_and_ps( a, b );
+#endif
 }
 
 FORCEINLINE fltx4 AndNotSIMD( const fltx4 & a, const fltx4 & b )			// ~a & b
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vbicq_s32(a, b);
+#else
 	return _mm_andnot_ps( a, b );
+#endif
 }
 
 FORCEINLINE fltx4 XorSIMD( const fltx4 & a, const fltx4 & b )				// a ^ b
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return veorq_s32(a, b);
+#else
 	return _mm_xor_ps( a, b );
+#endif
 }
 
 FORCEINLINE fltx4 OrSIMD( const fltx4 & a, const fltx4 & b )				// a | b
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vorrq_s32(a, b);
+#else
 	return _mm_or_ps( a, b );
+#endif
 }
 
 // Squelch the w component of a vector to +0.0.
@@ -1789,33 +1827,51 @@ FORCEINLINE fltx4 LoadAlignedSIMD( const VectorAligned & pSIMD )
 
 FORCEINLINE fltx4 LoadUnalignedSIMD( const void *pSIMD )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vld1q_f32( reinterpret_cast< const float *> ( pSIMD ) );
+#else
 	return _mm_loadu_ps( reinterpret_cast<const float *>( pSIMD ) );
+#endif
 }
 
 FORCEINLINE fltx4 LoadUnaligned3SIMD( const void *pSIMD )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vld1q_f32( reinterpret_cast< const float *> ( pSIMD ) );
+#else
 	return _mm_loadu_ps( reinterpret_cast<const float *>( pSIMD ) );
+#endif
 }
 
 /// replicate a single 32 bit integer value to all 4 components of an m128
 FORCEINLINE fltx4 ReplicateIX4( int i )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vdupq_n_s32(i);
+#else
 	fltx4 value = _mm_set_ss( * ( ( float *) &i ) );;
 	return _mm_shuffle_ps( value, value, 0);
+#endif
 }
 
 
 FORCEINLINE fltx4 ReplicateX4( float flValue )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vdupq_n_f32(flValue);
+#else
 	__m128 value = _mm_set_ss( flValue );
 	return _mm_shuffle_ps( value, value, 0 );
+#endif
 }
 
 
 FORCEINLINE float SubFloat( const fltx4 & a, int idx )
 {
 	// NOTE: if the output goes into a register, this causes a Load-Hit-Store stall (don't mix fpu/vpu math!)
-#ifndef POSIX
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return (reinterpret_cast<float const*>(&a))[idx];
+#elif !defined(POSIX)
 	return a.m128_f32[ idx ];
 #else
 	return (reinterpret_cast<float const *>(&a))[idx];
@@ -1824,7 +1880,9 @@ FORCEINLINE float SubFloat( const fltx4 & a, int idx )
 
 FORCEINLINE float & SubFloat( fltx4 & a, int idx )
 {
-#ifndef POSIX
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return (reinterpret_cast<float*>(&a))[idx];
+#elif !defined(POSIX)
 	return a.m128_f32[ idx ];
 #else
 	return (reinterpret_cast<float *>(&a))[idx];
@@ -1836,18 +1894,22 @@ FORCEINLINE uint32 SubFloatConvertToInt( const fltx4 & a, int idx )
 	return (uint32)SubFloat(a,idx);
 }
 
-FORCEINLINE uint32 SubInt( const fltx4 & a, int idx )
+FORCEINLINE uint32 SubInt( const i32x4 & a, int idx )
 {
-#ifndef POSIX
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return (reinterpret_cast<uint32 const*>(&a))[idx];
+#elif !defined(POSIX)
 	return a.m128_u32[idx];
 #else
 	return (reinterpret_cast<uint32 const *>(&a))[idx];
 #endif
 }
 
-FORCEINLINE uint32 & SubInt( fltx4 & a, int idx )
+FORCEINLINE uint32 & SubInt( i32x4 & a, int idx )
 {
-#ifndef POSIX
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return (reinterpret_cast<uint32*>(&a))[idx];
+#elif !defined(POSIX)
 	return a.m128_u32[idx];
 #else
 	return (reinterpret_cast<uint32 *>(&a))[idx];
@@ -1880,22 +1942,38 @@ FORCEINLINE fltx4 MaskedAssign( const fltx4 & ReplacementMask, const fltx4 & New
 
 FORCEINLINE fltx4 SplatXSIMD( fltx4 const & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vdupq_laneq_f32(a, 0);
+#else
 	return _mm_shuffle_ps( a, a, MM_SHUFFLE_REV( 0, 0, 0, 0 ) );
+#endif
 }
 
 FORCEINLINE fltx4 SplatYSIMD( fltx4 const &a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vdupq_laneq_f32(a, 1);
+#else
 	return _mm_shuffle_ps( a, a, MM_SHUFFLE_REV( 1, 1, 1, 1 ) );
+#endif
 }
 
 FORCEINLINE fltx4 SplatZSIMD( fltx4 const &a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vdupq_laneq_f32(a, 2);
+#else
 	return _mm_shuffle_ps( a, a, MM_SHUFFLE_REV( 2, 2, 2, 2 ) );
+#endif
 }
 
 FORCEINLINE fltx4 SplatWSIMD( fltx4 const &a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vdupq_laneq_f32(a, 3);
+#else
 	return _mm_shuffle_ps( a, a, _MM_SHUFFLE( 3, 3, 3, 3 ) );
+#endif
 }
 
 FORCEINLINE fltx4 SetXSIMD( const fltx4& a, const fltx4& x )
@@ -1932,46 +2010,78 @@ FORCEINLINE fltx4 SetComponentSIMD( const fltx4& a, int nComponent, float flValu
 // a b c d -> b c d a
 FORCEINLINE fltx4 RotateLeft( const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vextq_f32(a, a, 1);
+#else
 	return _mm_shuffle_ps( a, a, MM_SHUFFLE_REV( 1, 2, 3, 0 ) );
+#endif
 }
 
 // a b c d -> c d a b
 FORCEINLINE fltx4 RotateLeft2( const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vextq_f32(a, a, 2);
+#else
 	return _mm_shuffle_ps( a, a, MM_SHUFFLE_REV( 2, 3, 0, 1 ) );
+#endif
 }
 
 // a b c d -> d a b c
 FORCEINLINE fltx4 RotateRight( const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vextq_f32(a, a, 3);
+#else
 	return _mm_shuffle_ps( a, a, _MM_SHUFFLE( 0, 3, 2, 1) );
+#endif
 }
 
 // a b c d -> c d a b
 FORCEINLINE fltx4 RotateRight2( const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vextq_f32(a, a, 2);
+#else
 	return _mm_shuffle_ps( a, a, _MM_SHUFFLE( 1, 0, 3, 2 ) );
+#endif
 }
 
 
 FORCEINLINE fltx4 AddSIMD( const fltx4 & a, const fltx4 & b )				// a+b
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vaddq_f32(a, b);
+#else
 	return _mm_add_ps( a, b );
+#endif
 };
 
 FORCEINLINE fltx4 SubSIMD( const fltx4 & a, const fltx4 & b )				// a-b
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vsubq_f32(a, b);
+#else
 	return _mm_sub_ps( a, b );
+#endif
 };
 
 FORCEINLINE fltx4 MulSIMD( const fltx4 & a, const fltx4 & b )				// a*b
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vmulq_f32(a, b);
+#else
 	return _mm_mul_ps( a, b );
+#endif
 };
 
 FORCEINLINE fltx4 DivSIMD( const fltx4 & a, const fltx4 & b )				// a/b
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vdivq_f32(a, b);
+#else
 	return _mm_div_ps( a, b );
+#endif
 };
 
 FORCEINLINE fltx4 MaddSIMD( const fltx4 & a, const fltx4 & b, const fltx4 & c )				// a*b + c
@@ -2066,7 +2176,14 @@ FORCEINLINE fltx4 NegSIMD(const fltx4 &a) // negate: -a
 
 FORCEINLINE int TestSignSIMD( const fltx4 & a )								// mask of which floats have the high bit set
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	const int shift_arr[4] = {0, 1, 2, 3};
+	const int32x4_t shift = vld1q_s32(shift_arr);
+	uint32x4_t tmp = vshrq_n_u32(a, 31);
+	return vaddvq_u32(vshlq_u32(tmp, shift));
+#else
 	return _mm_movemask_ps( a );
+#endif
 }
 
 FORCEINLINE bool IsAnyNegative( const fltx4 & a )							// (a.x < 0) || (a.y < 0) || (a.z < 0) || (a.w < 0)
@@ -2076,27 +2193,47 @@ FORCEINLINE bool IsAnyNegative( const fltx4 & a )							// (a.x < 0) || (a.y < 0
 
 FORCEINLINE fltx4 CmpEqSIMD( const fltx4 & a, const fltx4 & b )				// (a==b) ? ~0:0
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vceqq_f32(a, b);
+#else
 	return _mm_cmpeq_ps( a, b );
+#endif
 }
 
 FORCEINLINE fltx4 CmpGtSIMD( const fltx4 & a, const fltx4 & b )				// (a>b) ? ~0:0
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vcgtq_f32(a, b);
+#else
 	return _mm_cmpgt_ps( a, b );
+#endif
 }
 
 FORCEINLINE fltx4 CmpGeSIMD( const fltx4 & a, const fltx4 & b )				// (a>=b) ? ~0:0
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vcgeq_f32(a, b);
+#else
 	return _mm_cmpge_ps( a, b );
+#endif
 }
 
 FORCEINLINE fltx4 CmpLtSIMD( const fltx4 & a, const fltx4 & b )				// (a<b) ? ~0:0
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vcltq_f32(a, b);
+#else
 	return _mm_cmplt_ps( a, b );
+#endif
 }
 
 FORCEINLINE fltx4 CmpLeSIMD( const fltx4 & a, const fltx4 & b )				// (a<=b) ? ~0:0
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vcleq_f32(a, b);
+#else
 	return _mm_cmple_ps( a, b );
+#endif
 }
 
 // for branching when a.xyzw > b.xyzw
@@ -2124,12 +2261,20 @@ FORCEINLINE fltx4 CmpInBoundsSIMD( const fltx4 & a, const fltx4 & b )		// (a <= 
 
 FORCEINLINE fltx4 MinSIMD( const fltx4 & a, const fltx4 & b )				// min(a,b)
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vminq_f32(a, b);
+#else
 	return _mm_min_ps( a, b );
+#endif
 }
 
 FORCEINLINE fltx4 MaxSIMD( const fltx4 & a, const fltx4 & b )				// max(a,b)
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vmaxq_f32(a, b);
+#else
 	return _mm_max_ps( a, b );
+#endif
 }
 
 
@@ -2176,17 +2321,29 @@ inline bool IsAllZeros( const fltx4 & var )
 
 FORCEINLINE fltx4 SqrtEstSIMD( const fltx4 & a )					// sqrt(a), more or less
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vsqrtq_f32(a);
+#else
 	return _mm_sqrt_ps( a );
+#endif
 }
 
 FORCEINLINE fltx4 SqrtSIMD( const fltx4 & a )						// sqrt(a)
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vsqrtq_f32(a);
+#else
 	return _mm_sqrt_ps( a );
+#endif
 }
 
 FORCEINLINE fltx4 ReciprocalSqrtEstSIMD( const fltx4 & a )			// 1/sqrt(a), more or less
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vrsqrteq_f32(a);
+#else
 	return _mm_rsqrt_ps( a );
+#endif
 }
 
 FORCEINLINE fltx4 ReciprocalSqrtEstSaturateSIMD( const fltx4 & a )
@@ -2209,7 +2366,11 @@ FORCEINLINE fltx4 ReciprocalSqrtSIMD( const fltx4 & a )				// 1/sqrt(a)
 
 FORCEINLINE fltx4 ReciprocalEstSIMD( const fltx4 & a )				// 1/a, more or less
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vrecpeq_f32(a);
+#else
 	return _mm_rcp_ps( a );
+#endif
 }
 
 /// 1/x for all 4 values, more or less
@@ -2263,7 +2424,16 @@ FORCEINLINE fltx4 ClampVectorSIMD( FLTX4 in, FLTX4 min, FLTX4 max)
 
 FORCEINLINE void TransposeSIMD( fltx4 & x, fltx4 & y, fltx4 & z, fltx4 & w)
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	float32x4x2_t ROW01 = vtrnq_f32(x, y);
+	float32x4x2_t ROW23 = vtrnq_f32(z, w);
+	x = vcombine_f32(vget_low_f32(ROW01.val[0]), vget_low_f32(ROW23.val[0]));
+	y = vcombine_f32(vget_low_f32(ROW01.val[1]), vget_low_f32(ROW23.val[1]));
+	z = vcombine_f32(vget_high_f32(ROW01.val[0]), vget_high_f32(ROW23.val[0]));
+	w = vcombine_f32(vget_high_f32(ROW01.val[1]), vget_high_f32(ROW23.val[1]));
+#else
 	_MM_TRANSPOSE4_PS( x, y, z, w );
+#endif
 }
 
 FORCEINLINE fltx4 FindLowestSIMD3( const fltx4 &a )
@@ -2322,29 +2492,49 @@ FORCEINLINE fltx4 IntSetImmediateSIMD(int to)
 // Load 4 aligned words into a SIMD register
 FORCEINLINE i32x4 LoadAlignedIntSIMD( const void * RESTRICT pSIMD)
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vld1q_s32( reinterpret_cast<const int *> (pSIMD) );
+#else
 	return _mm_load_ps( reinterpret_cast<const float *>(pSIMD) );
+#endif
 }
 
 // Load 4 unaligned words into a SIMD register
 FORCEINLINE i32x4 LoadUnalignedIntSIMD( const void * RESTRICT pSIMD)
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	return vld1q_s32( reinterpret_cast<const int *> (pSIMD));
+#else
 	return _mm_loadu_ps( reinterpret_cast<const float *>(pSIMD) );
+#endif
 }
 
 // save into four words, 16-byte aligned
 FORCEINLINE void StoreAlignedIntSIMD( int32 * RESTRICT pSIMD, const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	vst1q_s32(pSIMD, a);
+#else
 	_mm_store_ps( reinterpret_cast<float *>(pSIMD), a );
+#endif
 }
 
 FORCEINLINE void StoreAlignedIntSIMD( intx4 &pSIMD, const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	vst1q_s32(pSIMD.Base(), a);
+#else
 	_mm_store_ps( reinterpret_cast<float *>(pSIMD.Base()), a );
+#endif
 }
 
 FORCEINLINE void StoreUnalignedIntSIMD( int32 * RESTRICT pSIMD, const fltx4 & a )
 {
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	vst1q_s32(pSIMD, a);
+#else
 	_mm_storeu_ps( reinterpret_cast<float *>(pSIMD), a );
+#endif
 }
 
 
@@ -2409,7 +2599,9 @@ FORCEINLINE i32x4 IntShiftLeftWordSIMD(const i32x4 &vSrcA, const i32x4 &vSrcB)
 // like this.
 FORCEINLINE void ConvertStoreAsIntsSIMD(intx4 * RESTRICT pDest, const fltx4 &vSrc)
 {
-#if defined( COMPILER_MSVC64 )
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+	*reinterpret_cast<int32x4_t *>(pDest) = vcvtq_s32_f32(vSrc);
+#elif defined( COMPILER_MSVC64 )
 
 	(*pDest)[0] = SubFloat( vSrc, 0 );
 	(*pDest)[1] = SubFloat( vSrc, 1 );

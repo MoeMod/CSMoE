@@ -43,6 +43,7 @@ DLL_GLOBAL int gmsgBattery = 0;
 DLL_GLOBAL int gmsgTrain = 0;
 DLL_GLOBAL int gmsgLogo = 0;
 DLL_GLOBAL int gmsgWeaponList = 0;
+DLL_GLOBAL int gmsgWeaponList2 = 0;
 DLL_GLOBAL int gmsgAmmoX = 0;
 DLL_GLOBAL int gmsgDeathMsg = 0;
 DLL_GLOBAL int gmsgShowWin = 0;
@@ -144,6 +145,7 @@ void LinkUserMessages()
 	gmsgSayText = REG_USER_MSG("SayText", -1);
 	gmsgTextMsg = REG_USER_MSG("TextMsg", -1);
 	gmsgWeaponList = REG_USER_MSG("WeaponList", -1);
+	gmsgWeaponList2 = REG_USER_MSG("WeaponList2", -1);
 	gmsgResetHUD = REG_USER_MSG("ResetHUD", 0);
 	gmsgInitHUD = REG_USER_MSG("InitHUD", 0);
 	gmsgViewMode = REG_USER_MSG("ViewMode", 0);
@@ -260,11 +262,11 @@ void WriteWeaponInfo(CBasePlayer *pPlayer, const ItemInfo &II)
 	else
 		pszName = II.pszName;
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgWeaponList, NULL, pPlayer->pev);
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeaponList2, NULL, pPlayer->pev);
 	WRITE_STRING(pszName);
-	WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo1));
+	WRITE_SHORT(CBasePlayer::GetAmmoIndex(II.pszAmmo1));
 	WRITE_BYTE(II.iMaxAmmo1);
-	WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo2));
+	WRITE_SHORT(CBasePlayer::GetAmmoIndex(II.pszAmmo2));
 	WRITE_BYTE(II.iMaxAmmo2);
 	WRITE_BYTE(II.iSlot);
 	WRITE_BYTE(II.iPosition);

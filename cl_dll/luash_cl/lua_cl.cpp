@@ -16,6 +16,11 @@
 #include "imgui_utils_lua.h"
 #endif
 
+#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
+#else
+#define LUASH_HOT_RELOAD
+#endif
+
 namespace cl
 {
 	static lua_State *L;
@@ -64,6 +69,7 @@ namespace cl
 		lua_register(L, "STRING", LuaSV_STRING);
 		lua_register(L, "UTIL_WeaponTimeBase", LuaSV_UTIL_WeaponTimeBase);
 		lua_register(L, "MAKE_STRING", LuaSV_MAKE_STRING);
+        lua_register(L, "MOE_SETUP_BUY_INFO", LuaSV_MOE_SETUP_BUY_INFO);
 
 		gEngfuncs.pfnAddCommand("luacl", Cmd_LuaCL);
 
@@ -109,9 +115,11 @@ namespace cl
 		}
 
 		int stack_cnt = lua_gettop(L);
-		luaL_loadstring(L, str);
+        lua_pushcfunction(L, LuaCL_ExceptionHandler);
+        int errc = luaL_loadstring(L, str);
 		// #1 = str
-		int errc = lua_pcall(L, 0, 0, 0);
+        if(errc == LUA_OK)
+            errc = lua_pcall(L, 0, 0, -2);
 		// #0 on succ
 		// #1 = errmsg on failed
 		if(errc)
@@ -120,17 +128,28 @@ namespace cl
 			gEngfuncs.Con_Printf("%s Error: exec (%s) failed: %s", __FUNCTION__, str, msg);
 			lua_pop(L, 1);
 		}
+        lua_pop(L, 1);
 		assert(stack_cnt == lua_gettop(L));
 	}
+
+    std::string LuaCL_ModulePath(const std::string &ModuleName)
+    {
+        std::string path = "addons/luash/";
+        path += ModuleName;
+        if (path.substr(path.size() - 4) != ".lua")
+            path += ".lua";
+        return path;
+    }
+
+#ifdef LUASH_HOT_RELOAD
+    std::unordered_map<std::string, fs_offset_t> g_LoadedLuaFileTime;
+#endif
 
 	int LuaUI_GlobalReload(lua_State* L)
 	{
 		int NumParams = lua_gettop(L);
 		if (NumParams < 1)
 		{
-			// reload all
-			lua_newtable(L);
-			lua_setfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
 			return 0;
 		}
 
@@ -143,13 +162,42 @@ namespace cl
 
 		lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
 		lua_pushnil(L);
-		lua_setfield(L, 2, ModuleName);
+		lua_setfield(L, -2, ModuleName);
+
+#ifdef LUASH_HOT_RELOAD
+        g_LoadedLuaFileTime.erase(ModuleName);
+#endif
+        using namespace luash;
+        eval(L, _require(_1), ModuleName);
+
+        gEngfuncs.Con_Printf("%s: reload %s \n", __FUNCTION__, ModuleName);
 		return 0;
 	}
 
+    extern "C" void LuaCL_AutoReload()
+    {
 #ifdef LUASH_HOT_RELOAD
-	std::unordered_map<std::string, fs_offset_t> g_LoadedLuaFileTime;
+        auto L = LuaCL_Get();
+        if(!L) return; // not yet initialized
+        std::vector<std::string> changed_modules;
+        for(const auto &[ModuleName, time] : g_LoadedLuaFileTime)
+        {
+            auto path = LuaCL_ModulePath(ModuleName);
+            auto new_time = gFileSystemAPI.FS_FileTime(path.c_str(), true);
+            if(time != new_time)
+            {
+                changed_modules.push_back(ModuleName);
+            }
+        }
+        for(const auto &ModuleName : changed_modules)
+        {
+            using namespace luash;
+            xpeval(L, LuaCL_ExceptionHandler, (
+                    _G[_S("reload")](_1)
+            ), ModuleName);
+        }
 #endif
+    }
 	
 	int LuaCL_GlobalRequire(lua_State* L)
 	{
@@ -170,28 +218,7 @@ namespace cl
 		lua_settop(L, 1);
 		// #1 = require path
 
-		std::string path = "addons/luash/";
-		path += ModuleName;
-		if (path.substr(path.size() - 4) != ".lua")
-			path += ".lua";
-#ifdef LUASH_HOT_RELOAD
-		auto time = gFileSystemAPI.FS_FileTime(path.c_str(), true);
-		auto iter = g_LoadedLuaFileTime.find(path);
-		if (iter != g_LoadedLuaFileTime.end())
-		{
-			if (time > g_LoadedLuaFileTime[path])
-			{
-				iter->second = time;
-				lua_pushcfunction(L, LuaUI_GlobalReload);
-				lua_pushvalue(L, 1);
-				lua_call(L, 1, 0);
-			}
-		}
-		else
-		{
-			g_LoadedLuaFileTime.emplace(path, time);
-		}
-#endif
+        auto path = LuaCL_ModulePath(ModuleName);
 
         luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE); // LUA_LOADED_TABLE
 		// #2 = _G.LUA_LOADED_TABLE
@@ -246,11 +273,13 @@ namespace cl
 			lua_setfield(L, 2, ModuleName);
 			// #2 = _G.LUA_LOADED_TABLE
 		}
+#ifdef LUASH_HOT_RELOAD
+        auto time = gFileSystemAPI.FS_FileTime(path.c_str(), true);
+        g_LoadedLuaFileTime.emplace(ModuleName, time);
+#endif
 
 		lua_getfield(L, 2, ModuleName);
 		// #3 = LUA_LOADED_TABLE[ModuleName]
-		
-		gEngfuncs.Con_DPrintf("%s Log: lua module (%s) loaded succ\n", __FUNCTION__, ModuleName);
 		return 1;
 	}
 
@@ -272,6 +301,26 @@ namespace cl
 		gEngfuncs.Con_Printf("%s: %s", __FUNCTION__, msg);
 	}
 
+    int LuaSV_ExceptionHandler(lua_State* L)
+    {
+        return LuaCL_ExceptionHandler(L);
+    }
+
+    int LuaCL_ExceptionHandler(lua_State* L)
+    {
+        // #1 = err
+        lua_getglobal(L, "debug");           // #2 = debug
+        lua_getfield(L, -1, "traceback");    // #3 = debug.traceback
+        lua_remove(L, -2);                   // remove 'debug'    // #2 = debug.traceback
+        lua_pushvalue(L, 1);                 // #3 = err
+        lua_call(L, 1, 1);                   // #2 = debug.traceback(err)
+
+        const char* errmsg = lua_tostring(L, -1);
+        gEngfuncs.Con_Printf(errmsg);    // print it
+
+        return 1;    // return debug.traceback(err)
+    }
+
 	void LuaCL_OnPrecache(resourcetype_t type, const char* name, int index)
 	{
 		if (type == t_eventscript)
@@ -280,39 +329,14 @@ namespace cl
 
 	void LuaCL_OnGUI()
 	{
-		lua_State* L = LuaCL_Get();
-
-        lua_getglobal(L, "debug"); // #1 = debug
-        lua_getfield(L, -1, "traceback"); // #2 = debug.traceback
-
-		lua_getglobal(L, "require");
-		// #3 = require
-
-		lua_pushstring(L, "imgui/client");
-		// #4 = path
-
-		lua_call(L, 1, 1);
-		// #3 = function LuaCL_OnGUI
-
-		if (!lua_isnil(L, -1))
-		{
-
-			int errc = lua_pcall(L, 0, 0, -2);
-			// #0 on succ
-			// #1 = errmsg on failed
-			if (errc)
-			{
-				const char* msg = lua_tostring(L, -1);
-				gEngfuncs.Con_Printf("%s Error: lua imgui failed: %s\n", __FUNCTION__, msg);
-				lua_pop(L, 1);
-				// #0
-			}
-            lua_pop(L, 2); // #0
-		}
-		else
-		{
-			lua_pop(L, 1);
-			// #0
-		}
+#if 0
+        using namespace luash;
+        xpeval(LuaCL_Get(), LuaCL_ExceptionHandler, (
+                _local(v1) = _require(_S("imgui/client")),
+                _if(v1)._then(
+                        v1()
+                )._end
+        ));
+#endif
 	}
 }

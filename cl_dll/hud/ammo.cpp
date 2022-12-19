@@ -111,7 +111,12 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 	pWeapon->hAmmo2 = 0;
 
 	sprintf(sz, "sprites/%s.txt", pWeapon->szName);
-	if (strncmp(pWeapon->szName, "knife_dgaxe", 11) && strncmp(pWeapon->szName, "knife_skullt9", 13) && strncmp(pWeapon->szName, "knife_summonknife", 17) && strncmp(pWeapon->szName, "knife_y22s1holyswordmb", 22) && strncmp(pWeapon->szName, "knife_y22s2sfsword", 18))
+	if (strncmp(pWeapon->szName, "knife_dgaxe", 11) && 
+		strncmp(pWeapon->szName, "knife_skullt9", 13) && 
+		strncmp(pWeapon->szName, "knife_summonknife", 17) && 
+		strncmp(pWeapon->szName, "knife_y22s1holyswordmb", 22) && 
+		strncmp(pWeapon->szName, "knife_y22s2sfsword", 18) && 
+		strncmp(pWeapon->szName, "knife_vulcanus9", 15))
 	{
 		if (!strncmp(pWeapon->szName, "knife_", 6))
 		{
@@ -279,6 +284,7 @@ HSPRITE ghsprBuckets;					// Sprite for top row of weapons menu
 
 DECLARE_MESSAGE(m_Ammo, CurWeapon ) // Current weapon and clip
 DECLARE_MESSAGE(m_Ammo, WeaponList) // new weapon type
+DECLARE_MESSAGE(m_Ammo, WeaponList2) // new weapon type
 DECLARE_MESSAGE(m_Ammo, AmmoX)      // update known ammo type's count
 DECLARE_MESSAGE(m_Ammo, AmmoPickup) // flashes an ammo pickup record
 DECLARE_MESSAGE(m_Ammo, WeapPickup) // flashes a weapon pickup record
@@ -314,6 +320,7 @@ int CHudAmmo::Init(void)
 
 	HOOK_MESSAGE(CurWeapon);
 	HOOK_MESSAGE(WeaponList);
+	HOOK_MESSAGE(WeaponList2);
 	HOOK_MESSAGE(AmmoPickup);
 	HOOK_MESSAGE(WeapPickup);
 	HOOK_MESSAGE(ItemPickup);
@@ -534,7 +541,12 @@ void WeaponsResource :: SelectSlot( int iSlot, int fAdvance, int iDirection )
 
 	if ((gHUD.m_ZB2.m_iFlags & HUD_ACTIVE) && (fAdvance == FALSE) && (iDirection == 1))
 	{
-		if(gHUD.m_ZB2.ActivateSkill(iSlot + 1))
+		if (gHUD.m_ZB2.SelectorCanDraw())
+		{
+			if (gHUD.m_ZB2.Selector((iSlot + 1)) == 10 ? 0 : (iSlot + 1))
+				return;
+		}
+		if (gHUD.m_ZB2.ActivateSkill(iSlot + 1))
 			return;
 	}
 
@@ -790,7 +802,7 @@ int CHudAmmo::MsgFunc_WeaponList(const char *pszName, int iSize, void *pbuf )
 	WEAPON Weapon;
 
 	strncpy( Weapon.szName, reader.ReadString(), MAX_WEAPON_NAME );
-	Weapon.iAmmoType = (int)reader.ReadChar();
+	Weapon.iAmmoType = reader.ReadChar();
 
 	Weapon.iMax1 = reader.ReadByte();
 	if (Weapon.iMax1 == 255)
@@ -808,6 +820,36 @@ int CHudAmmo::MsgFunc_WeaponList(const char *pszName, int iSize, void *pbuf )
 	Weapon.iClip = 0;
 
 	gWR.AddWeapon( &Weapon );
+
+	return 1;
+
+}
+
+int CHudAmmo::MsgFunc_WeaponList2(const char* pszName, int iSize, void* pbuf)
+{
+	BufferReader reader(pszName, pbuf, iSize);
+
+	WEAPON Weapon;
+
+	strncpy(Weapon.szName, reader.ReadString(), MAX_WEAPON_NAME);
+	Weapon.iAmmoType = reader.ReadShort();
+
+	Weapon.iMax1 = reader.ReadByte();
+	if (Weapon.iMax1 == 255)
+		Weapon.iMax1 = -1;
+
+	Weapon.iAmmo2Type = reader.ReadShort();
+	Weapon.iMax2 = reader.ReadByte();
+	if (Weapon.iMax2 == 255)
+		Weapon.iMax2 = -1;
+
+	Weapon.iSlot = reader.ReadChar();
+	Weapon.iSlotPos = reader.ReadChar();
+	Weapon.iId = reader.ReadShort();
+	Weapon.iFlags = reader.ReadByte();
+	Weapon.iClip = 0;
+
+	gWR.AddWeapon(&Weapon);
 
 	return 1;
 
@@ -1194,7 +1236,12 @@ int CHudAmmo::Draw(float flTime)
 	}
 	else if( gHUD.m_iFOV > 40 )
 	{
-		if (m_pWeapon && (m_pWeapon->iId == WEAPON_SKULL5 || m_pWeapon->iId == WEAPON_SKULL6 || m_pWeapon->iId == WEAPON_CROSSBOW) && gHUD.m_iFOV < 90)
+		if (m_pWeapon && gHUD.m_iFOV < 90 && (m_pWeapon->iId == WEAPON_SKULL5 ||
+			m_pWeapon->iId == WEAPON_SKULL6 ||
+			m_pWeapon->iId == WEAPON_CROSSBOW ||
+			m_pWeapon->iId == WEAPON_KINGCOBRA ||
+			m_pWeapon->iId == WEAPON_KINGCOBRAG ||
+			m_pWeapon->iId == WEAPON_DESTROYER))
 		{
 			if (!switchCrosshairType)
 			{
@@ -1480,7 +1527,11 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		|| weaponid == WEAPON_CHAINSAWM
 		|| weaponid == WEAPON_HEROCHAINSAW
 		|| weaponid == WEAPON_Z4B_BARRETTD
-		|| weaponid == WEAPON_BUFFAWP)
+		|| weaponid == WEAPON_BUFFAWP
+		|| weaponid == WEAPON_DESTROYER
+		|| weaponid == WEAPON_STARCHASERSR
+		|| weaponid == WEAPON_MOSIN
+		|| weaponid == WEAPON_CARTBLUES)
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )
@@ -1572,7 +1623,7 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	}*/
 	if (data.iAccuracyFlags & CROSSHAIR_COLOR_CUSTOM)
 	{
-		if(weaponid == WEAPON_JANUS11 || weaponid == WEAPON_JANUS3)
+		if(weaponid == WEAPON_JANUS11 || weaponid == WEAPON_JANUS3 || weaponid == WEAPON_Z4B_DEATHRAY)
 			DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, m_bAdditive, 170, 83, 196, m_iAlpha);
 	}
 	else

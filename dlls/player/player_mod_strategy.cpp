@@ -192,18 +192,18 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
-		//m_pPlayer->GiveNamedItem("weapon_divinetitan");
-		//m_pPlayer->GiveNamedItem("knife_y22s2sfsword");
+		//m_pPlayer->GiveNamedItem("knife_spknife");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
+		//m_pPlayer->GiveNamedItem("z4b_malorian3516");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
 		//m_pPlayer->GiveNamedItem("weapon_y22s2sfpistol");
 		//m_pPlayer->GiveNamedItem("z4b_m60amethyst");
-		//m_pPlayer->GiveNamedItem("weapon_bunkerbuster");
 		m_pPlayer->GiveNamedItem("weapon_knife");
+		//m_pPlayer->GiveNamedItem("knife_swordbombard");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
@@ -380,11 +380,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
 			{
 				std::vector<MoEWeaponBuyInfo_s> candidate_list;
-#ifndef XASH_DEDICATED
-				std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
-#else
 				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
-#endif // !XASH_DEDICATED
 				std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 				const MoEWeaponBuyInfo_s& info = candidate_list.front();
 				if (iSlot == KNIFE_SLOT) {
@@ -405,11 +401,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 				for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
 				{
 					std::vector<MoEWeaponBuyInfo_s> candidate_list;
-#ifndef XASH_DEDICATED
-					std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
-#else
 					std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
-#endif // !XASH_DEDICATED
 					std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 					const MoEWeaponBuyInfo_s& info = candidate_list.front();
 					if (iSlot == KNIFE_SLOT) {
@@ -427,11 +419,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
 		{
 			std::vector<MoEWeaponBuyInfo_s> candidate_list;
-#ifndef XASH_DEDICATED
 			std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
-#else
-			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
-#endif // !XASH_DEDICATED
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 			const MoEWeaponBuyInfo_s& info = candidate_list.front();
 			if (iSlot == KNIFE_SLOT) {
@@ -495,6 +483,9 @@ bool CPlayerModStrategy_Zombie::CanPlayerBuy(bool display)
 {
 	// is the player alive?
 	if (m_pPlayer->pev->deadflag != DEAD_NO)
+		return false;
+
+	if(m_pPlayer->m_iBuff & BUFF_GHOSTHUNTER)
 		return false;
 
 	//return !m_pPlayer->m_bIsZombie;

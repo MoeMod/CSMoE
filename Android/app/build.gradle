@@ -15,12 +15,12 @@ bugly {
 
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "in.celest.xash3d.csbtem"
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 29
 
         externalNativeBuild {
             cmake {
@@ -59,6 +59,9 @@ android {
         }
     }
     ndkVersion '23.2.8568313'
+    aaptOptions {
+        noCompress = ['.tga', '.astc']
+    }
 }
 
 dependencies {

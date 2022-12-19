@@ -191,7 +191,7 @@ qboolean Image_LoadASTC_SW( const char *name, const byte *buffer, size_t filesiz
 
 	astcenc_image *image_decomp_out = alloc_image(8, dim_x, dim_y, dim_z);
 
-	status = astcenc_decompress_image(context, (uint8_t*)buffer, filesize, image_decomp_out, &swizzle, 0);
+	status = astcenc_decompress_image(context, (uint8_t*)buffer + sizeof(astc_header), filesize, image_decomp_out, &swizzle, 0);
 	if (status != ASTCENC_SUCCESS)
 	{
 		MsgDev( D_WARN, "Image_LoadASTC: Codec decompress failed: %s\n", astcenc_get_error_string(status));

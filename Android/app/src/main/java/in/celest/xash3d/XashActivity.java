@@ -1,5 +1,7 @@
 package in.celest.xash3d;
 
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+
 import android.app.*;
 import android.content.*;
 import android.content.res.AssetManager;
@@ -55,7 +57,15 @@ public class XashActivity extends SDLActivity {
 		
 		int flags = WindowManager.LayoutParams.FLAG_FULLSCREEN | 
 			WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+			flags |= WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+		}
+
 		getWindow().setFlags( flags, flags );
+
+		final View decorView = getWindow().getDecorView();
+		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 
 		mVibrator = ( Vibrator )getSystemService( Context.VIBRATOR_SERVICE );
 			

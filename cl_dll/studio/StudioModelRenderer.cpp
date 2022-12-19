@@ -52,11 +52,68 @@ typedef struct pmtrace_s pmtrace_t;
 
 struct model_s* CStudioModelRenderer::s_pBuffAugViewModel;
 struct model_s* CStudioModelRenderer::s_pBuffAugSmokeModel;
+
 struct model_s* CStudioModelRenderer::s_pBloodHunterViewModel;
+
 struct model_s* CStudioModelRenderer::s_pMGSMViewModel;
 struct model_s* CStudioModelRenderer::s_pMGSMLauncherModel;
+
 struct model_s* CStudioModelRenderer::s_pM1887xmasViewModel;
 struct model_s* CStudioModelRenderer::s_pXmasEmptyModel;
+
+struct model_s* CStudioModelRenderer::s_pBUFFNG7ViewModel;
+struct model_s* CStudioModelRenderer::s_pBUFFNG7BModeModel;
+struct model_s* CStudioModelRenderer::s_pBUFFNG7BMode2Model;
+struct model_s* CStudioModelRenderer::s_pBUFFNG7BMode3Model;
+
+struct model_s* CStudioModelRenderer::s_pDualSwordViewModel;
+struct model_s* CStudioModelRenderer::s_pDualSwordLeftModel;
+struct model_s* CStudioModelRenderer::s_pDualSwordRightModel;
+
+struct model_s* CStudioModelRenderer::s_pReviveGunViewModel;
+struct model_s* CStudioModelRenderer::s_pReviveGunIdle1Model;
+struct model_s* CStudioModelRenderer::s_pReviveGunIdle1LeftModel;
+struct model_s* CStudioModelRenderer::s_pReviveGunIdle2Model;
+struct model_s* CStudioModelRenderer::s_pReviveGunIdle2LeftModel;
+struct model_s* CStudioModelRenderer::s_pReviveGunDraw1Model;
+struct model_s* CStudioModelRenderer::s_pReviveGunDraw1LeftModel;
+struct model_s* CStudioModelRenderer::s_pReviveGunDraw2Model;
+struct model_s* CStudioModelRenderer::s_pReviveGunDraw2LeftModel;
+
+struct model_s* CStudioModelRenderer::s_pM95TigerViewModel;
+struct model_s* CStudioModelRenderer::s_pM95TigerEye1Model;
+struct model_s* CStudioModelRenderer::s_pM95TigerEye2Model;
+
+struct model_s* CStudioModelRenderer::s_pWonderCannonViewModel;
+struct model_s* CStudioModelRenderer::s_pWonderCannonBombSetModel;
+
+struct model_s* CStudioModelRenderer::s_pWonderCannonEXViewModel;
+struct model_s* CStudioModelRenderer::s_pWonderCannonEXLightModel;
+
+struct model_s* CStudioModelRenderer::s_pM3DragonViewModel;
+struct model_s* CStudioModelRenderer::s_pM3DragonFlame1Model;
+struct model_s* CStudioModelRenderer::s_pM3DragonFlame2Model;
+
+struct model_s* CStudioModelRenderer::s_pM3DragonmViewModel;
+struct model_s* CStudioModelRenderer::s_pM3DragonmSmoke1Model;
+struct model_s* CStudioModelRenderer::s_pM3DragonmSmoke2Model;
+
+struct model_s* CStudioModelRenderer::s_pSGDrillEXViewModel;
+
+struct model_s* CStudioModelRenderer::s_pVoidPistolViewModel;
+struct model_s* CStudioModelRenderer::s_pVoidPistolEXViewModel;
+struct model_s* CStudioModelRenderer::s_pVoidPistolBlackHoleModel;
+struct model_s* CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel;
+
+struct model_s* CStudioModelRenderer::s_pVulcanus9PModel;
+struct model_s* CStudioModelRenderer::s_pVulcanus9ViewModel;
+struct model_s* CStudioModelRenderer::s_pVulcanus9FlameModel;
+
+struct model_s* CStudioModelRenderer::s_pWingGunPModel;
+
+struct model_s* CStudioModelRenderer::s_pLaserSGPModel;
+
+struct model_s* CStudioModelRenderer::s_pSPKnifeViewModel;
 
 void CStudioModelRenderer::Init(void)
 {
@@ -447,8 +504,16 @@ void CStudioModelRenderer::StudioSetUpTransform(int trivial_accept)
 	(*m_protationmatrix)[2][3] = modelpos[2];
 }
 
+void CGameStudioModelRenderer::SetFixInterpolant(bool value)
+{
+	m_bSetFixDadt = value;
+}
+
 float CStudioModelRenderer::StudioEstimateInterpolant(void)
 {
+	if (m_bSetFixDadt)
+		return 2.0;
+
 	float dadt = 1.0;
 
 	if (m_fDoInterp && (m_pCurrentEntity->curstate.animtime >= m_pCurrentEntity->latched.prevanimtime + 0.01))
@@ -907,7 +972,9 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 	StudioSetUpTransform(0);
 
-	if(m_pCurrentEntity == gEngfuncs.GetViewModel())
+	cl_entity_s* viewent = gEngfuncs.GetViewModel();
+
+	if(m_pCurrentEntity == viewent)
 	{
 		if (gHUD.cl_righthand->value)
 		{

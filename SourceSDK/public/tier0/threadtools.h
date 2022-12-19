@@ -146,9 +146,11 @@ extern "C" unsigned long __declspec(dllimport) __stdcall GetCurrentThreadId();
 
 inline void ThreadPause()
 {
-#if defined( PLATFORM_WINDOWS_PC )
+#if defined( PLATFORM_WINDOWS_PC ) && ( defined( _M_IX86 ) || defined( _M_X64 ) )
 	// Intrinsic for __asm pause; from <intrin.h>
 	_mm_pause();
+#elif defined( PLATFORM_WINDOWS_PC ) && ( defined( _M_ARM ) || defined( _M_ARM64 ) )
+	__yield();
 #elif POSIX && ( defined( __i386__ ) || defined( __x86_64__ ) )
 	__asm __volatile( "pause" );
 #elif defined( _X360 )
@@ -279,8 +281,13 @@ inline bool ThreadInterlockedAssignPointerToConstIf( void const * volatile *p, v
 
 #if defined( PLATFORM_64BITS )
 #if defined (_WIN32) 
+#if defined( _M_ARM ) || defined( _M_ARM64 )
+typedef int32x4_t int128;
+inline int128 int128_zero() { return vdupq_n_s32(0); }
+#else
 typedef __m128i int128;
 inline int128 int128_zero()	{ return _mm_setzero_si128(); }
+#endif
 #else
 typedef __int128_t int128;
 #define int128_zero() int128()

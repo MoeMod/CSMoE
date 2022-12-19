@@ -4092,7 +4092,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							break;
 
 						case GRENADE_FIREBOMB:
-							killer_weapon_name = "firebomb";
+							killer_weapon_name = "fgrenade";
 							break;
 
 						case GRENADE_HEARTBOMB:
@@ -4100,7 +4100,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							break;
 
 						case GRENADE_CAKEBOMB:
-							killer_weapon_name = "cakebomb";
+							killer_weapon_name = "cake";
 							break;
 
 						case GRENADE_MOONCAKE:
@@ -4125,10 +4125,6 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 
 						case GRENADE_CHAINGRENADE:
 							killer_weapon_name = "chaingren";
-							break;
-
-						case GRENADE_PATROLDRONE:
-							killer_weapon_name = "patroldrone";
 							break;
 
 						default:
@@ -4219,6 +4215,52 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "guillotine";
 					else if (iId == WEAPON_GUILLOTINEEX)
 						killer_weapon_name = "guillotineex";
+					else if (iId == WEAPON_BLOODHUNTER)
+						killer_weapon_name = "bloodhunter";
+					else if (iId == WEAPON_MGSM)
+						killer_weapon_name = "mgsm";
+					else if (iId == WEAPON_SPEARGUNM)
+						killer_weapon_name = "speargunm";
+					else if (iId == WEAPON_BLOCKAR)
+						killer_weapon_name = "blockar";
+					else if (iId == WEAPON_BLOCKMG)
+						killer_weapon_name = "blockmg";
+					else if (iId == WEAPON_BLOCKAS)
+						killer_weapon_name = "blockas";
+					else if (iId == WEAPON_COILGUN)
+						killer_weapon_name = "coilgun";
+					else if (iId == WEAPON_BOUNCER)
+						killer_weapon_name = "bouncer";
+					else if (iId == WEAPON_THANATOS5)
+						killer_weapon_name = "thanatos5";
+					else if (iId == WEAPON_THANATOS3)
+						killer_weapon_name = "thanatos3";
+					else if (iId == WEAPON_THANATOS1)
+						killer_weapon_name = "thanatos1";
+					else if (iId == WEAPON_OICW)
+						killer_weapon_name = "oicw";
+					else if (iId == WEAPON_BUFFNG7)
+						killer_weapon_name = "buffng7";
+					else if (iId == WEAPON_WONDERCANNONEX)
+						killer_weapon_name = "wondercannonex";
+					else if (iId == WEAPON_VOIDPISTOLEX)
+						killer_weapon_name = "voidpistolex";
+					else if (iId == WEAPON_TKNIFE)
+						killer_weapon_name = "tknife";
+					else if (iId == WEAPON_TKNIFEEX)
+						killer_weapon_name = "tknifeex";
+					else if (iId == WEAPON_TKNIFEEX2)
+						killer_weapon_name = "tknifeex2";
+					else if (iId == WEAPON_Z4B_TKNIFEDX)
+						killer_weapon_name = "tknife";
+					else if (iId == WEAPON_LASERMINIGUN)
+						killer_weapon_name = "laserminigun";
+					else if (iId == WEAPON_DRILLGUN)
+						killer_weapon_name = "drillgun";
+					else if (iId == WEAPON_VULCANUS7)
+						killer_weapon_name = "vulcanus7";
+					else if (iId == WEAPON_VULCANUS11)
+						killer_weapon_name = "vulcanus11";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}
@@ -4239,7 +4281,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						break;
 
 					case GRENADE_FIREBOMB:
-						killer_weapon_name = "firebomb";
+						killer_weapon_name = "fgrenade";
 						break;
 
 					case GRENADE_HEARTBOMB:
@@ -4247,7 +4289,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						break;
 
 					case GRENADE_CAKEBOMB:
-						killer_weapon_name = "cakebomb";
+						killer_weapon_name = "cake";
 						break;
 
 					case GRENADE_MOONCAKE:
@@ -4272,10 +4314,6 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 
 					case GRENADE_CHAINGRENADE:
 						killer_weapon_name = "chaingren";
-						break;
-
-					case GRENADE_PATROLDRONE:
-						killer_weapon_name = "patroldrone";
 						break;
 
 					default:

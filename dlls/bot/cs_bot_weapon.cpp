@@ -128,7 +128,7 @@ void CCSBot::FireWeaponAtEnemy()
 							}
 						}
 					}
-					else if (IsUsingCannon())
+					else if (IsUsingCannon() || IsUsingChainsaw())
 					{
 						const float cannonRange = 150.0f; // 50.0f
 						if (rangeToEnemy < cannonRange)
@@ -137,7 +137,7 @@ void CCSBot::FireWeaponAtEnemy()
 							//ForceRun(5.0s);
 
 							// if multiple enemy found, press 6
-							if (GetNearbyEnemyCount() > 2 && m_flNextAttack < 0.2s)
+							if ((GetNearbyEnemyCount() > 2 || GetEnemiesRemaining() <= 2 || GetFriendsRemaining() <= 2 || g_pGameRules->TimeRemaining() <= 15.0s) && m_flNextAttack < 0.2s)
 							{
 								m_pModStrategy->ClientCommand("MoE_HumanSkill2");
 							}
@@ -374,6 +374,11 @@ bool isSniperRifle(CBasePlayerItem *item)
 	case WEAPON_Z4B_BARRETTD:
 	case WEAPON_Z4B_FREEDOM:
 	case WEAPON_BUFFAWP:
+	case WEAPON_DESTROYER:
+	case WEAPON_STARCHASERSR:
+	case WEAPON_MOSIN:
+	case WEAPON_Z4B_DEATHRAY:
+	case WEAPON_CARTBLUES:
 		return true;
 
 	default:
@@ -404,7 +409,8 @@ bool CCSBot::IsUsingAWP() const
 		|| weapon->m_iId == WEAPON_SFSNIPER
 		|| weapon->m_iId == WEAPON_Z4B_BARRETTD
 		|| weapon->m_iId == WEAPON_Z4B_FREEDOM
-		|| weapon->m_iId == WEAPON_BUFFAWP))
+		|| weapon->m_iId == WEAPON_BUFFAWP
+		|| weapon->m_iId == WEAPON_Z4B_DEATHRAY))
 		return true;
 
 	return false;
@@ -506,7 +512,27 @@ bool CCSBot::IsUsingMachinegun() const
 		weapon->m_iId == WEAPON_AIRBURSTER ||
 		weapon->m_iId == WEAPON_FLAMETHROWER ||
 		weapon->m_iId == WEAPON_POISONGUN ||
-		weapon->m_iId == WEAPON_WATERCANNON)
+		weapon->m_iId == WEAPON_WATERCANNON ||
+		weapon->m_iId == WEAPON_WONDERCANNONEX ||
+		weapon->m_iId == WEAPON_DRILLGUN)
+		return true;
+
+	return false;
+}
+
+// Returns true if using chainsaw
+
+bool CCSBot::IsUsingChainsaw() const
+{
+	CBasePlayerWeapon *weapon = GetActiveWeapon();
+
+	if (weapon == NULL)
+		return false;
+
+	if (weapon->m_iId == WEAPON_CHAINSAW)
+		return true;
+
+	if(weapon->GetBotStrategy() == BOT_STRATEGY_CHAINSAW)
 		return true;
 
 	return false;
@@ -628,7 +654,8 @@ void CCSBot::EquipBestWeapon(bool mustEquip)
 			|| (ctrl->AllowRifles() && weaponClass == WEAPONCLASS_RIFLE)
 			|| (ctrl->AllowSnipers() && weaponClass == WEAPONCLASS_SNIPERRIFLE)
 			|| (ctrl->AllowSubMachineGuns() && weaponClass == WEAPONCLASS_SUBMACHINEGUN)
-			|| (ctrl->AllowTacticalShield() && primary->m_iId == WEAPON_SHIELDGUN))
+			|| (ctrl->AllowTacticalShield() && primary->m_iId == WEAPON_SHIELDGUN)
+            || weaponClass == WEAPONCLASS_EQUIPMENT)
 		{
 			if (DoEquip(primary))
 				return;

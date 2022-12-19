@@ -418,6 +418,7 @@ public:
 	bool IsSniping() const;							// return true if we are actively sniping (moving to sniper spot or settled in)
 	bool IsUsingShotgun() const;						// returns true if using a shotgun
 	bool IsUsingMachinegun() const;						// returns true if using the big 'ol machinegun
+	bool IsUsingChainsaw() const;						// returns true if using a shotgun
 	bool IsUsingCannon() const;						// returns true if using a shotgun
     bool IsUsingSkullAxe() const;						// returns true if using a shotgun
 	void ThrowGrenade(const Vector *target);				// begin the process of throwing the grenade

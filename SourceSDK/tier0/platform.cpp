@@ -374,6 +374,13 @@ bool Is64BitOS()
 	}
 }
 
+PLATFORM_INTERFACE uint64 Plat_Rdtsc()
+{
+	LARGE_INTEGER ret;
+	QueryPerformanceCounter(&ret);
+	return ret.QuadPart;
+}
+
 
 // -------------------------------------------------------------------------------------------------- //
 // Memory stuff. 

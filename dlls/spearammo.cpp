@@ -31,7 +31,7 @@ namespace sv {
 	}
 
 
-	CSpear* CSpear::Create(void)
+	CSpear* CSpear::Create(int iType)
 	{
 		edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("spear"));
 
@@ -45,7 +45,7 @@ namespace sv {
 		if (pSpear)
 		{
 			pSpear->pev->classname = MAKE_STRING("spear");
-
+			pSpear->m_iType = iType;
 			pSpear->Spawn();
 		}
 
@@ -254,17 +254,34 @@ namespace sv {
 	{
 		Update();
 
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_BEAMFOLLOW);
-		WRITE_SHORT(entindex());
-		WRITE_SHORT(m_iBeamModelIndex);
-		WRITE_BYTE(4);
-		WRITE_BYTE(3);
-		WRITE_BYTE(50);
-		WRITE_BYTE(185);
-		WRITE_BYTE(200);
-		WRITE_BYTE(200);
-		MESSAGE_END();
+		if (m_iType)
+		{
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_BEAMFOLLOW);
+			WRITE_SHORT(entindex());
+			WRITE_SHORT(m_iBeamModelIndex);
+			WRITE_BYTE(4);
+			WRITE_BYTE(3);
+			WRITE_BYTE(255);
+			WRITE_BYTE(100);
+			WRITE_BYTE(0);
+			WRITE_BYTE(200);
+			MESSAGE_END();
+		}
+		else
+		{
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_BEAMFOLLOW);
+			WRITE_SHORT(entindex());
+			WRITE_SHORT(m_iBeamModelIndex);
+			WRITE_BYTE(4);
+			WRITE_BYTE(3);
+			WRITE_BYTE(50);
+			WRITE_BYTE(185);
+			WRITE_BYTE(200);
+			WRITE_BYTE(200);
+			MESSAGE_END();
+		}
 
 		SetThink(&CSpear::FollowThink);
 
@@ -408,8 +425,17 @@ namespace sv {
 
 	void CSpear::Precache(void)
 	{
-		m_iArrowModel = PRECACHE_MODEL("models/spear.mdl");
-		m_iExplodeModel = PRECACHE_MODEL("models/spear2.mdl");
+		if (m_iType)
+		{
+			m_iArrowModel = PRECACHE_MODEL("models/spearm.mdl");
+			m_iExplodeModel = PRECACHE_MODEL("models/spearm2.mdl");
+		}
+		else
+		{
+			m_iArrowModel = PRECACHE_MODEL("models/spear.mdl");
+			m_iExplodeModel = PRECACHE_MODEL("models/spear2.mdl");
+		}
+		
 		m_iBeamModelIndex = PRECACHE_MODEL("sprites/smoke.spr");
 	}
 
@@ -434,7 +460,10 @@ namespace sv {
 		pev->gravity = 0.5;
 		pev->friction = 0;
 
-		SET_MODEL(ENT(pev), "models/spear.mdl");
+		if(m_iType)
+			SET_MODEL(ENT(pev), "models/spearm.mdl");
+		else
+			SET_MODEL(ENT(pev), "models/spear.mdl");
 
 		pev->mins = pev->maxs = Vector(0.008, 0.008, 0.008);
 

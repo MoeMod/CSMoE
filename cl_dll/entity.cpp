@@ -617,7 +617,22 @@ void DLLEXPORT HUD_TempEntUpdate (
 
 					if (pTemp->hitSound)
 					{
-						Callback_TempEntPlaySound(pTemp, damp);
+						if (pTemp->hitSound == BOUNCE_BLOCKSHELL)
+						{
+							float zvel = abs(pTemp->entity.baseline.origin.z);
+
+							if (zvel >= 200 || !gEngfuncs.pfnRandomLong(0, 3))
+							{
+								if (damp > 0.0f)
+								{
+									char SoundName[256];
+									sprintf(SoundName, "weapons/blockar1_shell%d.wav", Com_RandomLong(1, 3));
+									gEngfuncs.pEventAPI->EV_PlaySound(-1, pTemp->entity.origin, CHAN_AUTO, SoundName, VOL_NORM * min(1.0f, ((float)zvel) / 350.0f), 1.0, 0, PITCH_NORM);
+								}
+							}
+						}
+						else
+							Callback_TempEntPlaySound(pTemp, damp);
 					}
 
 					if (pTemp->flags & FTENT_COLLIDEKILL)

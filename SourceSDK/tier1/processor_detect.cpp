@@ -6,7 +6,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#if defined( _X360 ) || defined( _WIN64 )
+#if defined( _X360 ) || defined( _M_X64 ) || defined(_M_ARM) || defined(_M_ARM64)
 
 bool CheckMMXTechnology(void) { return false; }
 bool CheckSSETechnology(void) { return false; }

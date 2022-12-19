@@ -57,7 +57,7 @@ typedef int BOOL;
 #include <stdarg.h>
 #include <string.h> // memset 
 
-#define _vsnprintf(a,b,c,d) vsnprintf(a,b,c,d)
+//#define _vsnprintf(a,b,c,d) vsnprintf(a,b,c,d)
 #endif //_WIN32
 
 // Misc C-runtime library headers

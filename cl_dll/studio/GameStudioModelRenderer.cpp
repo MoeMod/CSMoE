@@ -79,6 +79,33 @@ static client_anim_state_t g_clientstate;
 
 TEMPENTITY* g_BuffAugSmoke = NULL;
 
+TEMPENTITY* g_BUFFNG7BMode[2];
+TEMPENTITY* g_BUFFNG7BMode2[3];
+TEMPENTITY* g_BUFFNG7BMode3 = NULL;
+
+TEMPENTITY* g_DualSwordLeft = NULL;
+TEMPENTITY* g_DualSwordRight = NULL;
+
+TEMPENTITY* g_ReviveGunSpr = NULL;
+
+TEMPENTITY* g_M95TigerEye1 = NULL;
+TEMPENTITY* g_M95TigerEye2 = NULL;
+
+TEMPENTITY* g_WonderCannonSpr[4];
+TEMPENTITY* g_WonderCannonEXSpr[5];
+
+TEMPENTITY* g_M3DragonFlame1 = NULL;
+TEMPENTITY* g_M3DragonFlame2 = NULL;
+
+TEMPENTITY* g_M3DragonmSmoke1 = NULL;
+TEMPENTITY* g_M3DragonmSmoke2 = NULL;
+
+TEMPENTITY* g_VoidPistolBlackHole = NULL;
+TEMPENTITY* g_VoidPistolEXBlackHole = NULL;
+
+TEMPENTITY* g_Vulcanus9Flame[8];
+TEMPENTITY* g_Vulcanus9PFlame[33][3];
+
 float g_flBloodhunterAnimTime = 0.0;
 int g_iBloodhunterSecAnim = 0;
 int g_iBloodhunterState = 0;
@@ -89,6 +116,19 @@ int g_iMGSMState = 0;
 
 float g_flM1887xmasAnimTime = 0.0;
 int g_iM1887xmasAnim = -1;
+
+int g_iBUFFNG7State = 0;
+
+int g_iReviveGunSeq = 0;
+
+int g_iM95TigerState = 0;
+
+int g_iVulcanus9State = 0;
+
+int g_iWingGunIdleB = 0;
+int g_iWingGunShootB = 0;
+
+int g_iSPKnifeAmmo = 0;
 
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {
@@ -1015,6 +1055,71 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 			model_t *pweaponmodel = IEngineStudio.GetModelByIndex(pplayer->weaponmodel);
 
+			//HOOK pModel
+			int idx = pplayer->number;
+
+			if (idx > 0 && idx < 33)
+			{
+				if (CStudioModelRenderer::s_pWingGunPModel && pweaponmodel == CStudioModelRenderer::s_pWingGunPModel)
+				{
+					if ((g_iWingGunShootB & (1 << idx) || g_iWingGunIdleB & (1 << idx)))
+					{
+						if (g_iWingGunShootB & (1 << idx))
+						{
+							m_pCurrentEntity->curstate.sequence = 2;
+							m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+							m_pCurrentEntity->curstate.framerate = 1.0;
+						}
+
+						if (g_iWingGunIdleB & (1 << idx))
+							m_pCurrentEntity->curstate.sequence = 1;
+					}
+					else
+					{
+						m_pCurrentEntity->curstate.sequence = 0;
+						m_pCurrentEntity->curstate.animtime = 0.0;
+						m_pCurrentEntity->curstate.framerate = 0.0;
+					}
+				}
+
+				if (g_iVulcanus9State & (1 << idx) && CStudioModelRenderer::s_pVulcanus9PModel && CStudioModelRenderer::s_pVulcanus9FlameModel && pweaponmodel == CStudioModelRenderer::s_pVulcanus9PModel)
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						if (!g_Vulcanus9PFlame[idx][i])
+						{
+							g_Vulcanus9PFlame[idx][i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(m_pCurrentEntity->attachment[i + 1], CStudioModelRenderer::s_pVulcanus9FlameModel);
+
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.aiment = idx;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.body = i + 2;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.rendermode = kRenderTransAdd;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.renderamt = 255;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.renderfx = 0;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.scale = 0.22;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.framerate = 24;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.rendercolor.r = g_Vulcanus9PFlame[idx][i]->entity.curstate.rendercolor.g = g_Vulcanus9PFlame[idx][i]->entity.curstate.rendercolor.b = 255;
+							g_Vulcanus9PFlame[idx][i]->frameMax = 16;
+							g_Vulcanus9PFlame[idx][i]->die = gHUD.m_flTime + 9999.0f;
+							g_Vulcanus9PFlame[idx][i]->entity.curstate.weaponmodel = pplayer->weaponmodel;
+
+							g_Vulcanus9PFlame[idx][i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+						}
+					}
+				}
+				else
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						if (g_Vulcanus9PFlame[idx][i])
+						{
+							g_Vulcanus9PFlame[idx][i]->die = 0.0;
+							g_Vulcanus9PFlame[idx][i] = NULL;
+						}
+					}
+				}
+			}
+
 			m_pStudioHeader = (studiohdr_t *)IEngineStudio.Mod_Extradata(pweaponmodel);
 			if( !m_pStudioHeader )
 				return 0;
@@ -1116,6 +1221,15 @@ int R_StudioDrawPlayer(int flags, entity_state_t *pplayer)
 
 int R_StudioDrawModel(int flags)
 {
+	int idx;
+	cl_entity_t* pLocalPlayer = gEngfuncs.GetLocalPlayer();
+
+	if (g_iUser1 == OBS_IN_EYE)
+		pLocalPlayer = gEngfuncs.GetEntityByIndex(g_iUser2);
+
+	idx = pLocalPlayer->index;
+
+	int righthand = gHUD.cl_righthand->value;
 	cl_entity_s* viewent = IEngineStudio.GetViewEntity();
 	cl_entity_s* curent = IEngineStudio.GetCurrentEntity();
 	if (curent == viewent)
@@ -1137,7 +1251,7 @@ int R_StudioDrawModel(int flags)
 			*curent = saveent;
 		}
 
-		if (CStudioModelRenderer::s_pMGSMViewModel && curent->model == CStudioModelRenderer::s_pMGSMViewModel && g_iMGSMSecAnim)
+		if (CStudioModelRenderer::s_pMGSMViewModel && CStudioModelRenderer::s_pMGSMLauncherModel && curent->model == CStudioModelRenderer::s_pMGSMViewModel && g_iMGSMSecAnim)
 		{
 			static cl_entity_t saveent;
 			saveent = *curent;
@@ -1163,6 +1277,25 @@ int R_StudioDrawModel(int flags)
 
 			g_StudioRenderer.StudioDrawModel(flags);
 			*curent = saveent;
+		}
+
+		if (CStudioModelRenderer::s_pSPKnifeViewModel && curent->model == CStudioModelRenderer::s_pSPKnifeViewModel && g_iSPKnifeAmmo)
+		{
+			float flState = 1.0 - ((float)g_iSPKnifeAmmo / 60.0);
+			
+			int body = curent->curstate.body;
+			byte control = byte(flState * 255);
+
+			g_StudioRenderer.SetFixInterpolant(true);
+
+			int iReturn = g_StudioRenderer.StudioDrawModel(flags);
+
+			curent->curstate.body = body;
+			curent->curstate.controller[0] = curent->latched.prevcontroller[0] = control;
+
+			g_StudioRenderer.SetFixInterpolant(false);
+
+			return iReturn;
 		}
 	}
 
@@ -1199,6 +1332,721 @@ int R_StudioDrawModel(int flags)
 			{
 				g_BuffAugSmoke->die = 0.0;
 				g_BuffAugSmoke = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pBUFFNG7ViewModel && curent->model == CStudioModelRenderer::s_pBUFFNG7ViewModel && CStudioModelRenderer::s_pBUFFNG7BModeModel && CStudioModelRenderer::s_pBUFFNG7BMode2Model && CStudioModelRenderer::s_pBUFFNG7BMode3Model && g_iBUFFNG7State)
+		{
+			for (int i = 0; i < 2; i++)
+			{
+				int iAttachment = i + 2;
+				if (!g_BUFFNG7BMode[i])
+				{
+					g_BUFFNG7BMode[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], CStudioModelRenderer::s_pBUFFNG7BModeModel);
+
+					g_BUFFNG7BMode[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_BUFFNG7BMode[i]->entity.curstate.aiment = curent->index;
+					g_BUFFNG7BMode[i]->entity.curstate.body = iAttachment + 1;
+					g_BUFFNG7BMode[i]->entity.curstate.rendermode = kRenderTransAdd;
+					g_BUFFNG7BMode[i]->entity.curstate.renderamt = 255;
+					g_BUFFNG7BMode[i]->entity.curstate.renderfx = 0;
+					g_BUFFNG7BMode[i]->entity.curstate.scale = 0.02;
+					g_BUFFNG7BMode[i]->entity.curstate.framerate = 24;
+					g_BUFFNG7BMode[i]->entity.curstate.rendercolor.r = g_BUFFNG7BMode[i]->entity.curstate.rendercolor.g = g_BUFFNG7BMode[i]->entity.curstate.rendercolor.b = 255;
+					g_BUFFNG7BMode[i]->frameMax = 28;
+					g_BUFFNG7BMode[i]->entity.curstate.frame = Com_RandomLong(0, 5);
+					g_BUFFNG7BMode[i]->die = gHUD.m_flTime + 9999.0f;
+					g_BUFFNG7BMode[i]->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_BUFFNG7BMode[i]->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_BUFFNG7BMode[i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+
+			for (int i = 0; i < 3; i++)
+			{
+				int iAttachment = i + 4;
+				if (!g_BUFFNG7BMode2[i])
+				{
+					g_BUFFNG7BMode2[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], CStudioModelRenderer::s_pBUFFNG7BMode2Model);
+
+					g_BUFFNG7BMode2[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_BUFFNG7BMode2[i]->entity.curstate.aiment = curent->index;
+					g_BUFFNG7BMode2[i]->entity.curstate.body = iAttachment + 1;
+					g_BUFFNG7BMode2[i]->entity.curstate.rendermode = kRenderTransAdd;
+					g_BUFFNG7BMode2[i]->entity.curstate.renderamt = 255;
+					g_BUFFNG7BMode2[i]->entity.curstate.renderfx = 0;
+					g_BUFFNG7BMode2[i]->entity.curstate.scale = 0.03;
+					g_BUFFNG7BMode2[i]->entity.curstate.framerate = 24;
+					g_BUFFNG7BMode2[i]->entity.curstate.rendercolor.r = g_BUFFNG7BMode2[i]->entity.curstate.rendercolor.g = g_BUFFNG7BMode2[i]->entity.curstate.rendercolor.b = 255;
+					g_BUFFNG7BMode2[i]->frameMax = 28;
+					g_BUFFNG7BMode2[i]->entity.curstate.frame = Com_RandomLong(0, 5);
+					g_BUFFNG7BMode2[i]->die = gHUD.m_flTime + 9999.0f;
+					g_BUFFNG7BMode2[i]->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_BUFFNG7BMode2[i]->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_BUFFNG7BMode2[i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+
+
+			if (g_iBUFFNG7State == 3)
+			{
+				if (!g_BUFFNG7BMode3)
+				{
+					g_BUFFNG7BMode3 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], CStudioModelRenderer::s_pBUFFNG7BMode3Model);
+
+					g_BUFFNG7BMode3->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_BUFFNG7BMode3->entity.curstate.aiment = curent->index;
+					g_BUFFNG7BMode3->entity.curstate.body = 1 + 1;
+					g_BUFFNG7BMode3->entity.curstate.rendermode = kRenderTransAdd;
+					g_BUFFNG7BMode3->entity.curstate.renderamt = 255;
+					g_BUFFNG7BMode3->entity.curstate.renderfx = 0;
+					g_BUFFNG7BMode3->entity.curstate.scale = 0.05;
+					g_BUFFNG7BMode3->entity.curstate.framerate = 24;
+					g_BUFFNG7BMode3->entity.curstate.rendercolor.r = g_BUFFNG7BMode3->entity.curstate.rendercolor.g = g_BUFFNG7BMode3->entity.curstate.rendercolor.b = 255;
+					g_BUFFNG7BMode3->frameMax = 23;
+					g_BUFFNG7BMode3->entity.curstate.frame = Com_RandomLong(0, 5);
+					g_BUFFNG7BMode3->die = gHUD.m_flTime + 9999.0f;
+					g_BUFFNG7BMode3->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_BUFFNG7BMode3->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_BUFFNG7BMode3->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+			else
+			{
+				if (g_BUFFNG7BMode3)
+				{
+					g_BUFFNG7BMode3->die = 0.0;
+					g_BUFFNG7BMode3 = NULL;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 2; i++)
+			{
+				if (g_BUFFNG7BMode[i])
+				{
+					g_BUFFNG7BMode[i]->die = 0.0;
+					g_BUFFNG7BMode[i] = NULL;
+				}
+			}
+
+			for (int i = 0; i < 3; i++)
+			{
+				if (g_BUFFNG7BMode2[i])
+				{
+					g_BUFFNG7BMode2[i]->die = 0.0;
+					g_BUFFNG7BMode2[i] = NULL;
+				}
+			}
+
+			if (g_BUFFNG7BMode3)
+			{
+				g_BUFFNG7BMode3->die = 0.0;
+				g_BUFFNG7BMode3 = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pDualSwordViewModel && curent->model == CStudioModelRenderer::s_pDualSwordViewModel && CStudioModelRenderer::s_pDualSwordLeftModel && CStudioModelRenderer::s_pDualSwordRightModel)
+		{
+			if (curent->curstate.sequence == 7)
+			{
+				if (!g_DualSwordLeft)
+				{
+					g_DualSwordLeft = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], CStudioModelRenderer::s_pDualSwordLeftModel);
+
+					g_DualSwordLeft->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_DualSwordLeft->entity.curstate.aiment = curent->index;
+					g_DualSwordLeft->entity.curstate.body = 2;
+					g_DualSwordLeft->entity.curstate.rendermode = kRenderTransAdd;
+					g_DualSwordLeft->entity.curstate.renderamt = 255;
+					g_DualSwordLeft->entity.curstate.renderfx = 0;
+					g_DualSwordLeft->entity.curstate.scale = 0.036;
+					g_DualSwordLeft->entity.curstate.framerate = 30.0f;
+					g_DualSwordLeft->frameMax = 30;
+					g_DualSwordLeft->die = gHUD.m_flTime + 9999.0f;
+					g_DualSwordLeft->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_DualSwordLeft->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_DualSwordLeft->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+			else
+			{
+				if (g_DualSwordLeft)
+				{
+					g_DualSwordLeft->die = 0.0;
+					g_DualSwordLeft = NULL;
+				}
+			}
+
+			if (curent->curstate.sequence == 0)
+			{
+				if (!g_DualSwordRight)
+				{
+					g_DualSwordRight = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[0], CStudioModelRenderer::s_pDualSwordRightModel);
+
+					g_DualSwordRight->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_DualSwordRight->entity.curstate.aiment = curent->index;
+					g_DualSwordRight->entity.curstate.body = 1;
+					g_DualSwordRight->entity.curstate.rendermode = kRenderTransAdd;
+					g_DualSwordRight->entity.curstate.renderamt = 255;
+					g_DualSwordRight->entity.curstate.renderfx = 0;
+					g_DualSwordRight->entity.curstate.scale = 0.036;
+					g_DualSwordRight->entity.curstate.framerate = 30.0f;
+					g_DualSwordRight->frameMax = 30;
+					g_DualSwordRight->die = gHUD.m_flTime + 9999.0f;
+					g_DualSwordRight->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_DualSwordRight->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_DualSwordRight->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+			else
+			{
+				if (g_DualSwordRight)
+				{
+					g_DualSwordRight->die = 0.0;
+					g_DualSwordRight = NULL;
+				}
+			}
+			
+		}
+		else
+		{
+			if (g_DualSwordLeft)
+			{
+				g_DualSwordLeft->die = 0.0;
+				g_DualSwordLeft = NULL;
+			}
+
+			if (g_DualSwordRight)
+			{
+				g_DualSwordRight->die = 0.0;
+				g_DualSwordRight = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pReviveGunViewModel && curent->model == CStudioModelRenderer::s_pReviveGunViewModel)
+		{
+			if (g_iReviveGunSeq != curent->curstate.sequence || curent->curstate.sequence == 1 || curent->curstate.sequence == 7)
+			{
+				if (g_ReviveGunSpr)
+				{
+					g_ReviveGunSpr->die = 0.0;
+					g_ReviveGunSpr = NULL;
+				}
+			}
+
+			g_iReviveGunSeq = curent->curstate.sequence;
+
+			if (!g_ReviveGunSpr)
+			{
+				switch (curent->curstate.sequence)
+				{
+				case 1:
+				case 7:
+					break;
+				case 2:
+				{
+					if (!g_ReviveGunSpr && CStudioModelRenderer::s_pReviveGunDraw1Model && CStudioModelRenderer::s_pReviveGunDraw1LeftModel)
+					{
+						g_ReviveGunSpr = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[5], righthand ? CStudioModelRenderer::s_pReviveGunDraw1Model : CStudioModelRenderer::s_pReviveGunDraw1LeftModel);
+
+						g_ReviveGunSpr->entity.curstate.movetype = MOVETYPE_FOLLOW;
+						g_ReviveGunSpr->entity.curstate.aiment = curent->index;
+						g_ReviveGunSpr->entity.curstate.body = 6;
+						g_ReviveGunSpr->entity.curstate.rendermode = kRenderTransAdd;
+						g_ReviveGunSpr->entity.curstate.renderamt = 255;
+						g_ReviveGunSpr->entity.curstate.renderfx = 0;
+						g_ReviveGunSpr->entity.curstate.scale = 0.03;
+						g_ReviveGunSpr->entity.curstate.framerate = 24.0f;
+						g_ReviveGunSpr->frameMax = 30;
+						g_ReviveGunSpr->die = gHUD.m_flTime + 9999.0f;
+						g_ReviveGunSpr->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+						g_ReviveGunSpr->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+						g_ReviveGunSpr->flags |= FTENT_PERSIST | FTENT_SPRANIMATE;
+					}
+					break;
+				}
+				case 8:
+				{
+					if (!g_ReviveGunSpr && CStudioModelRenderer::s_pReviveGunDraw2Model && CStudioModelRenderer::s_pReviveGunDraw2LeftModel)
+					{
+						g_ReviveGunSpr = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[5], righthand ? CStudioModelRenderer::s_pReviveGunDraw2Model : CStudioModelRenderer::s_pReviveGunDraw2LeftModel);
+
+						g_ReviveGunSpr->entity.curstate.movetype = MOVETYPE_FOLLOW;
+						g_ReviveGunSpr->entity.curstate.aiment = curent->index;
+						g_ReviveGunSpr->entity.curstate.body = 6;
+						g_ReviveGunSpr->entity.curstate.rendermode = kRenderTransAdd;
+						g_ReviveGunSpr->entity.curstate.renderamt = 255;
+						g_ReviveGunSpr->entity.curstate.renderfx = 0;
+						g_ReviveGunSpr->entity.curstate.scale = 0.04;
+						g_ReviveGunSpr->entity.curstate.framerate = 24.0f;
+						g_ReviveGunSpr->frameMax = 30;
+						g_ReviveGunSpr->die = gHUD.m_flTime + 9999.0f;
+						g_ReviveGunSpr->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+						g_ReviveGunSpr->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+						g_ReviveGunSpr->flags |= FTENT_PERSIST | FTENT_SPRANIMATE;
+					}
+					break;
+				}
+				case 6:
+				case 9:
+				case 10:
+				case 11:
+				{
+					if (CStudioModelRenderer::s_pReviveGunIdle2Model && CStudioModelRenderer::s_pReviveGunIdle2LeftModel)
+					{
+						g_ReviveGunSpr = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[5], righthand ? CStudioModelRenderer::s_pReviveGunIdle2Model : CStudioModelRenderer::s_pReviveGunIdle2LeftModel);
+
+						g_ReviveGunSpr->entity.curstate.movetype = MOVETYPE_FOLLOW;
+						g_ReviveGunSpr->entity.curstate.aiment = curent->index;
+						g_ReviveGunSpr->entity.curstate.body = 6;
+						g_ReviveGunSpr->entity.curstate.rendermode = kRenderTransAdd;
+						g_ReviveGunSpr->entity.curstate.renderamt = 255;
+						g_ReviveGunSpr->entity.curstate.renderfx = 0;
+						g_ReviveGunSpr->entity.curstate.scale = 0.04;
+						g_ReviveGunSpr->entity.curstate.framerate = 24.0f;
+						g_ReviveGunSpr->frameMax = 47;
+						g_ReviveGunSpr->die = gHUD.m_flTime + 9999.0f;
+						g_ReviveGunSpr->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+						g_ReviveGunSpr->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+						g_ReviveGunSpr->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+					}
+					break;
+				}
+
+				default:
+				{
+					if (CStudioModelRenderer::s_pReviveGunIdle1Model && CStudioModelRenderer::s_pReviveGunIdle1LeftModel)
+					{
+						g_ReviveGunSpr = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[5], righthand ? CStudioModelRenderer::s_pReviveGunIdle1Model : CStudioModelRenderer::s_pReviveGunIdle1LeftModel);
+
+						g_ReviveGunSpr->entity.curstate.movetype = MOVETYPE_FOLLOW;
+						g_ReviveGunSpr->entity.curstate.aiment = curent->index;
+						g_ReviveGunSpr->entity.curstate.body = 6;
+						g_ReviveGunSpr->entity.curstate.rendermode = kRenderTransAdd;
+						g_ReviveGunSpr->entity.curstate.renderamt = 255;
+						g_ReviveGunSpr->entity.curstate.renderfx = 0;
+						g_ReviveGunSpr->entity.curstate.scale = 0.03;
+						g_ReviveGunSpr->entity.curstate.framerate = 24.0f;
+						g_ReviveGunSpr->frameMax = 45;
+						g_ReviveGunSpr->die = gHUD.m_flTime + 9999.0f;
+						g_ReviveGunSpr->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+						g_ReviveGunSpr->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+						g_ReviveGunSpr->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+					}
+					break;
+				}
+				}
+			}
+		}
+		else
+		{
+			if (g_ReviveGunSpr)
+			{
+				g_ReviveGunSpr->die = 0.0;
+				g_ReviveGunSpr = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pM95TigerViewModel && curent->model == CStudioModelRenderer::s_pM95TigerViewModel && CStudioModelRenderer::s_pM95TigerEye1Model && CStudioModelRenderer::s_pM95TigerEye2Model)
+		{
+			if (!g_iM95TigerState)
+			{
+				if (g_M95TigerEye2)
+				{
+					g_M95TigerEye2->die = 0.0;
+					g_M95TigerEye2 = NULL;
+				}
+
+				if (!g_M95TigerEye1)
+				{
+					g_M95TigerEye1 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[3], CStudioModelRenderer::s_pM95TigerEye1Model);
+
+					g_M95TigerEye1->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_M95TigerEye1->entity.curstate.aiment = curent->index;
+					g_M95TigerEye1->entity.curstate.body = 4;
+					g_M95TigerEye1->entity.curstate.rendermode = kRenderTransAdd;
+					g_M95TigerEye1->entity.curstate.renderamt = 255;
+					g_M95TigerEye1->entity.curstate.renderfx = 0;
+					g_M95TigerEye1->entity.curstate.scale = 0.03;
+					g_M95TigerEye1->entity.curstate.framerate = 30.0f;
+					g_M95TigerEye1->frameMax = 15;
+					g_M95TigerEye1->die = gHUD.m_flTime + 9999.0f;
+					g_M95TigerEye1->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_M95TigerEye1->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_M95TigerEye1->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM;
+
+					g_M95TigerEye1->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+					{
+						if (gHUD.m_iFOV != 90)
+						{
+							pEnt->die = 0.0;
+							g_M95TigerEye1 = NULL;
+						}
+					};
+				}
+			}
+			else
+			{
+				if (g_M95TigerEye1)
+				{
+					g_M95TigerEye1->die = 0.0;
+					g_M95TigerEye1 = NULL;
+				}
+
+				if (!g_M95TigerEye2)
+				{
+					g_M95TigerEye2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[3], CStudioModelRenderer::s_pM95TigerEye2Model);
+
+					g_M95TigerEye2->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_M95TigerEye2->entity.curstate.aiment = curent->index;
+					g_M95TigerEye2->entity.curstate.body = 4;
+					g_M95TigerEye2->entity.curstate.rendermode = kRenderTransAdd;
+					g_M95TigerEye2->entity.curstate.renderamt = 255;
+					g_M95TigerEye2->entity.curstate.renderfx = 0;
+					g_M95TigerEye2->entity.curstate.scale = 0.03;
+					g_M95TigerEye2->entity.curstate.framerate = 30.0f;
+					g_M95TigerEye2->frameMax = 15;
+					g_M95TigerEye2->die = gHUD.m_flTime + 9999.0f;
+					g_M95TigerEye2->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_M95TigerEye2->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_M95TigerEye2->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM;
+
+					g_M95TigerEye2->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+					{
+						if (gHUD.m_iFOV != 90)
+						{
+							pEnt->die = 0.0;
+							g_M95TigerEye2 = NULL;
+						}
+					};
+				}
+			}
+		}
+		else
+		{
+			if (g_M95TigerEye1)
+			{
+				g_M95TigerEye1->die = 0.0;
+				g_M95TigerEye1 = NULL;
+			}
+
+			if (g_M95TigerEye2)
+			{
+				g_M95TigerEye2->die = 0.0;
+				g_M95TigerEye2 = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pWonderCannonViewModel && CStudioModelRenderer::s_pWonderCannonBombSetModel && curent->model == CStudioModelRenderer::s_pWonderCannonViewModel && (curent->curstate.sequence != 1 && curent->curstate.sequence != 6))
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (!g_WonderCannonSpr[i])
+				{
+					g_WonderCannonSpr[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[8 + i], CStudioModelRenderer::s_pWonderCannonBombSetModel);
+
+					g_WonderCannonSpr[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_WonderCannonSpr[i]->entity.curstate.aiment = curent->index;
+					g_WonderCannonSpr[i]->entity.curstate.body = 9 + i;
+					g_WonderCannonSpr[i]->entity.curstate.rendermode = kRenderTransAdd;
+					g_WonderCannonSpr[i]->entity.curstate.renderamt = 210;
+					g_WonderCannonSpr[i]->entity.curstate.renderfx = 0;
+					g_WonderCannonSpr[i]->entity.curstate.scale = 0.01;
+					g_WonderCannonSpr[i]->entity.curstate.framerate = 24;
+					g_WonderCannonSpr[i]->entity.curstate.frame = Com_RandomLong(0, 5);
+					g_WonderCannonSpr[i]->frameMax = 22;
+					g_WonderCannonSpr[i]->die = gHUD.m_flTime + 9999.0f;
+					g_WonderCannonSpr[i]->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_WonderCannonSpr[i]->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_WonderCannonSpr[i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (g_WonderCannonSpr[i])
+				{
+					g_WonderCannonSpr[i]->die = 0.0;
+					g_WonderCannonSpr[i] = NULL;
+				}
+			}
+		}
+
+		if (CStudioModelRenderer::s_pWonderCannonEXViewModel && CStudioModelRenderer::s_pWonderCannonEXLightModel && curent->model == CStudioModelRenderer::s_pWonderCannonEXViewModel && (curent->curstate.sequence != 1 && curent->curstate.sequence != 6))
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				if (!g_WonderCannonEXSpr[i])
+				{
+					
+					g_WonderCannonEXSpr[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[8 + i], CStudioModelRenderer::s_pWonderCannonEXLightModel);
+
+					g_WonderCannonEXSpr[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_WonderCannonEXSpr[i]->entity.curstate.aiment = curent->index;
+					g_WonderCannonEXSpr[i]->entity.curstate.body = 9 + i;
+					g_WonderCannonEXSpr[i]->entity.curstate.rendermode = kRenderTransAdd;
+					g_WonderCannonEXSpr[i]->entity.curstate.renderamt = 210;
+					g_WonderCannonEXSpr[i]->entity.curstate.renderfx = 0;
+					g_WonderCannonEXSpr[i]->entity.curstate.scale = 0.01;
+					g_WonderCannonEXSpr[i]->entity.curstate.framerate = 24;
+					g_WonderCannonEXSpr[i]->entity.curstate.frame = Com_RandomLong(0, 5);
+					g_WonderCannonEXSpr[i]->frameMax = 22;
+					g_WonderCannonEXSpr[i]->die = gHUD.m_flTime + 9999.0f;
+					g_WonderCannonEXSpr[i]->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_WonderCannonEXSpr[i]->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_WonderCannonEXSpr[i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				if (g_WonderCannonEXSpr[i])
+				{
+					g_WonderCannonEXSpr[i]->die = 0.0;
+					g_WonderCannonEXSpr[i] = NULL;
+				}
+			}
+		}
+
+		if (CStudioModelRenderer::s_pM3DragonViewModel && curent->model == CStudioModelRenderer::s_pM3DragonViewModel && CStudioModelRenderer::s_pM3DragonFlame1Model && CStudioModelRenderer::s_pM3DragonFlame2Model && curent->curstate.sequence > 6)
+		{
+			int iAttachment = righthand ? 2 : 3;
+
+			if (!g_M3DragonFlame1)
+			{
+				g_M3DragonFlame1 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], CStudioModelRenderer::s_pM3DragonFlame1Model);
+
+				g_M3DragonFlame1->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_M3DragonFlame1->entity.curstate.aiment = curent->index;
+				g_M3DragonFlame1->entity.curstate.body = iAttachment + 1;
+				g_M3DragonFlame1->entity.curstate.rendermode = kRenderTransAdd;
+				g_M3DragonFlame1->entity.curstate.renderamt = 255;
+				g_M3DragonFlame1->entity.curstate.renderfx = 0;
+				g_M3DragonFlame1->entity.curstate.scale = 0.08;
+				g_M3DragonFlame1->entity.curstate.framerate = 30.0f;
+				g_M3DragonFlame1->frameMax = 20;
+				g_M3DragonFlame1->die = gHUD.m_flTime + 9999.0f;
+				g_M3DragonFlame1->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+				g_M3DragonFlame1->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+				g_M3DragonFlame1->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_PERSIST;
+			}
+
+			iAttachment = righthand ? 3 : 2;
+
+			if (!g_M3DragonFlame2)
+			{
+				g_M3DragonFlame2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], CStudioModelRenderer::s_pM3DragonFlame2Model);
+
+				g_M3DragonFlame2->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_M3DragonFlame2->entity.curstate.aiment = curent->index;
+				g_M3DragonFlame2->entity.curstate.body = iAttachment + 1;
+				g_M3DragonFlame2->entity.curstate.rendermode = kRenderTransAdd;
+				g_M3DragonFlame2->entity.curstate.renderamt = 255;
+				g_M3DragonFlame2->entity.curstate.renderfx = 0;
+				g_M3DragonFlame2->entity.curstate.scale = 0.08;
+				g_M3DragonFlame2->entity.curstate.framerate = 30.0f;
+				g_M3DragonFlame2->frameMax = 20;
+				g_M3DragonFlame2->die = gHUD.m_flTime + 9999.0f;
+				g_M3DragonFlame2->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+				g_M3DragonFlame2->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+				g_M3DragonFlame2->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_PERSIST;
+			}		
+		}
+		else
+		{
+			if (g_M3DragonFlame1)
+			{
+				g_M3DragonFlame1->die = 0.0;
+				g_M3DragonFlame1 = NULL;
+			}
+
+			if (g_M3DragonFlame2)
+			{
+				g_M3DragonFlame2->die = 0.0;
+				g_M3DragonFlame2 = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pM3DragonmViewModel && curent->model == CStudioModelRenderer::s_pM3DragonmViewModel && CStudioModelRenderer::s_pM3DragonmSmoke1Model && CStudioModelRenderer::s_pM3DragonmSmoke2Model && curent->curstate.sequence > 6)
+		{
+			int iAttachment = righthand ? 2 : 3;
+
+			if (!g_M3DragonmSmoke1)
+			{
+				g_M3DragonmSmoke1 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], CStudioModelRenderer::s_pM3DragonmSmoke1Model);
+
+				g_M3DragonmSmoke1->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_M3DragonmSmoke1->entity.curstate.aiment = curent->index;
+				g_M3DragonmSmoke1->entity.curstate.body = iAttachment + 1;
+				g_M3DragonmSmoke1->entity.curstate.rendermode = kRenderTransAdd;
+				g_M3DragonmSmoke1->entity.curstate.renderamt = 255;
+				g_M3DragonmSmoke1->entity.curstate.renderfx = 0;
+				g_M3DragonmSmoke1->entity.curstate.scale = 0.08;
+				g_M3DragonmSmoke1->entity.curstate.framerate = 30.0f;
+				g_M3DragonmSmoke1->frameMax = 20;
+				g_M3DragonmSmoke1->die = gHUD.m_flTime + 9999.0f;
+				g_M3DragonmSmoke1->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+				g_M3DragonmSmoke1->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+				g_M3DragonmSmoke1->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_PERSIST;
+			}
+
+			iAttachment = righthand ? 3 : 2;
+
+			if (!g_M3DragonmSmoke2)
+			{
+				g_M3DragonmSmoke2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], CStudioModelRenderer::s_pM3DragonmSmoke2Model);
+
+				g_M3DragonmSmoke2->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_M3DragonmSmoke2->entity.curstate.aiment = curent->index;
+				g_M3DragonmSmoke2->entity.curstate.body = iAttachment + 1;
+				g_M3DragonmSmoke2->entity.curstate.rendermode = kRenderTransAdd;
+				g_M3DragonmSmoke2->entity.curstate.renderamt = 255;
+				g_M3DragonmSmoke2->entity.curstate.renderfx = 0;
+				g_M3DragonmSmoke2->entity.curstate.scale = 0.08;
+				g_M3DragonmSmoke2->entity.curstate.framerate = 30.0f;
+				g_M3DragonmSmoke2->frameMax = 20;
+				g_M3DragonmSmoke2->die = gHUD.m_flTime + 9999.0f;
+				g_M3DragonmSmoke2->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+				g_M3DragonmSmoke2->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+				g_M3DragonmSmoke2->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_PERSIST;
+			}
+		}
+		else
+		{
+			if (g_M3DragonmSmoke1)
+			{
+				g_M3DragonmSmoke1->die = 0.0;
+				g_M3DragonmSmoke1 = NULL;
+			}
+
+			if (g_M3DragonmSmoke2)
+			{
+				g_M3DragonmSmoke2->die = 0.0;
+				g_M3DragonmSmoke2 = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pVoidPistolViewModel && curent->model == CStudioModelRenderer::s_pVoidPistolViewModel && CStudioModelRenderer::s_pVoidPistolBlackHoleModel && (curent->curstate.sequence == 2 || curent->curstate.sequence == 5))
+		{
+			int iAttachment = righthand ? 2 : 3;
+
+			if (!g_VoidPistolBlackHole)
+			{
+				g_VoidPistolBlackHole = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], CStudioModelRenderer::s_pVoidPistolBlackHoleModel);
+
+				g_VoidPistolBlackHole->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_VoidPistolBlackHole->entity.curstate.aiment = curent->index;
+				g_VoidPistolBlackHole->entity.curstate.body = 2;
+				g_VoidPistolBlackHole->entity.curstate.rendermode = kRenderTransAdd;
+				g_VoidPistolBlackHole->entity.curstate.renderamt = 255;
+				g_VoidPistolBlackHole->entity.curstate.renderfx = 0;
+				g_VoidPistolBlackHole->entity.curstate.scale = 0.06;
+				g_VoidPistolBlackHole->entity.curstate.framerate = 30.0f;
+				g_VoidPistolBlackHole->frameMax = 35;
+				g_VoidPistolBlackHole->die = gHUD.m_flTime + 9999.0f;
+				g_VoidPistolBlackHole->entity.curstate.eflags |=  EFLAG_DEPTH_CHANGED;
+				g_VoidPistolBlackHole->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+				g_VoidPistolBlackHole->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_PERSIST;
+			}
+
+		}
+		else
+		{
+			if (g_VoidPistolBlackHole)
+			{
+				g_VoidPistolBlackHole->die = 0.0;
+				g_VoidPistolBlackHole = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pVoidPistolEXViewModel && curent->model == CStudioModelRenderer::s_pVoidPistolEXViewModel && CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel && (curent->curstate.sequence == 2 || curent->curstate.sequence == 5))
+		{
+			int iAttachment = righthand ? 2 : 3;
+
+			if (!g_VoidPistolEXBlackHole)
+			{
+				g_VoidPistolEXBlackHole = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], CStudioModelRenderer::s_pVoidPistolEXBlackHoleModel);
+
+				g_VoidPistolEXBlackHole->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_VoidPistolEXBlackHole->entity.curstate.aiment = curent->index;
+				g_VoidPistolEXBlackHole->entity.curstate.body = 2;
+				g_VoidPistolEXBlackHole->entity.curstate.rendermode = kRenderTransAdd;
+				g_VoidPistolEXBlackHole->entity.curstate.renderamt = 255;
+				g_VoidPistolEXBlackHole->entity.curstate.renderfx = 0;
+				g_VoidPistolEXBlackHole->entity.curstate.scale = 0.06;
+				g_VoidPistolEXBlackHole->entity.curstate.framerate = 30.0f;
+				g_VoidPistolEXBlackHole->frameMax = 35;
+				g_VoidPistolEXBlackHole->die = gHUD.m_flTime + 9999.0f;
+				g_VoidPistolEXBlackHole->entity.curstate.eflags |=  EFLAG_DEPTH_CHANGED;
+				g_VoidPistolEXBlackHole->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+				g_VoidPistolEXBlackHole->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_PERSIST;
+			}
+
+		}
+		else
+		{
+			if (g_VoidPistolEXBlackHole)
+			{
+				g_VoidPistolEXBlackHole->die = 0.0;
+				g_VoidPistolEXBlackHole = NULL;
+			}
+		}
+
+
+		if (g_iVulcanus9State & (1 << idx) && CStudioModelRenderer::s_pVulcanus9ViewModel && CStudioModelRenderer::s_pVulcanus9FlameModel && curent->model == CStudioModelRenderer::s_pVulcanus9ViewModel && (curent->curstate.sequence == 0 || (curent->curstate.sequence > 3 && curent->curstate.sequence < 8)))
+		{
+			for (int i = 2; i < 8; i++)
+			{
+				if (!g_Vulcanus9Flame[i])
+				{
+					g_Vulcanus9Flame[i] = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[i], CStudioModelRenderer::s_pVulcanus9FlameModel);
+
+					g_Vulcanus9Flame[i]->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_Vulcanus9Flame[i]->entity.curstate.aiment = curent->index;
+					g_Vulcanus9Flame[i]->entity.curstate.body = i + 1;
+					g_Vulcanus9Flame[i]->entity.curstate.rendermode = kRenderTransAdd;
+					g_Vulcanus9Flame[i]->entity.curstate.renderamt = 255;
+					g_Vulcanus9Flame[i]->entity.curstate.renderfx = 0;
+					g_Vulcanus9Flame[i]->entity.curstate.scale = 0.07;
+					g_Vulcanus9Flame[i]->entity.curstate.framerate = 24;
+					g_Vulcanus9Flame[i]->entity.curstate.rendercolor.r = g_Vulcanus9Flame[i]->entity.curstate.rendercolor.g = g_Vulcanus9Flame[i]->entity.curstate.rendercolor.b = 255;
+					g_Vulcanus9Flame[i]->frameMax = 16;
+					g_Vulcanus9Flame[i]->die = gHUD.m_flTime + 9999.0f;
+					g_Vulcanus9Flame[i]->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_Vulcanus9Flame[i]->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_Vulcanus9Flame[i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				if (g_Vulcanus9Flame[i])
+				{
+					g_Vulcanus9Flame[i]->die = 0.0;
+					g_Vulcanus9Flame[i] = NULL;
+				}
 			}
 		}
 	}
