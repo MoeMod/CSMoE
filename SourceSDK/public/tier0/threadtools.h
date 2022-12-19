@@ -1270,7 +1270,13 @@ private:
 //
 //-----------------------------------------------------------------------------
 
-class ALIGN8 PLATFORM_CLASS CThreadSpinRWLock
+class
+#if PLATFORM_64BITS
+	ALIGN16
+#else
+	ALIGN8 
+#endif
+PLATFORM_CLASS CThreadSpinRWLock
 {
 public:
 	CThreadSpinRWLock()	{ Assert( (intp)this % 8 == 0 ); memset( this, 0, sizeof( *this ) ); }

@@ -158,7 +158,7 @@ typedef struct cl_enginefuncs_s
 	void	(*pfnPlaySoundByIndex)( int iSound, float volume );
 
 	// vector helpers
-	void	(*pfnAngleVectors)( const vec3_t vecAngles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up );
+	void	(XASH_VECTORCALL *pfnAngleVectors)( const vec3_t vecAngles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up );
 
 	// text message system
 	client_textmessage_t *(*pfnTextMessageGet)( const char *pName );

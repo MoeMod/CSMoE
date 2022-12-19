@@ -29,6 +29,12 @@ using matrix4x4_ref = matrix4x4 &;
 using cmatrix3x4 = const matrix3x4 &;
 using cmatrix4x4 = const matrix4x4 &;
 
+#ifdef _MSC_VER
+#define XASH_VECTORCALL __vectorcall
+#else
+#define XASH_VECTORCALL
+#endif
+
 #ifndef time_point_t
 typedef float		time_point_t;
 #endif

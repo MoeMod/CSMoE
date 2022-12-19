@@ -110,8 +110,8 @@ typedef struct enginefuncs_s
 	void	(*pfnChangeLevel)( const char *s1, const char *s2 );
 	void	(*pfnGetSpawnParms)( edict_t *ent );
 	void	(*pfnSaveSpawnParms)( edict_t *ent );
-	float	(*pfnVecToYaw)( const vec3_t rgflVector );
-	void	(*pfnVecToAngles)( const vec3_t rgflVectorIn, vec3_t_ref rgflVectorOut );
+	float	(XASH_VECTORCALL *pfnVecToYaw)( const vec3_t rgflVector );
+	void	(XASH_VECTORCALL *pfnVecToAngles)( const vec3_t rgflVectorIn, vec3_t_ref rgflVectorOut );
 	void	(*pfnMoveToOrigin)( edict_t *ent, const vec3_t pflGoal, float dist, int iMoveType );
 	void	(*pfnChangeYaw)( edict_t* ent );
 	void	(*pfnChangePitch)( edict_t* ent );
@@ -120,8 +120,8 @@ typedef struct enginefuncs_s
 	edict_t*	(*pfnFindEntityInSphere)( edict_t *pEdictStartSearchAfter, const vec3_t org, float rad );
 	edict_t*	(*pfnFindClientInPVS)( edict_t *pEdict );
 	edict_t*	(*pfnEntitiesInPVS)( edict_t *pplayer );
-	void	(*pfnMakeVectors)( const vec3_t rgflVector );
-	void	(*pfnAngleVectors)( const vec3_t rgflVector, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up );
+	void	(XASH_VECTORCALL *pfnMakeVectors)( const vec3_t rgflVector );
+	void	(XASH_VECTORCALL *pfnAngleVectors)( const vec3_t rgflVector, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up );
 	edict_t*	(*pfnCreateEntity)( void );
 	void	(*pfnRemoveEntity)( edict_t* e );
 	edict_t*	(*pfnCreateNamedEntity)( int className );

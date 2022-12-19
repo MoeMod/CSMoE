@@ -30,11 +30,11 @@ namespace cl {
 //int		VectorCompare (const float *v1, const float *v2);
 //void	CrossProduct (const float *v1, const float *v2, float *cross);
 //void	VectorTransform (const float *in1, float in2[3][4], float *out);
-void	ConcatTransforms (cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out);
-void	MatrixCopy( cmatrix3x4 in, matrix3x4_ref out );
-void	QuaternionMatrix( const vec4_t quaternion, matrix3x4_ref matrix );
-void	QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt );
-void	AngleQuaternion( const vec3_t angles, vec4_t_ref quaternion );
+void	XASH_VECTORCALL ConcatTransforms (cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out);
+void	XASH_VECTORCALL MatrixCopy( cmatrix3x4 in, matrix3x4_ref out );
+void	XASH_VECTORCALL QuaternionMatrix( const vec4_t quaternion, matrix3x4_ref matrix );
+void	XASH_VECTORCALL QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt );
+void	XASH_VECTORCALL AngleQuaternion( const vec3_t angles, vec4_t_ref quaternion );
 }
 
 #endif // STUDIO_UTIL_H

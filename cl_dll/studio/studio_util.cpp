@@ -20,7 +20,7 @@ ConcatTransforms
 
 ================
 */
-void ConcatTransforms(cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out)
+void XASH_VECTORCALL ConcatTransforms(cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out)
 {
 #if U_VECTOR_NEON
 	memset(&out, 0, sizeof(out)); // out = {};
@@ -82,7 +82,7 @@ const __m128 AngleQuaternion_sign2 = _mm_castsi128_ps(_mm_setr_epi32(0x00000000,
 #elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
 const float32x4_t AngleQuaternion_sign2 = vzipq_f32(vdupq_n_u32(0x80000000), vdupq_n_u32(0x00000000)).val[0]; // { 0x80000000, 0x00000000, 0x80000000, 0x00000000 };
 #endif
-void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
+void XASH_VECTORCALL AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 {
 #if defined __SSE__ || defined __x86_64__ || defined _M_X64 || defined _M_AMD64 || defined _M_IX86_FP
 	__m128 sina, cosa;
@@ -151,7 +151,7 @@ QuaternionSlerp
 
 ====================
 */
-void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
+void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 {
 	int i;
 	float cosom, sclp, sclq;
@@ -213,7 +213,7 @@ QuaternionMatrix
 
 ====================
 */
-void QuaternionMatrix(const vec4_t quaternion, matrix3x4_ref matrix)
+void XASH_VECTORCALL QuaternionMatrix(const vec4_t quaternion, matrix3x4_ref matrix)
 {
 	matrix[0][0] = 1.0 - 2.0 * quaternion[1] * quaternion[1] - 2.0 * quaternion[2] * quaternion[2];
 	matrix[1][0] = 2.0 * quaternion[0] * quaternion[1] + 2.0 * quaternion[3] * quaternion[2];
@@ -234,7 +234,7 @@ MatrixCopy
 
 ====================
 */
-void MatrixCopy(cmatrix3x4 in, matrix3x4_ref out)
+void XASH_VECTORCALL MatrixCopy(cmatrix3x4 in, matrix3x4_ref out)
 {
     out = in;
 }

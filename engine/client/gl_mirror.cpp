@@ -121,7 +121,9 @@ void R_PlaneForMirror( msurface_t *surf, mplane_t *out, matrix4x4_ref m )
 		tmp = *out;
 
 		// transform mirror plane by entity matrix
-        out->normal = Matrix4x4_TransformPositivePlane( m, tmp.normal, tmp.dist, &out->dist );
+		vec3_t tmp2;
+        Matrix4x4_TransformPositivePlane( m, tmp.normal, tmp.dist, tmp2, &out->dist );
+		out->normal = tmp2;
 	}
 	else Matrix4x4_LoadIdentity( m );
 }
