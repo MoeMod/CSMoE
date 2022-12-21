@@ -2442,7 +2442,7 @@ namespace sv {
 	std::pair<byte, std::shared_ptr<CZombieZSkill_Base>> ZSkillFactory(CBasePlayer* player, std::function<bool(ZombieZSkillSkillId)> is_available)
 	{
 		std::vector<std::tuple<byte, unsigned int, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)>> list{ SKILL_LIST.begin(), SKILL_LIST.end() };
-		list.erase(std::remove_if(list.begin(), list.end(), [&](std::tuple<byte, unsigned int, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)> skill) { return !is_available((ZombieZSkillSkillId)std::get<0>(skill)); }), list.end());
+		list.erase(std::remove_if(list.begin(), list.end(), [&](std::tuple<byte, unsigned int, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)> skill) { return !is_available((ZombieZSkillSkillId)get<0>(skill)); }), list.end());
 
 		size_t size = list.size();
 		if (!size)

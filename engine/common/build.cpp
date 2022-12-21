@@ -47,7 +47,7 @@ static char mond[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 (__DATE__ [5] - '0') * 1 \
 )
 
-#define BUILD (std::enable_if_t<true, int[]>{ 0, 0,  31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 }[MONTH] + (DAY - 1) + (YEAR - 1900 - 1) * 365.25 + (YEAR % 4 == 0 && MONTH >= 2) - 41728)
+#define BUILD (std::type_identity_t<int[]>{ 0, 0,  31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 }[MONTH] + (DAY - 1) + (YEAR - 1900 - 1) * 365.25 + (YEAR % 4 == 0 && MONTH >= 2) - 41728)
 
 constexpr int g_iBuildNum = BUILD;
 

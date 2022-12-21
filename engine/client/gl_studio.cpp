@@ -1212,7 +1212,7 @@ static void (*R_MeshUVFunc())(const short* ptricmds, vec2_t &uv, float s, float 
 			uv[1] = HalfToFloat(ptricmds[3]);
 		};
 	}
-	else //[[likely]]
+	else [[likely]]
 	{
 		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
 			uv[0] = ptricmds[2] * s;
@@ -1250,7 +1250,7 @@ static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], float 
 			cl[3] = alpha;
 		};
 	}
-	else //[[likely]]
+	else [[likely]]
 	{
 		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
 			vec3_t lv = g_lightvalues[ptricmds[1]];

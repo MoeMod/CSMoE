@@ -7,7 +7,7 @@
 #include <variant>
 
 #include <boost/asio.hpp>
-#include <boost/asio/spawn.hpp>
+#include <boost/asio/awaitable.hpp>
 
 class TSourceEngineQuery
 {
@@ -123,7 +123,7 @@ public:
 	static std::size_t WriteServerInfoQueryResultToBuffer(const ServerInfoQueryResult &res, char* buffer, std::size_t max_len);
 	static std::size_t WritePlayerListQueryResultToBuffer(const PlayerListQueryResult& res, char* buffer, std::size_t max_len);
 
-	static ServerInfoQueryResult Co_GetServerInfoDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout, boost::asio::yield_context await);
-	static PlayerListQueryResult Co_GetPlayerListDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout, boost::asio::yield_context await);
+	static boost::asio::awaitable<ServerInfoQueryResult> Co_GetServerInfoDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout);
+	static boost::asio::awaitable<PlayerListQueryResult> Co_GetPlayerListDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout);
 
 };

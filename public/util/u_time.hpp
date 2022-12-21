@@ -114,19 +114,11 @@ namespace cl {
 			std::random_device rd;
 			return RandomDuration(a, b, rd);
 		}
-#if __cpp_lib_interpolate
-		using std::lerp;
-#else
-		inline float lerp(float a, float b, float t)
-		{
-			return a + t * (b - a);
-		}
-#endif
 
 		template<class Rep1, class Rep2, class RetRep = typename std::common_type<Rep1, Rep2>::type>
 		auto LerpDuration(std::chrono::duration<Rep1> a, std::chrono::duration<Rep2> b, RetRep t) -> typename std::enable_if<std::is_floating_point_v<RetRep>, std::chrono::duration<RetRep>>::type
 		{
-			return std::chrono::duration<RetRep>(lerp((RetRep)a.count(), (RetRep)b.count(), t));
+			return std::chrono::duration<RetRep>(std::lerp((RetRep)a.count(), (RetRep)b.count(), t));
 		}
 	}
 }

@@ -22,7 +22,7 @@
 cmake_minimum_required(VERSION  3.6.0)
 project(XASH_ENGINE CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 # fix C++17 register
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
@@ -520,7 +520,7 @@ if(XASH_TBBMALLOC)
 	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-tbbmalloc)
 endif()
 
-target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus 3rdparty-mpg123 Boost::coroutine)
+target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus 3rdparty-mpg123)
 
 if(WIN32)
 	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-mman-win32)

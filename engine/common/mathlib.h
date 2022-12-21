@@ -318,21 +318,21 @@ auto PlaneDiff(const VectorTypeA& point, const VectorTypeB& plane) -> decltype((
 }
 
 template <class T>
-auto boundmax(T num, std::enable_if_t<true, T> high)
+auto boundmax(T num, std::type_identity_t<T> high)
 {
     using std::min;
     return min(num, high);
 }
 
 template <class T>
-auto boundmin(T num, std::enable_if_t<true, T> low)
+auto boundmin(T num, std::type_identity_t<T> low)
 {
     using std::max;
     return max(num, low);
 }
 
 template <class T>
-auto bound(std::enable_if_t<true, T> low, T num, std::enable_if_t<true, T> high)
+auto bound(std::type_identity_t<T> low, T num, std::type_identity_t<T> high)
 {
     using std::clamp;
     return clamp(num, low, high);

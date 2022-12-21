@@ -18,7 +18,8 @@
 #include "util/u_range.hpp"
 
 #include <boost/asio.hpp>
-#include <boost/asio/spawn.hpp>
+#include <boost/asio/use_awaitable.hpp>
+#include <boost/asio/awaitable.hpp>
 #include <boost/asio/detached.hpp>
 
 #include <random>
@@ -67,7 +68,7 @@ namespace sv {
 			m_iSkyColor[1] = CVAR_GET_FLOAT("sv_skycolor_g");
 			m_iSkyColor[2] = CVAR_GET_FLOAT("sv_skycolor_b");
 
-			boost::asio::spawn(ioc, std::bind(&round_t::Task_Night, this, std::placeholders::_1));
+			boost::asio::co_spawn(ioc, Task_Night(), boost::asio::detached);
 		}
 
 		CMod_ZombieIV * const mod;
@@ -84,7 +85,7 @@ namespace sv {
 			ioc.poll();
 		}
 
-		void Task_Night(boost::asio::yield_context await)
+		boost::asio::awaitable<void> Task_Night()
 		{
 			try
 			{
@@ -103,11 +104,11 @@ namespace sv {
 
 				// countdown
 				timer.expires_after(20s);
-				timer.async_wait(await);
+				co_await timer.async_wait(boost::asio::use_awaitable);
 				UTIL_BroadcastStuffText("mp3 loop sound/Zombi_Ambience.mp3\n");
 
 				timer.expires_after(night_start_time);
-				timer.async_wait(await);
+				co_await timer.async_wait(boost::asio::use_awaitable);
 
 				// night starts, pre 15secs
 				UTIL_BroadcastStuffText("spk z4/z4_bgm_night.wav\n");
@@ -118,7 +119,7 @@ namespace sv {
                     //Set_Light(iLight, 5, (5 - iLight) * 3);
 					Update_Environment(iLight);
 					timer.expires_after(3s);
-					timer.async_wait(await);
+					co_await timer.async_wait(boost::asio::use_awaitable);
 				}
 				m_iDayNightStatus = DNS_DARK;
 				Check_NightStart();
@@ -127,7 +128,7 @@ namespace sv {
                 Set_Light(5, 6, 45.0f);
                 Update_Environment(6);
 				timer.expires_after(45s);
-				timer.async_wait(await);
+				co_await timer.async_wait(boost::asio::use_awaitable);
 
                 Set_Light(6, 0, 3.0f);
 				for(int iLight = 6; iLight > 0; --iLight)
@@ -136,7 +137,7 @@ namespace sv {
 					Update_Environment(iLight);
 
 					timer.expires_after(3s);
-					timer.async_wait(await);
+					co_await timer.async_wait(boost::asio::use_awaitable);
 				}
                 Set_Light(0, 0, 0.0f);
 
@@ -329,7 +330,7 @@ namespace sv {
 		void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override;
 		int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
-		void DelayRespawnCheck(boost::asio::yield_context yield);
+		boost::asio::awaitable<void> DelayRespawnCheck();
 
 	public:
 		bool IsZombie() const { return m_pPlayer->m_bIsZombie; }
@@ -345,7 +346,7 @@ namespace sv {
 			}
 			else
 			{
-				boost::asio::spawn(ioc, std::bind(&CPlayerModStrategy_ZB4::Task_DashActivateCheck, this, std::placeholders::_1));
+				boost::asio::co_spawn(ioc, Task_DashActivateCheck(), boost::asio::detached);
 			}
 		}
 
@@ -357,23 +358,23 @@ namespace sv {
 			}
 		}
 
-		void Task_DashActivateCheck(boost::asio::yield_context await)
+		boost::asio::awaitable<void> Task_DashActivateCheck()
 		{
 			m_bDashActivateCheckRunning = true;
 			try {
 				w_release_timer.expires_after(0.15s);
 				try {
-					w_release_timer.async_wait(await);
+					co_await w_release_timer.async_wait(boost::asio::use_awaitable);
 					m_bDashActivateCheckRunning = false;
-					return;
+					co_return;
 				} catch(const boost::system::system_error & e) {  }
 
 
 				w_press_timer.expires_after(0.15s);
 				try {
-					w_press_timer.async_wait(await);
+					co_await w_press_timer.async_wait(boost::asio::use_awaitable);
 					m_bDashActivateCheckRunning = false;
-					return;
+					co_return;
 				} catch(const boost::system::system_error & e) {  }
 
 				if(m_pCharacter_Z4)
@@ -387,7 +388,7 @@ namespace sv {
 				}
 			}
 			m_bDashActivateCheckRunning = false;
-			return;
+			co_return;
 		}
 
 	public:
@@ -408,7 +409,7 @@ namespace sv {
 	struct CPlayerModStrategy_ZB4::adrenaline_t
 	{
 		adrenaline_t(CMod_ZombieIV *p, CPlayerModStrategy_ZB4 *s) : mod(p), strategy(s) {
-			boost::asio::spawn(ioc, std::bind(&adrenaline_t::Task_Adrenaline_Check, this, std::placeholders::_1));
+			boost::asio::co_spawn(ioc, Task_Adrenaline_Check(), boost::asio::detached);
 		}
 
 		CMod_ZombieIV * const mod;
@@ -425,7 +426,7 @@ namespace sv {
 			ioc.poll();
 		}
 
-		void Task_Adrenaline_Check(boost::asio::yield_context await)
+		boost::asio::awaitable<void> Task_Adrenaline_Check()
 		{
 			try {
 				timer_type timer(ioc);
@@ -435,7 +436,7 @@ namespace sv {
 					while(m_bIsUsingAdrShoot || m_bIsUsingDash)
 					{
 						timer.expires_after(1s);
-						timer.async_wait(await);
+						co_await timer.async_wait(boost::asio::use_awaitable);
 					}
 
 					if(strategy->IsAlive())
@@ -451,7 +452,7 @@ namespace sv {
 					}
 
 					timer.expires_after(1s);
-					timer.async_wait(await);
+					co_await timer.async_wait(boost::asio::use_awaitable);
 				}
 			}
 			catch(const boost::system::system_error & e)
@@ -486,7 +487,7 @@ namespace sv {
 
 			auto time = LerpDuration(zero_duration, SKILL_ADRSHOOT_LASTING, m_iAdrenaline / 100.0);
 			m_bIsUsingAdrShoot = true;
-			boost::asio::spawn(ioc, std::bind(&adrenaline_t::Task_Adrenaline_SkillConsume, this, std::placeholders::_1));
+			boost::asio::co_spawn(ioc, Task_Adrenaline_SkillConsume(), boost::asio::detached);
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgZ4Msg, nullptr, strategy->m_pPlayer->pev);
 			WRITE_BYTE(Z4_MESSAGE_SKILL);
@@ -509,7 +510,7 @@ namespace sv {
 			MESSAGE_END();
 		}
 
-		void Task_Adrenaline_SkillConsume(boost::asio::yield_context await)
+		boost::asio::awaitable<void> Task_Adrenaline_SkillConsume()
 		{
 			try {
 				timer_type timer(ioc);
@@ -521,7 +522,7 @@ namespace sv {
 						Adrenaline_Set(-5);
 
 						timer.expires_after(SKILL_ADRSHOOT_LASTING / 20);
-						timer.async_wait(await);
+						co_await timer.async_wait(boost::asio::use_awaitable);
 
 						CLIENT_COMMAND(strategy->m_pPlayer->edict(), "spk zombi/speedup_heartbeat\n");
 						continue;
@@ -547,8 +548,8 @@ namespace sv {
 			strategy(strategy),
 			zclass(z4::Z4_MakeRandomZombie(m_pPlayer))
 		{
-			boost::asio::spawn(ioc, std::bind(&CZombie_Z4::Task_Dash_SkillConsume, this, std::placeholders::_1));
-			boost::asio::spawn(ioc, std::bind(&CZombie_Z4::Task_Dash_SkillCheck, this, std::placeholders::_1));
+			boost::asio::co_spawn(ioc, Task_Dash_SkillConsume(), boost::asio::detached);
+			boost::asio::co_spawn(ioc, Task_Dash_SkillCheck(), boost::asio::detached);
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgZ4Msg, nullptr, strategy->m_pPlayer->pev);
 			WRITE_BYTE(Z4_MESSAGE_ZCLASS);
@@ -692,7 +693,7 @@ namespace sv {
 			}, zclass);
 		}
 
-		void Task_Dash_SkillConsume(boost::asio::yield_context await)
+		boost::asio::awaitable<void> Task_Dash_SkillConsume()
 		{
 			try {
 				auto skill = SkillForZClass();
@@ -701,7 +702,7 @@ namespace sv {
 				while(true)
 				{
 					timer.expires_after(skill.flDashLasting / 20);
-					timer.async_wait(await); // throws
+					co_await timer.async_wait(boost::asio::use_awaitable); // throws
 
 					if(strategy->adrenaline->m_bIsUsingDash)
 					{
@@ -746,7 +747,7 @@ namespace sv {
 			strategy->adrenaline->Adrenaline_Set(-Skill.iSkillConsume);
 		}
 
-		void Task_Dash_SkillCheck(boost::asio::yield_context await)
+		boost::asio::awaitable<void> Task_Dash_SkillCheck()
 		{
 			try {
 				auto skill = SkillForZClass();
@@ -756,7 +757,7 @@ namespace sv {
 				while(true)
 				{
 					timer.expires_after(skill.flDashTimeCheck);
-					timer.async_wait(await); // throws
+					co_await timer.async_wait(boost::asio::use_awaitable); // throws
 
 					if(strategy->adrenaline->m_bIsUsingDash)
 					{
@@ -884,8 +885,8 @@ namespace sv {
 		CHuman_Z4(CPlayerModStrategy_ZB4 *strategy) : CHuman_ZB1(strategy->m_pPlayer),
 		strategy(strategy)
 		{
-			boost::asio::spawn(ioc, std::bind(&CHuman_Z4::Task_Dash_SkillConsume, this, std::placeholders::_1));
-			boost::asio::spawn(ioc, std::bind(&CHuman_Z4::Task_Dash_SkillCheck, this, std::placeholders::_1));
+			boost::asio::co_spawn(ioc, Task_Dash_SkillConsume(), boost::asio::detached);
+			boost::asio::co_spawn(ioc, Task_Dash_SkillCheck(), boost::asio::detached);
 		}
 
 		void ResetMaxSpeed() const override
@@ -903,7 +904,7 @@ namespace sv {
 			ioc.poll();
 		}
 
-		void Task_Dash_SkillConsume(boost::asio::yield_context await)
+		boost::asio::awaitable<void> Task_Dash_SkillConsume()
 		{
 			try {
 				timer_type timer(ioc);
@@ -911,7 +912,7 @@ namespace sv {
 				while(true)
 				{
 					timer.expires_after(SKILL_HUMANDASH_LASTING / 20);
-					timer.async_wait(await); // throws
+					co_await timer.async_wait(boost::asio::use_awaitable); // throws
 
 					if(strategy->adrenaline->m_bIsUsingDash)
 					{
@@ -931,7 +932,7 @@ namespace sv {
 			}
 		}
 
-		void Task_Dash_SkillCheck(boost::asio::yield_context await)
+		boost::asio::awaitable<void> Task_Dash_SkillCheck()
 		{
 			try {
 				timer_type timer(ioc);
@@ -939,7 +940,7 @@ namespace sv {
 				while(true)
 				{
 					timer.expires_after(0.5s);
-					timer.async_wait(await); // throws
+					co_await timer.async_wait(boost::asio::use_awaitable); // throws
 
 					if(strategy->adrenaline->m_bIsUsingDash)
 					{
@@ -1237,14 +1238,14 @@ namespace sv {
 		}
 
 		if(bCanRespawn)
-			boost::asio::spawn(ioc, std::bind(&CPlayerModStrategy_ZB4::DelayRespawnCheck, this, std::placeholders::_1));
+			boost::asio::co_spawn(ioc, DelayRespawnCheck(), boost::asio::detached);
 
 		// TODO : Respawn effect
 
 		return CPlayerModStrategy_ZB1::OnKilled(pKiller, pInflictor);
 	}
 
-	void CPlayerModStrategy_ZB4::DelayRespawnCheck(boost::asio::yield_context await)
+	boost::asio::awaitable<void> CPlayerModStrategy_ZB4::DelayRespawnCheck()
 	{
 		try{
 
@@ -1255,7 +1256,7 @@ namespace sv {
 			for(int i = 0; i < 5; ++i)
 			{
 				// countdown
-				timer.async_wait(await);
+				co_await timer.async_wait(boost::asio::use_awaitable);
 				ClientPrint(this->m_pPlayer->pev, HUD_PRINTCENTER, "距离复活剩余%s1秒", UTIL_dtos1(5 - i)); // #CSO_ZombiSelectCount
 
 				// stun over pre anim
@@ -1406,7 +1407,7 @@ namespace sv {
 		WRITE_BYTE(m_pPlayer->entindex());
 		MESSAGE_END();
 
-		boost::asio::spawn(ioc, std::bind(&CPlayerModStrategy_ZB4::DelayRespawnCheck, this, std::placeholders::_1));
+		boost::asio::co_spawn(ioc, DelayRespawnCheck(), boost::asio::detached);
 
 		return 0;
 	}

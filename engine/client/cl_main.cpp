@@ -39,7 +39,9 @@ GNU General Public License for more details.
 #include <optional>
 #include <chrono>
 #include <boost/asio.hpp>
-#include <boost/asio/spawn.hpp>
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/use_awaitable.hpp>
 
 #define MAX_TOTAL_CMDS		16
 #define MAX_CMD_BUFFER		4000
@@ -1461,7 +1463,7 @@ void CL_ParseNETInfoMessage( netadr_t from, sizebuf_t *msg )
 boost::asio::io_context ioc_cl_main;
 std::optional<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>> ioc_cl_main_work_guard;
 
-void CL_CheckFrameSmooth(boost::asio::yield_context await)
+boost::asio::awaitable<void> CL_CheckFrameSmooth()
 {
 	static std::chrono::high_resolution_clock::time_point last_frame_time;
 	auto now = std::chrono::high_resolution_clock::now();
@@ -1469,9 +1471,9 @@ void CL_CheckFrameSmooth(boost::asio::yield_context await)
 	{
 		last_frame_time = now;
 		// yield for next frame
-		boost::asio::post(ioc_cl_main, await);
+		co_await boost::asio::post(ioc_cl_main, boost::asio::use_awaitable);
 	}
-	return;
+	co_return;
 }
 
 /*
@@ -1481,7 +1483,7 @@ CL_PrepSound
 Call before entering a new level, or after changing dlls
 ======================
 */
-void CL_PrepSound(boost::asio::yield_context await)
+boost::asio::awaitable<void> CL_PrepSound( void )
 {
 	int	i, sndcount, step;
 
@@ -1491,10 +1493,10 @@ void CL_PrepSound(boost::asio::yield_context await)
 	step = sndcount/10;
 
 	S_BeginRegistration();
-	CL_CheckFrameSmooth(await);
+	co_await CL_CheckFrameSmooth();
 
 	if (cls.state == ca_disconnected)
-		return;
+		co_return;
 
 	for( i = 0; i < MAX_SOUNDS - 1 && cl.sound_precache[i+1][0]; i++ )
 	{
@@ -1502,18 +1504,18 @@ void CL_PrepSound(boost::asio::yield_context await)
 		Cvar_SetFloat( "scr_loading", scr_loading->value + 5.0f / sndcount );
 		if( step && !( i % step ) && ( cl_allow_levelshots->integer || cl.background ))
 			SCR_UpdateScreen();
-		CL_CheckFrameSmooth(await);
+		co_await CL_CheckFrameSmooth();
 	}
 
 	if (cls.state == ca_disconnected)
-		return;
+		co_return;
 
 	S_EndRegistration();
 
-	CL_CheckFrameSmooth(await);
+	co_await CL_CheckFrameSmooth();
 
 	if (cls.state == ca_disconnected)
-		return;
+		co_return;
 
 	if( host.soundList )
 	{
@@ -1528,19 +1530,19 @@ void CL_PrepSound(boost::asio::yield_context await)
 					S_RegisterSound( entry->name ), entry->volume, entry->attenuation,
 					entry->pitch, 0 );
 			}
-			CL_CheckFrameSmooth(await);
+			co_await CL_CheckFrameSmooth();
 		}
 	}
 
 	if (cls.state == ca_disconnected)
-		return;
+		co_return;
 
 	host.soundList = NULL;
 	host.numsounds = 0;
 
 	cl.audio_prepped = true;
 
-	return;
+	co_return;
 }
 
 /*
@@ -1550,14 +1552,14 @@ CL_PrepVideo
 Call before entering a new level, or after changing dlls
 =================
 */
-void CL_PrepVideo(boost::asio::yield_context await)
+boost::asio::awaitable<void> CL_PrepVideo( void )
 {
 	string	mdlname, mapname;
 	int	i, mdlcount, step;
 	int	map_checksum; // dummy
 
 	if( !cl.model_precache[1][0] )
-		return; // no map loaded
+		co_return; // no map loaded
 
 	Cvar_SetFloat( "scr_loading", 0.0f ); // reset progress bar
 	MsgDev( D_NOTE, "CL_PrepVideo: %s\n", clgame.mapname );
@@ -1566,10 +1568,10 @@ void CL_PrepVideo(boost::asio::yield_context await)
 	Q_strncpy( mapname, cl.model_precache[1], MAX_STRING );
 	Mod_LoadWorld( mapname, (uint *)&map_checksum, cl.maxclients > 1 );
 
-	CL_CheckFrameSmooth(await);
+	co_await CL_CheckFrameSmooth();
 
 	if (cls.state == ca_disconnected)
-		return;
+		co_return;
 
 	cl.worldmodel = Mod_Handle( 1 ); // get world pointer
 	Cvar_SetFloat( "scr_loading", 25.0f );
@@ -1592,11 +1594,11 @@ void CL_PrepVideo(boost::asio::yield_context await)
 		if( step && !( i % step ) && ( cl_allow_levelshots->integer || cl.background ) )
 			SCR_UpdateScreen();
 
-		CL_CheckFrameSmooth(await);
+		co_await CL_CheckFrameSmooth();
 	}
 
 	if (cls.state == ca_disconnected)
-		return;
+		co_return;
 
 	// update right muzzleflash indexes
 	CL_RegisterMuzzleFlashes ();
@@ -1610,10 +1612,10 @@ void CL_PrepVideo(boost::asio::yield_context await)
 
 	V_SetupOverviewState(); // set overview bounds
 
-	CL_CheckFrameSmooth(await);
+	co_await CL_CheckFrameSmooth();
 
 	if (cls.state == ca_disconnected)
-		return;
+		co_return;
 
 	// must be called after lightmap loading!
 	clgame.dllFuncs.pfnVidInit();
@@ -1669,12 +1671,12 @@ void CL_PrepVideo(boost::asio::yield_context await)
 				entry->pitch, 0 );
 			}
 
-			CL_CheckFrameSmooth(await);
+			co_await CL_CheckFrameSmooth();
 		}
 	}
 
 	if (cls.state == ca_disconnected)
-		return;
+		co_return;
 
 	host.soundList = NULL;
 	host.numsounds = 0;
@@ -1686,7 +1688,7 @@ void CL_PrepVideo(boost::asio::yield_context await)
 
 	cl.video_prepped = true;
 	cl.force_refdef = true;
-	return;
+	co_return;
 }
 
 /*
@@ -2115,14 +2117,19 @@ The server will send this command right
 before allowing the client into the server
 =================
 */
-void Co_CL_Precache(boost::asio::yield_context await)
+boost::asio::awaitable<void> Co_CL_Precache( void )
 {
 	int	spawncount;
 
 	spawncount = Q_atoi( Cmd_Argv( 1 ));
 
-	CL_PrepSound(await);
-	CL_PrepVideo(await);
+	//CL_PrepSound();
+	//CL_PrepVideo();
+	auto aw1 = CL_PrepSound();
+	auto aw2 = CL_PrepVideo();
+
+	co_await std::move(aw1);
+	co_await std::move(aw2);
 
 	if( Cmd_Argc() > 2 )
 	{
@@ -2142,12 +2149,12 @@ void Co_CL_Precache(boost::asio::yield_context await)
 	BF_WriteByte( &cls.netchan.message, clc_stringcmd );
 	BF_WriteString( &cls.netchan.message, va( "begin %i\n", spawncount ));
 
-	return;
+	co_return;
 }
 
 void CL_Precache_f( void )
 {
-	boost::asio::spawn(ioc_cl_main, Co_CL_Precache);
+	boost::asio::co_spawn(ioc_cl_main, Co_CL_Precache(), boost::asio::detached);
 }
 
 /*

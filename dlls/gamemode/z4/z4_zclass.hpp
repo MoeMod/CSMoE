@@ -94,16 +94,16 @@ namespace sv {
 		}
 
 		template<class...ZC>
-		void Z4_ZClass_Precache_All(std::variant<ZC...> *)
+		void Z4_ZClass_Precache_All(std::type_identity<std::variant<ZC...>>)
 		{
 			(..., Z4_ZClass_Precache_Single<ZC>());
 		}
 		inline void Z4_ZClass_Precache_All()
 		{
-			return Z4_ZClass_Precache_All((zclass_variant_t *)nullptr);
+			return Z4_ZClass_Precache_All(std::type_identity<zclass_variant_t>());
 		}
 
-		template<class...ZC> zclass_variant_t Z4_MakeRandomZombie(std::variant<ZC...> *, CBasePlayer *player)
+		template<class...ZC> zclass_variant_t Z4_MakeRandomZombie(std::type_identity<std::variant<ZC...>>, CBasePlayer *player)
 		{
 			auto Index = RANDOM_LONG(0, sizeof...(ZC) - 1);
 			constexpr zclass_variant_t(*pfn[sizeof...(ZC)])(CBasePlayer *player) = { [](CBasePlayer *player) -> zclass_variant_t { return ZC(player); }... };
@@ -111,7 +111,7 @@ namespace sv {
 		}
 		zclass_variant_t Z4_MakeRandomZombie(CBasePlayer *player)
 		{
-			return Z4_MakeRandomZombie((zclass_variant_t *)nullptr, player);
+			return Z4_MakeRandomZombie(std::type_identity<zclass_variant_t>(), player);
 		}
 	}
 }

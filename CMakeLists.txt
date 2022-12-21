@@ -27,7 +27,7 @@ if(NOT ANDROID AND NOT IOS)
 	option(XASH_ANGLE "Use OpenGL ES on desktop platforms" OFF) # use angle on desktop platforms
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
 	option(XASH_PCH "Enable PCH support." ON)
