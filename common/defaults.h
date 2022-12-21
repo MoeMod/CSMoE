@@ -134,7 +134,7 @@ Default build-depended cvar and constant values
 #define XASH_INTERNAL_GAMELIBS
 #endif
 
-#if defined XASH_NANOGL || defined XASH_WES || defined XASH_REGAL
+#if defined XASH_NANOGL || defined XASH_WES || defined XASH_REGAL || defined XASH_GL4ES
 #ifndef XASH_GLES
 #define XASH_GLES
 #endif // XASH_GLES

@@ -25,7 +25,7 @@ android {
         externalNativeBuild {
             cmake {
                 arguments "-DXASH_SDL=1",
-                        "-DXASH_WES=1",
+                        "-DXASH_GL4ES=1",
                         "-DXASH_STATIC_GAMELIB=1"
                 version "3.18.1"
             }

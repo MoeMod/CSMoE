@@ -434,11 +434,16 @@ GLint GL_MANGLE(glGetAttribLocationARB)(GLhandleARB programObj, const GLcharARB 
 void GL_MANGLE(glBindBufferARB)(GLenum target, GLuint buffer);
 void GL_MANGLE(glDeleteBuffersARB)(GLsizei n, const GLuint *buffers);
 void GL_MANGLE(glGenBuffersARB)(GLsizei n, GLuint *buffers);
+void GL_MANGLE(glBindBuffer)(GLenum target, GLuint buffer);
+void GL_MANGLE(glDeleteBuffers)(GLsizei n, const GLuint* buffers);
+void GL_MANGLE(glGenBuffers)(GLsizei n, GLuint* buffers);
 GLboolean GL_MANGLE(glIsBufferARB)(GLuint buffer);
 GLvoid* GL_MANGLE(glMapBufferARB)(GLenum target, GLenum access);
 GLboolean GL_MANGLE(glUnmapBufferARB)(GLenum target);
 void GL_MANGLE(glBufferDataARB)(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage);
 void GL_MANGLE(glBufferSubDataARB)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data);
+void GL_MANGLE(glBufferData)(GLenum target, GLsizeiptrARB size, const GLvoid* data, GLenum usage);
+void GL_MANGLE(glBufferSubData)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid* data);
 void GL_MANGLE(glGenQueriesARB)(GLsizei n, GLuint *ids);
 void GL_MANGLE(glDeleteQueriesARB)(GLsizei n, const GLuint *ids);
 GLboolean GL_MANGLE(glIsQueryARB)(GLuint id);
@@ -873,11 +878,16 @@ void GL_MANGLE(glSwapInterval)( int interval );
 #define pglBindBufferARB GL_MANGLE(glBindBufferARB)
 #define pglDeleteBuffersARB GL_MANGLE(glDeleteBuffersARB)
 #define pglGenBuffersARB GL_MANGLE(glGenBuffersARB)
+#define pglBindBuffer GL_MANGLE(glBindBuffer)
+#define pglGenBuffers GL_MANGLE(glGenBuffers)
+#define pglDeleteBuffers GL_MANGLE(glDeleteBuffers)
 #define pglIsBufferARB GL_MANGLE(glIsBufferARB)
 #define pglMapBufferARB GL_MANGLE(glMapBufferARB)
 #define pglUnmapBufferARB GL_MANGLE(glUnmapBufferARB)
 #define pglBufferDataARB GL_MANGLE(glBufferDataARB)
 #define pglBufferSubDataARB GL_MANGLE(glBufferSubDataARB)
+#define pglBufferData GL_MANGLE(glBufferData)
+#define pglBufferSubData GL_MANGLE(glBufferSubData)
 #define pglGenQueriesARB GL_MANGLE(glGenQueriesARB)
 #define pglDeleteQueriesARB GL_MANGLE(glDeleteQueriesARB)
 #define pglIsQueryARB GL_MANGLE(glIsQueryARB)
@@ -890,5 +900,49 @@ void GL_MANGLE(glSwapInterval)( int interval );
 #define pglMTexCoord2fSGIS GL_MANGLE(glMTexCoord2fSGIS)
 #define pglSwapInterval GL_MANGLE(glSwapInterval)
 #endif
+
+#ifdef XASH_GL4ES
+// redirect ARB alias
+#undef pglActiveTextureARB
+#define pglActiveTextureARB pglActiveTexture
+
+#undef pglClientActiveTextureARB
+#define pglClientActiveTextureARB pglClientActiveTexture
+
+#undef pglCompressedTexSubImage1DARB
+#define pglCompressedTexSubImage1DARB pglCompressedTexSubImage1D
+
+#undef pglCompressedTexImage1DARB
+#define pglCompressedTexImage1DARB pglCompressedTexImage1D
+
+#undef pglCompressedTexSubImage2DARB
+#define pglCompressedTexSubImage2DARB pglCompressedTexSubImage2D
+
+#undef pglCompressedTexImage2DARB
+#define pglCompressedTexImage2DARB pglCompressedTexImage2D
+
+#undef pglCompressedTexSubImage3DARB
+#define pglCompressedTexSubImage3DARB pglCompressedTexSubImage3D
+
+#undef pglCompressedTexImage3DARB
+#define pglCompressedTexImage3DARB pglCompressedTexImage3D
+
+#undef pglBindBufferARB
+#define pglBindBufferARB pglBindBuffer
+
+#undef pglGenBuffersARB
+#define pglGenBuffersARB pglGenBuffers
+
+#undef pglBufferDataARB
+#define pglBufferDataARB pglBufferData
+
+#undef pglDeleteBuffersARB
+#define pglDeleteBuffersARB pglDeleteBuffers
+
+#undef pglBufferSubDataARB
+#define pglBufferSubDataARB pglBufferSubData
+
+#endif
+
 #endif // GL_STATIC_H
 

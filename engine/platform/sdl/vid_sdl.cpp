@@ -57,7 +57,7 @@ void *SDL_GetVideoDevice( void );
 
 static void SDLCALL GL_GetDrawableSize(SDL_Window* window, int* w, int* h)
 {
-#if defined(XASH_EGL)
+#if defined(XASH_EGL) && defined(XASH_ANGLE)
     SDL_GetRendererOutputSize(SDL_GetRenderer(window), w, h);
     // TODO macos hidpi
 #ifdef __APPLE__
