@@ -109,9 +109,9 @@ void EXPORT CWebBomb::OnTouch(CBaseEntity* pOther)
 	WRITE_COORD(vecOrigin.x);
 	WRITE_COORD(vecOrigin.y);
 	WRITE_COORD(vecOrigin.z);
-	WRITE_ANGLE(vecAngles.x);
-	WRITE_ANGLE(vecAngles.y);
-	WRITE_ANGLE(vecAngles.z);
+	WRITE_COORD(vecAngles.x);
+	WRITE_COORD(vecAngles.y);
+	WRITE_COORD(vecAngles.z);
 	WRITE_COORD(vecVelocity.x);
 	WRITE_COORD(vecVelocity.y);
 	WRITE_COORD(vecVelocity.z);

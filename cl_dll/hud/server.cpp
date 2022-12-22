@@ -213,21 +213,28 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	case 16:		
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadByte();
-
+		
 		switch (arg2)
 		{
 		case WINGGUN_WING:
 		{
-			if (iWingGunEffect[arg1])
-			{
-				iWingGunEffect[arg1]->die = gHUD.m_flTime;
-				iWingGunEffect[arg1] = nullptr;
-				break;
-			}
+			int bOn = reader.ReadByte();
 
-			if (!iWingGunEffect[arg1])
-				iWingGunEffect[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_idle.spr"),
-					Vector(0.0, 0.0, 50.0), 15.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.5, kRenderTransAdd, 30.0);
+			if (bOn)
+			{
+				if (!iWingGunEffect[arg1])
+					iWingGunEffect[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_idle.spr"),
+						Vector(0.0, 0.0, 50.0), 15.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.5, kRenderTransAdd, 30.0);
+			}
+			else
+			{
+				if (iWingGunEffect[arg1])
+				{
+					iWingGunEffect[arg1]->die = gHUD.m_flTime;
+					iWingGunEffect[arg1] = nullptr;
+				}
+			}
+	
 			break;
 		}
 		case HOLYFIST_GLITCH_RING:

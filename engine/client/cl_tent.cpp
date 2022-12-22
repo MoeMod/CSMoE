@@ -2844,9 +2844,9 @@ void R_TempModel(sizebuf_t* msg)
 	pos.y = BF_ReadCoord(msg);
 	pos.z = BF_ReadCoord(msg);
 
-	angles.x = BF_ReadAngle(msg);
-	angles.y = BF_ReadAngle(msg);
-	angles.z = BF_ReadAngle(msg);
+	angles.x = BF_ReadCoord(msg);
+	angles.y = BF_ReadCoord(msg);
+	angles.z = BF_ReadCoord(msg);
 
 	velocity.x = BF_ReadCoord(msg);
 	velocity.y = BF_ReadCoord(msg);

@@ -749,7 +749,7 @@ TL_ADD(CThrowingKnifeEntity)
 TL_ADD(CLasermingunChargeAmmo)
 TL_ADD(CDrillAmmo)
 TL_ADD(CMagicSgCannon)
-TL_ADD(CPetrolMine)
+TL_ADD(CSwordBombardTouchBox)
 #endif
 
 TL_END(AllEntityTypeList)

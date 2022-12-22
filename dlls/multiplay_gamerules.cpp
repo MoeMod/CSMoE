@@ -4158,6 +4158,8 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "holysword";
 					else if (!Q_strcmp(killer_weapon_name, "summonknife_cannon"))
 						killer_weapon_name = "summonknife";
+					else if (!Q_strcmp(killer_weapon_name, "swordbombard_touchbox"))
+						killer_weapon_name = "swordbombard";
 				}
 				else
 				{

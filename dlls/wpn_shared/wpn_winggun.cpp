@@ -387,11 +387,12 @@ namespace sv {
 				pev->renderfx = kRenderFxNone;
 				pev->renderamt = 255;
 
-				//wing_idle.spr
+				//winggun_idle.spr
 				MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, m_pOwner->pev);
 				WRITE_BYTE(16);
 				WRITE_SHORT(m_pOwner->entindex());
 				WRITE_BYTE(16);
+				WRITE_BYTE(1);
 				MESSAGE_END();
 			}
 			else
@@ -414,6 +415,7 @@ namespace sv {
 				WRITE_BYTE(16);
 				WRITE_SHORT(m_pOwner->entindex());
 				WRITE_BYTE(16);
+				WRITE_BYTE(0);
 				MESSAGE_END();
 
 				pev->nextthink = invalid_time_point;

@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
-
+#include "weapons/RadiusDamage.hpp"
 #include "weapons/WeaponTemplate.hpp"
 #include "weapons/KnifeAttack.h"
 
@@ -76,15 +76,19 @@ public:
 	{
 		Base::Precache();
 		
-		PRECACHE_MODEL("sprites/flame3.spr");
+		m_iSteamModelIndex = PRECACHE_MODEL("sprites/spsmg_steam.spr");
 
-		PRECACHE_SOUND("weapons/spknife_stab1.wav");
-		PRECACHE_SOUND("weapons/spknife_stab_miss.wav");
-		PRECACHE_SOUND("weapons/spknife_off_slash1.wav");
-		PRECACHE_SOUND("weapons/spknife_off_slash2.wav");
-		PRECACHE_SOUND("weapons/spknife_idle.wav");
-		PRECACHE_SOUND("weapons/tomahawk_wall.wav");
-		PRECACHE_SOUND("weapons/tomahawk_slash1_hit.wav");
+		PRECACHE_SOUND("weapons/spknife_steam.wav");
+		PRECACHE_SOUND("weapons/spknife_slashb3_1.wav");
+		PRECACHE_SOUND("weapons/spknife_slashb3_2.wav");
+		PRECACHE_SOUND("weapons/spknife_slasha1_1.wav");
+		PRECACHE_SOUND("weapons/spknife_slasha1_2.wav");
+		PRECACHE_SOUND("weapons/spknife_slasha2_1.wav");
+		PRECACHE_SOUND("weapons/spknife_slasha2_2.wav");
+	
+		PRECACHE_SOUND("weapons/skullaxe_wall.wav");
+		PRECACHE_SOUND("weapons/balrog9_hit1.wav");
+		PRECACHE_SOUND("weapons/balrog9_hit2.wav");
 	}
 
 	BOOL Deploy() override
@@ -106,48 +110,56 @@ public:
 
 public:
 #ifndef CLIENT_DLL
-	hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsSlashAttack);
+	hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer);
 #endif
 	float GetPrimaryAttackDamage() const
 	{
-		float flDamage = 65.0f;
+		float flDamage = 33.0f;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 715.0f;
+			flDamage = 330.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage = 715.0f;
+			flDamage = 430.0f;
 #endif
 		return flDamage;
 	}
 
 	float GetSecondaryAttackDamage() const
 	{
-		bool bFireOn = m_iAmmo > 0 ? true : false;
-
-		float flDamage = bFireOn ? 120.0f : 80.0f;
+	
+		float flDamage = 55.0f;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = bFireOn ? 1320.0f : 880.0f;
+			flDamage = 550.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage = bFireOn ? 1320.0f : 880.0f;
+			flDamage = 665.0f;
 #endif
 		return flDamage;
 	}
 
 	float GetBuffDamage() const
 	{
-		float flDamage = 5.0f;
+		float flDamage = 40.0f;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 50.0f;
+			flDamage = 400.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage = 50.0f;
+			flDamage = 280.0f;
 #endif
 		return flDamage;
 	}
 
+	KnockbackData GetKnockBackData() override
+	{
+		if (pev->iuser1)
+			return { 5000.0f, 500.0f, 300.0f, 200.0f, 1.0f };
+		else
+			return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+	}
+
 	void ItemPostFrame() override;
 
+	int m_iSteamModelIndex;
 	int m_iAmmo;
 	time_point_t m_flTimeNextCharge;
 
@@ -177,41 +189,41 @@ void CKnifeSPKnife::PrimaryAttack(void)
 	if (m_iAmmo >= 30)
 		iAnim += 2;
 
-
 	SendWeaponAnim(iAnim, UseDecrement() != FALSE);
+
+	if (m_iSwing & 1)
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_slasha2_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+	else
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_slasha2_1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.56s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
+
 #ifndef CLIENT_DLL
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-
-	switch (sv::KnifeAttack(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, GetPrimaryAttackDamage(), 70, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	pev->iuser1 = 0;
+	switch (sv::KnifeAttack(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, GetPrimaryAttackDamage(), 80, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 	{
 	case HIT_NONE:
 	{
-		if (m_iSwing & 1)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_off_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_off_slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-		if (!RANDOM_LONG(0, 4))
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_stab_miss.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
+	
 		break;
 	}
 	case HIT_PLAYER:
 	{
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5s;
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-		if (!RANDOM_LONG(0, 4))
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_stab_miss.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.37s;
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+		if (m_iSwing & 1)
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/balrog9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/balrog9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);	
 		break;
 	}
 	case HIT_WALL:
 	{
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5s;
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.37s;
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/skullaxe_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		break;
 	}
 	}
@@ -219,83 +231,115 @@ void CKnifeSPKnife::PrimaryAttack(void)
 
 	m_iSwing++;
 	m_iSwing %= 2;
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+
 }
 
 void CKnifeSPKnife::SecondaryAttack(void)
 {
+	int iAnim;
 	if (m_iAmmo < 30)
 	{
-		int iAnim = RANDOM_LONG(0, 1) ? ANIM_SLASHA1_2 : ANIM_SLASHA1_1;
+		m_iWeaponState = 0;
+		iAnim = m_iSwing ? ANIM_SLASHA1_2 : ANIM_SLASHA1_1;
 
-		if (m_iAmmo >= 30)
-			iAnim += 2;
-
-		SendWeaponAnim(iAnim, UseDecrement() != FALSE);
+		if (m_iSwing & 1)
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_slasha1_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_slasha1_1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
-		return;
-	}	
+	}
+	else
+	{
+		m_iWeaponState = 1;
+		iAnim = RANDOM_LONG(0, 1) ? ANIM_SLASHB3_2 : ANIM_SLASHB3_1;
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.52s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
+		if (iAnim % 2)
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_slashb3_1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/spknife_slashb3_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-	int iAnim = RANDOM_LONG(0, 1) ? ANIM_SLASHB3_2 : ANIM_SLASHB3_1;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.52s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
-	m_iAmmo -= 30;
+		m_iAmmo -= 30;
+
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, FALSE);
+
 #ifndef CLIENT_DLL
-	MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-	WRITE_BYTE(44);
-	WRITE_BYTE(m_iAmmo);
-	MESSAGE_END();
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+		WRITE_BYTE(44);
+		WRITE_BYTE(m_iAmmo);
+		MESSAGE_END();
 #endif
-	if (m_iAmmo < 30)
-		iAnim += 4;
+		if (m_iAmmo < 30)
+			iAnim += 4;
+	}
 
 	SendWeaponAnim(iAnim, UseDecrement() != FALSE);
+	
 #ifndef CLIENT_DLL
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-
-	switch (KnifeAttack(GetSecondaryAttackDamage(), 90, 100, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, true))
+	pev->iuser1 = 1;
+	switch (KnifeAttack(GetSecondaryAttackDamage(), 80, 50, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_NONE:
 	{
-		if (m_iSwing & 1)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/vulcanus9_off_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/vulcanus9_off_slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-		if (!RANDOM_LONG(0, 4))
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/vulcanus9_stab_miss.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
 		break;
 	}
 	case HIT_PLAYER:
 	{
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5s;
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-		if (!RANDOM_LONG(0, 4))
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/vulcanus9_stab_miss.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
+		if (m_iSwing & 1)
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/balrog9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/balrog9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 		break;
 	}
 	case HIT_WALL:
 	{
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5s;
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/skullaxe_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
 		break;
 	}
 	}
+
+	if (m_iWeaponState)
+	{
+		struct
+		{
+			float RadiusDamageRadius;
+			int RadiusDamageBitsDamageType;
+			bool RadiusDamageCanHeadshot;
+			float RadiusDamageAmount;
+			float RadiusDamageHasFallOff;
+		} Data;
+
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+
+		Data.RadiusDamageRadius = 175;
+		Data.RadiusDamageBitsDamageType = DMG_BULLET;
+		Data.RadiusDamageCanHeadshot = false;
+		Data.RadiusDamageAmount = GetBuffDamage();
+		Data.RadiusDamageHasFallOff = false;
+
+		std::vector<CBaseEntity*> out;
+		RadiusDamage(Data, vecSrc, m_pPlayer, m_pPlayer, std::back_inserter(out));
+		for (CBaseEntity* ent : out)
+		{
+			CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(ent);
+			if (player && player->m_bIsZombie)
+				player->pev->velocity.z = 400.0f;
+		}
+	}
 #endif
+	m_iWeaponState = 0;
+
 }
 
 #ifndef CLIENT_DLL
-hit_result_t CKnifeSPKnife::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsChargeAttack)
+hit_result_t CKnifeSPKnife::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer)
 {
 	CBaseEntity* pEntity = NULL;
 	hit_result_t result = HIT_NONE;
@@ -341,13 +385,15 @@ hit_result_t CKnifeSPKnife::KnifeAttack(float flDamage, float flRadius, float fl
 
 		pAttackPlayer->m_iWeaponVolume = 128;
 
+		CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+		if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
+			pPlayer->pev->velocity.z = 400;
+
 		ClearMultiDamage();
 
 		pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 		ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);
-
-		
 
 		result = HIT_PLAYER;
 	}
@@ -388,6 +434,15 @@ void CKnifeSPKnife::ItemPostFrame()
 			WRITE_BYTE(m_iAmmo);
 			MESSAGE_END();
 #endif
+
+			if (m_iAmmo == 30 && m_flTimeWeaponIdle <= 0.0s)
+			{
+				//event
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, FALSE);
+
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.01s;
+			}
+
 			m_flTimeNextCharge = gpGlobals->time + 0.1s;
 		}
 	}

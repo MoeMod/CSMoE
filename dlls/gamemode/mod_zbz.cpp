@@ -763,9 +763,9 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			WRITE_COORD(m_pPlayer->pev->origin.x);
 			WRITE_COORD(m_pPlayer->pev->origin.y);
 			WRITE_COORD(m_pPlayer->pev->origin.z);
-			WRITE_ANGLE(g_vecZero.x);
-			WRITE_ANGLE(g_vecZero.y);
-			WRITE_ANGLE(g_vecZero.z);
+			WRITE_COORD(g_vecZero.x);
+			WRITE_COORD(g_vecZero.y);
+			WRITE_COORD(g_vecZero.z);
 			WRITE_COORD(g_vecZero.x);
 			WRITE_COORD(g_vecZero.y);
 			WRITE_COORD(g_vecZero.z);

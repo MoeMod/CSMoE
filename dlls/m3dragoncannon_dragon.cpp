@@ -233,9 +233,9 @@ namespace sv {
 			WRITE_COORD(pev->origin.x);
 			WRITE_COORD(pev->origin.y);
 			WRITE_COORD(pev->origin.z);
-			WRITE_ANGLE(0);
-			WRITE_ANGLE(0);
-			WRITE_ANGLE(0);
+			WRITE_COORD(0);
+			WRITE_COORD(0);
+			WRITE_COORD(0);
 			WRITE_COORD(0);
 			WRITE_COORD(0);
 			WRITE_COORD(0);

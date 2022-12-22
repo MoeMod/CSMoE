@@ -4262,9 +4262,9 @@ namespace sv {
 		WRITE_COORD(g_vecZero.x);
 		WRITE_COORD(g_vecZero.y);
 		WRITE_COORD(g_vecZero.z);
-		WRITE_ANGLE(g_vecZero.x);
-		WRITE_ANGLE(g_vecZero.y);
-		WRITE_ANGLE(g_vecZero.z);
+		WRITE_COORD(g_vecZero.x);
+		WRITE_COORD(g_vecZero.y);
+		WRITE_COORD(g_vecZero.z);
 		WRITE_COORD(g_vecZero.x);
 		WRITE_COORD(g_vecZero.y);
 		WRITE_COORD(g_vecZero.z);
