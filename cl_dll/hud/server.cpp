@@ -84,6 +84,7 @@ void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int i
 TEMPENTITY* AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
 //void EnableWallHack(int enable, int iTarget);
 void EV_DragonTailFX(int iDidHit, int iType);
+void EV_Crow9FX(Vector angle);
 
 int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 {
@@ -499,6 +500,15 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		int iType = reader.ReadByte();
 
 		EV_DragonTailFX(iDidHit, iType);
+
+		break;
+	}
+	case 34:
+	{
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+		EV_Crow9FX(pos);
 
 		break;
 	}
@@ -940,5 +950,44 @@ void EV_DragonTailFX(int iDidHit, int iType)
 	pTemp->entity.curstate.skin = iDidHit ? 0 : 1;
 	pTemp->entity.curstate.sequence = gHUD.cl_righthand->value > 0 ? iType : iType + 4;
 }
+
+
+void Crow9FXLock(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	ent->entity.angles = ent->entity.curstate.vuser1;
+	ent->entity.origin = ent->entity.curstate.vuser2;
+}
+
+void EV_Crow9FX(Vector angle)
+{
+	cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+	if (!viewent)
+		return;
+
+	TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->R_TempModel(viewent->attachment[0], Vector(0, 0, 0), angle, 0.5, gEngfuncs.pEventAPI->EV_FindModelIndex("models/crow9_wind.mdl"), 0);
+
+	if (!pTemp)
+		return;
+
+	pTemp->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+	pTemp->flags |= FTENT_CLIENTCUSTOM;
+
+	pTemp->tentOffset.z = 16;
+	pTemp->clientIndex = viewent->index;
+	pTemp->entity.curstate.animtime = gHUD.m_flTime;
+	pTemp->entity.curstate.framerate = 1.0;
+	pTemp->entity.curstate.frame = 0;
+	pTemp->entity.curstate.renderamt = 210;
+	pTemp->entity.curstate.rendermode = kRenderNormal;
+	pTemp->entity.curstate.vuser1 = angle;
+	pTemp->entity.curstate.vuser2 = viewent->attachment[0];
+	pTemp->entity.curstate.effects |= EF_NOCULL;
+	pTemp->entity.angles = angle;
+	pTemp->frameMax = 256;
+	pTemp->callback = Crow9FXLock;
+
+}
+
 
 }

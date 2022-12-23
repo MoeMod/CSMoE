@@ -40,15 +40,12 @@ public:
 	static constexpr const char *ClassName = "knife_crow9";
 	static constexpr const char *V_Model = "models/v_crow9.mdl";
 	static constexpr const char *P_Model = "models/p_crow9a.mdl";
-	static constexpr const char* P_Model_1 = "models/p_crow9b.mdl";
 	static constexpr const char *W_Model = "models/w_knife.mdl";
 
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "dragontail";
 	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-
-	int m_iSlash;
 
 public:
 	enum
@@ -66,7 +63,7 @@ public:
 	{
 		Base::Precache();
 
-		PRECACHE_MODEL("models/crow9_wind.mdl");
+		m_iWindModelIndex = PRECACHE_MODEL("models/crow9_wind.mdl");
 		PRECACHE_MODEL("sprites/muzzleflash35.spr");
 	
 		PRECACHE_SOUND("weapons/skullaxe_wall.wav");
@@ -82,7 +79,6 @@ public:
 	{
 		m_fMaxSpeed = 250;
 		m_iSwing = 0;
-		m_iSlash = 0;
 		m_iWeaponState = 0;
 		m_flNextCheckButton = invalid_time_point;
 
@@ -100,6 +96,7 @@ public:
 
 	time_point_t m_flNextCheckButton;
 	int m_iCheckButton;
+	int m_iWindModelIndex;
 public:
 	float GetPrimaryAttackDamage() const
 	{
@@ -218,6 +215,7 @@ void CKnifeCrow9::SecondaryAttack(void)
 {
 	if (m_flNextCheckButton != invalid_time_point && m_flNextCheckButton > gpGlobals->time)
 	{
+		m_iCheckButton = 0;
 		DelaySecondaryAttack();
 		m_flNextCheckButton = invalid_time_point;
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.3s;
@@ -229,7 +227,10 @@ void CKnifeCrow9::SecondaryAttack(void)
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
-	switch (KnifeAttack5(GetSecondaryAttackDamage(), 60, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/crow9_slashc_in.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+
+	switch (KnifeAttack(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, GetSecondaryAttackDamage(), 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 	{
 	case HIT_NONE:
 	{
@@ -237,27 +238,28 @@ void CKnifeCrow9::SecondaryAttack(void)
 	}
 	case HIT_PLAYER:
 	{
-		if (RANDOM_LONG(0, 1))
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/balrog9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/balrog9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+		if (RANDOM_LONG(0, 1))
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/balrog9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/balrog9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		break;
 	}
 	case HIT_WALL:
 	{
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/skullaxe_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		break;
 	}
 	}
 #endif
 	SendWeaponAnim(ANIM_SLASHC_IN, UseDecrement() != FALSE);
 
-	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/crow9_slashc_in.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
+	
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() +  2.62s;
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.85s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
+	m_pPlayer->m_flNextAttack = 0.5s;
 
 	m_flNextCheckButton = gpGlobals->time + 1.0s;
 	m_iCheckButton = 1;
@@ -267,21 +269,23 @@ void CKnifeCrow9::ItemPostFrame()
 {
 	if (m_pPlayer->pev->button & IN_ATTACK2)
 	{
-		if (m_flNextCheckButton != invalid_time_point && m_flNextCheckButton > gpGlobals->time)
+		if (m_iCheckButton && m_flNextCheckButton != invalid_time_point && m_flNextCheckButton > gpGlobals->time)
 		{
-			if (m_flNextSecondaryAttack > UTIL_WeaponTimeBase())
+			//玩家一开始就按住右键没有放开或者狂按右键的情况下拒绝充能
+			if (m_flNextSecondaryAttack > 0.15s)
 			{
-
+				m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.62s;
 			}
-
 		}
 	}
 
-	if (m_flNextCheckButton != invalid_time_point && m_flNextCheckButton < gpGlobals->time)
+	if (m_iCheckButton && m_flNextCheckButton != invalid_time_point && m_flNextCheckButton < gpGlobals->time)
 	{
+		m_iCheckButton = 0;
 		m_flNextCheckButton = invalid_time_point;
 		SendWeaponAnim(ANIM_SLASHC_2, UseDecrement() != FALSE);
 		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.6s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6s;
 	}
 
 
@@ -295,32 +299,24 @@ void CKnifeCrow9::DelaySecondaryAttack()
 
 	SendWeaponAnim(ANIM_SLASHC_1, UseDecrement() != FALSE);
 
-	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/crow9_slashc_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/crow9_slashc_1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 #ifndef CLIENT_DLL
-	switch (KnifeAttack5(GetSlashAttackDamage(), 120, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
-	{
-	case HIT_NONE:
-	{
-		break;
-	}
-	case HIT_PLAYER:
-	{
-		if (RANDOM_LONG(0, 1))
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/balrog9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/balrog9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-		break;
-	}
-	case HIT_WALL:
-	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/crow9_hitwall1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
-		break;
-	}
-	}
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+
+	MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, m_pPlayer->pev);
+	WRITE_BYTE(34);
+	WRITE_COORD(m_pPlayer->pev->v_angle.x);
+	WRITE_COORD(m_pPlayer->pev->v_angle.y);
+	WRITE_COORD(m_pPlayer->pev->v_angle.z);
+	MESSAGE_END();
+
+	KnifeAttack5(GetSlashAttackDamage(), 120, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer);
 #endif
+
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.3s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.3s;
 }
 
 void CKnifeCrow9::WeaponIdle()

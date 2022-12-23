@@ -99,7 +99,7 @@ public:
 		m_flAttackLoop = invalid_time_point;
 		m_flTimeCheckCharge = invalid_time_point;
 		m_iChargeState = 0;
-
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5s;
 		return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "dragontail", UseDecrement() != FALSE, 1.5s);
 	}
 
@@ -139,6 +139,14 @@ public:
 #endif
 		return flDamage;
 	}
+
+	KnockbackData GetKnockBackData() override
+	{
+		if (m_iWeaponState)
+			return { 3000.0f, 600.0f, 450.0f, 300.0f, 1.0f };
+		else
+			return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+	}
 };
 
 LINK_ENTITY_TO_CLASS(knife_turbulent9, CKnifeTurbulent9)
@@ -165,9 +173,12 @@ void CKnifeTurbulent9::PrimaryAttack(void)
 	SetThink(&CKnifeTurbulent9::DelayPrimaryAttack);
 	pev->nextthink = gpGlobals->time + 0.2s;
 
-	m_iSwing = 0;
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
+
+	pev->iuser1++;
+	pev->iuser1 %= 2;
+
 }
 
 void CKnifeTurbulent9::SecondaryAttack(void)
@@ -211,11 +222,11 @@ void CKnifeTurbulent9::SecondaryAttack(void)
 
 void CKnifeTurbulent9::DelayPrimaryAttack()
 {
-	if (pev->iuser1)
+	if (m_iSwing)
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/turbulent9_slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 	else
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/turbulent9_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
+	m_iWeaponState = 0;
 #ifndef CLIENT_DLL
 	switch (KnifeAttack5(GetPrimaryAttackDamage(), 60, 80, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer)) 
 	{
@@ -247,8 +258,6 @@ void CKnifeTurbulent9::DelayPrimaryAttack()
 
 	if (++m_iSwing & 1)
 	{
-		pev->iuser1++;
-		pev->iuser1 %= 2;
 		pev->nextthink = gpGlobals->time + 0.13s;
 		SetThink(&CKnifeTurbulent9::DelayPrimaryAttack);
 	}
@@ -256,9 +265,6 @@ void CKnifeTurbulent9::DelayPrimaryAttack()
 	{
 		SetThink(nullptr);
 	}
-
-	m_iSwing++;
-	m_iSwing %= 2;
 }
 
 void CKnifeTurbulent9::OnAttack2Released()
@@ -268,7 +274,7 @@ void CKnifeTurbulent9::OnAttack2Released()
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.13s;
 
 	m_iChargeState = 3;
-
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 9999.0s;
 	m_iHitCount = TURBULENT9_HIT_COUNT;
 
 	m_flAttackLoop = gpGlobals->time + 0.1s;
@@ -316,6 +322,7 @@ void CKnifeTurbulent9::MaterialSound(float flRadius)
 void CKnifeTurbulent9::DelaySecondaryAttack()
 {
 	SetThink(nullptr);
+	m_iWeaponState = 1;
 #ifndef CLIENT_DLL
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
@@ -331,9 +338,9 @@ void CKnifeTurbulent9::DelaySecondaryAttack()
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 
 		if (RANDOM_LONG(0, 1))
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/turbulent9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/turbulent9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/turbulent9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/turbulent9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		break;
 	}
 	case HIT_WALL:
@@ -372,6 +379,9 @@ void CKnifeTurbulent9::ItemPostFrame()
 
 			DelaySecondaryAttack();
 
+			if(m_iHitCount % 2 == 0)
+				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/turbulent9_slash3_hit_idle.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
 			m_iHitCount--;
 
 			if (m_iHitCount <= 0)
@@ -389,7 +399,14 @@ void CKnifeTurbulent9::ItemPostFrame()
 
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 9999.0s;
 
-			m_flAttackLoop = gpGlobals->time + 0.1s;
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/turbulent9_slash3_hit_idle.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+			DelaySecondaryAttack();
+
+			m_iHitCount--;
+
+			m_flAttackLoop = gpGlobals->time + TURBULENT9_HIT_INTERVAL;
+
 			break;
 		}
 		default:
