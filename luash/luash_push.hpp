@@ -86,6 +86,10 @@ namespace luash
     {
         lua_pushcfunction(L, p);
     }
+	template<class T> auto PushStatelessLambda(lua_State* L, T x) -> typename std::enable_if<IsStatelessLambda<T>::value>::type
+	{
+		lua_pushcfunction(L, (LuaStatelessLambdaCaller<T, typename GetParameterType<T>::type>::MetaCall));
+	}
 	// just unsupported
 	template<class T, class U> void PushMemberPointer(lua_State* L, U T::* mem_ptr)
 	{
@@ -155,6 +159,10 @@ namespace luash
 		template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<1>) -> decltype(PushMemberPointer(L, x))
 		{
 			return PushMemberPointer(L, x);
+		}
+		template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<1>) -> decltype(PushStatelessLambda(L, x))
+		{
+			return PushStatelessLambda(L, x);
 		}
 		template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<0>) -> decltype(PushPointer(L, x))
 		{

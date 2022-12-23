@@ -103,7 +103,6 @@ extern int CL_UPDATE_BACKUP;
 #define INVALID_HANDLE	0xFFFF		// for XashXT cache system
 
 // used by SetUpPlayerPrediction
-#if 0
 typedef struct
 {
 	int movetype;
@@ -113,7 +112,6 @@ typedef struct
 	vec3_t origin;
 	vec3_t angles;
 } predicted_player_t;
-#endif
 
 typedef struct
 {
@@ -207,9 +205,7 @@ typedef struct
 	int weaponseq;
 	int     scr_fov;
 	model_t *playermodels[32];
-#if 0 // used by SetUpPlayerPrediction
 	predicted_player_t predicted_players[MAX_CLIENTS];
-#endif
 	int lostpackets;					// count lost packets and show dialog in menu
 } client_t;
 
@@ -793,6 +789,7 @@ qboolean CL_AddVisibleEntity( cl_entity_t *ent, int entityType );
 void CL_UpdateStudioVars( cl_entity_t *ent, entity_state_t *newstate, qboolean noInterp );
 qboolean CL_GetEntitySpatialization( channel_t *ch );
 qboolean CL_UpdateEntityFields( cl_entity_t *ent );
+void CL_ComputePlayerOrigin( cl_entity_t* ent );
 qboolean CL_IsPlayerIndex( int idx );
 void CL_SetIdealPitch( void );
 

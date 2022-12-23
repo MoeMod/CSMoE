@@ -1218,8 +1218,11 @@ int CL_ParsePacketEntities( sizebuf_t *msg, qboolean delta )
 	{
 		cl_entity_t *ent = CL_GetEntityByIndex( i + 1 );
 		if( !ent ) continue;
+
+		newframe->playerstate[i].number = ent->curstate.number;
+		newframe->playerstate[i].messagenum = cl.parsecount;
+		newframe->playerstate[i].msg_time = cl.mtime[0];
 		clgame.dllFuncs.pfnProcessPlayerState( &newframe->playerstate[i], &ent->curstate );
-		newframe->playerstate[i].number = ent->index;
 	}
 
 	cl.frame = *newframe;
