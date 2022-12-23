@@ -405,16 +405,6 @@ namespace luash
 		}
 	};
 
-	template<class T> inline bool PushIfLvRef(lua_State* L, T& obj, std::true_type)
-	{
-		Push(L, obj);
-		return true;
-	}
-	template<class T> constexpr bool PushIfLvRef(lua_State* L, T&& obj, std::false_type)
-	{
-		return false;
-	}
-
 	template<class T, class Base>
 	class TypeInterfaceDecoratorCall<T, Base, true> : public Base
 	{
@@ -437,15 +427,15 @@ namespace luash
 			(..., Get(L, I + 2, std::get<I>(args)));
 			if constexpr (std::is_void_v<Ret>)
 			{
-				(*pfn)(std::get<I>(args)...);
+				(*pfn)(std::forward<Args>(std::get<I>(args))...);
 			}
 			else
 			{
-				Ret ret = (*pfn)(std::get<I>(args)...);
+				Ret ret = (*pfn)(std::forward<Args>(std::get<I>(args))...);
 				Push(L, std::move(ret));
 			}
 
-			return (!std::is_void_v<Ret> + ... + PushIfLvRef(L, std::get<I>(args), std::bool_constant<(std::is_lvalue_reference<Args>::value && !std::is_const<typename std::remove_reference<Args>::type>::value)>()));
+			return (!std::is_void_v<Ret> + ... + PushIfLvRef(L, std::forward<Args>(std::get<I>(args)), std::bool_constant<(std::is_lvalue_reference<Args>::value && !std::is_const<typename std::remove_reference<Args>::type>::value)>()));
 		}
 
 		template<std::size_t...I, class Ret, class...Args>
