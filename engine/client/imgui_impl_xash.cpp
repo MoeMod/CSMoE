@@ -545,7 +545,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	unsigned char* pixels;
 	int width, height, bytes_per_pixel;
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
-#ifdef XASH_WES
+#if 0
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytes_per_pixel);
 #else
     io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bytes_per_pixel);
@@ -569,7 +569,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	r_image->flags = IMAGE_HAS_ALPHA | IMAGE_TEMP;
 	r_image->buffer = (byte *)pixels;
 
-#ifdef XASH_WES
+#if 0
     r_image->type = PF_RGBA_32;
     r_image->flags |= IMAGE_HAS_COLOR;
 #endif
