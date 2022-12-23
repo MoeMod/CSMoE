@@ -81,7 +81,7 @@ CL_SetUpPlayerPrediction
 */
 void GAME_EXPORT CL_SetUpPlayerPrediction( int dopred, int includeLocal )
 {
-#if 0
+#if 1
 	int i;
 	entity_state_t     *state;
 	predicted_player_t *player;
@@ -89,9 +89,9 @@ void GAME_EXPORT CL_SetUpPlayerPrediction( int dopred, int includeLocal )
 
 	for( i = 0; i < MAX_CLIENTS; i++ )
 	{
-		state = cl.frames[cl.parsecountmod].playerstate[i];
+		state = &cl.frames[cl.parsecountmod].playerstate[i];
 
-		player = cl.predicted_players[j];
+		player = &cl.predicted_players[i];
 		player->active = false;
 
 		if( state->messagenum != cl.parsecount )
@@ -100,38 +100,30 @@ void GAME_EXPORT CL_SetUpPlayerPrediction( int dopred, int includeLocal )
 		if( !state->modelindex )
 			continue;
 
-		ent = CL_GetEntityByIndex( j + 1 );
+		player->active = true;
+		player->movetype = state->movetype;
+		player->solid = state->solid;
+		player->usehull = state->usehull;
 
-		if( !ent ) // in case
+
+		if (state->effects & EF_NODRAW && !includeLocal && (cl.playernum == i))
 			continue;
-
-		// special for EF_NODRAW and local client?
-		if( state->effects & EF_NODRAW && !includeLocal )
+		
+		// note that the local player is special, since he moves locally
+		// we use his last predicted postition
+		if (cl.playernum == i)
 		{
-			if( cl.playernum == j )
-				continue;
-
-			player->active   = true;
-			player->movetype = state->movetype;
-			player->solid    = state->solid;
-			player->usehull  = state->usehull;
-
-			VectorCopy( ent->origin, player->origin );
-			VectorCopy( ent->angles, player->angles );
+			VectorCopy(state->origin, player->origin);
+			VectorCopy(state->angles, player->angles);
 		}
 		else
 		{
-			player->active   = true;
-			player->movetype = state->movetype;
-			player->solid    = state->solid;
-			player->usehull  = state->usehull;
+			ent = CL_GetEntityByIndex(i + 1);
 
-			// don't rewrite origin and angles of local client
-			if( cl.playernum == j )
-				continue;
+			CL_ComputePlayerOrigin(ent);
 
-			VectorCopy(state->origin, player->origin);
-			VectorCopy(state->angles, player->angles);
+			VectorCopy(ent->origin, player->origin);
+			VectorCopy(ent->angles, player->angles);
 		}
 	}
 #endif
@@ -328,6 +320,7 @@ void GAME_EXPORT CL_SetSolidPlayers( int playernum )
 	int		       j;
 	cl_entity_t	   *ent;
 	entity_state_t *state;
+	predicted_player_t* player;
 	physent_t      *pe;
 
 	if( !cl_solid_players->integer )
@@ -350,7 +343,7 @@ void GAME_EXPORT CL_SetSolidPlayers( int playernum )
 			continue; // not present this frame
 
 
-#if 1 // came from SetUpPlayerPrediction
+#if 0 // came from SetUpPlayerPrediction
 		state = cl.frames[cl.parsecountmod].playerstate + j;
 
 		if( ent->curstate.messagenum != cl.parsecount )
@@ -366,12 +359,25 @@ void GAME_EXPORT CL_SetSolidPlayers( int playernum )
 			continue; // not solid
 
 #endif
+
+		player = &cl.predicted_players[j];
+		if (!player->active)
+			continue;
+
 		if (ent->curstate.playerclass == 1 || ((pPlayer->curstate.playerclass == 2 || ent->curstate.playerclass == 2) && pPlayer->curstate.team == ent->curstate.team))
 			continue;
 
 		pe = &clgame.pmove->physents[clgame.pmove->numphysent];
 		if( CL_CopyEntityToPhysEnt( pe, ent ))
 			clgame.pmove->numphysent++;
+
+		// some fields needs to be override from cls.predicted_players
+		VectorCopy(player->origin, pe->origin);
+		VectorCopy(player->angles, pe->angles);
+		VectorCopy(clgame.pmove->player_mins[player->usehull], pe->mins);
+		VectorCopy(clgame.pmove->player_maxs[player->usehull], pe->maxs);
+		pe->movetype = player->movetype;
+		pe->solid = player->solid;
 	}
 }
 
