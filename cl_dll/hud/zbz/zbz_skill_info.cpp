@@ -489,7 +489,7 @@ int CHudZBZ_Skill::Draw(float time)
 		{
 			//Redirect the skill's index and type(team type).
 			auto FindSkillByIndex = g_SkillList.find(*RedirectIdList);
-			auto FindSkillType = (std::get<0>(FindSkillByIndex->second));
+			
 
 			//Invalid Skill,ignore?
 			if (FindSkillByIndex == g_SkillList.end())
@@ -498,6 +498,7 @@ int CHudZBZ_Skill::Draw(float time)
 			//Target is searched.
 			if (FindSkillByIndex->first == m_iSkillIndex)
 			{
+				auto FindSkillType = (std::get<0>(FindSkillByIndex->second));
 				//Default When press vKey(Ekey
 				if (m_iHudShowType == 1)
 				{

@@ -110,7 +110,10 @@ namespace sv {
 
 		if (DefaultDeploy("models/v_wondercannonex.mdl", "models/p_wondercannonex.mdl", WONDERCANNON_DRAW, "ak47", UseDecrement() != FALSE, 0.1s, 1.5s))
 		{
+			m_pPlayer->pev->weaponanim = WONDERCANNON_DRAW;
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75s;
+			m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75s;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase();
 			return TRUE;
 		}
 		return FALSE;

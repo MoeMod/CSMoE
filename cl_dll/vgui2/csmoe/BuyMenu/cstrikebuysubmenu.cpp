@@ -282,6 +282,7 @@ void CCSBuySubMenu::SetupItems(MoEWeaponBuyType type)
 			m_pSlotButtons[i]->SetHotkey('0' + i + 1);
 			m_pSlotButtons[i]->SetVisible(true);
 			m_pSlotButtons[i]->UpdateWeapon("");
+			m_pSlotButtons[i]->SetBanWeapon("");
 		}
 		m_pSlotButtons[9]->SetHotkey('0');
 		m_pPrevBtn->SetVisible(false);
@@ -325,7 +326,7 @@ void CCSBuySubMenu::SetupItems(MoEWeaponBuyType type)
 					continue;
 			}
 
-			m_BuyItemList.push_back(ItemInfo{ name, x.pszDisplayName, std::string("VGUI_BuyMenu_BuyWeapon ") + name });
+			m_BuyItemList.push_back(ItemInfo{ name, x.pszDisplayName, std::string("VGUI_BuyMenu_BuyWeapon ") + name ,x.iLevel });
 		}
 
 		m_pPrevBtn->SetHotkey(L'-');
@@ -352,6 +353,7 @@ void CCSBuySubMenu::SetupPage(size_t iPage)
 		int iElement = m_iCurrentPage * 9 + i;
 		if (iElement >= m_BuyItemList.size())
 		{
+			m_pSlotButtons[i]->SetBanWeapon("");
 			m_pSlotButtons[i]->SetText("");
 			m_pSlotButtons[i]->SetCommand("");
 			m_pSlotButtons[i]->SetVisible(false);
@@ -359,6 +361,9 @@ void CCSBuySubMenu::SetupPage(size_t iPage)
 		}
 		else
 		{
+			m_pSlotButtons[i]->SetEnabled(true);
+			m_pSlotButtons[i]->SetBanWeapon("");
+
 			const char *weapon = m_BuyItemList[iElement].name.c_str();
 			const char *showname = m_BuyItemList[iElement].showname.c_str();
 			const char *cmd = m_BuyItemList[iElement].command.c_str();
@@ -367,13 +372,24 @@ void CCSBuySubMenu::SetupPage(size_t iPage)
 			m_pSlotButtons[i]->SetVisible(true);
 			m_pSlotButtons[i]->SetHotkey('0' + i + 1);
 			m_pSlotButtons[i]->UpdateWeapon(weapon);
-			
+
+			//如果武器等级＞玩家等级，该武器上锁
+			if ((cl::gHUD.IsZombieMod() && (cl::gHUD.m_iModRunning == MOD_ZBZ)))
+			{
+				if (m_BuyItemList[iElement].level > gHUD.m_iZlevel)
+				{
+					m_pSlotButtons[i]->SetEnabled(false);
+					m_pSlotButtons[i]->SetBanWeapon(weapon, m_BuyItemList[iElement].level);
+				}
+			}
 		}
 	}
 	
 	m_pSlotButtons[9]->SetText("#CSO_PrevWpnBuy");
 	m_pSlotButtons[9]->SetCommand("VGUI_BuyMenu_Show");
 	m_pSlotButtons[9]->SetHotkey('0');
+	m_pSlotButtons[9]->SetBanWeapon("");
+
 
 }
 

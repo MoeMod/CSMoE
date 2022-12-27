@@ -67,6 +67,7 @@ protected:
 		std::string name;
 		std::string showname;
 		std::string command;
+		int level;
 	};
 	std::vector<ItemInfo> m_BuyItemList;
 	FavoriteSet m_FavoriteItems[5];

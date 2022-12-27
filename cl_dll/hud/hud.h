@@ -1345,6 +1345,8 @@ public:
 	std::set<int> m_setBanKnife;
 	std::set<int> m_setBanGrenade;
 
+	int m_iZlevel;
+
 private:
 	HUDLIST	*m_pHudList;
 	HSPRITE	m_hsprLogo;
