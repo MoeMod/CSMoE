@@ -2623,11 +2623,6 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 	if( ptexture->flags & STUDIO_NF_NORMALMAP )
 		flags |= (TF_NORMALMAP);
 
-#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
-	// dont build mipmap on iOS to reduce memory usage
-	flags |= TF_NOPICMIP|TF_NOMIPMAP;
-#endif
-
 #if 0 // Useless feature in CSMoE, removed for optimization
 	// store some textures for remapping
 	if( !Q_strnicmp( ptexture->name, "DM_Base", 7 ) || !Q_strnicmp( ptexture->name, "remap", 5 ))

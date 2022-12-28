@@ -321,11 +321,6 @@ void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, size_t filesize, qbo
 	int		i, size;
 	qboolean is_dds_mode = false;
 
-#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
-	// dont build mipmap on iOS to reduce memory usage
-	texFlags |= TF_NOPICMIP|TF_NOMIPMAP;
-#endif
-
 	if( loaded ) *loaded = false;
     pin = reinterpret_cast<const dsprite_t *>(buffer);
 	mod->type = mod_sprite;

@@ -1406,7 +1406,7 @@ void R_EndFrame( void )
 	BOOL wrap_wglSwapBuffers(HDC);
 	wrap_wglSwapBuffers(NULL);
 #elif defined(XASH_SDL)
-#ifdef __ANDROID__
+#if defined __ANDROID__ && (defined(XASH_WES) || defined(XASH_GL4ES))
 	// skip useless lock
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
