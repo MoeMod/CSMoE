@@ -10,11 +10,19 @@ typedef float		vec_t;
 using vec2_t = moe::VectorBase<float, 2>;
 using vec2_t_ref = vec2_t &;
 
+#ifdef XASH_SIMD
 using vec3_t = moe::VectorBase<float, 3, 16>;
+#else
+using vec3_t = moe::VectorBase<float, 3>;
+#endif
 using vec3_c = moe::VectorBase<float, 3>;
 using vec3_t_ref = vec3_t &;
 
+#ifdef XASH_SIMD
 using vec4_t = moe::VectorBase<float, 4, 16>;
+#else
+using vec4_t = moe::VectorBase<float, 4>;
+#endif
 using vec4_t_ref = vec4_t &;
 
 typedef byte		rgba_t[4];	// unsigned byte colorpack

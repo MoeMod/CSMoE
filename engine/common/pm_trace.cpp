@@ -424,7 +424,7 @@ pmtrace_t PM_PlayerTraceExt( playermove_t *pmove, vec3_t start, vec3_t end, int 
 
 				for( j = 0; j < 3; j++ )
 				{
-#ifdef XASH_SIMD
+#if 0 // XASH_SIMD
 					vec3_t temp;
 					VectorCopySign(start_l, offset, temp);
 					VectorSubtract(start_l, temp, start_l);
@@ -608,7 +608,7 @@ int PM_TestPlayerPosition( playermove_t *pmove, const vec3_t pos, pmtrace_t *ptr
 
 				for( j = 0; j < 3; j++ )
 				{
-#ifdef XASH_SIMD
+#if 0 // XASH_SIMD
 					vec3_t temp;
 					VectorCopySign(pos_l, offset, temp);
 					VectorSubtract(pos_l, offset, pos_l);

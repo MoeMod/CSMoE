@@ -611,7 +611,7 @@ void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
 		if ((1.0 - cosom) > 0.00000001)
 		{
 			float omega = acos((float)cosom);
-#ifdef U_VECTOR_SIMD
+#ifdef XASH_SIMD
             vec3_t x = { omega, (1.0f - t) * omega, t * omega };
             vec3_t sinx = sin_ps(x);
             float sinom = sinx[0];

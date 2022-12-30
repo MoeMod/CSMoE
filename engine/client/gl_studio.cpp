@@ -152,8 +152,13 @@ int			g_nTopColor, g_nBottomColor;	// remap colors
 int			g_nFaceFlags, g_nForceFaceFlags;
 
 // quick cache aligned
+#ifdef XASH_SIMD
 vec3_t pstudioverts[MAXSTUDIOVERTS]; // copied from m_pStudioHeader + m_pSubModel->vertindex
 vec3_t pstudionorms[MAXSTUDIOVERTS]; // copied from m_pStudioHeader + m_pSubModel->normindex
+#else
+const vec3_t *pstudioverts;
+const vec3_t *pstudionorms;
+#endif
 
 
 /*
@@ -208,6 +213,7 @@ static void R_GenAlignedVertAndNormCache()
     const float* pstudionorms_unaligned = (const float*)((const byte*)m_pStudioHeader + m_pSubModel->normindex);
     float *pstudioverts_out = (float *)pstudioverts;
     float *pstudionorms_out = (float *)pstudionorms;
+#ifdef XASH_SIMD
     for(int i = 0; i < m_pSubModel->numverts; ++i)
     {
         pstudioverts_out[i * 4 + 0] = pstudioverts_unaligned[i * 3 + 0];
@@ -222,6 +228,10 @@ static void R_GenAlignedVertAndNormCache()
         pstudionorms_out[i * 4 + 2] = pstudionorms_unaligned[i * 3 + 2];
         pstudionorms_out[i * 4 + 3] = 0;
     }
+#else
+	pstudioverts = (const vec3_t*)((const byte*)m_pStudioHeader + m_pSubModel->vertindex);
+	pstudionorms = (const vec3_t*)((const byte*)m_pStudioHeader + m_pSubModel->normindex);
+#endif
 }
 
 /*

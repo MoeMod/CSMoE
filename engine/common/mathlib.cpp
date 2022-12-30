@@ -21,6 +21,18 @@ GNU General Public License for more details.
 #include "common.h"
 #include "mathlib.h"
 
+#ifdef XASH_VECTORIZE_SINCOS
+// Test shown that this is not so effictively
+#if defined(__SSE__) || defined(_M_IX86_FP)
+#if defined(__SSE2__) || defined(_M_IX86_FP)
+  #define USE_SSE2
+ #endif
+#include "util/sse_mathfun.h"
+#endif
+#if defined(__ARM_NEON__) || defined(__NEON__)
+#include "util/neon_mathfun.h"
+#endif
+#endif
 #include "util/u_vector_angle.hpp"
 
 /*
@@ -479,7 +491,7 @@ void XASH_VECTORCALL AngleQuaternion( const vec3_t angles, vec4_t_ref q )
 {
 	float	sr, sp, sy, cr, cp, cy;
 
-#ifdef U_VECTOR_SIMD
+#ifdef XASH_SIMD
 	vec3_t sina, cosa;
 	sincos_ps(angles * 0.5, &sina.m_xmm, &cosa.m_xmm);
 	sy = sina[2];

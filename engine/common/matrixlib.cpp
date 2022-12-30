@@ -70,11 +70,16 @@ void XASH_VECTORCALL Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, 
 	out = vfmsq_laneq_f32(out, in[1], in[1], 3);
 	out = vfmsq_laneq_f32(out, in[2], in[2], 3);
 #else
+	vec3_t dir;
+	vec3_t in3;
+	VectorSet(in3, in[0][3], in[1][3], in[2][3]);
+	VectorSubtract(v, in3, dir);
+
 	VectorSet(out,
-		(v[0] - in[0][3]) * in[0][0] + (v[1] - in[1][3]) * in[1][0] + (v[2] - in[2][3]) * in[2][0],
-		(v[0] - in[0][3]) * in[0][1] + (v[1] - in[1][3]) * in[1][1] + (v[2] - in[2][3]) * in[2][1],
-		(v[0] - in[0][3]) * in[0][2] + (v[1] - in[1][3]) * in[1][2] + (v[2] - in[2][3]) * in[2][2]
-		);
+			  dir[0] * in[0][0] + dir[1] * in[1][0] + dir[2] * in[2][0],
+			  dir[0] * in[0][1] + dir[1] * in[1][1] + dir[2] * in[2][1],
+			  dir[0] * in[0][2] + dir[1] * in[1][2] + dir[2] * in[2][2]
+	);
 #endif
 }
 
@@ -351,10 +356,10 @@ void XASH_VECTORCALL Matrix4x4_VectorITransform( cmatrix4x4 in, const vec3_t v, 
 	VectorSubtract(v, in3, dir);
 
 	VectorSet(out,
-		(v[0] - in[0][3]) * in[0][0] + (v[1] - in[1][3]) * in[1][0] + (v[2] - in[2][3]) * in[2][0],
-		(v[0] - in[0][3]) * in[0][1] + (v[1] - in[1][3]) * in[1][1] + (v[2] - in[2][3]) * in[2][1],
-		(v[0] - in[0][3]) * in[0][2] + (v[1] - in[1][3]) * in[1][2] + (v[2] - in[2][3]) * in[2][2]
-		);
+			  dir[0] * in[0][0] + dir[1] * in[1][0] + dir[2] * in[2][0],
+			  dir[0] * in[0][1] + dir[1] * in[1][1] + dir[2] * in[2][1],
+			  dir[0] * in[0][2] + dir[1] * in[1][2] + dir[2] * in[2][2]
+	);
 #endif
 }
 

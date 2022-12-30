@@ -76,15 +76,15 @@ AngleQuaternion
 ====================
 */
 
-#if defined __SSE__ || defined __x86_64__ || defined _M_X64 || defined _M_AMD64 || defined _M_IX86_FP
+#if U_VECTOR_SSE
 const __m128 AngleQuaternion_sign1 = _mm_castsi128_ps(_mm_setr_epi32(0x80000000, 0x00000000, 0x00000000, 0x00000000));
 const __m128 AngleQuaternion_sign2 = _mm_castsi128_ps(_mm_setr_epi32(0x00000000, 0x00000000, 0x80000000, 0x00000000));
-#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+#elif U_VECTOR_NEON
 const float32x4_t AngleQuaternion_sign2 = vzipq_f32(vdupq_n_u32(0x80000000), vdupq_n_u32(0x00000000)).val[0]; // { 0x80000000, 0x00000000, 0x80000000, 0x00000000 };
 #endif
 void XASH_VECTORCALL AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 {
-#if defined __SSE__ || defined __x86_64__ || defined _M_X64 || defined _M_AMD64 || defined _M_IX86_FP
+#if U_VECTOR_SSE
 	__m128 sina, cosa;
 	sincos_ps(angles * 0.5, &sina, &cosa);
 	auto sr_sr_sr_sr = _mm_shuffle_ps(sina, sina, _MM_SHUFFLE(0, 0, 0, 0));
@@ -104,7 +104,7 @@ void XASH_VECTORCALL AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 	//quaternion[1] =   cr * sp * cy + sr * cp * sy; // Y
 	//quaternion[2] =   cr * cp * sy - sr * sp * cy; // Z
 	//quaternion[3] =   cr * cp * cy + sr * sp * sy; // W
-#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+#elif U_VECTOR_NEON
     float32x4x2_t sr_sp_sy_0_cr_cp_cy_1;
     sincos_ps(angles * 0.5, &sr_sp_sy_0_cr_cp_cy_1.val[0], &sr_sp_sy_0_cr_cp_cy_1.val[1]);
 

@@ -16,9 +16,6 @@ GNU General Public License for more details.
 #ifndef MATHLIB_H
 #define MATHLIB_H
 
-#ifdef XASH_SIMD
-#include <immintrin.h>
-#endif
 #include <math.h>
 
 #ifdef MSC_VER
