@@ -546,7 +546,7 @@ qboolean VID_SetMode( void )
 
 	gl_swapInterval->modified = true;
 	fullscreen = Cvar_VariableInteger("fullscreen") != 0;
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) && defined(XASH_SDL)
 	fullscreen = true;
 #endif
 

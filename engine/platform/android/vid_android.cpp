@@ -20,7 +20,14 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "mod_local.h"
 #include "input.h"
+#ifdef XASH_NANOGL
 #include <GL/nanogl.h>
+#endif
+#ifdef XASH_GL4ES
+#include "gl4esinit.h"
+#include "gl4eshint.h"
+#endif
+#include <EGL/egl.h> // nanogl
 #include "gl_vidnt.h"
 #include "filesystem.h"
 
@@ -33,6 +40,14 @@ typedef enum
 	rserr_invalid_mode,
 	rserr_unknown
 } rserr_t;
+
+#ifndef XASH_GL_STATIC
+#define GL_CALL( x ) #x, (void **)&p##x
+#define GL_CALL_EX( x, y ) #x, (void **)&p##y
+#else
+#define GL_CALL( x ) #x, NULL
+#define GL_CALL_EX( x, y ) #x, NULL
+#endif
 
 static dllfunc_t texturecompressionfuncs[] =
 {
@@ -53,7 +68,13 @@ GL_GetProcAddress
 */
 void *GL_GetProcAddress( const char *name )
 {
+#if defined( XASH_NANOGL )
 	void *func = nanoGL_GetProcAddress(name);
+#elif defined( XASH_WES )
+	void* func = nullptr; // TODO
+#elif defined( XASH_GL4ES )
+	void* func = gl4es_GetProcAddress( name );
+#endif
 	if(!func)
 	{
 		MsgDev(D_ERROR, "Error: GL_GetProcAddress failed for %s", name);
@@ -129,7 +150,11 @@ void GL_InitExtensions( void )
 	GL_SetExtension( GL_ARB_DEPTH_FLOAT_EXT, false );
 	GL_SetExtension( GL_OCCLUSION_QUERIES_EXT,false );
 	GL_CheckExtension( "GL_OES_depth_texture", NULL, "gl_depthtexture", GL_DEPTH_TEXTURE );
+#ifdef XASH_GL4ES
+	GL_SetExtension(GL_ASTC_EXT, true);
+#else
     GL_CheckExtension( "GL_KHR_texture_compression_astc_ldr", NULL, "gl_astc_format", GL_ASTC_EXT );
+#endif
 
 	glConfig.texRectangle = glConfig.max_2d_rectangle_size = 0; // no rectangle
 
@@ -235,6 +260,25 @@ void GL_SetupAttributes()
 
 }
 
+#ifdef XASH_WES
+extern "C" void wes_init();
+extern "C" void wes_destroy();
+#endif
+#ifdef XASH_GL4ES
+void GL4ES_GetMainFBSize( int *width, int *height )
+{
+	*width = glState.width;
+	*height = glState.height;
+}
+void *GL4ES_GetProcAddress( const char *name )
+{
+	if( !Q_strcmp(name, "glShadeModel") )
+		// combined gles/gles2/gl implementation exports this, but it is invalid
+		return NULL;
+	return (void *)eglGetProcAddress( name );
+}
+#endif
+
 /*
 =================
 GL_CreateContext
@@ -242,7 +286,22 @@ GL_CreateContext
 */
 qboolean GL_CreateContext( void )
 {
+#ifdef XASH_NANOGL
 	nanoGL_Init();
+#endif
+#ifdef XASH_WES
+	wes_init();
+#endif
+#ifdef XASH_GL4ES
+	set_getprocaddress( GL4ES_GetProcAddress );
+	set_getmainfbsize( GL4ES_GetMainFBSize );
+	initialize_gl4es();
+
+	// merge glBegin/glEnd in beams and console
+	pglHint( GL_BEGINEND_HINT_GL4ES, 1 );
+	// dxt unpacked to 16-bit looks ugly
+	pglHint( GL_AVOID16BITS_HINT_GL4ES, 1 );
+#endif
 	return true;
 }
 
@@ -265,7 +324,15 @@ qboolean GL_DeleteContext( void )
 {
 #if 0 // unsure, need testing
 	MsgDev( D_NOTE, "nanoGL_Destroy( );");
+#ifdef XASH_NANOGL
 	nanoGL_Destroy();
+#endif
+#ifdef XASH_WES
+	wes_destroy();
+#endif
+#ifdef XASH_GL4ES
+	close_gl4es();
+#endif
 
 	MsgDev( D_NOTE, "Android_ShutdownGL( );");
 	Android_ShutdownGL();
@@ -368,6 +435,20 @@ qboolean VID_SetMode( void )
 	Android_GetScreenRes( &width, &height );
 	MsgDev( D_NOTE, "VID_SetMode(%d, %d)\n", width, height);
 	R_ChangeDisplaySettings( width, height, false );
+	if( !glw_state.initialized )
+	{
+		if( !GL_CreateContext( ))
+		{
+			return false;
+		}
+
+		VID_StartupGamma();
+	}
+	else
+	{
+		if( !GL_UpdateContext( ))
+			return false;
+	}
 	return true;
 }
 

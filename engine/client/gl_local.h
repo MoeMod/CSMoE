@@ -467,6 +467,7 @@ void R_Strobe_Init( void );
 #define GL_CheckForErrors() GL_CheckForErrors_( __FILE__, __LINE__ )
 void GL_CheckForErrors_( const char *filename, const int fileline );
 void GL_UpdateSwapInterval( void );
+qboolean GL_CreateContext( void );
 qboolean GL_DeleteContext( void );
 void GL_SetExtension( int r_ext, int enable );
 qboolean GL_Support( int r_ext );

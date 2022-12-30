@@ -59,7 +59,7 @@ qboolean	error_on_exit = false;	// arg for exit();
 Sys_DoubleTime
 ================
 */
-#if 1
+#if XASH_TIMER == TIMER_STL
 #include <chrono>
 double GAME_EXPORT Sys_DoubleTime( void )
 {
