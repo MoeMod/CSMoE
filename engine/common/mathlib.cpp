@@ -21,22 +21,7 @@ GNU General Public License for more details.
 #include "common.h"
 #include "mathlib.h"
 
-#ifdef XASH_SIMD
 #include "util/u_vector_angle.hpp"
-#else
-#ifdef XASH_VECTORIZE_SINCOS
-// Test shown that this is not so effictively
-#if defined(__SSE__) || defined(_M_IX86_FP)
-#if defined(__SSE2__) || defined(_M_IX86_FP)
-  #define USE_SSE2
- #endif
-#include "util/sse_mathfun.h"
-#endif
-#if defined(__ARM_NEON__) || defined(__NEON__)
-#include "util/neon_mathfun.h"
-#endif
-#endif
-#endif
 
 /*
 =================

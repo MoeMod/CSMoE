@@ -172,7 +172,7 @@ void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4
 		if ((1.0 - cosom) > 0.000001)
 		{
 			float omega = acos(cosom);
-#ifdef U_VECTOR_SIMD
+#ifdef XASH_SIMD
             vec3_t x = { omega, (1.0f - t) * omega, t * omega };
             vec3_t sinx = sin_ps(x);
             float sinom = sinx[0];

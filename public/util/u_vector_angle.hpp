@@ -3,10 +3,10 @@
 #include "angledef.h"
 #include "u_vector.hpp"
 
-#if U_VECTOR_NEON
+#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(_M_ARM) || defined(_M_ARM64)
 #include "neon_mathfun.h"
 #endif
-#if U_VECTOR_SSE
+#if defined __SSE__ || defined __x86_64__ || defined _M_X64 || defined _M_AMD64 || defined _M_IX86_FP
 #include "sse_mathfun.h"
 #endif
 
