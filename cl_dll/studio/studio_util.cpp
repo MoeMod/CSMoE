@@ -22,7 +22,7 @@ ConcatTransforms
 */
 void XASH_VECTORCALL ConcatTransforms(cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out)
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	memset(&out, 0, sizeof(out)); // out = {};
 
 	out[0] = vcopyq_laneq_f32(out[0], 3, in1[0], 3); // out[0][3] = in[0][3]
@@ -76,15 +76,15 @@ AngleQuaternion
 ====================
 */
 
-#if U_VECTOR_SSE
+#if defined(XASH_SIMD) && U_VECTOR_SSE
 const __m128 AngleQuaternion_sign1 = _mm_castsi128_ps(_mm_setr_epi32(0x80000000, 0x00000000, 0x00000000, 0x00000000));
 const __m128 AngleQuaternion_sign2 = _mm_castsi128_ps(_mm_setr_epi32(0x00000000, 0x00000000, 0x80000000, 0x00000000));
-#elif U_VECTOR_NEON
+#elif defined(XASH_SIMD) && U_VECTOR_NEON
 const float32x4_t AngleQuaternion_sign2 = vzipq_f32(vdupq_n_u32(0x80000000), vdupq_n_u32(0x00000000)).val[0]; // { 0x80000000, 0x00000000, 0x80000000, 0x00000000 };
 #endif
 void XASH_VECTORCALL AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 {
-#if U_VECTOR_SSE
+#if defined(XASH_SIMD) && U_VECTOR_SSE
 	__m128 sina, cosa;
 	sincos_ps(angles * 0.5, &sina, &cosa);
 	auto sr_sr_sr_sr = _mm_shuffle_ps(sina, sina, _MM_SHUFFLE(0, 0, 0, 0));
@@ -104,7 +104,7 @@ void XASH_VECTORCALL AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 	//quaternion[1] =   cr * sp * cy + sr * cp * sy; // Y
 	//quaternion[2] =   cr * cp * sy - sr * sp * cy; // Z
 	//quaternion[3] =   cr * cp * cy + sr * sp * sy; // W
-#elif U_VECTOR_NEON
+#elif defined(XASH_SIMD) && U_VECTOR_NEON
     float32x4x2_t sr_sp_sy_0_cr_cp_cy_1;
     sincos_ps(angles * 0.5, &sr_sp_sy_0_cr_cp_cy_1.val[0], &sr_sp_sy_0_cr_cp_cy_1.val[1]);
 

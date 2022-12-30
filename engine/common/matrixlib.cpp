@@ -41,7 +41,7 @@ void XASH_VECTORCALL Matrix4x4_LoadIdentity( matrix4x4_ref mat ) { Matrix4x4_Cop
 */
 void XASH_VECTORCALL Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	float32x4x4_t in_t;
 	memcpy(&in_t, &in, sizeof(in));
 	memset(&in_t.val[3], sizeof(in_t.val[3]), 0);
@@ -62,7 +62,7 @@ void XASH_VECTORCALL Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, v
 
 void XASH_VECTORCALL Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	out = vmulq_laneq_f32(in[0], v, 0);
 	out = vfmaq_laneq_f32(out, in[1], v, 1);
 	out = vfmaq_laneq_f32(out, in[2], v, 2);
@@ -85,7 +85,7 @@ void XASH_VECTORCALL Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, 
 
 void XASH_VECTORCALL Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	float32x4x4_t in_t;
 	memcpy(&in_t, &in, sizeof(in));
 	memset(&in_t.val[3], sizeof(in_t.val[3]), 0);
@@ -105,7 +105,7 @@ void XASH_VECTORCALL Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3
 
 void XASH_VECTORCALL Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	out = vmulq_laneq_f32(in[0], v, 0);
 	out = vfmaq_laneq_f32(out, in[1], v, 1);
 	out = vfmaq_laneq_f32(out, in[2], v, 2);
@@ -120,7 +120,7 @@ void XASH_VECTORCALL Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec
 
 void XASH_VECTORCALL Matrix3x4_ConcatTransforms( matrix3x4_ref out, cmatrix3x4 in1, cmatrix3x4 in2 )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	memset(&out, 0, sizeof(out)); // out = {};
 
 	out[0] = vcopyq_laneq_f32(out[0], 3, in1[0], 3); // out[0][3] = in[0][3]
@@ -324,7 +324,7 @@ void XASH_VECTORCALL Matrix3x4_Invert_Simple( matrix3x4_ref out, cmatrix3x4 in1 
 */
 void XASH_VECTORCALL Matrix4x4_VectorTransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	float32x4x4_t in_t = vld4q_f32((const float *)&in);
 
 	out = in_t.val[3];
@@ -342,7 +342,7 @@ void XASH_VECTORCALL Matrix4x4_VectorTransform( cmatrix4x4 in, const vec3_t v, v
 
 void XASH_VECTORCALL Matrix4x4_VectorITransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	out = vmulq_laneq_f32(in[0], v, 0);
 	out = vfmaq_laneq_f32(out, in[1], v, 1);
 	out = vfmaq_laneq_f32(out, in[2], v, 2);
@@ -365,7 +365,7 @@ void XASH_VECTORCALL Matrix4x4_VectorITransform( cmatrix4x4 in, const vec3_t v, 
 
 void XASH_VECTORCALL Matrix4x4_VectorRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	float32x4x4_t in_t = vld4q_f32((const float *)&in);
 
 	out = vmulq_laneq_f32(in_t.val[0], v, 0);
@@ -382,7 +382,7 @@ void XASH_VECTORCALL Matrix4x4_VectorRotate( cmatrix4x4 in, const vec3_t v, vec3
 
 void XASH_VECTORCALL Matrix4x4_VectorIRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	out = vmulq_laneq_f32(in[0], v, 0);
 	out = vfmaq_laneq_f32(out, in[1], v, 1);
 	out = vfmaq_laneq_f32(out, in[2], v, 2);
@@ -397,7 +397,7 @@ void XASH_VECTORCALL Matrix4x4_VectorIRotate( cmatrix4x4 in, const vec3_t v, vec
 
 void XASH_VECTORCALL Matrix4x4_ConcatTransforms( matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 in2 )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	memset(&out, 0, sizeof(out)); // out = {};
 
 	out[0] = vcopyq_laneq_f32(out[0], 3, in1[0], 3); // out[0][3] = in[0][3]
@@ -606,7 +606,7 @@ void XASH_VECTORCALL Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t_ref angles
 
 void XASH_VECTORCALL Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	float32x4x4_t in_t = vld4q_f32((const float*)&in);
 
 	out = vmulq_laneq_f32(in_t.val[0], normal, 0);
@@ -632,7 +632,7 @@ void XASH_VECTORCALL Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3
 
 void XASH_VECTORCALL Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	float32x4x4_t in_t = vld4q_f32((const float*)&in);
 
 	out = vmulq_laneq_f32(in_t.val[0], normal, 0);
@@ -658,7 +658,7 @@ void XASH_VECTORCALL Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3
 
 void XASH_VECTORCALL Matrix4x4_Invert_Simple( matrix4x4_ref out, cmatrix4x4 in1 )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	auto scale_v = vsetq_lane_f32(0, in1[0], 3);
 	float scale = 1 / (vaddvq_f32(vmulq_f32(scale_v, scale_v)));
 	
@@ -706,7 +706,7 @@ void XASH_VECTORCALL Matrix4x4_Invert_Simple( matrix4x4_ref out, cmatrix4x4 in1 
 
 void XASH_VECTORCALL Matrix4x4_Transpose( matrix4x4_ref out, cmatrix4x4 in1 )
 {
-#if U_VECTOR_NEON
+#if defined(XASH_SIMD) && U_VECTOR_NEON
 	*(float32x4x4_t *)&out = vld4q_f32((const float *)&in1);
 #else
 	out[0][0] = in1[0][0];

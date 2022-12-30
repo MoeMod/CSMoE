@@ -55,13 +55,7 @@ if(XASH_QINDIEGL)
 endif()
 option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OFF)
 
-if(ANDROID)
-	# disable neon on android by default
-	option(XASH_SIMD "Try to use neon and sse" OFF)
-else()
-	option(XASH_SIMD "Try to use neon and sse" ON)
-endif()
-
+option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
 option(XASH_SKIPCRTLIB "Use system CRT" ON)
 
 option(XASH_CPUINFO "Build with cpuinfo support" OFF)
@@ -404,8 +398,8 @@ add_definitions(-DXASH_FORCEINLINE)
 
 # ----- Conditions -----
 
-if(XASH_SIMD) # I know what I am doing and I want to build version that requires SSE
-	add_definitions(-DXASH_SIMD -DVECTORIZE_SINCOS)
+if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version that requires SSE
+	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 if(XASH_SKIPCRTLIB)
 	add_definitions(-DXASH_SKIPCRTLIB)

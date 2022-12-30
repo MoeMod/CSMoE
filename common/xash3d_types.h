@@ -4,6 +4,11 @@
 
 #include "util/u_vector.hpp"
 
+#ifndef __ANDROID__
+// remove simd support on android
+#define XASH_SIMD
+#endif
+
 typedef unsigned char byte;
 typedef int		sound_t;
 typedef float		vec_t;

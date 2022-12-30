@@ -25,7 +25,6 @@ GNU General Public License for more details.
 
 typedef struct lua_State lua_State;
 
-#ifdef XASH_SIMD
 #if defined __SSE__ || defined __x86_64__ || defined _M_X64 || defined _M_AMD64 || defined _M_IX86_FP
 #include <xmmintrin.h> // sse
 #include <emmintrin.h> // sse2
@@ -38,7 +37,6 @@ typedef struct lua_State lua_State;
 #include <arm_neon.h>
 #define U_VECTOR_NEON 2
 #define U_VECTOR_SIMD U_VECTOR_NEON
-#endif
 #endif
 
 #ifdef _MSC_VER
