@@ -1359,7 +1359,8 @@ int CHudAmmo::Draw(float flTime)
 
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 
-		if (pw->iClip >= 0)
+		if (pw->iClip >= 0 &&
+			m_pWeapon->iId != WEAPON_TURBULENT1)
 		{
 			// room for the number and the '|' and the current ammo
 
@@ -1404,24 +1405,30 @@ int CHudAmmo::Draw(float flTime)
 
 			// SPR_Draw a bullets only line
 
-		
-
-			if (gWR.CountAmmo(pw->iAmmoType) > 1500)
+			if (m_pWeapon->iId == WEAPON_TURBULENT1)
 			{
-				x = ScreenWidth - AmmoWidth - iIconWidth;
-				int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
-				x -= width;
-
-				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
-				SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
-				x = ScreenWidth - AmmoWidth - iIconWidth;
+				x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+				x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, pw->iClip, r, g, b);
 			}
 			else
 			{
-				if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+				if (gWR.CountAmmo(pw->iAmmoType) > 1500)
 				{
-					x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
-					x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
+					x = ScreenWidth - AmmoWidth - iIconWidth;
+					int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+					x -= width;
+
+					SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+					SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
+					x = ScreenWidth - AmmoWidth - iIconWidth;
+				}
+				else
+				{
+					if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+					{
+						x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+						x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
+					}
 				}
 			}
 		}
@@ -2069,7 +2076,8 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 
-		if (pw->iClip >= 0)
+		if (pw->iClip >= 0 &&
+			m_pWeapon->iId != WEAPON_TURBULENT1)
 		{
 			// room for the number and the '|' and the current ammo
 
@@ -2104,20 +2112,28 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 
 			iX = ScreenWidth - 5 - iIconWidth;
 			// GL Seems to need this
-			if (gWR.CountAmmo(pw->iAmmoType) > 1500)
+			if (m_pWeapon->iId == WEAPON_TURBULENT1)
 			{
-				int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
-				iX -= width;
-
-				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
-				SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iInfinite));
+				iX -= DrawUtils::GetNEWHudNumberWidth(0, pw->iClip, FALSE, 3, 0);
+				DrawUtils::DrawNEWHudNumber(0, iX, iY, pw->iClip, r, g, b, 255, FALSE, 3);
 			}
 			else
 			{
-				if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+				if (gWR.CountAmmo(pw->iAmmoType) > 1500)
 				{
-					iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
-					DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
+					int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+					iX -= width;
+
+					SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+					SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iInfinite));
+				}
+				else
+				{
+					if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+					{
+						iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
+						DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
+					}
 				}
 			}
 		}

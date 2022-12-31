@@ -281,3 +281,6 @@ HOOK_EVENT(vulcanus9, FireVulcanus9LightMove);
 HOOK_EVENT(magicsg, FireMagicSg);
 HOOK_EVENT(malorian3516, FireMalorian3516);
 HOOK_EVENT(spknife, FireSPKnife);
+HOOK_EVENT(thanatos3, FireThanatos3);
+HOOK_EVENT(dfpistol, FireDFPISTOL);
+HOOK_EVENT(turbulent1, FireTurbulent1);

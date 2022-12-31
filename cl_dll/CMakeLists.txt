@@ -432,6 +432,10 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_turbulent9.cpp
 	../dlls/wpn_shared/knife_spknife.cpp
 	../dlls/wpn_shared/knife_swordbombard.cpp
+	../dlls/wpn_shared/knife_ironfan.cpp
+	../dlls/wpn_shared/wpn_thanatos3.cpp
+	../dlls/wpn_shared/wpn_dfpistol.cpp
+	../dlls/wpn_shared/wpn_turbulent1.cpp
 	)
 
 set (HUD_SRCS

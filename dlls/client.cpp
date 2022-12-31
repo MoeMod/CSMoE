@@ -32,6 +32,7 @@
 #include "weapons_buy.h"
 #include "cbase/cbase_hash.h"
 #include "wpn_shared/wpn_cannonex.h"
+#include "wpn_shared/wpn_turbulent1.h"
 #ifdef XASH_DEDICATED
 #include "player/player_fuck.h"
 #endif
@@ -2255,6 +2256,8 @@ bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 	if (player->m_iAccount >= cost) {
 		player->GiveNamedItem(classname);
 		player->AddAccount(-cost);
+		if (weapon->m_iId == WEAPON_TURBULENT1)
+			weapon->m_iSwing = 1;
 		return true;
 	}
 

@@ -184,9 +184,6 @@ void CKnifeCrow9::PrimaryAttack(void)
 	{
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.4s;
 
-		m_pPlayer->pev->punchangle.x += RANDOM_FLOAT(-0.02, 0.02) * 100;
-		m_pPlayer->pev->punchangle.y += RANDOM_FLOAT(-0.02, 0.02) * 100;
-
 		if (RANDOM_LONG(0, 1))
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/balrog9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		else
@@ -197,9 +194,6 @@ void CKnifeCrow9::PrimaryAttack(void)
 	case HIT_WALL:
 	{
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.4s;
-
-		m_pPlayer->pev->punchangle.x += RANDOM_FLOAT(-0.02, 0.02) * 100;
-		m_pPlayer->pev->punchangle.y += RANDOM_FLOAT(-0.02, 0.02) * 100;
 
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/skullaxe_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;

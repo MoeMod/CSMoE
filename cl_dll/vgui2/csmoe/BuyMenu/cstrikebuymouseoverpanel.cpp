@@ -131,7 +131,7 @@ void CSBuyMouseOverPanel::UpdateWeapon(const char *weapon)
 		weapon = "xm8";
 	}
 	char szBuffer[64];
-	sprintf(szBuffer, "gfx/vgui/basket/%s", weapon);
+	sprintf(szBuffer, (weapon&&weapon[0])?"gfx/vgui/basket/%s":"", weapon);
 	classimage->SetImage(szBuffer);
 
 	std::string str1("#CStrike_");

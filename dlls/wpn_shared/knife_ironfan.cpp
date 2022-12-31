@@ -31,9 +31,8 @@ namespace cl {
 namespace sv {
 #endif
 
-class CKnifeironfan: public LinkWeaponTemplate<CKnifeironfan,
+class CKnifeIronFan: public LinkWeaponTemplate<CKnifeIronFan,
 	TGeneralData,
-	TPrecacheEvent,
 	BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type
 >
 {
@@ -50,7 +49,6 @@ public:
 
 public:
 
-#define ironfan_MAXAMMO	60
 	enum ironfan_e
 	{
 		ANIM_IDLE = 0,
@@ -72,10 +70,9 @@ public:
 		PRECACHE_SOUND("weapons/ironfan_slash3_1_2.wav");
 		PRECACHE_SOUND("weapons/ironfan_slash1_1_2.wav");
 
-	
-		PRECACHE_SOUND("weapons/skullaxe_wall.wav");
-		PRECACHE_SOUND("weapons/balrog9_hit1.wav");
-		PRECACHE_SOUND("weapons/balrog9_hit2.wav");
+		PRECACHE_SOUND("weapons/tomahawk_wall.wav");
+		PRECACHE_SOUND("weapons/tomahawk_slash1_hit.wav");
+		PRECACHE_SOUND("weapons/tomahawk_slash2_hit.wav");
 	}
 
 	BOOL Deploy() override
@@ -83,18 +80,25 @@ public:
 		m_fMaxSpeed = 250;
 		m_iSwing = 0;
 		m_iWeaponState = 0;
+		m_iCheck = 0;
 
+		m_iLastAnim = ANIM_DRAW;
 		return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, AnimExtension, UseDecrement() != FALSE);
 
 	}
 
+	void Holster(int skiplocal) override;
 	void Spawn() override;
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
-	void WeaponIdle();
+	void WeaponIdle() override;
+	void ItemPostFrame() override;
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	BOOL CanDrop() override { return false; }
 
+	void SkillAttack();
+	void DelayPrimaryAttack();
+	void DelaySecondaryAttack();
 public:
 #ifndef CLIENT_DLL
 	hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer);
@@ -124,7 +128,7 @@ public:
 		return flDamage;
 	}
 
-	float GetBuffDamage() const
+	float GetSkillDamage() const
 	{
 		float flDamage = 40.0f;
 #ifndef CLIENT_DLL
@@ -138,195 +142,229 @@ public:
 
 	KnockbackData GetKnockBackData() override
 	{
-		if (pev->iuser1)
+		if (m_iWeaponState == 2)
 			return { 5000.0f, 500.0f, 300.0f, 200.0f, 1.0f };
 		else
 			return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 	}
 
-	void ItemPostFrame() override;
-
-	int m_iSteamModelIndex;
-	int m_iAmmo;
-	time_point_t m_flTimeNextCharge;
+	int m_iLastAnim;
+	int m_iCheck;
 
 };
 
-LINK_ENTITY_TO_CLASS(knife_ironfan, CKnifeironfan)
+LINK_ENTITY_TO_CLASS(knife_ironfan, CKnifeIronFan)
 
-void CKnifeironfan::Spawn()
+void CKnifeIronFan::Spawn()
 {
 	pev->classname = MAKE_STRING("knife_ironfan");
 	m_iId = WEAPON_KNIFE;
 	Precache();
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");
 	m_iClip = WEAPON_NOCLIP;
-	m_flTimeNextCharge = invalid_time_point;
+	m_iCheck = 0;
 	FallInit();
 }
 
-void CKnifeironfan::PrimaryAttack(void)
+void CKnifeIronFan::Holster(int skiplocal)
 {
+	SetThink(nullptr);
+	return CBasePlayerWeapon::Holster(skiplocal);
+}
+
+void CKnifeIronFan::DelaySecondaryAttack(void)
+{
+	SetThink(nullptr);
+
+	SendWeaponAnim(ANIM_SLASH3_2, UseDecrement() != FALSE);
+	m_iLastAnim = ANIM_SLASH3_2;
+
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/ironfan_slash3_1_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.3s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.3s;
+
+	m_iWeaponState = 2;
+#ifndef CLIENT_DLL
+	switch (KnifeAttack(GetSecondaryAttackDamage(), 116, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	{
+	case HIT_NONE:
+	{
+		break;
+	}
+	case HIT_PLAYER:
+	{
+		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+		if (RANDOM_LONG(0, 1))
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/tomahawk_slash2_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		break;
+	}
+	case HIT_WALL:
+	{
+		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		break;
+	}
+	}
+#endif
+}
+
+void CKnifeIronFan::DelayPrimaryAttack(void)
+{
+	SetThink(nullptr);
+
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/ironfan_slash1_1_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+	m_iWeaponState = 0;
+#ifndef CLIENT_DLL
+	switch (KnifeAttack(GetSkillDamage(), 71, 49, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	{
+	case HIT_NONE:
+	{
+
+		break;
+	}
+	case HIT_PLAYER:
+	{
+		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+		if (RANDOM_LONG(0, 1))
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/tomahawk_slash2_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		break;
+	}
+	case HIT_WALL:
+	{
+		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		break;
+	}
+	}
+#endif
+}
+
+void CKnifeIronFan::SkillAttack()
+{
+	Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
+
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 
-	int iAnim = m_iSwing ? ANIM_SLASHA2_2 : ANIM_SLASHA2_1;
+	SendWeaponAnim(ANIM_SLASH2_1, UseDecrement() != FALSE);
+	m_iLastAnim = ANIM_SLASH2_1;
 
-	if (m_iAmmo >= 30)
-		iAnim += 2;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5s;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
 
-	SendWeaponAnim(iAnim, UseDecrement() != FALSE);
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/ironfan_slash2_1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+	
+	m_iWeaponState = 1;
+#ifndef CLIENT_DLL
+	switch (KnifeAttack(GetSkillDamage(), 82, 67, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	{
+	case HIT_NONE:
+	{
+		break;
+	}
+	case HIT_PLAYER:
+	{
+		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+		if (RANDOM_LONG(0, 1))
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		else
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/tomahawk_slash2_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		break;
+	}
+	case HIT_WALL:
+	{
+		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		break;
+	}
+	}
+#endif
+}
 
-	if (m_iSwing & 1)
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/ironfan_slasha2_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+void CKnifeIronFan::PrimaryAttack(void)
+{
+	switch (m_iCheck)
+	{
+	case 0:
+	{
+		m_iCheck = 1;
+		break;
+	}
+	case 1:
+	{
+		SkillAttack();
+		m_iCheck = 2;
+		return;
+	}
+	default:
+	{
+		m_iCheck = 0;
+		break;
+	}
+	}
+
+	Q_strcpy(m_pPlayer->m_szAnimExtention, "skullaxe");
+
+#ifndef CLIENT_DLL
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+
+	SendWeaponAnim(ANIM_SLASH1_1, UseDecrement() != FALSE);
+	m_iLastAnim = ANIM_SLASH1_1;
+
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.5s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+
+	SetThink(&CKnifeIronFan::DelayPrimaryAttack);
+	pev->nextthink = gpGlobals->time + 1.12s;
+
+}
+
+void CKnifeIronFan::SecondaryAttack(void)
+{
+	if (m_iCheck == 2)
+	{
+		Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
+
+#ifndef CLIENT_DLL
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+
+		DelaySecondaryAttack();
+		m_iCheck = 0;
+		return;
+	}
 	else
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/ironfan_slasha2_1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		m_iCheck = 0;
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.56s;
+	Q_strcpy(m_pPlayer->m_szAnimExtention, "skullaxe");
+
+#ifndef CLIENT_DLL
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+
+	SendWeaponAnim(ANIM_SLASH3_1, UseDecrement() != FALSE);
+	m_iLastAnim = ANIM_SLASH3_1;
+
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.6s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
-#ifndef CLIENT_DLL
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	pev->iuser1 = 0;
-	switch (sv::KnifeAttack(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, GetPrimaryAttackDamage(), 80, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
-	{
-	case HIT_NONE:
-	{
-	
-		break;
-	}
-	case HIT_PLAYER:
-	{
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.37s;
-		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-		if (m_iSwing & 1)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/balrog9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/balrog9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);	
-		break;
-	}
-	case HIT_WALL:
-	{
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.37s;
-		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/skullaxe_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		break;
-	}
-	}
-#endif
-
-	m_iSwing++;
-	m_iSwing %= 2;
-
-}
-
-void CKnifeironfan::SecondaryAttack(void)
-{
-	int iAnim;
-	if (m_iAmmo < 30)
-	{
-		m_iWeaponState = 0;
-		iAnim = m_iSwing ? ANIM_SLASHA1_2 : ANIM_SLASHA1_1;
-
-		if (m_iSwing & 1)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/ironfan_slasha1_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/ironfan_slasha1_1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
-	}
-	else
-	{
-		m_iWeaponState = 1;
-		iAnim = RANDOM_LONG(0, 1) ? ANIM_SLASHB3_2 : ANIM_SLASHB3_1;
-
-		if (iAnim % 2)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/ironfan_slashb3_1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/ironfan_slashb3_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.52s;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
-
-		m_iAmmo -= 30;
-
-		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, FALSE);
-
-#ifndef CLIENT_DLL
-		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-		WRITE_BYTE(44);
-		WRITE_BYTE(m_iAmmo);
-		MESSAGE_END();
-#endif
-		if (m_iAmmo < 30)
-			iAnim += 4;
-	}
-
-	SendWeaponAnim(iAnim, UseDecrement() != FALSE);
-	
-#ifndef CLIENT_DLL
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	pev->iuser1 = 1;
-	switch (KnifeAttack(GetSecondaryAttackDamage(), 80, 50, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
-	{
-	case HIT_NONE:
-	{
-		break;
-	}
-	case HIT_PLAYER:
-	{
-		if (m_iSwing & 1)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/balrog9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/balrog9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-		break;
-	}
-	case HIT_WALL:
-	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "weapons/skullaxe_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
-		break;
-	}
-	}
-
-	if (m_iWeaponState)
-	{
-		struct
-		{
-			float RadiusDamageRadius;
-			int RadiusDamageBitsDamageType;
-			bool RadiusDamageCanHeadshot;
-			float RadiusDamageAmount;
-			float RadiusDamageHasFallOff;
-		} Data;
-
-		Vector vecSrc = m_pPlayer->GetGunPosition();
-
-		Data.RadiusDamageRadius = 175;
-		Data.RadiusDamageBitsDamageType = DMG_BULLET;
-		Data.RadiusDamageCanHeadshot = false;
-		Data.RadiusDamageAmount = GetBuffDamage();
-		Data.RadiusDamageHasFallOff = false;
-
-		std::vector<CBaseEntity*> out;
-		RadiusDamage(Data, vecSrc, m_pPlayer, m_pPlayer, std::back_inserter(out));
-		for (CBaseEntity* ent : out)
-		{
-			CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(ent);
-			if (player && player->m_bIsZombie)
-				player->pev->velocity.z = 400.0f;
-		}
-	}
-#endif
-	m_iWeaponState = 0;
+	SetThink(&CKnifeIronFan::DelaySecondaryAttack);
+	pev->nextthink = gpGlobals->time + 1.2s;
 
 }
 
 #ifndef CLIENT_DLL
-hit_result_t CKnifeironfan::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer)
+hit_result_t CKnifeIronFan::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer)
 {
 	CBaseEntity* pEntity = NULL;
 	hit_result_t result = HIT_NONE;
@@ -372,15 +410,19 @@ hit_result_t CKnifeironfan::KnifeAttack(float flDamage, float flRadius, float fl
 
 		pAttackPlayer->m_iWeaponVolume = 128;
 
-		CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
-		if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
-			pPlayer->pev->velocity.z = 400;
-
 		ClearMultiDamage();
 
 		pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 		ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);
+
+		if (m_iWeaponState == 1)
+		{
+			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+			if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
+				pPlayer->pev->velocity.z = 400;
+
+		}
 
 		result = HIT_PLAYER;
 	}
@@ -408,36 +450,40 @@ hit_result_t CKnifeironfan::KnifeAttack(float flDamage, float flRadius, float fl
 }
 #endif
 
-void CKnifeironfan::ItemPostFrame()
+void CKnifeIronFan::ItemPostFrame(void)
 {
-	if (m_iAmmo < ironfan_MAXAMMO)
+	if (m_flTimeWeaponIdle < UTIL_WeaponTimeBase())
 	{
-		if (m_flTimeNextCharge <= gpGlobals->time)
+		if (m_iLastAnim == ANIM_SLASH1_1)
 		{
-			m_iAmmo++;
-#ifndef CLIENT_DLL
-			MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-			WRITE_BYTE(44);
-			WRITE_BYTE(m_iAmmo);
-			MESSAGE_END();
-#endif
+			m_iCheck = 0;
 
-			if (m_iAmmo == 30 && m_flTimeWeaponIdle <= 0.0s)
-			{
-				//event
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, FALSE);
+			Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
 
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.01s;
-			}
+			m_iLastAnim = ANIM_SLASH1_2;
+			SendWeaponAnim(ANIM_SLASH1_2, UseDecrement() != FALSE);
 
-			m_flTimeNextCharge = gpGlobals->time + 0.1s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.83s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.83s;
+		}
+		else if (m_iLastAnim == ANIM_SLASH2_1)
+		{
+			m_iCheck = 0;
+
+			Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
+
+			m_iLastAnim = ANIM_SLASH2_2;
+			SendWeaponAnim(ANIM_SLASH2_2, UseDecrement() != FALSE);
+
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.3s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.3s;
 		}
 	}
-
+	
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 
-void CKnifeironfan::WeaponIdle(void)
+void CKnifeIronFan::WeaponIdle(void)
 {
 	ResetEmptySound();
 	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
@@ -445,8 +491,13 @@ void CKnifeironfan::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
-	SendWeaponAnim(m_iAmmo < 30 ? ANIM_IDLEA : ANIM_IDLEB, UseDecrement() != FALSE);
+	m_iCheck = 0;
+
+	Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
+
+	SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
+	m_iLastAnim = ANIM_IDLE;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0s;
 }
 
 

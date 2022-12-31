@@ -1019,7 +1019,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if (!Q_stricmp(command, "MoeLogin"))
 	{
-		OnOpenMoeLogin();
+		//OnOpenMoeLogin();
 	}
 
 	else

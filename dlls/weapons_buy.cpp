@@ -136,6 +136,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "tknifeex2",	WEAPON_TKNIFEEX2 },
 	{ "tknifedx",	WEAPON_Z4B_TKNIFEDX },
 	{ "malorian3516" , WEAPON_Z4B_MALORIAN3516},
+	{ "dfpistol" , WEAPON_DFPISTOL},
+	{ "turbulent1" , WEAPON_TURBULENT1},
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -197,6 +199,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "vulcanus3",	WEAPON_VULCANUS3 },
 	{ "skull3",	WEAPON_SKULL3 },
 	{ "skull3d",	WEAPON_SKULL3D },
+	{ "thanatos3",	WEAPON_THANATOS3 },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -589,6 +592,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "tknifeex2",	WEAPONCLASS_PISTOL },
 	{ "tknifedx",	WEAPONCLASS_PISTOL },
 	{ "malorian3516" , WEAPONCLASS_PISTOL},
+	{ "dfpistol" , WEAPONCLASS_PISTOL},
+	{ "turbulent1" , WEAPONCLASS_PISTOL},
+
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -653,6 +659,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "sterlingbayonet",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "skull3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "skull3d",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "thanatos3",	WEAPONCLASS_SUBMACHINEGUN },
 
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
@@ -1218,6 +1225,8 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_TKNIFEEX2:
 	case WEAPON_Z4B_TKNIFEDX:
 	case WEAPON_Z4B_MALORIAN3516:
+	case WEAPON_DFPISTOL:
+	case WEAPON_TURBULENT1:
 		return true;
 	default:
 		break;

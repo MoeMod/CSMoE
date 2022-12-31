@@ -817,7 +817,12 @@ void CBasePlayerWeapon::ItemPostFrame()
 
 		// Add them to the clip
 		m_iClip += j;
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+		
+		if(this->m_iId == WEAPON_TURBULENT1)
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+		else
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+
 		m_pPlayer->TabulateAmmo();
 		m_fInReload = FALSE;
 	}

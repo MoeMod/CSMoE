@@ -2034,6 +2034,8 @@ namespace sv {
 					|| pWeapon->m_iId == WEAPON_TKNIFEEX2
 					|| pWeapon->m_iId == WEAPON_Z4B_TKNIFEDX
 					|| pWeapon->m_iId == WEAPON_DRILLGUN
+					|| pWeapon->m_iId == WEAPON_TURBULENT1
+					|| pWeapon->m_iId == WEAPON_Z4B_DEATHRAY
 					)
 					return;
 				switch (pWeapon->iItemSlot())
