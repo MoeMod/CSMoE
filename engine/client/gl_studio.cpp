@@ -214,6 +214,50 @@ static void R_GenAlignedVertAndNormCache()
     float *pstudioverts_out = (float *)pstudioverts;
     float *pstudionorms_out = (float *)pstudionorms;
 #ifdef XASH_SIMD
+#if 1
+	auto f = [](float* out, const float* in, int num) {
+
+		for (;num >= 4; num -= 4, out += 16, in += 12)
+		{
+			union {
+				float32x4x4_t out;
+				struct {
+					float32x4x3_t in;
+					float32x4_t padding;
+				};
+			} temp;
+			temp.in = vld3q_f32(in);
+			temp.padding = {};
+			vst4q_f32(out, temp.out);
+		}
+
+		switch (num)
+		{
+		case 3:
+			out[8] = in[6];
+			out[9] = in[7];
+			out[10] = in[8];
+			out[11] = 0;
+			[[fallthrough]];
+		case 2:
+			out[4] = in[3];
+			out[5] = in[4];
+			out[6] = in[5];
+			out[7] = 0;
+			[[fallthrough]];
+		case 1:
+			out[0] = in[0];
+			out[1] = in[1];
+			out[2] = in[2];
+			out[3] = 0;
+			[[fallthrough]];
+		default:
+			break;
+		}
+	};
+	f(pstudioverts_out, pstudioverts_unaligned, m_pSubModel->numverts);
+	f(pstudionorms_out, pstudionorms_unaligned, m_pSubModel->numnorms);
+#else
     for(int i = 0; i < m_pSubModel->numverts; ++i)
     {
         pstudioverts_out[i * 4 + 0] = pstudioverts_unaligned[i * 3 + 0];
@@ -228,6 +272,7 @@ static void R_GenAlignedVertAndNormCache()
         pstudionorms_out[i * 4 + 2] = pstudionorms_unaligned[i * 3 + 2];
         pstudionorms_out[i * 4 + 3] = 0;
     }
+#endif
 #else
 	pstudioverts = (const vec3_t*)((const byte*)m_pStudioHeader + m_pSubModel->vertindex);
 	pstudionorms = (const vec3_t*)((const byte*)m_pStudioHeader + m_pSubModel->normindex);
@@ -2474,17 +2519,10 @@ void R_DrawStudioModelInternal( cl_entity_t *e, qboolean follow_entity )
 
 	prevFrame = e->latched.prevframe;
 
-#ifdef XASH_RAGDOLL
-		// select the properly method
-		if (e->player)
-			result = GameStudioRenderer_StudioDrawPlayer(flags, &e->curstate);
-		else result = GameStudioRenderer_StudioDrawModel(flags);
-#else
-		// select the properly method
-		if (e->player)
-			result = pStudioDraw->StudioDrawPlayer(flags, &e->curstate);
-		else result = pStudioDraw->StudioDrawModel(flags);
-#endif
+	// select the properly method
+	if (e->player)
+		result = GameStudioRenderer_StudioDrawPlayer(flags, &e->curstate);
+	else result = GameStudioRenderer_StudioDrawModel(flags);
 	
 	// old frame must be restored
 	if( !RP_NORMALPASS( )) e->latched.prevframe = prevFrame;
@@ -2544,7 +2582,7 @@ void R_RunViewmodelEvents( void )
 		cl.weaponstarttime = cl.time;
 	RI.currententity->curstate.animtime = cl.weaponstarttime;
 	RI.currententity->curstate.sequence = cl.weaponseq;
-	pStudioDraw->StudioDrawModel( STUDIO_EVENTS );
+	GameStudioRenderer_StudioDrawModel( STUDIO_EVENTS );
 
 	RI.currententity = NULL;
 	RI.currentmodel = NULL;
@@ -2597,7 +2635,7 @@ void R_DrawViewModel( void )
 		cl.weaponstarttime = cl.time;
 	RI.currententity->curstate.animtime = cl.weaponstarttime;
 	RI.currententity->curstate.sequence = cl.weaponseq;
-	pStudioDraw->StudioDrawModel( STUDIO_RENDER );
+	GameStudioRenderer_StudioDrawModel( STUDIO_RENDER );
 
 	// restore depth range
 	pglDepthRange( gldepthmin, gldepthmax );

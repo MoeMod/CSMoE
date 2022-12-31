@@ -1606,9 +1606,8 @@ void EXPORT Host_Shutdown( void )
 	SV_Shutdown( false );
 	SV_ShutdownFilter();
 	SV_UnloadProgs();
-	CL_Shutdown();
-
 	Mod_Shutdown();
+	CL_Shutdown();
 	NET_Shutdown();
 	HTTP_Shutdown();
 	Con_ClearAutoComplete();
