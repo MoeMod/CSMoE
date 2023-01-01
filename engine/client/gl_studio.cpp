@@ -1204,7 +1204,7 @@ R_StudioRenderShadow
 just a prefab for render shadow
 ===============
 */
-void GAME_EXPORT R_StudioRenderShadow( int iSprite, float *p1, float *p2, float *p3, float *p4 )
+void GAME_EXPORT R_StudioRenderShadow( int iSprite, const vec3_t p1, const vec3_t p2, const vec3_t p3, const vec3_t p4 )
 {
 	if( !p1 || !p2 || !p3 || !p4 )
 		return;
@@ -1219,13 +1219,13 @@ void GAME_EXPORT R_StudioRenderShadow( int iSprite, float *p1, float *p2, float 
 
 		pglBegin( GL_QUADS );
 			pglTexCoord2f( 0.0f, 0.0f );
-			pglVertex3fv( p1 );
+			pglVertex3fv( p1.data() );
 			pglTexCoord2f( 0.0f, 1.0f );
-			pglVertex3fv( p2 );
+			pglVertex3fv( p2.data() );
 			pglTexCoord2f( 1.0f, 1.0f );
-			pglVertex3fv( p3 );
+			pglVertex3fv( p3.data() );
 			pglTexCoord2f( 1.0f, 0.0f );
-			pglVertex3fv( p4 );
+			pglVertex3fv( p4.data() );
 		pglEnd();
 
 		pglDisable( GL_BLEND );
