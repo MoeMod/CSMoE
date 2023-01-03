@@ -214,7 +214,7 @@ static void R_GenAlignedVertAndNormCache()
     float *pstudioverts_out = (float *)pstudioverts;
     float *pstudionorms_out = (float *)pstudionorms;
 #ifdef XASH_SIMD
-#if 1
+#if U_VECTOR_NEON
 	auto f = [](float* out, const float* in, int num) {
 
 		for (;num >= 4; num -= 4, out += 16, in += 12)
