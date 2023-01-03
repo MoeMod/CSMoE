@@ -138,7 +138,7 @@ static qboolean R_OpaqueEntity( cl_entity_t *ent )
 		return false;
 
 	if( ent->curstate.rendermode == kRenderTransAlpha )
-		return true;
+		return false; // alpha-test breaks early z test， ignore
 
 	return false;
 }
@@ -150,9 +150,26 @@ R_SolidEntityCompare
 Sorting opaque entities by model type
 ===============
 */
+static float R_CalcDistance(cl_entity_t *ent1)
+{
+    vec3_t		vecLen, org;
+    if( ent1->model->type == mod_brush )
+    {
+        VectorAverage( ent1->model->mins, ent1->model->maxs, org );
+        VectorAdd( ent1->origin, org, org );
+        VectorSubtract( RI.vieworg, org, vecLen );
+    }
+    else VectorSubtract( RI.vieworg, ent1->origin, vecLen );
+    return VectorLength( vecLen );
+}
+
 static bool R_SolidEntityCompare( cl_entity_t *ent1, cl_entity_t *ent2 )
 {
-	return ent1->model->type < ent2->model->type;
+    // first sort by model type, first brush then studio
+    if(ent1->model->type != ent2->model->type)
+        return ent1->model->type < ent2->model->type;
+    // draw from near to far to avoid overdraw
+    return R_CalcDistance(ent1) < R_CalcDistance(ent2);
 }
 
 /*
@@ -168,30 +185,8 @@ static bool R_TransEntityCompare( cl_entity_t *ent1, cl_entity_t *ent2 )
 	int render1 = R_RankForRenderMode(ent1), render2 = R_RankForRenderMode(ent2);
 	if(render1 != render2)
 		return render1 < render2;
-
-	vec3_t		vecLen, org;
-	float		len1, len2;
-
 	// then by distance
-	if( ent1->model->type == mod_brush )
-	{
-		VectorAverage( ent1->model->mins, ent1->model->maxs, org );
-		VectorAdd( ent1->origin, org, org );
-		VectorSubtract( RI.vieworg, org, vecLen );
-	}
-	else VectorSubtract( RI.vieworg, ent1->origin, vecLen );
-	len1 = VectorLength( vecLen );
-
-	if( ent2->model->type == mod_brush )
-	{
-		VectorAverage( ent2->model->mins, ent2->model->maxs, org );
-		VectorAdd( ent2->origin, org, org );
-		VectorSubtract( RI.vieworg, org, vecLen );
-	}
-	else VectorSubtract( RI.vieworg, ent2->origin, vecLen );
-	len2 = VectorLength( vecLen );
-
-	return len1 > len2;
+    return R_CalcDistance(ent1) > R_CalcDistance(ent2);
 }
 
 /*

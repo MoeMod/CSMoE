@@ -120,8 +120,8 @@ static vec3_t		g_chromeup[MAXSTUDIOBONES];	// chrome vector "up" in bone referen
 static int		g_chromeage[MAXSTUDIOBONES];	// last time chrome vectors were updated
 static vec3_t		g_xformverts[MAXSTUDIOVERTS];
 static vec3_t		g_xformnorms[MAXSTUDIOVERTS];
-static vec3_t		g_xarrayverts[MAXARRAYVERTS];
-static vec2_t		g_xarraycoord[MAXARRAYVERTS];
+static GLfloat		g_xarrayverts[MAXARRAYVERTS][3];
+static GLfloat		g_xarraycoord[MAXARRAYVERTS][2];
 static GLubyte		g_xarraycolor[MAXARRAYVERTS][4];
 static unsigned short		g_xarrayelems[MAXARRAYVERTS*6];
 static uint		g_nNumArrayVerts;
@@ -1251,25 +1251,25 @@ R_StudioDrawMesh
 
 ===============
 */
-static void (*R_MeshUVFunc())(const short* ptricmds, vec2_t &uv, float s, float t)
+static void (*R_MeshUVFunc())(const short* ptricmds, GLfloat (&uv)[2], float s, float t)
 {
 	if (g_nFaceFlags & STUDIO_NF_CHROME || (g_nForceFaceFlags & STUDIO_NF_CHROME))
 	{
-		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+		return [](const short* ptricmds, GLfloat (&uv)[2], float s, float t) {
 			uv[0] = g_chrome[ptricmds[1]][0] * s;
 			uv[1] = g_chrome[ptricmds[1]][1] * t;
 		};
 	}
 	else if (g_nFaceFlags & STUDIO_NF_UV_COORDS)
 	{
-		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+		return [](const short* ptricmds, GLfloat (&uv)[2], float s, float t) {
 			uv[0] = HalfToFloat(ptricmds[2]);
 			uv[1] = HalfToFloat(ptricmds[3]);
 		};
 	}
 	else [[likely]]
 	{
-		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+		return [](const short* ptricmds, GLfloat (&uv)[2], float s, float t) {
 			uv[0] = ptricmds[2] * s;
 			uv[1] = ptricmds[3] * t;
 		};
@@ -1339,7 +1339,6 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 
 		for( ; i > 0; i--, ptricmds += 4 )
 		{
-			GLubyte cl[4];
 			// build in indices
 			if( vertexState++ < 3 )
 			{
@@ -1388,7 +1387,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 	}
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglVertexPointer( 3, GL_FLOAT, sizeof(vec3_t), g_xarrayverts );
+	pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
 
 	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );
@@ -2397,7 +2396,7 @@ void R_StudioDeformShadow( void )
 	dist2 = -1.0f / DotProduct( g_mvShadowVec, g_shadowTrace.plane.normal );
 	VectorScale( g_mvShadowVec, dist2, g_mvShadowVec );
 
-	auto vert_calc_fn = [dist](vec3_t& v)
+	auto vert_calc_fn = [dist](float(&v)[3])
 	{
 		float dist3 = DotProduct(v, g_shadowTrace.plane.normal) - dist;
 		if (dist3 > 0.0f) VectorMA(v, dist3, g_mvShadowVec, v);
@@ -2425,7 +2424,7 @@ static void R_StudioDrawPlanarShadow( void )
 		pglEnable( GL_STENCIL_TEST );
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglVertexPointer( 3, GL_FLOAT, sizeof(vec3_t), g_xarrayverts );
+	pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
 
 #if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
 	if( pglDrawRangeElements )

@@ -4,8 +4,7 @@
 
 #include "util/u_vector.hpp"
 
-#ifndef __ANDROID__
-// remove simd support on android
+#if U_VECTOR_SSE || U_VECTOR_NEON
 #define XASH_SIMD
 #endif
 
