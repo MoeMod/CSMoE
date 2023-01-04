@@ -1930,32 +1930,35 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 		SET_CLIENT_MAXSPEED(ENT(player->pev), 1);
 		SET_MODEL(ENT(player->pev), "models/player.mdl");
 	}
-
-	if (!g_pGameRules->IsCareer()) {
-		switch (team) {
+	if (player->m_iMenu != Menu_ChooseAppearance)
+	{
+		if (!g_pGameRules->IsCareer()) {
+			switch (team) {
 			case CT:
 				if (g_bIsCzeroGame)
 					ShowVGUIMenu(player, VGUI_Menu_Class_CT,
-					             (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6),
-					             "#CT_Select");
+						(MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6),
+						"#CT_Select");
 				else
 					ShowVGUIMenu(player, VGUI_Menu_Class_CT,
-					             (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5), "#CT_Select");
+						(MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5), "#CT_Select");
 				break;
 
 			case TERRORIST:
 				if (g_bIsCzeroGame)
 					ShowVGUIMenu(player, VGUI_Menu_Class_T,
-					             (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6),
-					             "#Terrorist_Select");
+						(MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6),
+						"#Terrorist_Select");
 				else
 					ShowVGUIMenu(player, VGUI_Menu_Class_T,
-					             (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5), "#Terrorist_Select");
+						(MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5), "#Terrorist_Select");
 				break;
 
 			default:
 				break;
+			}
 		}
+		player->m_iMenu = Menu_ChooseAppearance;
 	}
 
 	player->m_iMenu = Menu_ChooseAppearance;
@@ -3298,13 +3301,46 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 		{
 			UTIL_SetDprintfFlags(CMD_ARGV_(1));
 		}
+		else if (FStrEq(pcmd, "chooseteamn"))
+		{
+			int slot = Q_atoi(CMD_ARGV_(1));
+			if (!g_pGameRules->IsCareer()) {
+				switch (slot) {
+				case CT:
+					if (g_bIsCzeroGame)
+						ShowVGUIMenu(player, VGUI_Menu_Class_CT,
+							(MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6),
+							"#CT_Select");
+					else
+						ShowVGUIMenu(player, VGUI_Menu_Class_CT,
+							(MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5), "#CT_Select");
+					break;
+
+				case TERRORIST:
+					if (g_bIsCzeroGame)
+						ShowVGUIMenu(player, VGUI_Menu_Class_T,
+							(MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6),
+							"#Terrorist_Select");
+					else
+						ShowVGUIMenu(player, VGUI_Menu_Class_T,
+							(MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5), "#Terrorist_Select");
+					break;
+
+				default:
+					break;
+				}
+			}
+
+			player->m_iMenu = Menu_ChooseAppearance;
+		}
 		else if (FStrEq(pcmd, "jointeam"))
 		{
-			if (player->m_iMenu == Menu_ChooseAppearance)
+			/*if (player->m_iMenu == Menu_ChooseAppearance)
 			{
 				ClientPrint(player->pev, HUD_PRINTCENTER, "#Command_Not_Available");
 				return;
-			}
+			}*/
+
 
 			int slot = Q_atoi(CMD_ARGV_(1));
 			if (HandleMenu_ChooseTeam(player, slot))

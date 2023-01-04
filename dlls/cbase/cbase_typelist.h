@@ -393,6 +393,7 @@ TL_ADD(CKnifeIronFan)
 TL_ADD(CThanatos3)
 TL_ADD(CDFPISTOL)
 TL_ADD(CTurbulent1)
+TL_ADD(CVulcanus1)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)

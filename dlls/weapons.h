@@ -623,6 +623,7 @@ public:
 			|| m_iId == WEAPON_Z4B_MALORIAN3516
 			|| m_iId == WEAPON_DFPISTOL
 			|| m_iId == WEAPON_TURBULENT1
+			|| m_iId == WEAPON_VULCANUS1
 			);
 	}
 	void SetPlayerShieldAnim();

@@ -138,6 +138,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "malorian3516" , WEAPON_Z4B_MALORIAN3516},
 	{ "dfpistol" , WEAPON_DFPISTOL},
 	{ "turbulent1" , WEAPON_TURBULENT1},
+	{ "vulcanus1" , WEAPON_VULCANUS1},
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -594,6 +595,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "malorian3516" , WEAPONCLASS_PISTOL},
 	{ "dfpistol" , WEAPONCLASS_PISTOL},
 	{ "turbulent1" , WEAPONCLASS_PISTOL},
+	{ "vulcanus1" , WEAPONCLASS_PISTOL},
 
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
@@ -1227,6 +1229,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_Z4B_MALORIAN3516:
 	case WEAPON_DFPISTOL:
 	case WEAPON_TURBULENT1:
+	case WEAPON_VULCANUS1:
 		return true;
 	default:
 		break;

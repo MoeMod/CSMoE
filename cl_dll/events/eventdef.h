@@ -284,3 +284,6 @@ HOOK_EVENT(spknife, FireSPKnife);
 HOOK_EVENT(thanatos3, FireThanatos3);
 HOOK_EVENT(dfpistol, FireDFPISTOL);
 HOOK_EVENT(turbulent1, FireTurbulent1);
+HOOK_EVENT(vulcanus1_left, FireVulcanus1Left);
+HOOK_EVENT(vulcanus1_right, FireVulcanus1Right);
+HOOK_EVENT(vulcanus1, FireVulcanus1);

@@ -627,6 +627,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_thanatos3.cpp
 	../dlls/wpn_shared/wpn_dfpistol.cpp
 	../dlls/wpn_shared/wpn_turbulent1.cpp
+	../dlls/wpn_shared/wpn_vulcanus1.cpp
 	)
 
 set(PM_SRCS

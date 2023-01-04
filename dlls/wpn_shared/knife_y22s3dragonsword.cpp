@@ -293,6 +293,9 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
+			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+				continue;
+
 			if (!AngleCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 197.0, c, &tr))
 				continue;
 
@@ -379,6 +382,9 @@ namespace sv {
 				continue;
 
 			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
+
+			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
 				continue;
 
 			if (!AngleCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))

@@ -165,13 +165,34 @@ bool CHudViewport::ShowVGUIMenu(int iMenu)
         case MENU_CLASS_T:
         {
             panel = m_pClassMenu;
-            m_pClassMenu->SetTeam(TERRORIST);
+
+            if (m_pClassMenu->CheckShowType())
+            {
+                panel = m_pClassMenu;
+                m_pClassMenu->m_iCurrentPage = 0;
+                m_pClassMenu->SetupPage(0);
+            }
+            else
+            {
+                m_pClassMenu->m_iCurrentTeamPage = TERRORIST;
+                m_pClassMenu->SetTeam(TERRORIST);
+            }
             break;
         }
         case MENU_CLASS_CT:
         {
             panel = m_pClassMenu;
-            m_pClassMenu->SetTeam(CT);
+            if (m_pClassMenu->CheckShowType())
+            {
+                panel = m_pClassMenu;
+                m_pClassMenu->m_iCurrentPage = 0;
+                m_pClassMenu->SetupPage(0);
+            }
+            else
+            {
+                m_pClassMenu->m_iCurrentTeamPage = CT;
+                m_pClassMenu->SetTeam(CT);
+            }
             break;
         }
         case MENU_BUY:
@@ -209,11 +230,19 @@ bool CHudViewport::HideVGUIMenu(int iMenu)
 
     switch (iMenu)
     {
-        case MENU_TEAM:
+    case MENU_TEAM:
+    {
+        if (m_pClassMenu->CheckShowType())
+        {
+            panel = m_pClassMenu;
+            m_pClassMenu->SetupPage(0);
+        }
+        else
         {
             panel = m_pTeamMenu;
-            break;
         }
+        break;
+    }
         case MENU_CLASS_T:
         case MENU_CLASS_CT:
         {

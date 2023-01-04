@@ -2548,7 +2548,7 @@ void C9MMBoxAmmo::Precache()
 
 BOOL C9MMBoxAmmo::AddAmmo(CBaseEntity* pOther)
 {
-	if (pOther->GiveAmmo(50, "9MMBox", 150) == -1) {
+	if (pOther->GiveAmmo(30, "9MMBox", 120) == -1) {
 		return FALSE;
 	}
 
