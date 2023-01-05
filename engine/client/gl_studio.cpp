@@ -122,8 +122,6 @@ static matrix3x4		g_rgCachedLightTransform[MAXSTUDIOBONES];
 static vec3_t		g_chromeright[MAXSTUDIOBONES];// chrome vector "right" in bone reference frames
 static vec3_t		g_chromeup[MAXSTUDIOBONES];	// chrome vector "up" in bone reference frames
 static int		g_chromeage[MAXSTUDIOBONES];	// last time chrome vectors were updated
-static vec3_t		g_xformverts[MAXSTUDIOVERTS];
-static vec3_t		g_xformnorms[MAXSTUDIOVERTS];
 #ifdef MOE_STUDIO_ENABLE_VBO
 typedef struct studiovbo_item_s {
     GLfloat pos[3];
@@ -1295,11 +1293,11 @@ static void (*R_MeshUVFunc())(const short* ptricmds, GLfloat (&uv)[2], float s, 
 	}
 }
 
-static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], GLubyte alpha)
+static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], GLubyte alpha, const vec3_t &norm)
 {
 	if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha) {
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha, const vec3_t &norm) {
 			cl[0] = alpha;
 			cl[1] = 0;
 			cl[2] = 0;
@@ -1308,7 +1306,7 @@ static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], GLubyt
 	}
 	else if (g_iRenderMode == kRenderTransColor || (g_nForceFaceFlags & STUDIO_NF_CHROME))
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha) {
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha, const vec3_t &norm) {
 			color24* clr;
 			clr = &RI.currententity->curstate.rendercolor;
 			cl[0] = clr->r;
@@ -1319,15 +1317,15 @@ static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], GLubyt
 	}
 	else if (g_iRenderMode == kRenderTransAdd || (g_nForceFaceFlags & STUDIO_NF_FULLBRIGHT))
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha) {
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha, const vec3_t &norm) {
 			cl[0] = cl[1] = cl[2] = 255;
 			cl[3] = alpha;
 		};
 	}
 	else [[likely]]
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha) {
-			R_LightLambert(g_studiolight.lightpos[ptricmds[0]], g_xformnorms[ptricmds[1]], g_lightvalues[ptricmds[1]], cl);
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha, const vec3_t &norm) {
+			R_LightLambert(g_studiolight.lightpos[ptricmds[0]], norm, g_lightvalues[ptricmds[1]], cl);
 			cl[3] = alpha;
 		};
 	}
@@ -1339,6 +1337,8 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 	int i;
 	uint startArrayVerts = g_nNumArrayVerts;
 	uint startArrayElems = g_nNumArrayElems;
+
+    const byte *pvertbone = ((const byte *)m_pStudioHeader + m_pSubModel->vertinfoindex);
 
 	const auto R_MeshColor = R_MeshColorFunc();
 	const auto R_MeshUV = R_MeshUVFunc();
@@ -1398,10 +1398,13 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
                 arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
 			}
 
-			vec3_t av = g_xformverts[ptricmds[0]];
+			vec3_t av, nv;
+            Matrix3x4_VectorTransform(g_bonestransform[pvertbone[ptricmds[0]]], pstudioverts[ptricmds[0]], av);
+
 			if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 			{
-				vec3_t nv = g_xformnorms[ptricmds[1]];
+                const byte *pnormbone = ((const byte *)m_pStudioHeader + m_pSubModel->norminfoindex);
+                Matrix3x4_VectorRotate( g_bonestransform[pnormbone[ptricmds[1]]], pstudionorms[ptricmds[1]], nv );
 				VectorMA( av, scale, nv, av );
 			}
 
@@ -1410,14 +1413,14 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
             if(g_vbo_current)
             {
                 R_MeshUV(ptricmds, vboverts[g_nNumArrayVerts].coord, s, t);
-                R_MeshColor(ptricmds, vboverts[g_nNumArrayVerts].color, alpha);
+                R_MeshColor(ptricmds, vboverts[g_nNumArrayVerts].color, alpha, nv);
                 VectorCopy(av, vboverts[g_nNumArrayVerts].pos); // store off vertex
             }
             else
 #endif
             {
                 R_MeshUV(ptricmds, g_xarraycoord[g_nNumArrayVerts], s, t);
-                R_MeshColor(ptricmds, g_xarraycolor[g_nNumArrayVerts], alpha);
+                R_MeshColor(ptricmds, g_xarraycolor[g_nNumArrayVerts], alpha, nv);
                 VectorCopy( av, g_xarrayverts[g_nNumArrayVerts] ); // store off vertex
             }
 			g_nNumArrayVerts++;
@@ -1676,32 +1679,9 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	if( m_pSubModel->numverts > MAXSTUDIOVERTS )
 		m_pSubModel->numverts = MAXSTUDIOVERTS;
 
-#ifdef STUDIO_SKINNING_OMP_MIN
-#pragma omp parallel for private(i) if(m_pSubModel->numverts > STUDIO_SKINNING_OMP_MIN)
-#endif
-	for (int i = 0; i < m_pSubModel->numverts; ++i)
-	{
-		Matrix3x4_VectorTransform(g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i]);
-	}
-
-	if (RI.currententity->curstate.scale != 1.0f)
-	{
-		//scale multi by Rentro
-		float scale_offset = -RI.currententity->curstate.mins[2];
-		for (int i = 0; i < m_pSubModel->numverts; ++i)
-		{
-			float temp = RI.currententity->curstate.scale - 1.0f;
-			g_xformverts[i] = (g_xformverts[i] - RI.currententity->origin) * (temp * 2);
-			g_xformverts[i][2] += scale_offset * temp;
-		}
-	};
-
 	if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 	{
 		scale = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
-
-		for(int i = 0; i < m_pSubModel->numnorms; i++ )
-			Matrix3x4_VectorRotate( g_bonestransform[pnormbone[i]], pstudionorms[i], g_xformnorms[i] );
 	}
 
 	for( int j = 0; j < m_pSubModel->nummesh; j++ )
