@@ -31,9 +31,13 @@ GNU General Public License for more details.
 #endif
 
 #define EVENT_CLIENT	5000	// less than this value it's a server-side studio events
-#define MAXARRAYVERTS	20000	// used for draw shadows
+#define MAXARRAYVERTS	16384	// used for draw shadows
 #define LEGS_BONES_COUNT	8
 #define MAX_LOCALLIGHTS	4
+
+// diable now
+//#define MOE_STUDIO_ENABLE_VBO
+//#define MOE_STUDIO_VBO_POOL_COUNT MAX_CLIENTS
 
 static vec3_t hullcolor[8] = 
 {
@@ -120,6 +124,16 @@ static vec3_t		g_chromeup[MAXSTUDIOBONES];	// chrome vector "up" in bone referen
 static int		g_chromeage[MAXSTUDIOBONES];	// last time chrome vectors were updated
 static vec3_t		g_xformverts[MAXSTUDIOVERTS];
 static vec3_t		g_xformnorms[MAXSTUDIOVERTS];
+#ifdef MOE_STUDIO_ENABLE_VBO
+typedef struct studiovbo_item_s {
+    GLfloat pos[3];
+    GLfloat coord[2];
+    GLubyte color[4];
+} studiovbo_item_t;
+static GLuint g_vbo_verts[MOE_STUDIO_VBO_POOL_COUNT + 1];
+static GLuint g_vbo_elems[MOE_STUDIO_VBO_POOL_COUNT + 1];
+static int g_vbo_current;
+#endif
 static GLfloat		g_xarrayverts[MAXARRAYVERTS][3];
 static GLfloat		g_xarraycoord[MAXARRAYVERTS][2];
 static GLubyte		g_xarraycolor[MAXARRAYVERTS][4];
@@ -128,8 +142,6 @@ static uint		g_nNumArrayVerts;
 static uint		g_nNumArrayElems;
 static vec3_t		g_lightvalues[MAXSTUDIOVERTS];
 static studiolight_t	g_studiolight;
-char			g_nCachedBoneNames[MAXSTUDIOBONES][32];
-int			g_nCachedBones;		// number of bones in cache
 int			g_nStudioCount;		// for chrome update
 int			g_iRenderMode;		// currentmodel rendermode
 int			g_iBackFaceCull;
@@ -198,6 +210,13 @@ void R_StudioInit( void )
 
 	g_nStudioCount = 0;
 	m_fDoRemap = false;
+
+#ifdef MOE_STUDIO_ENABLE_VBO
+    // Setup VBO
+    pglGenBuffersARB( MOE_STUDIO_VBO_POOL_COUNT, &g_vbo_verts[1] );
+    pglGenBuffersARB( MOE_STUDIO_VBO_POOL_COUNT, &g_vbo_elems[1] );
+    g_vbo_current = 0;
+#endif
 }
 
 /*
@@ -1276,11 +1295,11 @@ static void (*R_MeshUVFunc())(const short* ptricmds, GLfloat (&uv)[2], float s, 
 	}
 }
 
-static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], float alpha)
+static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], GLubyte alpha)
 {
 	if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha) {
 			cl[0] = alpha;
 			cl[1] = 0;
 			cl[2] = 0;
@@ -1289,7 +1308,7 @@ static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], float 
 	}
 	else if (g_iRenderMode == kRenderTransColor || (g_nForceFaceFlags & STUDIO_NF_CHROME))
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha) {
 			color24* clr;
 			clr = &RI.currententity->curstate.rendercolor;
 			cl[0] = clr->r;
@@ -1300,16 +1319,15 @@ static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], float 
 	}
 	else if (g_iRenderMode == kRenderTransAdd || (g_nForceFaceFlags & STUDIO_NF_FULLBRIGHT))
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha) {
 			cl[0] = cl[1] = cl[2] = 255;
 			cl[3] = alpha;
 		};
 	}
 	else [[likely]]
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
-			vec3_t lv = g_lightvalues[ptricmds[1]];
-			R_LightLambert(g_studiolight.lightpos[ptricmds[0]], g_xformnorms[ptricmds[1]], lv, cl);
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha) {
+			R_LightLambert(g_studiolight.lightpos[ptricmds[0]], g_xformnorms[ptricmds[1]], g_lightvalues[ptricmds[1]], cl);
 			cl[3] = alpha;
 		};
 	}
@@ -1324,6 +1342,16 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 
 	const auto R_MeshColor = R_MeshColorFunc();
 	const auto R_MeshUV = R_MeshUVFunc();
+
+    auto arrayelems = g_xarrayelems;
+#ifdef MOE_STUDIO_ENABLE_VBO
+    studiovbo_item_t *vboverts = nullptr;
+    if(g_vbo_current)
+    {
+        vboverts = (studiovbo_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
+        arrayelems = (unsigned short *)pglMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
+    }
+#endif
 
 	while( ( i = *( ptricmds++ ) ) )
 	{
@@ -1342,7 +1370,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 			// build in indices
 			if( vertexState++ < 3 )
 			{
-				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
 			}
 			else if( tri_strip )
 			{
@@ -1350,28 +1378,25 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				if( vertexState & 1 )
 				{
 					// draw triangle [n-2 n-1 n]
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
+                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
+                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
 				}
 				else
 				{
 					// draw triangle [n-1 n-2 n]
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
+                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
+                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
 				}
 			}
 			else
 			{
 				// draw triangle fan [0 n-1 n]
-				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - ( vertexState - 1 );
-				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - ( vertexState - 1 );
+                arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
+                arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
 			}
-
-			R_MeshUV(ptricmds, g_xarraycoord[g_nNumArrayVerts], s, t);
-			R_MeshColor(ptricmds, g_xarraycolor[g_nNumArrayVerts], alpha);
 
 			vec3_t av = g_xformverts[ptricmds[0]];
 			if( g_nForceFaceFlags & STUDIO_NF_CHROME )
@@ -1381,34 +1406,74 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 			}
 
 			ASSERT( g_nNumArrayVerts < MAXARRAYVERTS );
-			VectorCopy( av, g_xarrayverts[g_nNumArrayVerts] ); // store off vertex
+#ifdef MOE_STUDIO_ENABLE_VBO
+            if(g_vbo_current)
+            {
+                R_MeshUV(ptricmds, vboverts[g_nNumArrayVerts].coord, s, t);
+                R_MeshColor(ptricmds, vboverts[g_nNumArrayVerts].color, alpha);
+                VectorCopy(av, vboverts[g_nNumArrayVerts].pos); // store off vertex
+            }
+            else
+#endif
+            {
+                R_MeshUV(ptricmds, g_xarraycoord[g_nNumArrayVerts], s, t);
+                R_MeshColor(ptricmds, g_xarraycolor[g_nNumArrayVerts], alpha);
+                VectorCopy( av, g_xarrayverts[g_nNumArrayVerts] ); // store off vertex
+            }
 			g_nNumArrayVerts++;
 		}
 	}
 
-	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
+#ifdef MOE_STUDIO_ENABLE_VBO
+    if(g_vbo_current)
+    {
+        pglUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
+        pglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
 
-	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );
+        pglEnableClientState( GL_VERTEX_ARRAY );
+        pglVertexPointer( 3, GL_FLOAT, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, pos) );
 
-	if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
-	{
-		pglEnableClientState( GL_COLOR_ARRAY );
-		pglColorPointer( 4, GL_UNSIGNED_BYTE, 0, g_xarraycolor );
-	}
+        pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+        pglTexCoordPointer( 2, GL_FLOAT, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, coord) );
 
-#if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
-	if( pglDrawRangeElements )
-		pglDrawRangeElements( GL_TRIANGLES, startArrayVerts, g_nNumArrayVerts,
-			g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
-	else
+        if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
+        {
+            pglEnableClientState( GL_COLOR_ARRAY );
+            pglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, color) );
+        }
+        pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const GLvoid *)startArrayElems );
+        pglDisableClientState( GL_VERTEX_ARRAY );
+        pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+        if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
+            pglDisableClientState( GL_COLOR_ARRAY );
+    }
+    else
 #endif
-		pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
-	pglDisableClientState( GL_VERTEX_ARRAY );
-	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
-		pglDisableClientState( GL_COLOR_ARRAY );
+    {
+        pglEnableClientState( GL_VERTEX_ARRAY );
+        pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
+
+        pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+        pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );
+
+        if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
+        {
+            pglEnableClientState( GL_COLOR_ARRAY );
+            pglColorPointer( 4, GL_UNSIGNED_BYTE, 0, g_xarraycolor );
+        }
+
+    #if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
+        if( pglDrawRangeElements )
+            pglDrawRangeElements( GL_TRIANGLES, startArrayVerts, g_nNumArrayVerts,
+                g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
+        else
+    #endif
+            pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
+        pglDisableClientState( GL_VERTEX_ARRAY );
+        pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+        if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
+            pglDisableClientState( GL_COLOR_ARRAY );
+    }
 }
 
 /*
@@ -1623,7 +1688,7 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	{
 		//scale multi by Rentro
 		float scale_offset = -RI.currententity->curstate.mins[2];
-		for (int i = 0; i < m_pSubModel->numverts; ++i) 
+		for (int i = 0; i < m_pSubModel->numverts; ++i)
 		{
 			float temp = RI.currententity->curstate.scale - 1.0f;
 			g_xformverts[i] = (g_xformverts[i] - RI.currententity->origin) * (temp * 2);
@@ -2332,6 +2397,16 @@ static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 	// was done before, in R_DrawViewModel
 	if( g_iBackFaceCull )
 		GL_FrontFace( !glState.frontFace );
+#ifdef MOE_STUDIO_ENABLE_VBO
+    g_vbo_current = RI.currententity->player && CL_IsPlayerIndex(RI.currententity->index) ? RI.currententity->index : 0;
+    if(g_vbo_current)
+    {
+        pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_vbo_elems[g_vbo_current] );
+        pglBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, MAXARRAYVERTS * 6 * sizeof(unsigned short), nullptr, GL_STREAM_DRAW_ARB );
+        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts[g_vbo_current] );
+        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, MAXARRAYVERTS * sizeof(studiovbo_item_t), nullptr, GL_STREAM_DRAW_ARB );
+    }
+#endif
 }
 
 /*
@@ -2342,6 +2417,15 @@ R_StudioRestoreRenderer
 */
 static void GAME_EXPORT R_StudioRestoreRenderer( void )
 {
+#ifdef MOE_STUDIO_ENABLE_VBO
+    if(g_vbo_current)
+    {
+        g_vbo_current = 0;
+        pglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+        pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    }
+#endif
+
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	pglShadeModel( GL_FLAT );
 
@@ -2381,6 +2465,10 @@ static int GAME_EXPORT pfnIsHardware( void )
 	return 1;	// 0 is Software, 1 is OpenGL, 2 is Direct3D
 }
 
+#ifdef MOE_STUDIO_ENABLE_VBO
+// disable shadow on vbo for better performance
+static void GAME_EXPORT GL_StudioDrawShadow( void ) {}
+#else
 /*
 ===============
 R_StudioDeformShadow
@@ -2401,7 +2489,12 @@ void R_StudioDeformShadow( void )
 		float dist3 = DotProduct(v, g_shadowTrace.plane.normal) - dist;
 		if (dist3 > 0.0f) VectorMA(v, dist3, g_mvShadowVec, v);
 	};
-
+#ifdef MOE_STUDIO_ENABLE_VBO
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts[g_vbo_current] );
+    auto vboverts = (studiovbo_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB );
+    std::for_each(vboverts, vboverts + g_nNumArrayVerts, [vert_calc_fn](studiovbo_item_t &item){ vert_calc_fn(item.pos); });
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+#else
 #ifdef XASH_RENDER_PAR
 #ifdef XASH_TBBMALLOC
 	tbb::parallel_for_each(g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
@@ -2410,6 +2503,7 @@ void R_StudioDeformShadow( void )
 #endif
 #else
 	std::for_each(g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
+#endif
 #endif
 }
 
@@ -2424,6 +2518,14 @@ static void R_StudioDrawPlanarShadow( void )
 		pglEnable( GL_STENCIL_TEST );
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
+#ifdef MOE_STUDIO_ENABLE_VBO
+    pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_vbo_elems[g_vbo_current] );
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts[g_vbo_current] );
+    pglVertexPointer( 3, GL_FLOAT, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, pos) );
+    pglDrawElements( GL_TRIANGLES, g_nNumArrayElems, GL_UNSIGNED_SHORT, 0 );
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+    pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, 0 );
+#else
 	pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
 
 #if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
@@ -2432,7 +2534,7 @@ static void R_StudioDrawPlanarShadow( void )
 	else
 #endif
 		pglDrawElements( GL_TRIANGLES, g_nNumArrayElems, GL_UNSIGNED_SHORT, g_xarrayelems );
-
+#endif
 	if( glState.stencilEnabled )
 		pglDisable( GL_STENCIL_TEST );
 
@@ -2487,7 +2589,7 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 		}
 	}
 }
-
+#endif
 /*
 =================
 R_DrawStudioModel

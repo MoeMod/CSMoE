@@ -44,7 +44,7 @@ void XASH_VECTORCALL Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, v
 #if defined(XASH_SIMD) && U_VECTOR_NEON
 	float32x4x4_t in_t;
 	memcpy(&in_t, &in, sizeof(in));
-	memset(&in_t.val[3], sizeof(in_t.val[3]), 0);
+	//memset(&in_t.val[3], 0, sizeof(in_t.val[3]));
 	in_t = vld4q_f32((const float *)&in_t);
 
 	out = in_t.val[3];
@@ -88,7 +88,7 @@ void XASH_VECTORCALL Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3
 #if defined(XASH_SIMD) && U_VECTOR_NEON
 	float32x4x4_t in_t;
 	memcpy(&in_t, &in, sizeof(in));
-	memset(&in_t.val[3], sizeof(in_t.val[3]), 0);
+	//memset(&in_t.val[3], 0, sizeof(in_t.val[3]));
 	in_t = vld4q_f32((const float *)&in_t);
 
 	out = vmulq_laneq_f32(in_t.val[0], v, 0);

@@ -442,8 +442,6 @@ GLvoid* GL_MANGLE(glMapBufferARB)(GLenum target, GLenum access);
 GLboolean GL_MANGLE(glUnmapBufferARB)(GLenum target);
 void GL_MANGLE(glBufferDataARB)(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage);
 void GL_MANGLE(glBufferSubDataARB)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data);
-void GL_MANGLE(glBufferData)(GLenum target, GLsizeiptrARB size, const GLvoid* data, GLenum usage);
-void GL_MANGLE(glBufferSubData)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid* data);
 void GL_MANGLE(glGenQueriesARB)(GLsizei n, GLuint *ids);
 void GL_MANGLE(glDeleteQueriesARB)(GLsizei n, const GLuint *ids);
 GLboolean GL_MANGLE(glIsQueryARB)(GLuint id);
@@ -455,6 +453,13 @@ void GL_MANGLE(glGetQueryObjectuivARB)(GLuint id, GLenum pname, GLuint *params);
 void GL_MANGLE(glSelectTextureSGIS)( GLenum );
 void GL_MANGLE(glMTexCoord2fSGIS)( GLenum, GLfloat, GLfloat );
 void GL_MANGLE(glSwapInterval)( int interval );
+#ifdef XASH_GL4ES
+GLboolean GL_MANGLE(glIsBuffer)(GLuint buffer);
+GLvoid* GL_MANGLE(glMapBuffer)(GLenum target, GLenum access);
+GLboolean GL_MANGLE(glUnmapBuffer)(GLenum target);
+void GL_MANGLE(glBufferData)(GLenum target, GLsizeiptrARB size, const GLvoid* data, GLenum usage);
+void GL_MANGLE(glBufferSubData)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid* data);
+#endif
 };
 // mangle to xash3d style
 #ifndef WES_MANGLE_PREPEND
@@ -886,8 +891,6 @@ void GL_MANGLE(glSwapInterval)( int interval );
 #define pglUnmapBufferARB GL_MANGLE(glUnmapBufferARB)
 #define pglBufferDataARB GL_MANGLE(glBufferDataARB)
 #define pglBufferSubDataARB GL_MANGLE(glBufferSubDataARB)
-#define pglBufferData GL_MANGLE(glBufferData)
-#define pglBufferSubData GL_MANGLE(glBufferSubData)
 #define pglGenQueriesARB GL_MANGLE(glGenQueriesARB)
 #define pglDeleteQueriesARB GL_MANGLE(glDeleteQueriesARB)
 #define pglIsQueryARB GL_MANGLE(glIsQueryARB)
@@ -899,6 +902,13 @@ void GL_MANGLE(glSwapInterval)( int interval );
 #define pglSelectTextureSGIS GL_MANGLE(glSelectTextureSGIS)
 #define pglMTexCoord2fSGIS GL_MANGLE(glMTexCoord2fSGIS)
 #define pglSwapInterval GL_MANGLE(glSwapInterval)
+#ifdef XASH_GL4ES
+#define pglIsBuffer GL_MANGLE(glIsBuffer)
+#define pglMapBuffer GL_MANGLE(glMapBuffer)
+#define pglUnmapBuffer GL_MANGLE(glUnmapBuffer)
+#define pglBufferData GL_MANGLE(glBufferData)
+#define pglBufferSubData GL_MANGLE(glBufferSubData)
+#endif
 #endif
 
 #ifdef XASH_GL4ES
@@ -927,6 +937,9 @@ void GL_MANGLE(glSwapInterval)( int interval );
 #undef pglCompressedTexImage3DARB
 #define pglCompressedTexImage3DARB pglCompressedTexImage3D
 
+#undef pglIsBufferARB
+#define pglIsBufferARB pglIsBuffer
+
 #undef pglBindBufferARB
 #define pglBindBufferARB pglBindBuffer
 
@@ -941,6 +954,12 @@ void GL_MANGLE(glSwapInterval)( int interval );
 
 #undef pglBufferSubDataARB
 #define pglBufferSubDataARB pglBufferSubData
+
+#undef pglUnmapBufferARB
+#define pglUnmapBufferARB pglUnmapBuffer
+
+#undef pglMapBufferARB
+#define pglMapBufferARB pglMapBuffer
 
 #endif
 
