@@ -2359,6 +2359,31 @@ void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entva
 
 	KickRate(pev, pevAttacker, pev->fuser1, pev->fuser2, pev->health, DMGFLAG_DECAY, 0.0);
 
+	CBaseEntity* pEntity = NULL;
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, pev->fuser2)) != NULL)
+	{
+		if (!pEntity->IsPlayer())
+			continue;
+		if (!pEntity->IsAlive())
+			continue;
+
+		Vector vecSub = pEntity->pev->origin - vecSrc;
+		if (vecSub.Length() > pev->fuser2)
+			continue;
+
+
+		CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+		if (pPlayer && !pPlayer->m_bIsZombie)
+		{
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, pevAttacker);
+			WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+			WRITE_BYTE(7);
+			WRITE_COORD(float(pPlayer->entindex()));
+			WRITE_BYTE(ENTINDEX(ENT(pevAttacker)));
+			MESSAGE_END();
+		}
+	}
+
 #if 0
 	CBaseEntity* pEntity = NULL;
 	TraceResult tr;

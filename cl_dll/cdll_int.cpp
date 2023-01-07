@@ -60,6 +60,7 @@ vec3_t g_velocity;
 vec3_t g_vecOrigin, g_vecEyePos, g_vecEye, g_vecVAngles;
 long g_iDamage[MAX_CLIENTS + 1];
 long g_iDamageTotal[MAX_CLIENTS + 1];
+double g_flDamageInAll;
 int g_iMobileAPIVersion = 0;
 void InitInput (void);
 void IN_Commands( void );

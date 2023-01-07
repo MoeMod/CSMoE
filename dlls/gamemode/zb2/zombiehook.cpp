@@ -182,6 +182,13 @@ void EXPORT CZombieHook::TailTouch(CBaseEntity* pOther)
 		WRITE_SHORT(0x6400);
 		MESSAGE_END();
 
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, pev->owner);
+		WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+		WRITE_BYTE(11);
+		WRITE_COORD(float(pPlayer->entindex()));
+		WRITE_BYTE(ENTINDEX(pev->owner));
+		MESSAGE_END();
+
 		pev->movetype = MOVETYPE_NONE;
 		pev->solid = SOLID_NOT;
 		pev->sequence = 1;

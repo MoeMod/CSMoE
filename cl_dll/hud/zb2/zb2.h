@@ -39,10 +39,18 @@ public:
 	bool Selector(int i);
 	bool SelectorCanDraw();
 
+	//Alarm
+	void SendAlarmState(int iType, float flValue, int iValue2);
+
 public:
 	class CHudZB2_impl_t *pimpl = nullptr;
 	float m_flBuffHealth;
 	int m_BuffHealthCross;
+
+	//Alarm
+	float m_flAliveTime;
+	float m_flPlayerMoveDis = 0.0;
+	float m_flRecoveryAmount = 0.0;
 
 	//zombie selector
 	bool m_bCanDraw;

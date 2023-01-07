@@ -175,6 +175,14 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		SetSelectorDrawTime(gHUD.m_flTime, flHoldTime);
 		break;
 	}
+	case ZB2_MESSAGE_ALARM:
+	{
+		int iType = buf.ReadByte();
+		float flValue = buf.ReadCoord();
+		int iValue2 = buf.ReadByte();
+		SendAlarmState(iType, flValue, iValue2);
+		break;
+	}
 	}
 
 	return 1;
@@ -599,6 +607,97 @@ bool CHudZB2::SelectorCanDraw()
 {
 	return m_bCanDraw;
 
+}
+
+void CHudZB2::SendAlarmState(int iType, float flValue, int iValue2)
+{
+	if (!iType)
+	{
+		m_flAliveTime = 0.0;
+		for (int i = 0; i < MAX_CLIENTS + 1; i++)
+		{
+			g_fLastAssist[(int)flValue][i] = 0.0;
+		}
+	}
+	else
+	{
+		switch (iType)
+		{
+		case 1:
+		{
+			m_flAliveTime = gHUD.m_flTime + flValue;
+			break;
+		}
+		case 2:
+		{
+			if (flValue)
+			{
+				if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+					NewAlarm().SetAlarm(ALARM_ZOMBIETANKER);
+			}
+			break;
+		}
+		case 3:
+		{
+			g_fLastAssist[(int)flValue][gEngfuncs.GetLocalPlayer()->index] = gHUD.m_flTime + 5.0f;
+			break;
+		}
+		case 4:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_ATTACKER);
+			break;
+		}
+		case 5:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_BESTMOMENT);
+			break;
+		}
+		case 6:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_HOLDOUT);
+			break;
+		}
+		case 7:
+		{
+			g_PlayerExtraInfoEx[iValue2].assisttime[1][(int)flValue] = gHUD.m_flTime + 5.0f;
+			break;
+		}
+		case 8:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_DROPWEAPON);
+			break;
+		}
+		case 9:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_HIDE);
+			break;
+		}
+		case 10:
+		{
+			float flRecovery = flValue;
+			if (m_flRecoveryAmount < 4500.0)
+				m_flRecoveryAmount += flRecovery;
+			else
+			{
+				m_flRecoveryAmount = 0.0;
+				if (iValue2 == gEngfuncs.GetLocalPlayer()->index)
+					NewAlarm().SetAlarm(ALARM_HEALER);
+			}
+			break;
+		}
+		case 11:
+		{
+			if (iValue2 == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_BATPULL);
+			break;
+		}
+		}
+	}
 }
 
 }

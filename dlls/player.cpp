@@ -167,6 +167,17 @@ const char *CDeadHEV::m_szPoses[] =
 int gEvilImpulse101;
 char g_szMapBriefingText[512];
 
+int iDeathInfo_Fire[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8], iDeathInfo_Body[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8];
+std::string SzDeathInfo_Wpn[MAX_CLIENTS + 1][MAX_CLIENTS + 1][2];
+
+int g_iZombieTankerCount[MAX_CLIENTS + 1];
+float g_flZombieTankerDamage[MAX_CLIENTS + 1];
+
+int g_iAttackerCount[MAX_CLIENTS + 1];
+float g_flAttackerDamage[MAX_CLIENTS + 1];
+float g_flRecordBestMoment[MAX_CLIENTS + 1];
+float g_flHoldOutDamage[MAX_CLIENTS + 1];
+
 
 entvars_t *g_pevLastInflictor;
 
@@ -1349,6 +1360,118 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		WRITE_BYTE(0);
 		MESSAGE_END();
 	}
+	//For DeathInfo TakeDamage Pre? Not work
+	if (ENTINDEX(edict()) >= 1 && ENTINDEX(edict()) <= 32)
+	{
+
+		//Push Health & Body Data When taken damage.(Victim)
+		float flOldHealth; flOldHealth = this->pev->health;
+		// From CBaseMonster
+		int iOldHitGroup; iOldHitGroup = this->m_LastHitGroup;
+
+		this->m_iVecOldHealth.push_back(flOldHealth);
+		this->m_iVecHitgroup.push_back(iOldHitGroup);
+	}
+
+	//For DeathInfo TakeDamage Post
+	if (ENTINDEX(edict()) >= 1 && ENTINDEX(edict()) <= 32)
+	{
+		//TakeDamage Post
+		int iCurrentHitCount = this->m_iVecOldHealth.size() - 1;
+
+		float flOldHealth_Pre = this->m_iVecOldHealth.back();
+		int iOldHitGroup_Pre = this->m_iVecHitgroup.back();
+
+		if (!this->m_flOldHealth)
+			this->m_flOldHealth = this->pev->health;
+
+		//Delete Last Data
+		this->m_iVecOldHealth.pop_back();
+		this->m_iVecHitgroup.pop_back();
+
+		int iDamageAmount = (int)flDamage;//(int)(flOldHealth_Pre - this->m_flOldHealth);
+		this->m_flOldHealth = iCurrentHitCount ? flOldHealth_Pre : 0.0;
+
+		//Alarm Tanker Alarm Attacker
+		if (iDamageAmount && this->m_bIsZombie)
+		{
+			g_flZombieTankerDamage[ENTINDEX(edict())] += iDamageAmount;
+			if (g_flZombieTankerDamage[ENTINDEX(edict())] >= 3000.0 && g_iZombieTankerCount[ENTINDEX(edict())] <= 5)
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, this->pev);
+				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+				WRITE_BYTE(2);
+				WRITE_COORD(float(ENTINDEX(edict())));
+				MESSAGE_END();
+
+				g_flZombieTankerDamage[ENTINDEX(edict())] = 0.0;
+				g_iZombieTankerCount[ENTINDEX(edict())]++;
+			}
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, this->pev);
+			WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+			WRITE_BYTE(3);
+			WRITE_COORD(float(ENTINDEX(edict())));
+			MESSAGE_END();
+
+			g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] += iDamageAmount;
+			if (g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] >= 5000.0 && g_iAttackerCount[ENTINDEX(ENT(pevAttacker))] <= 5)
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, pevAttacker);
+				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+				WRITE_BYTE(4);
+				WRITE_COORD(float(ENTINDEX(ENT(pevAttacker))));
+				MESSAGE_END();
+
+				g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] = 0.0;
+				g_iAttackerCount[ENTINDEX(ENT(pevAttacker))]++;
+			}
+
+			if (!g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))])
+				g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))] = iDamageAmount;
+
+			if (g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))] && g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))] < iDamageAmount)
+			{
+				g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))] = iDamageAmount;
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, pevAttacker);
+				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+				WRITE_BYTE(5);
+				WRITE_COORD(float(ENTINDEX(ENT(pevAttacker))));
+				MESSAGE_END();
+
+			}
+		}
+
+		if (iDamageAmount)
+		{
+			g_flHoldOutDamage[ENTINDEX(edict())] += iDamageAmount;
+			if (g_flHoldOutDamage[ENTINDEX(edict())] >= 5000.0)
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, this->pev);
+				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+				WRITE_BYTE(6);
+				WRITE_COORD(float(ENTINDEX(edict())));
+				MESSAGE_END();
+
+				g_flHoldOutDamage[ENTINDEX(edict())] = 0.0;
+			}
+		}
+
+
+		int iAtt = ENTINDEX(ENT(pevAttacker));
+		int iVic = ENTINDEX(edict());
+
+		if (iDamageAmount)
+		{
+			if (!iOldHitGroup_Pre || iOldHitGroup_Pre < 0 || iOldHitGroup_Pre > 7)
+				iOldHitGroup_Pre = 2;//HIT_CHEST
+
+			iDeathInfo_Fire[iAtt][iVic][iOldHitGroup_Pre] += iDamageAmount;
+			iDeathInfo_Body[iAtt][iVic][iOldHitGroup_Pre] += 1;
+		}
+
+		//End OF TakeDamage Post
+	}
+
 
 
 	if (m_iBuff & BUFF_REVIVE && flDamage > pev->health)

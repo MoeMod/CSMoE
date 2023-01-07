@@ -510,6 +510,8 @@ set (HUD_SRCS
 	./hud/newhud/newhud.cpp
 	./hud/hud_centertips.cpp
 	./hud/zbz/zbz_ghosthunter.cpp
+	./hud/newhud/NewAlarm.cpp
+	./hud/newhud/NewDeathInfo.cpp
 )
 
 set (STUDIORENDER_SRCS

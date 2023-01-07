@@ -15,6 +15,7 @@ enum ZB2MessageType : byte
 	ZB2_MESSAGE_DRAW_RETINA,
 	ZB2_MESSAGE_HPBUFF,
 	ZB2_MESSAGE_ZOMBIESELECTOR,
+	ZB2_MESSAGE_ALARM,
 };
 
 enum ZombieSkillSlot : byte

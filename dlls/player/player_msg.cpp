@@ -124,6 +124,8 @@ DLL_GLOBAL int gmsgZ4Msg = 0;
 DLL_GLOBAL int gmsgMVPInfo = 0;
 DLL_GLOBAL int gmsgMPToCL = 0;
 DLL_GLOBAL int gmsgNewHudMsg = 0;
+DLL_GLOBAL int gmsgResetRound = 0;
+DLL_GLOBAL int gmsgDeathInfo = 0;
 
 // main code
 
@@ -231,6 +233,9 @@ void LinkUserMessages()
 	gmsgMVPInfo = REG_USER_MSG("MVPInfo", -1);
 	gmsgMPToCL = REG_USER_MSG("MPToCL", -1);
 	gmsgHeadIcon = REG_USER_MSG("NewHudMsg", -1);
+
+	gmsgDeathInfo = REG_USER_MSG("DeathInfo", -1);
+	gmsgResetRound = REG_USER_MSG("ResetRound", -1);
 }
 
 /*void WriteWeaponInfo(const ItemInfo &II)

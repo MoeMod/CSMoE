@@ -272,6 +272,27 @@ namespace sv {
 		{
 			OnHideEffect();
 		}
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING && m_flTimeZombieSkillEnd > gpGlobals->time && gpGlobals->time > m_flTimeZombieSkillThinkRate)
+		{
+			m_flTimeZombieSkillThinkRate = gpGlobals->time + 1.0s;
+			//Alarm Overrun
+			float flOverrunDis = 47 * 39.37f;
+			vec3_t vecZeroPos = { 0.0,0.0,0.0 };
+			vec3_t vecPlayerVel = m_pPlayer->pev->velocity; vecPlayerVel.z = 0.0;
+
+			m_flMoveDis += (vecPlayerVel - vecZeroPos).Length();
+
+			if (m_flMoveDis >= flOverrunDis)
+			{
+				m_flMoveDis = 0.0;
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+				WRITE_BYTE(9);
+				WRITE_COORD((float)m_pPlayer->entindex());
+				MESSAGE_END();
+			}
+		}
 	}
 
 	int CZombieSkill_ZombieHide::AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
@@ -586,6 +607,8 @@ namespace sv {
 		WRITE_BYTE(3);
 		MESSAGE_END();
 
+
+
 		if (flOldHealth < m_pPlayer->pev->health)
 		{
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "zombi/TD_Heal.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
@@ -662,6 +685,16 @@ namespace sv {
 				WRITE_SHORT(player->entindex());
 				WRITE_BYTE(3);
 				MESSAGE_END();
+
+				if (player == m_pPlayer)
+				{
+					MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+					WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+					WRITE_BYTE(10);
+					WRITE_COORD(player->pev->max_health * (player->m_iZombieLevel ? 0.3 : 0.1));
+					WRITE_BYTE(m_pPlayer->entindex());
+					MESSAGE_END();
+				}
 			}
 		}
 

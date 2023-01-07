@@ -56,6 +56,13 @@ enum
 extern const char *sPlayerModelFiles[];
 extern wrect_t nullrc;
 
+extern const char* sPlayerModelFiles[];
+extern wrect_t nullrc;
+extern bool g_bFirstBlood;
+extern float g_fLastAssist[MAX_CLIENTS + 1][MAX_CLIENTS + 1];
+extern int g_iDefuser, g_iPlanter, g_CWcount[MAX_CLIENTS + 1][3];
+extern int g_lastsoldier[2];
+
 class CClientSprite;
 
 inline bool BIsValidTModelIndex( int i )
@@ -124,9 +131,12 @@ struct HUDLIST {
 #include "moe/moe_touch.h"
 #include "hud_mvp.h"
 #include "newhud/NewHud.h"
+#include "newhud/NewAlarm.h"
 #include "hud_centertips.h"
 #include "weapons_const.h"
 #include "weapons_moe_buy.h"
+
+
 
 namespace cl {
 //
@@ -391,6 +401,16 @@ struct team_info_t
 	int teamnumber;
 };
 
+struct RoundPlayerInfo
+{
+	int kill[2];
+	int assist;
+	float assisttime[3][MAX_PLAYERS + 1];
+	float totaldmg[MAX_PLAYERS + 1];
+	int revenge;
+
+};
+
 struct hostage_info_t
 {
 	vec3_t origin;
@@ -403,11 +423,160 @@ struct hostage_info_t
 
 extern hud_player_info_t	g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
 extern extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];   // additional player info sent directly to the client dll
+extern RoundPlayerInfo      g_PlayerExtraInfoEx[MAX_PLAYERS + 1];
 extern team_info_t			g_TeamInfo[MAX_TEAMS+1];
 extern hostage_info_t		g_HostageInfo[MAX_HOSTAGES+1];
 extern int					g_IsSpectator[MAX_PLAYERS+1];
 
+//
+//-----------------------------------------------------
+//
 
+class AlarmBasicdata
+{
+public:
+	AlarmBasicdata() {};
+public:
+	bool bInitialized;
+
+	char szName[32];
+	char szSound[64];
+
+	bool bHasMsgBox;
+	bool bHasAlarm;
+
+	wchar_t m_wcsAlarmText[64];
+	wchar_t m_wcsAlarmDesc[256];
+	wchar_t m_wcsRibbonText[64];
+	wchar_t m_wcsRibbonDesc[512];
+
+	SharedTexture iTexture;
+	int iRibbonRequire;
+	SharedTexture iTextureRibbon;
+
+
+	int index;
+
+};
+
+typedef struct AlarmDisplay_s
+{
+	bool m_bPlaying;
+	bool m_bReset;
+	bool m_bBackGround;
+	float m_flDisplayTime;
+
+	// Alarm, bRibbon
+	std::vector<std::pair<AlarmBasicdata, bool>> m_vecAlarm;
+
+	int m_iCount_Ribbon[ALARM_LAST];
+	std::vector<int> m_vecCountRibbonC;
+}AlarmDisplay_t;
+
+class CHudNewAlarm : public CHudBase
+{
+public:
+	CHudNewAlarm();
+	~CHudNewAlarm();
+public:
+	int Init(void);
+	int VidInit(void);
+	int Draw(float flTime);
+	void InitHUDData(void);
+	void Shutdown();
+
+	CHudMsgFunc(ResetRound);
+
+public:
+
+	//NewAlarm From Sme
+	AlarmBasicdata m_AlarmDefault[ALARM_LAST];
+
+	std::vector<AlarmBasicdata> m_vecAlarmCustom;
+	AlarmDisplay_t m_AlarmDisplay;
+	bool bFirstblood;
+
+	int RedrawAlarm(float flTime);
+	AlarmBasicdata InitAlarm(char* szName, int iType, bool bCustom);
+	void SetAlarm(int iAlarm, bool bCustom = false);
+
+	int FindAlarm(char* szName, int iType);
+	bool IsPlaying(void)
+	{
+		if (m_AlarmDisplay.m_vecAlarm.size())
+			return true;
+
+		return false;
+	}
+	bool IsPlaying(int iAlarm, bool bCustom);
+
+	int GetWide(const wchar_t* str);
+	void DrawVguiTexts(int x, int y, int r, int g, int b, int a, const wchar_t* str);
+private:
+	UniqueTexture m_iTextureBG;
+	UniqueTexture m_iTextureLogoBG;
+	bool bTextureLoaded;
+	bool bAlarmRead;
+
+};
+
+CHudNewAlarm& NewAlarm(void);
+
+
+//
+//-----------------------------------------------------
+//
+typedef struct deathinfo_s
+{
+	bool bDraw = false;
+	int iPlayer = 0;
+	int iDist = 0;
+	long iDamage[6]{ 0 };
+	int iShot[5]{};
+	char szWeapon[64]{};
+	int iHealth[2]{};
+	float fDisplaytime = 0.0;
+}
+deathinfo_t;
+
+class CHudDeathInfo
+{
+public:
+	CHudDeathInfo();
+	~CHudDeathInfo();
+
+	void Init(void);
+	void VidInit(void);
+	void Set(deathinfo_t data, int type); //killer = 1, victim = 2
+	void Redraw(void);
+
+	void ReplaceTokenFirst(char* szString, const char* szToken, const char* szSwitch);
+	void ReplaceTokenAll(char* szString, const char* szToken, const char* szSwitch);
+	char* UnicodeToUTF8(const wchar_t* str);
+	wchar_t* UTF8ToUnicode(const char* str);
+
+	void InitDeathInfo(deathinfo_t* temp);
+
+	CHudMsgFunc(DeathInfo);
+
+private:
+	deathinfo_t Killer;
+	deathinfo_t Victim;
+	deathinfo_t Victim2;
+
+	char m_szMsgEnemyDeath[64];
+	char m_szBody[5][32];
+	char m_szAmmoCount[16];
+
+	char m_szMsgDamageToKiller[64];
+	char m_szMsgKillerState[64];
+	char m_szMsgDamagedNone[64];
+
+	char m_szTempKiller[512], m_szTempVictim[512];
+	wchar_t m_wszTotalKillerText[512], m_wszTotalVictimText[512];
+};
+
+CHudDeathInfo& HudDeathInfo(void);
 //
 //-----------------------------------------------------
 //
@@ -1229,6 +1398,7 @@ public:
 	cvar_t *m_pCvarDraw;
 	cvar_t *cl_shadows;
 	cvar_t *m_hudstyle;
+	cvar_t* m_alarmstyle;
 	cvar_t *fastsprites;
 	cvar_t *cl_predict;
 	cvar_t *cl_weapon_wallpuff;
@@ -1303,6 +1473,8 @@ public:
 	CHudMVP m_MVP;
 	CHudNewHud m_NewHud;
     CHudCenterTips m_CenterTips;
+	CHudDeathInfo m_DeathInfo;
+	CHudNewAlarm  m_NewAlarm;
 
 	// user messages
 	CHudMsgFunc(Damage);

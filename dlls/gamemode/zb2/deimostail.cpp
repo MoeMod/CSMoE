@@ -135,6 +135,20 @@ void EXPORT CDeimosTail::TailTouch(CBaseEntity* pOther)
 		((CBasePlayer*)pOther)->ReactToDeimosTail();
 
 	m_bHitHuman = true;
+	CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+	CBasePlayer* pAttackePlayer = nullptr;
+	if (pAttacker && pAttacker->IsPlayer())
+		pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
+
+
+	if (m_bHitHuman && pAttackePlayer)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, pAttackePlayer->pev);
+		WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+		WRITE_BYTE(8);
+		WRITE_COORD(float(pAttackePlayer->entindex()));
+		MESSAGE_END();
+	}
 
 	Kill();
 }

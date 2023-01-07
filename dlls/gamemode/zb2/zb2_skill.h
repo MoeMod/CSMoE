@@ -68,6 +68,10 @@ protected:
 	EngineClock::time_point m_flTimeZombieSkillEnd;
 	EngineClock::time_point m_flTimeZombieSkillNext;
 
+	EngineClock::time_point m_flTimeZombieSkillThinkRate;
+	float m_flMoveDis;
+
+
 };
 
 class CZombieSkill_Empty : public BasePlayerExtra, public IZombieSkill
