@@ -1420,9 +1420,15 @@ void RichText::LayoutVerticalScrollBarSlider()
 		
 		// this should make it scroll one line at a time
 		_vertScrollBar->SetButtonPressedScrollValue(1);
-		if (bCurrentlyAtEnd)
+		if (m_bShouldDrawStart)
+			_vertScrollBar->SetValue(0);
+		else
 		{
-			_vertScrollBar->SetValue(numLines - displayLines);
+
+			if (bCurrentlyAtEnd)
+			{
+				_vertScrollBar->SetValue(numLines - displayLines);
+			}
 		}
 		_vertScrollBar->InvalidateLayout();
 		_vertScrollBar->Repaint();

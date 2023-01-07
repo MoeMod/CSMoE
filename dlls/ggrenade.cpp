@@ -1087,6 +1087,19 @@ void CGrenade::ExplodeTouch3(CBaseEntity* pOther, int iRadius, E_EXPLODE_TYPE ty
 		KickRate(NULL, NULL, ((rand() % 6) / 10.0 + 1.7) * 350.0, 250.0, 0.0, DMGFLAG_TRONLY, 0.0);
 }
 
+void CGrenade::ExplodeTouchWithKickRate(CBaseEntity* pOther, float flRadius, E_EXPLODE_TYPE type, float flKickRate, bool bKickRate)
+{
+	TraceResult tr;
+
+	pev->enemy = ENT(pOther->pev);
+
+	UTIL_TraceLine(pev->origin - pev->velocity.Normalize() * 32, pev->origin + pev->velocity.Normalize() * 64, ignore_monsters, ENT(pev), &tr);
+	Explode3(&tr, DMG_EXPLOSION, type, flRadius);
+
+	if (bKickRate)
+		KickRate(NULL, NULL, ((rand() % 6) / 10.0 + 1.7) * 350.0 * flKickRate, 250.0, 0.0, DMGFLAG_TRONLY, 0.0);
+}
+
 void CGrenade::ExplodeTouch(CBaseEntity *pOther)
 {
 	TraceResult tr;

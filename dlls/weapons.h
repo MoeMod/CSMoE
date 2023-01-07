@@ -283,6 +283,7 @@ public:
 	void EXPORT BounceTouch(CBaseEntity *pOther);
 	void EXPORT SlideTouch(CBaseEntity *pOther);
 	void EXPORT C4Touch(CBaseEntity *pOther);
+	void EXPORT ExplodeTouchWithKickRate(CBaseEntity* pOther, float flRadius, E_EXPLODE_TYPE type, float flKickRate, bool bKickRate);
 	void EXPORT ExplodeTouch3(CBaseEntity* pOther, int radius, E_EXPLODE_TYPE type, bool bBoost);
 	void EXPORT ExplodeTouch(CBaseEntity *pOther);
 	void EXPORT DangerSoundThink();
@@ -624,6 +625,12 @@ public:
 			|| m_iId == WEAPON_DFPISTOL
 			|| m_iId == WEAPON_TURBULENT1
 			|| m_iId == WEAPON_VULCANUS1
+			|| m_iId == WEAPON_CROW1
+			|| m_iId == WEAPON_THANATOS1
+			|| m_iId == WEAPON_M79
+			|| m_iId == WEAPON_M79G
+			|| m_iId == WEAPON_JANUS1
+			|| m_iId == WEAPON_FIRECRACKER
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -1429,6 +1436,7 @@ private:
 	int m_iType;
 	int m_iTrail;
 };
+
 class CMagicSgCannon : public CSGMissileCannon
 {
 	//From CS:AE
@@ -1452,6 +1460,31 @@ private:
 
 	int m_iColor;
 	int m_iBuffType;
+};
+
+class CM79Rocket : public CGrenade
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void GetExplodeDamage(float& flDamage);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT FollowThink(void);
+	void EXPORT IgniteThink(void);
+	void EXPORT RocketTouch(CBaseEntity* pOther);
+
+public:
+	static CM79Rocket* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+
+private:
+	float GetRadius();
+	float GetDamage();
+
+	int m_iType;
+	int m_iTrail;
+	time_point_t m_flIgniteTime;
 };
 
 #if 0

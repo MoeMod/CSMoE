@@ -139,6 +139,12 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "dfpistol" , WEAPON_DFPISTOL},
 	{ "turbulent1" , WEAPON_TURBULENT1},
 	{ "vulcanus1" , WEAPON_VULCANUS1},
+	{ "crow1" , WEAPON_CROW1},
+	{ "thanatos1" , WEAPON_THANATOS1},
+	{ "m79" , WEAPON_M79},
+	{ "m79g" , WEAPON_M79G},
+	{ "janus1" , WEAPON_JANUS1},
+	{ "firecracker" , WEAPON_FIRECRACKER},
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -254,6 +260,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "cartblues",	WEAPON_CARTBLUES },
 	{ "cartredl",	WEAPON_CARTREDL },
 	{ "cartredh",	WEAPON_CARTREDH },
+	{ "vulcanus5",	WEAPON_VULCANUS5 },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -596,6 +603,12 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "dfpistol" , WEAPONCLASS_PISTOL},
 	{ "turbulent1" , WEAPONCLASS_PISTOL},
 	{ "vulcanus1" , WEAPONCLASS_PISTOL},
+	{ "crow1" , WEAPONCLASS_PISTOL},
+	{ "thanatos1" , WEAPONCLASS_PISTOL},
+	{ "m79" , WEAPONCLASS_PISTOL},
+	{ "m79g" , WEAPONCLASS_PISTOL},
+	{ "janus1" , WEAPONCLASS_PISTOL},
+	{ "firecracker" , WEAPONCLASS_PISTOL},
 
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
@@ -718,6 +731,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "cartbluec",	WEAPONCLASS_RIFLE },
 	{ "cartredl",	WEAPONCLASS_RIFLE },
 	{ "cartredh",	WEAPONCLASS_RIFLE },
+	{ "vulcanus5",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -1163,6 +1177,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_CARTBLUES:
 	case WEAPON_CARTREDL:
 	case WEAPON_CARTREDH:
+	case WEAPON_VULCANUS5:
 		return true;
 	default:
 		break;
@@ -1230,6 +1245,12 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_DFPISTOL:
 	case WEAPON_TURBULENT1:
 	case WEAPON_VULCANUS1:
+	case WEAPON_CROW1:
+	case WEAPON_THANATOS1:
+	case WEAPON_M79:
+	case WEAPON_M79G:
+	case WEAPON_JANUS1:
+	case WEAPON_FIRECRACKER:
 		return true;
 	default:
 		break;

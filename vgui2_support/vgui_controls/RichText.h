@@ -115,6 +115,7 @@ public:
 	bool IsScrollbarVisible();
 
 	void SetUnderlineFont( HFont font );
+	void SetShouldDrawStart(bool value) { m_bShouldDrawStart = value; };
 
 protected:
 	virtual void OnThink();
@@ -279,6 +280,8 @@ private:
 
 	// draws a string of characters with the same formatting using the current render state
 	int DrawString(int iFirst, int iLast, TRenderState &renderState, HFont font);
+
+	bool m_bShouldDrawStart;
 };
 
 } // namespace vgui

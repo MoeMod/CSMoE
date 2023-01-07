@@ -9224,6 +9224,8 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_CARTREDH:
 		case WEAPON_Z4B_MALORIAN3516:
 		case WEAPON_VULCANUS1:
+		case WEAPON_THANATOS1:
+		case WEAPON_VULCANUS5:
 			return TRUE;
 		}
 	}

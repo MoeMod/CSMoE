@@ -38,7 +38,8 @@ add_library(GameUI STATIC
 	OptionsSubButtonSettings.cpp
 	OptionsSubMoeSettings.cpp
 	MoeLogin.cpp
-)
+	MoEBulletIn.cpp
+ )
 
 if(SE_WIN32)
 	target_sources(GameUI PRIVATE
@@ -47,6 +48,9 @@ if(SE_WIN32)
 endif()
 
 target_link_libraries(GameUI PUBLIC vgui_controls)
+target_link_libraries(GameUI PUBLIC Boost::boost json_3p)
+target_link_libraries(GameUI PRIVATE cqmiao)
+
 target_include_directories(GameUI PUBLIC
 		${HLSDK_PATH}/public
 		)

@@ -861,6 +861,22 @@ public:
 	virtual void Precache();
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
+
+class C40MMGrenadeAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class C40MMGrenade2Ammo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
 }
 
 #endif // AMMO_H

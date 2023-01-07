@@ -1203,6 +1203,7 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 
 		pTemp->flags |= FTENT_FADEOUT | FTENT_SPRANIMATE | FTENT_PERSIST | FTENT_SPRANIMATELOOP;
 		pTemp->entity.curstate.framerate = 20;
+		pTemp->entity.curstate.rendermode = kRenderTransAdd;
 
 		iStartFrame = 0;
 		bAlreadyCreated = true;

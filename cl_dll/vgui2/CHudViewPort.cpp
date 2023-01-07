@@ -159,7 +159,16 @@ bool CHudViewport::ShowVGUIMenu(int iMenu)
     {
         case MENU_TEAM:
         {
-            panel = m_pTeamMenu;
+            if (m_pClassMenu->CheckShowType())
+            {
+                panel = m_pClassMenu;
+                m_pClassMenu->m_iCurrentPage = 0;
+                m_pClassMenu->SetupPage(0);
+            }
+            else
+            {
+                panel = m_pTeamMenu;
+            }
             break;
         }
         case MENU_CLASS_T:

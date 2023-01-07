@@ -178,7 +178,7 @@ namespace sv {
             m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
             SendWeaponAnim(ANIM_RELOAD_START, UseDecrement() != FALSE);
-            m_flNextCheckReload = gpGlobals->time + 0.7s;
+            m_flNextCheckReload = gpGlobals->time + 0.8s;
             m_pPlayer->m_flNextAttack = 0.5s;   //oldbutton is useless now need to avoid double time IN_RELOAD
             m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
             m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
@@ -202,13 +202,25 @@ namespace sv {
         {
             bCheckingReload = false;
             m_flNextCheckReload = invalid_time_point;
-            if (DefaultReload(MaxClip, ANIM_RELOAD_SLOW, 2.0s))
+            if (DefaultReload(MaxClip, ANIM_RELOAD_SLOW, 2.5s))
             {
                 m_flAccuracy = AccuracyDefault;
                 m_bDelayFire = false;
                 m_iShotsFired = 0;
             }       
         }
+    }
+
+    void FireEvent(const Vector& vecDir)
+    {
+        int flags = 0;
+#ifdef CLIENT_WEAPONS
+        flags = FEV_NOTHOST;
+#else
+        flags = 0;
+#endif
+
+        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), m_iClip != 0, FALSE);
     }
 
     void SecondaryAttack()
@@ -262,7 +274,7 @@ namespace sv {
         flags = 0;
 #endif
 
-        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), 5, TRUE);
+        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), m_iClip != 0, TRUE);
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 #ifndef CLIENT_DLL
         if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)

@@ -27,10 +27,6 @@
 */
 #include "events.h"
 
-namespace cl {
-    bool g_bGlockBurstMode = false;
-}
-
 namespace cl::event::crow1 {
 
 enum crow1_e
@@ -68,26 +64,20 @@ void EV_FireCrow1( event_args_t *args )
 
 	AngleVectors( angles, forward, right, up );
 
-	cl_entity_t* ent = GetViewEntity();
+	cl_entity_t* ent = gEngfuncs.GetViewModel();
 
 	if ( EV_IsLocal( idx ) )
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
 		int seq;
-		if( args->bparam1 )
+		if( args->bparam2 )
 		{
-			if( g_bHoldingShield )
-				seq = GLOCK18_SHIELD_SHOOT;
-			else
-				seq = (g_iWeaponFlags & WPNSTATE_GLOCK18_BURST_MODE) != 0 || g_bGlockBurstMode? GLOCK18_SHOOT1: GLOCK18_SHOOT3;
+			seq = ANIM_SHOOT1;
 		}
 		else
 		{
-			if( g_bHoldingShield )
-				seq = GLOCK18_SHIELD_SHOOT_EMPTY;
-			else
-				seq = GLOCK18_SHOOT_EMPTY;
+			seq = args->bparam1 ? ANIM_SHOOT2 : ANIM_SHOOT_EMPTY;
 		}
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(seq, 2);
 
@@ -111,8 +101,7 @@ void EV_FireCrow1( event_args_t *args )
 
 	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iPShell, TE_BOUNCE_SHELL);
 
-	PLAY_EVENT_SOUND( ((g_iWeaponFlags & WPNSTATE_GLOCK18_BURST_MODE) != 0 || g_bGlockBurstMode )
-						&& !g_bHoldingShield ? SOUNDS_NAME[0] : SOUNDS_NAME[1] );
+	PLAY_EVENT_SOUND(args->bparam1 ? SOUNDS_NAME[0] : SOUNDS_NAME[1]);
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );
@@ -124,6 +113,6 @@ void EV_FireCrow1( event_args_t *args )
 		forward, right,	up,
 		1, vecSrc, vecAiming,
 		vSpread, 4096.0, BULLET_PLAYER_9MM,
-		2 );
+		1 );
 }
 }

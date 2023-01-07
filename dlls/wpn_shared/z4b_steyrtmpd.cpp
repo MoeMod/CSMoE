@@ -48,7 +48,7 @@ namespace sv {
     static constexpr int DamageZB = 60;
     static constexpr int DamageZBS = 135;
 
-    KnockbackData KnockBack = { 350.0f, 300.0f, 350.0f, 200.0f, 0.5f };
+    KnockbackData KnockBack = { 650.0f, 500.0f, 550.0f, 400.0f, 0.9f };
 
 	enum
 	{
@@ -139,6 +139,14 @@ namespace sv {
         return bResult;
     }
 
+    float GetMaxSpeed(void)
+    {
+        if (m_iWeaponState == 1)
+            return 220.0;
+
+        return 240.0;
+    }
+
     void SecondaryAttack()
     {   
         if (m_flNextSecondaryAttack > UTIL_WeaponTimeBase())
@@ -169,9 +177,9 @@ namespace sv {
         if (m_iWeaponState)
         {
             if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-                DualTMPFire((0.1) * m_flAccuracy, 0.06s, FALSE);
+                DualTMPFire((0.1) * m_flAccuracy, 0.04s, FALSE);
             else
-                DualTMPFire((0.015) * m_flAccuracy, 0.06s, FALSE);
+                DualTMPFire((0.015) * m_flAccuracy, 0.04s, FALSE);
         }
         else
         {
@@ -287,23 +295,23 @@ namespace sv {
         float flDamage;
         if (m_iWeaponState)
         {
-            flDamage = 187.0f;
+            flDamage = 33.0f;
 #ifndef CLIENT_DLL
             if (g_pModRunning->DamageTrack() == DT_ZB)
-                flDamage = 187.0f;
+                flDamage = 265.0f;
             else if (g_pModRunning->DamageTrack() == DT_ZBS)
-                flDamage = 187.0f;
+                flDamage = 265.0f;
 #endif
             return flDamage;
         }
         else
         {
-            flDamage = 185.0f;
+            flDamage = 30.0f;
 #ifndef CLIENT_DLL
             if (g_pModRunning->DamageTrack() == DT_ZB)
-                flDamage = 185.0f;
+                flDamage = 287.0f;
             else if (g_pModRunning->DamageTrack() == DT_ZBS)
-                flDamage = 185.0f;
+                flDamage = 287.0f;
 #endif
             return flDamage;
         }
