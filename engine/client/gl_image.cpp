@@ -1467,8 +1467,8 @@ static void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage
 		{
             if(PFDesc[pic->type].compressed)
             {
-                if( subImage ) pglCompressedTexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, 0, 0, tex->width, tex->height, inFormat, pic->size, data );
-                else pglCompressedTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, inFormat, tex->width, tex->height, 0, pic->size, data );
+                if( subImage ) pglCompressedTexSubImage2DARB( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, 0, 0, tex->width, tex->height, inFormat, pic->size, data );
+                else pglCompressedTexImage2DARB( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, inFormat, tex->width, tex->height, 0, pic->size, data );
             }
             else
             {
@@ -1489,8 +1489,8 @@ static void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage
 		{
             if(PFDesc[pic->type].compressed)
             {
-                if( subImage ) pglCompressedTexSubImage2D( tex->target, 0, 0, 0, tex->width, tex->height, inFormat, pic->size, data );
-                else pglCompressedTexImage2D( tex->target, 0, inFormat, tex->width, tex->height, 0, pic->size, data );
+                if( subImage ) pglCompressedTexSubImage2DARB( tex->target, 0, 0, 0, tex->width, tex->height, inFormat, pic->size, data );
+                else pglCompressedTexImage2DARB( tex->target, 0, inFormat, tex->width, tex->height, 0, pic->size, data );
             }
             else
             {
@@ -1568,13 +1568,13 @@ int GL_LoadTexture_DDS(const char *name, GLvoid* data, int type, int size, int w
 	switch (type)
 	{
 	case 1:
-		pglCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_S3TC_DXT1_EXT, w, h, 0, size, data);
+		pglCompressedTexImage2DARB(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_S3TC_DXT1_EXT, w, h, 0, size, data);
 		break;
 	case 2:
-		pglCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, w, h, 0, size, data);
+		pglCompressedTexImage2DARB(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, w, h, 0, size, data);
 		break;
 	case 3:
-		pglCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, w, h, 0, size, data);
+		pglCompressedTexImage2DARB(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, w, h, 0, size, data);
 		break;
 	}
 

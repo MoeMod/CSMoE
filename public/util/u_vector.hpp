@@ -255,7 +255,7 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
         this->m_xmm = xmm;
     }
 
-    operator xmm_t() const
+    operator const xmm_t &() const
     {
         return this->m_xmm;
     }
@@ -321,7 +321,7 @@ template<> struct VectorBase_Storage<float, 4, 16> : VectorBase_Gen<float, 4, st
         this->m_xmm = xmm;
     }
 
-    operator xmm_t() const
+    operator const xmm_t &() const
     {
         return this->m_xmm;
     }
