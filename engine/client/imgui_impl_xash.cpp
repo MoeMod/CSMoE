@@ -45,9 +45,7 @@ GNU General Public License for more details.
 #include "platform/winrt/winrt_interop.h"
 #endif
 
-#ifdef XASH_SHADER
-#include "GLES2/gl2.h"
-#endif
+#include "gl_shader.h"
 
 // Data
 double g_Time = 0.0;
@@ -347,44 +345,6 @@ qboolean ImGui_ImplGL_CharCallbackUTF(const char *c)
 	return io.WantTextInput;
 }
 
-#ifdef XASH_SHADER
-// If you get an error please report on github. You may try different GL context version or GLSL version. See GL<>GLSL version table at the top of this file.
-static bool CheckShader(GLuint handle, const char* desc)
-{
-    GLint status = 0, log_length = 0;
-    pglGetObjectParameterivARB(handle, GL_OBJECT_COMPILE_STATUS_ARB, &status);
-    pglGetObjectParameterivARB(handle, GL_OBJECT_INFO_LOG_LENGTH_ARB, &log_length);
-    if ((GLboolean)status == GL_FALSE)
-        MsgDev( D_ERROR, "ImGui_ImplOpenGL3_CreateDeviceObjects: failed to compile %s\n", desc);
-    if (log_length > 1)
-    {
-        ImVector<char> buf;
-        buf.resize((int)(log_length + 1));
-        pglGetInfoLogARB(handle, log_length, NULL, (GLcharARB*)buf.begin());
-        MsgDev( D_ERROR, "%s\n", buf.begin());
-    }
-    return (GLboolean)status == GL_TRUE;
-}
-
-// If you get an error please report on GitHub. You may try different GL context version or GLSL version.
-static bool CheckProgram(GLuint handle, const char* desc)
-{
-    GLint status = 0, log_length = 0;
-    pglGetObjectParameterivARB(handle, GL_OBJECT_LINK_STATUS_ARB, &status);
-    pglGetObjectParameterivARB(handle, GL_OBJECT_INFO_LOG_LENGTH_ARB, &log_length);
-    if ((GLboolean)status == GL_FALSE)
-        MsgDev( D_ERROR, "ImGui_ImplOpenGL3_CreateDeviceObjects: failed to link %s\n", desc);
-    if (log_length > 1)
-    {
-        ImVector<char> buf;
-        buf.resize((int)(log_length + 1));
-        pglGetInfoLogARB(handle, log_length, NULL, (GLcharARB*)buf.begin());
-        MsgDev( D_ERROR, "%s\n", buf.begin());
-    }
-    return (GLboolean)status == GL_TRUE;
-}
-#endif
-
 #define GL_UNPACK_ROW_LENGTH			0x0CF2
 
 qboolean ImGui_ImplGL_CreateDeviceObjects(void)
@@ -393,12 +353,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	ImGuiIO& io = ImGui::GetIO();
 #ifdef XASH_SHADER
     // compile shaders for es2
-    const GLcharARB* vertex_shader_with_version =
-#ifdef __APPLE__
-            "#version 120\n"
-#else
-            "#version 100\n"
-#endif
+    const char *vertex_shader_list[2] = { xe::GetShaderVersionString(),
             "uniform mat4 ProjMtx;\n"
             "attribute vec2 Position;\n"
             "attribute vec2 UV;\n"
@@ -410,36 +365,33 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
             "    Frag_UV = UV;\n"
             "    Frag_Color = Color;\n"
             "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
-            "}\n";
+            "}\n"
+     };
 
-    const GLcharARB* fragment_shader_with_version =
-#ifdef __APPLE__
-            "#version 120\n"
-#else
-            "#version 100\n"
-#endif
+    const GLcharARB* fragment_shader_list[2] = { xe::GetShaderVersionString(),
             "uniform sampler2D Texture;\n"
             "varying vec2 Frag_UV;\n"
             "varying vec4 Frag_Color;\n"
             "void main()\n"
             "{\n"
             "    gl_FragColor = Frag_Color * texture2D(Texture, Frag_UV.st);\n"
-            "}\n";
+            "}\n"
+        };
     g_VertHandle = pglCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-    pglShaderSourceARB(g_VertHandle, 1, &vertex_shader_with_version, NULL);
+    pglShaderSourceARB(g_VertHandle, 2, vertex_shader_list, NULL);
     pglCompileShaderARB(g_VertHandle);
-    CheckShader(g_VertHandle, "vertex shader");
+    xe::CheckShader(g_VertHandle, "vertex shader");
 
     g_FragHandle = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-    pglShaderSourceARB(g_FragHandle, 1, &fragment_shader_with_version, NULL);
+    pglShaderSourceARB(g_FragHandle, 2, fragment_shader_list, NULL);
     pglCompileShaderARB(g_FragHandle);
-    CheckShader(g_FragHandle, "fragment shader");
+    xe::CheckShader(g_FragHandle, "fragment shader");
 
     g_ShaderHandle = pglCreateProgramObjectARB();
     pglAttachObjectARB(g_ShaderHandle, g_VertHandle);
     pglAttachObjectARB(g_ShaderHandle, g_FragHandle);
     pglLinkProgramARB(g_ShaderHandle);
-    CheckProgram(g_ShaderHandle, "shader program");
+    xe::CheckProgram(g_ShaderHandle, "shader program");
 
     g_AttribLocationTex = pglGetUniformLocationARB(g_ShaderHandle, "Texture");
     g_AttribLocationProjMtx = pglGetUniformLocationARB(g_ShaderHandle, "ProjMtx");

@@ -25,6 +25,7 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "cl_tent.h"
 #include "gl_texlru.h"
+#include "gl_shader.h"
 
 #ifdef XASH_RAGDOLL
 #include "physics.h"
@@ -36,8 +37,7 @@ GNU General Public License for more details.
 #define MAX_LOCALLIGHTS	4
 
 // diable now
-//#define MOE_STUDIO_ENABLE_VBO
-//#define MOE_STUDIO_VBO_POOL_COUNT MAX_CLIENTS
+#define XASH_SHADER
 
 static vec3_t hullcolor[8] = 
 {
@@ -117,28 +117,48 @@ static vec2_t		g_chrome[MAXSTUDIOVERTS];	// texture coords for surface normals
 static sortedmesh_t		g_sortedMeshes[MAXSTUDIOMESHES];
 matrix3x4		g_bonestransform[MAXSTUDIOBONES];
 matrix3x4		g_lighttransform[MAXSTUDIOBONES];
-static matrix3x4		g_rgCachedBonesTransform[MAXSTUDIOBONES];
-static matrix3x4		g_rgCachedLightTransform[MAXSTUDIOBONES];
 static vec3_t		g_chromeright[MAXSTUDIOBONES];// chrome vector "right" in bone reference frames
 static vec3_t		g_chromeup[MAXSTUDIOBONES];	// chrome vector "up" in bone reference frames
 static int		g_chromeage[MAXSTUDIOBONES];	// last time chrome vectors were updated
-#ifdef MOE_STUDIO_ENABLE_VBO
+#ifdef XASH_SHADER
 typedef struct studiovbo_item_s {
     GLfloat pos[3];
+    GLfloat boneIdx;
     GLfloat coord[2];
-    GLubyte color[4];
+    GLubyte norm[3];
 } studiovbo_item_t;
-static GLuint g_vbo_verts[MOE_STUDIO_VBO_POOL_COUNT + 1];
-static GLuint g_vbo_elems[MOE_STUDIO_VBO_POOL_COUNT + 1];
-static int g_vbo_current;
-#endif
+static GLuint g_vbo_verts;
+static GLuint g_vbo_elems;
+typedef struct studioshader_s {
+    GLuint program;
+    GLuint vertex_shader;
+    GLuint fragment_shader;
+    struct {
+        GLint texOffset;
+        GLint colorMix;
+        GLint lightInfo;
+        GLint dLightDir;
+        GLint boneMat;
+        GLint muWVP;
+        GLint worldEye;
+        GLint texDiffuseMap;
+    } uniform;
+    struct {
+        GLint vaPosition;
+        GLint vaNormal;
+        GLint vaTexCoord;
+    } attrib;
+} studioshader_t;
+static studioshader_t g_studioshader;
+#else
 static GLfloat		g_xarrayverts[MAXARRAYVERTS][3];
 static GLfloat		g_xarraycoord[MAXARRAYVERTS][2];
 static GLubyte		g_xarraycolor[MAXARRAYVERTS][4];
 static unsigned short		g_xarrayelems[MAXARRAYVERTS*6];
+static vec3_t		g_lightvalues[MAXSTUDIOVERTS];
+#endif
 static uint		g_nNumArrayVerts;
 static uint		g_nNumArrayElems;
-static vec3_t		g_lightvalues[MAXSTUDIOVERTS];
 static studiolight_t	g_studiolight;
 int			g_nStudioCount;		// for chrome update
 int			g_iRenderMode;		// currentmodel rendermode
@@ -209,11 +229,55 @@ void R_StudioInit( void )
 	g_nStudioCount = 0;
 	m_fDoRemap = false;
 
-#ifdef MOE_STUDIO_ENABLE_VBO
+#ifdef XASH_SHADER
     // Setup VBO
-    pglGenBuffersARB( MOE_STUDIO_VBO_POOL_COUNT, &g_vbo_verts[1] );
-    pglGenBuffersARB( MOE_STUDIO_VBO_POOL_COUNT, &g_vbo_elems[1] );
-    g_vbo_current = 0;
+    pglGenBuffersARB( 1, &g_vbo_verts );
+    pglGenBuffersARB( 1, &g_vbo_elems );
+
+    fs_offset_t length;
+    const byte *data;
+
+    data = FS_MapFile("shader/mdlrender.vs", &length, true);
+    const GLcharARB *vertex_shader_list[4] = {
+            xe::GetShaderVersionString(),
+            "#define MAX_BONE_REG 128 * 3\n",
+            (const GLcharARB *)data
+    };
+    g_studioshader.vertex_shader = pglCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+    pglShaderSourceARB(g_studioshader.vertex_shader, 3, vertex_shader_list, NULL);
+    pglCompileShaderARB(g_studioshader.vertex_shader);
+    FS_MapFree(data, length);
+    xe::CheckShader(g_studioshader.vertex_shader, "vertex shader");
+
+    data = FS_MapFile("shader/mdlrender.fs", &length, true);
+    const GLcharARB *fragment_shader_list[2] = {
+            xe::GetShaderVersionString(),
+            (const GLcharARB *)data
+    };
+    g_studioshader.fragment_shader = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+    pglShaderSourceARB(g_studioshader.fragment_shader, 2, fragment_shader_list, NULL);
+    pglCompileShaderARB(g_studioshader.fragment_shader);
+    FS_MapFree(data, length);
+    xe::CheckShader(g_studioshader.fragment_shader, "fragment shader");
+
+    g_studioshader.program = pglCreateProgramObjectARB();
+    pglAttachObjectARB(g_studioshader.program, g_studioshader.vertex_shader);
+    pglAttachObjectARB(g_studioshader.program, g_studioshader.fragment_shader);
+    pglLinkProgramARB(g_studioshader.program);
+    xe::CheckProgram(g_studioshader.program, "shader program");
+
+    g_studioshader.uniform.texOffset = pglGetUniformLocationARB(g_studioshader.program, "texOffset");
+    g_studioshader.uniform.colorMix = pglGetUniformLocationARB(g_studioshader.program, "colorMix");
+    g_studioshader.uniform.lightInfo = pglGetUniformLocationARB(g_studioshader.program, "lightInfo");
+    g_studioshader.uniform.dLightDir = pglGetUniformLocationARB(g_studioshader.program, "dLightDir");
+    g_studioshader.uniform.boneMat = pglGetUniformLocationARB(g_studioshader.program, "boneMat");
+    g_studioshader.uniform.muWVP = pglGetUniformLocationARB(g_studioshader.program, "muWVP");
+    g_studioshader.uniform.worldEye = pglGetUniformLocationARB(g_studioshader.program, "worldEye");
+    g_studioshader.uniform.texDiffuseMap = pglGetUniformLocationARB(g_studioshader.program, "texDiffuseMap");
+
+    g_studioshader.attrib.vaPosition = pglGetAttribLocationARB(g_studioshader.program, "vaPosition");
+    g_studioshader.attrib.vaNormal = pglGetAttribLocationARB(g_studioshader.program, "vaNormal");
+    g_studioshader.attrib.vaTexCoord = pglGetAttribLocationARB(g_studioshader.program, "vaTexCoord");
 #endif
 }
 
@@ -1045,6 +1109,9 @@ void GAME_EXPORT R_StudioSetupLighting( alight_t *lightinfo )
 	g_studiolight.lightval = g_studiolight.lightcolor * (illum / 255.0f);
 }
 
+#ifdef XASH_SHADER
+// handled in shader
+#else
 /*
 ===============
 R_StudioLighting
@@ -1130,7 +1197,7 @@ void R_LightStrength( int bone, const vec3_t localpos, vec4_t light[MAX_LOCALLIG
         light[i][3] = 0.0f;
     }
 }
-
+#endif
 /*
 ===============
 R_StudioSetupTextureHeader
@@ -1293,6 +1360,9 @@ static void (*R_MeshUVFunc())(const short* ptricmds, GLfloat (&uv)[2], float s, 
 	}
 }
 
+#ifdef XASH_SHADER
+// done in shader
+#else
 static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], GLubyte alpha, const vec3_t &norm)
 {
 	if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
@@ -1330,6 +1400,7 @@ static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], GLubyt
 		};
 	}
 }
+#endif
 
 static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float scale )
 {
@@ -1340,17 +1411,15 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 
     const byte *pvertbone = ((const byte *)m_pStudioHeader + m_pSubModel->vertinfoindex);
 
+
+#ifdef XASH_SHADER
+    studiovbo_item_t *vboverts = (studiovbo_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
+    auto arrayelems = (unsigned short *)pglMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
+    const auto R_MeshUV = R_MeshUVFunc();
+#else
+    auto arrayelems = g_xarrayelems;
 	const auto R_MeshColor = R_MeshColorFunc();
 	const auto R_MeshUV = R_MeshUVFunc();
-
-    auto arrayelems = g_xarrayelems;
-#ifdef MOE_STUDIO_ENABLE_VBO
-    studiovbo_item_t *vboverts = nullptr;
-    if(g_vbo_current)
-    {
-        vboverts = (studiovbo_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
-        arrayelems = (unsigned short *)pglMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
-    }
 #endif
 
 	while( ( i = *( ptricmds++ ) ) )
@@ -1399,59 +1468,68 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 			}
 
 			vec3_t av, nv;
+#ifdef XASH_SHADER
+            VectorCopy(pstudioverts[ptricmds[0]], av);
+#else
             Matrix3x4_VectorTransform(g_bonestransform[pvertbone[ptricmds[0]]], pstudioverts[ptricmds[0]], av);
+#endif
 
+#ifdef XASH_SHADER
+            const byte *pnormbone = ((const byte *)m_pStudioHeader + m_pSubModel->norminfoindex);
+            VectorCopy(pstudionorms[ptricmds[1]], nv);
+            if( g_nForceFaceFlags & STUDIO_NF_CHROME )
+            {
+                VectorMA( av, scale, nv, av );
+            }
+#else
 			if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 			{
                 const byte *pnormbone = ((const byte *)m_pStudioHeader + m_pSubModel->norminfoindex);
                 Matrix3x4_VectorRotate( g_bonestransform[pnormbone[ptricmds[1]]], pstudionorms[ptricmds[1]], nv );
 				VectorMA( av, scale, nv, av );
 			}
+#endif
 
 			ASSERT( g_nNumArrayVerts < MAXARRAYVERTS );
-#ifdef MOE_STUDIO_ENABLE_VBO
-            if(g_vbo_current)
+#ifdef XASH_SHADER
             {
                 R_MeshUV(ptricmds, vboverts[g_nNumArrayVerts].coord, s, t);
-                R_MeshColor(ptricmds, vboverts[g_nNumArrayVerts].color, alpha, nv);
                 VectorCopy(av, vboverts[g_nNumArrayVerts].pos); // store off vertex
+                vboverts[g_nNumArrayVerts].boneIdx = pvertbone[ptricmds[0]];
+                VectorCopy(nv, vboverts[g_nNumArrayVerts].norm); // store off vertex
             }
-            else
-#endif
+#else
             {
                 R_MeshUV(ptricmds, g_xarraycoord[g_nNumArrayVerts], s, t);
                 R_MeshColor(ptricmds, g_xarraycolor[g_nNumArrayVerts], alpha, nv);
                 VectorCopy( av, g_xarrayverts[g_nNumArrayVerts] ); // store off vertex
             }
+#endif
 			g_nNumArrayVerts++;
 		}
 	}
 
-#ifdef MOE_STUDIO_ENABLE_VBO
-    if(g_vbo_current)
+#ifdef XASH_SHADER
     {
         pglUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
         pglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
 
-        pglEnableClientState( GL_VERTEX_ARRAY );
-        pglVertexPointer( 3, GL_FLOAT, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, pos) );
+        pglEnableVertexAttribArrayARB(g_studioshader.attrib.vaPosition);
+        pglVertexAttribPointerARB(g_studioshader.attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, pos));
 
-        pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-        pglTexCoordPointer( 2, GL_FLOAT, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, coord) );
+        pglEnableVertexAttribArrayARB(g_studioshader.attrib.vaTexCoord);
+        pglVertexAttribPointerARB(g_studioshader.attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, coord));
 
-        if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
-        {
-            pglEnableClientState( GL_COLOR_ARRAY );
-            pglColorPointer( 4, GL_UNSIGNED_BYTE, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, color) );
-        }
-        pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const GLvoid *)startArrayElems );
-        pglDisableClientState( GL_VERTEX_ARRAY );
-        pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-        if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
-            pglDisableClientState( GL_COLOR_ARRAY );
+        pglEnableVertexAttribArrayARB(g_studioshader.attrib.vaNormal);
+        pglVertexAttribPointerARB(g_studioshader.attrib.vaNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, norm));
+
+        pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const GLvoid *)(startArrayElems * sizeof(unsigned short)) );
+
+        pglDisableVertexAttribArrayARB(g_studioshader.attrib.vaPosition);
+        pglDisableVertexAttribArrayARB(g_studioshader.attrib.vaTexCoord);
+        pglDisableVertexAttribArrayARB(g_studioshader.attrib.vaNormal);
     }
-    else
-#endif
+#else
     {
         pglEnableClientState( GL_VERTEX_ARRAY );
         pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
@@ -1465,18 +1543,13 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
             pglColorPointer( 4, GL_UNSIGNED_BYTE, 0, g_xarraycolor );
         }
 
-    #if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
-        if( pglDrawRangeElements )
-            pglDrawRangeElements( GL_TRIANGLES, startArrayVerts, g_nNumArrayVerts,
-                g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
-        else
-    #endif
-            pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
+        pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
         pglDisableClientState( GL_VERTEX_ARRAY );
         pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
         if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
             pglDisableClientState( GL_COLOR_ARRAY );
     }
+#endif
 }
 
 /*
@@ -1630,6 +1703,31 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			pglStencilMask(0xFF);  // �����޸�ģ�建��			
 			pglStencilFunc(GL_ALWAYS, 1, 0xFF); //����Ƭ�ζ�Ҫд��ģ�建��
 		}
+#ifdef XASH_SHADER
+        float envBrightMul = 1;
+        vec3_t colormix = g_studiolight.lightcolor;
+        if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
+        {
+            colormix = { alpha, 0, 0 };
+        }
+        else if (g_iRenderMode == kRenderTransColor || (g_nForceFaceFlags & STUDIO_NF_CHROME))
+        {
+            colormix = { RI.currententity->curstate.rendercolor.r / 255.0f, RI.currententity->curstate.rendercolor.g / 255.0f, RI.currententity->curstate.rendercolor.b / 255.0f };
+        }
+        float ambient = (192 - g_studiolight.ambientlight) / 255.0f;
+        float shadeLight = 0; // - g_studiolight.shadelight / (255.0f);
+        vec3_t dLightDir = g_studiolight.lightvec;
+
+        if((g_nForceFaceFlags & STUDIO_NF_FULLBRIGHT))
+        {
+            ambient = 1;
+            shadeLight = 0;
+        }
+
+        pglUniform4fARB(g_studioshader.uniform.colorMix, colormix.x, colormix.y, colormix.z, envBrightMul);
+        pglUniform4fARB(g_studioshader.uniform.lightInfo, alpha, ambient, shadeLight, 0);
+        pglUniform4fvARB(g_studioshader.uniform.dLightDir, 1, (const float *)&dLightDir);
+#endif
 
 		R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
 	}
@@ -1692,6 +1790,9 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 		// fill in sortedmesh info
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
+#ifdef XASH_SHADER
+        // handled in shader
+#else
 		for (int i = 0; i < pmesh[j].numnorms; ++i)
 		{
 			R_StudioLighting(g_lightvalues[i], pnormbone[i], g_nFaceFlags, pstudionorms[i]);
@@ -1704,7 +1805,16 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 				R_StudioSetupChrome(g_chrome[i], pnormbone[i], pstudionorms[i]);
 			};
 		}
+#endif
 	}
+
+#ifdef XASH_SHADER
+    pglUniform1iARB(g_studioshader.uniform.texDiffuseMap, 0);
+    pglUniform4fARB(g_studioshader.uniform.texOffset, 0, 0, 1, 1);
+    pglUniform4fvARB(g_studioshader.uniform.worldEye, 1, (const float *)&RI.vieworg);
+    pglUniformMatrix4fvARB(g_studioshader.uniform.muWVP, 1, GL_TRUE, (const float *)&RI.worldviewProjectionMatrix);
+    pglUniform4fvARB(g_studioshader.uniform.boneMat, 3 * MAXSTUDIOBONES, (const float *)g_bonestransform);
+#endif
 
 	if( r_studio_sort_textures->integer )
 	{
@@ -2377,15 +2487,12 @@ static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 	// was done before, in R_DrawViewModel
 	if( g_iBackFaceCull )
 		GL_FrontFace( !glState.frontFace );
-#ifdef MOE_STUDIO_ENABLE_VBO
-    g_vbo_current = RI.currententity->player && CL_IsPlayerIndex(RI.currententity->index) ? RI.currententity->index : 0;
-    if(g_vbo_current)
-    {
-        pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_vbo_elems[g_vbo_current] );
-        pglBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, MAXARRAYVERTS * 6 * sizeof(unsigned short), nullptr, GL_STREAM_DRAW_ARB );
-        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts[g_vbo_current] );
-        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, MAXARRAYVERTS * sizeof(studiovbo_item_t), nullptr, GL_STREAM_DRAW_ARB );
-    }
+#ifdef XASH_SHADER
+    pglUseProgramObjectARB(g_studioshader.program);
+    pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_vbo_elems );
+    pglBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, MAXARRAYVERTS * 6 * sizeof(unsigned short), nullptr, GL_STREAM_DRAW_ARB );
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts );
+    pglBufferDataARB( GL_ARRAY_BUFFER_ARB, MAXARRAYVERTS * sizeof(studiovbo_item_t), nullptr, GL_STREAM_DRAW_ARB );
 #endif
 }
 
@@ -2397,13 +2504,10 @@ R_StudioRestoreRenderer
 */
 static void GAME_EXPORT R_StudioRestoreRenderer( void )
 {
-#ifdef MOE_STUDIO_ENABLE_VBO
-    if(g_vbo_current)
-    {
-        g_vbo_current = 0;
-        pglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-        pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    }
+#ifdef XASH_SHADER
+    pglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+    pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    pglUseProgramObjectARB(0);
 #endif
 
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
@@ -2445,7 +2549,7 @@ static int GAME_EXPORT pfnIsHardware( void )
 	return 1;	// 0 is Software, 1 is OpenGL, 2 is Direct3D
 }
 
-#ifdef MOE_STUDIO_ENABLE_VBO
+#ifdef XASH_SHADER
 // disable shadow on vbo for better performance
 static void GAME_EXPORT GL_StudioDrawShadow( void ) {}
 #else
@@ -2469,8 +2573,8 @@ void R_StudioDeformShadow( void )
 		float dist3 = DotProduct(v, g_shadowTrace.plane.normal) - dist;
 		if (dist3 > 0.0f) VectorMA(v, dist3, g_mvShadowVec, v);
 	};
-#ifdef MOE_STUDIO_ENABLE_VBO
-    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts[g_vbo_current] );
+#ifdef XASH_SHADER
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts );
     auto vboverts = (studiovbo_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB );
     std::for_each(vboverts, vboverts + g_nNumArrayVerts, [vert_calc_fn](studiovbo_item_t &item){ vert_calc_fn(item.pos); });
     pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
@@ -2498,9 +2602,9 @@ static void R_StudioDrawPlanarShadow( void )
 		pglEnable( GL_STENCIL_TEST );
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
-#ifdef MOE_STUDIO_ENABLE_VBO
-    pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_vbo_elems[g_vbo_current] );
-    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts[g_vbo_current] );
+#ifdef XASH_SHADER
+    pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_vbo_elems );
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts );
     pglVertexPointer( 3, GL_FLOAT, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, pos) );
     pglDrawElements( GL_TRIANGLES, g_nNumArrayElems, GL_UNSIGNED_SHORT, 0 );
     pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
