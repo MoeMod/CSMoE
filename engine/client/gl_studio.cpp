@@ -1413,8 +1413,10 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 
 
 #ifdef XASH_SHADER
-    studiovbo_item_t *vboverts = (studiovbo_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
-    auto arrayelems = (unsigned short *)pglMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
+    //studiovbo_item_t *vboverts = (studiovbo_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
+    //auto arrayelems = (unsigned short *)pglMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
+    static studiovbo_item_t vboverts[MAXARRAYVERTS];
+    static unsigned short arrayelems[MAXARRAYVERTS*6];
     const auto R_MeshUV = R_MeshUVFunc();
 #else
     auto arrayelems = g_xarrayelems;
@@ -1511,8 +1513,10 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 
 #ifdef XASH_SHADER
     {
-        pglUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
-        pglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+        //pglUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
+        //pglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+        pglBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, startArrayElems * sizeof(unsigned short), (g_nNumArrayElems - startArrayElems) * sizeof(unsigned short), arrayelems + startArrayElems);
+        pglBufferSubDataARB(GL_ARRAY_BUFFER_ARB, startArrayVerts * sizeof(studiovbo_item_t), (g_nNumArrayVerts - startArrayVerts) * sizeof(studiovbo_item_t), vboverts + startArrayVerts);
 
         pglEnableVertexAttribArrayARB(g_studioshader.attrib.vaPosition);
         pglVertexAttribPointerARB(g_studioshader.attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studiovbo_item_t), (const GLvoid *)offsetof(studiovbo_item_t, pos));
