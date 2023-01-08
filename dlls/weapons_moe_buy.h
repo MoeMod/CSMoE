@@ -365,6 +365,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_SKULL8, "weapon_skull8",        "碎魂利刃SKULL-8",                  6200, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_SKULL8, "weapon_skull6",        "碎魂骑士SKULL-6",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_HK23, "weapon_hk23",        "追击者HK23",                  4600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+	{ WEAPON_HK121EX, "weapon_hk121ex",        "嗜血战狼HK121",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_M60, "weapon_m60",        "掠食者M60E4",                  4700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_MK48, "weapon_mk48",        "劫掠者MK48",                  5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_K3, "weapon_k3",        "k3",                  4750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },

@@ -443,6 +443,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m79.cpp
 	../dlls/wpn_shared/wpn_m79g.cpp
 	../dlls/wpn_shared/wpn_firecracker.cpp
+	../dlls/wpn_shared/wpn_hk121ex.cpp
+	../dlls/wpn_shared/wpn_claymore.cpp
 	)
 
 set (HUD_SRCS

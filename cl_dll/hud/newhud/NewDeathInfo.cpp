@@ -73,7 +73,7 @@ namespace cl {
 	void CHudDeathInfo::VidInit(void)
 	{
 		//Vgui Localize
-		static char SzText[64]; sprintf_s(SzText, "CSO_EnemyDeathMsg");
+		static char SzText[64]; sprintf(SzText, "CSO_EnemyDeathMsg");
 		if (vgui2::localize()->Find(SzText))
 			strcpy(m_szMsgEnemyDeath, UnicodeToUTF8(vgui2::localize()->Find(SzText)));
 		else
@@ -93,22 +93,22 @@ namespace cl {
 			}
 			case 1:
 			{
-				sprintf_s(szTempBody, "CSO_Chest");
+				sprintf(szTempBody, "CSO_Chest");
 				break;
 			}
 			case 2:
 			{
-				sprintf_s(szTempBody, "CSO_Stomach");
+				sprintf(szTempBody, "CSO_Stomach");
 				break;
 			}
 			case 3:
 			{
-				sprintf_s(szTempBody, "CSO_Arm");
+				sprintf(szTempBody, "CSO_Arm");
 				break;
 			}
 			case 4:
 			{
-				sprintf_s(szTempBody, "CSO_Leg");
+				sprintf(szTempBody, "CSO_Leg");
 				break;
 			}
 			break;
@@ -175,7 +175,7 @@ namespace cl {
 				if (data.iDamage[i])
 				{
 					static char szShots[64];
-					sprintf_s(szShots, "%s: %d(%d%s)", m_szBody[i], data.iDamage[i], data.iShot[i], m_szAmmoCount);
+					sprintf(szShots, "%s: %d(%d%s)", m_szBody[i], data.iDamage[i], data.iShot[i], m_szAmmoCount);
 					strcat(m_szTempKiller, szShots);
 					strcat(m_szTempKiller, "\n");
 				}
@@ -218,7 +218,7 @@ namespace cl {
 				if (data.iDamage[i])
 				{
 					static char szShots[64];
-					sprintf_s(szShots, "%s: %d(%d%s)", m_szBody[i], data.iDamage[i], data.iShot[i], m_szAmmoCount);
+					sprintf(szShots, "%s: %d(%d%s)", m_szBody[i], data.iDamage[i], data.iShot[i], m_szAmmoCount);
 					strcat(m_szTempVictim, szShots);
 					strcat(m_szTempVictim, "\n");
 				}
@@ -241,7 +241,7 @@ namespace cl {
 					if (data.iDamage[i])
 					{
 						static char szShots[64];
-						sprintf_s(szShots, "%s: %d(%d%s)", m_szBody[i], data.iDamage[i], data.iShot[i], m_szAmmoCount);
+						sprintf(szShots, "%s: %d(%d%s)", m_szBody[i], data.iDamage[i], data.iShot[i], m_szAmmoCount);
 						strcat(m_szTempVictim, szShots);
 						strcat(m_szTempVictim, "\n");
 					}
@@ -335,7 +335,7 @@ namespace cl {
 		if (szWeapon && szWeapon[0])
 		{
 			//Vgui Localize
-			static char SzText[64]; sprintf_s(SzText, "CSO_%s", szWeapon);
+			static char SzText[64]; sprintf(SzText, "CSO_%s", szWeapon);
 			if (vgui2::localize()->Find(SzText))
 				strcpy(g_DeathInfo.szWeapon, UnicodeToUTF8(vgui2::localize()->Find(SzText)));
 			else
@@ -363,7 +363,7 @@ namespace cl {
 			if (szWeapon && szWeapon[0])
 			{
 				//Vgui Localize
-				static char SzText[64]; sprintf_s(SzText, "CSO_%s", szWeapon);
+				static char SzText[64]; sprintf(SzText, "CSO_%s", szWeapon);
 				if (vgui2::localize()->Find(SzText))
 					strcpy(g_DeathInfo.szWeapon, UnicodeToUTF8(vgui2::localize()->Find(SzText)));
 				else
@@ -461,19 +461,23 @@ namespace cl {
 	char* CHudDeathInfo::UnicodeToUTF8(const wchar_t* str)
 	{
 		static char result[1024];
-		int textlen;
+		/*int textlen;
 		textlen = WideCharToMultiByte(CP_UTF8, 0, str, -1, NULL, 0, NULL, NULL);
 		memset(result, 0, sizeof(char) * (textlen + 1));
-		WideCharToMultiByte(CP_UTF8, 0, str, -1, result, textlen, NULL, NULL);
+		WideCharToMultiByte(CP_UTF8, 0, str, -1, result, textlen, NULL, NULL);*/
+
+		Q_UnicodeToUTF8(str, result, 1023);
 		return result;
 	}
 	wchar_t* CHudDeathInfo::UTF8ToUnicode(const char* str)
 	{
 		static wchar_t result[1024];
-		int textlen;
+		/*int textlen;
 		textlen = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
 		memset(result, 0, sizeof(char) * (textlen + 1));
-		MultiByteToWideChar(CP_UTF8, 0, str, -1, (LPWSTR)result, textlen);
+		MultiByteToWideChar(CP_UTF8, 0, str, -1, (LPWSTR)result, textlen);*/
+
+		Q_UTF8ToUnicode(str, result, 1023);
 		return result;
 	}
 }

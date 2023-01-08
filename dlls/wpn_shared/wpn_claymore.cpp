@@ -6,496 +6,310 @@
 #include "wpn_claymore.h"
 
 #include "monsters.h"
-#include "decals.h"
 #include "gamerules.h"
-#include "cbase/cbase_hash.h"
 
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
 #endif
-#ifndef CLIENT_DLL
-	LINK_ENTITY_TO_CLASS(claymore_bomb, CClaymoreBomb)
-#define WONDERCANNON_MINE_EXP_RADIUS	39.37 * 5
-#define WONDERCANNONEX_MINE_EXP_RADIUS	39.37 * 6.5
-		CWonderCannonMine* CWonderCannonMine::Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner)
-	{
-		edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("wondercannon_mine"));
 
-		if (FNullEnt(pent))
-		{
-			ALERT(at_console, "NULL Ent in Create!\n");
-			return NULL;
-		}
+	LINK_ENTITY_TO_CLASS(weapon_claymore, CClayMore)
 
-		CWonderCannonMine* pMine = (CWonderCannonMine*)Instance(pent);
-
-		if (pMine)
-		{
-			pMine->m_iType = iType;
-			pMine->pev->owner = pentOwner;
-			pMine->pev->origin = vecOrigin;
-			pMine->pev->angles = vecAngles;
-			pMine->Spawn();
-		}
-
-		return pMine;
-	}
-
-	void CWonderCannonMine::Spawn(void)
+		void CClayMore::Spawn(void)
 	{
 		Precache();
+		m_iId = WEAPON_CLAYMORE;
+		SET_MODEL(ENT(pev), "models/w_claymore.mdl");
 
-		SET_MODEL(ENT(pev), m_iType ? "models/bomb_wondercannonex.mdl" : "models/bomb_wondercannon.mdl");
-		UTIL_SetOrigin(pev, pev->origin);
+		pev->classname = MAKE_STRING("weapon_claymore");
 
-		pev->angles = g_vecZero;
-		pev->gravity = 2.5;
-		pev->solid = SOLID_BBOX;
-		pev->movetype = MOVETYPE_TOSS;
-		pev->frame = 0;
+		m_iClip = -1;
+		m_iDefaultAmmo = 999;
+		m_bDelayFire = false;
 
-		pev->classname = MAKE_STRING("wondercannon_mine");
-		pev->nextthink = gpGlobals->time + 0.01s;
-		SetThink(&CWonderCannonMine::MineThink);
+		m_bAlreadySetUp = false;
+		m_bDeployRemoteControl = false;
+		m_iTriggerLaserMode = 0;
+		m_iSetUpType = 0;
+
+		m_flSetUpTime = invalid_time_point;
+		m_flDeployRemoteControl = invalid_time_point;
+
+		FallInit();
 	}
 
-	void CWonderCannonMine::Init(CBasePlayer* pOwner, CWonderCannon* pWeapon)
+	void CClayMore::Precache(void)
 	{
-		m_pOwner = pOwner;
-		m_pWeapon = pWeapon;
-		m_iTeam = m_pOwner->m_iTeam;
+		PRECACHE_MODEL("models/v_claymore.mdl");
+		PRECACHE_MODEL("models/p_claymore.mdl");
+		PRECACHE_MODEL("models/w_claymore.mdl");
+
+		m_usFireClayMore = PRECACHE_EVENT(1, "events/claymore.sc");
 	}
 
-	void CWonderCannonMine::Precache(void)
+	int CClayMore::GetItemInfo(ItemInfo* p)
 	{
-		PRECACHE_MODEL("sprites/ef_wondercannon_bomb_set.spr");
-		PRECACHE_MODEL("sprites/ef_wondercannonex_bomb_set.spr");
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "claymore";
+		p->iMaxAmmo1 = 999;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = WEAPON_NOCLIP;
+		p->iSlot = 3;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_CLAYMORE;
+		p->iWeight = HEGRENADE_WEIGHT;
+		p->iFlags = 0;
 
-		PRECACHE_MODEL("models/ef_wondercannon_area.mdl");
-		PRECACHE_MODEL("models/bomb_wondercannon.mdl");
 
-		PRECACHE_MODEL("models/ef_wondercannonex_area.mdl");
-		PRECACHE_MODEL("models/bomb_wondercannonex.mdl");
-
-		if (m_iType)
-		{
-			m_iExp[0] = PRECACHE_MODEL("sprites/ef_wondercannonex_hit3.spr");
-			m_iExp[1] = PRECACHE_MODEL("sprites/ef_wondercannonex_bomb_set.spr");
-		}
-		else
-		{
-			m_iExp[0] = PRECACHE_MODEL("sprites/ef_wondercannon_hit3.spr");
-			m_iExp[1] = PRECACHE_MODEL("sprites/ef_wondercannon_bomb_ex.spr");
-		}
-
-		PRECACHE_SOUND("weapons/wondercannon_comd_drop.wav");
-		PRECACHE_SOUND("weapons/wondercannon_comd_exp.wav");
-		PRECACHE_SOUND("weapons/wondercannonex_cmod_exp.wav");
+		return 1;
 	}
 
-	void CWonderCannonMine::Remove()
+	BOOL CClayMore::Deploy(void)
 	{
-		MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY, pev->origin);
-		WRITE_BYTE(TE_KILLENTITYATTACHMENTS);
-		WRITE_SHORT(entindex());
-		MESSAGE_END();
+		m_fMaxSpeed = 260;
 
-		SetThink(nullptr);
-		pev->effects |= EF_NODRAW; // 0x80u
-		return UTIL_Remove(this);
+		if (!m_bAlreadySetUp)
+		{
+			m_bDeployRemoteControl = false;
+			m_iTriggerLaserMode = 0;
+			m_iSetUpType = 0;
+
+			m_flSetUpTime = invalid_time_point;
+		}
+
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase();
+
+		m_flDelayBoom = invalid_time_point;
+		m_flDeployRemoteControl = invalid_time_point;
+
+		int iAnim = CLAYMORE_DRAW;
+		if (m_bAlreadySetUp)
+		{
+			if (m_iTriggerLaserMode == 0)
+				iAnim = CLAYMORE_TRIGGER_DRAW_OFF;
+			else
+				iAnim = CLAYMORE_TRIGGER_DRAW_ON;
+		}
+
+		return DefaultDeploy("models/v_claymore.mdl", m_bAlreadySetUp ? "models/p_claymore_2.mdl" : "models/p_claymore.mdl", iAnim, "grenade", UseDecrement() != FALSE);
 	}
 
-	void CWonderCannonMine::Explode(bool IsManual)
+	void CClayMore::Holster(int skiplocal)
 	{
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_TEMPSPRITE);
-		WRITE_COORD(pev->origin.x);
-		WRITE_COORD(pev->origin.y);
-		WRITE_COORD(pev->origin.z);
-		WRITE_SHORT(m_iExp[0]);
-		WRITE_BYTE(10);
-		WRITE_BYTE(255);
-		WRITE_BYTE(30);
-		MESSAGE_END();
+		m_fInReload = 0;
 
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_TEMPSPRITE);
-		WRITE_COORD(pev->origin.x);
-		WRITE_COORD(pev->origin.y);
-		WRITE_COORD(pev->origin.z + 5.0);
-		WRITE_SHORT(m_iExp[1]);
-		WRITE_BYTE(5);
-		WRITE_BYTE(255);
-		WRITE_BYTE(30);
-		MESSAGE_END();
-
-		if (m_iType)
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/wondercannonex_cmod_exp.wav", VOL_NORM, ATTN_NORM);
-		else
-			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/wondercannon_comd_exp.wav", VOL_NORM, ATTN_NORM);
-
-		DoBombExp(IsManual);
-
-		Remove();
-	}
-	void CWonderCannonMine::DoBombExp(bool IsManual)
-	{
-		CBaseEntity* pEntity = NULL;
-		float flRadius = m_iType ? WONDERCANNONEX_MINE_EXP_RADIUS : WONDERCANNON_MINE_EXP_RADIUS;
-		while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, flRadius)) != NULL)
+		if (!m_bAlreadySetUp)
 		{
-			if (pEntity->IsDormant())
-				continue;
+			m_bDeployRemoteControl = false;
+			m_iTriggerLaserMode = 0;
+			m_iSetUpType = 0;
 
-			if (pEntity->pev->takedamage == DAMAGE_NO)
-				continue;
-
-			if (pEntity == m_pOwner)
-			{
-				if (IsManual && m_iType)
-				{
-					if ((pEntity->pev->origin - pev->origin).Length() < 39.37 * 2.2)
-					{
-						Vector2D vecVelocity = pEntity->pev->velocity.Make2D();
-						float flSpeed = vecVelocity.Length();
-
-						vecVelocity = vecVelocity.Normalize();
-						pEntity->pev->velocity.x = vecVelocity.x * flSpeed * 2.5;
-						pEntity->pev->velocity.y = vecVelocity.y * flSpeed * 2.5;
-						pEntity->pev->velocity.z = 600;
-					}
-
-				}
-				continue;
-			}
-
-			if (g_pGameRules->PlayerRelationship(m_pOwner, pEntity) == GR_TEAMMATE)
-				continue;
-
-			pEntity->TakeDamage(pev, m_pOwner->pev, GetDamage(IsManual), DMG_NEVERGIB | DMG_EXPLOSION | DMG_NOMORALE);
-
-			if (pEntity->IsPlayer())
-			{
-				CBasePlayer* player = (CBasePlayer*)pEntity;
-
-				if (player->m_bIsZombie)
-				{
-					auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-					if (strategy)
-					{
-						strategy->SetStunSpeedTime(3.5s, 55.0);
-						strategy->SetStunGravityTime(3.5s);
-					}
-				}
-			}
-		}
-	}
-
-	float CWonderCannonMine::GetDamage(bool IsManual) const
-	{
-		float flDamage = 1.0f;
-		if (m_iType)
-		{
-			flDamage = IsManual ? 110.0f : 100.0f;
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = IsManual ? 29200.0f : 19200.0f;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = IsManual ? 40000.0f : 25000.0f;
-		}
-		else
-		{
-			flDamage = IsManual ? 110.0f : 100.0f;
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				//flDamage = IsManual ? 28600.0f : 18600.0f;
-				flDamage = IsManual ? 16900.0f : 10900.0f;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = IsManual ? 39400.0f : 24400.0f;
-		}
-		return flDamage;
-	}
-
-	void EXPORT CWonderCannonMine::MineThink(void)
-	{
-		pev->nextthink = gpGlobals->time + 0.01s;
-
-		if (!m_pOwner)
-		{
-			Remove();
-			return;
+			m_flSetUpTime = invalid_time_point;
 		}
 
-		if (m_pOwner->m_bIsZombie || !m_pOwner->IsAlive())
-		{
-			Remove();
-			return;
-		}
-
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pOwner->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-
-		if (!pWeapon)
-		{
-			Remove();
-			return;
-		}
-
-		if (pWeapon->m_iId != GetWeaponsId())
-		{
-			Remove();
-			return;
-		}
-
-		if (pev->flags & FL_ONGROUND)
-		{
-			if (m_iState == 2)
-			{
-				CBaseEntity* pEntity = NULL;
-				if (!m_iType)
-				{
-					while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 39.37 * 1.5)) != NULL)
-					{
-						//a lazy way
-						if (pEntity != m_pOwner)
-							continue;
-
-						Vector2D vecVelocity = pEntity->pev->velocity.Make2D();
-						float flSpeed = vecVelocity.Length();
-						vecVelocity = vecVelocity.Normalize();
-						pEntity->pev->velocity.x = vecVelocity.x * flSpeed * 2;
-						pEntity->pev->velocity.y = vecVelocity.y * flSpeed * 2;
-						pEntity->pev->velocity.z = 400;
-
-						Explode(false);
-						return;
-					}
-				}
-
-				while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 39.37 * 2.8)) != NULL)
-				{
-					if (pEntity->IsDormant())
-						continue;
-
-					if (pEntity->pev->takedamage == DAMAGE_NO)
-						continue;
-
-					if (pEntity == m_pOwner)
-						continue;
-
-					if (g_pGameRules->PlayerRelationship(m_pOwner, pEntity) == GR_TEAMMATE)
-						continue;
-
-					Explode(false);
-
-				}
-			}
-
-			if (m_flNextAnim != invalid_time_point && m_flNextAnim < gpGlobals->time)
-			{
-				pev->sequence = 1;
-				//play model & spr
-
-				MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, this->pev);
-				WRITE_BYTE(18);
-				WRITE_BYTE(m_iType ? 2 : 0);
-				WRITE_SHORT(this->entindex());
-				MESSAGE_END();
-
-				m_iState = 2;
-				m_flNextAnim = invalid_time_point;
-			}
-
-			if (!m_iState)
-			{
-				pev->sequence = 0;
-				pev->frame = 0;
-				ResetSequenceInfo();
-
-				MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, this->pev);
-				WRITE_BYTE(18);
-				WRITE_BYTE(m_iType ? 3 : 1);
-				WRITE_SHORT(this->entindex());
-				MESSAGE_END();
-
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/wondercannon_comd_drop.wav", VOL_NORM, ATTN_NORM);
-
-				m_flNextAnim = gpGlobals->time + 0.5s;
-
-				m_iState = 1;
-			}
-		}
-	}
-#endif
-LINK_ENTITY_TO_CLASS(weapon_claymore, CClaymore)
-
-void CClaymore::Spawn(void)
-{
-	Precache();
-	m_iId = WEAPON_CLAYMORE;
-	SET_MODEL(ENT(pev), "models/w_claymore.mdl");
-
-	m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE;
-	m_flStartThrow = invalid_time_point;
-	m_flReleaseThrow = invalid_time_point;
-	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
-
-	FallInit();
-}
-
-void CClaymore::Precache(void)
-{
-	PRECACHE_MODEL("models/v_claymore.mdl");
-	PRECACHE_MODEL("models/p_claymore.mdl");
-	PRECACHE_MODEL("models/w_claymore.mdl");
-}
-
-int CClaymore::GetItemInfo(ItemInfo *p)
-{
-	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "HEGrenade";
-	p->iMaxAmmo1 = MAX_AMMO_HEGRENADE;
-	p->pszAmmo2 = NULL;
-	p->iMaxAmmo2 = -1;
-	p->iMaxClip = WEAPON_NOCLIP;
-	p->iSlot = 3;
-	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_CLAYMORE;
-	p->iWeight = HEGRENADE_WEIGHT;
-	p->iFlags = ITEM_FLAG_LIMITINWORLD | ITEM_FLAG_EXHAUSTIBLE;
-
-	return 1;
-}
-
-BOOL CClaymore::Deploy(void)
-{
-	m_flReleaseThrow = invalid_time_point;
-	m_fMaxSpeed = 250;
-	
-	m_pPlayer->m_bShieldDrawn = false;
-
-	return DefaultDeploy("models/v_claymore.mdl", "models/p_claymore.mdl", claymore_DRAW, "grenade", UseDecrement() != FALSE);
-}
-
-BOOL CClaymore::CanHolster(void)
-{
-	return CBasePlayerWeapon::CanHolster();
-}
-
-void CClaymore::Holster(int skiplocal)
-{
-	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
-
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-	{
-		m_pPlayer->RemoveWeapon(m_iId);
-		DestroyItem();
-	}
-
-	m_flStartThrow = invalid_time_point;
-	m_flReleaseThrow = invalid_time_point;
-}
-
-void CClaymore::PrimaryAttack(void)
-{
-	if (m_flStartThrow == invalid_time_point && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
-	{
-		m_flStartThrow = gpGlobals->time;
-		m_flReleaseThrow = invalid_time_point;
-		SendWeaponAnim(HEGRENADE_PULLPIN, UseDecrement() != FALSE);
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
-	}
-}
-
-
-void CClaymore::SecondaryAttack(void)
-{
-	
-}
-
-void CClaymore::WeaponIdle(void)
-{
-	if (m_flReleaseThrow == invalid_time_point && m_flStartThrow != invalid_time_point)
-		m_flReleaseThrow = gpGlobals->time;
-
-	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
-		return;
-
-	if (m_flStartThrow != invalid_time_point)
-	{	
-		Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
-
-		if (angThrow.x < 0)
-			angThrow.x = -10 + angThrow.x * ((90 - 10) / 90.0);
-		else
-			angThrow.x = -10 + angThrow.x * ((90 + 10) / 90.0);
-
-		float flVel = 750;
-
-		UTIL_MakeVectors(angThrow);
-		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
-		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75s;
-
-		CClaymoreGrenade::ShootGrenade(m_pPlayer->pev, vecSrc, vecThrow, m_pPlayer->m_iTeam, GetDamage());
-
-		SendWeaponAnim(CLAYMORE_SHOOT, UseDecrement() != FALSE);
-		SetPlayerShieldAnim();
-
-#ifndef CLIENT_DLL
-		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
-		m_flStartThrow = invalid_time_point;
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
-		
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+		m_flDelayBoom = invalid_time_point;
+		m_flDeployRemoteControl = invalid_time_point;
 
 		if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
-
-		return;
-	}
-	else if (m_flReleaseThrow != invalid_time_point)
-	{
-		m_flStartThrow = invalid_time_point;
-
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 		{
-			SendWeaponAnim(claymore_DRAW, UseDecrement() != FALSE);
-			m_flReleaseThrow = invalid_time_point;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RandomDuration<float>(10s, 15s);
+			m_pPlayer->RemoveWeapon(m_iId);
+			DestroyItem();
+		}
+
+		return CBasePlayerWeapon::Holster(skiplocal);
+	}
+
+
+	void CClayMore::PrimaryAttack(void)
+	{
+		if (!m_bAlreadySetUp)
+		{
+			//Shoot:39.9 / 30.0 = 1.33s
+
+			SendWeaponAnim(CLAYMORE_SHOOT, UseDecrement() != FALSE);
+
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.8s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 30.0s;
+			m_flSetUpTime = gpGlobals->time + 1.33s;
+
+			m_iSetUpType = 1;
 		}
 		else
-			RetireWeapon();
-
-		return;
+		{
+			OnAttack_Shoot();
+			return;
+		}
 	}
-
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	void CClayMore::OnAttack_Shoot(void)
 	{
-		SendWeaponAnim(claymore_IDLE, UseDecrement() != FALSE);
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RandomDuration<float>(10s, 15s);
+		int iAnim = m_iTriggerLaserMode ? CLAYMORE_SHOOT_ON : CLAYMORE_SHOOT_OFF;
+		SendWeaponAnim(iAnim, UseDecrement() != FALSE);
+
+		//36 / 30.0 = 1.2
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.2s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
+
+		m_flDelayBoom = gpGlobals->time + 0.66s;
 	}
-}
 
-BOOL CClaymore::CanDeploy(void)
-{
-	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
-}
 
-float CClaymore::GetDamage()
-{
+	void CClayMore::SecondaryAttack(void)
+	{
+		if (m_bAlreadySetUp)
+		{
+			int iAnim = CLAYMORE_TRIGGER_ON;
+			switch (m_iTriggerLaserMode)
+			{
+			case 0:
+			{
+				m_iTriggerLaserMode = 1;
+				m_flSwitchLaserTime = gpGlobals->time + 1.0s;
+
+				iAnim = CLAYMORE_TRIGGER_ON;
+				break;
+			}
+			case 1:
+			{
+				m_iTriggerLaserMode = 0;
+				m_flSwitchLaserTime = gpGlobals->time + 1.0s;
+
+				iAnim = CLAYMORE_TRIGGER_OFF;
+				break;
+			}
+			default:break;
+			}
+
+			SendWeaponAnim(iAnim, UseDecrement() != FALSE);
+
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.03s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.2s;
+		}
+	}
+
+	void CClayMore::ItemPostFrame()
+	{
+		if (!m_bAlreadySetUp)
+		{
+			if (m_iSetUpType == 1)
+			{
+				if (m_flSetUpTime != invalid_time_point && m_flSetUpTime < gpGlobals->time)
+				{
+					if (m_flDeployRemoteControl == invalid_time_point)
+						m_flDeployRemoteControl = gpGlobals->time + 0.5s;
+
+					m_flSetUpTime = invalid_time_point;
+					m_iSetUpType = 2;
+
+					m_bAlreadySetUp = true;
+
+					Vector vecSrc = m_pPlayer->pev->origin;
+					Vector vecAngle = m_pPlayer->pev->v_angle;
+					vecAngle.x = 0;
+					UTIL_MakeVectors(vecAngle);
+
 #ifndef CLIENT_DLL
-	if (g_pModRunning->DamageTrack() == DT_ZBS)
-		return 500.0f;
-	if (g_pModRunning->DamageTrack() == DT_ZB)
-		return 500.0f;
-#endif
-	return 100.0f;
-}
+					m_pClayMoreMine = CClayMoreMine::Create(0, vecSrc, vecAngle, ENT(m_pPlayer->pev));
 
-float CClaymore::GetRange()
-{
-	return 100.0f;
-}
+					if (m_pClayMoreMine)
+					{
+						m_pClayMoreMine->Init(m_pPlayer, this);
+					}
+#endif
+				}
+			}
+		}
+		else
+		{
+			if (m_iSetUpType == 2 && m_flDeployRemoteControl != invalid_time_point)
+			{
+				if (m_flDeployRemoteControl < gpGlobals->time)
+				{
+					if (!m_bDeployRemoteControl)
+					{
+						SendWeaponAnim(CLAYMORE_TRIGGER_DRAW_OFF, UseDecrement() != FALSE);
+
+						m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.03s;
+						m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.2s;
+
+						m_flDeployRemoteControl = invalid_time_point;
+						m_bDeployRemoteControl = true;
+						m_iSetUpType = 3;
+					}
+				}
+			}
+			if (m_iSetUpType == 3 && m_flDelayBoom != invalid_time_point && m_flDelayBoom < gpGlobals->time)
+			{
+				m_flDelayBoom = invalid_time_point;
+
+#ifndef CLIENT_DLL
+				if (m_pClayMoreMine)
+				{
+					m_pClayMoreMine->CheckCanBoom(true, false);
+				}
+#endif
+				if ((--m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]) > 0)
+				{
+					m_bAlreadySetUp = false;
+					Deploy();
+					return CBasePlayerWeapon::ItemPostFrame();
+				}
+				else
+				{
+					RetireWeapon();
+					return CBasePlayerWeapon::ItemPostFrame();
+				}
+
+			}
+			if (m_iSetUpType == 3 && m_flSwitchLaserTime != invalid_time_point && m_flSwitchLaserTime < gpGlobals->time)
+			{
+				m_flSwitchLaserTime = invalid_time_point;
+
+#ifndef CLIENT_DLL
+				if (m_pClayMoreMine)
+					m_pClayMoreMine->ChangeMode(m_pClayMoreMine, m_iTriggerLaserMode ? true : false);
+#endif
+			}
+		}
+
+
+		return CBasePlayerWeapon::ItemPostFrame();
+	}
+
+
+	void CClayMore::WeaponIdle(void)
+	{
+		if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
+			return;
+
+		int iAnim = CLAYMORE_IDLE;
+		if (m_bAlreadySetUp)
+		{
+			switch (m_iTriggerLaserMode)
+			{
+			case 0:
+			{
+				iAnim = CLAYMORE_IDLE_TRIGGER_OFF;
+				break;
+			}
+			case 1:
+			{
+				iAnim = CLAYMORE_IDLE_TRIGGER_ON;
+				break;
+			}
+			default:break;
+			}
+		}
+
+
+
+
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
+#ifndef CLIENT_DLL
+		SendWeaponAnim(iAnim, UseDecrement() != FALSE);
+#endif
+	}
+
 
 }

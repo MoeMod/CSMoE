@@ -100,7 +100,7 @@ namespace sv {
 		pev->gravity = 0.4;
 		pev->friction = 0.3;
 		pev->dmg = GetExplodeDamage();
-		pev->dmgtime = gpGlobals->time + 1.5s;
+		pev->dmgtime = gpGlobals->time + 3.0s;
 		pev->angles.x -= 30.0;
 
 		UTIL_MakeVectors(pev->angles);
@@ -117,6 +117,11 @@ namespace sv {
 
 	void CFireCrackerRocket::Explode(CBaseEntity* pOther)
 	{
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_KILLBEAM);
+		WRITE_SHORT(this->entindex());
+		MESSAGE_END();
+
 		TraceResult tr;
 		Vector vecParticleVel;
 
@@ -142,15 +147,12 @@ namespace sv {
 			vecParticleVel = Vector(0, 0, 200);
 		}
 
-		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
-		WRITE_BYTE(TE_EXPLOSION);
+		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL);
+		WRITE_BYTE(35);
+		WRITE_BYTE(2);
 		WRITE_COORD(pev->origin.x);
 		WRITE_COORD(pev->origin.y);
 		WRITE_COORD(pev->origin.z);
-		WRITE_SHORT(g_sModelIndexFireball2);
-		WRITE_BYTE(5);
-		WRITE_BYTE(30);
-		WRITE_BYTE(TE_EXPLFLAG_NONE);
 		MESSAGE_END();
 
 		EMIT_SOUND_DYN(edict(), CHAN_VOICE, "weapons/firecracker_explode.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
@@ -160,10 +162,19 @@ namespace sv {
 
 	void CFireCrackerRocket::FollowThink(void)
 	{
+		pev->nextthink = gpGlobals->time + 0.05s;
+
 		pev->angles = UTIL_VecToAngles(pev->velocity);
 
 		if (gpGlobals->time > pev->dmgtime)
 			Explode(this);
+
+		MESSAGE_BEGIN(MSG_BROADCAST, gmsgMPToCL);
+		WRITE_BYTE(36);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		MESSAGE_END();
 
 		m_vecLastPos = pev->origin;
 	}
@@ -193,8 +204,8 @@ namespace sv {
 	{
 		PRECACHE_MODEL("models/shell_svdex.mdl");
 		PRECACHE_MODEL("sprites/spark1.spr");
-		PRECACHE_MODEL("sprites/spark2.spr");
-		PRECACHE_MODEL("sprites/spark3.spr");
+		//PRECACHE_MODEL("sprites/spark2.spr"); //FGLauncher
+		//PRECACHE_MODEL("sprites/spark3.spr"); //FGLauncher
 
 		PRECACHE_SOUND("weapons/firecracker_bounce1.wav");
 		PRECACHE_SOUND("weapons/firecracker_bounce2.wav");
@@ -249,7 +260,8 @@ void CFireCracker::Precache(void)
 
 	PRECACHE_MODEL("sprites/muzzleflash12.spr");
 
-	PRECACHE_SOUND("weapons/m79-1.wav");
+	PRECACHE_SOUND("weapons/firecracker-1.wav");
+	PRECACHE_SOUND("weapons/firecracker-2.wav");
 
 	PRECACHE_MODEL("models/p_firecracker.mdl");
 	PRECACHE_MODEL("models/v_firecracker.mdl");
@@ -339,7 +351,9 @@ void CFireCracker::FireCrackerFire(bool bBounce)
 	}
 
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/m79-1.wav", 0.7, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/firecracker-1.wav", 0.7, ATTN_NORM, 0, PITCH_NORM);
+	else
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/firecracker-2.wav", 0.7, ATTN_NORM, 0, PITCH_NORM);
 #endif
 
 	int flags;

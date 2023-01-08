@@ -901,6 +901,15 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 
 		m_lastDamageAmount = flDamage;
+
+		if (m_lastDamageAmount)
+		{
+			int iAtt = ENTINDEX(ENT(pevAttacker));
+			int iVic = ENTINDEX(edict());
+
+			iDeathInfo_Fire[iAtt][iVic][2] += m_lastDamageAmount;
+			iDeathInfo_Body[iAtt][iVic][2] += 1;
+		}
 		
 		CBaseEntity* temp = GetClassPtr<CBaseEntity>(pevInflictor);
 
@@ -1396,7 +1405,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		if (iDamageAmount && this->m_bIsZombie)
 		{
 			g_flZombieTankerDamage[ENTINDEX(edict())] += iDamageAmount;
-			if (g_flZombieTankerDamage[ENTINDEX(edict())] >= 3000.0 && g_iZombieTankerCount[ENTINDEX(edict())] <= 5)
+			if (g_flZombieTankerDamage[ENTINDEX(edict())] >= 3000.0 && g_iZombieTankerCount[ENTINDEX(edict())] <= 20)
 			{
 				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, this->pev);
 				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
@@ -1414,16 +1423,18 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			MESSAGE_END();
 
 			g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] += iDamageAmount;
-			if (g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] >= 5000.0 && g_iAttackerCount[ENTINDEX(ENT(pevAttacker))] <= 5)
+			if (g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] >= 5000.0 && g_iAttackerCount[ENTINDEX(ENT(pevAttacker))] <= 10)
 			{
+				g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] = 0.0;
+				g_iAttackerCount[ENTINDEX(ENT(pevAttacker))]++;
+
 				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, pevAttacker);
 				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
 				WRITE_BYTE(4);
 				WRITE_COORD(float(ENTINDEX(ENT(pevAttacker))));
 				MESSAGE_END();
 
-				g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] = 0.0;
-				g_iAttackerCount[ENTINDEX(ENT(pevAttacker))]++;
+				
 			}
 
 			if (!g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))])
@@ -9349,6 +9360,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_VULCANUS1:
 		case WEAPON_THANATOS1:
 		case WEAPON_VULCANUS5:
+		case WEAPON_HK121EX:
 			return TRUE;
 		}
 	}

@@ -36,6 +36,9 @@
 #include "triangleapi.h"
 #include "weapons_const.h"
 
+#include "vgui_controls/controls.h"
+#include "vgui/ILocalize.h"
+
 namespace cl {
 
 //#include "vgui_TeamFortressViewport.h"
@@ -2219,9 +2222,39 @@ int CHudAmmo::DrawNEWHudCurrentWpn(float flTime)
 
 		gEngfuncs.pfnDrawSetTextColor(1.0f, 1.0f, 1.0f);
 
+		char* szModifiedWpnName = m_pWeapon->szName;
 		char szWeaponInfo[64];
 
-		sprintf(szWeaponInfo, "%d %s", m_pWeapon->iSlot + 1, m_pWeapon->szName);
+		// strip the monster_* or weapon_* from the inflictor's classname
+		if (!strncmp(szModifiedWpnName, "weapon_", 7))
+			szModifiedWpnName += 7;
+
+		else if (!strncmp(szModifiedWpnName, "knife_", 6))
+			szModifiedWpnName += 6;
+
+		else if (!strncmp(szModifiedWpnName, "func_", 5))
+			szModifiedWpnName += 5;
+
+		if (!strcmp(szModifiedWpnName, "usp"))
+			strcpy(szModifiedWpnName, "USP45");
+		else if (!strcmp(szModifiedWpnName, "deagle"))
+			strcpy(szModifiedWpnName, "DesertEagle");
+		else if (!strcmp(szModifiedWpnName, "hegrenade"))
+			strcpy(szModifiedWpnName, "HE_Grenade");
+
+
+		//Vgui Localize
+		char SzWpnNameCn[64];
+		char SzText[64]; sprintf_s(SzText, "CSO_%s", szModifiedWpnName);
+		if (vgui2::localize()->Find(SzText))
+			strcpy(SzWpnNameCn, HudDeathInfo().UnicodeToUTF8(vgui2::localize()->Find(SzText)));
+		else
+		{
+			sprintf_s(SzText, "#CSO_%s", szModifiedWpnName);
+			strcpy(SzWpnNameCn, SzText);
+		}
+
+		sprintf(szWeaponInfo, "%d %s", m_pWeapon->iSlot + 1, SzWpnNameCn);
 
 		gEngfuncs.pfnDrawConsoleStringLen(szWeaponInfo, &iLength, &iHeight);
 		gEngfuncs.pfnDrawConsoleString(iX, iY + 1, szWeaponInfo);

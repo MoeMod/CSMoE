@@ -192,6 +192,7 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
+		m_pPlayer->GiveNamedItem("weapon_claymore");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		//m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveNamedItem("weapon_m79");

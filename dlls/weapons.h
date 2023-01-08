@@ -227,6 +227,7 @@ public:
 		EXPTYPE_THANATOS5ROCKET,
 		EXPTYPE_VULCANUS7ROCKET,
 		EXPTYPE_FIREBOMB,
+		EXPTYPE_HK121ROCKET
 	};
 
 	void Spawn() override;
@@ -1215,6 +1216,44 @@ private:
 	int m_iExp[2];
 	int m_iSequence;
 	time_point_t m_flNextAnim;
+
+};
+
+class CClayMore;
+class CClayMoreMine : public CGrenade
+{
+public:
+	CClayMoreMine()
+	{
+		m_iState = 0;
+	}
+
+	static CClayMoreMine* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner);
+	void Init(CBasePlayer* pOwner, CClayMore* pWeapon);
+
+	void Spawn(void);
+	void Precache(void);
+	void EXPORT MineThink();
+	void Remove();
+
+	void Explode(bool IsManual);//Show Effect
+	int CheckCanBoom(bool IsManual, bool IsDetection);//Do Damage & KnockBack
+	void ChangeMode(CBaseEntity* pMine, bool State);
+
+	float GetDamage(bool IsManual) const;
+	int GetWeaponsId(void) { return m_iType ? WEAPON_CLAYMORE : WEAPON_CLAYMORE; }
+public:
+	CBasePlayer* m_pOwner;
+	CClayMore* m_pWeapon;
+
+	int m_iState;
+	int m_iType;
+	bool m_bLaserMode;
+	bool m_bSuperDamage;
+	time_point_t m_flDelayTrigger;
+
+private:
+	int m_iLaser;
 
 };
 

@@ -85,6 +85,46 @@ TEMPENTITY* AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float 
 //void EnableWallHack(int enable, int iTarget);
 void EV_DragonTailFX(int iDidHit, int iType);
 void EV_Crow9FX(Vector angle);
+void EV_SPR3(struct tempent_s* ent, float frametime, float currenttime);
+void EV_Explosion(int type, Vector pos);
+
+int ModelFrameCount(model_t* mod)
+{
+	int count = 1;
+
+	if (!mod)
+		return count;
+
+	if (mod->type == mod_sprite)
+	{
+		count = ((msprite_t*)mod->cache.data)->numframes;
+
+		if (count > 0)
+			return count;
+
+		return 1;
+	}
+
+	if (mod->type != mod_studio)
+		return count;
+
+	studiohdr_t* pstudiohdr = (studiohdr_t*)IEngineStudio.Mod_Extradata(mod);
+
+	if (!pstudiohdr)
+		return 1;
+
+	mstudiobodyparts_t* pbodypart = (mstudiobodyparts_t*)((byte*)pstudiohdr + pstudiohdr->bodypartindex);
+
+	for (int i = 0; i < pstudiohdr->numbodyparts; i++)
+	{
+		count *= pbodypart[i].nummodels;
+	}
+
+	if (count > 0)
+		return count;
+
+	return 1;
+}
 
 int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 {
@@ -512,6 +552,26 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		break;
 	}
+	case 35:
+	{
+		arg1 = reader.ReadByte();
+
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+
+		EV_Explosion(arg1, pos);
+		break;
+	}
+	case 36:
+	{
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+
+		gEngfuncs.pEfxAPI->R_SparkEffect(pos, 8, -200, 200);
+		break;
+	}
 	case 44:
 	{
 		arg1 = reader.ReadByte();
@@ -573,6 +633,97 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 //		pEnt->curstate.renderfx = kRenderFxWallHack;
 //	}
 //}
+
+
+void EV_SPR3(struct tempent_s* ent, float frametime, float currenttime)
+{
+	if ((ent->die - gHUD.m_flTime) < ent->entity.curstate.fuser2)
+	{
+		ent->entity.curstate.renderamt = 255.0 * (ent->die - gHUD.m_flTime) / ent->entity.curstate.fuser2;
+	}
+
+	ent->entity.origin[2] += 0.7;
+	ent->entity.curstate.scale += 0.007;
+
+	if ((gHUD.m_flTime - ent->entity.curstate.fuser1) > (1.0 / ent->entity.curstate.framerate))
+	{
+		if (ent->entity.curstate.frame + 1 > ent->entity.curstate.iuser1)
+			ent->entity.curstate.frame = 0;
+		else
+			ent->entity.curstate.frame += 1;
+
+		ent->entity.curstate.fuser1 = gHUD.m_flTime;
+	}
+}
+
+void EV_Explosion(int type, Vector origin)
+{
+	switch (type)
+	{
+	case 2:
+	{
+		float vColor[3][3];
+
+		for (int i = 0; i < 3; i++)
+		{
+			vColor[i][0] = gEngfuncs.pfnRandomLong(70, 250);
+			vColor[i][1] = gEngfuncs.pfnRandomLong(70, 250);
+			vColor[i][2] = gEngfuncs.pfnRandomLong(70, 250);
+
+			vec3_t vOrigin;
+
+			vOrigin[0] = origin[0] + gEngfuncs.pfnRandomFloat(-100.0, 100.0);
+			vOrigin[1] = origin[1] + gEngfuncs.pfnRandomFloat(-100.0, 100.0);
+			vOrigin[2] = origin[2] + gEngfuncs.pfnRandomFloat(20.0, 70.0);
+
+			struct model_s* pModel;
+			TEMPENTITY* pEnt;
+
+			pModel = IEngineStudio.Mod_ForName("sprites/spark1.spr", 0);
+
+			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(vOrigin, pModel);
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 254;
+			pEnt->entity.curstate.scale = 0.7;
+			pEnt->entity.curstate.rendercolor.r = vColor[i][0];
+			pEnt->entity.curstate.rendercolor.g = vColor[i][1];
+			pEnt->entity.curstate.rendercolor.b = vColor[i][2];
+			pEnt->flags |= FTENT_CLIENTCUSTOM;
+			pEnt->callback = EV_SPR3;
+
+			pEnt->entity.curstate.iuser1 = ModelFrameCount(pModel);
+			pEnt->entity.curstate.framerate = 15.0;
+			pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+			pEnt->entity.curstate.fuser2 = 0.2;
+
+			pEnt->die = gHUD.m_flTime + pEnt->entity.curstate.iuser1 / 15.0;
+		}
+
+		struct model_s* pModel;
+		TEMPENTITY* pEnt;
+
+		pModel = IEngineStudio.Mod_ForName("sprites/spark1.spr", 0);
+
+		origin[2] += 10.0;
+
+		pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+		pEnt->entity.curstate.rendermode = kRenderTransAdd;
+		pEnt->entity.curstate.renderamt = 255;
+		pEnt->entity.curstate.scale = 0.7;
+		pEnt->entity.curstate.fuser2 = 0.6;
+		pEnt->flags |= FTENT_CLIENTCUSTOM;
+		pEnt->callback = EV_SPR3;
+
+		pEnt->entity.curstate.iuser1 =  ModelFrameCount(pModel);
+		pEnt->entity.curstate.framerate = 15.0;
+		pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+		pEnt->entity.curstate.fuser2 = 0.2;
+
+		pEnt->die = gHUD.m_flTime + pEnt->entity.curstate.iuser1 / 15.0;
+		break;
+	}
+	}
+}
 
 void FollowThink(tempent_s* ent, float frametime, float currenttime)
 {

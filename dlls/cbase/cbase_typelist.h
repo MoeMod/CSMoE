@@ -400,6 +400,8 @@ TL_ADD(CVulcanus5)
 TL_ADD(CM79)
 TL_ADD(CM79G)
 TL_ADD(CFireCracker)
+TL_ADD(CHK121EX)
+TL_ADD(CClayMore)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -766,6 +768,8 @@ TL_ADD(CMagicSgCannon)
 TL_ADD(CSwordBombardTouchBox)
 TL_ADD(CM79Rocket)
 TL_ADD(CFireCrackerRocket)
+TL_ADD(CHK121Rocket)
+TL_ADD(CClayMoreMine)
 #endif
 
 TL_END(AllEntityTypeList)

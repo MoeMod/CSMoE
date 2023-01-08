@@ -41,7 +41,7 @@ namespace xe {
 
     inline const char *GetShaderVersionString()
     {
-#ifdef __APPLE__
+#ifndef XASH_GLES
         return "#version 120\n";
 #else
         return "#version 100\n";

@@ -1196,7 +1196,7 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 	}
 	case 3:
 	{
-		pTemp = CL_TempEntAllocHigh(parent->attachment[iAttachment], Mod_Handle(modelIndex));
+		pTemp = CL_AllocMuzzleFlash(pos, Mod_Handle(modelIndex), scale);
 
 		if (!pTemp)
 			return;

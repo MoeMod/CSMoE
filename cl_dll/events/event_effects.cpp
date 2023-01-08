@@ -68,6 +68,7 @@ enum event_effect
 	EVENT_MAGICKNIFE,
 	EVENT_DEATHKNIGHT,
 	EVENT_MAGICSG,
+	EVENT_CLAYMORE,
 };
 
 enum buffsg552ex_slash_e
@@ -112,6 +113,42 @@ void EV_MagicSgCallBack(struct tempent_s* pEnt, float frametime, float currentti
 		VectorCopy(origin, pEnt->entity.curstate.vuser1);
 	}
 
+}
+void Claymore_CallBack(struct tempent_s* ent, float frametime, float currenttime)
+{
+	if (ent->entity.curstate.iuser1)
+	{
+		if (ent->entity.curstate.fuser1 < gHUD.m_flTime)
+		{
+			ent->entity.curstate.renderamt -= 10;
+			if (ent->entity.curstate.renderamt <= 0)
+				ent->die = gHUD.m_flTime;
+		}
+
+		if (ent->entity.curstate.fuser2 < gHUD.m_flTime || !ent->entity.curstate.fuser2)
+		{
+			if (ent->entity.curstate.frame < ent->frameMax)
+				ent->entity.curstate.frame++;
+			ent->entity.curstate.fuser2 = gHUD.m_flTime + 0.1;
+		}
+	}
+	else
+	{
+		if (ent->entity.curstate.fuser1 < gHUD.m_flTime)
+		{
+			ent->entity.curstate.renderamt -= 15;
+			if (ent->entity.curstate.renderamt <= 0)
+				ent->die = gHUD.m_flTime;
+		}
+
+		if (ent->entity.curstate.fuser2 < gHUD.m_flTime || !ent->entity.curstate.fuser2)
+		{
+			if (ent->entity.curstate.frame < ent->frameMax)
+				ent->entity.curstate.frame++;
+
+			ent->entity.curstate.fuser2 = gHUD.m_flTime + 0.08;
+		}
+	}
 }
 void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType)
 {
@@ -2214,6 +2251,47 @@ void EV_WpnEffects(event_args_s* args)
 			}
 		}
 
+		break;
+	}
+	case EVENT_CLAYMORE:
+	{
+		if (!args->iparam2)
+		{
+			struct model_s* pModel;
+			TEMPENTITY* pEnt;
+
+			origin[2] += 400.0f;
+			pModel = IEngineStudio.Mod_ForName("sprites/claymore_explosion1.spr", 0);
+
+			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.scale = 4.0f;
+			pEnt->entity.curstate.iuser1 = 1;
+			pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 2.0f;
+			pEnt->die = gHUD.m_flTime + 100.0f;
+			pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_PERSIST;;
+			pEnt->callback = Claymore_CallBack;
+			pEnt->frameMax = 46;
+			origin[2] -= 400.0f;
+
+			TEMPENTITY* pEnt2;
+
+			origin[2] += 200.0f;
+			pModel = IEngineStudio.Mod_ForName("sprites/claymore_explosion2.spr", 0);
+
+			pEnt2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+			pEnt2->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt2->entity.curstate.renderamt = 255;
+			pEnt2->entity.curstate.scale = 1.5f;
+			pEnt2->entity.curstate.fuser1 = gHUD.m_flTime + 1.5f;
+			pEnt2->die = gHUD.m_flTime + 100.0f;
+			pEnt2->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_PERSIST;;
+			pEnt2->callback = Claymore_CallBack;
+			pEnt2->frameMax = 40;
+
+			origin[2] -= 200.0f;
+		}
 		break;
 	}
 

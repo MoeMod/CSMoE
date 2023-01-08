@@ -116,6 +116,11 @@ namespace sv {
 
 	void CM79Rocket::RocketTouch(CBaseEntity* pOther)
 	{
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_KILLBEAM);
+		WRITE_SHORT(this->entindex());
+		MESSAGE_END();
+
 		ExplodeTouch3(pOther, GetRadius(), EXPTYPE_M79ROCKET, false);
 	}
 

@@ -1,100 +1,73 @@
 #pragma once
 
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
 #endif
-
-enum
-{
-	SBMINE_IDLE,
-	SBMINE_SHOOT_READY,
-	SBMINE_READY_IDLE,
-	SBMINE_SHOOT1,
-	SBMINE_SHOOT2,
-	SBMINE_DRAW,
-	SBMINE_TRIGGER_IDLE,
-	SBMINE_TRIGGER_SHOOT,
-	SBMINE_TRIGGER_DRAW,
-};
-
-enum
-{
-	CLAYMORE_IDLE,
-	CLAYMORE_SHOOT,
-	CLAYMORE_DRAW,
-	CLAYMORE_TRIGGER_IDLE_ON,
-	CLAYMORE_TRIGGER_IDLE_OFF,
-	CLAYMORE_TRIGGER_ON,
-	CLAYMORE_TRIGGER_OFF,
-	CLAYMORE_TRIGGER_SHOOT_ON,
-	CLAYMORE_TRIGGER_SHOOT_OFF,
-	CLAYMORE_TRIGGER_DRAW_ON,
-	CLAYMORE_TRIGGER_DRAW_OFF,
-};
-
-class CClaymore : public CBasePlayerWeapon
-{
-	
-public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual int GetItemInfo(ItemInfo *p);
-	virtual BOOL CanDeploy();
-	virtual BOOL CanDrop() { return FALSE; }
-	virtual BOOL CanHolster();
-	virtual BOOL Deploy();
-	virtual void Holster(int skiplocal);
-	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
-	virtual int iItemSlot() { return GRENADE_SLOT; }
-	virtual void PrimaryAttack();
-	virtual void SecondaryAttack();
-	virtual void WeaponIdle();
-	virtual BOOL UseDecrement()
+	class CClayMore : public CBasePlayerWeapon
 	{
+		enum claymore_e
+		{
+			CLAYMORE_IDLE,
+			CLAYMORE_SHOOT,
+			CLAYMORE_DRAW,
+			CLAYMORE_IDLE_TRIGGER_ON,
+			CLAYMORE_IDLE_TRIGGER_OFF,
+			CLAYMORE_TRIGGER_ON,
+			CLAYMORE_TRIGGER_OFF,
+			CLAYMORE_SHOOT_ON,
+			CLAYMORE_SHOOT_OFF,
+			CLAYMORE_TRIGGER_DRAW_ON,
+			CLAYMORE_TRIGGER_DRAW_OFF
+		};
+
+	public:
+		virtual void Spawn();
+		virtual void Precache();
+		virtual int GetItemInfo(ItemInfo* p);
+		virtual BOOL CanDeploy() { return TRUE; };
+		virtual BOOL CanDrop() { return FALSE; }
+		virtual BOOL Deploy();
+		virtual void Holster(int skiplocal);
+		virtual float GetMaxSpeed() { return m_fMaxSpeed; }
+		virtual int iItemSlot() { return GRENADE_SLOT; }
+		virtual void PrimaryAttack();
+		virtual void SecondaryAttack();
+		virtual void ItemPostFrame();
+		virtual void WeaponIdle();
+		virtual BOOL UseDecrement()
+		{
 #ifdef CLIENT_WEAPONS
-		return TRUE;
+			return TRUE;
 #else
-		return FALSE;
+			return FALSE;
 #endif
-	}
-
-public:
-	float GetDamage();
-	float GetRange();
-
-	EntityHandle <CSbmineGrenade> m_hClaymoreMine;
-};
-
-
-class CSbmineGrenade : public CGrenade
-{
-public:
-	void Spawn() override;
-	void Precache() override;
-
-public:
+		}
 #ifndef CLIENT_DLL
-	static CSbmineGrenade* ShootGrenade(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, int iTeam, float flDamage);
-#else
-	static CSbmineGrenade* ShootGrenade(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, int iTeam, float flDamage) { return NULL; }
+		EntityHandle <CClayMoreMine> m_pClayMoreMine;
 #endif
 
-public:
-	void Explode(TraceResult* pTrace, int bitsDamageType);
-	void EXPORT Detonate();
-	void EXPORT BounceTouch(CBaseEntity* pOther);
-	void EXPORT TumbleThink();
-	void EXPORT Smoke();
-	CBasePlayer* m_pOwner;
+	public:
+		void OnAttack_Shoot();
 
-private:
-	duration_t GetExplosionTime() const { return 1.5s; }
-	float GetRange() const { return 100.0f; }
+	private:
 
-private:
-	short m_sModelIndexExp;
-};
+		bool m_bAlreadySetUp;
+		bool m_bDeployRemoteControl;
+		int m_iTriggerLaserMode;
+		int m_iSetUpType;
 
+		time_point_t m_flSetUpTime;
+		time_point_t m_flDeployRemoteControl;
+		time_point_t m_flSwitchLaserTime;
+		time_point_t m_flDelayBoom;
+
+		unsigned short m_usFireClayMore;
+
+	};
 }
+
+
+
