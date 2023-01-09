@@ -865,7 +865,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 			if (szAssistant[0])
 			{
 				char szTemp[64];
-				sprintf_s(szTemp, "%s + %s", szKiller, szAssistant);
+				sprintf(szTemp, "%s + %s", szKiller, szAssistant);
 				strncpy(rgDeathNoticeList[i].szKiller, szTemp, MAX_PLAYER_NAME_LENGTH);
 				rgDeathNoticeList[i].szKiller[MAX_PLAYER_NAME_LENGTH - 1] = 0;
 			}

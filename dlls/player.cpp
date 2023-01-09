@@ -6241,6 +6241,10 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/z4b/v_deathray.mdl");
 		case WEAPON_CARTBLUES:
 			pev->viewmodel = MAKE_STRING("models/v_cartblue.mdl");
+		case WEAPON_AT4:
+			pev->viewmodel = MAKE_STRING("models/v_at4.mdl");
+		case WEAPON_AT4EX:
+			pev->viewmodel = MAKE_STRING("models/v_at4ex.mdl");
 
 		default:
 			break;

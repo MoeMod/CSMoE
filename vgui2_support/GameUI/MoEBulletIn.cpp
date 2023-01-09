@@ -568,15 +568,15 @@ int CCSBTEBulletin::ReadContextFile(bulletin_elem* pElement, char* szFile, int i
 	bool bisLangEng = (!Q_stricmp(g_szLanguage, "english"));
 
 	if (!bisLangEng)
-		sprintf_s(szFileName, "csmoe_%s/%s", g_szLanguage, szFile);
+		sprintf(szFileName, "csmoe_%s/%s", g_szLanguage, szFile);
 	else
-		sprintf_s(szFileName, "csmoe/%s", szFile);
+		sprintf(szFileName, "csmoe/%s", szFile);
 
 	FILE* fp = fopen(szFileName, "r");
 
 	if (!bisLangEng && !fp)
 	{
-		sprintf_s(szFileName, "csmoe/%s", szFile);
+		sprintf(szFileName, "csmoe/%s", szFile);
 		fp = fopen(szFileName, "r");
 	}
 
@@ -811,16 +811,16 @@ void CCSBTEBulletin::ReadCustomizeFile(void)
 
 			char* szKey = va("%s%d", !i ? "Bulletin" : "EventProgress", j + 1);
 
-			GetPrivateProfileString(szKey, "ContextFile", "", data, 63, "csmoe\\bulletin.ini");
+			//GetPrivateProfileString(szKey, "ContextFile", "", data, 63, "csmoe\\bulletin.ini");
 			if (data[0])
 			{
 				if (!ReadContextFile(&pTemp, data, i))
 					continue;
 
-				GetPrivateProfileString(szKey, "Title", "", data, 255, "csmoe\\bulletin.ini");
+				//GetPrivateProfileString(szKey, "Title", "", data, 255, "csmoe\\bulletin.ini");
 				Q_UTF8ToUnicode(data, pTemp.szTitle, 255);
 
-				GetPrivateProfileString(szKey, "Date", "", data, 127, "csmoe\\bulletin.ini");
+				//GetPrivateProfileString(szKey, "Date", "", data, 127, "csmoe\\bulletin.ini");
 				Q_UTF8ToUnicode(data, pTemp.szDate, 127);
 
 				m_vecPageBulletin[i].emplace_back(pTemp);

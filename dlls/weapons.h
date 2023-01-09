@@ -1526,6 +1526,32 @@ private:
 	time_point_t m_flIgniteTime;
 };
 
+
+class CAT4Rocket : public CGrenade
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void GetExplodeDamage(float& flDamage);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT FollowThink(void);
+	void EXPORT IgniteThink(void);
+	void EXPORT RocketTouch(CBaseEntity* pOther);
+
+public:
+	static CAT4Rocket* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+
+private:
+	float GetRadius();
+	float GetDamage();
+
+	int m_iType;
+	int m_iTrail;
+	time_point_t m_flIgniteTime;
+};
+
 #if 0
 class CGuillotineexAmmo : public CBaseAnimating
 {

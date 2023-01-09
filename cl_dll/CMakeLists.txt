@@ -445,6 +445,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_firecracker.cpp
 	../dlls/wpn_shared/wpn_hk121ex.cpp
 	../dlls/wpn_shared/wpn_claymore.cpp
+	../dlls/wpn_shared/wpn_at4.cpp
 	)
 
 set (HUD_SRCS

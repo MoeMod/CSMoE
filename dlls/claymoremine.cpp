@@ -380,13 +380,8 @@ namespace sv {
 		}
 		else
 		{
-			MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, pev);
-			WRITE_BYTE(33);
-			WRITE_BYTE(m_iType);
-			WRITE_SHORT(entindex());
-			MESSAGE_END();
 
-			UTIL_TempModel(pev->origin, pev->angles, g_vecZero, m_iLaser, 999, 0, 1.0, false, 0, 255, kRenderTransAdd, this, false, 0, 1.0, 1, 0);
+			UTIL_TempModel(g_vecZero, pev->angles, g_vecZero, m_iLaser, 255, 0, 10, false, 0, 255, kRenderTransAdd, this, false, 0, 0, 256, 0);
 			m_flDelayTrigger = gpGlobals->time + 1.03s;
 
 		}

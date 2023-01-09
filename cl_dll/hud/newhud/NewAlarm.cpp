@@ -220,7 +220,7 @@ namespace cl {
 			strcpy(g_TempAlarm.szName, data);
 
 			static char szImagePath[128];
-			sprintf_s(szImagePath, "resource\\announceribbon\\announceicon\\alarm_%s", g_TempAlarm.szName);
+			sprintf(szImagePath, "resource\\announceribbon\\announceicon\\alarm_%s", g_TempAlarm.szName);
 			R_InitTexture(g_TempAlarm.iTexture, szImagePath);
 
 			//HaveMessage?
@@ -264,7 +264,7 @@ namespace cl {
 
 			if (g_TempAlarm.iRibbonRequire)
 			{
-				sprintf_s(szImagePath, "resource\\announceribbon\\ribbonicon\\ribbon_%s", g_TempAlarm.szName);
+				sprintf(szImagePath, "resource\\announceribbon\\ribbonicon\\ribbon_%s", g_TempAlarm.szName);
 				R_InitTexture(g_TempAlarm.iTextureRibbon, szImagePath);
 
 				//Vgui Localize

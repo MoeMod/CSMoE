@@ -2868,6 +2868,9 @@ void R_TempModel(sizebuf_t* msg)
 	frameMax = BF_ReadShort(msg);
 	flags = BF_ReadLong(msg);
 
+	if (life > 25.0)
+		life = 999.0;
+
 	CL_TempCustomModel(pos, angles, velocity, life, modelIndex, sequence, framerate, fadeOut, brightness, rendermode, entity, fadeSpeed, fadeIn, fadeInSpeed, scale, frameMax, flags);
 }
 

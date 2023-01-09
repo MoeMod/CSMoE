@@ -1541,7 +1541,10 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		|| weaponid == WEAPON_DESTROYER
 		|| weaponid == WEAPON_STARCHASERSR
 		|| weaponid == WEAPON_MOSIN
-		|| weaponid == WEAPON_CARTBLUES)
+		|| weaponid == WEAPON_CARTBLUES
+		|| weaponid == WEAPON_AT4
+		|| weaponid == WEAPON_AT4EX
+		|| weaponid == WEAPON_RPG7)
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )
@@ -2245,12 +2248,12 @@ int CHudAmmo::DrawNEWHudCurrentWpn(float flTime)
 
 		//Vgui Localize
 		char SzWpnNameCn[64];
-		char SzText[64]; sprintf_s(SzText, "CSO_%s", szModifiedWpnName);
+		char SzText[64]; sprintf(SzText, "CSO_%s", szModifiedWpnName);
 		if (vgui2::localize()->Find(SzText))
 			strcpy(SzWpnNameCn, HudDeathInfo().UnicodeToUTF8(vgui2::localize()->Find(SzText)));
 		else
 		{
-			sprintf_s(SzText, "#CSO_%s", szModifiedWpnName);
+			sprintf(SzText, "#CSO_%s", szModifiedWpnName);
 			strcpy(SzWpnNameCn, SzText);
 		}
 

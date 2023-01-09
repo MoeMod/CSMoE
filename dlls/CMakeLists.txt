@@ -258,6 +258,7 @@ set(HLDLL_SRCS
 	./magicsgcannon.cpp
 	./m79rocket.cpp
 	./claymoremine.cpp
+	./at4rocket.cpp
 	)
 
 set (HLWPN_SRCS
@@ -638,6 +639,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_firecracker.cpp
 	../dlls/wpn_shared/wpn_hk121ex.cpp
 	../dlls/wpn_shared/wpn_claymore.cpp
+	../dlls/wpn_shared/wpn_at4.cpp
 	)
 
 set(PM_SRCS

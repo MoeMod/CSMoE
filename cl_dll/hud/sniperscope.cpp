@@ -453,7 +453,12 @@ int CHudSniperScope::Draw(float flTime)
 			return 0;
 
 		}
-		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS || pActiveBTEWeapon->m_iId == WEAPON_M400 || pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM)
+		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || 
+			pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS ||
+			pActiveBTEWeapon->m_iId == WEAPON_M400 || 
+			pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM || 
+			pActiveBTEWeapon->m_iId == WEAPON_AT4 || 
+			pActiveBTEWeapon->m_iId == WEAPON_AT4EX)
 		{
 			if (gHUD.m_iFOV > 40)
 				return 1;
@@ -534,7 +539,9 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 		FillRGBABlend(0, 0, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE, 0, 0, 0, 255);
 		FillRGBABlend(0, ScreenHeight / 2 + LENGTH_SCOPE, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE, 0, 0, 0, 255);
 	}
-	if (iId == WEAPON_M400)
+	if (iId == WEAPON_M400 ||
+		iId == WEAPON_AT4 || 
+		iId == WEAPON_AT4EX)
 	{
 		m_iScopeArc[0]->Draw2DQuad(left, 0, centerx, centery, 0, 0, 1, 1, 0, 0, 0, 255);
 

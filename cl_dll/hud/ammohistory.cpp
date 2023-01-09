@@ -349,12 +349,12 @@ int HistoryResource::DrawNEWHudAmmoHistory(float flTime)
 
 				//Vgui Localize
 				char SzWpnNameCn[64];
-				char SzText[64]; sprintf_s(SzText, "CSO_%s", szModifiedWpnName);
+				char SzText[64]; sprintf(SzText, "CSO_%s", szModifiedWpnName);
 				if (vgui2::localize()->Find(SzText))
 					strcpy(SzWpnNameCn, HudDeathInfo().UnicodeToUTF8(vgui2::localize()->Find(SzText)));
 				else
 				{
-					sprintf_s(SzText, "#CSO_%s", szModifiedWpnName);
+					sprintf(SzText, "#CSO_%s", szModifiedWpnName);
 					strcpy(SzWpnNameCn, SzText);
 				}
 

@@ -43,6 +43,7 @@ namespace sv {
 	{
 		PRECACHE_MODEL("models/v_claymore.mdl");
 		PRECACHE_MODEL("models/p_claymore.mdl");
+		PRECACHE_MODEL("models/p_claymore_trigger.mdl");
 		PRECACHE_MODEL("models/w_claymore.mdl");
 
 		m_usFireClayMore = PRECACHE_EVENT(1, "events/claymore.sc");
@@ -93,7 +94,7 @@ namespace sv {
 				iAnim = CLAYMORE_TRIGGER_DRAW_ON;
 		}
 
-		return DefaultDeploy("models/v_claymore.mdl", m_bAlreadySetUp ? "models/p_claymore_2.mdl" : "models/p_claymore.mdl", iAnim, "grenade", UseDecrement() != FALSE);
+		return DefaultDeploy("models/v_claymore.mdl", m_bAlreadySetUp ? "models/p_claymore_trigger.mdl" : "models/p_claymore.mdl", iAnim, "grenade", UseDecrement() != FALSE);
 	}
 
 	void CClayMore::Holster(int skiplocal)
