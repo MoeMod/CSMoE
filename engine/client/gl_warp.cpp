@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "common.h"
 #include "client.h"
 #include "gl_local.h"
+#include "gl_cubemap.h"
 #include "com_model.h"
 #include "wadfile.h"
 
@@ -504,6 +505,8 @@ void R_InitSky( const mip_t *mt, const byte *buf, texture_t *tx )
 	int	r, g, b;
 	int	i, j, p;
 	char	texname[32];
+
+    xe::CubeMap_LoadTexture();
 
 	Q_snprintf( texname, sizeof( texname ), "%s%s.mip", ( mt->offsets[0] > 0 ) ? "#" : "", tx->name );
 

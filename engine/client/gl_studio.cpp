@@ -26,6 +26,7 @@ GNU General Public License for more details.
 #include "cl_tent.h"
 #include "gl_texlru.h"
 #include "gl_shader.h"
+#include "gl_cubemap.h"
 
 #ifdef XASH_RAGDOLL
 #include "physics.h"
@@ -286,6 +287,25 @@ void R_StudioInit( void )
     g_studioshader.attrib.vaPosition = pglGetAttribLocationARB(g_studioshader.program, "vaPosition");
     g_studioshader.attrib.vaNormal = pglGetAttribLocationARB(g_studioshader.program, "vaNormal");
     g_studioshader.attrib.vaTexCoord = pglGetAttribLocationARB(g_studioshader.program, "vaTexCoord");
+
+    xe::CubeMap_Init();
+#endif
+}
+
+void R_StudioShutdown()
+{
+    xe::CubeMap_Shutdown();
+#ifdef XASH_SHADER
+#ifdef XASH_SHADER_VBO
+    // Setup VBO
+    pglDeleteBuffersARB( 1, &g_vbo_verts );
+    pglDeleteBuffersARB( 1, &g_vbo_elems );
+#endif
+    pglDetachObjectARB(g_studioshader.program, g_studioshader.vertex_shader);
+    pglDetachObjectARB(g_studioshader.program, g_studioshader.fragment_shader);
+    pglDeleteObjectARB(g_studioshader.vertex_shader);
+    pglDeleteObjectARB(g_studioshader.fragment_shader);
+    pglDeleteObjectARB(g_studioshader.program);
 #endif
 }
 
@@ -1241,6 +1261,7 @@ static void GAME_EXPORT R_StudioSetupSkin( mstudiotexture_t *ptexture, int index
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
 		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
 
+    xe::CubeMap_Bind(&ptexture[pskinref[index]]);
     xe::TexLru_Bind(&ptexture[pskinref[index]]);
 }
 

@@ -1185,6 +1185,7 @@ void R_Shutdown( void )
 	}
 	Q_memset( clgame.sprites, 0, sizeof( clgame.sprites ));
 
+    R_StudioShutdown();
 	GL_RemoveCommands();
 	R_ShutdownImages();
 

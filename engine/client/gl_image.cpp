@@ -1712,10 +1712,13 @@ namespace xe {
         const dsprite_t *psprite;
         const dspriteframe_t *texture;
     };
+    struct texlru_src_skybox_s {
+        std::string skyname;
+    };
 	struct texlru_extdata_s {
 		int texnum;
 		imgfilter_t *filter;
-		std::variant<texlru_src_external_s, texlru_src_internal_s, texlru_src_spr_s> src;
+		std::variant<texlru_src_external_s, texlru_src_internal_s, texlru_src_spr_s, texlru_src_skybox_s> src;
 	};
 
     std::unordered_map<const mstudiotexture_t *, TextureAttr> g_textureAttrMap;
@@ -1925,7 +1928,83 @@ namespace xe {
         return i;
     }
 
+    int TexLru_LoadTextureSkybox(const char *name, int flags, imgfilter_t *filter)
+    {
+        uint		picFlags = 0;
+
+        if( !name || !name[0] || !glw_state.initialized )
+            return 0;
+
+        string key;
+        sprintf(key, "#CUBEMAP/%s", name);
+
+        // see if already loaded
+        int i = GL_FindTexture(key);
+        if(i > 0)
+        {
+            // prolonge registration
+            gltexture_t	*tex = &r_textures[i];
+            tex->cacheframe = world.load_sequence;
+            if (tex->name[0] != '*')
+                tex->refCount++;
+
+            return i;
+        }
+
+        if( flags & TF_NOFLIP_TGA )
+            picFlags |= IL_DONTFLIP_TGA;
+
+        if( flags & TF_KEEP_8BIT )
+            picFlags |= IL_KEEP_8BIT;
+
+        // set some image flags
+        Image_SetForceFlags( picFlags );
+
+        i = GL_AllocateTextureSlot(key);
+
+        auto tex = &r_textures[i];
+        Q_strncpy( tex->name, key, sizeof( tex->name ));
+        tex->flags = (texFlags_t)flags;
+
+        // init reference exclude brush model's texture
+        if (tex->name[0] != '*')
+            tex->refCount = 1;
+
+        tex->texnum = i;
+
+        // set sky data
+        tex->target = GL_TEXTURE_CUBE_MAP_ARB;
+
+        // add to lru
+        tex->texlru_extdata = std::make_unique<texlru_extdata_t>(texlru_extdata_t{ i, filter, texlru_src_skybox_s{ name } });
+
+        // NOTE: always return texnum as index in array or engine will stop work !!!
+        return i;
+    }
+
 	int TexLru_ReleaseTexture(gltexture_t *image)
+	{
+		// release source
+		if( image->flags & (TF_KEEP_RGBDATA|TF_KEEP_8BIT) && image->original )
+		{
+			image->original = nullptr;
+		}
+
+		//pglDeleteTextures( 1, &image->texnum );
+
+		byte data2D[4] = {  };
+		data2D[0] = data2D[1] = data2D[2] = 80;
+		data2D[3] = 255;
+
+        pglBindTexture( image->target, image->texnum );
+		pglTexImage2D( image->target, 0, image->format, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2D);
+        pglBindTexture( image->target, 0 );
+		MsgDev(D_INFO, "TexLru : swap out texture %s\n", image->name);
+
+		return 0;
+	}
+
+	int TexLru_ReleaseSkybox(gltexture_t *image)
 	{
 		// release source
 		if( image->flags & (TF_KEEP_RGBDATA|TF_KEEP_8BIT) && image->original )
@@ -2050,6 +2129,59 @@ namespace xe {
 
             MsgDev(D_INFO, "TexLru : load SPR texture %s\n", src.path.c_str());
             return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
+        }
+        std::shared_ptr<gltexture_t> operator()(texlru_src_skybox_s &src) const
+        {
+            int flags = tex->flags;
+            const char *skyname = src.skyname.c_str();
+            constexpr const char *g_envsuf[6] = { "rt", "bk", "lf", "ft", "up", "dn" };
+
+            image_ref img[6];
+
+            for (int j = 0; j < 6; j++)
+            {
+                string path;
+                sprintf(path, "gfx/env/%s%s.tga", skyname, g_envsuf[j]);
+                auto pic = FS_LoadImage(path, nullptr, 0);
+                if(!pic)
+                {
+                    MsgDev(D_ERROR, "TexLru : fail to load skybox %s\n", path);
+                    return {}; // couldn't loading image
+                }
+
+                if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
+                    pic = nullptr; // release source texture
+
+                // force upload texture as RGB or RGBA (detail textures requires this)
+                if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
+
+                img[j] = pic;
+            }
+
+            //GL_UploadTexture( pic, tex, false, filter );
+
+            pglBindTexture( tex->target, tex->texnum );
+            tex->texType = TEX_CUBEMAP;
+            for(int j = 0; j < 6; ++j)
+            {
+                auto pic = img[j];
+
+                tex->srcWidth = tex->width = pic->width;
+                tex->srcHeight = tex->height = pic->height;
+
+                tex->fogParams[0] = pic->fogParams[0];
+                tex->fogParams[1] = pic->fogParams[1];
+                tex->fogParams[2] = pic->fogParams[2];
+                tex->fogParams[3] = pic->fogParams[3];
+
+                pglTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, 0, GL_RGB8, pic->width, pic->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pic->buffer);
+            }
+            pglBindTexture( tex->target, tex->texnum );
+
+            GL_TexFilter( tex, false ); // update texture filter, wrap etc
+
+            MsgDev(D_INFO, "TexLru : load skybox gfx/env/%s\n", src.skyname.c_str());
+            return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseSkybox };
         }
 	};
 
