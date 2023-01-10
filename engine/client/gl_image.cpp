@@ -2018,9 +2018,15 @@ namespace xe {
 		data2D[0] = data2D[1] = data2D[2] = 80;
 		data2D[3] = 255;
 
-        pglBindTexture( image->target, image->texnum );
-		pglTexImage2D( image->target, 0, image->format, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2D);
-        pglBindTexture( image->target, 0 );
+		Assert(image->target == GL_TEXTURE_CUBE_MAP_ARB);
+
+		pglActiveTextureARB(GL_TEXTURE1_ARB);
+		pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, image->texnum);
+		for (int j = 0; j < 6; ++j)
+		{
+			pglTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, 0, image->format, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2D);
+		}
+        pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0 );
 		MsgDev(D_INFO, "TexLru : swap out texture %s\n", image->name);
 
 		return 0;
@@ -2149,18 +2155,18 @@ namespace xe {
                     return {}; // couldn't loading image
                 }
 
-                if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
-                    pic = nullptr; // release source texture
-
                 // force upload texture as RGB or RGBA (detail textures requires this)
                 if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
 
-                img[j] = pic;
+				img[j] = pic;
             }
 
             //GL_UploadTexture( pic, tex, false, filter );
 
-            pglBindTexture( tex->target, tex->texnum );
+			Assert(tex->target == GL_TEXTURE_CUBE_MAP_ARB);
+			pglActiveTextureARB(GL_TEXTURE2_ARB);
+			pglEnable(GL_TEXTURE_CUBE_MAP_ARB);
+			pglBindTexture(tex->target, tex->texnum);
             tex->texType = TEX_CUBEMAP;
             for(int j = 0; j < 6; ++j)
             {
@@ -2168,19 +2174,27 @@ namespace xe {
 
                 tex->srcWidth = tex->width = pic->width;
                 tex->srcHeight = tex->height = pic->height;
+				tex->format = PFDesc[pic->type].glFormat;
 
                 tex->fogParams[0] = pic->fogParams[0];
                 tex->fogParams[1] = pic->fogParams[1];
                 tex->fogParams[2] = pic->fogParams[2];
                 tex->fogParams[3] = pic->fogParams[3];
 
-                pglTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, 0, GL_RGB8, pic->width, pic->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pic->buffer);
+				pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+				pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+				pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+				pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+                pglTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, 0, GL_RGBA, pic->width, pic->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pic->buffer);
             }
-            pglBindTexture( tex->target, tex->texnum );
+			pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);
+			pglDisable(GL_TEXTURE_CUBE_MAP_ARB);
+			pglActiveTextureARB(GL_TEXTURE0_ARB);
 
             GL_TexFilter( tex, false ); // update texture filter, wrap etc
 
-            MsgDev(D_INFO, "TexLru : load skybox gfx/env/%s\n", src.skyname.c_str());
+            MsgDev(D_INFO, "TexLru : load cubemap gfx/env/%s\n", src.skyname.c_str());
             return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseSkybox };
         }
 	};

@@ -19,7 +19,8 @@ public:
     bool CheckTexture(const mstudiotexture_t *current);
     void SetupTexture();
     void UnloadTexture();
-    float GetAdjustedBright(float in);
+    float GetBrightMul() const;
+    float GetBrightAdd() const;
     void SetEnabled(bool x) { m_bEnabled = x; }
     bool GetEnabled() { return m_bEnabled; }
     void LoadTexture();
@@ -204,38 +205,34 @@ bool CCubeMapManager::CheckTexture(const mstudiotexture_t *ptexture)
 void CCubeMapManager::SetupTexture()
 {
     m_bRendering = true;
-    GL_SelectTexture(XASH_TEXTURE1);
-    pglEnable(GL_TEXTURE_CUBE_MAP_ARB);
-
     auto textureID = m_EnvTextureId[m_iCubeMapID];
-    GL_Bind(XASH_TEXTURE1, textureID);
-    
-    pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    xe::TexLru_Upload(textureID);
 
-    pglEnable(GL_BLEND);
-    pglDisable(GL_ALPHA_TEST);
-    pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    pglTexEnvi(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_ENV, GL_BLEND);
-    GL_SelectTexture(XASH_TEXTURE0);
+    pglActiveTextureARB(GL_TEXTURE2_ARB);
+    pglEnable(GL_TEXTURE_2D);
+    pglEnable(GL_TEXTURE_CUBE_MAP_ARB);
+    pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, textureID);
+    pglActiveTextureARB(GL_TEXTURE0_ARB);
 }
 
 void CCubeMapManager::UnloadTexture()
 {
     if (!m_bEnabled || !m_bRendering)
         return;
-    
-    GL_Bind(XASH_TEXTURE1, 0);
-    GL_SelectTexture(XASH_TEXTURE0);
+
+    pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);
     pglDisable(GL_TEXTURE_CUBE_MAP_ARB);
+    pglActiveTextureARB(GL_TEXTURE0_ARB);
 }
 
-float CCubeMapManager::GetAdjustedBright(float in)
+float CCubeMapManager::GetBrightMul() const
 {
-    return in * m_pCubeMapData[m_iCubeMapID]->mulBright + m_pCubeMapData[m_iCubeMapID]->addBright;
+    return m_pCubeMapData[m_iCubeMapID]->mulBright;
+}
+
+float CCubeMapManager::GetBrightAdd() const
+{
+    return m_pCubeMapData[m_iCubeMapID]->addBright;
 }
 
 void CubeMap_Init()
@@ -255,16 +252,28 @@ void CubeMap_LoadTexture()
     gpCubeMapManager->LoadTexture();
 }
 
-void CubeMap_Bind(const mstudiotexture_t *ptexture)
+bool CubeMap_Bind(const mstudiotexture_t *ptexture)
 {
-    if(RI.currententity == &clgame.viewent && gpCubeMapManager->CheckTexture(ptexture))
+    if(RI.currententity == &clgame.viewent && ptexture && gpCubeMapManager->CheckTexture(ptexture))
     {
         gpCubeMapManager->SetupTexture();
+        return true;
     }
     else
     {
         gpCubeMapManager->UnloadTexture();
+        return false;
     }
+}
+
+float CubeMap_envBrightMul()
+{
+    return gpCubeMapManager->GetBrightMul();
+}
+
+float CubeMap_envBrightAdd()
+{
+    return gpCubeMapManager->GetBrightAdd();
 }
 
 }
