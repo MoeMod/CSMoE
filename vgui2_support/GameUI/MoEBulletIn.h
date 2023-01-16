@@ -422,6 +422,7 @@ public:
 	enum Bulletin_Type
 	{
 		BULLETIN_BULLETIN = 0,
+		BULLETIN_SERVERUPDATE,
 		BULLETIN_EVENTPROGRESS
 	};
 
@@ -549,7 +550,7 @@ private:
 	Bulletin_Type m_Type;
 	int m_iCurrentPage;
 
-	std::vector<bulletin_elem> m_vecPageBulletin[2];
+	std::vector<bulletin_elem> m_vecPageBulletin[3];
 	std::vector<bulletin_column_elem> m_vecColumn;
 
 	vgui2::MessageBox* pMessageBox;

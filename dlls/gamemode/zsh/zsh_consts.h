@@ -5,7 +5,8 @@
 #endif
 
 namespace zsh {
-	constexpr char LIGHTSTYLE[7] = { 's', 'p', 'm', 'j', 'g', 'd', 'b' };
+	//constexpr char LIGHTSTYLE[7] = { 's', 'p', 'm', 'j', 'g', 'd', 'b' };
+	constexpr char LIGHTSTYLE[7] = { 's', 's', 's', 's', 's', 's', 's' };
 	constexpr float SKY_COLOR[7] = { 0.7, 0.6, 0.6, 0.5, 0.5, 0.4, 0.4 };
 	constexpr const char* FOG_DENSITY[7] = { "0.0001", "0.00015", "0.0002", "0.00025", "0.00025", "0.0003", "0.0003" };
 	constexpr const char* FOG_COLOR[7] = { "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0" };
@@ -74,7 +75,9 @@ namespace zsh {
 		BUILDING_GENERATOR_SOLAR,
 		BUILDING_WALL_1,
 		BUILDING_WALL_2,
-		BUILDING_WALL_3
+		BUILDING_WALL_3,
+		BUILDING_TURRET,
+		BUILDING_TURRET_GRENADE,
 	};
 
 	struct ZSHBuildingCost_s

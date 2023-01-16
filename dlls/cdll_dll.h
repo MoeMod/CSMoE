@@ -174,6 +174,7 @@ enum VGUIMenuSlot
 #define MENU_RADIOSELECTOR 38
 #define MENU_NUMERICAL_MENU -1
 // -- cs16client extension end -- //
+#define MENU_MOBILE_ZOMBIEKEEPER 39
 
 constexpr size_t MAX_PLAYER_NAME_LENGTH =		32;
 constexpr size_t MAX_AUTOBUY_LENGTH =		256;

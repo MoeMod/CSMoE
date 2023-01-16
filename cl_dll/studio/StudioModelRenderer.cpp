@@ -115,6 +115,8 @@ struct model_s* CStudioModelRenderer::s_pLaserSGPModel;
 
 struct model_s* CStudioModelRenderer::s_pSPKnifeViewModel;
 
+struct model_s* CStudioModelRenderer::s_pHaloGunPModel;
+
 void CStudioModelRenderer::Init(void)
 {
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");

@@ -44,7 +44,8 @@ version.
 
 namespace cl {
 
-
+extern bool bHaloGunLoopRetinaOn;
+extern bool bHaloGunHitRetinaOn;
 extern vec3_t g_vecEyePos;
 
 enum drawscope_type
@@ -176,6 +177,21 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iStarChaserSRScope_Light, "sprites/starchasersr_scope_light.tga");
 
 	m_flStarChaserSRAlpha = 255.0f;
+
+	R_InitTexture(m_iHaloGun_Aim_Gauge, "sprites/halogun_aim_gauge.tga");
+	R_InitTexture(m_iHaloGun_Aim_BG, "sprites/halogun_aim_bg.tga");
+	R_InitTexture(m_iHaloGun_Aim_01, "sprites/halogun_aim_01.tga");
+	R_InitTexture(m_iHaloGun_Aim_02, "sprites/halogun_aim_02.tga");
+	R_InitTexture(m_iHaloGun_Aim_03, "sprites/halogun_aim_03.tga");
+
+	m_iHaloGunClip = m_iHaloGunAmmo = 0;
+	m_iHaloGunMaxAmmo = 150;
+
+	m_iHaloGunLoopSprite = SPR_Load("sprites/halogun_loop.spr");
+	m_pHaloGunLoopSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iHaloGunLoopSprite);
+
+	m_iHaloGunHitSprite = SPR_Load("sprites/halogun_hit.spr");
+	m_pHaloGunHitSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iHaloGunHitSprite);
 
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
@@ -361,6 +377,8 @@ void CHudSniperScope::FuncDrawScope(const CTextureRef& tex, int type, int x, int
 
 int CHudSniperScope::Draw(float flTime)
 {
+	DrawRetina(flTime);
+
 	CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
 	if (pActiveBTEWeapon)
 	{
@@ -443,6 +461,11 @@ int CHudSniperScope::Draw(float flTime)
 			DrawMGSMScope(flTime);
 			return 1;
 		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_HALOGUN)
+		{
+			DrawHaloGunCrossHair(flTime);
+			return 1;
+		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_BUNKERBUSTER)
 		{
 
@@ -458,7 +481,8 @@ int CHudSniperScope::Draw(float flTime)
 			pActiveBTEWeapon->m_iId == WEAPON_M400 || 
 			pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM || 
 			pActiveBTEWeapon->m_iId == WEAPON_AT4 || 
-			pActiveBTEWeapon->m_iId == WEAPON_AT4EX)
+			pActiveBTEWeapon->m_iId == WEAPON_AT4EX ||
+			pActiveBTEWeapon->m_iId == WEAPON_BAZOOKA)
 		{
 			if (gHUD.m_iFOV > 40)
 				return 1;
@@ -541,7 +565,8 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 	}
 	if (iId == WEAPON_M400 ||
 		iId == WEAPON_AT4 || 
-		iId == WEAPON_AT4EX)
+		iId == WEAPON_AT4EX ||
+		iId == WEAPON_BAZOOKA)
 	{
 		m_iScopeArc[0]->Draw2DQuad(left, 0, centerx, centery, 0, 0, 1, 1, 0, 0, 0, 255);
 
@@ -560,6 +585,97 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 	}
 
 }
+
+void CHudSniperScope::DrawRetina(float flTime)
+{
+	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
+
+	if (m_pHaloGunLoopSprite && bHaloGunLoopRetinaOn)
+	{
+		static int iHaloGunLoopSpriteFrame = 0;
+		int iWidth = ScreenWidth;
+		int iHeight = ScreenHeight;
+
+		int iX = 0;
+		int iY = 0;
+
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+
+		gEngfuncs.pTriAPI->SpriteTexture(m_pHaloGunLoopSprite, iHaloGunLoopSpriteFrame);
+		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->End();
+
+
+		if (1.0 / (30.0 * 1.0) <= gHUD.m_flTime - m_flLastFrameTime)
+		{
+			iHaloGunLoopSpriteFrame++;
+			m_flLastFrameTime = gHUD.m_flTime;
+		}
+
+		if (iHaloGunLoopSpriteFrame > 25)
+		{
+			iHaloGunLoopSpriteFrame = 0;
+		}
+
+	}
+
+	if (m_pHaloGunHitSprite && bHaloGunHitRetinaOn)
+	{
+		static int iHaloGunHitSpriteFrame = 0;
+		int iWidth = ScreenWidth;
+		int iHeight = ScreenHeight;
+
+		int iX = 0;
+		int iY = 0;
+
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+
+		gEngfuncs.pTriAPI->SpriteTexture(m_pHaloGunHitSprite, iHaloGunHitSpriteFrame);
+		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->End();
+
+
+		if (1.0 / (30.0 * 1.0) <= gHUD.m_flTime - m_flLastFrameTime)
+		{
+			iHaloGunHitSpriteFrame++;
+			m_flLastFrameTime = gHUD.m_flTime;
+		}
+
+		if (iHaloGunHitSpriteFrame > 12)
+		{
+			iHaloGunHitSpriteFrame = 0;
+			bHaloGunHitRetinaOn = false;
+		}
+
+	}
+}
+
 
 void CHudSniperScope::DrawKronosScope(float flTime)
 {
@@ -1005,16 +1121,16 @@ void CHudSniperScope::DrawPatrolDroneScope(float flTime)
 				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
 
 				gEngfuncs.pTriAPI->TexCoord2f(0, 1);
-				gEngfuncs.pTriAPI->Vertex3f(iX, iY + tall, 0);
+				gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + tall) * flScale, 0);
 
 				gEngfuncs.pTriAPI->TexCoord2f(1, 1);
-				gEngfuncs.pTriAPI->Vertex3f(iX + wide, iY + tall, 0);
+				gEngfuncs.pTriAPI->Vertex3f((iX + wide) * flScale, (iY + tall) * flScale, 0);
 
 				gEngfuncs.pTriAPI->TexCoord2f(1, drawoffset);
-				gEngfuncs.pTriAPI->Vertex3f(iX + wide, iY + tall * drawoffset, 0);
+				gEngfuncs.pTriAPI->Vertex3f((iX + wide) * flScale, (iY + tall * drawoffset) * flScale, 0);
 
 				gEngfuncs.pTriAPI->TexCoord2f(0, drawoffset);
-				gEngfuncs.pTriAPI->Vertex3f(iX, iY + tall * drawoffset, 0);
+				gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + tall * drawoffset) * flScale, 0);
 
 				gEngfuncs.pTriAPI->End();
 			}
@@ -1278,6 +1394,78 @@ void CHudSniperScope::DrawStarChaserSRScope(float flTime)
 
 	FuncDraw2DQuadScaled(*m_iStarChaserSRScope_Light, (ScreenWidth - SCOPE_LIGHT_LENGTH) / 2, (ScreenHeight - SCOPE_LIGHT_LENGTH) / 2, SCOPE_LIGHT_LENGTH, SCOPE_LIGHT_LENGTH, 0.0, 0.0, 1.0, 1.0, 255, 255, 255, m_flStarChaserSRAlpha);
 }
+
+
+void CHudSniperScope::SetHaloGunAmmo(int iClip, int iAmmo, int iMaxAmmo)
+{
+	m_iHaloGunClip = iClip;
+	m_iHaloGunAmmo = iAmmo;
+	m_iHaloGunMaxAmmo = iMaxAmmo;
+}
+
+void CHudSniperScope::DrawHaloGunCrossHair(float flTime)
+{
+	int texid = 0;
+	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
+
+	int iX = ScreenWidth / 2;
+	int iY = ScreenHeight / 2;
+
+	int iWidth, iHeight;
+
+	iHeight = m_iHaloGun_Aim_Gauge->h();
+	iWidth = m_iHaloGun_Aim_Gauge->w();
+
+	FuncDraw2DQuadScaled(*m_iHaloGun_Aim_BG, ScreenWidth / 2 - m_iHaloGun_Aim_BG->w() * 1.5, ScreenHeight / 2 - m_iHaloGun_Aim_BG->h(), m_iHaloGun_Aim_BG->w(), m_iHaloGun_Aim_BG->h());
+
+	FuncDraw2DQuadScaled(*m_iHaloGun_Aim_BG, ScreenWidth / 2 + m_iHaloGun_Aim_BG->w() * 0.5 + m_iHaloGun_Aim_BG->w(), ScreenHeight / 2 - m_iHaloGun_Aim_BG->h(), -m_iHaloGun_Aim_BG->w(), m_iHaloGun_Aim_BG->h());
+
+	//FuncDraw2DQuadScaled(*m_iCrossbowex21_AimImage, x - w, y - t / 2, w, t);
+	//FuncDraw2DQuadScaled(*m_iCrossbowex21_AimImage, x + w, y - t / 2, -w, t);
+
+	if (m_iHaloGunClip > 2)
+		FuncDraw2DQuadScaled(*m_iHaloGun_Aim_03, ScreenWidth / 2 + m_iHaloGun_Aim_03->w() * 0.5, ScreenHeight / 2 - m_iHaloGun_Aim_03->h(), m_iHaloGun_Aim_03->w(), m_iHaloGun_Aim_03->h());
+	else if (m_iHaloGunClip > 1)
+		FuncDraw2DQuadScaled(*m_iHaloGun_Aim_02, ScreenWidth / 2 + m_iHaloGun_Aim_02->w() * 0.5, ScreenHeight / 2 - m_iHaloGun_Aim_02->h(), m_iHaloGun_Aim_02->w(), m_iHaloGun_Aim_02->h());
+	else if (m_iHaloGunClip > 0)
+		FuncDraw2DQuadScaled(*m_iHaloGun_Aim_01, ScreenWidth / 2 + m_iHaloGun_Aim_01->w() * 0.5, ScreenHeight / 2 - m_iHaloGun_Aim_01->h(), m_iHaloGun_Aim_01->w(), m_iHaloGun_Aim_01->h());
+	else
+		;
+
+	float drawoffset = 1.0f - (float)m_iHaloGunAmmo / (float)m_iHaloGunMaxAmmo;
+
+	if (m_iHaloGunClip > 2)
+		drawoffset = 0.0f;
+
+	texid = m_iHaloGun_Aim_Gauge->texnum();
+
+	if (!texid)
+		return;
+
+
+	iX = ScreenWidth / 2 - m_iHaloGun_Aim_BG->w() * 1.5;
+	iY = ScreenHeight / 2 - m_iHaloGun_Aim_BG->h();
+
+	gRenderAPI.GL_Bind(0, texid);
+
+	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+	gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+	gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + iWidth) * flScale, 0);
+
+	gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+	gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, (iY + iHeight) * flScale, 0);
+
+	gEngfuncs.pTriAPI->TexCoord2f(1, drawoffset);
+	gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, (iY + iHeight * drawoffset) * flScale, 0);
+
+	gEngfuncs.pTriAPI->TexCoord2f(0, drawoffset);
+	gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + iHeight * drawoffset) * flScale, 0);
+
+	gEngfuncs.pTriAPI->End();
+	
+}
+
 
 
 void CHudSniperScope::Shutdown()

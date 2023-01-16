@@ -648,6 +648,7 @@ public:
 	virtual int GetPriorityByTarget(CBaseEntity* target) { return 1; }
 	virtual void WeaponCallBack(int iType = 0) {};
 	virtual void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace) {};
+	virtual void WpnDeathCallBack(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) {}
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];
@@ -1220,7 +1221,7 @@ private:
 };
 
 class CClayMore;
-class CClayMoreMine : public CGrenade
+class CClayMoreMine : public CBaseEntity
 {
 public:
 	CClayMoreMine()
@@ -1230,8 +1231,8 @@ public:
 
 	static CClayMoreMine* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner);
 	void Init(CBasePlayer* pOwner, CClayMore* pWeapon);
-
 	void Spawn(void);
+
 	void Precache(void);
 	void EXPORT MineThink();
 	void Remove();
@@ -1242,6 +1243,9 @@ public:
 
 	float GetDamage(bool IsManual) const;
 	int GetWeaponsId(void) { return m_iType ? WEAPON_CLAYMORE : WEAPON_CLAYMORE; }
+
+	virtual int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType);
+	virtual void Killed(entvars_t* pevAttacker, int iGib);
 public:
 	CBasePlayer* m_pOwner;
 	CClayMore* m_pWeapon;
@@ -1249,11 +1253,12 @@ public:
 	int m_iState;
 	int m_iType;
 	bool m_bLaserMode;
-	bool m_bSuperDamage;
+	int m_iDamageType;
 	time_point_t m_flDelayTrigger;
 
 private:
 	int m_iLaser;
+	int m_iGibs[2];
 
 };
 

@@ -1636,7 +1636,7 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	}*/
 	if (data.iAccuracyFlags & CROSSHAIR_COLOR_CUSTOM)
 	{
-		if(weaponid == WEAPON_JANUS11 || weaponid == WEAPON_JANUS3 || weaponid == WEAPON_Z4B_DEATHRAY)
+		if(weaponid == WEAPON_JANUS11 || weaponid == WEAPON_JANUS3 || weaponid == WEAPON_Z4B_DEATHRAY|| weaponid == WEAPON_JANUS3)
 			DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, m_bAdditive, 170, 83, 196, m_iAlpha);
 	}
 	else

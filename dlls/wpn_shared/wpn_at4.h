@@ -52,17 +52,36 @@ public:
 
 	int m_usFireAT4;
 };
-//
-//
-//class CAT4EX : public CAT4
-//{
-//public:
-//	void Spawn() override;
-//	void Precache() override;
-//	int GetItemInfo(ItemInfo* p) override;
-//	BOOL Deploy() override;
-//
-//	const char* GetCSModelName() override { return "models/w_at4ex.mdl"; }
-//};
+
+
+class CAT4EX : public CAT4
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	int GetItemInfo(ItemInfo* p) override;
+	BOOL Deploy() override;
+	void PrimaryAttack() override;
+
+	const char* GetCSModelName() override { return "models/w_at4ex.mdl"; }
+};
+
+class CBazooka : public CAT4
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	int GetItemInfo(ItemInfo* p) override;
+	BOOL Deploy() override;
+	void PrimaryAttack() override;
+	void Reload() override;
+
+	const char* GetCSModelName() override { return "models/w_bazooka.mdl"; }
+
+
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_84mmrocket2" , 200 }; }
+#endif
+};
 
 }

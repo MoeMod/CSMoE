@@ -90,10 +90,7 @@ BOOL CAT4::Deploy(void)
 
 void CAT4::PrimaryAttack(void)
 {
-	if (m_pPlayer->pev->fov != 90)
-		AT4Fire(true);
-	else
-		AT4Fire(false);
+	AT4Fire(false);
 }
 
 void CAT4::SecondaryAttack(void)
@@ -143,7 +140,17 @@ void CAT4::AT4Fire(bool autoanim)
 
 	Vector vecVelocity = gpGlobals->v_forward * 1000;
 
-	CAT4Rocket* pRocket = CAT4Rocket::Create(0, m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev), m_pPlayer->m_iTeam);
+	int iType = 0;
+	if (m_iId == WEAPON_AT4EX)
+	{
+		if (autoanim)
+			iType = 1;
+		else
+			iType = 2;
+	}
+	
+
+	CAT4Rocket* pRocket = CAT4Rocket::Create(iType, m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev), m_pPlayer->m_iTeam);
 
 	if (pRocket)
 	{

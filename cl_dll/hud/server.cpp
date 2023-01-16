@@ -71,7 +71,11 @@ enum
 	EF_ELEC_BLUE,
 	EF_ELEC_YELLOW,
 	MK3A1SE_BURN,
+	SBMINE_DEBUFF,
 };
+
+bool bHaloGunLoopRetinaOn;
+bool bHaloGunHitRetinaOn;
 
 TEMPENTITY *iHolyFistRingEffect[33];
 TEMPENTITY *iWingGunEffect[33];
@@ -572,6 +576,25 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		gEngfuncs.pEfxAPI->R_SparkEffect(pos, 8, -200, 200);
 		break;
 	}
+	case 37:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		int arg3 = reader.ReadByte();
+		m_SniperScope.SetHaloGunAmmo(arg1, arg2, arg3);
+		break;
+	}
+	case 38:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		if (arg1)
+			bHaloGunHitRetinaOn = arg2 ? true : false;
+		else
+			bHaloGunLoopRetinaOn = arg2 ? true : false;
+
+		break;
+	}
 	case 44:
 	{
 		arg1 = reader.ReadByte();
@@ -971,6 +994,12 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 	{
 		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_mk3a1seburn.spr"),
 			Vector(0.0, 0.0, -5.0), 2.0, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
+		break;
+	}
+	case SBMINE_DEBUFF:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_sbmine_debuff.spr"),
+			Vector(0.0, 0.0, 40.0), 1.0, TRUE, flags, 0.3, kRenderTransAdd, 30.0);
 		break;
 	}
 

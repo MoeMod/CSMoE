@@ -102,6 +102,9 @@ void CZombieClass_Default::ResetMaxSpeed() const
 
 float CZombieClass_Default::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
+	if (m_pZombieSkill->GetStatus() == SKILL_STATUS_USING)
+		flDamage *= 1.5f;
+
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 

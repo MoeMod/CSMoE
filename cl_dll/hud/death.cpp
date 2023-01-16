@@ -977,14 +977,14 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 					}
 				}
 			}
-			if ((gHUD.m_Scoreboard.m_iTeamAlive_CT - 1) == 1 || (gHUD.m_Scoreboard.m_iTeamAlive_T - 1) == 1)
+			if ((gHUD.m_Scoreboard.m_iTeamAlive_CT) == 1 || (gHUD.m_Scoreboard.m_iTeamAlive_T) == 1)
 			{
-				if ((gHUD.m_Scoreboard.m_iTeamAlive_CT - 1) == 1 && g_PlayerExtraInfo[killer].teamnumber == TERRORIST)
+				if ((gHUD.m_Scoreboard.m_iTeamAlive_CT) == 1 && g_PlayerExtraInfo[killer].teamnumber == TERRORIST)
 				{
 					if (!g_PlayerExtraInfo[killer].dead && idx == killer)
 						NewAlarm().SetAlarm(ALARM_THELAST);
 				}
-				else if ((gHUD.m_Scoreboard.m_iTeamAlive_T - 1) == 1 && g_PlayerExtraInfo[killer].teamnumber == CT)
+				else if ((gHUD.m_Scoreboard.m_iTeamAlive_T ) == 1 && g_PlayerExtraInfo[killer].teamnumber == CT)
 				{
 					if (!g_PlayerExtraInfo[killer].dead && idx == killer)
 						NewAlarm().SetAlarm(ALARM_THELAST);

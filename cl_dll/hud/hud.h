@@ -1007,6 +1007,9 @@ public:
 	int DrawDestroyerSniperScopeNumbers(int x, int y, int iFlags, int iNumber, int r, int g, int b);
 	int CalculateDistance();
 	void DrawStarChaserSRScope(float flTime);
+	void DrawHaloGunCrossHair(float flTime);
+	void SetHaloGunAmmo(int iClip, int iAmmo, int iMaxAmmo);
+	void DrawRetina(float flTime);
 private:
 
 	struct LockOnData
@@ -1124,6 +1127,21 @@ private:
 	UniqueTexture m_iStarChaserSRScope_Light;
 
 	float m_flStarChaserSRAlpha;
+
+	UniqueTexture m_iHaloGun_Aim_Gauge;
+	UniqueTexture m_iHaloGun_Aim_BG;
+	UniqueTexture m_iHaloGun_Aim_01;
+	UniqueTexture m_iHaloGun_Aim_02;
+	UniqueTexture m_iHaloGun_Aim_03;
+
+	int m_iHaloGunClip;
+	int m_iHaloGunAmmo;
+	int m_iHaloGunMaxAmmo;
+
+	HSPRITE m_iHaloGunLoopSprite;
+	model_t* m_pHaloGunLoopSprite;
+	HSPRITE m_iHaloGunHitSprite;
+	model_t* m_pHaloGunHitSprite;
 
 };
 
@@ -1383,6 +1401,9 @@ public:
 		return m_bIsCZero;
 	}
 
+	int FindPrivateSprList();
+	void AddPrivateSprList(const char* SzName, const char* szSprite, const wrect_t szWrect, const int iRes = 640);
+	wrect_t PushBackSprRect(int left, int top, int right, int bottom);
 
 	float   m_flTime;      // the current client time
 	float   m_fOldTime;    // the time at which the HUD was last redrawn
@@ -1518,6 +1539,7 @@ public:
 	std::set<int> m_setBanGrenade;
 
 	int m_iZlevel;
+	float m_flZombieSelectTime;
 
 private:
 	HUDLIST	*m_pHudList;
@@ -1538,6 +1560,8 @@ private:
 	HSPRITE *m_rghSprites;	/*[HUD_SPRITE_COUNT]*/			// the sprites loaded from hud.txt
 	wrect_t *m_rgrcRects;	/*[HUD_SPRITE_COUNT]*/
 	char *m_rgszSpriteNames; /*[HUD_SPRITE_COUNT][MAX_SPRITE_NAME_LENGTH]*/
+
+	std::vector<client_sprite_t> m_iAdditionalSprList;
 };
 
 extern CHud gHUD;

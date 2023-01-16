@@ -89,6 +89,7 @@ color24 gTracerColors[] =
 #define FTENT_IGNOREGRAVITY		0x00200000 // CS1.6
 #define FTENT_FADEIN			0x10000000 //CSAE
 #define FTENT_VELOCITYANGLES	0x08000000 // calc angles by velocity when updating
+#define FTENT_NOCULL	0x20000000		// NOCULL
 
 typedef struct tempent_s	TEMPENTITY;
 typedef struct tempent_s

@@ -3333,13 +3333,18 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 
 			player->m_iMenu = Menu_ChooseAppearance;
 		}
+		else if (FStrEq(pcmd, "chooseteam"))
+		{
+			if (player->m_iMenu != Menu_ChooseAppearance)
+				return;
+		}
 		else if (FStrEq(pcmd, "jointeam"))
 		{
-			/*if (player->m_iMenu == Menu_ChooseAppearance)
+			if (player->m_iMenu != Menu_ChooseAppearance)
 			{
 				ClientPrint(player->pev, HUD_PRINTCENTER, "#Command_Not_Available");
 				return;
-			}*/
+			}
 
 
 			int slot = Q_atoi(CMD_ARGV_(1));
@@ -3373,6 +3378,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 
 			HandleMenu_ChooseAppearance(player, slot);
+			player->ResetMenu();
 		}
 		else if (player->pev->deadflag == DEAD_NO)
 		{

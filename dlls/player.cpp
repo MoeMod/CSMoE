@@ -944,32 +944,20 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 		else
 		{
-			if (m_iBuff & BUFF_REVIVE)
+			if (m_pModStrategy->DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType))
 			{
-				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-				
-				CSDM_DoRandomSpawn(this);
-				m_iBuff &= ~BUFF_REVIVE;
-				m_iReviveGunShotsFired = 0;
-				if (pWeapon)
-				{
-					if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
-						pWeapon->WeaponCallBack(1);
-				}
 				return flDamage;
 			}
-			else
-			{
-				if (CBaseEntity::Instance(this->pev)->IsPlayer()) {
-					MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, this->pev);
-					WRITE_LONG(-1);
-					WRITE_SHORT(ENTINDEX(edict()));
-					WRITE_BYTE(0);
-					WRITE_BYTE(1);
-					MESSAGE_END();
-				}
+		
+			if (CBaseEntity::Instance(this->pev)->IsPlayer()) {
+				MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, this->pev);
+				WRITE_LONG(-1);
+				WRITE_SHORT(ENTINDEX(edict()));
+				WRITE_BYTE(0);
+				WRITE_BYTE(1);
+				MESSAGE_END();
 			}
-
+			
 			if (m_bIsZombie && m_ZombieClass)
 			{
 				if (!stricmp(m_ZombieClass, "revival") && ~m_iBuff & BUFF_IGNORE_KNOCKBACK)
@@ -1405,7 +1393,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		if (iDamageAmount && this->m_bIsZombie)
 		{
 			g_flZombieTankerDamage[ENTINDEX(edict())] += iDamageAmount;
-			if (g_flZombieTankerDamage[ENTINDEX(edict())] >= 3000.0 && g_iZombieTankerCount[ENTINDEX(edict())] <= 20)
+			if (g_flZombieTankerDamage[ENTINDEX(edict())] >= 3000.0 && g_iZombieTankerCount[ENTINDEX(edict())] <= 999)
 			{
 				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, this->pev);
 				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
@@ -1423,7 +1411,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			MESSAGE_END();
 
 			g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] += iDamageAmount;
-			if (g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] >= 5000.0 && g_iAttackerCount[ENTINDEX(ENT(pevAttacker))] <= 10)
+			if (g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] >= 5000.0 && g_iAttackerCount[ENTINDEX(ENT(pevAttacker))] <= 999)
 			{
 				g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] = 0.0;
 				g_iAttackerCount[ENTINDEX(ENT(pevAttacker))]++;
@@ -1483,20 +1471,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		//End OF TakeDamage Post
 	}
 
-
-
-	if (m_iBuff & BUFF_REVIVE && flDamage > pev->health)
+	if (flDamage > pev->health && m_pModStrategy->DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType))
 	{
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-
-		CSDM_DoRandomSpawn(this);
-		m_iBuff &= ~BUFF_REVIVE;
-		m_iReviveGunShotsFired = 0;
-		if (pWeapon)
-		{
-			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
-				pWeapon->WeaponCallBack(1);
-		}
 		return flDamage;
 	}
 
@@ -6245,6 +6221,8 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/v_at4.mdl");
 		case WEAPON_AT4EX:
 			pev->viewmodel = MAKE_STRING("models/v_at4ex.mdl");
+		case WEAPON_BAZOOKA:
+			pev->viewmodel = MAKE_STRING("models/v_bazooka.mdl");
 
 		default:
 			break;

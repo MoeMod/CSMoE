@@ -149,6 +149,7 @@ public:
 	static struct model_s* s_pWingGunPModel;
 	static struct model_s* s_pLaserSGPModel;
 	static struct model_s* s_pSPKnifeViewModel;
+	static struct model_s* s_pHaloGunPModel;
 };
 
 }

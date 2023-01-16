@@ -320,6 +320,12 @@ void CHud :: VidInit( void )
 		// we need to load the hud.txt, and all sprites within
 		m_pSpriteList = SPR_GetList("sprites/hud.txt", &m_iSpriteCountAllRes);
 
+		//Must Load PrivateSprList After hud.txt
+		AddPrivateSprList("d_chainsr", "640hud225", PushBackSprRect(172, 16, 48, 16), 640);
+		AddPrivateSprList("d_halogun", "640hud225", PushBackSprRect(172, 0, 48, 16), 640);
+		AddPrivateSprList("d_claymore", "640hud14", PushBackSprRect(222, 48, 32, 16), 640);
+		AddPrivateSprList("d_sbmine", "640hud57", PushBackSprRect(172, 32, 48, 16), 640);
+
 		if( m_pSpriteList )
 		{
 			// count the number of sprites of the appropriate res
@@ -331,6 +337,9 @@ void CHud :: VidInit( void )
 					m_iSpriteCount++;
 				p++;
 			}
+
+			if (!m_iAdditionalSprList.empty())
+				m_iSpriteCount += m_iAdditionalSprList.size();
 
 			// allocated memory for sprite handle arrays
 			m_rghSprites      = new(std::nothrow) HSPRITE[m_iSpriteCount];
@@ -345,8 +354,9 @@ void CHud :: VidInit( void )
 			}
 
 			p = m_pSpriteList;
-			for ( int index = 0, j = 0; j < m_iSpriteCountAllRes; j++ )
+			for ( int index = 0, j = 0; j < (m_iSpriteCountAllRes + m_iAdditionalSprList.size()); j++ )
 			{
+
 				if ( p->iRes == m_iRes )
 				{
 					char sz[256];
@@ -361,6 +371,7 @@ void CHud :: VidInit( void )
 				p++;
 			}
 		}
+		int iAdditionalList = FindPrivateSprList();
 	}
 	else
 	{
@@ -368,7 +379,7 @@ void CHud :: VidInit( void )
 		// we need to make sure all the sprites have been loaded (we've gone through a transition, or loaded a save game)
 		client_sprite_t *p = m_pSpriteList;
 		int index = 0;
-		for ( int j = 0; j < m_iSpriteCountAllRes; j++ )
+		for ( int j = 0; j < (m_iSpriteCountAllRes + m_iAdditionalSprList.size()); j++ )
 		{
 			if ( p->iRes == m_iRes )
 			{
@@ -380,6 +391,7 @@ void CHud :: VidInit( void )
 
 			p++;
 		}
+		FindPrivateSprList();
 	}
 
 	// assumption: number_1, number_2, etc, are all listed and loaded sequentially
@@ -463,6 +475,60 @@ int CHud::MsgFunc_Logo(const char *pszName,  int iSize, void *pbuf)
 
 	return 1;
 }
+/*
+============
+PrivateSprList
+============
+*/
+int CHud::FindPrivateSprList(void)
+{
+	int iAdditionalSpr = 0;
+
+	for (std::vector<client_sprite_t>::iterator iter = m_iAdditionalSprList.begin(); iter != m_iAdditionalSprList.end(); ++iter)
+	{
+		const client_sprite_t& info = *iter;
+
+		if (info.szName[0] && info.szSprite[0])
+		{
+			if (info.iRes == m_iRes)
+			{
+				char sz[256];
+				sprintf(sz, "sprites/%s.spr", info.szSprite);
+				m_rghSprites[(m_iSpriteCountAllRes - 1) + (iter - m_iAdditionalSprList.begin())] = SPR_Load(sz);
+				m_rgrcRects[(m_iSpriteCountAllRes - 1) + (iter - m_iAdditionalSprList.begin())] = info.rc;
+				strncpy(&m_rgszSpriteNames[((m_iSpriteCountAllRes - 1) + (iter - m_iAdditionalSprList.begin())) * MAX_SPRITE_NAME_LENGTH], info.szName, MAX_SPRITE_NAME_LENGTH);
+
+				iAdditionalSpr++;
+			}
+		}
+	}
+	return iAdditionalSpr;
+}
+wrect_t CHud::PushBackSprRect(int left, int top, int right, int bottom)
+{
+	wrect_t SzTemp{};
+	SzTemp.left = left;
+	SzTemp.top = top;
+
+	SzTemp.right = SzTemp.left + right;
+	SzTemp.bottom = SzTemp.top + bottom;
+
+	return SzTemp;
+}
+void CHud::AddPrivateSprList(const char* SzName, const char* szSprite, const wrect_t szWrect, const int iRes)
+{
+	client_sprite_t pPrivateList{};
+	if (SzName[0])
+		Q_strncpy(pPrivateList.szName, SzName, sizeof(pPrivateList.szName));
+	if (szSprite[0])
+		Q_strncpy(pPrivateList.szSprite, szSprite, sizeof(pPrivateList.szSprite));
+
+	pPrivateList.rc = szWrect;
+	pPrivateList.iRes = iRes;
+
+	m_iAdditionalSprList.emplace_back(pPrivateList);
+}
+
 
 /*
 ============

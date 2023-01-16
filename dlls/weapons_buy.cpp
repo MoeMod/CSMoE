@@ -380,6 +380,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "at4",	WEAPON_AT4 },
 	{ "at4ex",	WEAPON_AT4EX },
 	{ "rpg7",	WEAPON_RPG7 },
+	{ "bazooka",	WEAPON_BAZOOKA },
 
 	{ NULL,		WEAPON_NONE }
 };
@@ -847,6 +848,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "at4",	WEAPONCLASS_EQUIPMENT },
 	{ "at4ex",	WEAPONCLASS_EQUIPMENT },
 	{ "rpg7",	WEAPONCLASS_EQUIPMENT },
+	{ "bazooka",	WEAPONCLASS_EQUIPMENT },
 
 	{ "syringe",	WEAPONCLASS_EQUIPMENT },
 	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
@@ -1189,6 +1191,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_AT4:
 	case WEAPON_AT4EX:
 	case WEAPON_RPG7:
+	case WEAPON_BAZOOKA:
 		return true;
 	default:
 		break;

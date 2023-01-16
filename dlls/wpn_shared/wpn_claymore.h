@@ -27,7 +27,7 @@ namespace sv {
 		virtual void Spawn();
 		virtual void Precache();
 		virtual int GetItemInfo(ItemInfo* p);
-		virtual BOOL CanDeploy() { return TRUE; };
+		virtual BOOL CanDeploy();
 		virtual BOOL CanDrop() { return FALSE; }
 		virtual BOOL Deploy();
 		virtual void Holster(int skiplocal);
@@ -52,10 +52,11 @@ namespace sv {
 	public:
 		void OnAttack_Shoot();
 
-	private:
-
 		bool m_bAlreadySetUp;
+
+	private:
 		bool m_bDeployRemoteControl;
+		bool m_bIsManual;
 		int m_iTriggerLaserMode;
 		int m_iSetUpType;
 
@@ -64,10 +65,5 @@ namespace sv {
 		time_point_t m_flSwitchLaserTime;
 		time_point_t m_flDelayBoom;
 
-		unsigned short m_usFireClayMore;
-
 	};
 }
-
-
-

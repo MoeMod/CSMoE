@@ -27,6 +27,8 @@
 #include <ctype.h>  // isspace
 #include <assert.h>  // isspace
 
+#define REGAMEDLL_FIXES
+
 #if defined(CLIENT_DLL)
 namespace cl {
 #elif defined(SERVER_DLL)
@@ -714,133 +716,6 @@ void PM_UpdateStepSound(void)
 
 		PM_PlayStepSound(step, fvol);
 	}
-
-	//int fWalking;
-	//float fvol;
-	//vec3_t knee;
-	//vec3_t feet;
-	////vec3_t center;
-	//float height;
-	//float speed;
-	//float velrun;
-	//float velwalk;
-	//float flduck;
-	//int fLadder;
-	//int step;
-
-	//if( pmove->flTimeStepSound > 0 )
-	//	return;
-
-	//if( pmove->flags & FL_FROZEN )
-	//	return;
-
-	//PM_CatagorizeTextureType();
-
-	//speed = Length( pmove->velocity );
-
-	//// determine if we are on a ladder
-	//fLadder = ( pmove->movetype == MOVETYPE_FLY );// IsOnLadder();
-
-	//// UNDONE: need defined numbers for run, walk, crouch, crouch run velocities!!!!	
-	//if( ( pmove->flags & FL_DUCKING) || fLadder )
-	//{
-	//	velwalk = 60;		// These constants should be based on cl_movespeedkey * cl_forwardspeed somehow
-	//	velrun = 80;		// UNDONE: Move walking to server
-	//	flduck = 100;
-	//}
-	//else
-	//{
-	//	velwalk = 120;
-	//	velrun = 210;
-	//	flduck = 0;
-	//}
-
-	//// If we're on a ladder or on the ground, and we're moving fast enough,
-	////  play step sound.  Also, if pmove->flTimeStepSound is zero, get the new
-	////  sound right away - we just started moving in new level.
-	//if( ( fLadder || ( pmove->onground != -1 ) ) && ( Length( pmove->velocity ) > 0.0 ) && ( speed >= velwalk || !pmove->flTimeStepSound ) )
-	//{
-	//	fWalking = speed < velrun;		
-
-	//	//VectorCopy( pmove->origin, center );
-	//	VectorCopy( pmove->origin, knee );
-	//	VectorCopy( pmove->origin, feet );
-
-	//	height = pmove->player_maxs[pmove->usehull][2] - pmove->player_mins[pmove->usehull][2];
-
-	//	knee[2] = pmove->origin[2] - 0.3 * height;
-	//	feet[2] = pmove->origin[2] - 0.5 * height;
-
-	//	// find out what we're stepping in or on...
-	//	if( fLadder )
-	//	{
-	//		step = STEP_LADDER;
-	//		fvol = 0.35;
-	//		pmove->flTimeStepSound = 350;
-	//	}
-	//	else if( pmove->PM_PointContents( knee, NULL ) == CONTENTS_WATER )
-	//	{
-	//		step = STEP_WADE;
-	//		fvol = 0.65;
-	//		pmove->flTimeStepSound = 600;
-	//	}
-	//	else if( pmove->PM_PointContents( feet, NULL ) == CONTENTS_WATER )
-	//	{
-	//		step = STEP_SLOSH;
-	//		fvol = fWalking ? 0.2 : 0.5;
-	//		pmove->flTimeStepSound = fWalking ? 400 : 300;		
-	//	}
-	//	else
-	//	{
-	//		// find texture under player, if different from current texture, 
-	//		// get material type
-	//		step = PM_MapTextureTypeStepType( pmove->chtexturetype );
-
-	//		switch( pmove->chtexturetype )
-	//		{
-	//		default:
-	//		case CHAR_TEX_CONCRETE:						
-	//			fvol = fWalking ? 0.2 : 0.5;
-	//			pmove->flTimeStepSound = fWalking ? 400 : 300;
-	//			break;
-	//		case CHAR_TEX_METAL:	
-	//			fvol = fWalking ? 0.2 : 0.5;
-	//			pmove->flTimeStepSound = fWalking ? 400 : 300;
-	//			break;
-	//		case CHAR_TEX_DIRT:	
-	//			fvol = fWalking ? 0.25 : 0.55;
-	//			pmove->flTimeStepSound = fWalking ? 400 : 300;
-	//			break;
-	//		case CHAR_TEX_VENT:	
-	//			fvol = fWalking ? 0.4 : 0.7;
-	//			pmove->flTimeStepSound = fWalking ? 400 : 300;
-	//			break;
-	//		case CHAR_TEX_GRATE:
-	//			fvol = fWalking ? 0.2 : 0.5;
-	//			pmove->flTimeStepSound = fWalking ? 400 : 300;
-	//			break;
-	//		case CHAR_TEX_TILE:	
-	//			fvol = fWalking ? 0.2 : 0.5;
-	//			pmove->flTimeStepSound = fWalking ? 400 : 300;
-	//			break;
-	//		case CHAR_TEX_SLOSH:
-	//			fvol = fWalking ? 0.2 : 0.5;
-	//			pmove->flTimeStepSound = fWalking ? 400 : 300;
-	//			break;
-	//		}
-	//	}
-
-	//	pmove->flTimeStepSound += flduck; // slower step time if ducking
-
-	//	// play the sound
-	//	// 35% volume if ducking
-	//	if( pmove->flags & FL_DUCKING )
-	//	{
-	//		fvol *= 0.35;
-	//	}
-
-	//	PM_PlayStepSound( step, fvol );
-	//}
 }
 
 /*
@@ -1682,6 +1557,11 @@ Sets pmove->waterlevel and pmove->watertype values.
 */
 qboolean PM_CheckWater()
 {
+#ifdef REGAMEDLL_FIXES
+	// do not check for dead
+	if (pmove->dead || pmove->deadflag != DEAD_NO)
+		return FALSE;
+#endif
 	vec3_t point;
 	int cont;
 	int truecont;
@@ -2125,7 +2005,18 @@ void PM_FixPlayerCrouchStuck(int direction)
 
 void PM_UnDuck(void)
 {
-	//int i;
+#ifdef REGAMEDLL_FIXES
+	// if ducking isn't finished yet, so don't unduck
+	if (pmove->bInDuck || !(pmove->flags & FL_DUCKING))
+	{
+		pmove->usehull = 0;
+		pmove->flDuckTime = 0;
+		pmove->bInDuck = FALSE;
+		pmove->view_ofs[2] = VEC_VIEW;
+		return;
+	}
+#endif // #ifdef REGAMEDLL_FIXES
+
 	pmtrace_t trace;
 	vec3_t newOrigin;
 
@@ -2133,7 +2024,13 @@ void PM_UnDuck(void)
 
 	if (pmove->onground != -1)
 	{
+#ifdef REGAMEDLL_FIXES
+		vec3_t offset;
+		VectorSubtract(pmove->player_mins[1], pmove->player_mins[0], offset);
+		VectorAdd(newOrigin, offset, newOrigin);
+#else
 		newOrigin[2] += 18.0;
+#endif
 	}
 
 	trace = pmove->PM_PlayerTrace(newOrigin, newOrigin, PM_NORMAL, -1);
@@ -2166,51 +2063,10 @@ void PM_UnDuck(void)
 
 		PM_CatagorizePosition();
 	}
-	//int i;
-	//pmtrace_t trace;
-	//vec3_t newOrigin;
-
-	//VectorCopy( pmove->origin, newOrigin );
-
-	//if( pmove->onground != -1 )
-	//{
-	//	for( i = 0; i < 3; i++ )
-	//	{
-	//		newOrigin[i] += ( pmove->player_mins[1][i] - pmove->player_mins[0][i] );
-	//	}
-	//}
-
-	//trace = pmove->PM_PlayerTrace( newOrigin, newOrigin, PM_NORMAL, -1 );
-
-	//if( !trace.startsolid )
-	//{
-	//	pmove->usehull = 0;
-
-	//	// Oh, no, changing hulls stuck us into something, try unsticking downward first.
-	//	trace = pmove->PM_PlayerTrace( newOrigin, newOrigin, PM_NORMAL, -1 );
-	//	if( trace.startsolid )
-	//	{
-	//		// See if we are stuck?  If so, stay ducked with the duck hull until we have a clear spot
-	//		//Con_Printf( "unstick got stuck\n" );
-	//		pmove->usehull = 1;
-	//		return;
-	//	}
-
-	//	pmove->flags &= ~FL_DUCKING;
-	//	pmove->bInDuck  = false;
-	//	pmove->view_ofs[2] = VEC_VIEW;
-	//	pmove->flDuckTime = 0;
-
-	//	VectorCopy( newOrigin, pmove->origin );
-
-	//	// Recatagorize position since ducking can change origin
-	//	PM_CatagorizePosition();
-	//}
 }
 
 void PM_Duck(void)
 {
-	//int i;
 	float time;
 	float duckFraction;
 
@@ -2230,13 +2086,21 @@ void PM_Duck(void)
 	}
 
 	if (pmove->dead)
-		return;
+	{
+#ifdef REGAMEDLL_FIXES
+		// Fix hanging corpse
+		if (pmove->flags & FL_DUCKING)
+		{
+			PM_UnDuck();
+		}
+#endif
+	}
 
 	if ((pmove->cmd.buttons & IN_DUCK) || (pmove->bInDuck) || (pmove->flags & FL_DUCKING))
 	{
-		pmove->cmd.forwardmove *= 0.333;
-		pmove->cmd.sidemove *= 0.333;
-		pmove->cmd.upmove *= 0.333;
+		pmove->cmd.forwardmove *= PLAYER_DUCKING_MULTIPLIER;
+		pmove->cmd.sidemove *= PLAYER_DUCKING_MULTIPLIER;
+		pmove->cmd.upmove *= PLAYER_DUCKING_MULTIPLIER;
 
 		if (pmove->cmd.buttons & IN_DUCK)
 		{
@@ -2260,7 +2124,13 @@ void PM_Duck(void)
 
 					if (pmove->onground != -1)
 					{
+#ifdef REGAMEDLL_FIXES
+						vec3_t newOrigin;
+						VectorSubtract(pmove->player_mins[1], pmove->player_mins[0], newOrigin);
+						VectorSubtract(pmove->origin, newOrigin, pmove->origin);
+#else
 						pmove->origin[2] = pmove->origin[2] - 18.0;
+#endif
 
 						PM_FixPlayerCrouchStuck(STUCK_MOVEUP);
 
@@ -2269,7 +2139,11 @@ void PM_Duck(void)
 				}
 				else
 				{
-					float fMore = (VEC_DUCK_HULL_MIN_Z - VEC_HULL_MIN_Z);
+#ifdef REGAMEDLL_FIXES
+					float fMore = (pmove->player_mins[1][2] - pmove->player_mins[0][2]);
+#else
+					float fMore = (PM_VEC_DUCK_HULL_MIN - PM_VEC_HULL_MIN);
+#endif
 
 					duckFraction = PM_SplineFraction(time, (1.0 / TIME_TO_DUCK));
 					pmove->view_ofs[2] = ((VEC_DUCK_VIEW_Z - fMore) * duckFraction) + (VEC_VIEW * (1 - duckFraction));
@@ -2281,93 +2155,6 @@ void PM_Duck(void)
 			PM_UnDuck();
 		}
 	}
-	//int i;
-	//float time;
-	//float duckFraction;
-
-	//int buttonsChanged = ( pmove->oldbuttons ^ pmove->cmd.buttons );	// These buttons have changed this frame
-	//int nButtonPressed = buttonsChanged & pmove->cmd.buttons;		// The changed ones still down are "pressed"
-
-	////int duckchange = buttonsChanged & IN_DUCK ? 1 : 0;
-	////int duckpressed = nButtonPressed & IN_DUCK ? 1 : 0;
-
-	//if( pmove->cmd.buttons & IN_DUCK )
-	//{
-	//	pmove->oldbuttons |= IN_DUCK;
-	//}
-	//else
-	//{
-	//	pmove->oldbuttons &= ~IN_DUCK;
-	//}
-
-	//// Prevent ducking if the iuser3 variable is set
-	//if( pmove->iuser3 || pmove->dead )
-	//{
-	//	// Try to unduck
-	//	if( pmove->flags & FL_DUCKING )
-	//	{
-	//		PM_UnDuck();
-	//	}
-	//	return;
-	//}
-
-	//if( ( pmove->cmd.buttons & IN_DUCK ) || ( pmove->bInDuck ) || ( pmove->flags & FL_DUCKING ) )
-	//{
-	//	pmove->cmd.forwardmove *= PLAYER_DUCKING_MULTIPLIER;
-	//	pmove->cmd.sidemove *= PLAYER_DUCKING_MULTIPLIER;
-	//	pmove->cmd.upmove *= PLAYER_DUCKING_MULTIPLIER;
-	//	
-	//	if( pmove->cmd.buttons & IN_DUCK )
-	//	{
-	//		if( (nButtonPressed & IN_DUCK ) && !( pmove->flags & FL_DUCKING ) )
-	//		{
-	//			// Use 1 second so super long jump will work
-	//			pmove->flDuckTime = 1000;
-	//			pmove->bInDuck = true;
-	//		}
-
-	//		time = max( 0.0, ( 1.0 - (float)pmove->flDuckTime / 1000.0 ) );
-
-	//		if( pmove->bInDuck )
-	//		{
-	//			// Finish ducking immediately if duck time is over or not on ground
-	//			if( ( (float)pmove->flDuckTime / 1000.0 <= ( 1.0 - TIME_TO_DUCK ) ) || ( pmove->onground == -1 ) )
-	//			{
-	//				pmove->usehull = 1;
-	//				pmove->view_ofs[2] = VEC_DUCK_VIEW_Z;
-	//				pmove->flags |= FL_DUCKING;
-	//				pmove->bInDuck = false;
-
-	//				// HACKHACK - Fudge for collision bug - no time to fix this properly
-	//				if( pmove->onground != -1 )
-	//				{
-	//					for( i = 0; i < 3; i++ )
-	//					{
-	//						pmove->origin[i] -= ( pmove->player_mins[1][i] - pmove->player_mins[0][i] );
-	//					}
-	//					// See if we are stuck?
-	//					PM_FixPlayerCrouchStuck( STUCK_MOVEUP );
-
-	//					// Recatagorize position since ducking can change origin
-	//					PM_CatagorizePosition();
-	//				}
-	//			}
-	//			else
-	//			{
-	//				float fMore = VEC_DUCK_HULL_MIN_Z - VEC_HULL_MIN_Z;
-
-	//				// Calc parametric time
-	//				duckFraction = PM_SplineFraction( time, (1.0/TIME_TO_DUCK) );
-	//				pmove->view_ofs[2] = ( ( VEC_DUCK_VIEW_Z - fMore ) * duckFraction ) + ( VEC_VIEW * ( 1 - duckFraction ) );
-	//			}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		// Try to unduck
-	//		PM_UnDuck();
-	//	}
-	//}
 }
 
 void PM_LadderMove(physent_t *pLadder)
@@ -3106,11 +2893,11 @@ void PM_DropPunchAngle(vec3_t_ref punchangle)
 
 /*
 ==============
-PM_CheckParamters
+PM_CheckParameters
 
 ==============
 */
-void PM_CheckParamters(void)
+void PM_CheckParameters(void)
 {
 	float spd;
 	float maxspeed;
@@ -3162,6 +2949,14 @@ void PM_CheckParamters(void)
 	// Set dead player view_offset
 	if (pmove->dead)
 	{
+#ifdef REGAMEDLL_FIXES
+		if (pmove->bInDuck)
+		{
+			PM_UnDuck();
+			pmove->bInDuck = FALSE;
+		}
+#endif
+
 		pmove->view_ofs[2] = PM_DEAD_VIEWHEIGHT;
 	}
 
@@ -3227,7 +3022,7 @@ void PM_PlayerMove(qboolean server)
 	pmove->server = server;
 
 	// Adjust speeds etc.
-	PM_CheckParamters();
+	PM_CheckParameters();
 
 	// Assume we don't touch anything
 	pmove->numtouch = 0;

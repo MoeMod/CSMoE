@@ -694,6 +694,7 @@ bool IsValidEntity(cl_entity_s* pEntity)
 }
 bool CCSClassMenu::CheckShowType()
 {
+	return false;
 	return ((cl::gHUD.IsZombieMod() && (cl::gHUD.m_iModRunning != MOD_ZB4)) && IsValidEntity(cl::gEngfuncs.GetEntityByIndex(cl::gEngfuncs.GetLocalPlayer()->index))) ? true : false;
 	//return ((cl::gHUD.IsZombieMod() && (cl::gHUD.m_iModRunning != MOD_ZB4)) && (cl::g_iTeamNumber != TEAM_UNASSIGNED) && cl::gEngfuncs.GetLocalPlayer()->model!=NULL && cl::gEngfuncs.GetLocalPlayer()->curstate.playerclass)? true : false;
 }

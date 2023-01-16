@@ -21,6 +21,7 @@ public:
 		m_iLevel = lv;
 		m_iExp = exp;
 		m_iSkillPoints = point;
+
 		gHUD.m_iZlevel = m_iLevel;
 	}
 	void SendHudInfo(int skillindex, int showtype, float showtime)

@@ -264,6 +264,8 @@ int DLLEXPORT HUD_VidInit( void )
 
 	CStudioModelRenderer::s_pSPKnifeViewModel = IEngineStudio.Mod_ForName("models/v_spknife.mdl", FALSE);
 
+	CStudioModelRenderer::s_pHaloGunPModel = IEngineStudio.Mod_ForName("models/p_halogun.mdl", FALSE);
+
 
 	//VGui_Startup();
 

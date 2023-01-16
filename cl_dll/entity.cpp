@@ -706,6 +706,11 @@ void DLLEXPORT HUD_TempEntUpdate (
 						pTemp->die = client_time;			// If we can't draw it this frame, just dump it.
 						pTemp->flags &= ~FTENT_FADEOUT;	// Don't fade out, just die
 					}
+
+					if (pTemp->flags & FTENT_NOCULL)
+					{
+						pTemp->entity.curstate.effects |= EF_NOCULL;
+					}
 				}
 			}
 		}

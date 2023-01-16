@@ -164,6 +164,7 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_SHOOTINGDOWN			(1<<10)
 #define BUFF_EMERGENCYESCAPE				(1<<11)
 #define BUFF_CLOAKING			(1<<12)
+#define BUFF_HALOGUN_AVOID_DEATH			(1<<13)
 
 #define COUNT_M32VENOM	0
 
@@ -779,6 +780,7 @@ public:
 
 		return true;
 	}
+
 public:
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;

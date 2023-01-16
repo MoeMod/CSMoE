@@ -516,7 +516,8 @@ bool CCSBot::IsUsingMachinegun() const
 		weapon->m_iId == WEAPON_POISONGUN ||
 		weapon->m_iId == WEAPON_WATERCANNON ||
 		weapon->m_iId == WEAPON_WONDERCANNONEX ||
-		weapon->m_iId == WEAPON_DRILLGUN)
+		weapon->m_iId == WEAPON_DRILLGUN || 
+		weapon->m_iId == WEAPON_BAZOOKA)
 		return true;
 
 	return false;

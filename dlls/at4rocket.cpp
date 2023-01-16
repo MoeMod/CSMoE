@@ -72,6 +72,7 @@ namespace sv {
 		case 0: iID = WEAPON_AT4; break;
 		case 1: 
 		case 2: iID = WEAPON_AT4EX; break;
+		case 3: iID = WEAPON_BAZOOKA; break;
 		}
 		return iID;
 	}

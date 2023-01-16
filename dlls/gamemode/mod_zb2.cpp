@@ -514,7 +514,7 @@ void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer 
 
 	CheckEvolution();
 
-#ifdef XASH_DEDICATED
+//#ifdef XASH_DEDICATED
 	if (victim->IsUsingPC())
 	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, victim->pev);
@@ -522,7 +522,7 @@ void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer 
 		WRITE_COORD(20.0);
 		MESSAGE_END();
 	}
-#endif
+//#endif
 }
 
 void CPlayerModStrategy_ZB2::Event_AdjustHumanDamage(CBasePlayer * attacker, float &flDamage)

@@ -91,4 +91,36 @@ public:
 
 };
 
+class CJANUS1 : public CM79
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	int GetItemInfo(ItemInfo* p) override;
+	BOOL Deploy() override;
+	void PrimaryAttack() override;
+	bool HasSecondaryAttack() override { return true; }
+	void SecondaryAttack() override;
+	void WeaponIdle() override;
+	void ItemPostFrame() override;
+	const char* GetCSModelName() override { return "models/w_janus1.mdl"; }
+
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
+
+	WeaponCrosshairData GetCrosshairData() override
+	{
+		if (m_iWeaponState)
+			return { CROSSHAIR_COLOR_CUSTOM | ACCURACY_AIR, 6, 3, 0 };
+		else
+			return { ACCURACY_AIR, 6, 3, 0 };
+	}
+
+public:
+	void Janus1Fire(bool bmode);
+
+	time_point_t m_flNextReset;
+	int m_iShotsRequired;
+
+};
+
 }

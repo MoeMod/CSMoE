@@ -28,13 +28,18 @@ namespace sv {
 		m_iDefaultAmmo = 999;
 		m_bDelayFire = false;
 
+
 		m_bAlreadySetUp = false;
 		m_bDeployRemoteControl = false;
+		m_bIsManual = false;
 		m_iTriggerLaserMode = 0;
 		m_iSetUpType = 0;
 
 		m_flSetUpTime = invalid_time_point;
 		m_flDeployRemoteControl = invalid_time_point;
+
+		m_flDelayBoom = invalid_time_point;
+
 
 		FallInit();
 	}
@@ -43,10 +48,7 @@ namespace sv {
 	{
 		PRECACHE_MODEL("models/v_claymore.mdl");
 		PRECACHE_MODEL("models/p_claymore.mdl");
-		PRECACHE_MODEL("models/p_claymore_trigger.mdl");
 		PRECACHE_MODEL("models/w_claymore.mdl");
-
-		m_usFireClayMore = PRECACHE_EVENT(1, "events/claymore.sc");
 	}
 
 	int CClayMore::GetItemInfo(ItemInfo* p)
@@ -66,27 +68,38 @@ namespace sv {
 
 		return 1;
 	}
-
+	BOOL CClayMore::CanDeploy(void)
+	{
+		return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
+	}
 	BOOL CClayMore::Deploy(void)
 	{
 		m_fMaxSpeed = 260;
+		m_bDelayFire = true;
 
-		if (!m_bAlreadySetUp)
+		if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+		{
+			m_pPlayer->RemoveWeapon(m_iId);
+			DestroyItem();
+
+			return false;
+		}
+
+		if (m_bAlreadySetUp == false)
 		{
 			m_bDeployRemoteControl = false;
 			m_iTriggerLaserMode = 0;
 			m_iSetUpType = 0;
 
-			m_flSetUpTime = invalid_time_point;
 		}
 
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase();
-
+		m_bIsManual = false;
 		m_flDelayBoom = invalid_time_point;
 		m_flDeployRemoteControl = invalid_time_point;
+		m_flSetUpTime = invalid_time_point;
 
 		int iAnim = CLAYMORE_DRAW;
-		if (m_bAlreadySetUp)
+		if (m_bAlreadySetUp == true)
 		{
 			if (m_iTriggerLaserMode == 0)
 				iAnim = CLAYMORE_TRIGGER_DRAW_OFF;
@@ -94,7 +107,7 @@ namespace sv {
 				iAnim = CLAYMORE_TRIGGER_DRAW_ON;
 		}
 
-		return DefaultDeploy("models/v_claymore.mdl", m_bAlreadySetUp ? "models/p_claymore_trigger.mdl" : "models/p_claymore.mdl", iAnim, "grenade", UseDecrement() != FALSE);
+		return DefaultDeploy("models/v_claymore.mdl", m_bAlreadySetUp == true ? "models/p_claymore_2.mdl" : "models/p_claymore.mdl", iAnim, "grenade", UseDecrement() != FALSE);
 	}
 
 	void CClayMore::Holster(int skiplocal)
@@ -106,12 +119,12 @@ namespace sv {
 			m_bDeployRemoteControl = false;
 			m_iTriggerLaserMode = 0;
 			m_iSetUpType = 0;
-
-			m_flSetUpTime = invalid_time_point;
 		}
 
+		m_bIsManual = false;
 		m_flDelayBoom = invalid_time_point;
 		m_flDeployRemoteControl = invalid_time_point;
+		m_flSetUpTime = invalid_time_point;
 
 		if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 		{
@@ -125,22 +138,28 @@ namespace sv {
 
 	void CClayMore::PrimaryAttack(void)
 	{
-		if (!m_bAlreadySetUp)
+		if (m_bAlreadySetUp == false)
 		{
 			//Shoot:39.9 / 30.0 = 1.33s
 
 			SendWeaponAnim(CLAYMORE_SHOOT, UseDecrement() != FALSE);
 
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.8s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 30.0s;
-			m_flSetUpTime = gpGlobals->time + 1.33s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
+
+			m_flSetUpTime = invalid_time_point;
+			m_flSetUpTime = gpGlobals->time + 1.36s;
 
 			m_iSetUpType = 1;
+			m_bDelayFire = true;
 		}
 		else
 		{
+#ifndef CLIENT_DLL
+			if (!m_pClayMoreMine)
+				return;
+#endif
 			OnAttack_Shoot();
-			return;
 		}
 	}
 	void CClayMore::OnAttack_Shoot(void)
@@ -153,12 +172,18 @@ namespace sv {
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
 		m_flDelayBoom = gpGlobals->time + 0.66s;
+		m_bIsManual = true;
+		m_bDelayFire = true;
 	}
 
 
 	void CClayMore::SecondaryAttack(void)
 	{
-		if (m_bAlreadySetUp)
+#ifndef CLIENT_DLL
+		if (!m_pClayMoreMine)
+			return;
+#endif
+		if (m_bAlreadySetUp == true && m_bDeployRemoteControl == true)
 		{
 			int iAnim = CLAYMORE_TRIGGER_ON;
 			switch (m_iTriggerLaserMode)
@@ -191,14 +216,12 @@ namespace sv {
 
 	void CClayMore::ItemPostFrame()
 	{
-		if (!m_bAlreadySetUp)
+		if (m_bAlreadySetUp == false)
 		{
 			if (m_iSetUpType == 1)
 			{
 				if (m_flSetUpTime != invalid_time_point && m_flSetUpTime < gpGlobals->time)
 				{
-					if (m_flDeployRemoteControl == invalid_time_point)
-						m_flDeployRemoteControl = gpGlobals->time + 0.5s;
 
 					m_flSetUpTime = invalid_time_point;
 					m_iSetUpType = 2;
@@ -218,11 +241,23 @@ namespace sv {
 						m_pClayMoreMine->Init(m_pPlayer, this);
 					}
 #endif
+					if (m_flDeployRemoteControl == invalid_time_point)
+						m_flDeployRemoteControl = gpGlobals->time + 0.5s;
 				}
 			}
 		}
 		else
 		{
+			if (m_bDeployRemoteControl && m_flSwitchLaserTime != invalid_time_point && m_flSwitchLaserTime < gpGlobals->time)
+			{
+				m_flSwitchLaserTime = invalid_time_point;
+
+#ifndef CLIENT_DLL
+				if (m_pClayMoreMine)
+					m_pClayMoreMine->ChangeMode(m_pClayMoreMine, m_iTriggerLaserMode ? true : false);
+#endif
+			}
+
 			if (m_iSetUpType == 2 && m_flDeployRemoteControl != invalid_time_point)
 			{
 				if (m_flDeployRemoteControl < gpGlobals->time)
@@ -240,7 +275,13 @@ namespace sv {
 					}
 				}
 			}
-			if (m_iSetUpType == 3 && m_flDelayBoom != invalid_time_point && m_flDelayBoom < gpGlobals->time)
+
+#ifndef CLIENT_DLL
+			if (!m_bIsManual || !m_pClayMoreMine)
+				return CBasePlayerWeapon::ItemPostFrame();
+#endif
+
+			if (m_bDeployRemoteControl && m_flDelayBoom != invalid_time_point && m_flDelayBoom < gpGlobals->time)
 			{
 				m_flDelayBoom = invalid_time_point;
 
@@ -250,27 +291,14 @@ namespace sv {
 					m_pClayMoreMine->CheckCanBoom(true, false);
 				}
 #endif
-				if ((--m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]) > 0)
-				{
-					m_bAlreadySetUp = false;
-					Deploy();
-					return CBasePlayerWeapon::ItemPostFrame();
-				}
-				else
-				{
-					RetireWeapon();
-					return CBasePlayerWeapon::ItemPostFrame();
-				}
 
-			}
-			if (m_iSetUpType == 3 && m_flSwitchLaserTime != invalid_time_point && m_flSwitchLaserTime < gpGlobals->time)
-			{
-				m_flSwitchLaserTime = invalid_time_point;
+				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+					--m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
 
-#ifndef CLIENT_DLL
-				if (m_pClayMoreMine)
-					m_pClayMoreMine->ChangeMode(m_pClayMoreMine, m_iTriggerLaserMode ? true : false);
-#endif
+				m_bAlreadySetUp = false;
+				Holster(false);
+				RetireWeapon();
+				m_bIsManual = false;
 			}
 		}
 

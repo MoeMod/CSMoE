@@ -259,6 +259,8 @@ set(HLDLL_SRCS
 	./m79rocket.cpp
 	./claymoremine.cpp
 	./at4rocket.cpp
+	./gamemode/zsh/zsh_building_turret.cpp
+	./gamemode/zsh/zsh_building_turret_grenade.cpp
 	)
 
 set (HLWPN_SRCS
@@ -640,6 +642,11 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_hk121ex.cpp
 	../dlls/wpn_shared/wpn_claymore.cpp
 	../dlls/wpn_shared/wpn_at4.cpp
+	../dlls/wpn_shared/wpn_sbmine.cpp
+	../dlls/wpn_shared/wpn_at4ex.cpp
+	../dlls/wpn_shared/wpn_bazooka.cpp
+	../dlls/wpn_shared/wpn_janus1.cpp
+	../dlls/wpn_shared/wpn_halogun.cpp
 	)
 
 set(PM_SRCS

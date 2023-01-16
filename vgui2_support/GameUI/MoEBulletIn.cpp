@@ -248,6 +248,7 @@ CCSBTEBulletin::CCSBTEBulletin(Panel* parent, const char* panelName, bool showTa
 
 	pimpl->Column = new CCSBTEBulletinColumn(this, "CSBTEBulletinColumn", this, (const char*)NULL);
 	pimpl->Column->AddColumn("#CSO_Bulletin_Notice", "Bulletin");
+	pimpl->Column->AddColumn("#CSMOE_Bulletin_ServerUpdate", "ServerUpdate");
 	pimpl->Column->AddColumn("#CSMOE_Bulletin_Announce_Title", "EventProgress");
 	pimpl->Column->SetBounds(15, 91, 86, 25);
 	pimpl->Column->SetColumnFlag(CCSBTEBulletinColumn::COLUMN_NO_PRESS_EFFECT);
@@ -341,6 +342,10 @@ void CCSBTEBulletin::OnCommand(const char* command)
 	else if (!Q_stricmp(command, "Bulletin"))
 	{
 		return SetType(BULLETIN_BULLETIN);
+	}
+	else if (!Q_stricmp(command, "ServerUpdate"))
+	{
+		return SetType(BULLETIN_SERVERUPDATE);
 	}
 	else if (!Q_stricmp(command, "EventProgress"))
 	{
@@ -750,7 +755,7 @@ void CCSBTEBulletin::LoadCreator(void)
 }
 void CCSBTEBulletin::ReadServerFile(void)
 {
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		bulletin_elem pTemp;
 		bool bContinueCurrent = false;
@@ -763,7 +768,7 @@ void CCSBTEBulletin::ReadServerFile(void)
 			pTemp.vecImage.clear();
 			pTemp.vecColor.clear();
 
-			char* szKey = va("%s%d", !i ? "Bulletin" : "EventProgress", j + 1);
+			char* szKey = va("%s%d", !i ? "Bulletin" : (i == 1 ? "ServerUpdate" : "EventProgress"), j + 1);
 
 			for (std::vector<BulletInInfo_s>::iterator iter = vecServerInfo.begin(); iter != vecServerInfo.end(); ++iter)
 			{
@@ -796,7 +801,7 @@ void CCSBTEBulletin::ReadServerFile(void)
 void CCSBTEBulletin::ReadCustomizeFile(void)
 {
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		bulletin_elem pTemp;
 		char data[256];
@@ -809,7 +814,7 @@ void CCSBTEBulletin::ReadCustomizeFile(void)
 			pTemp.vecColor.clear();
 
 
-			char* szKey = va("%s%d", !i ? "Bulletin" : "EventProgress", j + 1);
+			char* szKey = va("%s%d", !i ? "Bulletin" : (i == 1 ? "ServerUpdate" : "EventProgress"), j + 1);
 
 			//GetPrivateProfileString(szKey, "ContextFile", "", data, 63, "csmoe\\bulletin.ini");
 			if (data[0])

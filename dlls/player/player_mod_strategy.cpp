@@ -23,9 +23,11 @@ GNU General Public License for more details.
 #include "player_mod_strategy.h"
 #include "gamemode/mods.h"
 #include "weapons_moe_buy.h"
+#include "csdm_randomspawn.h"
 
 #include <vector>
 #include <algorithm>
+
 
 namespace sv {
 
@@ -194,17 +196,15 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	case CT:
 		m_pPlayer->GiveNamedItem("weapon_claymore");
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		//m_pPlayer->GiveNamedItem("weapon_usp");
-		m_pPlayer->GiveNamedItem("weapon_at4");
+		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
 		//m_pPlayer->GiveNamedItem("weapon_y22s2sfpistol");
 		//m_pPlayer->GiveNamedItem("z4b_m60amethyst");
-		//m_pPlayer->GiveNamedItem("knife_ironfan");
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("weapon_firecracker");
+		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
 		break;
@@ -335,6 +335,39 @@ void CPlayerModStrategy_Default::UpdateClientData(int sendweapons, clientdata_s 
 
 }
 
+int CPlayerModStrategy_Default::DeathCallBack(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	if (m_pPlayer->m_iBuff & BUFF_HALOGUN_AVOID_DEATH)
+	{
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+		m_pPlayer->m_iBuff &= ~BUFF_HALOGUN_AVOID_DEATH;
+		if (pWeapon)
+		{
+			if (pWeapon->m_iId == WEAPON_HALOGUN)
+				pWeapon->WpnDeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+		}
+		return 1;
+	}
+
+	if (m_pPlayer->m_iBuff & BUFF_REVIVE)
+	{
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+		CSDM_DoRandomSpawn(m_pPlayer);
+		m_pPlayer->m_iBuff &= ~BUFF_REVIVE;
+		m_pPlayer->m_iReviveGunShotsFired = 0;
+		if (pWeapon)
+		{
+			if (pWeapon->m_iId == WEAPON_REVIVEGUN)
+				pWeapon->WeaponCallBack(1);
+		}
+		return flDamage;
+	}
+
+	return 0;
+}
+
 void CPlayerModStrategy_Zombie::Pain(int m_LastHitGroup, bool HasArmour)
 {
 	CPlayerModStrategy_Default::Pain(m_LastHitGroup, HasArmour);
@@ -440,13 +473,13 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 				CBasePlayer* TargetPlayer = static_cast<CBasePlayer*>(Entity);
 
 				TargetPlayer->RemoveAllItems(FALSE);
-				TargetPlayer->GiveNamedItem("weapon_pianogun");
+				TargetPlayer->GiveNamedItem("weapon_revivegun");
 				TargetPlayer->GiveNamedItem("weapon_y22s2sfpistol");
 				TargetPlayer->GiveNamedItem("knife_holysword");
 
 				GiveSlotAmmo(TargetPlayer, 1);
 				GiveSlotAmmo(TargetPlayer, 2);
-				TargetPlayer->m_iBuff |= BUFF_AVOID_INFECT;
+				//TargetPlayer->m_iBuff |= BUFF_AVOID_INFECT;
 
 			}
 		}

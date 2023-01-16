@@ -12,6 +12,7 @@
 #include "csmoe/BuyMenu/cstrikebuymenu.h"
 #include "csmoe/cstriketeammenu.h"
 #include "csmoe/cstrikeclassmenu.h"
+#include "csmoe/zb2/Zb2ZombieSelector.h"
 #include "csmoe/zsh/zshelterteamhousingdlg.h"
 
 using cl::gHUD;
@@ -130,7 +131,16 @@ IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
     {
         pPanel = new ZShelterTeamHousingDialog();
     }
+    else if (Q_strcmp(PANEL_ZOMBIEKEEPER, pszName) == 0)
+    {
+        if (!m_pZombieKeeperMenu)
+        {
+            m_pZombieKeeperMenu = new CZb2ZombieKeeper();
+            m_pZombieKeeperMenu->SetupPage(0);
+        }
+        pPanel = m_pZombieKeeperMenu;
 
+    }
 	/*else if (Q_strcmp(VIEWPORT_PANEL_SCORE, pszName) == 0)
 	{
 		pPanel = new CScorePanel(this);
@@ -221,6 +231,14 @@ bool CHudViewport::ShowVGUIMenu(int iMenu)
 
             m_pBuyMenu->ActivateMenu(iMenu);
             return true;
+        }
+        case MENU_MOBILE_ZOMBIEKEEPER:
+        {
+            panel = m_pZombieKeeperMenu;
+            m_pZombieKeeperMenu->SetupPage(0);
+            //cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + 20.0;
+
+            break;
         }
     }
 

@@ -423,6 +423,7 @@ void CPlayerModStrategy_ZB1::BecomeHuman()
 
 CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp)
 	:   CPlayerModStrategy_Zombie(player),
+		m_pModZB1(mp),
 	    m_eventBecomeZombieListener(mp->m_eventBecomeZombie.subscribe(&CPlayerModStrategy_ZB1::Event_OnBecomeZombie, this))
 {
 
@@ -457,6 +458,36 @@ void CPlayerModStrategy_ZB1::UpdateClientData(int sendweapons, struct clientdata
 	entvars_t* pev = pl->pev;
 
 	cd->health = (int)pev->health % 512 == 0 ? pev->health + 1 : pev->health;
+}
+
+int CPlayerModStrategy_ZB1::DeathCallBack(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	if (m_pPlayer->m_iBuff & BUFF_AVOID_INFECT)
+	{
+		return 0;
+	}
+
+	return CPlayerModStrategy_Default::DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+}
+
+int CPlayerModStrategy_ZB1::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	if (m_pPlayer->m_bIsZombie)
+		return 1;
+
+	CBaseEntity* pAttacker = GetClassPtr<CBaseEntity>(pevAttacker);
+	if (!pAttacker->IsPlayer())
+		return 1;
+
+	CBasePlayer* pAttackerPlayer = GetClassPtr<CBasePlayer>(pevAttacker);
+	if (!pAttackerPlayer->m_bIsZombie)
+		return 1;
+
+	if (DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType))
+		return 0;
+
+	m_pModZB1->HumanInfectionByZombie(m_pPlayer, pAttackerPlayer);
+	return 0;
 }
 
 size_t CMod_Zombi::ZombieOriginNum()
@@ -608,7 +639,8 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 		iReturn = TRUE;
 	}
 
-	CBasePlayer *pAttackerPlayer = dynamic_ent_cast<CBasePlayer *>(pAttacker);
+
+	/*CBasePlayer *pAttackerPlayer = dynamic_ent_cast<CBasePlayer *>(pAttacker);
 	if (pAttackerPlayer)
 	{
 		if (pAttackerPlayer->m_bIsZombie && !pPlayer->m_bIsZombie)
@@ -653,7 +685,7 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 			iReturn = false;
 		}
 	}
-	
+	*/
 
 	return iReturn;
 }

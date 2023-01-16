@@ -130,6 +130,9 @@ int g_iWingGunShootB = 0;
 
 int g_iSPKnifeAmmo = 0;
 
+int g_iHaloGunShootB = 0;
+int g_iHaloGunChargingShootB = 0;
+
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {
 	m_bLocal = false;
@@ -1076,6 +1079,39 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 					}
 					else
 					{
+						m_pCurrentEntity->curstate.sequence = 0;
+						m_pCurrentEntity->curstate.animtime = 0.0;
+						m_pCurrentEntity->curstate.framerate = 0.0;
+					}
+				}
+
+				if (CStudioModelRenderer::s_pHaloGunPModel && pweaponmodel == CStudioModelRenderer::s_pHaloGunPModel)
+				{
+					m_pCurrentEntity->curstate.effects |= EF_NOCULL;
+
+					if ((g_iHaloGunChargingShootB & (1 << idx) || g_iHaloGunShootB & (1 << idx)))
+					{
+						if (g_iHaloGunShootB & (1 << idx))
+						{
+							m_pCurrentEntity->curstate.body = 1;
+							
+							m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+							m_pCurrentEntity->curstate.framerate = 1.0;
+						}
+
+						if (g_iHaloGunChargingShootB & (1 << idx))
+						{
+							m_pCurrentEntity->curstate.body = 3;
+							
+							m_pCurrentEntity->curstate.skin = 1;
+							m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+							m_pCurrentEntity->curstate.framerate = 1.0;
+						}
+					}
+					else
+					{
+						m_pCurrentEntity->curstate.body = 0;
+						m_pCurrentEntity->curstate.skin = 0;
 						m_pCurrentEntity->curstate.sequence = 0;
 						m_pCurrentEntity->curstate.animtime = 0.0;
 						m_pCurrentEntity->curstate.framerate = 0.0;

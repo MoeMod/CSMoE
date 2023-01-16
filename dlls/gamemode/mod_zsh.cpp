@@ -15,6 +15,8 @@
 #include "zbs/zbs_const.h"
 #include "zbs/monster_entity.h"
 #include "zsh/zsh_building.h"
+#include "zsh/zsh_building_turret.h"
+#include "zsh/zsh_building_turret_grenade.h"
 #include "player/csdm_randomspawn.h"
 
 #include "player/player_human_level.h"
@@ -38,6 +40,8 @@ namespace sv {
 	}
 	const std::tuple<ZSHBuildingClass, const char*, std::shared_ptr<CBaseBuildingClass>(*)(CZSHBuilding*)> g_BuildingClassList[] = {
 		{BUILDING_GENERATOR_DIESEL, "1", MakeBuildingClass<CBuilding_Generator_Diesel>},
+		{BUILDING_TURRET, "2", MakeBuildingClass<CBuilding_Turret>},
+		{BUILDING_TURRET_GRENADE, "3", MakeBuildingClass<CBuilding_TurretGrenade>},
 	};
 
 	constexpr auto NUM_BUILDINGCLASSES = std::extent<decltype(g_BuildingClassList)>::value;
@@ -383,7 +387,7 @@ namespace sv {
 			// spawn zombie
 			if (gpGlobals->time > m_flNextSpawnNPC)
 			{
-				//MakeZombieNPC();
+				MakeZombieNPC();
 				m_flNextSpawnNPC = gpGlobals->time + 1.0s;
 			}
 		}
@@ -425,8 +429,16 @@ namespace sv {
 		round->m_iMaxResource[type] = amount;
 	}
 
-	CPlayerModStrategy_ZSH::CPlayerModStrategy_ZSH(CBasePlayer* player, CMod_ZombieShelter* mp) : CPlayerModStrategy_Default(player), m_pModZSH(mp), m_iBuildProgress(8), m_iFixHealth(20)
+	CPlayerModStrategy_ZSH::CPlayerModStrategy_ZSH(CBasePlayer* player, CMod_ZombieShelter* mp) : CPlayerModStrategy_Default(player), m_pModZSH(mp), m_iBuildProgress(8), m_iFixHealth(20), m_iRotate(0), m_iCollection(0), m_iSkillPoint(0)
 	{
+		m_hBuilding = nullptr;
+		for (size_t i = 0; i < RT_MAX; i++)
+		{
+			m_iResource[i] = 0;
+			m_iMaxResource[i] = 0;
+			g_iReduceCost[i] = 0;
+		}
+
 		m_listenerAdjustDamage = mp->m_eventAdjustDamage.subscribe(
 			[=](CBasePlayer* attacker, float& out)
 			{

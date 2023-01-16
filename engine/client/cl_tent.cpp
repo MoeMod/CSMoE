@@ -2388,6 +2388,9 @@ TEMPENTITY* GAME_EXPORT CL_TempCustomModel(const vec3_t pos, const vec3_t angles
 		pTemp->tentOffset = pos;
 	}
 
+	if (pTemp->flags & FTENT_NOCULL)
+		pTemp->entity.curstate.effects |= EF_NOCULL;
+
 	if (scale > 0)
 		pTemp->entity.curstate.scale = scale;
 

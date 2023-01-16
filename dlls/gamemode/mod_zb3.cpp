@@ -285,6 +285,9 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 	if (!pAttackerPlayer->m_bIsZombie)
 		return 1;
 
+	if (DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType))
+		return 0;
+
 	if (m_pPlayer->m_iBuff & BUFF_HOLYSWORD_AVOID_INFECT)
 	{
 		UTIL_MakeVectors(m_pPlayer->pev->angles);
@@ -314,21 +317,6 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 
 	if (m_pPlayer->m_iBuff & BUFF_AVOID_INFECT)
 	{
-		return 0;
-	}
-
-	if (m_pPlayer->m_iBuff & BUFF_REVIVE && (bitsDamageType & DMG_BULLET))
-	{
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-
-		CSDM_DoRandomSpawn(m_pPlayer);
-		m_pPlayer->m_iBuff &= ~BUFF_REVIVE;
-		m_pPlayer->m_iReviveGunShotsFired = 0;
-		if (pWeapon)
-		{
-			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
-				pWeapon->WeaponCallBack(1);
-		}
 		return 0;
 	}
 

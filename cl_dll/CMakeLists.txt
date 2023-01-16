@@ -446,6 +446,11 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_hk121ex.cpp
 	../dlls/wpn_shared/wpn_claymore.cpp
 	../dlls/wpn_shared/wpn_at4.cpp
+	../dlls/wpn_shared/wpn_sbmine.cpp
+	../dlls/wpn_shared/wpn_at4ex.cpp
+	../dlls/wpn_shared/wpn_bazooka.cpp
+	../dlls/wpn_shared/wpn_janus1.cpp
+	../dlls/wpn_shared/wpn_halogun.cpp
 	)
 
 set (HUD_SRCS
@@ -586,6 +591,7 @@ if(XASH_VGUI2)
 		vgui2/csmoe/BuyMenu/WeaponImagePanel.cpp
 		vgui2/csmoe/zsh/zshelterteamhousingdlg.cpp
 		vgui2/csmoe/zsh/zshelterteamhousingsubdlg.cpp
+		vgui2/csmoe/zb2/Zb2ZombieSelector.cpp
 	)
 	add_definitions(-DXASH_VGUI2=1)
 else()

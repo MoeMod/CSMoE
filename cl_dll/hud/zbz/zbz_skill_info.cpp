@@ -393,7 +393,8 @@ int CHudZBZ_Skill::Draw(float time)
 		iMutationX -= 18 * 2;
 
 		auto iCurrentPoints = m_iSkillPoints;
-		auto iCurrentLevel = m_SkillList.size() + iCurrentPoints;
+		char szCurrentSkills[16]; sprintf(szCurrentSkills, "%zd", m_SkillList.size());
+		auto iCurrentLevel = std::atoi(szCurrentSkills) + iCurrentPoints;
 		const int Darkcolor[3] = { 46,139,87 };
 
 		iMutationX += iSprRectLen;

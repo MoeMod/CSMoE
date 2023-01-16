@@ -96,7 +96,7 @@ namespace cl {
 
 		{ ALARM_OVERRUN , "overrun" ,"metalarena/supply.wav" ,15},
 		{ ALARM_ATTACKER , "attacker" ,"metalarena/supply.wav" ,20},
-		{ ALARM_BESTMOMENT , "bestmoment" ,"metalarena/supply.wav" ,1},
+		{ ALARM_BESTMOMENT , "bestmoment" ,"metalarena/supply.wav" ,15},
 		{ ALARM_HOLDOUT , "holdout" ,"metalarena/supply.wav" ,18},
 		{ ALARM_BATPULL , "batpull" ,"metalarena/supply.wav" ,5},
 		{ ALARM_DROPWEAPON , "dropweapon" ,"metalarena/supply.wav" ,14},
