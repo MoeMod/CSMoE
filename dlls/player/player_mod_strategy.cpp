@@ -521,6 +521,9 @@ bool CPlayerModStrategy_Zombie::CanPlayerBuy(bool display)
 	if(m_pPlayer->m_iBuff & BUFF_GHOSTHUNTER)
 		return false;
 
+	if (m_pPlayer->m_iBuff & BUFF_LASTHERO)
+		return false;
+
 	//return !m_pPlayer->m_bIsZombie;
 	// random weapon now, DONT BUY!!!
 #if XASH_DEDICATED

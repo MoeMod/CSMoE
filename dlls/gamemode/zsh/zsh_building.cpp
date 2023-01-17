@@ -288,4 +288,38 @@ namespace sv
 		auto mod = (CMod_ZombieShelter*)g_pGameRules;
 		mod->AddResource(zsh::RT_EPOWER, 1);
 	}
+
+	void CBuilding_Wall01::OnCreate()
+	{
+		PRECACHE_MODEL("models/zsh_building/zsh_wall_1.mdl");
+		SET_MODEL(m_pBuilding->edict(), "models/zsh_building/zsh_wall_1.mdl");
+		m_vecMins = Vector(-100.0, -16.0, 0.0);
+		m_vecMaxs = Vector(100.0, 16.0, 160.0);
+	}
+
+	void CBuilding_Wall01::OnCompleted()
+	{
+	}
+
+	void CBuilding_Wall01::OnThink()
+	{
+		m_pBuilding->pev->nextthink = gpGlobals->time + 5s;
+	}
+
+	void CBuilding_WareHouse01::OnCreate()
+	{
+		PRECACHE_MODEL("models/zsh_building/bg_warehouse.mdl");
+		SET_MODEL(m_pBuilding->edict(), "models/zsh_building/bg_warehouse.mdl");
+		m_vecMins = Vector(-60, -64.0, 0.0);
+		m_vecMaxs = Vector(60.0, 56.0, 120.0);
+	}
+
+	void CBuilding_WareHouse01::OnCompleted()
+	{
+	}
+
+	void CBuilding_WareHouse01::OnThink()
+	{
+		m_pBuilding->pev->nextthink = gpGlobals->time + 5s;
+	}
 }

@@ -78,6 +78,7 @@ namespace zsh {
 		BUILDING_WALL_3,
 		BUILDING_TURRET,
 		BUILDING_TURRET_GRENADE,
+		BUILDING_WAREHOUSE_1,
 	};
 
 	struct ZSHBuildingCost_s

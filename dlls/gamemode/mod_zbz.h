@@ -18,6 +18,7 @@ GNU General Public License for more details.
 
 #include "mod_zb3.h"
 #include "zbz/zbz_skill.h"
+#include "zbz/supersupplybox.h"
 #include "usercmd.h"
 
 #include <set>
@@ -30,6 +31,7 @@ public:
 	CMod_ZombieZ();
 	void InstallPlayerModStrategy(CBasePlayer *) override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
+	void Think() override;
 	void RestartRound() override;
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 	float GetAdjustedEntityDamage(CBaseEntity* victim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
@@ -38,7 +40,13 @@ public:
 	void ZombieWin() override;
 
 protected:
+	void MakeSuperSupplyboxThink();
+	void RemoveAllSuperSupplybox();
+	CGhostHunterSupplyBox* CreateGhostHunterSupplybox();
+	CMechSupplyBox* CreateMechSupplybox();
+	int SuperSupplyboxCount();
 	void PickHero() override;
+	EngineClock::time_point m_flTimeNextMakeSuperSupplybox;
 
 public:
 	EventDispatcher<void(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType)> m_eventTakeDamage;

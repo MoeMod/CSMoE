@@ -261,6 +261,7 @@ set(HLDLL_SRCS
 	./at4rocket.cpp
 	./gamemode/zsh/zsh_building_turret.cpp
 	./gamemode/zsh/zsh_building_turret_grenade.cpp
+	./gamemode/zbz/supersupplybox.cpp
 	)
 
 set (HLWPN_SRCS

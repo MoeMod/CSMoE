@@ -22,7 +22,7 @@ GNU General Public License for more details.
 #include "mod_zbz.h"
 #include "player/player_zombie.h"
 #include "player/player_mod_strategy.h"
-
+#include "player/csdm_randomspawn.h"
 #include "util/u_range.hpp"
 
 #include <vector>
@@ -899,14 +899,118 @@ void CMod_ZombieZ::UpdateGameMode(CBasePlayer * pPlayer)
 	MESSAGE_END();
 }
 
+
+CGhostHunterSupplyBox* CMod_ZombieZ::CreateGhostHunterSupplybox()
+{
+	auto supplybox = CreateClassPtr<CGhostHunterSupplyBox>();
+
+	Vector backup_v_angle = supplybox->pev->v_angle;
+	CSDM_DoRandomSpawn(supplybox);
+	supplybox->pev->v_angle = backup_v_angle;
+
+	supplybox->pev->spawnflags |= SF_NORESPAWN;
+
+	DispatchSpawn(supplybox->edict());
+	return supplybox;
+}
+
+CMechSupplyBox* CMod_ZombieZ::CreateMechSupplybox()
+{
+	auto supplybox = CreateClassPtr<CMechSupplyBox>();
+
+	Vector backup_v_angle = supplybox->pev->v_angle;
+	CSDM_DoRandomSpawn(supplybox);
+	supplybox->pev->v_angle = backup_v_angle;
+
+	supplybox->pev->spawnflags |= SF_NORESPAWN;
+
+	DispatchSpawn(supplybox->edict());
+	return supplybox;
+}
+
+void CMod_ZombieZ::RemoveAllSuperSupplybox()
+{
+	CBaseEntity* ent = nullptr;
+	while ((ent = UTIL_FindEntityByClassname(ent, "ghosthunter_supplybox")) != nullptr)
+	{
+		CGhostHunterSupplyBox* sb = dynamic_ent_cast<CGhostHunterSupplyBox*>(ent);
+		sb->pev->effects |= EF_NODRAW;
+		sb->pev->flags |= FL_KILLME;
+		sb->SetThink(&CBaseEntity::SUB_Remove);
+	}
+
+	while ((ent = UTIL_FindEntityByClassname(ent, "mech_supplybox")) != nullptr)
+	{
+		CMechSupplyBox* sb = dynamic_ent_cast<CMechSupplyBox*>(ent);
+		sb->pev->effects |= EF_NODRAW;
+		sb->pev->flags |= FL_KILLME;
+		sb->SetThink(&CBaseEntity::SUB_Remove);
+	}
+}
+
+int CMod_ZombieZ::SuperSupplyboxCount()
+{
+	int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;
+	InitializePlayerCounts(NumAliveTerrorist, NumAliveCT, NumDeadTerrorist, NumDeadCT);
+	int iSupplyboxCount = (NumAliveTerrorist + NumAliveCT + NumDeadTerrorist) / 10 + 2;
+	return iSupplyboxCount;
+}
+
+void CMod_ZombieZ::MakeSuperSupplyboxThink()
+{
+	if (!FInfectionStarted())
+		return;
+	if (gpGlobals->time < m_flTimeNextMakeSuperSupplybox)
+		return;
+	m_flTimeNextMakeSuperSupplybox = gpGlobals->time + RandomDuration(50.0s, 60.0s);
+
+	RemoveAllSuperSupplybox();
+
+	int iSupplyboxCount = SuperSupplyboxCount();
+	for (int i = 0; i < iSupplyboxCount; ++i)
+	{
+		if (i == (iSupplyboxCount - 1))
+		{
+			CMechSupplyBox* sb = CreateMechSupplybox();
+		}	
+		else
+		{
+			CGhostHunterSupplyBox* sb = CreateGhostHunterSupplybox();
+		}
+		
+	}
+
+	UTIL_ClientPrintAll(HUD_PRINTCENTER, "[💰]强化猎手补给箱已到达！！");
+
+	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	{
+		CBaseEntity* entity = UTIL_PlayerByIndex(iIndex);
+		if (!entity)
+			continue;
+		CLIENT_COMMAND(entity->edict(), "spk zombi/zombi_box.wav\n");
+
+	}
+}
+
+void CMod_ZombieZ::Think()
+{
+	MakeSuperSupplyboxThink();
+
+	return CMod_ZombieHero::Think();
+}
+
 void CMod_ZombieZ::RestartRound()
 {
+	m_flTimeNextMakeSuperSupplybox = gpGlobals->time + RandomDuration(30.0s, 60.0s);
 	return CMod_ZombieHero::RestartRound();
 }
 
 void CMod_ZombieZ::PlayerKilled(CBasePlayer * pVictim, entvars_t * pKiller, entvars_t * pInflictor)
 {
-	if(pInflictor && (FClassnameIs(pInflictor, "z4b_dualkukri") || FClassnameIs(pInflictor, "z4b_dualslayer") || FClassnameIs(pInflictor, "z4b_holyfist")))
+	if(pInflictor && (FClassnameIs(pInflictor, "z4b_dualkukri") ||
+		FClassnameIs(pInflictor, "z4b_dualslayer") ||
+		FClassnameIs(pInflictor, "z4b_holyfist") ||
+		FClassnameIs(pInflictor, "z4b_dualstinger")))
 		UTIL_BroadcastStuffText("spk \"zombi/KILLNANOCOUNTSND\"\n");
 	return CMod_ZombieHero::PlayerKilled(pVictim, pKiller, pInflictor);
 }

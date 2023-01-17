@@ -42,6 +42,8 @@ namespace sv {
 		{BUILDING_GENERATOR_DIESEL, "1", MakeBuildingClass<CBuilding_Generator_Diesel>},
 		{BUILDING_TURRET, "2", MakeBuildingClass<CBuilding_Turret>},
 		{BUILDING_TURRET_GRENADE, "3", MakeBuildingClass<CBuilding_TurretGrenade>},
+		{BUILDING_WALL_1, "4", MakeBuildingClass<CBuilding_Wall01>},
+		{BUILDING_WAREHOUSE_1, "5", MakeBuildingClass<CBuilding_WareHouse01>},
 	};
 
 	constexpr auto NUM_BUILDINGCLASSES = std::extent<decltype(g_BuildingClassList)>::value;

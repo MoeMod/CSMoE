@@ -59,7 +59,6 @@ KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, int bi
 	if (tr.flFraction < 1) {
 		CBaseEntity *pHit = CBaseEntity::Instance(tr.pHit);
 		if (pHit && pHit->pev->takedamage != DAMAGE_NO) {
-			const float flAdjustedDamage = flDamage;
 
 			if (!IsPrimaryAttack)
 			{
@@ -72,7 +71,7 @@ KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, int bi
 			}
 			
 			ClearMultiDamage();
-			pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+			pHit->TraceAttack(pevInflictor, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 			ApplyMultiDamage(pevInflictor, pevAttacker);
 			result = HIT_PLAYER;
 		}

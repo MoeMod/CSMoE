@@ -108,6 +108,144 @@ void CSupplyBox::Spawn()
 	m_flNextRadarTime = gpGlobals->time + RandomDuration(0.0s, 1.0s);
 }
 
+void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+{
+	if (!pCaller->IsPlayer())
+		return;
+
+	CBasePlayer* p = static_cast<CBasePlayer*>(pCaller);
+
+	if (p->m_bIsVIP || p->m_bIsZombie || p->m_iBuff & BUFF_MASTERHUNTER)
+		return;
+
+	const char* mod_str = CVAR_GET_STRING("mp_gamemode");
+	if (strcmp(mod_str, "zb3f2p") && strcmp(mod_str, "zb3zp"))
+	{
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
+		{
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+		}
+
+		DropPrimary(p);
+		DropSecondary(p);
+		p->RemoveAllItems(FALSE, false);
+		p->m_bHasPrimary = false;
+
+		const char* weapon_names_view[5];
+
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT, GRENADE_SLOT })
+		{
+			std::vector<MoEWeaponBuyInfo_s> candidate_list;
+#ifndef XASH_DEDICATED
+			std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+#else
+			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+#endif // !XASH_DEDICATED
+			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+			const MoEWeaponBuyInfo_s& info = candidate_list.front();
+			if (iSlot == KNIFE_SLOT) {
+				p->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+			}
+			else if (iSlot == GRENADE_SLOT) {
+
+				CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)p->m_rgpPlayerItems[GRENADE_SLOT];
+				std::vector<CBasePlayerWeapon*> GrenadesToRemove;
+
+				while (pGrenade)
+				{
+					if (pGrenade->m_iId == WEAPON_HEGRENADE ||
+						pGrenade->m_iId == WEAPON_PATROLDRONE ||
+						pGrenade->m_iId == WEAPON_DIVINETITAN ||
+						pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+					{
+						pGrenade->Kill();
+
+						GrenadesToRemove.push_back(pGrenade);
+					}
+
+					pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
+				}
+
+				for (auto iter : GrenadesToRemove)
+				{
+					p->RemovePlayerItem(iter);
+				}
+
+				p->GiveNamedItem(info.pszClassName);
+				p->m_iGrenadeID = AliasToGrenadeType(info.pszClassName);
+				weapon_names_view[iSlot] = info.pszDisplayName;
+				continue;
+#if 0
+				CBasePlayerItem* pItem = p->m_rgpPlayerItems[GRENADE_SLOT];
+
+				// have at least one weapon in this slot
+				while (pItem != NULL)
+				{
+					if (p->m_rgpPlayerItems[GRENADE_SLOT]->IsWeapon() && p->m_rgpPlayerItems[GRENADE_SLOT])
+					{
+						CBasePlayerWeapon* pGrenade = static_cast<CBasePlayerWeapon*>(pItem);
+						if (pGrenade->m_iId == WEAPON_DIVINETITAN ||
+							pGrenade->m_iId == WEAPON_HEGRENADE ||
+							pGrenade->m_iId == WEAPON_PATROLDRONE ||
+							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+						{
+							p->RemovePlayerItem(pGrenade);
+							break;
+						}
+					}
+				}
+				if (info.iID == WEAPON_DIVINETITAN ||
+					info.iID == WEAPON_PATROLDRONE ||
+					info.iID == WEAPON_BUNKERBUSTER)
+				{
+					//bad way
+					p->GiveNamedItem(info.pszClassName);
+					p->m_iGrenadeID = AliasToGrenadeType(info.pszClassName);
+					weapon_names_view[iSlot] = info.pszDisplayName;
+					continue;
+				}
+				else
+					p->m_iGrenadeID = info.iID;
+#endif
+			}
+			p->GiveNamedItem(info.pszClassName);
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+			weapon_names_view[iSlot] = info.pszDisplayName;
+		}
+
+		//p->GiveNamedItem("weapon_hegrenade");
+		p->GiveNamedItem("weapon_smokegrenade");
+		p->GiveNamedItem("weapon_flashbang");
+		p->GiveNamedItem("weapon_flashbang");
+
+		if (!(p->m_flDisplayHistory & DHF_NIGHTVISION))
+		{
+			p->HintMessage("#Hint_use_nightvision");
+			p->m_flDisplayHistory |= DHF_NIGHTVISION;
+		}
+		EMIT_SOUND(ENT(p->pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
+		p->m_bHasNightVision = true;
+		SendItemStatus(p);
+
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s1 获得补给物品 (%s2, %s3, %s4).", STRING(p->pev->netname), weapon_names_view[PRIMARY_WEAPON_SLOT], weapon_names_view[PISTOL_SLOT], weapon_names_view[KNIFE_SLOT]);
+		ClientPrint(p->pev, HUD_PRINTCENTER, "你获得了补给物品 (%s1, %s2, %s3).", weapon_names_view[PRIMARY_WEAPON_SLOT], weapon_names_view[PISTOL_SLOT], weapon_names_view[KNIFE_SLOT]);
+	}
+	else
+	{
+		auto& nf = g_SupplyboxItems[RANDOM_LONG(0, std::extent<decltype(g_SupplyboxItems)>::value - 1)];
+		nf.second(p);
+
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s1 获得补给物品 (%s2).", STRING(p->pev->netname), nf.first);
+		ClientPrint(p->pev, HUD_PRINTCENTER, "你获得了补给物品 (%s1).", nf.first);
+	}
+
+	EMIT_SOUND(ENT(p->pev), CHAN_BODY, "zombi/get_box.wav", VOL_NORM, ATTN_NORM);
+
+	pev->effects |= EF_NODRAW;
+	SendPositionMsg();
+	SUB_Remove();
+}
+
 void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 {
 	if (!pOther->IsPlayer())
@@ -115,25 +253,11 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 
 	CBasePlayer *p = static_cast<CBasePlayer *>(pOther);
 
-	if (p->m_bIsVIP || p->m_bIsZombie || p->m_iBuff & BUFF_MASTERHUNTER)
+	if (p->IsUsingPC())
 		return;
 
-	if (p->m_iBuff & BUFF_GHOSTHUNTER)
-	{
-		MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, p->edict());
-		WRITE_BYTE(7);
-		WRITE_BYTE(4);
-		WRITE_BYTE(5);
-		MESSAGE_END();
-		
-		ghosthuntermenu::ShowGhostHunterMenu(p);
-	
-		p->m_iBuff |= BUFF_MASTERHUNTER;
-		pev->effects |= EF_NODRAW;
-		SendPositionMsg();
-		SUB_Remove();
+	if (p->m_bIsVIP || p->m_bIsZombie || p->m_iBuff & BUFF_MASTERHUNTER)
 		return;
-	}
 
 	const char *mod_str = CVAR_GET_STRING("mp_gamemode");
 	if(strcmp(mod_str, "zb3f2p") && strcmp(mod_str, "zb3zp"))

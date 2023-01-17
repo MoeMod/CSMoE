@@ -1738,7 +1738,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pOther);
 
-	if (pPlayer->m_bIsVIP || pPlayer->m_bShieldDrawn || pPlayer->m_bIsZombie || pPlayer->m_iBuff & BUFF_GHOSTHUNTER)
+	if (pPlayer->m_bIsVIP || pPlayer->m_bShieldDrawn || pPlayer->m_bIsZombie || pPlayer->m_iBuff & BUFF_GHOSTHUNTER || pPlayer->m_iBuff & BUFF_LASTHERO)
 		return;
 
 	pPlayer->OnTouchingWeapon(this);

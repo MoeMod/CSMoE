@@ -256,6 +256,9 @@ namespace sv {
 			if (m_pPlayer->m_iBuff & BUFF_GHOSTHUNTER)
 				return;
 
+			if (m_pPlayer->m_iBuff & BUFF_LASTHERO)
+				return;
+
 			if (m_flNextThink > gpGlobals->time)
 				return;
 

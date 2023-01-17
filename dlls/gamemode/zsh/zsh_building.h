@@ -125,6 +125,36 @@ namespace sv
 		const zsh::ZSHBuildingCost_s GetCost() const override { return { 5, 5, 0 }; }
 	};
 
+	class CBuilding_Wall01 : public CBaseBuildingClass
+	{
+	public:
+		explicit CBuilding_Wall01(CZSHBuilding* p) : CBaseBuildingClass(p) {}
+
+		void OnCreate() override;
+		void OnCompleted() override;
+		void OnThink() override;
+
+		const char* GetName() const override { return "#CSO_zsht_Build_Menu_16"; }
+		const float GetHealth() const override { return 1000.0f; }
+		const int GetTotalProgress() const override { return 104; }
+		const zsh::ZSHBuildingCost_s GetCost() const override { return { 5, 5, 0 }; }
+	};
+
+	class CBuilding_WareHouse01 : public CBaseBuildingClass
+	{
+	public:
+		explicit CBuilding_WareHouse01(CZSHBuilding* p) : CBaseBuildingClass(p) {}
+
+		void OnCreate() override;
+		void OnCompleted() override;
+		void OnThink() override;
+
+		const char* GetName() const override { return "#CSO_zsht_Build_Menu_8"; }
+		const float GetHealth() const override { return 1000.0f; }
+		const int GetTotalProgress() const override { return 104; }
+		const zsh::ZSHBuildingCost_s GetCost() const override { return { 5, 5, 0 }; }
+	};
+
 }
 
 #endif
