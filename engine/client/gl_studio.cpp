@@ -1659,7 +1659,6 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 #ifdef XASH_SHADER
 	g_pstudioshader = &g_studioshadervariant[SSV_NORMAL];
-	pglUseProgramObjectARB(g_pstudioshader->program);
 	R_StudioSetupShader();
 #endif
 
@@ -1863,6 +1862,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 	}
 #ifdef XASH_SHADER
+	g_pstudioshader = nullptr;
 	R_StudioRestoreShader();
 #endif
 }
@@ -2937,7 +2937,7 @@ void R_DrawViewModel( void )
 	RI.currententity->curstate.renderamt = R_ComputeFxBlend( RI.currententity );
 
 	// hack the depth range to prevent view model from poking into walls
-	pglDepthRange( gldepthmin, gldepthmin + 0.3f * ( gldepthmax - gldepthmin ));
+	pglDepthRange( gldepthmin, gldepthmin + 0.2f * ( gldepthmax - gldepthmin ));
 
 	// backface culling for left-handed weapons
 	if (R_AllowFlipViewModel(RI.currententity) || g_iBackFaceCull)

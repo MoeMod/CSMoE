@@ -220,7 +220,9 @@ void CCubeMapManager::UnloadTexture()
     if (!m_bEnabled || !m_bRendering)
         return;
 
+    pglActiveTextureARB(GL_TEXTURE2_ARB);
     pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);
+    pglDisable(GL_TEXTURE_2D);
     pglDisable(GL_TEXTURE_CUBE_MAP_ARB);
     pglActiveTextureARB(GL_TEXTURE0_ARB);
 }
