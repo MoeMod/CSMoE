@@ -2,7 +2,7 @@
 
 namespace sv {
 
-class CGhostHunterSupplyBox : public CBaseEntity
+class CGhostHunterSupplyBox : public CBaseAnimating
 {
 public:
 	virtual void Spawn();
@@ -12,6 +12,12 @@ public:
 	{
 		return CBaseEntity::ObjectCaps() | FCAP_IMPULSE_USE;
 	}
+
+	void EXPORT SupplyBoxThink();
+public:
+
+	bool m_bCanOpen;
+	int m_iLandingEffectIndex;
 };
 
 
@@ -22,9 +28,8 @@ public:
 	virtual void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 	virtual void Precache();
 
-public:
+	void EXPORT SupplyBoxThink();
 
-	int m_iLandingEffectIndex;
 };
 
 

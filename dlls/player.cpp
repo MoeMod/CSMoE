@@ -944,7 +944,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 		else
 		{
-			if (m_pModStrategy->DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType))
+			if (m_pModStrategy->DeathCallBack(this, pevInflictor, pevAttacker, flDamage, bitsDamageType))
 			{
 				return flDamage;
 			}
@@ -1471,7 +1471,21 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		//End OF TakeDamage Post
 	}
 
-	if (flDamage > pev->health && m_pModStrategy->DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType))
+	CBasePlayer* pAttackPlayer = nullptr;
+	if (pAttacker && pAttacker->IsPlayer())
+		pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+	if (pAttackPlayer)
+	{
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttackPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+		if (pWeapon)
+		{
+			if (pWeapon->m_iId == WEAPON_CHAINSR)
+				pWeapon->EntityTakeDamageCallBack(WEAPON_CHAINSR, this, pevInflictor, pAttackPlayer, flDamage, bitsDamageType);
+		}
+	}
+
+	if (flDamage > pev->health && m_pModStrategy->DeathCallBack(this, pevInflictor, pevAttacker, flDamage, bitsDamageType))
 	{
 		return flDamage;
 	}
@@ -6076,11 +6090,6 @@ void CBasePlayer::Spawn()
 	m_iBuff = 0;
 	m_bHasBuffWpn = 0;
 
-	if(IsBot())
-		m_iReviveGunShotsFired = 79;
-	else
-		m_iReviveGunShotsFired = 0;
-
 	SpawnProtection_End();
 
 	if (m_iObserverC4State)
@@ -8473,6 +8482,25 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			{
 				((CGuillotineex*)pWeapon)->CrashAmmo();
 			}
+
+			if (FClassnameIs(pWeapon->pev, "weapon_halogun"))
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, this->pev);
+				WRITE_BYTE(38);
+				WRITE_BYTE(0);
+				WRITE_BYTE(0);
+				MESSAGE_END();
+			}
+
+			if (FClassnameIs(pWeapon->pev, "weapon_revivegun"))
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, this->pev);
+				WRITE_BYTE(38);
+				WRITE_BYTE(2);
+				WRITE_BYTE(0);
+				MESSAGE_END();
+			}
+
 
 			if (pWeapon->iFlags() & ITEM_FLAG_EXHAUSTIBLE)
 			{

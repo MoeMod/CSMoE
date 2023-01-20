@@ -194,15 +194,13 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
-		m_pPlayer->GiveNamedItem("knife_stormgiant");
-		//m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
-		m_pPlayer->GiveNamedItem("knife_dualsword");
-		//m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
@@ -334,36 +332,59 @@ void CPlayerModStrategy_Default::UpdateClientData(int sendweapons, clientdata_s 
 
 }
 
-int CPlayerModStrategy_Default::DeathCallBack(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+int CPlayerModStrategy_Default::DeathCallBack(CBasePlayer* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
+	CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+	
+	CBasePlayerWeapon* pActiveWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+
 	if (m_pPlayer->m_iBuff & BUFF_HALOGUN_AVOID_DEATH)
 	{
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-
 		m_pPlayer->m_iBuff &= ~BUFF_HALOGUN_AVOID_DEATH;
+
 		if (pWeapon)
 		{
 			if (pWeapon->m_iId == WEAPON_HALOGUN)
-				pWeapon->WpnDeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+			{
+				pWeapon->WpnDeathCallBack(m_pPlayer, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+				return 1;
+			}
 		}
-		return 1;
 	}
 
 	if (m_pPlayer->m_iBuff & BUFF_REVIVE)
 	{
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-
-		CSDM_DoRandomSpawn(m_pPlayer);
 		m_pPlayer->m_iBuff &= ~BUFF_REVIVE;
-		m_pPlayer->m_iReviveGunShotsFired = 0;
 		if (pWeapon)
 		{
 			if (pWeapon->m_iId == WEAPON_REVIVEGUN)
-				pWeapon->WeaponCallBack(1);
+			{
+				CSDM_DoRandomSpawn(m_pPlayer);
+				if (pActiveWeapon->m_iId != WEAPON_REVIVEGUN)
+					pWeapon->WpnDeathCallBack(m_pPlayer, pevInflictor, pevAttacker, 1, bitsDamageType);
+				else
+					pWeapon->WpnDeathCallBack(m_pPlayer, pevInflictor, pevAttacker, 0, bitsDamageType);
+				return 1;
+			}
+				
 		}
-		return flDamage;
+		
 	}
 
+
+	if (pWeapon && m_pPlayer->pev != pevAttacker)
+	{
+		CBaseEntity* pEnt = CBaseEntity::Instance(pevInflictor);
+
+
+		if ((pEnt && !Q_strcmp(STRING(pEnt->pev->classname), "chainsr_shadow")) && (pevInflictor != m_pPlayer->pev))
+		{		
+			pWeapon->WpnDeathCallBack(pVictim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+		}
+	}
+
+
+	
 	return 0;
 }
 
@@ -474,7 +495,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 				TargetPlayer->RemoveAllItems(FALSE);
 				TargetPlayer->GiveNamedItem("weapon_revivegun");
 				TargetPlayer->GiveNamedItem("weapon_y22s2sfpistol");
-				TargetPlayer->GiveNamedItem("knife_holysword");
+				TargetPlayer->GiveNamedItem("knife_lance");
 
 				GiveSlotAmmo(TargetPlayer, 1);
 				GiveSlotAmmo(TargetPlayer, 2);

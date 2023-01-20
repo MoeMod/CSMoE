@@ -185,8 +185,8 @@ namespace cl {
 
 		if (!bTextureLoaded)
 		{
-			R_InitTexture(m_iTextureBG, "resource\\announceribbon\\announceicon\\alarm_bg");
-			R_InitTexture(m_iTextureLogoBG, "resource\\announceribbon\\announceicon\\alarm_logobg");
+			R_InitTexture(m_iTextureBG, "resource/announceribbon/announceicon/alarm_bg");
+			R_InitTexture(m_iTextureLogoBG, "resource/announceribbon/announceicon/alarm_logobg");
 			bTextureLoaded = true;
 		}
 
@@ -220,7 +220,7 @@ namespace cl {
 			strcpy(g_TempAlarm.szName, data);
 
 			static char szImagePath[128];
-			sprintf(szImagePath, "resource\\announceribbon\\announceicon\\alarm_%s", g_TempAlarm.szName);
+			sprintf(szImagePath, "resource/announceribbon/announceicon/alarm_%s", g_TempAlarm.szName);
 			R_InitTexture(g_TempAlarm.iTexture, szImagePath);
 
 			//HaveMessage?
@@ -264,7 +264,7 @@ namespace cl {
 
 			if (g_TempAlarm.iRibbonRequire)
 			{
-				sprintf(szImagePath, "resource\\announceribbon\\ribbonicon\\ribbon_%s", g_TempAlarm.szName);
+				sprintf(szImagePath, "resource/announceribbon/ribbonicon/ribbon_%s", g_TempAlarm.szName);
 				R_InitTexture(g_TempAlarm.iTextureRibbon, szImagePath);
 
 				//Vgui Localize
@@ -585,6 +585,7 @@ namespace cl {
 
 
 			g_bFirstBlood = true;
+			cl::gHUD.m_flZombieSelectTime = 0.0;
 		}
 
 		return 1;

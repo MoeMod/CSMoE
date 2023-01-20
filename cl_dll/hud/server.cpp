@@ -72,10 +72,14 @@ enum
 	EF_ELEC_YELLOW,
 	MK3A1SE_BURN,
 	SBMINE_DEBUFF,
+	CHAINSR_SHADOWSHOOT,
+	CHAINSR_SHADOWSHOOT2,
 };
 
 bool bHaloGunLoopRetinaOn;
 bool bHaloGunHitRetinaOn;
+bool bReviveGunLoopRetinaOn;
+bool bReviveGunRetinaOn;
 
 TEMPENTITY *iHolyFistRingEffect[33];
 TEMPENTITY *iWingGunEffect[33];
@@ -588,10 +592,17 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	{
 		arg1 = reader.ReadByte();
 		arg2 = reader.ReadByte();
-		if (arg1)
-			bHaloGunHitRetinaOn = arg2 ? true : false;
-		else
-			bHaloGunLoopRetinaOn = arg2 ? true : false;
+
+		switch (arg1)
+		{
+		case 3: bReviveGunRetinaOn = arg2 ? true : false; break;
+		case 2: bReviveGunLoopRetinaOn = arg2 ? true : false; break;
+		case 1: bHaloGunHitRetinaOn = arg2 ? true : false; break;
+		case 0: bHaloGunLoopRetinaOn = arg2 ? true : false; break;
+		default:
+			break;
+		}
+
 
 		break;
 	}
@@ -1000,6 +1011,18 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 	{
 		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_sbmine_debuff.spr"),
 			Vector(0.0, 0.0, 40.0), 1.0, TRUE, flags, 0.3, kRenderTransAdd, 30.0);
+		break;
+	}
+	case CHAINSR_SHADOWSHOOT:
+	{
+		gEngfuncs.pEfxAPI->R_AttachTentToModel(entity, 0, 10, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_chainsr_shadowshoot1.spr"), 30.0, 255, kRenderTransAdd,
+			0.2, 22, FTENT_CLIENTCUSTOM, EFLAG_DEPTH_CHANGED);
+		break;
+	}
+	case CHAINSR_SHADOWSHOOT2:
+	{
+		gEngfuncs.pEfxAPI->R_AttachTentToModel(entity, 0, 10, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_chainsr_shadowshoot2.spr"), 30.0, 255, kRenderTransAdd,
+			0.2, 22, FTENT_CLIENTCUSTOM, EFLAG_DEPTH_CHANGED);
 		break;
 	}
 

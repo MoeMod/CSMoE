@@ -450,6 +450,7 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	int m_iKnifeID;
 	int m_iGrenadeID;
 	int m_iZombieClass;
+	int m_iZombieZLevel;
 	int m_iNewMenuKeys;
 	int m_iNewMenuID;
 	int m_iNewMenuPage;
@@ -818,7 +819,6 @@ public:
 	int m_iBuff;
 	int m_bHasBuffWpn;	//revivegun buffak buffm4 and more
 	float m_flAccumulateDamage[33];	//like m32venom
-	int m_iReviveGunShotsFired;
 
 	float m_flPlayerBuffData;
 	bool m_bBlockWdnmd;

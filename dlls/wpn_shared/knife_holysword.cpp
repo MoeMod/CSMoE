@@ -425,7 +425,8 @@ namespace sv {
 		}
 
 		void Spawn(void);
-		void EXPORT OnThink();
+		void EXPORT BoxThink();
+		void EXPORT OnThink();	//removed
 		void EXPORT OnTouch(CBaseEntity* pOther);
 		void Init(CBasePlayer* pOwner, CKnifeHolySword* pWeapon);
 
@@ -1047,11 +1048,11 @@ namespace sv {
 		Vector vecAngle = m_pPlayer->pev->angles;
 		vecAngle.x = 0;
 
-		Vector vecSrc = m_pPlayer->pev->origin;
+		Vector vecSrc = m_pPlayer->pev->origin - vecForward * 8;
 		if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
 			vecSrc.z -= 32.0;
 
-		m_pParray = static_cast<CHolySwordParray*>(CBaseEntity::Create("holysword_parray", vecSrc + vecForward * 115, vecAngle, ENT(m_pPlayer->pev)));
+		m_pParray = static_cast<CHolySwordParray*>(CBaseEntity::Create("holysword_parray", vecSrc, vecAngle, ENT(m_pPlayer->pev)));
 		if (m_pParray)
 		{
 			m_pParray->Init(m_pPlayer, this);
@@ -1264,6 +1265,76 @@ namespace sv {
 			}
 		}
 		
+	}
+
+	void EXPORT CHolySwordParray::BoxThink()
+	{
+		pev->nextthink = gpGlobals->time + 0.01s;
+
+		if (!m_pOwner || m_pOwner->m_bIsZombie)
+		{
+			Remove();
+		}
+
+		TraceResult tr;
+		CBaseEntity* pList[100];
+
+		Vector vecStart = m_pOwner->GetGunPosition();
+
+		const float flWidth = 4.5 * 39.37;
+		const float flLength = 2 * 39.37;
+		const float flHeight = 1.5 * 39.37;
+
+		int iCount = UTIL_EntitiesInRotatedBox(pList, 100, vecStart, m_pOwner->pev->v_angle, flLength, flWidth, flHeight, FL_CLIENT | FL_MONSTER);
+
+		for (int i = 0; i < iCount; i++)
+		{
+			CBaseEntity* pEntity = pList[i];
+
+			if (pEntity == this)
+				continue;
+
+			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
+
+			if (pEntity->edict() == pev->owner)
+				continue;
+
+			if (g_pGameRules->PlayerRelationship(m_pOwner, pEntity) == GR_TEAMMATE)
+				continue;
+
+			UTIL_TraceLine(vecStart, pEntity->BodyTarget(vecStart), dont_ignore_monsters, edict(), &tr);
+
+			if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+				continue;
+
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pOwner->m_pActiveItem;
+			if (pWeapon)
+			{
+				if (pWeapon->iItemSlot() != KNIFE_SLOT)
+					return;
+
+				if (pWeapon->m_flNextPrimaryAttack > UTIL_WeaponTimeBase() && pWeapon->m_flNextPrimaryAttack < 0.1s)
+				{
+					float Damage = 500.0;
+
+					this->TakeDamage(pEntity->pev, pEntity->pev, Damage, DMG_NEVERGIB | DMG_BULLET);
+					return;
+				}
+				else if (pWeapon->m_flNextSecondaryAttack > UTIL_WeaponTimeBase() && pWeapon->m_flNextSecondaryAttack < 0.1s)
+				{
+					float Damage = 1000.0;
+
+					this->TakeDamage(pEntity->pev, pEntity->pev, Damage, DMG_NEVERGIB | DMG_BULLET);
+					return;
+				}
+			}
+		}
+
+		if (m_flRemoveTime < gpGlobals->time)
+		{
+			Remove();
+		}
 	}
 
 	void EXPORT CHolySwordParray::OnThink()

@@ -285,7 +285,7 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 	if (!pAttackerPlayer->m_bIsZombie)
 		return 1;
 
-	if (DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType))
+	if (DeathCallBack(m_pPlayer, pevInflictor, pevAttacker, flDamage, bitsDamageType))
 		return 0;
 
 	if (m_pPlayer->m_iBuff & BUFF_HOLYSWORD_AVOID_INFECT)

@@ -460,14 +460,14 @@ void CPlayerModStrategy_ZB1::UpdateClientData(int sendweapons, struct clientdata
 	cd->health = (int)pev->health % 512 == 0 ? pev->health + 1 : pev->health;
 }
 
-int CPlayerModStrategy_ZB1::DeathCallBack(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+int CPlayerModStrategy_ZB1::DeathCallBack(CBasePlayer* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
 	if (m_pPlayer->m_iBuff & BUFF_AVOID_INFECT)
 	{
 		return 0;
 	}
 
-	return CPlayerModStrategy_Default::DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	return CPlayerModStrategy_Default::DeathCallBack(pVictim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 int CPlayerModStrategy_ZB1::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
@@ -483,7 +483,7 @@ int CPlayerModStrategy_ZB1::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 	if (!pAttackerPlayer->m_bIsZombie)
 		return 1;
 
-	if (DeathCallBack(pevInflictor, pevAttacker, flDamage, bitsDamageType))
+	if (DeathCallBack(m_pPlayer, pevInflictor, pevAttacker, flDamage, bitsDamageType))
 		return 0;
 
 	m_pModZB1->HumanInfectionByZombie(m_pPlayer, pAttackerPlayer);
@@ -640,7 +640,7 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	}
 
 
-	/*CBasePlayer *pAttackerPlayer = dynamic_ent_cast<CBasePlayer *>(pAttacker);
+	CBasePlayer *pAttackerPlayer = dynamic_ent_cast<CBasePlayer *>(pAttacker);
 	if (pAttackerPlayer)
 	{
 		if (pAttackerPlayer->m_bIsZombie && !pPlayer->m_bIsZombie)
@@ -667,25 +667,11 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 				return iReturn;
 			}
 
-			if (pPlayer->m_iBuff & BUFF_REVIVE)
-			{
-				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-
-				CSDM_DoRandomSpawn(pPlayer);
-				pPlayer->m_iBuff &= ~BUFF_REVIVE;
-				pPlayer->m_iReviveGunShotsFired = 0;
-				if (pWeapon)
-				{
-					if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
-						pWeapon->WeaponCallBack(1);
-				}
-			}
-
 			HumanInfectionByZombie(pPlayer, pAttackerPlayer);
 			iReturn = false;
 		}
 	}
-	*/
+	
 
 	return iReturn;
 }

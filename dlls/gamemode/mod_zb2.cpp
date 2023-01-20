@@ -236,7 +236,34 @@ CSupplyBox *CMod_ZombieMod2::CreateSupplybox()
 
 void CMod_ZombieMod2::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
-	CMod_Zombi::HumanInfectionByZombie(player, attacker);
+	player->m_ZombieClass = "random";
+	player->pev->sequence = 0;
+	player->m_tLockBuffTime = invalid_time_point;
+	player->m_flLockSpeed = 0.0;
+	player->m_flLockGravity = 0.0;
+	player->m_iCustomSequence = -1;
+	MakeZombie(player, ZOMBIE_LEVEL_HOST);
+	if (enhancedzombie.value)
+		player->pev->health = player->pev->max_health = 15000.0f;
+	else
+		player->pev->health = player->pev->max_health = std::max(3000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
+	player->m_iKevlar = ARMOR_TYPE_HELMET;
+	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + 100.0f;
+
+	InfectionSound();
+	EmitHomoSound(player, attacker);
+
+
+	DeathNotice(player, attacker->pev, attacker->pev);
+	SetScoreAttrib(player, player);
+	TeamCheck();
+	CheckWinConditions();
+
+	player->m_iDeaths += 1;
+	player->AddPoints(0, FALSE);
+	attacker->m_iRoundInfect++;
+	attacker->AddPoints(1, FALSE);
+
 	m_eventInfection.dispatch(player, attacker);
 }
 
@@ -482,13 +509,11 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	UpdatePlayerEvolutionHUD();
 
 #ifdef XASH_DEDICATED
-	if (m_pPlayer->IsUsingPC())
-	{
-		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-		WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
-		WRITE_COORD(20.0);
-		MESSAGE_END();
-	}
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
+	WRITE_COORD(20.0);
+	WRITE_BYTE((!m_pPlayer->IsUsingPC())? (0:1));
+	MESSAGE_END();
 #endif
 }
 
@@ -514,15 +539,14 @@ void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer 
 
 	CheckEvolution();
 
-//#ifdef XASH_DEDICATED
-	if (victim->IsUsingPC())
-	{
-		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, victim->pev);
-		WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
-		WRITE_COORD(20.0);
-		MESSAGE_END();
-	}
-//#endif
+#ifdef XASH_DEDICATED
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, victim->pev);
+	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
+	WRITE_COORD(20.0);
+	WRITE_BYTE((!victim->IsUsingPC()) ? (0:1));
+	MESSAGE_END();
+#endif
 }
 
 void CPlayerModStrategy_ZB2::Event_AdjustHumanDamage(CBasePlayer * attacker, float &flDamage)

@@ -93,6 +93,18 @@ namespace sv {
             UTIL_SetSize(pev, g_vecZero, g_vecZero);
 
             pev->nextthink = gpGlobals->time + 0.1s;
+
+            MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+            WRITE_BYTE(TE_BEAMFOLLOW);
+            WRITE_SHORT(entindex());
+            WRITE_SHORT(m_iTrail);
+            WRITE_BYTE(2);
+            WRITE_BYTE(60);
+            WRITE_BYTE(255);
+            WRITE_BYTE(255);
+            WRITE_BYTE(255);
+            WRITE_BYTE(255);
+            MESSAGE_END();
         }
 
         void Precache() override
@@ -142,7 +154,7 @@ namespace sv {
                 pEntity->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_BULLET | DMG_NOMORALE);
 
                 Vector vecDirection = (pEntity->pev->origin - pAttackPlayer->pev->origin).Normalize();
-                UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 2000.0, 0, true);
+                UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 2000.0, 0);
             }
         }
 
@@ -217,14 +229,14 @@ namespace sv {
 
     static constexpr float PrimaryAttackWalkingMiniumSpeed = 0;
     static constexpr const auto& SpreadCalcNotOnGround = 0.4 * A + 0.04;
-    static constexpr const auto& SpreadCalcWalking = 0.0275 * A;
-    static constexpr const auto& SpreadCalcDefault = 0.03 * A;
+    static constexpr const auto& SpreadCalcWalking = 0.03 * A;
+    static constexpr const auto& SpreadCalcDefault = 0.0275 * A;
 
 	static constexpr const auto& CycleTime = 0.13s;
     static constexpr int DamageDefault = 25;
     static constexpr int DamageZB = 370;
     static constexpr int DamageZBS = 1690;
-    static constexpr const auto& AccuracyCalc = (N * N * N / 200.0) + 0.35;
+    static constexpr const auto& AccuracyCalc = (N * N * N / 220.0) + 0.35;
     static constexpr float AccuracyDefault = 0.2;
     static constexpr float AccuracyMax = 1.25;
     static constexpr float RangeModifier = 0.98;
@@ -232,15 +244,24 @@ namespace sv {
     static constexpr auto BulletType = BULLET_PLAYER_556MM;
 
     KickBackData KickBackWalking = { 1.5, 0.45, 0.225, 0.05, 6.5, 2.5, 7 };
-    KickBackData KickBackNotOnGround = { 2.0, 1.0, 0.5, 0.35, 9.0, 6.0, 5 };
-    KickBackData KickBackDucking = { 0.9, 0.35, 0.15, 0.025, 5.5, 1.5, 9 };
-    KickBackData KickBackDefault = { 1.0, 0.375, 0.175, 0.0375, 5.75, 1.75, 8 };
+    KickBackData KickBackNotOnGround = { 2.0, 1.0, 0.4, 0.35, 9.0, 6.0, 5 };
+    KickBackData KickBackDucking = { 0.48, 0.16, 0.2, 0.011, 2.0, 1.65, 9 };
+    KickBackData KickBackDefault = { 0.49, 0.18, 0.2, 0.013, 2.4, 1.74, 8 };
 
     /*static constexpr*/ int Penetration = 3;
     KnockbackData KnockBack = { 600.0f, 550.0f, 650.0f, 550.0f, 0.4f };
 
-#define HALOGUN_MAXAMMO_3 50
+    KnockbackData GetKnockBackData() override
+    {
+        if (m_iChargeState)
+            return { 600.0f, 550.0f, 650.0f, 550.0f, -1.0f };
+        else
+            return { 600.0f, 550.0f, 650.0f, 550.0f, 0.4f };
+    }
 
+
+#define HALOGUN_MAXAMMO_3 150
+#define HALOGUN_FIRETARGET 60
     int m_iDefaultAmmo2;
     int m_iClip2;
     int m_iClip3;
@@ -320,7 +341,12 @@ namespace sv {
         m_iHitIndex[0] = PRECACHE_MODEL("sprites/ef_halogun_shootA_hit.spr");
         m_iHitIndex[1] = PRECACHE_MODEL("sprites/ef_halogun_shootB_hit.spr");
 
-
+        PRECACHE_MODEL("sprites/muzzleflash273.spr");
+        PRECACHE_MODEL("sprites/muzzleflash274.spr");
+        PRECACHE_MODEL("sprites/muzzleflash275.spr");
+        PRECACHE_MODEL("sprites/muzzleflash276.spr");
+        PRECACHE_MODEL("sprites/muzzleflash277.spr");
+        PRECACHE_MODEL("sprites/muzzleflash278.spr");
         PRECACHE_MODEL("sprites/muzzleflash279.spr");
         PRECACHE_MODEL("sprites/muzzleflash280.spr");
         PRECACHE_MODEL("sprites/muzzleflash281.spr");
@@ -425,7 +451,7 @@ namespace sv {
     void Holster(int skiplocal)
     {
         ResetChargeTimer();
-
+        StopSound();
         CBasePlayerWeapon::Holster();
     }
 
@@ -438,13 +464,26 @@ namespace sv {
         SetPModel();
 
         ChargeAmmo();
-       
+
         if (DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "m249", UseDecrement() != FALSE, 0.1s, 1.0s))
         {
             m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.1s;
             return TRUE;
         }
+
         return FALSE;
+    }
+
+    void StopSound()
+    {
+#ifndef CLIENT_DLL
+        MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+        WRITE_BYTE(79);
+        WRITE_SHORT(m_pPlayer->entindex());
+        WRITE_SHORT(CHAN_ITEM);
+        WRITE_STRING("weapons/halogun-2.wav");
+        MESSAGE_END();
+#endif
     }
 
     void FireC()
@@ -514,6 +553,7 @@ namespace sv {
     void PrimaryAttack()
     {
         m_iChargeState = 0;
+
         Base::PrimaryAttack();
     }
 
@@ -543,11 +583,32 @@ namespace sv {
         PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 2.0, 0.0, 0, m_iChargeState, FALSE, TRUE);
     }
 
+    int AddToPlayer(CBasePlayer* pPlayer)
+    {
+#ifndef CLIENT_DLL
+        if(pPlayer->m_iBuff & BUFF_HALOGUN_AVOID_DEATH)
+        {
+            MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
+            WRITE_BYTE(38);
+            WRITE_BYTE(0);
+            WRITE_BYTE(1);
+            MESSAGE_END();
+        }
+#endif
+        return CBasePlayerWeapon::AddToPlayer(pPlayer);
+    }
+
+
+
     void SecondaryAttack()
     {
         if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
+        {
+            PlayEmptySound();
+            m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2s;
             return;
-
+        }
+           
         ResetChargeTimer();
 
         if (m_iChargeState)
@@ -578,6 +639,8 @@ namespace sv {
                 {
                     m_flTimeCheckCharge = gpGlobals->time + 0.15s;
 
+                    m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
+
                     if (m_iClip2 - m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 10)
                     {
                         m_flTimeCheckCharge = gpGlobals->time + 0.7s;
@@ -591,8 +654,7 @@ namespace sv {
                     }
                     else
                     {
-                        //SHOOTB
-                        m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
+                        //SHOOTB                
                         FireB();
                     }
 
@@ -608,8 +670,6 @@ namespace sv {
                     m_flTimeCheckCharge = gpGlobals->time + 0.15s;
                     m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 9999.0s;
 
-                    m_iClip2 = m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType];
-
                     //SHOOTB_CHARGING
                     m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
                     FireB();
@@ -622,14 +682,14 @@ namespace sv {
                     //SHOOTB_CHARGING
                     m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
                     FireB();
-                    SetPModel();
-
-                    if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
-                    {
-                        OnAttack2Released();
-                    }
+                    SetPModel();             
                     break;
                 }
+                }
+
+                if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
+                {
+                    OnAttack2Released();
                 }
             }
         }
@@ -637,18 +697,18 @@ namespace sv {
         {
             SendWeaponAnim(ANIM_SHOOTB_START);
 
+#ifndef CLIENT_DLL
+            EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/halogun-2.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+#endif
             m_flTimeCheckCharge = gpGlobals->time + 0.37s;
             m_iChargeState = 1;
             m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.37s;
-            m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 9999s;
             m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.37s;
         }
     }
 
     void FireB()
     {
-        EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/halogun-2.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
-
 #ifndef CLIENT_DLL
         Vector vecSrc, vecEnd;
         TraceResult tr;
@@ -691,8 +751,8 @@ namespace sv {
 
             ClearMultiDamage();
 
-            pEntity->TraceAttack(m_pPlayer->pev, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
             pEntity->m_LastHitGroup = HITGROUP_CHEST;
+            pEntity->TraceAttack(m_pPlayer->pev, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);    
 
             ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
@@ -721,6 +781,7 @@ namespace sv {
                 if (strategy)
                 {
                     strategy->SetStunSpeedTime(0.2s, 100.0);
+                    strategy->SetStunGravityTime(0.2s);
                 }
             }
         }
@@ -729,25 +790,35 @@ namespace sv {
 
     void OnAttack2Released()
     {
+
         SendWeaponAnim(m_iChargeState > 2 ? ANIM_SHOOTB_CHARGING_END : ANIM_SHOOTB_END, UseDecrement() != FALSE);
 
-        m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + (m_iChargeState > 2 ? 1.7s :  0.7s);
+        m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + (m_iChargeState > 2 ? 1.7s :  0.1s);
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
 
         ResetChargeTimer();
 
-        if (m_iChargeState == 1)
+        StopSound();
+
+        if (m_iChargeState <= 2)
         {
+            EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/halogun-2_end.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
             m_iChargeState = 0;
             SetPModel();
             return;
         }
-           
+        
+        EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/halogun-2_exp1.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+
+
 #ifndef CLIENT_DLL
         m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
         m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
         m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
+
+        m_iChargeState = 0;
+
 #ifndef CLIENT_DLL
         TraceResult tr;
 
@@ -755,8 +826,50 @@ namespace sv {
 
         Vector vecSrc = m_pPlayer->GetGunPosition() - gpGlobals->v_up * 2;
         Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0, 8192, 3, BULLET_PLAYER_556MM, 0, 0, m_pPlayer->pev, false, m_pPlayer->random_seed);
+
+        vecDir = gpGlobals->v_forward + gpGlobals->v_right * vecDir.x + gpGlobals->v_up * vecDir.y;
+
+        Vector vecEnd = vecSrc + vecDir * 39.37 * 12;
+
+        UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+
+        vecEnd = tr.vecEndPos;
+        vecEnd.z -= 8192;
+        UTIL_TraceLine(tr.vecEndPos, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+
+        vecEnd = tr.vecEndPos;
+ 
+        vecEnd.z += 32;
+
+        CBaseEntity* pEntity = NULL;
+        while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecEnd, 7 * 39.37)) != NULL)
+        {
+            if (pEntity->IsDormant())
+                continue;
+
+            if (pEntity->pev->takedamage == DAMAGE_NO)
+                continue;
+
+            if (pEntity->pev == m_pPlayer->pev)
+                continue;
+
+            if (UTIL_IsWallBetweenEntity(pEntity, m_pPlayer))
+                continue;
+
+            ClearMultiDamage();
+
+            pEntity->m_LastHitGroup = HITGROUP_CHEST;
+            pEntity->TraceAttack(m_pPlayer->pev, GetDirectDamage(), vecDir, &tr, DMG_BULLET | DMG_NEVERGIB);
+           
+            ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+            Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
+            UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 1500.0, 0);
+
+        }
+
+        UTIL_TempModel(vecEnd, g_vecZero, g_vecZero, m_iChargingShotIndex[0], 10, 0, 10, 0, 0, 255, kRenderNormal, NULL, false, 0, 0, 256, 0x20000000);
 #endif
-        m_iChargeState = 0;
         pev->skin = 0;
         SetPModel();
     }
@@ -771,30 +884,8 @@ namespace sv {
         {
             if (m_iChargeState > 2)
             {
-                Vector vecEnd = pTrace->vecEndPos - vecDir * 35;
-                vecEnd.z += 16;
-
-                EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/halogun-2_exp1.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
-
-                CBaseEntity* pEntity = NULL;
-                while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecEnd, 3 * 39.37)) != NULL)
-                {
-                    if (pEntity->IsDormant())
-                        continue;
-
-                    if (pEntity->pev->takedamage == DAMAGE_NO)
-                        continue;
-
-                    if (pEntity->pev == m_pPlayer->pev)
-                        continue;
-
-                    if (UTIL_IsWallBetweenEntity(pEntity, m_pPlayer))
-                        continue;
-
-                    pEntity->TraceAttack(m_pPlayer->pev, GetDirectDamage(), vecDir, pTrace, DMG_BULLET | DMG_NEVERGIB);
-                }
-
-                UTIL_TempModel(vecEnd, g_vecZero, g_vecZero, m_iChargingShotIndex[0], 10, 0, 10, 0, 0, 255, kRenderNormal, NULL, false, 0, 0, 256, 0x20000000);
+               
+               
 
             }
             else if (m_iChargeState > 0)
@@ -803,12 +894,24 @@ namespace sv {
             }
             else
             {
-                Vector vecEnd = pTrace->vecEndPos - vecDir * 35;
+                Vector vecEnd = pTrace->vecEndPos - vecDir * 15;
 
-                m_iChargeShotFired++;
-                m_iSkillShotFired++;
+                if (!(m_pPlayer->m_iBuff & BUFF_HALOGUN_AVOID_DEATH))
+                {
+                    if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+                    {
+                        if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+                        {
+                            if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
+                            {
+                                m_iSkillShotFired++;
 
-                if (m_iSkillShotFired >= 20)
+                            }
+                        }
+                    }
+                }
+
+                if (m_iSkillShotFired >= HALOGUN_FIRETARGET)
                 {
                     m_pPlayer->m_iBuff |= BUFF_HALOGUN_AVOID_DEATH;
 
@@ -817,6 +920,8 @@ namespace sv {
                     WRITE_BYTE(0);
                     WRITE_BYTE(1);
                     MESSAGE_END();
+
+                    EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/halogun_fx.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 
                     m_iSkillShotFired = 0;
                 }
@@ -882,7 +987,7 @@ namespace sv {
     }
 #endif
 
-    void WpnDeathCallBack(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override
+    void WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override
     {
 #ifndef CLIENT_DLL
         Vector vecOrigin = m_pPlayer->pev->origin;
@@ -906,7 +1011,7 @@ namespace sv {
             pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, GetExplodeDamage(), DMG_NEVERGIB | DMG_BULLET);
 
             Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
-            UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 1500.0, 400, true);
+            UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 1500.0, 400);
         }
 
         MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
@@ -945,4 +1050,6 @@ namespace sv {
 
 };
 LINK_ENTITY_TO_CLASS(weapon_halogun, CHaloGun)
+
+
 }

@@ -79,6 +79,7 @@ namespace zsh {
 		BUILDING_TURRET,
 		BUILDING_TURRET_GRENADE,
 		BUILDING_WAREHOUSE_1,
+		BUILDING_MEDICAL,
 	};
 
 	struct ZSHBuildingCost_s

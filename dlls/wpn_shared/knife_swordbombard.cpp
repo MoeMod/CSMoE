@@ -198,8 +198,8 @@ namespace sv {
 		vecStart = m_vecBoxOrigin + Vector(0.0, 0.0, 1.0);
 
 		const float flWidth = 17 * 39.37;
-		const float flLength = 6 * 39.37;
-		const float flHeight = 4 * 39.37;
+		const float flLength = 6 * 39.37 / 2.0;
+		const float flHeight = 4 * 39.37 / 2.0;
 		//int iCount = UTIL_EntitiesInBox(pList, 100, vecStart - Vector(flLength, flWidth, 0.0), vecStart + Vector(flLength, flWidth, flHeight), FL_CLIENT | FL_MONSTER);
 
 		int iCount = UTIL_EntitiesInRotatedBox(pList, 100, vecStart, m_vecAngle, flLength, flWidth, flHeight, FL_CLIENT | FL_MONSTER);
@@ -635,8 +635,8 @@ namespace sv {
 		Vector vecStart = m_pPlayer->GetGunPosition();
 
 		const float flWidth = 8 * 39.37;
-		const float flLength = 5 * 39.37;
-		const float flHeight = 3 * 39.37;
+		const float flLength = 5 * 39.37 / 2.0;
+		const float flHeight = 3 * 39.37 / 2.0;
 	
 		int iCount = UTIL_EntitiesInRotatedBox(pList, 100, vecStart, m_pPlayer->pev->v_angle, flLength, flWidth, flHeight, FL_CLIENT | FL_MONSTER);
 

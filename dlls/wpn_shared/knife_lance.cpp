@@ -45,8 +45,9 @@ namespace sv {
 			pev->sequence = 0;
 			pev->framerate = 1.0;
 			pev->frame = 0.0;
-			pev->solid = SOLID_TRIGGER; // 2	
-			pev->rendermode = kRenderTransAdd; // 5;
+			pev->solid = SOLID_TRIGGER; // 2
+			pev->effects |= EF_NOCULL;
+			pev->rendermode = 0; // 5;
 			pev->renderamt = 255.0;
 			pev->movetype = MOVETYPE_NONE; // 9
 			UTIL_SetSize(pev, { -1.0, -1.0, -1.0 }, { 1.0, 1.0, 1.0 });
@@ -215,7 +216,8 @@ namespace sv {
 			pev->framerate = 1.0;
 			pev->frame = 0.0;
 			pev->solid = SOLID_NOT; // 2	
-			pev->rendermode = kRenderTransAdd; // 5;
+			pev->effects |= EF_NOCULL;
+			pev->rendermode = 0; // 5;
 			pev->renderamt = 255.0;
 			pev->movetype = MOVETYPE_NONE; // 9
 			UTIL_SetSize(pev, { -1.0, -1.0, -1.0 }, { 1.0, 1.0, 1.0 });		

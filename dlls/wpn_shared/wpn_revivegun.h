@@ -13,7 +13,7 @@ namespace sv {
 #define AUG_RANGE_MODIFER		0.96
 #define SECNDARYATTACK_RADIUS		900
 #define MAXTARGET		12
-
+#define	REVIVEGUN_FIRETARGET	60
 class CBeam;
 
 class CReviveGun : public CBasePlayerWeapon
@@ -48,6 +48,7 @@ public:
 	void ItemPostFrame() override;
 	void WeaponIdle() override;
 	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
+	int AddToPlayer(CBasePlayer* pPlayer) override;
 	void SecondaryAttack_FindTargets();
 	void SecondaryAttack_InstantDamage();
 	bool SecondaryAttack_CheckTargetAvailable(CBaseEntity* a2, Vector vecAngleDirection);
@@ -55,8 +56,12 @@ public:
 	void ClearEffect();
 	void CreateEffect();
 	void DestroyEffect();
+	
+#ifndef CLIENT_DLL
 	void ExpToLineTargets(Vector vecSrc, Vector vecDir);
-
+	void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace) override;
+	void WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+#endif
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
@@ -78,7 +83,6 @@ public:
 	float GetDamage() const;
 	float GetSecondaryAttackDamage() const;
 	float GetExpDamage() const;
-	void WeaponCallBack(int iType) override;
 
 	std::vector<EHANDLE> m_pEnemyList;
 	std::array<CBeam*, MAXTARGET> m_pBeamList;

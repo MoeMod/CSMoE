@@ -712,6 +712,47 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 	}
 	else
 	{
+		CBasePlayer* pAttackPlayer = nullptr;
+
+		if (pAttacker && pAttacker->IsPlayer())
+			pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+
+		if (pAttackPlayer && FClassnameIs(this->pev, "monster_entity"))
+		{
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttackPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+			if (pWeapon)
+			{
+				if (pWeapon->m_iId == WEAPON_CHAINSR)
+					pWeapon->EntityTakeDamageCallBack(WEAPON_CHAINSR, this, pevInflictor, pAttackPlayer, flDamage, bitsDamageType);
+			}
+		}
+
+		if (this && FClassnameIs(this->pev, "monster_entity"))
+		{
+			if (this->m_vecTempAttackers.size())
+			{
+				for (std::vector<CBasePlayer*>::iterator iter = this->m_vecTempAttackers.begin(); iter != this->m_vecTempAttackers.end(); ++iter)
+				{
+					CBasePlayer* TragetPlayer = *iter;
+					if (TragetPlayer && TragetPlayer->IsAlive())
+					{
+						CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)TragetPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+						if (TragetPlayer->pev != pevAttacker)
+						{
+							pWeapon = (CBasePlayerWeapon*)TragetPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+							if (pWeapon && pWeapon->m_iId == WEAPON_CHAINSR)
+							{
+								pWeapon->WpnDeathCallBack(this, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+							}
+						}
+					}
+				}
+				this->m_vecTempAttackers.clear();
+			}
+		}
+
 		Killed(pevAttacker, GIB_NORMAL);
 	}
 

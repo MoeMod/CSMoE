@@ -408,6 +408,8 @@ TL_ADD(CAT4EX)
 TL_ADD(CBazooka)
 TL_ADD(CJANUS1)
 TL_ADD(CHaloGun)
+TL_ADD(CChainSr)
+TL_ADD(CMechanicHeroGun)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -786,7 +788,9 @@ TL_ADD(CSbMineNade)
 TL_ADD(CSbMineEffect)
 TL_ADD(CJanus1Rocket)
 TL_ADD(CHaloGunProjectile)
+TL_ADD(CChainSrShadow)
 TL_ADD(CZSHTurretGrenade)
+TL_ADD(CSentryGun)
 #endif
 
 TL_END(AllEntityTypeList)

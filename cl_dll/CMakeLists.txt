@@ -451,6 +451,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_bazooka.cpp
 	../dlls/wpn_shared/wpn_janus1.cpp
 	../dlls/wpn_shared/wpn_halogun.cpp
+	../dlls/wpn_shared/wpn_chainsr.cpp
+	../dlls/wpn_shared/z4b_mechanichero.cpp
 	)
 
 set (HUD_SRCS

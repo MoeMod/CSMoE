@@ -122,7 +122,7 @@ public:
 	void Pain(int m_LastHitGroup, bool HasArmour) override;
 	void DeathSound() override;
 	void UpdateClientData(int sendweapons, struct clientdata_s* cd, entvars_t* pevOrg) override;
-	int DeathCallBack(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+	int DeathCallBack(CBasePlayer* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
 private:

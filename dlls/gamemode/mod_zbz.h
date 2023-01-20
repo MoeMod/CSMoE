@@ -42,6 +42,7 @@ public:
 protected:
 	void MakeSuperSupplyboxThink();
 	void RemoveAllSuperSupplybox();
+
 	CGhostHunterSupplyBox* CreateGhostHunterSupplybox();
 	CMechSupplyBox* CreateMechSupplybox();
 	int SuperSupplyboxCount();

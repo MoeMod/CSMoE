@@ -1143,6 +1143,14 @@ private:
 	HSPRITE m_iHaloGunHitSprite;
 	model_t* m_pHaloGunHitSprite;
 
+	HSPRITE m_iReviveGunLoopSprite;
+	model_t* m_pReviveGunLoopSprite;
+	HSPRITE m_iReviveGunSprite;
+	model_t* m_pReviveGunSprite;
+
+	UniqueTexture m_iChainSrAimBg;
+	UniqueTexture m_iChainSrAimCenter;
+	UniqueTexture m_iChainSrAimDeco[4];
 };
 
 //

@@ -172,9 +172,19 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 	{
 
 		float flHoldTime = buf.ReadCoord();
-		SetSelectorDrawTime(gHUD.m_flTime, flHoldTime);
-		cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + flHoldTime;
-		ClientCmd("showvguimenu2 ZombieKeeper");
+		int iIsPc = buf.ReadByte();
+
+		cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + 20.0;
+		if (iIsPc)
+		{
+			SetSelectorDrawTime(gHUD.m_flTime, flHoldTime);
+		}
+		else
+		{
+			ClientCmd("showvguimenu2 ZombieKeeper");
+		}
+		
+		
 		break;
 	}
 	case ZB2_MESSAGE_ALARM:

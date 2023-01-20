@@ -37,14 +37,37 @@ void CGhostHunterSupplyBox::Spawn()
 	pev->movetype = MOVETYPE_TOSS;
 	pev->solid = SOLID_TRIGGER;
 
-	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 16));
+	SetThink(&CMechSupplyBox::SupplyBoxThink);
+
+	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 32));
 	UTIL_SetOrigin(pev, pev->origin);
 
 	SET_MODEL(edict(), "models/ghosthunter_supplybox.mdl");
+
+	m_bCanOpen = false;
+
+	pev->frame = 0;
+	pev->sequence = 1;
+
+	ResetSequenceInfo();
+
+	pev->nextthink = gpGlobals->time + 2.1s;
 }
+
+void  CGhostHunterSupplyBox::SupplyBoxThink()
+{
+	pev->sequence = 0;
+	m_bCanOpen = true;
+
+	UTIL_TempModel(pev->origin, g_vecZero, g_vecZero, m_iLandingEffectIndex, 10, 0, 10, 0, 0, 255, kRenderNormal, NULL, false, 0, 0, 256, 0);
+}
+
 
 void CGhostHunterSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
+	if (!m_bCanOpen)
+		return;
+
 	if (!pCaller->IsPlayer())
 		return;
 
@@ -99,16 +122,36 @@ void CMechSupplyBox::Spawn()
 	pev->movetype = MOVETYPE_TOSS;
 	pev->solid = SOLID_TRIGGER;
 
-	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 16));
+	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 32));
 	UTIL_SetOrigin(pev, pev->origin);
 
+	SetThink(&CMechSupplyBox::SupplyBoxThink);
+
 	SET_MODEL(edict(), "models/mech_supplybox.mdl");
+
+	m_bCanOpen = false;
+
+	pev->frame = 0;
+	pev->sequence = 1;
+
+	ResetSequenceInfo();
+
+	pev->nextthink = gpGlobals->time + 2.1s;
+}
+
+void  CMechSupplyBox::SupplyBoxThink()
+{
+	pev->sequence = 0;
+	m_bCanOpen = true;
 
 	UTIL_TempModel(pev->origin, g_vecZero, g_vecZero, m_iLandingEffectIndex, 10, 0, 10, 0, 0, 255, kRenderNormal, NULL, false, 0, 0, 256, 0);
 }
 
 void CMechSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
+	if (!m_bCanOpen)
+		return;
+
 	if (!pCaller->IsPlayer())
 		return;
 

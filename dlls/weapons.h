@@ -648,7 +648,8 @@ public:
 	virtual int GetPriorityByTarget(CBaseEntity* target) { return 1; }
 	virtual void WeaponCallBack(int iType = 0) {};
 	virtual void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace) {};
-	virtual void WpnDeathCallBack(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) {}
+	virtual void WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) {};
+	virtual void EntityTakeDamageCallBack(int iWpnID, CBaseEntity* pVictim, entvars_t* pevInflictor, CBasePlayer* pAttacker, float flDamage, int bitsDamageType) {};
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];

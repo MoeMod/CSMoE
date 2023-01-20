@@ -119,6 +119,7 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 		return;
 
 	const char* mod_str = CVAR_GET_STRING("mp_gamemode");
+	bool bIsZbzMode = (!strcmp(mod_str, "zbz")) ? true : false;
 	if (strcmp(mod_str, "zb3f2p") && strcmp(mod_str, "zb3zp"))
 	{
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
@@ -132,6 +133,7 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 		p->m_bHasPrimary = false;
 
 		const char* weapon_names_view[5];
+		bool bAlreadyGenWeapon[5];
 
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT, GRENADE_SLOT })
 		{
@@ -142,7 +144,27 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 #endif // !XASH_DEDICATED
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
-			const MoEWeaponBuyInfo_s& info = candidate_list.front();
+			MoEWeaponBuyInfo_s& info = candidate_list.front();
+
+			if (bIsZbzMode)
+			{
+				if (info.iLevel > p->m_iZombieZLevel)
+				{
+					std::vector<MoEWeaponBuyInfo_s> candidate_list_zbz;
+					std::copy_if(std::begin(candidate_list), std::end(candidate_list), std::back_inserter(candidate_list_zbz), [iSlot,p](const MoEWeaponBuyInfo_s& info) { return info.iLevel <= p->m_iZombieZLevel; });
+
+					if (candidate_list_zbz.size())
+					{
+						std::shuffle(candidate_list_zbz.begin(), candidate_list_zbz.end(), std::random_device());
+
+						info = candidate_list_zbz.front();
+					}
+				}
+				else
+					bAlreadyGenWeapon[iSlot] = true;
+			}
+			
+
 			if (iSlot == KNIFE_SLOT) {
 				p->m_iKnifeID = AliasToKnifeType(info.pszClassName);
 			}
@@ -260,6 +282,7 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 		return;
 
 	const char *mod_str = CVAR_GET_STRING("mp_gamemode");
+	bool bIsZbzMode = (!strcmp(mod_str, "zbz")) ? true : false;
 	if(strcmp(mod_str, "zb3f2p") && strcmp(mod_str, "zb3zp"))
 	{
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
@@ -283,7 +306,23 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 #endif // !XASH_DEDICATED
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
-			const MoEWeaponBuyInfo_s& info = candidate_list.front();
+			MoEWeaponBuyInfo_s& info = candidate_list.front();
+
+			if (bIsZbzMode)
+			{
+				if (info.iLevel > p->m_iZombieZLevel)
+				{
+					std::vector<MoEWeaponBuyInfo_s> candidate_list_zbz;
+					std::copy_if(std::begin(candidate_list), std::end(candidate_list), std::back_inserter(candidate_list_zbz), [iSlot, p](const MoEWeaponBuyInfo_s& info) { return info.iLevel <= p->m_iZombieZLevel; });
+
+					if (candidate_list_zbz.size())
+					{
+						std::shuffle(candidate_list_zbz.begin(), candidate_list_zbz.end(), std::random_device());
+
+						info = candidate_list_zbz.front();
+					}
+				}
+			}
 			if (iSlot == KNIFE_SLOT) {
 				p->m_iKnifeID = AliasToKnifeType(info.pszClassName);
 			} else if (iSlot == GRENADE_SLOT) {

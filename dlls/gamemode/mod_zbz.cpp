@@ -79,10 +79,13 @@ void CPlayerModStrategy_ZBZ::OnInitHUD()
 	WRITE_BYTE(m_iPoint);
 	MESSAGE_END();
 
+
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
 	WRITE_BYTE(ZBZ_MESSAGE_SKILL_REMOVE);
 	WRITE_BYTE(0);
 	MESSAGE_END();
+
+	m_pPlayer->m_iZombieZLevel = m_iLevel;
 }
 
 void CPlayerModStrategy_ZBZ::Evolution(ZombieLevel iEvolutionLevel)
@@ -427,6 +430,8 @@ void CPlayerModStrategy_ZBZ::SetLevel(int lv)
 	WRITE_SHORT(m_iExp);
 	WRITE_BYTE(m_iPoint);
 	MESSAGE_END();
+
+	m_pPlayer->m_iZombieZLevel = m_iLevel;
 }
 
 void CPlayerModStrategy_ZBZ::AddLevel(int lv)
@@ -443,6 +448,8 @@ void CPlayerModStrategy_ZBZ::AddLevel(int lv)
 	WRITE_SHORT(m_iExp);
 	WRITE_BYTE(m_iPoint);
 	MESSAGE_END();
+
+	m_pPlayer->m_iZombieZLevel = m_iLevel;
 }
 
 void CPlayerModStrategy_ZBZ::AddExp(int exp)
@@ -480,6 +487,8 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 	WRITE_SHORT(m_iExp);
 	WRITE_BYTE(m_iPoint);
 	MESSAGE_END();
+
+	m_pPlayer->m_iZombieZLevel = m_iLevel;
 }
 
 void CPlayerModStrategy_ZBZ::Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType)
@@ -591,6 +600,8 @@ bool CPlayerModStrategy_ZBZ::UpgradeSkill()
 		WRITE_BYTE(1);
 		WRITE_COORD(0.2);
 		MESSAGE_END();
+
+		m_pPlayer->m_iZombieZLevel = m_iLevel;
 	}
 
 	if (m_pPlayer->IsUsingPC())

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.celest.xash3d.csbtem"
     android:installLocation="auto"
-    android:versionCode="2587"
+    android:versionCode="2851"
     android:versionName="v22-citrus">
     <!-- OpenGL ES 1.0 -->
     <uses-feature android:glEsVersion="0x00020000" android:required="true" /> <!-- Permissions -->

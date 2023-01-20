@@ -261,7 +261,9 @@ set(HLDLL_SRCS
 	./at4rocket.cpp
 	./gamemode/zsh/zsh_building_turret.cpp
 	./gamemode/zsh/zsh_building_turret_grenade.cpp
+	./gamemode/zsh/zsh_building_medical.cpp
 	./gamemode/zbz/supersupplybox.cpp
+	./gamemode/zbz/sentrygun.cpp
 	)
 
 set (HLWPN_SRCS
@@ -648,6 +650,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_bazooka.cpp
 	../dlls/wpn_shared/wpn_janus1.cpp
 	../dlls/wpn_shared/wpn_halogun.cpp
+	../dlls/wpn_shared/wpn_chainsr.cpp
+	../dlls/wpn_shared/z4b_mechanichero.cpp
 	)
 
 set(PM_SRCS

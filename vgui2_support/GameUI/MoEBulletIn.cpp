@@ -267,7 +267,7 @@ CCSBTEBulletin::CCSBTEBulletin(Panel* parent, const char* panelName, bool showTa
 		pimpl->ImagePanel[i]->SetId(i);
 	}
 
-	SetType(BULLETIN_BULLETIN, true);
+	SetType(BULLETIN_EVENTPROGRESS, true);
 
 	SetMenuButtonVisible(false);
 	SetCloseButtonVisible(false);
@@ -483,7 +483,7 @@ int CCSBTEBulletin::ReadServerContextFile(bulletin_elem* pElement, std::string s
 										bulletin_imgdata TempImageData{ 0 };
 										//memset(&TempImageData, 0, sizeof(TempImageData));
 
-										for (int k = 0; k < 6; k++)
+										for (int k = 0; k < 7; k++)
 										{
 											if (!p2)
 												break;
@@ -505,6 +505,7 @@ int CCSBTEBulletin::ReadServerContextFile(bulletin_elem* pElement, std::string s
 											case 3:TempImageData.w = atoi(p2); break;
 											case 4:TempImageData.h = atoi(p2); break;
 											case 5:TempImageData.frame = !Q_strncmp(p2, "1", 1) ? true : false; break;
+											case 6:TempImageData.solid = !Q_strncmp(p2, "1", 1) ? true : false; break;
 											}
 
 											p2 = strtok(NULL, ",");
@@ -751,7 +752,7 @@ void CCSBTEBulletin::LoadCreator(void)
 	temp.vecImage.push_back(pLogo);
 
 
-	m_vecPageBulletin[0].push_back(temp);
+	m_vecPageBulletin[2].push_back(temp);
 }
 void CCSBTEBulletin::ReadServerFile(void)
 {
@@ -1038,7 +1039,7 @@ void CCSBTEBulletinText::LoadContext(bulletin_elem Data)
 					SetImage(lastimg, Data.vecImage[lastimg]);
 					Data.vecImage[lastimg].y -= val;
 
-					if (height)
+					if (height && !Data.vecImage[lastimg].solid)
 					{
 						int width2, height2;
 						m_Image[lastimg]->GetSize(width2, height2);

@@ -371,6 +371,7 @@ public:
 		int w;
 		int h;
 		bool frame;
+		bool solid = false;
 	};
 
 	struct bulletin_elem

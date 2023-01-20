@@ -46,6 +46,8 @@ namespace cl {
 
 extern bool bHaloGunLoopRetinaOn;
 extern bool bHaloGunHitRetinaOn;
+extern bool bReviveGunLoopRetinaOn;
+extern bool bReviveGunRetinaOn;
 extern vec3_t g_vecEyePos;
 
 enum drawscope_type
@@ -192,6 +194,20 @@ int CHudSniperScope::VidInit()
 
 	m_iHaloGunHitSprite = SPR_Load("sprites/halogun_hit.spr");
 	m_pHaloGunHitSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iHaloGunHitSprite);
+
+	m_iReviveGunLoopSprite = SPR_Load("sprites/revivegun_loop.spr");
+	m_pReviveGunLoopSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iReviveGunLoopSprite);
+
+	m_iReviveGunSprite = SPR_Load("sprites/revivegun.spr");
+	m_pReviveGunSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iReviveGunSprite);
+
+	R_InitTexture(m_iChainSrAimBg, "sprites/chainsr_aim_bg.tga");
+	R_InitTexture(m_iChainSrAimCenter, "sprites/chainsr_aim_center.tga");
+
+	R_InitTexture(m_iChainSrAimDeco[0], "sprites/chainsr_aim_deco01.tga");
+	R_InitTexture(m_iChainSrAimDeco[1], "sprites/chainsr_aim_deco02.tga");
+	R_InitTexture(m_iChainSrAimDeco[2], "sprites/chainsr_aim_deco03.tga");
+	R_InitTexture(m_iChainSrAimDeco[3], "sprites/chainsr_aim_deco04.tga");
 
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
@@ -482,7 +498,8 @@ int CHudSniperScope::Draw(float flTime)
 			pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM || 
 			pActiveBTEWeapon->m_iId == WEAPON_AT4 || 
 			pActiveBTEWeapon->m_iId == WEAPON_AT4EX ||
-			pActiveBTEWeapon->m_iId == WEAPON_BAZOOKA)
+			pActiveBTEWeapon->m_iId == WEAPON_BAZOOKA ||
+			pActiveBTEWeapon->m_iId == WEAPON_CHAINSR)
 		{
 			if (gHUD.m_iFOV > 40)
 				return 1;
@@ -539,6 +556,71 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 		FillRGBABlend(0, iY + Height / 2, ScreenWidth, ScreenHeight, 0, 0, 0, 93);
 		FillRGBABlend(0, 0, ScreenWidth, iY - Height / 2, 0, 0, 0, 93);
 
+		FuncDrawCorner(*m_iM95TigerScopeCorner, TYPE_CORNER_SW, Width, Height / 2);
+	}
+	if (iId == WEAPON_CHAINSR)
+	{
+		float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
+
+		int iX = ScreenWidth / 2;
+		int iY = ScreenHeight / 2;
+
+		float Height = min(ScreenWidth, ScreenHeight);
+		float Width;
+
+
+		Width = min(ScreenWidth, ScreenHeight) / 2 / 0.88;
+		Height = min(ScreenWidth, ScreenHeight) / 2 / 1.10;
+
+		FillRGBABlend(0, 0, iX - Width, ScreenHeight, 0, 0, 0, 100);
+		FillRGBABlend(iX + Width, 0, ScreenWidth, ScreenHeight, 0, 0, 0, 100);
+
+
+		FillRGBABlend(iX - Width, iY + Height, ScreenWidth - ((iX - Width) * 2.0f), ScreenHeight, 0, 0, 0, 100);
+		FillRGBABlend(iX - Width, 0, ScreenWidth - ((iX - Width) * 2.0f), iY - Height, 0, 0, 0, 100);
+
+		iX = ScreenWidth / 2 - Width;
+		iY = ScreenHeight / 2 - Height;
+		FuncDraw2DQuadScaled(*m_iChainSrAimBg, iX, iY, Width, Height);
+		iX = ScreenWidth / 2 - Width;
+		iY = ScreenHeight / 2 + Height;
+		FuncDraw2DQuadScaled(*m_iChainSrAimBg, iX, iY, Width, -Height);
+		iX = ScreenWidth / 2 + Width;
+		iY = ScreenHeight / 2 - Height;
+		FuncDraw2DQuadScaled(*m_iChainSrAimBg, iX, iY, -Width, Height);
+		iY = ScreenHeight / 2 + Height;
+		FuncDraw2DQuadScaled(*m_iChainSrAimBg, iX, iY, -Width, -Height);
+
+		iX = ScreenWidth / 2;
+		iY = ScreenHeight / 2 + Height;
+		FuncDraw2DQuadScaled(*m_iChainSrAimDeco[2], iX - Width / 17.06f / 2, iY - Height * 0.121f, Width / 17.06f, -Height / 8.3f);
+		iX = ScreenWidth / 2;
+		iY = ScreenHeight / 2 - Height;
+		FuncDraw2DQuadScaled(*m_iChainSrAimDeco[2], iX - Width / 17.06f / 2, iY + Height * 0.121f, Width / 17.06f, Height / 8.3f);
+		iX = ScreenWidth / 2 + Width;
+		iY = ScreenHeight / 2;
+		//FuncDraw2DQuadScaled(*m_iChainSrAimDeco[1], iX - Width * 0.235f, iY - Height / 17.06f / 2, Width / 17.06f, -Height / 5.06f);
+		FuncDraw2DQuadScaled(*m_iChainSrAimDeco[3], iX - Width * 0.255f, iY - Height / 17.06f / 2, -Width / 5.65f, Height / 15.8f);
+		iX = ScreenWidth / 2 - Width;
+		iY = ScreenHeight / 2;
+		//FuncDraw2DQuadScaled(*m_iChainSrAimDeco[1], iX + Width * 0.235f, iY - Height / 17.06f / 2,  Width / 17.06f, -Height / 5.06f);
+		FuncDraw2DQuadScaled(*m_iChainSrAimDeco[3], iX + Width * 0.255f, iY - Height / 17.06f / 2, Width / 5.65f, Height / 15.8f);
+
+		iX = ScreenWidth / 2;
+		iY = ScreenHeight / 2;
+
+		m_iChainSrAimCenter->Draw2DQuadScaled(iX - m_iChainSrAimCenter->w() / 2, iY - m_iChainSrAimCenter->h() / 2, iX + m_iChainSrAimCenter->w() / 2, iY + m_iChainSrAimCenter->h() / 2);
+
+		FuncDraw2DQuadScaled(*m_iChainSrAimDeco[0], iX - m_iChainSrAimDeco[0]->w() / 2 - m_iChainSrAimCenter->w() / 2, iY - m_iChainSrAimDeco[0]->h() / 2, m_iChainSrAimDeco[0]->w(), m_iChainSrAimDeco[0]->h());
+		FuncDraw2DQuadScaled(*m_iChainSrAimDeco[0], iX + m_iChainSrAimDeco[0]->w() / 2 + m_iChainSrAimCenter->w() / 2, iY - m_iChainSrAimDeco[0]->h() / 2, -m_iChainSrAimDeco[0]->w(), m_iChainSrAimDeco[0]->h());
+
+		/*m_iChainSrAimCenter->Draw2DQuadScaled(iX - m_iChainSrAimCenter->w()  / 2, iY - m_iChainSrAimCenter->h()  / 2, iX + 112 * flScale / 4, iY + 112 * flScale / 4);
+
+		FuncDraw2DQuadScaled(*m_iChainSrAimDeco[0], iX - m_iChainSrAimDeco[0]->w() * flScale / 2 - m_iChainSrAimCenter->w() * flScale / 2, iY - m_iChainSrAimDeco[0]->h() * flScale / 2, m_iChainSrAimDeco[0]->w() * flScale, m_iChainSrAimDeco[0]->h() * flScale);
+		FuncDraw2DQuadScaled(*m_iChainSrAimDeco[0], iX + m_iChainSrAimDeco[0]->w() * flScale / 2 + m_iChainSrAimCenter->w() * flScale / 2, iY - m_iChainSrAimDeco[0]->h() * flScale / 2, -m_iChainSrAimDeco[0]->w() * flScale, m_iChainSrAimDeco[0]->h() * flScale);*/
+
+
+		Width = (Height * m_iM95TigerScope[0]->w() / m_iM95TigerScope[0]->h());
 		FuncDrawCorner(*m_iM95TigerScopeCorner, TYPE_CORNER_SW, Width, Height / 2);
 	}
 	if (iId == WEAPON_CHEYTACLRRS)
@@ -644,6 +726,9 @@ void CHudSniperScope::DrawRetina(float flTime)
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
 
 		gEngfuncs.pTriAPI->SpriteTexture(m_pHaloGunHitSprite, iHaloGunHitSpriteFrame);
+
+		//gEngfuncs.pTriAPI->Color4f(0.3f, 0.3f, 1.0f, 1.0f);
+
 		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
 
 		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
@@ -671,6 +756,94 @@ void CHudSniperScope::DrawRetina(float flTime)
 		{
 			iHaloGunHitSpriteFrame = 0;
 			bHaloGunHitRetinaOn = false;
+		}
+
+	}
+
+	if (m_pReviveGunLoopSprite && bReviveGunLoopRetinaOn)
+	{
+		static int iReviveGunLoopSpriteFrame = 0;
+		int iWidth = ScreenWidth;
+		int iHeight = ScreenHeight;
+
+		int iX = 0;
+		int iY = 0;
+
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+
+		gEngfuncs.pTriAPI->SpriteTexture(m_pReviveGunLoopSprite, iReviveGunLoopSpriteFrame);
+		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->End();
+
+
+		if (1.0 / (30.0 * 1.0) <= gHUD.m_flTime - m_flLastFrameTime)
+		{
+			iReviveGunLoopSpriteFrame++;
+			m_flLastFrameTime = gHUD.m_flTime;
+		}
+
+		if (iReviveGunLoopSpriteFrame > 16)
+		{
+			iReviveGunLoopSpriteFrame = 0;
+		}
+
+	}
+
+	if (m_pReviveGunSprite && bReviveGunRetinaOn)
+	{
+		static int iReviveGunSpriteFrame = 0;
+		int iWidth = ScreenWidth;
+		int iHeight = ScreenHeight;
+
+		int iX = 0;
+		int iY = 0;
+
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+
+		gEngfuncs.pTriAPI->SpriteTexture(m_pReviveGunSprite, iReviveGunSpriteFrame);
+
+		//gEngfuncs.pTriAPI->Color4f(0.3f, 0.3f, 1.0f, 1.0f);
+
+		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, (iY + iHeight) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iWidth) * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->End();
+
+
+		if (1.0 / (30.0 * 1.0) <= gHUD.m_flTime - m_flLastFrameTime)
+		{
+			iReviveGunSpriteFrame++;
+			m_flLastFrameTime = gHUD.m_flTime;
+		}
+
+		if (iReviveGunSpriteFrame > 13)
+		{
+			iReviveGunSpriteFrame = 0;
+			bReviveGunRetinaOn = false;
 		}
 
 	}

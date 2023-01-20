@@ -79,7 +79,7 @@ void CSBuyMouseOverPanelButton::SetBanWeapon(const char* weapon, int iLevel)
 		m_pLockedImage->SetImage("resource/zombiez/level_lock_l");
 		m_pLockedImageBg->SetImage("resource/zombiez/level_lock_bg");
 
-		m_pBlankBg->SetImage("resource/control/btn_mode@c2");
+		m_pBlankBg->SetImage("resource/pcbangpremium_bg_red");
 		m_pBlankBg->SetBgColor({ 255,99,71,255 });
 
 		m_pBlankBg->SetVisible(true);

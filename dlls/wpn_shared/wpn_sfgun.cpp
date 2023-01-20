@@ -144,7 +144,7 @@ void CSFGUN::SFGUNFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
-		KickBack(0.52, 0.2, 0.22, 0.015, 2.7, 2.0, 7);
+		KickBack(1.5, 0.45, 0.225, 0.05, 6.5, 2.5, 7);
 	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(2.0, 1.0, 0.4, 0.35, 9.0, 6.0, 5);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))

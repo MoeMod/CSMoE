@@ -119,33 +119,8 @@ void EV_FireHaloGun(event_args_s *args)
 
 	if (args->bparam1)
 	{
-		Vector vecBeamStart, vecBeamEnd;
-
-		int iBeamIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_halogun_projectile.spr");
-
-		if (EV_IsLocal(idx))
-		{
-			vecBeamStart = ent->attachment[0];
-		}
-		else
-		{
-			if (args->ducking)
-			{
-				vecBeamStart = vecSrc + forward * 40 - up * 3;
-			}
-			else
-			{
-				vecBeamStart = vecSrc + forward * 40 - up * 9;
-			}
-		}
-
-		vecBeamEnd = vecBeamStart + forward * 8192;
-
-		gEngfuncs.pEfxAPI->R_BeamPoints_Stretch(vecBeamStart, vecBeamEnd, iBeamIndex, 1.0, 30.0, 255, 0, 15.0, 255, 255, 255);
-
 		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/halogun-3.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 15));
-	}
-		
+	}	
 	else
 		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/halogun-1.wav", VOL_NORM, ATTN_NORM, 0, 94 + Com_RandomLong(0, 15));
 

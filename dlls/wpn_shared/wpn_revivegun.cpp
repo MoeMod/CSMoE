@@ -534,11 +534,6 @@ void CReviveGun::PrimaryAttack(void)
 
 bool CReviveGun::IsSignal(void)
 {
-	if (!(m_pPlayer->m_iBuff & BUFF_REVIVE) && m_pPlayer->m_iReviveGunShotsFired > 80)
-	{
-		m_pPlayer->m_iBuff |= BUFF_REVIVE;
-	}
-	
 	return m_pPlayer->m_iBuff & BUFF_REVIVE ? true : false;
 }
 
@@ -564,7 +559,6 @@ void CReviveGun::ReviveGunFire(float flSpread, duration_t flCycleTime, BOOL fUse
 	}
 
 	m_iThinkType = 0;
-	m_pPlayer->m_iReviveGunShotsFired++;
 	m_iClip--;
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
@@ -580,9 +574,10 @@ void CReviveGun::ReviveGunFire(float flSpread, duration_t flCycleTime, BOOL fUse
 
 	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_762MM, GetDamage(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
+#ifndef CLIENT_DLL
 	ExpToLineTargets(vecSrc, vecDirShooting);
 
-#ifndef CLIENT_DLL
+
 	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireReviveGun, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), IsSignal(), FALSE);
 #endif
 
@@ -604,6 +599,7 @@ void CReviveGun::ReviveGunFire(float flSpread, duration_t flCycleTime, BOOL fUse
 		KickBack(0.625, 0.375, 0.25, 0.0125, 3.5, 2.25, 8);
 
 }
+
 
 void CReviveGun::ItemPostFrame()
 {
@@ -701,9 +697,54 @@ void CReviveGun::Reload(void)
 }
 
 
+#ifndef CLIENT_DLL
+void CReviveGun::FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace)
+{
+	int iOriginalPenetration = 3;
+
+	if (iOriginalPenetration == iPenetration)
+	{
+		if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+		{
+			if (!(m_pPlayer->m_iBuff & BUFF_REVIVE))
+			{
+				if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+				{
+					if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+					{
+						if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
+						{
+							m_iChargeShotsFired++;
+
+						}
+					}
+				}
+			}
+
+			if (m_iChargeShotsFired >= REVIVEGUN_FIRETARGET)
+			{
+				m_pPlayer->m_iBuff |= BUFF_REVIVE;
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+				WRITE_BYTE(38);
+				WRITE_BYTE(2);
+				WRITE_BYTE(1);
+				MESSAGE_END();
+
+				EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/revivegun_revive_in1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+				m_iChargeShotsFired = 0;
+			}
+		}
+	}
+
+}
+#endif
+
+#ifndef CLIENT_DLL
 void CReviveGun::ExpToLineTargets(Vector vecSrc, Vector vecDir)
 {
-#ifndef CLIENT_DLL
+
 	TraceResult tr;
 	g_engfuncs.pfnSetGroupMask(0, GROUP_OP_AND);
 	m_pPlayer->pev->groupinfo = (1 << 1);
@@ -791,34 +832,39 @@ void CReviveGun::ExpToLineTargets(Vector vecSrc, Vector vecDir)
 			pEntity->TraceAttack(m_pPlayer->pev, GetExpDamage(), (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
 
 			ApplyMultiDamage(pev, m_pPlayer->pev);
+
+			if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+				m_iChargeShotsFired++;
 		}
 		
 	}
-#endif
 }
 
-void CReviveGun::WeaponCallBack(int iType)
+
+void CReviveGun::WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
-	if (iType == 1)
-	{
-#ifndef CLIENT_DLL
-		m_pPlayer->m_iReviveGunShotsFired = 0;
+	if(!flDamage)
 		SendWeaponAnim(REVIVEGUN_REVIVE, UseDecrement() != FALSE);
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 
-		UTIL_TempModel(Vector(0, 0, -32), g_vecZero, g_vecZero, m_iFieldModelIndex, 17, 0, 10, false, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 10, 50, 0);
-#endif
-		m_pPlayer->m_iBuff &= ~BUFF_REVIVE;
+	MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+	WRITE_BYTE(38);
+	WRITE_BYTE(2);
+	WRITE_BYTE(0);
+	MESSAGE_END();
 
-		return;
-	}
-	IsSignal();
+	MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+	WRITE_BYTE(38);
+	WRITE_BYTE(3);
+	WRITE_BYTE(1);
+	MESSAGE_END();
 
-	/*if (m_flTimeHold == invalid_time_point)
-		m_flTimeHold = gpGlobals->time;
-	else
-		m_flTimeHold = time_point_t(gpGlobals->time + (gpGlobals->time - m_flTimeHold));*/
+	EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/revivegun_revive_out1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+
+	UTIL_TempModel(Vector(0, 0, -32), g_vecZero, g_vecZero, m_iFieldModelIndex, 17, 0, 10, false, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 10, 50, 0);
 }
+#endif
 
 void CReviveGun::WeaponIdle(void)
 {
@@ -831,6 +877,21 @@ void CReviveGun::WeaponIdle(void)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(IsSignal() ? REVIVEGUN_REVIVE_IDLE : REVIVEGUN_IDLE, UseDecrement() != FALSE);
 
+}
+
+int CReviveGun::AddToPlayer(CBasePlayer* pPlayer)
+{
+#ifndef CLIENT_DLL
+	if (pPlayer->m_iBuff & BUFF_REVIVE)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
+		WRITE_BYTE(38);
+		WRITE_BYTE(2);
+		WRITE_BYTE(1);
+		MESSAGE_END();
+	}
+#endif
+	return CBasePlayerWeapon::AddToPlayer(pPlayer);
 }
 
 void CReviveGun::Holster(int skiplocal)

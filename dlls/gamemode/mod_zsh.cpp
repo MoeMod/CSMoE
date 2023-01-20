@@ -17,6 +17,7 @@
 #include "zsh/zsh_building.h"
 #include "zsh/zsh_building_turret.h"
 #include "zsh/zsh_building_turret_grenade.h"
+#include "zsh/zsh_building_medical.h"
 #include "player/csdm_randomspawn.h"
 
 #include "player/player_human_level.h"
@@ -44,6 +45,7 @@ namespace sv {
 		{BUILDING_TURRET_GRENADE, "3", MakeBuildingClass<CBuilding_TurretGrenade>},
 		{BUILDING_WALL_1, "4", MakeBuildingClass<CBuilding_Wall01>},
 		{BUILDING_WAREHOUSE_1, "5", MakeBuildingClass<CBuilding_WareHouse01>},
+		{BUILDING_MEDICAL, "6", MakeBuildingClass<CBuilding_Medical>},
 	};
 
 	constexpr auto NUM_BUILDINGCLASSES = std::extent<decltype(g_BuildingClassList)>::value;
@@ -561,6 +563,7 @@ namespace sv {
 		m_pPlayer->RemoveAllItems(FALSE);
 		m_pPlayer->m_bHasPrimary = false;
 		m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("weapon_chainsr");
 	}
 
 	void CPlayerModStrategy_ZSH::CmdStart(struct usercmd_s* cmd, unsigned int random_seed)
