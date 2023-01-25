@@ -35,6 +35,7 @@ namespace xe {
     int TexLru_LoadTextureSkybox(const char *name, int flags, imgfilter_t *filter);
 
     const TextureAttr &TexLru_GetAttr(const mstudiotexture_t *ptexture);
+    void TexLru_UpdateAttr(const mstudiotexture_t* ptexture);
     void TexLru_Bind(const mstudiotexture_t *ptexture);
     void TexLru_Bind(const mspriteframe_t *pspriteframe);
     void TexLru_CreateAttr(const mstudiotexture_t *ptexture, int gl_texturenum);

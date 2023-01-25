@@ -1543,8 +1543,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 #endif
 
 #ifdef XASH_SHADER_VBO
-        xe::StudioLru_Submit(startArrayVerts, g_nNumArrayVerts - startArrayVerts);
-        xe::StudioLru_DrawMesh();
+        xe::StudioLru_Submit(startArrayElems, g_nNumArrayElems - startArrayElems);
 #else
         pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
         pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
@@ -1623,7 +1622,9 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
 
-        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		const auto& attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		if(xe::TexLru_Upload(attr.index))
+			xe::TexLru_UpdateAttr(&ptexture[pskinref[pmesh->skinref]]);
 		float envBrightMul = 1;
 		float envBrightAdd = 0;
 
@@ -1806,18 +1807,15 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		}
 #endif
 #ifdef XASH_SHADER_VBO
-        bool use_vbo_cache = xe::StudioLru_BindVBO(m_pStudioHeader, m_pSubModel, j, g_nForceFaceFlags & STUDIO_NF_CHROME);
-        if(use_vbo_cache)
+        xe::StudioLru_BindVBO(m_pStudioHeader, m_pSubModel, j, !(g_nForceFaceFlags & STUDIO_NF_CHROME));
+        if(!xe::StudioLru_HasCachedData())
         {
-            xe::StudioLru_DrawMesh();
+			R_StudioDrawMesh(ptricmds, s, t, alpha, scale);
         }
-        else
-#endif
-        {
-            R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
-        }
-#ifdef XASH_SHADER_VBO
-        xe::StudioLru_UnbindVBO();
+		xe::StudioLru_DrawMesh();
+		xe::StudioLru_UnbindVBO();
+#else
+		R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
 #endif
 
 		if (use_cubemap)
@@ -2588,13 +2586,6 @@ R_StudioRestoreRenderer
 */
 static void GAME_EXPORT R_StudioRestoreRenderer( void )
 {
-#ifdef XASH_SHADER
-#ifdef XASH_SHADER_VBO
-    pglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-    pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-#endif
-#endif
-
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	pglShadeModel( GL_FLAT );
 
@@ -2658,12 +2649,6 @@ void R_StudioDeformShadow( void )
 		float dist3 = DotProduct(v, g_shadowTrace.plane.normal) - dist;
 		if (dist3 > 0.0f) VectorMA(v, dist3, g_mvShadowVec, v);
 	};
-#ifdef XASH_SHADER_VBO
-    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts );
-    auto vboverts = (studio_vertex_attrib_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB );
-    std::for_each(vboverts, vboverts + g_nNumArrayVerts, [vert_calc_fn](studio_vertex_attrib_item_t &item){ vert_calc_fn(item.pos); });
-    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
-#else
 #ifdef XASH_RENDER_PAR
 #ifdef XASH_TBBMALLOC
 	tbb::parallel_for_each(g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
@@ -2672,7 +2657,6 @@ void R_StudioDeformShadow( void )
 #endif
 #else
 	std::for_each(g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
-#endif
 #endif
 }
 
@@ -2687,18 +2671,6 @@ static void R_StudioDrawPlanarShadow( void )
 		pglEnable( GL_STENCIL_TEST );
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
-#ifdef XASH_SHADER
-#ifdef XASH_SHADER_VBO
-    pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_vbo_elems );
-    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts );
-    pglVertexPointer( 3, GL_FLOAT, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_t, pos) );
-    pglDrawElements( GL_TRIANGLES, g_nNumArrayElems, GL_UNSIGNED_SHORT, 0 );
-    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
-    pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, 0 );
-#else
-#error "not implemented"
-#endif
-#else
 	pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
 
 #if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
@@ -2707,7 +2679,6 @@ static void R_StudioDrawPlanarShadow( void )
 	else
 #endif
 		pglDrawElements( GL_TRIANGLES, g_nNumArrayElems, GL_UNSIGNED_SHORT, g_xarrayelems );
-#endif
 	if( glState.stencilEnabled )
 		pglDisable( GL_STENCIL_TEST );
 

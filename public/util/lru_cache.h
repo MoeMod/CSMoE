@@ -2,6 +2,7 @@
 #include <utility>
 #include <list>
 #include <map>
+#include <optional>
 
 template<class Key, class Value>
 class lru_cache

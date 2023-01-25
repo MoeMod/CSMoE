@@ -51,8 +51,9 @@ namespace xe {
 
     std::unordered_map<const mstudiotexture_t *, TextureAttr> g_textureAttrMap;
 
-    void UpdateAttr(const mstudiotexture_t *ptexture, TextureAttr &attr)
+    void TexLru_UpdateAttr(const mstudiotexture_t *ptexture)
     {
+        auto& attr = g_textureAttrMap.at(ptexture);
         if ( ptexture->name[0] == '$' )
         {
             if ( ptexture->name[1] == '0' && ptexture->name[2] == 'b' )
@@ -92,7 +93,7 @@ namespace xe {
         }
 
         auto [iter, succ] = g_textureAttrMap.emplace(ptexture, TextureAttr{  ptexture->flags, ptexture->width, ptexture->height, gl_texturenum });
-        return UpdateAttr(ptexture, iter->second);
+        return TexLru_UpdateAttr(ptexture);
     }
 
     int TexLru_LoadTextureExternal(const char *name, int flags, imgfilter_t *filter)
@@ -591,8 +592,8 @@ namespace xe {
         auto &attr = g_textureAttrMap.at(ptexture);
 
         // set size for external texture
-        TexLru_Upload(attr.index);
-        UpdateAttr(ptexture, attr);
+        if(TexLru_Upload(attr.index))
+            TexLru_UpdateAttr(ptexture);
         return GL_Bind( XASH_TEXTURE0, attr.index);
     }
 

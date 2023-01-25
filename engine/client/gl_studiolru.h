@@ -26,7 +26,7 @@ namespace xe {
     void StudioLru_Init();
     void StudioLru_Shutdown();
     // return true if already has result, false if new vbo is created
-    bool StudioLru_BindVBO(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags);
+    void StudioLru_BindVBO(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags);
     void StudioLru_UnbindVBO();
     bool StudioLru_HasCachedData();
     void StudioLru_Submit(int startArrayElems, int numArrayElems);

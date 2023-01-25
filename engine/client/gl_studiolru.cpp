@@ -41,7 +41,7 @@ namespace xe {
     private:
         std::string name;
         GLuint studioverts;
-        GLuint studionorms;
+        GLuint studioelems;
         int start;
         int num;
     };
@@ -50,30 +50,30 @@ namespace xe {
     {
         name = debugname;
         pglGenBuffersARB( 1, &studioverts );
-        pglGenBuffersARB( 1, &studionorms );
+        pglGenBuffersARB( 1, &studioelems);
         start = 0;
         num = 0;
 
         pglBindBufferARB( GL_ARRAY_BUFFER_ARB, studioverts );
-        pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, studionorms );
-        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, MAXARRAYVERTS * sizeof(studio_vertex_attrib_item_t), nullptr, GL_STREAM_DRAW_ARB );
-        pglBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, MAXARRAYVERTS * 6 * sizeof(unsigned short), nullptr, GL_STREAM_DRAW_ARB );
-        pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, 0 );
+        pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, studioelems);
+        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, MAXARRAYVERTS * sizeof(studio_vertex_attrib_item_t), nullptr, GL_STATIC_DRAW_ARB);
+        pglBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, MAXARRAYVERTS * 6 * sizeof(unsigned short), nullptr, GL_STATIC_DRAW_ARB);
         pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+        pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 
         MsgDev(D_INFO, "StudioLru : loading model vbo %s\n", name.c_str());
     }
 
     studiolru_vbo_cache::~studiolru_vbo_cache() {
         pglDeleteBuffersARB( 1, &studioverts );
-        pglDeleteBuffersARB( 1, &studionorms );
+        pglDeleteBuffersARB( 1, &studioelems);
         MsgDev(D_INFO, "StudioLru : swap out model vbo %s\n", name.c_str());
     }
 
     void studiolru_vbo_cache::Bind()
     {
         pglBindBufferARB( GL_ARRAY_BUFFER_ARB, studioverts );
-        pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, studionorms );
+        pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, studioelems );
     }
 
     void studiolru_vbo_cache::Unbind()
@@ -107,17 +107,18 @@ namespace xe {
     }
 
     static lru_cache<studiolru_key_t, std::shared_ptr<studiolru_vbo_cache>> studiovbocache(512);
-    std::shared_ptr<studiolru_vbo_cache> current_studiolru_vbo;
+    static std::shared_ptr<studiolru_vbo_cache> current_studiolru_vbo;
 
     bool StudioLru_HasCachedData()
     {
-        return current_studiolru_vbo->HasCachedData() > 0;
+        return current_studiolru_vbo->HasCachedData();
     }
 
-    bool StudioLru_BindVBO(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags)
+    void StudioLru_BindVBO(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags)
     {
-        studiolru_key_t key{studiohdr, submodel, mesh, flags};
-        if((current_studiolru_vbo = studiovbocache.get(key).value_or(nullptr)) == nullptr)
+        studiolru_key_t key{ studiohdr, submodel, mesh, flags };
+        current_studiolru_vbo = studiovbocache.get(key).value_or(nullptr);
+        if (current_studiolru_vbo == nullptr)
         {
             auto new_vbo = std::make_shared<studiolru_vbo_cache>(studiohdr->name);
             studiovbocache.insert(key, new_vbo);
