@@ -27,26 +27,21 @@ GNU General Public License for more details.
 #include "gl_texlru.h"
 #include "gl_shader.h"
 #include "gl_cubemap.h"
+#include "gl_studioshader.h"
+#include "gl_studiolru.h"
 
 #ifdef XASH_RAGDOLL
 #include "physics.h"
 #endif
 
 #define EVENT_CLIENT	5000	// less than this value it's a server-side studio events
-#define MAXARRAYVERTS	16384	// used for draw shadows
 #define LEGS_BONES_COUNT	8
 #define MAX_LOCALLIGHTS	4
 
 // diable now
 #define XASH_SHADER
-//#define XASH_SHADER_VBO
+#define XASH_SHADER_VBO
 #ifdef XASH_SHADER
-typedef enum
-{
-	SSV_NORMAL,
-	SSV_CUBEMAP,
-	MAX_STUDIOSHADERVARIANTS
-} studioshadervariant_e;
 static const char* studioshadervariant_define[MAX_STUDIOSHADERVARIANTS] = {
 	"",
 	"#define CSO_ENV\n#define CSO_FINAL_WHITE\n"
@@ -135,43 +130,11 @@ static vec3_t		g_chromeright[MAXSTUDIOBONES];// chrome vector "right" in bone re
 static vec3_t		g_chromeup[MAXSTUDIOBONES];	// chrome vector "up" in bone reference frames
 static int		g_chromeage[MAXSTUDIOBONES];	// last time chrome vectors were updated
 #ifdef XASH_SHADER
-typedef struct studio_vertex_attrib_item_s {
-    GLfloat pos[3];
-    GLfloat boneIdx;
-    GLfloat coord[2];
-    GLubyte norm[3];
-} studio_vertex_attrib_item_t;
-#ifdef XASH_SHADER_VBO
-static GLuint g_vbo_verts;
-static GLuint g_vbo_elems;
-#else
 static studio_vertex_attrib_item_t		g_xarrayattrs[MAXARRAYVERTS];
 static unsigned short		g_xarrayelems[MAXARRAYVERTS*6];
-#endif
-typedef struct studioshader_s {
-    GLuint program;
-    GLuint vertex_shader;
-    GLuint fragment_shader;
-    struct {
-        GLint texOffset;
-        GLint colorMix;
-        GLint lightInfo;
-        GLint dLightDir;
-        GLint boneMat;
-        GLint muWVP;
-        GLint worldEye;
-        GLint texDiffuseMap;
-        GLint texEnvMap;
-        GLint glowColor;
-    } uniform;
-    struct {
-        GLint vaPosition;
-        GLint vaNormal;
-        GLint vaTexCoord;
-    } attrib;
-} studioshader_t;
-static studioshader_t g_studioshadervariant[MAX_STUDIOSHADERVARIANTS];
-static studioshader_t *g_pstudioshader;
+// moved to gl_studioshader.h
+studioshader_t g_studioshadervariant[MAX_STUDIOSHADERVARIANTS];
+studioshader_t *g_pstudioshader;
 #else
 static GLfloat		g_xarrayverts[MAXARRAYVERTS][3];
 static GLfloat		g_xarraycoord[MAXARRAYVERTS][2];
@@ -254,8 +217,7 @@ void R_StudioInit( void )
 #ifdef XASH_SHADER
 #ifdef XASH_SHADER_VBO
     // Setup VBO
-    pglGenBuffersARB( 1, &g_vbo_verts );
-    pglGenBuffersARB( 1, &g_vbo_elems );
+    xe::StudioLru_Init();
 #endif
 
 	for (int i = SSV_NORMAL; i < MAX_STUDIOSHADERVARIANTS; ++i)
@@ -322,9 +284,7 @@ void R_StudioShutdown()
     xe::CubeMap_Shutdown();
 #ifdef XASH_SHADER
 #ifdef XASH_SHADER_VBO
-    // Setup VBO
-    pglDeleteBuffersARB( 1, &g_vbo_verts );
-    pglDeleteBuffersARB( 1, &g_vbo_elems );
+    xe::StudioLru_Shutdown();
 #endif
 
 	for (int i = SSV_NORMAL; i < MAX_STUDIOSHADERVARIANTS; ++i)
@@ -1475,13 +1435,8 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 #ifdef XASH_SHADER
     //studio_vertex_attrib_item_t *vboattrs = (studio_vertex_attrib_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
     //auto arrayelems = (unsigned short *)pglMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
-#ifdef XASH_SHADER_VBO
-    static studio_vertex_attrib_item_t vboattrs[MAXARRAYVERTS];
-    static unsigned short arrayelems[MAXARRAYVERTS*6];
-#else
     auto vboattrs = g_xarrayattrs;
     auto arrayelems = g_xarrayelems;
-#endif
     const auto R_MeshUV = R_MeshUVFunc();
 #else
     auto arrayelems = g_xarrayelems;
@@ -1582,28 +1537,26 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
         //pglUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
         //pglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
         pglBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, startArrayElems * sizeof(unsigned short), (g_nNumArrayElems - startArrayElems) * sizeof(unsigned short), arrayelems + startArrayElems);
-        pglBufferSubDataARB(GL_ARRAY_BUFFER_ARB, startArrayVerts * sizeof(studio_vertex_attrib_item_t), (g_nNumArrayVerts - startArrayVerts) * sizeof(studio_vertex_attrib_item_t), vboverts + startArrayVerts);
+        pglBufferSubDataARB(GL_ARRAY_BUFFER_ARB, startArrayVerts * sizeof(studio_vertex_attrib_item_t), (g_nNumArrayVerts - startArrayVerts) * sizeof(studio_vertex_attrib_item_t), vboattrs + startArrayVerts);
 #else
         // no copy
 #endif
+
+#ifdef XASH_SHADER_VBO
+        xe::StudioLru_Submit(startArrayVerts, g_nNumArrayVerts - startArrayVerts);
+        xe::StudioLru_DrawMesh();
+#else
         pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
         pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
         pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
-
-#ifdef XASH_SHADER_VBO
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studiovbo_item_t, pos));
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studiovbo_item_t, coord));
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studiovbo_item_t, norm));
-        pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const GLvoid *)(startArrayElems * sizeof(unsigned short)) );
-#else
         pglVertexAttribPointerARB(g_pstudioshader->attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, pos));
         pglVertexAttribPointerARB(g_pstudioshader->attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, coord));
         pglVertexAttribPointerARB(g_pstudioshader->attrib.vaNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, norm));
         pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const byte *)arrayelems + (startArrayElems * sizeof(unsigned short)) );
-#endif
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
+#endif
     }
 #else
     {
@@ -1852,8 +1805,20 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			
 		}
 #endif
-
-		R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
+#ifdef XASH_SHADER_VBO
+        bool use_vbo_cache = xe::StudioLru_BindVBO(m_pStudioHeader, m_pSubModel, j, g_nForceFaceFlags & STUDIO_NF_CHROME);
+        if(use_vbo_cache)
+        {
+            xe::StudioLru_DrawMesh();
+        }
+        else
+#endif
+        {
+            R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
+        }
+#ifdef XASH_SHADER_VBO
+        xe::StudioLru_UnbindVBO();
+#endif
 
 		if (use_cubemap)
 		{
@@ -2613,14 +2578,6 @@ static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 	// was done before, in R_DrawViewModel
 	if( g_iBackFaceCull )
 		GL_FrontFace( !glState.frontFace );
-#ifdef XASH_SHADER
-#ifdef XASH_SHADER_VBO
-    pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_vbo_elems );
-    pglBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, MAXARRAYVERTS * 6 * sizeof(unsigned short), nullptr, GL_STREAM_DRAW_ARB );
-    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_vbo_verts );
-    pglBufferDataARB( GL_ARRAY_BUFFER_ARB, MAXARRAYVERTS * sizeof(studio_vertex_attrib_item_t), nullptr, GL_STREAM_DRAW_ARB );
-#endif
-#endif
 }
 
 /*

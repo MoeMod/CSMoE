@@ -249,6 +249,8 @@ set(XASH_ENGINE_CLIENT_SOURCES
    client/vgui/vgui_draw.cpp
    client/voice.cpp
    client/gl_cubemap.cpp
+   client/gl_texlru.cpp
+   client/gl_studiolru.cpp
 )
 
 set(XASH_ENGINE_IMGUI_SOURCES

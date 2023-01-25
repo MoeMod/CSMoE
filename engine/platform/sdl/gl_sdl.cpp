@@ -925,6 +925,9 @@ void GL4ES_GetMainFBSize( int *width, int *height )
 }
 void *GL4ES_GetProcAddress( const char *name )
 {
+#ifdef XASH_ANGLE
+    return (void *)eglGetProcAddress(name);
+#endif
 	if( !Q_strcmp(name, "glShadeModel") )
 		// combined gles/gles2/gl implementation exports this, but it is invalid
 		return NULL;

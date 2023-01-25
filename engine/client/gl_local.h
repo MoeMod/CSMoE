@@ -42,6 +42,7 @@ extern mempool_t	*r_temppool;
 #define SUBDIVIDE_SIZE	64
 #define MAX_MIRRORS		32	// per one frame!
 
+#define MAXARRAYVERTS	16384	// used for draw shadows
 #define NUMVERTEXNORMALS	162
 #define SHADEDOT_QUANT 	16	// precalculated dot products for quantized angles
 #define SHADE_LAMBERT	1.495f
@@ -98,7 +99,7 @@ typedef struct gltexture_s
 	// reference count
 	uint		refCount; // 2021.10.01 added.
 
-	std::unique_ptr<xe::texlru_extdata_t> texlru_extdata;
+	std::shared_ptr<xe::texlru_extdata_t> texlru_extdata;
 } gltexture_t;
 
 // mirror entity
@@ -339,6 +340,10 @@ const char *GL_Target( GLenum target );
 void R_TextureList_f( void );
 void R_InitImages( void );
 void R_ShutdownImages( void );
+
+// internal use
+int GL_AllocateTextureSlot(const char *name);
+void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfilter_t *filter );
 
 //
 // gl_mirror.c

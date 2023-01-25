@@ -42,6 +42,7 @@ namespace xe {
     void TexLru_FreeTexture(const mstudiotexture_t *ptexture);
     bool TexLru_Upload(int texnum);
 
+    void TexLru_Free( int texnum );
 	void TexLru_Shrink();
 	void TexLru_Clear();
 }
