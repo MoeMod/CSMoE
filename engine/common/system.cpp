@@ -19,6 +19,7 @@ GNU General Public License for more details.
 
 #ifndef XASH_DEDICATED
 #include "gl_texlru.h"
+#include "gl_studiolru.h"
 #endif
 
 #ifdef XASH_SDL
@@ -934,7 +935,9 @@ void Sys_LowMemory()
     void CL_ClearViewBeams( void );
     void CL_ClearParticles( void );
 
+    MsgDev( D_INFO, "Sys_LowMemory: cleaning cache\n" );
     xe::TexLru_Shrink();
+    xe::StudioLru_Shrink();
     CL_FreeLowPriorityTempEnt();
     CL_ClearViewBeams ();
     CL_ClearParticles();

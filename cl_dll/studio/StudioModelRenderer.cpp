@@ -231,12 +231,18 @@ void CStudioModelRenderer::StudioCalcBoneAdj(float dadt, float *adj, const byte 
 	}
 }
 
-void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec4_t_ref q)
+void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, const mstudiobone_t *pbone, const mstudioanim_t *panim, const float *adj, vec4_t_ref q)
 {
 	int j, k;
 	vec4_t q1, q2;
 	vec3_t angle1, angle2;
 	mstudioanimvalue_t *panimvalue;
+
+    if(m_pStudioHeader->numbonecontrollers == 0)
+    {
+        using key = std::tuple<int, const mstudiobone_t *, const mstudioanim_t *>;
+        // TODO: 没有controller时候用缓存四元数
+    }
 
 	for (j = 0; j < 3; j++)
 	{
@@ -310,7 +316,7 @@ void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, mstudiobo
 	}
 }
 
-void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos)
+void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, const mstudiobone_t *pbone, const mstudioanim_t *panim, const float *adj, vec3_t_ref pos)
 {
 	int j, k;
 	mstudioanimvalue_t *panimvalue;

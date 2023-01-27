@@ -15,6 +15,8 @@ GNU General Public License for more details.
 
 #pragma once
 
+#include "gl_export.h"
+
 typedef struct studio_vertex_attrib_item_s {
     GLfloat pos[3];
     GLfloat boneIdx;
@@ -31,4 +33,5 @@ namespace xe {
     bool StudioLru_HasCachedData();
     void StudioLru_Submit(int startArrayElems, int numArrayElems);
     void StudioLru_DrawMesh();
+    void StudioLru_Shrink();
 }

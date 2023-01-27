@@ -154,4 +154,12 @@ namespace xe {
         current_studiolru_vbo = nullptr;
         studiovbocache.clear();
     }
+
+    void StudioLru_Shrink()
+    {
+        while( studiovbocache.size() >= 64 ){
+            // cache is full, evict the least recently used item
+            studiovbocache.evict();
+        }
+    }
 }
