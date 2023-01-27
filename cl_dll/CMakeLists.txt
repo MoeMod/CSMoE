@@ -528,6 +528,7 @@ set (STUDIORENDER_SRCS
 	./studio/GameStudioModelRenderer.cpp
 	./studio/StudioModelRenderer.cpp
 	./studio/studio_util.cpp
+	./studio/bonequatlru.cpp
 
 )
 

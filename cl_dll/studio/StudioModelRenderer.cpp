@@ -37,6 +37,8 @@
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
 
+#include "bonequatlru.h"
+
 #include "event_api.h"
 #include "pm_defs.h"
 #include "pm_math.h"
@@ -238,12 +240,6 @@ void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, const mst
 	vec3_t angle1, angle2;
 	mstudioanimvalue_t *panimvalue;
 
-    if(m_pStudioHeader->numbonecontrollers == 0)
-    {
-        using key = std::tuple<int, const mstudiobone_t *, const mstudioanim_t *>;
-        // TODO: 没有controller时候用缓存四元数
-    }
-
 	for (j = 0; j < 3; j++)
 	{
 		if (panim->offset[j + 3] == 0)
@@ -319,7 +315,7 @@ void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, const mst
 void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, const mstudiobone_t *pbone, const mstudioanim_t *panim, const float *adj, vec3_t_ref pos)
 {
 	int j, k;
-	mstudioanimvalue_t *panimvalue;
+	const mstudioanimvalue_t *panimvalue;
 
 	for (j = 0; j < 3; j++)
 	{
@@ -327,7 +323,7 @@ void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, const mstu
 
 		if (panim->offset[j] != 0)
 		{
-			panimvalue = (mstudioanimvalue_t *)((byte *)panim + panim->offset[j]);
+			panimvalue = (const mstudioanimvalue_t *)((const byte *)panim + panim->offset[j]);
 			k = frame;
 
 			if (panimvalue->num.total < panimvalue->num.valid)
@@ -345,14 +341,14 @@ void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, const mstu
 			if (panimvalue->num.valid > k)
 			{
 				if (panimvalue->num.valid > k + 1)
-					pos[j] += (panimvalue[k + 1].value * (1.0 - s) + s * panimvalue[k + 2].value) * pbone->scale[j];
+					pos[j] += std::lerp(panimvalue[k + 1].value, panimvalue[k + 2].value, s) * pbone->scale[j];
 				else
 					pos[j] += panimvalue[k + 1].value * pbone->scale[j];
 			}
 			else
 			{
 				if (panimvalue->num.total <= k + 1)
-					pos[j] += (panimvalue[panimvalue->num.valid].value * (1.0 - s) + s * panimvalue[panimvalue->num.valid + 2].value) * pbone->scale[j];
+					pos[j] += std::lerp(panimvalue[panimvalue->num.valid].value, panimvalue[panimvalue->num.valid + 2].value, s) * pbone->scale[j];
 				else
 					pos[j] += panimvalue[panimvalue->num.valid].value * pbone->scale[j];
 			}
@@ -535,11 +531,11 @@ float CStudioModelRenderer::StudioEstimateInterpolant(void)
 	return dadt;
 }
 
-void CStudioModelRenderer::StudioCalcRotations(vec3_t pos[], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f)
+void CStudioModelRenderer::StudioCalcRotations(vec3_t pos[], vec4_t q[], mstudioseqdesc_t* pseqdesc, mstudioanim_t* panim, float f)
 {
 	int i;
 	int frame;
-	mstudiobone_t *pbone;
+	const mstudiobone_t *pbone;
 
 	float s;
 	float adj[MAXSTUDIOCONTROLLERS];
@@ -554,14 +550,22 @@ void CStudioModelRenderer::StudioCalcRotations(vec3_t pos[], vec4_t *q, mstudios
 	dadt = StudioEstimateInterpolant();
 	s = (f - frame);
 
-	pbone = (mstudiobone_t *)((byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
+	pbone = (const mstudiobone_t *)((const byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
 
 	StudioCalcBoneAdj(dadt, adj, m_pCurrentEntity->curstate.controller, m_pCurrentEntity->latched.prevcontroller, m_pCurrentEntity->mouth.mouthopen);
 
-	for (i = 0; i < m_pStudioHeader->numbones; i++, pbone++, panim++)
+	if (m_pStudioHeader->numbonecontrollers == 0 && m_pStudioHeader->numbones >= 32)
 	{
-		StudioCalcBoneQuaterion(frame, s, pbone, panim, adj, q[i]);
-		StudioCalcBonePosition(frame, s, pbone, panim, adj, pos[i]);
+		// use cache for player models
+		BoneQuatLru_StudioCalcBoneBatch(pos, q, frame, s, m_pStudioHeader->numbones, pbone, panim);
+	}
+	else
+	{
+		for (i = 0; i < m_pStudioHeader->numbones; i++, pbone++, panim++)
+		{
+			StudioCalcBoneQuaterion(frame, s, pbone, panim, adj, q[i]);
+			StudioCalcBonePosition(frame, s, pbone, panim, adj, pos[i]);
+		}
 	}
 
 	if (pseqdesc->motiontype & STUDIO_X)
