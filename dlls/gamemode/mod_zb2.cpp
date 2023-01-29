@@ -121,7 +121,7 @@ void CMod_ZombieMod2::MakeSupplyboxThink()
 		return;
 	if (gpGlobals->time < m_flTimeNextMakeSupplybox)
 		return;
-	m_flTimeNextMakeSupplybox = gpGlobals->time + RandomDuration(20.0s, 30.0s);
+	m_flTimeNextMakeSupplybox = gpGlobals->time + RandomDuration(30.0s, 40.0s);
 
 	//RemoveAllSupplybox();
 
@@ -179,6 +179,8 @@ void CMod_ZombieMod2::RemoveAllSupplybox()
 	while ((ent = UTIL_FindEntityByClassname(ent, "supplybox")) != nullptr)
 	{
 		CSupplyBox *sb = dynamic_ent_cast<CSupplyBox *>(ent);
+		if (sb == nullptr)
+			continue;
 		sb->pev->effects |= EF_NODRAW;
 		sb->pev->flags |= FL_KILLME;
 		sb->SendPositionMsg();
@@ -218,11 +220,17 @@ void CMod_ZombieMod2::RemoveAllEntity()
 		ent->SetThink(&CBaseEntity::SUB_Remove);
 		ent->SetTouch(NULL);
 	}
+
+	CBaseEntity* npc = nullptr;
+	while ((npc = UTIL_FindEntityByClassname(npc, "monster_entity")) != nullptr)
+	{
+		npc->Killed(nullptr, GIB_NORMAL);
+	}
 }
 
 CSupplyBox *CMod_ZombieMod2::CreateSupplybox()
 {
-	auto supplybox = CreateClassPtr<CSupplyBox>();
+	CSupplyBox *supplybox = CreateClassPtr<CSupplyBox>();
 
 	Vector backup_v_angle = supplybox->pev->v_angle;
 	CSDM_DoRandomSpawn(supplybox);
@@ -234,6 +242,45 @@ CSupplyBox *CMod_ZombieMod2::CreateSupplybox()
 	return supplybox;
 }
 
+
+void CMod_ZombieMod2::PickZombieOrigin()
+{
+	auto iNumZombies = ZombieOriginNum();
+	auto iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
+
+	// build alive player list
+	moe::range::PlayersList list;
+	std::vector<CBasePlayer*> players{ list.begin(), list.end() };
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer* player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
+
+	if (players.empty())
+		return;
+
+	// randomize player list
+	std::shuffle(players.begin(), players.end(), std::random_device());
+
+	// pick them
+	for (size_t i = 0; i < iNumZombies; ++i)
+	{
+		players[i]->m_ZombieClass = "random";
+		players[i]->pev->sequence = 0;
+		players[i]->m_iCustomSequence = -1;
+		players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
+		players[i]->pev->armortype = ARMOR_TYPE_HELMET;
+		players[i]->pev->armorvalue = 1100;
+		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
+
+		players[i]->m_flZombieHealth = players[i]->pev->health;
+		players[i]->m_flZombieArmor = players[i]->pev->armorvalue;
+	}
+	TeamCheck();
+
+	// sound effect
+	UTIL_BroadcastStuffText("mp3 stop;spk \"r_start\"\n");
+	CheckWinConditions();
+}
+
+
 void CMod_ZombieMod2::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
 	player->m_ZombieClass = "random";
@@ -242,13 +289,21 @@ void CMod_ZombieMod2::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *a
 	player->m_flLockSpeed = 0.0;
 	player->m_flLockGravity = 0.0;
 	player->m_iCustomSequence = -1;
-	MakeZombie(player, ZOMBIE_LEVEL_HOST);
 	if (enhancedzombie.value)
 		player->pev->health = player->pev->max_health = 15000.0f;
 	else
 		player->pev->health = player->pev->max_health = std::max(3000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
+	MakeZombie(player, ZOMBIE_LEVEL_HOST);
+	
+	
 	player->m_iKevlar = ARMOR_TYPE_HELMET;
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + 100.0f;
+
+	if (player->pev->health > 32000)
+		player->pev->health = 32000;
+
+	player->m_flZombieHealth = player->pev->health;
+	player->m_flZombieArmor = player->pev->armorvalue;
 
 	InfectionSound();
 	EmitHomoSound(player, attacker);
@@ -345,8 +400,6 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 				AbsZombie->InitHUD();
 			}
 
-			float flMaxHealth = m_pPlayer->pev->max_health;
-
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
 
@@ -358,8 +411,7 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 				m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
 			}
 
-			m_pPlayer->pev->max_health = flMaxHealth;
-			m_pPlayer->pev->health = flMaxHealth;
+			SetBanSkillsTime(0s, false);
 
 			return true;
 		}
@@ -407,6 +459,7 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 void CPlayerModStrategy_ZB2::OnSpawn()
 {
 	UpdatePlayerEvolutionHUD();
+	SetBanSkillsTime(0s, false);
 
 	return CPlayerModStrategy_ZB1::OnSpawn();
 }
@@ -508,13 +561,13 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	m_iZombieInfections = 0;
 	UpdatePlayerEvolutionHUD();
 
-#ifdef XASH_DEDICATED
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
 	WRITE_COORD(20.0);
-	WRITE_BYTE((!m_pPlayer->IsUsingPC())? (0:1));
+	WRITE_BYTE((!m_pPlayer->IsUsingPC()) ? 0 : 1);
 	MESSAGE_END();
-#endif
+
+	SetBanSkillsTime(0s, false);
 }
 
 void CPlayerModStrategy_ZB2::BecomeHuman()
@@ -538,15 +591,6 @@ void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer 
 	m_iZombieInfections++;
 
 	CheckEvolution();
-
-#ifdef XASH_DEDICATED
-
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, victim->pev);
-	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
-	WRITE_COORD(20.0);
-	WRITE_BYTE((!victim->IsUsingPC()) ? (0:1));
-	MESSAGE_END();
-#endif
 }
 
 void CPlayerModStrategy_ZB2::Event_AdjustHumanDamage(CBasePlayer * attacker, float &flDamage)
@@ -649,12 +693,18 @@ void CPlayerModStrategy_ZB2::Evolution(ZombieLevel iEvolutionLevel)
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
 		m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 		m_pPlayer->pev->armorvalue = 500.0f;
+
+		m_pPlayer->m_flZombieHealth = m_pPlayer->pev->health;
+		m_pPlayer->m_flZombieArmor = m_pPlayer->pev->armorvalue;
 	}
 	else if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
 	{
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
 		m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 		m_pPlayer->pev->armorvalue = 1000.0f;
+
+		m_pPlayer->m_flZombieHealth = m_pPlayer->pev->health;
+		m_pPlayer->m_flZombieArmor = m_pPlayer->pev->armorvalue;
 	}
 
 	if (m_pPlayer->m_ZombieClass)

@@ -75,8 +75,8 @@ void CPlayerModStrategy_ZBZ::OnInitHUD()
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
 	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 	WRITE_BYTE(m_iLevel);
-	WRITE_BYTE(m_iExp);
-	WRITE_BYTE(m_iPoint);
+	WRITE_SHORT(m_iExp);
+	WRITE_SHORT(m_iPoint);
 	MESSAGE_END();
 
 
@@ -116,6 +116,13 @@ void CPlayerModStrategy_ZBZ::Evolution(ZombieLevel iEvolutionLevel)
 		}
 		m_pPlayer->pev->armorvalue = 1000.0f + g_pGameRules->m_iTotalRoundsPlayed * 100;
 	}
+	
+	if (m_pPlayer->pev->health > 32000.0f)
+		m_pPlayer->pev->health = 32000.0f;
+
+	m_pPlayer->m_flZombieHealth = m_pPlayer->pev->health;
+	m_pPlayer->m_flZombieArmor = m_pPlayer->pev->armorvalue;
+
 
 	SKILL_FUNCTION(m_vecSkill, OnEvolution, iEvolutionLevel);
 }
@@ -337,6 +344,43 @@ void CPlayerModStrategy_ZBZ::BecomeZombie(ZombieLevel iEvolutionLevel)
 		m_pPlayer->m_ZombieClass = "random";
 		m_pModZBZ->MakeZombie(m_pPlayer, m_pPlayer->m_iZombieLevel);
 	}*/
+
+	if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		if (enhancedzombie.value)
+		{
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 20000.0f;
+		}
+		else
+		{
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f + g_pGameRules->m_iTotalRoundsPlayed * 500;
+		}
+		m_pPlayer->pev->armorvalue = 500.0f + g_pGameRules->m_iTotalRoundsPlayed * 100;
+
+		m_pPlayer->m_flZombieHealth = m_pPlayer->pev->health;
+		m_pPlayer->m_flZombieArmor = m_pPlayer->pev->armorvalue;
+	}
+	else if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
+	{
+		if (enhancedzombie.value)
+		{
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 25000.0f;
+		}
+		else
+		{
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f + g_pGameRules->m_iTotalRoundsPlayed * 500;
+		}
+		m_pPlayer->pev->armorvalue = 1000.0f + g_pGameRules->m_iTotalRoundsPlayed * 100;
+
+		m_pPlayer->m_flZombieHealth = m_pPlayer->pev->health;
+		m_pPlayer->m_flZombieArmor = m_pPlayer->pev->armorvalue;
+	}
+
+	if (m_pPlayer->pev->health > 32000.0f)
+		m_pPlayer->pev->health = 32000.0f;
+
+	
+
 	SKILL_FUNCTION(m_vecSkill, OnBecomeZombie, iEvolutionLevel);
 }
 
@@ -428,7 +472,7 @@ void CPlayerModStrategy_ZBZ::SetLevel(int lv)
 	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 	WRITE_BYTE(m_iLevel);
 	WRITE_SHORT(m_iExp);
-	WRITE_BYTE(m_iPoint);
+	WRITE_SHORT(m_iPoint);
 	MESSAGE_END();
 
 	m_pPlayer->m_iZombieZLevel = m_iLevel;
@@ -446,7 +490,7 @@ void CPlayerModStrategy_ZBZ::AddLevel(int lv)
 	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 	WRITE_BYTE(m_iLevel);
 	WRITE_SHORT(m_iExp);
-	WRITE_BYTE(m_iPoint);
+	WRITE_SHORT(m_iPoint);
 	MESSAGE_END();
 
 	m_pPlayer->m_iZombieZLevel = m_iLevel;
@@ -485,7 +529,7 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 	WRITE_BYTE(m_iLevel);
 	WRITE_SHORT(m_iExp);
-	WRITE_BYTE(m_iPoint);
+	WRITE_SHORT(m_iPoint);
 	MESSAGE_END();
 
 	m_pPlayer->m_iZombieZLevel = m_iLevel;
@@ -591,7 +635,7 @@ bool CPlayerModStrategy_ZBZ::UpgradeSkill()
 		WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 		WRITE_BYTE(m_iLevel);
 		WRITE_SHORT(m_iExp);
-		WRITE_BYTE(m_iPoint);
+		WRITE_SHORT(m_iPoint);
 		MESSAGE_END();
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
@@ -888,6 +932,8 @@ CMod_ZombieZ::CMod_ZombieZ()
 {
 	Skill_Precache();
 
+	UTIL_PrecacheOther("supersupplybox");
+
 	PRECACHE_MODEL("models/v_emotion.mdl");
 	PRECACHE_SOUND("metalarena/level_up.wav");
 	PRECACHE_SOUND("player/zombiez_mutation.wav");
@@ -910,7 +956,7 @@ void CMod_ZombieZ::UpdateGameMode(CBasePlayer * pPlayer)
 	MESSAGE_END();
 }
 
-
+#if 0
 CGhostHunterSupplyBox* CMod_ZombieZ::CreateGhostHunterSupplybox()
 {
 	auto supplybox = CreateClassPtr<CGhostHunterSupplyBox>();
@@ -925,6 +971,7 @@ CGhostHunterSupplyBox* CMod_ZombieZ::CreateGhostHunterSupplybox()
 	return supplybox;
 }
 
+
 CMechSupplyBox* CMod_ZombieZ::CreateMechSupplybox()
 {
 	auto supplybox = CreateClassPtr<CMechSupplyBox>();
@@ -938,21 +985,30 @@ CMechSupplyBox* CMod_ZombieZ::CreateMechSupplybox()
 	DispatchSpawn(supplybox->edict());
 	return supplybox;
 }
+#endif
+
+CSuperSupplyBox* CMod_ZombieZ::CreateSuperSupplybox(int iType)
+{
+	CSuperSupplyBox *supplybox = CreateClassPtr<CSuperSupplyBox>();
+
+	Vector backup_v_angle = supplybox->pev->v_angle;
+	CSDM_DoRandomSpawn(supplybox);
+	supplybox->pev->v_angle = backup_v_angle;
+
+	supplybox->pev->spawnflags |= SF_NORESPAWN;
+	supplybox->m_iType = iType;
+	DispatchSpawn(supplybox->edict());
+	return supplybox;
+}
 
 void CMod_ZombieZ::RemoveAllSuperSupplybox()
 {
 	CBaseEntity* ent = nullptr;
-	while ((ent = UTIL_FindEntityByClassname(ent, "ghosthunter_supplybox")) != nullptr)
+	while ((ent = UTIL_FindEntityByClassname(ent, "supersupplybox")) != nullptr)
 	{
-		CGhostHunterSupplyBox* sb = dynamic_ent_cast<CGhostHunterSupplyBox*>(ent);
-		sb->pev->effects |= EF_NODRAW;
-		sb->pev->flags |= FL_KILLME;
-		sb->SetThink(&CBaseEntity::SUB_Remove);
-	}
-
-	while ((ent = UTIL_FindEntityByClassname(ent, "mech_supplybox")) != nullptr)
-	{
-		CMechSupplyBox* sb = dynamic_ent_cast<CMechSupplyBox*>(ent);
+		CSuperSupplyBox* sb = dynamic_ent_cast<CSuperSupplyBox*>(ent);
+		if (sb == nullptr)
+			continue;
 		sb->pev->effects |= EF_NODRAW;
 		sb->pev->flags |= FL_KILLME;
 		sb->SetThink(&CBaseEntity::SUB_Remove);
@@ -982,13 +1038,12 @@ void CMod_ZombieZ::MakeSuperSupplyboxThink()
 	{
 		if (i == (iSupplyboxCount - 1))
 		{
-			CMechSupplyBox* sb = CreateMechSupplybox();
+			CSuperSupplyBox* sb = CreateSuperSupplybox(1);
 		}	
 		else
 		{
-			CGhostHunterSupplyBox* sb = CreateGhostHunterSupplybox();
-		}
-		
+			CSuperSupplyBox* sb = CreateSuperSupplybox(0);
+		}	
 	}
 
 	UTIL_ClientPrintAll(HUD_PRINTCENTER, "[💰]强化猎手补给箱已到达！！");
@@ -1012,7 +1067,9 @@ void CMod_ZombieZ::Think()
 
 void CMod_ZombieZ::RestartRound()
 {
-	m_flTimeNextMakeSuperSupplybox = gpGlobals->time + RandomDuration(30.0s, 60.0s);
+	RemoveAllSuperSupplybox();
+
+	m_flTimeNextMakeSuperSupplybox = gpGlobals->time + RandomDuration(50.0s, 60.0s);
 	return CMod_ZombieHero::RestartRound();
 }
 
@@ -1065,6 +1122,21 @@ void CMod_ZombieZ::PickHero()
 	// make heroes
 	const auto iNumHeroes = std::min(players.size(), players.size() / 10 + std::uniform_int_distribution<size_t>(0, 1)(rd));
 	std::for_each(players.begin(), players.begin() + iNumHeroes, std::bind(&CMod_ZombieZ::MakeHero, this, std::placeholders::_1));
+}
+
+void CMod_ZombieZ::PlayerSpawn(CBasePlayer* pPlayer)
+{
+	pPlayer->m_bIsZombie = false;
+	pPlayer->m_bNotKilled = false;
+	CHalfLifeMultiplay::PlayerSpawn(pPlayer);
+	pPlayer->m_iAccount = 0;
+	pPlayer->AddAccount(16000);
+}
+
+ModConfigData_t CMod_ZombieZ::QueryModConfig(const char* key, ModConfigData_t defaultValue, CBaseEntity* invoker) {
+	if (!strcmp(key, "MaxMoney"))
+		return 32000;
+	return IBaseMod::QueryModConfig(key, defaultValue, invoker);
 }
 
 void CMod_ZombieZ::HumanWin()

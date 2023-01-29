@@ -12,8 +12,10 @@
 #include "newmenus.h"
 #include "client/ghosthuntermenu.h"
 #include <utility>
+#include <gamemode/mod_zb3.h>
 
 namespace sv {
+#if 0
 
 LINK_ENTITY_TO_CLASS(ghosthunter_supplybox, CGhostHunterSupplyBox);
 
@@ -37,7 +39,8 @@ void CGhostHunterSupplyBox::Spawn()
 	pev->movetype = MOVETYPE_TOSS;
 	pev->solid = SOLID_TRIGGER;
 
-	SetThink(&CMechSupplyBox::SupplyBoxThink);
+	SetTouch(&CGhostHunterSupplyBox::SupplyboxTouch);
+	SetThink(&CGhostHunterSupplyBox::SupplyBoxThink);
 
 	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 32));
 	UTIL_SetOrigin(pev, pev->origin);
@@ -63,20 +66,17 @@ void  CGhostHunterSupplyBox::SupplyBoxThink()
 }
 
 
-void CGhostHunterSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+void CGhostHunterSupplyBox::SupplyboxTouch(CBaseEntity* pOther)
 {
 	if (!m_bCanOpen)
 		return;
 
-	if (!pCaller->IsPlayer())
-		return;
-
-	CBasePlayer* p = static_cast<CBasePlayer*>(pCaller);
+	CBasePlayer* p = static_cast<CBasePlayer*>(pOther);
 
 	if (p->m_bIsZombie)
 		return;
 
-	if (!p->m_bIsVIP)
+	if (!(p->m_iBuff & BUFF_GHOSTHUNTER))
 		return;
 
 	if (p->m_iBuff & BUFF_LASTHERO)
@@ -160,9 +160,10 @@ void CMechSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE
 	if (p->m_bIsZombie)
 		return;
 
-	if (!p->m_bIsVIP)
+	auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(p->m_pModStrategy.get());
+	if (strategy && !strategy->IsHero())
 		return;
-	
+
 	if (p->m_iBuff & (BUFF_GHOSTHUNTER | BUFF_MASTERHUNTER))
 		return;
 
@@ -185,5 +186,142 @@ void CMechSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE
 	pev->effects |= EF_NODRAW;
 	SUB_Remove();
 }
+#endif
+
+LINK_ENTITY_TO_CLASS(supersupplybox, CSuperSupplyBox);
+
+
+void CSuperSupplyBox::Precache()
+{
+	PRECACHE_MODEL("models/ghosthunter_supplybox.mdl");
+	PRECACHE_MODEL("models/mech_supplybox.mdl");
+	m_iLandingEffectIndex = PRECACHE_MODEL("models/zs_allout/ef_ground_zero.mdl");
+}
+
+void CSuperSupplyBox::Spawn()
+{
+	Precache();
+
+	if (pev->classname)
+	{
+		RemoveEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
+	}
+
+	MAKE_STRING_CLASS("supersupplybox", pev);
+	AddEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
+
+	pev->movetype = MOVETYPE_TOSS;
+	pev->solid = SOLID_TRIGGER;
+
+	SetTouch(&CSuperSupplyBox::SupplyboxTouch);
+	SetThink(&CSuperSupplyBox::SupplyBoxThink);
+
+	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 32));
+	UTIL_SetOrigin(pev, pev->origin);
+
+	if (m_iType == GHOSTHHUNTER_SUPPLYBOX)
+		SET_MODEL(edict(), "models/ghosthunter_supplybox.mdl");
+	else
+		SET_MODEL(edict(), "models/mech_supplybox.mdl");
+
+	m_bCanOpen = false;
+
+	pev->frame = 0;
+	pev->sequence = 1;
+
+	ResetSequenceInfo();
+
+	pev->nextthink = gpGlobals->time + 2.1s;
+}
+
+void  CSuperSupplyBox::SupplyBoxThink()
+{
+	pev->sequence = 0;
+	m_bCanOpen = true;
+
+	UTIL_TempModel(pev->origin, g_vecZero, g_vecZero, m_iLandingEffectIndex, 10, 0, 10, 0, 0, 255, kRenderNormal, NULL, false, 0, 0, 256, 0);
+}
+
+
+void CSuperSupplyBox::SupplyboxTouch(CBaseEntity* pOther)
+{
+	if (!m_bCanOpen)
+		return;
+
+	if (m_iType == MECH_SUPPLYBOX)
+		return;
+
+	CBasePlayer* p = static_cast<CBasePlayer*>(pOther);
+
+	if (p->m_bIsZombie)
+		return;
+
+	if (!(p->m_iBuff & BUFF_GHOSTHUNTER))
+		return;
+
+	if (p->m_iBuff & BUFF_LASTHERO)
+		return;
+
+	if (p->m_iBuff & BUFF_MASTERHUNTER)
+		return;
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, p->edict());
+	WRITE_BYTE(8);
+	WRITE_BYTE(4);
+	WRITE_BYTE(5);
+	MESSAGE_END();
+
+	ghosthuntermenu::ShowGhostHunterMenu(p);
+
+	p->m_iBuff |= BUFF_MASTERHUNTER;
+	pev->effects |= EF_NODRAW;
+	SUB_Remove();
+	return;
+}
+
+
+void CSuperSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+{
+	if (!m_bCanOpen)
+		return;
+
+	if (m_iType == GHOSTHHUNTER_SUPPLYBOX)
+		return;
+
+	if (!pCaller->IsPlayer())
+		return;
+
+	CBasePlayer* p = static_cast<CBasePlayer*>(pCaller);
+
+	if (p->m_bIsZombie)
+		return;
+
+	auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(p->m_pModStrategy.get());
+	if (strategy && !strategy->IsHero())
+		return;
+
+	if (p->m_iBuff & (BUFF_GHOSTHUNTER | BUFF_MASTERHUNTER))
+		return;
+
+	if (p->m_iBuff & BUFF_LASTHERO)
+		return;
+
+	p->m_iBuff |= BUFF_LASTHERO;
+
+	p->RemoveAllItems(FALSE);
+	p->m_bHasPrimary = false;
+	p->m_bHolsterDisabled = true;
+
+	p->SetNewPlayerModel("models/player/lasthero/lasthero.mdl");
+	p->GiveNamedItem("weapon_herochainsaw");
+
+	UTIL_ClientPrintAll(HUD_PRINTCENTER, "动力机甲 %s 已投放完毕", STRING(p->pev->netname));
+
+	EMIT_SOUND(ENT(p->pev), CHAN_BODY, "zombi/get_box.wav", VOL_NORM, ATTN_NORM);
+
+	pev->effects |= EF_NODRAW;
+	SUB_Remove();
+}
+
 
 }

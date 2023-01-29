@@ -327,7 +327,7 @@ int HistoryResource::DrawNEWHudAmmoHistory(float flTime)
 
 				int iLength, iHeight;
 
-				char* szModifiedWpnName = weap->szName;
+				const char* szModifiedWpnName = weap->szName;
 				char szWeaponInfo[64];
 
 				// strip the monster_* or weapon_* from the inflictor's classname
@@ -340,12 +340,15 @@ int HistoryResource::DrawNEWHudAmmoHistory(float flTime)
 				else if (!strncmp(szModifiedWpnName, "func_", 5))
 					szModifiedWpnName += 5;
 
-				if (!strcmp(szModifiedWpnName, "usp"))
-					strcpy(szModifiedWpnName, "USP45");
-				else if (!strcmp(szModifiedWpnName, "deagle"))
-					strcpy(szModifiedWpnName, "DesertEagle");
-				else if (!strcmp(szModifiedWpnName, "hegrenade"))
-					strcpy(szModifiedWpnName, "HE_Grenade");
+				char szModifiedWpnName2[64];
+				strcpy(szModifiedWpnName2, szModifiedWpnName);
+
+				if (!strcmp(szModifiedWpnName2, "usp"))
+					strcpy(szModifiedWpnName2, "USP45");
+				else if (!strcmp(szModifiedWpnName2, "deagle"))
+					strcpy(szModifiedWpnName2, "DesertEagle");
+				else if (!strcmp(szModifiedWpnName2, "hegrenade"))
+					strcpy(szModifiedWpnName2, "HE_Grenade");
 
 				//Vgui Localize
 				char SzWpnNameCn[64];

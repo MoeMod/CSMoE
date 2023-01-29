@@ -264,6 +264,7 @@ set(HLDLL_SRCS
 	./gamemode/zsh/zsh_building_medical.cpp
 	./gamemode/zbz/supersupplybox.cpp
 	./gamemode/zbz/sentrygun.cpp
+	./gamemode/zb2/rushbox.cpp
 	)
 
 set (HLWPN_SRCS

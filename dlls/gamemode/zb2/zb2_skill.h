@@ -763,14 +763,7 @@ protected:
 	EngineClock::time_point m_flTimeTriggerZombieSkill;
 };
 
-enum ZombieRushSkillStatus
-{
-	RUSH_IDLE,
-	RUSH_START,
-	RUSH_LOOP,
-	RUSH_HOLD,
-	RUSH_FINISH,
-};
+class CZombieRushBox;
 
 class CZombieSkill_ZombieRush : public CZombieSkill_Base
 {
@@ -782,23 +775,17 @@ public:
 	void Activate() override;
 	float GetDamageRatio() const override;
 	void ResetMaxSpeed() override;
+	void OnSkillEnd() override;
 	void FireZombieSkill();
 
 protected:
 	duration_t GetDurationTime() const;
 	duration_t GetCooldownTime() const;
-	float GetChargeDamage() const;
 
-	void Reset() override
-	{
-		m_flPlayerAnimTime = invalid_time_point;
-	}
-
-	Vector m_vecLockAngle;
-	EngineClock::time_point m_flTimeBotUseSkill = invalid_time_point;
+	EntityHandle <CZombieRushBox> m_pRushBox;
 	EngineClock::time_point m_flTimeTriggerZombieSkill = invalid_time_point;
-	EngineClock::time_point m_flPlayerAnimTime = invalid_time_point;
-	ZombieRushSkillStatus m_SkillStatus;
+
+
 };
 
 class CZombieSkill_ZombieScream : public CZombieSkill_Base

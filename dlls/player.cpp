@@ -2543,8 +2543,17 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 	if (!pev->modelindex)
 		return;
 	
+	bool bMeatWallZombie = false;
 	if (m_bIsZombie)
+	{
 		speedLimit = 160.0;
+		if (!stricmp(this->m_ZombieClass, "meatwall"))
+		{
+			speedLimit = 300.0;
+			bMeatWallZombie = true;
+		}
+			
+	}
 	
 	if (pev->health > 0)
 	{
@@ -2913,14 +2922,31 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 							animDesired = 0;
 					}
 
-					m_Activity = ACT_RUN;
-					pev->gaitsequence = LookupActivity(ACT_RUN);
+					if (bMeatWallZombie)
+					{
+						m_Activity = ACT_WALK;
+						pev->gaitsequence = LookupActivity(ACT_WALK);
+					}
+					else
+					{
+						m_Activity = ACT_RUN;
+						pev->gaitsequence = LookupActivity(ACT_RUN);
+					}
+					
 				}
 				else
 				{
-					m_Activity = ACT_RUN;
+					if (bMeatWallZombie)
+					{
+						m_Activity = ACT_WALK;
+					}
+					else
+					{
+						m_Activity = ACT_RUN;
+					}
 					pev->gaitsequence = animDesired;
 				}
+
 				if (m_Activity == ACT_RUN)
 				{
 					//TODO: maybe away used variable 'speed'?
@@ -2938,10 +2964,17 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		else
 			animDesired = pev->sequence;
 
-		if (speed > speedLimit)
-			pev->gaitsequence = LookupActivity(ACT_RUN);
-		else
+		if (bMeatWallZombie)
+		{
 			pev->gaitsequence = LookupActivity(ACT_WALK);
+		}
+		else
+		{
+			if (speed > speedLimit)
+				pev->gaitsequence = LookupActivity(ACT_RUN);
+			else
+				pev->gaitsequence = LookupActivity(ACT_WALK);
+		}
 		break;
 	}
 	case ACT_FLINCH:
@@ -3290,10 +3323,16 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 						else
 							pev->gaitsequence = animDesired;
 
-						m_Activity = ACT_RUN;
+						if (bMeatWallZombie)
+							m_Activity = ACT_WALK;
+						else
+							m_Activity = ACT_RUN;
 					}
 				}
-				pev->gaitsequence = LookupActivity(ACT_RUN);
+				if (bMeatWallZombie)
+					pev->gaitsequence = LookupActivity(ACT_WALK);
+				else
+					pev->gaitsequence = LookupActivity(ACT_RUN);
 			}
 			else
 			{

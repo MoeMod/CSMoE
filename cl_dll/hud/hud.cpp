@@ -442,6 +442,7 @@ void CHud :: VidInit( void )
 
 	for( HUDLIST *pList = m_pHudList; pList; pList = pList->pNext )
 		pList->p->VidInit();
+	m_DrawFontText.VidInit();
 
 	g_pViewport->VidInit();
 	gFog.VidInit();

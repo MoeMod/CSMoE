@@ -132,6 +132,7 @@ struct HUDLIST {
 #include "hud_mvp.h"
 #include "newhud/NewHud.h"
 #include "newhud/NewAlarm.h"
+#include "newhud/NewFontManager.h"
 #include "hud_centertips.h"
 #include "weapons_const.h"
 #include "weapons_moe_buy.h"
@@ -980,6 +981,7 @@ public:
 	int Init( void );
 	int VidInit( void );
 	int Draw( float flTime );
+	void Reset(void);
 	void FuncDrawScope(const CTextureRef& tex, int type, int x, int y, int width, int height);
 	void FuncDrawCorner(const CTextureRef& tex, int type, int width, int height, int width2 = 0, int height2 = 0);
 	void FuncDraw2DQuadScaled(const CTextureRef& tex, int x, int y, int width, int height, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
@@ -1504,6 +1506,7 @@ public:
     CHudCenterTips m_CenterTips;
 	CHudDeathInfo m_DeathInfo;
 	CHudNewAlarm  m_NewAlarm;
+	CHudDrawFontText m_DrawFontText;
 
 	// user messages
 	CHudMsgFunc(Damage);

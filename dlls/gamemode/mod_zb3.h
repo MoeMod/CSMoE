@@ -117,8 +117,6 @@ private:
 
 	float m_flRagePercent; // [0.0-100.0]
 	EngineClock::time_point m_flDeadTime;
-	float m_flBackupMaxHealth;
-	float m_flBackupArmor;
 	bool m_bIsHero;
 	time_point_t m_flGodMode;
 	bool m_bPickAsZombie;

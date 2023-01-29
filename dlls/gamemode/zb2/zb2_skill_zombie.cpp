@@ -35,7 +35,7 @@ GNU General Public License for more details.
 #include "player/player_zombie.h"
 #include "entity_state.h"
 #include "wpn_shared/wpn_zombielaw.h"
-
+#include "rushbox.h"
 
 namespace sv {
 	void ZombieSkill_Precache()
@@ -4742,8 +4742,8 @@ namespace sv {
 			m_pPlayer->m_bHolsterDisabled = true;
 			m_pPlayer->m_flNextAttack = 2.0s;
 
-			m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill");
-			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.5s;
+			m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("ref_aim_egg");
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.0s;
 
 			m_pPlayer->SetAnimation(PLAYER_IDLE);
 
@@ -4777,6 +4777,12 @@ namespace sv {
 			pWeapon->SendWeaponAnim(14, TRUE);
 			pWeapon->m_flTimeWeaponIdle = 1.0s;
 		}
+
+		m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("ref_shoot_egg");
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.3s;
+
+		m_pPlayer->SetAnimation(PLAYER_IDLE);
+
 
 		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "zombi/meatwallzombie_ref_shoot_egg.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
 
@@ -4829,7 +4835,7 @@ namespace sv {
 
 	CZombieSkill_ZombieRush::CZombieSkill_ZombieRush(CBasePlayer* player) : CZombieSkill_Base(player)
 	{
-		m_SkillStatus = RUSH_IDLE;
+
 	}
 
 	void CZombieSkill_ZombieRush::Think()
@@ -4839,22 +4845,33 @@ namespace sv {
 			FireZombieSkill();
 		}
 
-		if (m_iZombieSkillStatus == SKILL_STATUS_USING && m_SkillStatus == RUSH_LOOP)
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
 		{
+			CLIENT_COMMAND(m_pPlayer->edict(), "+forward\n");
 
-			OnSkillEnd();
-		}
+			if (m_pRushBox)
+			{
+				if (!m_pRushBox->GetSkillState())
+				{
+					if (m_pRushBox->GetLifespan() < gpGlobals->time || m_pPlayer->pev->velocity.Length2D() < 2.0)
+					{
+						m_pRushBox->Kill();
 
-		if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEnd)
-		{
-			OnSkillEnd();
-		}
+						MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+						WRITE_BYTE(ZB2_MESSAGE_DRAW_RETINA);
+						WRITE_BYTE(ZOMBIE_SKILL_RUSH);
+						WRITE_SHORT(-1);
+						MESSAGE_END();
 
-		if (m_iZombieSkillStatus == SKILL_STATUS_FREEZING && gpGlobals->time > m_flTimeZombieSkillNext)
-		{
-			m_iZombieSkillStatus = SKILL_STATUS_READY;
-			OnSkillReady();
+						m_flTimeZombieSkillEnd = gpGlobals->time + 0.5s;
+					}	
+				}
+			}
 		}
+		else
+			m_pPlayer->ResetMaxSpeed();
+
+		CZombieSkill_Base::Think();
 	}
 
 	void CZombieSkill_ZombieRush::Activate()
@@ -4867,14 +4884,7 @@ namespace sv {
 			case SKILL_STATUS_FREEZING:
 				char buf[16];
 				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
-				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER,
-					"The 'Berserk' skill can't be used because the skill is in cooldown. [Remaining Cooldown Time: %s1 sec.]",
-					buf
-				); // #CSO_WaitCoolTimeNormal
-
-				break;
-			case SKILL_STATUS_USED:
-				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Sprint' skill can only be used once per round."); // #CSO_CantSprintUsed
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_WaitSkillCoolTime", buf);
 				break;
 			default:
 				break;
@@ -4883,59 +4893,115 @@ namespace sv {
 			return;
 		}
 
-		if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId == WEAPON_KNIFE)
+		m_iZombieSkillStatus = SKILL_STATUS_USING;
+		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+		if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId != WEAPON_KNIFE)
+			m_pPlayer->SwitchWeapon(m_pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
+
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[KNIFE_SLOT];
+
+		if (pWeapon)
 		{
-			m_SkillStatus = RUSH_START;
-			m_iZombieSkillStatus = SKILL_STATUS_USING;
-			m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
-
-			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
-			if (pWeapon)
-			{
-				pWeapon->SendWeaponAnim(9, TRUE);
-				pWeapon->m_flTimeWeaponIdle = 0.5s;
-			}
-
-			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 105;
-			m_pPlayer->ResetMaxSpeed();
-
-			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-			WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
-			WRITE_BYTE(ZOMBIE_SKILL_RUSH);
-			WRITE_SHORT(-1);
-			WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
-			MESSAGE_END();
+			pWeapon->SendWeaponAnim(9, TRUE);
+			pWeapon->m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
+			pWeapon->m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 10.0s;
+			pWeapon->m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 10.0s;
 		}
-	
+
+		m_flTimeTriggerZombieSkill = gpGlobals->time + 0.5s;
+
+		m_pPlayer->ResetMaxSpeed();
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+		WRITE_BYTE(ZOMBIE_SKILL_RUSH);
+		WRITE_SHORT(-1);
+		WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+		MESSAGE_END();
+
+	}
+
+	void CZombieSkill_ZombieRush::OnSkillEnd()
+	{
+		if (m_pRushBox)
+		{
+			if (!m_pRushBox->GetSkillState())
+			{
+				m_pRushBox->Kill();
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+				WRITE_BYTE(ZB2_MESSAGE_DRAW_RETINA);
+				WRITE_BYTE(ZOMBIE_SKILL_RUSH);
+				WRITE_SHORT(-1);
+				MESSAGE_END();
+
+				m_flTimeZombieSkillEnd = gpGlobals->time + 0.5s;
+				return;
+			}	
+		}
+
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+		CLIENT_COMMAND(m_pPlayer->edict(), "-forward\n");
+		m_pPlayer->ResetMaxSpeed();
 	}
 
 	void CZombieSkill_ZombieRush::ResetMaxSpeed()
 	{
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
 		{
-			m_pPlayer->pev->maxspeed = 390;
-		}
-	}
+			m_pPlayer->pev->maxspeed = 370;
 
-	float CZombieSkill_ZombieRush::GetChargeDamage() const
-	{
-		return 100.0f;
+			if (m_pRushBox)
+			{
+				if(m_pRushBox->GetSkillState())
+					m_pPlayer->pev->maxspeed = 1;
+			}			
+		}
 	}
 
 	void CZombieSkill_ZombieRush::FireZombieSkill()
 	{
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+
+		m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill_dash");
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 10.0s;
+
+		m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[KNIFE_SLOT];
+
 		if (pWeapon)
 		{
 			pWeapon->SendWeaponAnim(10, TRUE);
-			pWeapon->m_flTimeWeaponIdle = 999s;
+			pWeapon->m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 10.0s;
+			pWeapon->m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 10.0s;
+			pWeapon->m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 10.0s;
 		}
-		m_SkillStatus = RUSH_LOOP;
+
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_DRAW_RETINA);
+		WRITE_BYTE(ZOMBIE_SKILL_RUSH);
+		WRITE_SHORT(10);
+		MESSAGE_END();
+
+		m_pRushBox = static_cast<CZombieRushBox*>(CBaseEntity::Create("zombierushbox", m_pPlayer->GetGunPosition(), UTIL_VecToAngles(gpGlobals->v_forward), m_pPlayer->edict()));
+
+		if (!m_pRushBox)
+			return;
+
+		m_pRushBox->SetLifespan(3.5s);
+		m_pRushBox->Init();
+
+		m_flTimeTriggerZombieSkill = invalid_time_point;
 	}
 
 	duration_t CZombieSkill_ZombieRush::GetDurationTime() const
 	{
-		return 0.0s;
+		return 4.0s;
 	}
 
 	duration_t CZombieSkill_ZombieRush::GetCooldownTime() const

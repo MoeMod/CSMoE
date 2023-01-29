@@ -4292,12 +4292,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "chainsr";
 					else if (!Q_strcmp(killer_weapon_name, "chainsr_shadow"))
 						killer_weapon_name = "chainsr";
-
 					else if (iId == WEAPON_SBMINE)
 						killer_weapon_name = "sbmine";
 					else if (!Q_strcmp(killer_weapon_name, "mine_sbmine"))
 						killer_weapon_name = "sbmine";
-
 					else if (iId == WEAPON_CLAYMORE)
 						killer_weapon_name = "claymore";
 					else if (!Q_strcmp(killer_weapon_name, "claymore_mine"))

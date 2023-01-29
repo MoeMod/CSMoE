@@ -89,6 +89,7 @@ private:
 	UniqueTexture m_iSkillPointIcon;
 
 	SharedTexture m_iSlash_Center;
+	CClientSprite m_hSprite_Slash;
 
 	UniqueTexture m_iMutation;
 

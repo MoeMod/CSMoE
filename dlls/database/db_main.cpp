@@ -130,6 +130,7 @@ void CDataBaseManager::ServerActivate()
     {
         sv::UTIL_DPrintf("mysql_real_connect() failed\n");
         mysql_close(mysql_local);
+        mysql_local = NULL;
         return;
     }
     sv::UTIL_DPrintf("mysql_real_connect() successful\n");
@@ -162,6 +163,7 @@ void CDataBaseManager::ServerDeactivate()
     if (mysql_local)
     {
         mysql_close(mysql_local);
+        mysql_local = NULL;
     }
 }
 

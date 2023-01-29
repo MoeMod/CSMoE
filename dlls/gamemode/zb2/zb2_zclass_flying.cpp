@@ -38,9 +38,6 @@ CZombieClass_Flying::CZombieClass_Flying(CBasePlayer *player, ZombieLevel iEvolu
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 4000;
-	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
 	m_pPlayer->pev->gravity = 0.65f;
 	m_pPlayer->ResetMaxSpeed();
 }

@@ -94,7 +94,7 @@ namespace sv {
 		m_bStartedCharge = false;
 		m_bIsCharging = false;
 
-		return DefaultDeploy("models/v_magicsg.mdl", "models/p_magicsg.mdl", MAGICSG_DRAW, "xm1014", UseDecrement() != FALSE);
+		return DefaultDeploy("models/v_magicsg.mdl", "models/p_magicsg.mdl", MAGICSG_DRAW, "shotgun", UseDecrement() != FALSE);
 	}
 
 	int CMagicSg::ExtractAmmo(CBasePlayerWeapon* pWeapon)

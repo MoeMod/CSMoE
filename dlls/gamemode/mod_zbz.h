@@ -34,17 +34,19 @@ public:
 	void Think() override;
 	void RestartRound() override;
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
+	void PlayerSpawn(CBasePlayer* pPlayer) override;
 	float GetAdjustedEntityDamage(CBaseEntity* victim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	HitBoxGroup GetAdjustedTraceAttackHitgroup(CBaseEntity* victim, entvars_t* pevAttacker, float flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) override;
 	void HumanWin() override;
 	void ZombieWin() override;
+	ModConfigData_t QueryModConfig(const char* key, ModConfigData_t defaultValue, CBaseEntity* invoker) override; 
 
 protected:
 	void MakeSuperSupplyboxThink();
 	void RemoveAllSuperSupplybox();
 
-	CGhostHunterSupplyBox* CreateGhostHunterSupplybox();
-	CMechSupplyBox* CreateMechSupplybox();
+	CSuperSupplyBox* CreateSuperSupplybox(int iType);
+	//CMechSupplyBox* CreateMechSupplybox();
 	int SuperSupplyboxCount();
 	void PickHero() override;
 	EngineClock::time_point m_flTimeNextMakeSuperSupplybox;

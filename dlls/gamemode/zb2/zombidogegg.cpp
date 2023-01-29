@@ -23,7 +23,7 @@ void CZombiDogEgg::Spawn(void)
 	Precache();
 	pev->movetype = MOVETYPE_BOUNCE;
 
-	pev->classname = MAKE_STRING("webbomb");
+	pev->classname = MAKE_STRING("zombi_dog_egg");
 
 	m_bIsC4 = false;
 	pev->solid = SOLID_BBOX;

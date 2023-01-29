@@ -161,19 +161,6 @@ public:
 		zombie->m_flStunGravity = value;
 		m_pPlayer->ResetMaxSpeed();
 	}
-	void SetBanSkillsTime(duration_t time, bool forcestop = false)
-	{
-		if (!m_pCharacter)
-			return;
-
-		auto zombie = std::dynamic_pointer_cast<CZombie_ZB1>(m_pCharacter);
-		if (!zombie)
-			return;
-
-		zombie->m_bCanUseSkills = false;
-		zombie->m_tBanSkillsTime = gpGlobals->time + time;
-		zombie->m_bForceStopSkills = forcestop;
-	}
 };
 
 }

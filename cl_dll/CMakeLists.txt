@@ -522,6 +522,7 @@ set (HUD_SRCS
 	./hud/zbz/zbz_ghosthunter.cpp
 	./hud/newhud/NewAlarm.cpp
 	./hud/newhud/NewDeathInfo.cpp
+	./hud/newhud/NewFontManager.cpp
 )
 
 set (STUDIORENDER_SRCS

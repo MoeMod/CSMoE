@@ -139,10 +139,11 @@ void CPatrolDrone::CallPatrol()
 			continue;
 
 		if (!m_pPatrolDrone[iOrderCall])
-		{
-			
+		{	
 			m_pPatrolDrone[iOrderCall] = CPatrolDroneGrenade::CreatePatrolDrone(m_pPlayer, this, vecSrc, g_vecZero, m_pPlayer->m_iTeam, iOrderCall, iOrder);
 			iOrder++;
+			if (iOrder >= PATROLDRONE_MAX_CLIP)
+				iOrder = 0;
 			SetThink(&CPatrolDrone::CallPatrol);
 			pev->nextthink = gpGlobals->time + 0.15s;
 			break;

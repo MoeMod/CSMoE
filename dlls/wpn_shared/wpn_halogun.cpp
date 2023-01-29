@@ -50,7 +50,7 @@ namespace sv {
                 if (enhancedzombie.value)
                     flDamage = 8000;
                 else
-                    flDamage = 6000;
+                    flDamage = 4000;
             }
             else if (g_pModRunning->DamageTrack() == DT_ZBS)
                 flDamage = 40000.0f;
@@ -154,7 +154,11 @@ namespace sv {
                 pEntity->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_BULLET | DMG_NOMORALE);
 
                 Vector vecDirection = (pEntity->pev->origin - pAttackPlayer->pev->origin).Normalize();
-                UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 2000.0, 0);
+                if(!(pEntity->pev->flags & FL_ONGROUND))
+                    UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 300.0, 0);
+                else
+                    UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 2000.0, 0);
+                
             }
         }
 
@@ -171,7 +175,7 @@ namespace sv {
             RadiusDamage();
         }
 
-        KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
+        KnockbackData GetKnockBackData() override { return { -1.0f, -1.0f, -1.0f, -1.0f, 1.0f }; }
 
         int m_iTrail;
         std::vector<int> m_TargetVector;
@@ -752,6 +756,7 @@ namespace sv {
             ClearMultiDamage();
 
             pEntity->m_LastHitGroup = HITGROUP_CHEST;
+            tr.iHitgroup = HITGROUP_CHEST;
             pEntity->TraceAttack(m_pPlayer->pev, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);    
 
             ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
@@ -825,17 +830,17 @@ namespace sv {
         UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
         Vector vecSrc = m_pPlayer->GetGunPosition() - gpGlobals->v_up * 2;
-        Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0, 8192, 3, BULLET_PLAYER_556MM, 0, 0, m_pPlayer->pev, false, m_pPlayer->random_seed);
+        Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0, 8192.0, 0, BULLET_PLAYER_556MM, 0, 0.0, m_pPlayer->pev, false, m_pPlayer->random_seed);
 
         vecDir = gpGlobals->v_forward + gpGlobals->v_right * vecDir.x + gpGlobals->v_up * vecDir.y;
 
         Vector vecEnd = vecSrc + vecDir * 39.37 * 12;
 
-        UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+        UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
 
         vecEnd = tr.vecEndPos;
         vecEnd.z -= 8192;
-        UTIL_TraceLine(tr.vecEndPos, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+        UTIL_TraceLine(tr.vecEndPos, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
 
         vecEnd = tr.vecEndPos;
  
@@ -859,12 +864,13 @@ namespace sv {
             ClearMultiDamage();
 
             pEntity->m_LastHitGroup = HITGROUP_CHEST;
+            tr.iHitgroup = HITGROUP_CHEST;
             pEntity->TraceAttack(m_pPlayer->pev, GetDirectDamage(), vecDir, &tr, DMG_BULLET | DMG_NEVERGIB);
            
             ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
             Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
-            UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 1500.0, 0);
+            UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 2000.0, 120);
 
         }
 
@@ -895,6 +901,7 @@ namespace sv {
             else
             {
                 Vector vecEnd = pTrace->vecEndPos - vecDir * 15;
+                m_iChargeShotFired++;
 
                 if (!(m_pPlayer->m_iBuff & BUFF_HALOGUN_AVOID_DEATH))
                 {
@@ -905,7 +912,6 @@ namespace sv {
                             if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
                             {
                                 m_iSkillShotFired++;
-
                             }
                         }
                     }

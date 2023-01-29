@@ -115,7 +115,7 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 
 	CBasePlayer* p = static_cast<CBasePlayer*>(pCaller);
 
-	if (p->m_bIsVIP || p->m_bIsZombie || p->m_iBuff & BUFF_MASTERHUNTER)
+	if (p->m_bIsZombie || p->m_iBuff & (BUFF_MASTERHUNTER | BUFF_GHOSTHUNTER | BUFF_LASTHERO))
 		return;
 
 	const char* mod_str = CVAR_GET_STRING("mp_gamemode");
@@ -178,7 +178,9 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 					if (pGrenade->m_iId == WEAPON_HEGRENADE ||
 						pGrenade->m_iId == WEAPON_PATROLDRONE ||
 						pGrenade->m_iId == WEAPON_DIVINETITAN ||
-						pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+						pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
+						pGrenade->m_iId == WEAPON_CLAYMORE ||
+						pGrenade->m_iId == WEAPON_SBMINE)
 					{
 						pGrenade->Kill();
 
@@ -197,38 +199,6 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 				p->m_iGrenadeID = AliasToGrenadeType(info.pszClassName);
 				weapon_names_view[iSlot] = info.pszDisplayName;
 				continue;
-#if 0
-				CBasePlayerItem* pItem = p->m_rgpPlayerItems[GRENADE_SLOT];
-
-				// have at least one weapon in this slot
-				while (pItem != NULL)
-				{
-					if (p->m_rgpPlayerItems[GRENADE_SLOT]->IsWeapon() && p->m_rgpPlayerItems[GRENADE_SLOT])
-					{
-						CBasePlayerWeapon* pGrenade = static_cast<CBasePlayerWeapon*>(pItem);
-						if (pGrenade->m_iId == WEAPON_DIVINETITAN ||
-							pGrenade->m_iId == WEAPON_HEGRENADE ||
-							pGrenade->m_iId == WEAPON_PATROLDRONE ||
-							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							p->RemovePlayerItem(pGrenade);
-							break;
-						}
-					}
-				}
-				if (info.iID == WEAPON_DIVINETITAN ||
-					info.iID == WEAPON_PATROLDRONE ||
-					info.iID == WEAPON_BUNKERBUSTER)
-				{
-					//bad way
-					p->GiveNamedItem(info.pszClassName);
-					p->m_iGrenadeID = AliasToGrenadeType(info.pszClassName);
-					weapon_names_view[iSlot] = info.pszDisplayName;
-					continue;
-				}
-				else
-					p->m_iGrenadeID = info.iID;
-#endif
 			}
 			p->GiveNamedItem(info.pszClassName);
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
@@ -278,7 +248,7 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 	if (p->IsUsingPC())
 		return;
 
-	if (p->m_bIsVIP || p->m_bIsZombie || p->m_iBuff & BUFF_MASTERHUNTER)
+	if (p->m_bIsZombie || p->m_iBuff & (BUFF_MASTERHUNTER | BUFF_GHOSTHUNTER | BUFF_LASTHERO))
 		return;
 
 	const char *mod_str = CVAR_GET_STRING("mp_gamemode");
@@ -335,7 +305,9 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 					if (pGrenade->m_iId == WEAPON_HEGRENADE ||
 						pGrenade->m_iId == WEAPON_PATROLDRONE ||
 						pGrenade->m_iId == WEAPON_DIVINETITAN ||
-						pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+						pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
+						pGrenade->m_iId == WEAPON_CLAYMORE ||
+						pGrenade->m_iId == WEAPON_SBMINE)
 					{
 						pGrenade->Kill();
 
@@ -354,38 +326,6 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 				p->m_iGrenadeID = AliasToGrenadeType(info.pszClassName);
 				weapon_names_view[iSlot] = info.pszDisplayName;
 				continue;
-#if 0
-				CBasePlayerItem* pItem = p->m_rgpPlayerItems[GRENADE_SLOT];
-
-				// have at least one weapon in this slot
-				while (pItem != NULL)
-				{
-					if (p->m_rgpPlayerItems[GRENADE_SLOT]->IsWeapon() && p->m_rgpPlayerItems[GRENADE_SLOT])
-					{
-						CBasePlayerWeapon* pGrenade = static_cast<CBasePlayerWeapon*>(pItem);
-						if (pGrenade->m_iId == WEAPON_DIVINETITAN || 
-							pGrenade->m_iId == WEAPON_HEGRENADE ||
-							pGrenade->m_iId == WEAPON_PATROLDRONE || 
-							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							p->RemovePlayerItem(pGrenade);
-							break;
-						}
-					}
-				}
-				if (info.iID == WEAPON_DIVINETITAN || 
-					info.iID == WEAPON_PATROLDRONE || 
-					info.iID == WEAPON_BUNKERBUSTER)
-				{
-					//bad way
-					p->GiveNamedItem(info.pszClassName);
-					p->m_iGrenadeID = AliasToGrenadeType(info.pszClassName);
-					weapon_names_view[iSlot] = info.pszDisplayName;
-					continue;
-				}
-				else
-					p->m_iGrenadeID = info.iID;
-#endif
 			}
 			p->GiveNamedItem(info.pszClassName);
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);

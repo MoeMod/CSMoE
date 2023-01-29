@@ -1858,6 +1858,8 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					case WEAPON_DIVINETITAN:
 					case WEAPON_PATROLDRONE:
 					case WEAPON_BUNKERBUSTER:
+					case WEAPON_SBMINE:
+					case WEAPON_CLAYMORE:
 					case WEAPON_HEGRENADE:
 						grenadeName = "weapon_hegrenade";
 						maxGrenades = 1;

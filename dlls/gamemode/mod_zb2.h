@@ -39,6 +39,7 @@ public:
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void RestartRound() override;
 	void Think() override;
+	void PickZombieOrigin() override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	void PlayerThink(CBasePlayer *pPlayer) override;
 	BOOL ClientCommand(CBasePlayer *pPlayer, const char *pcmd) override;
@@ -133,6 +134,30 @@ public:
 
 		human->m_tSlowdown = gpGlobals->time + value;
 		m_pPlayer->ResetMaxSpeed();
+	}
+
+	void SetBanSkillsTime(duration_t time, bool forcestop = false)
+	{
+		if (!m_pCharacter)
+			return;
+
+		auto zombie = std::dynamic_pointer_cast<CBaseZombieClass_ZB2>(m_pCharacter);
+		if (!zombie)
+			return;
+
+		if (time == 0s)
+		{
+			//reset
+			zombie->m_bCanUseSkills = true;
+			zombie->m_tBanSkillsTime = invalid_time_point;
+			zombie->m_bForceStopSkills = forcestop;
+		}
+		else
+		{
+			zombie->m_bCanUseSkills = false;
+			zombie->m_tBanSkillsTime = gpGlobals->time + time;
+			zombie->m_bForceStopSkills = forcestop;
+		}
 	}
 };
 

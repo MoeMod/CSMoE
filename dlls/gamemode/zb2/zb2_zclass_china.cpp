@@ -38,9 +38,6 @@ CZombieClass_China::CZombieClass_China(CBasePlayer *player, ZombieLevel iEvoluti
 	Evolution(iEvolutionLevel);
 
 	// set china property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 4000;
-	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
 	m_pPlayer->pev->gravity = 0.7f;
 	m_pPlayer->ResetMaxSpeed();
 }

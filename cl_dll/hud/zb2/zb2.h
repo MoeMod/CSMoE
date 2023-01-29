@@ -36,8 +36,12 @@ public:
 	void SetSelectorDrawTime(float flTime, float flDisplayTime);
 	void SetSelectorIcon(int slot, const char* name);
 	void SetSelectorIconBan(int slot);
+	void SetSelectorIconLevel(int slot, int level);
 	bool Selector(int i);
 	bool SelectorCanDraw();
+
+	//dmg indicator
+	void DrawDmgIndicator();
 
 	//Alarm
 	void SendAlarmState(int iType, float flValue, int iValue2);
@@ -58,6 +62,7 @@ public:
 	int m_iPage;
 	int m_iMax;
 	bool m_bBanned[64];
+	int m_iLevel[64];
 
 private:
 	//zombie selector
@@ -79,5 +84,13 @@ private:
 	UniqueTexture m_iBlank;
 	UniqueTexture m_iBanned;
 	UniqueTexture m_iCancel;
+
+	UniqueTexture m_iLockedImage;
+	UniqueTexture m_iLockedImageBg;
+	UniqueTexture m_iLockedImageBar;
+
+	//dmg indicator
+	UniqueTexture m_iDamageBg;
+	UniqueTexture m_iDamageText;
 };
 }

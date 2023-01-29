@@ -149,6 +149,8 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER | CHudRetina::RETINA_DRAW_TYPE_BLACK, flHoldTime);
 			else if (skilltype == ZOMBIE_SKILL_SCREAM)
 				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER | CHudRetina::RETINA_DRAW_TYPE_BLACK, flHoldTime);
+			else if (skilltype == ZOMBIE_SKILL_RUSH)
+				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime);
 			else if (skilltype == ZOMBIE_SKILL_SHIELD)
 			{
 				int type = buf.ReadByte();
@@ -245,6 +247,13 @@ int CHudZB2::VidInit()
 	R_InitTexture(m_iBlank, "resource\\hud\\zombie\\zmrewalk_box");
 	R_InitTexture(m_iBanned, "resource\\hud\\zombie\\zombietype_cancel");
 
+	R_InitTexture(m_iLockedImage, "resource\\zombiez\\level_lock_l");
+	R_InitTexture(m_iLockedImageBg, "resource\\zombiez\\zombie_lock_bg");
+	R_InitTexture(m_iLockedImageBar, "resource\\zombiez\\level_lock_bg");
+
+	R_InitTexture(m_iDamageBg, "resource\\helperhud\\damagebg");
+	R_InitTexture(m_iDamageText, "resource\\helperhud\\damagetext");
+
 	m_flTimeEnd = 0.0f;
 	m_bCanDraw = false;
 
@@ -255,6 +264,7 @@ int CHudZB2::Draw(float time)
 {
 	pimpl->for_each(&IBaseHudSub::Draw, time);
 	DrawBuffHP();
+	DrawDmgIndicator();
 
 	if (!m_bCanDraw)
 		return 0;
@@ -375,6 +385,19 @@ int CHudZB2::Draw(float time)
 				{
 					m_iIcon[index]->Draw2DQuadScaled(iX, iY, (iX + m_iIcon[index]->w()), (iY + m_iIcon[index]->h()));
 				}
+				if (m_iLevel[index] > gHUD.m_iZlevel)
+				{
+					if (m_iLockedImageBg)
+						m_iLockedImageBg->Draw2DQuadScaled(iX, iY, (iX + m_iIcon[index]->w()), (iY + m_iIcon[index]->h()));
+					if (m_iLockedImage)
+						m_iLockedImage->Draw2DQuadScaled(iX + (m_iIcon[index]->w() - m_iLockedImage->w()) / 2, iY + (m_iIcon[index]->h() - m_iLockedImage->h()) / 2, (iX + (m_iIcon[index]->w() - m_iLockedImage->w()) / 2 + m_iLockedImage->w()), (iY + (m_iIcon[index]->h() - m_iLockedImage->h()) / 2 + m_iLockedImage->h()));
+					if (m_iLockedImageBar)
+						m_iLockedImageBar->Draw2DQuadScaled(iX + (m_iIcon[index]->w() - m_iLockedImageBar->w()) / 2, iY + (m_iIcon[index]->h() - m_iLockedImageBar->h()), (iX + (m_iIcon[index]->w() - m_iLockedImageBar->w()) / 2 + m_iLockedImageBar->w()), (iY + (m_iIcon[index]->h() - m_iLockedImageBar->h()) + m_iLockedImageBar->h()));
+
+					char SzText[16]; sprintf(SzText, "Lv.%d", m_iLevel[index]);
+					gEngfuncs.pfnDrawSetTextColor(255 / 255.0f, 99 / 255.0f, 71 / 255.0f);
+					DrawUtils::DrawConsoleString(iX + 8, iY + 35, SzText);
+				}
 
 				if (m_bBanned[index])
 				{
@@ -486,6 +509,91 @@ int CHudZB2::DrawBuffHP()
 
 	return 1;
 }
+void CHudZB2::DrawDmgIndicator()
+{
+	int iTopRecordId[3]{};
+	float flTopRecordData[3]{};
+
+	//循环所有玩家
+	for (int iId = 1; iId <= gEngfuncs.GetMaxClients(); ++iId)
+	{
+		//循环排名前三的三个槽位
+		for (int i = 0; i < 3; i++)
+		{
+			float flDamage = (float)g_iDamageTotal[iId];
+			if (!iTopRecordId[i] || flTopRecordData[i] <= flDamage)
+			{
+				//前二名
+				if (i < 2)
+				{
+					for (int j = 1; j >= i; j--)
+					{
+						iTopRecordId[j + 1] = iTopRecordId[j];
+						flTopRecordData[j + 1] = flTopRecordData[j];
+					}
+				}
+				iTopRecordId[i] = iId;
+				flTopRecordData[i] = flDamage;
+				break;
+			}
+		}
+	}
+
+	if (!iTopRecordId[0] || !iTopRecordId[1] || !iTopRecordId[2])
+		return;
+
+	int iX = 30;
+	int iY = gHUD.m_iMapHeight + gHUD.m_NEWHUD_iFontHeight_Dollar * 2 + m_iDamageBg->h() * 0.75;
+
+	iY -= m_iDamageText->h();
+	m_iDamageText->Draw2DQuadScaled(iX, iY, (iX + m_iDamageText->w()), (iY + m_iDamageText->h()));
+	iY += m_iDamageText->h();
+
+	for (int iImage = 0; iImage < 3; ++iImage)
+	{
+		m_iDamageBg->Draw2DQuadScaled(iX, iY, (iX + m_iDamageBg->w()), (iY + m_iDamageBg->h()));
+
+		iX += 20;
+		
+		//Draw Rank Num
+		int iTextHeight = gHUD.m_DrawFontText.GetFontTextHeight("Default", 20);
+		const wchar_t* SzRank = gHUD.m_DeathInfo.UTF8ToUnicode(std::to_string(iImage + 1).c_str());
+		gHUD.m_DrawFontText.DrawFontText("Default", 20, iX, iY + iTextHeight / 2, 255, 255, 255, 255, SzRank);
+
+		const char* SzName = g_PlayerInfoList[iTopRecordId[iImage]].name;
+		const int IsZombie = g_PlayerExtraInfo[iTopRecordId[iImage]].zombie;
+
+		iX += 20;
+
+		//Draw Rank Name
+		int iTextLen = gHUD.m_DrawFontText.GetFontTextWide("Default", 16, gHUD.m_DeathInfo.UTF8ToUnicode(SzName));
+		iTextHeight = gHUD.m_DrawFontText.GetFontTextHeight("Default", 16);
+
+		if(SzName)
+			gHUD.m_DrawFontText.DrawFontText("Default", 16, iX, iY + iTextHeight, IsZombie ? 146 : 99, IsZombie ? 75 : 116, IsZombie ? 81 : 146, 255, gHUD.m_DeathInfo.UTF8ToUnicode(SzName));
+
+		float flPercent; flPercent = (flTopRecordData[iImage] / g_flDamageInAll);
+		char SzData[64]; sprintf(SzData, "%.1f K(%d%%)", flTopRecordData[iImage] / 1000.0, (int)(flPercent * 100.0));
+
+		int iWideBar = 120, iHeightBar = 12;
+		int iBarRect = int(min((float)iWideBar, (iWideBar * (flTopRecordData[iImage] / (flTopRecordData[0] > 0.0 ? flTopRecordData[0] : 1.0)))));
+		FillRGBABlend(iX, (iY + m_iDamageBg->h()) - iHeightBar - iTextHeight / 2, iBarRect, iHeightBar, IsZombie ? 146 : 99, IsZombie ? 75 : 116, IsZombie ? 81 : 146, 200);
+
+		//Draw Rank Data
+		if (flTopRecordData[iImage])
+		{
+			iTextLen = gHUD.m_DrawFontText.GetFontTextWide("ChatDefault", -1, gHUD.m_DeathInfo.UTF8ToUnicode(SzData));
+			int iTextX = m_iDamageBg->w() + 30 - iTextLen;
+
+			gHUD.m_DrawFontText.DrawFontText("ChatDefault", -1, iTextX, (iY + m_iDamageBg->h()) - iHeightBar - iTextHeight, 255, 255, 255, 255, gHUD.m_DeathInfo.UTF8ToUnicode(SzData));
+		}
+
+		iX -= 40;
+		iY += m_iDamageBg->h();
+	}
+
+
+}
 
 void CHudZB2::Think()
 {
@@ -577,6 +685,9 @@ bool CHudZB2::Selector(int item)
 			if (!m_bDraw[iNum] || m_bBanned[iNum])
 				return false;
 
+			if (m_iLevel[iNum] > gHUD.m_iZlevel)
+				return false;
+
 			sprintf(ch, "BTE_Zb_Select_Zombie%d\n", iNum);
 			gEngfuncs.pfnClientCmd(ch);
 
@@ -598,6 +709,10 @@ void CHudZB2::SetSelectorIcon(int slot, const char* name)
 void CHudZB2::SetSelectorIconBan(int slot)
 {
 	m_bBanned[slot] = true;
+}
+void CHudZB2::SetSelectorIconLevel(int slot, int level)
+{
+	m_iLevel[slot] = level;
 }
 void CHudZB2::ClearSelector()
 {

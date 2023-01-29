@@ -39,10 +39,6 @@ CZombieClass_Witch::CZombieClass_Witch(CBasePlayer *player, ZombieLevel iEvoluti
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 4000;
-	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 1000;
-
 	m_pPlayer->ResetMaxSpeed();
 }
 

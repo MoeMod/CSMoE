@@ -828,6 +828,8 @@ public:
 	std::vector <float> m_iVecOldHealth;
 	std::vector <int> m_iVecHitgroup;
 	float m_flOldHealth = 0.0;
+	float m_flZombieHealth;
+	float m_flZombieArmor;
 };
 
 }

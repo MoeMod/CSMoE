@@ -163,7 +163,7 @@ public:
 		float flDamage = 80;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 1140 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
+			flDamage = 1840 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif

@@ -484,7 +484,7 @@ namespace sv {
 				if (enhancedzombie.value)
 					flDamage = 2400;
 				else
-					flDamage *= 9.5f;
+					flDamage *= 17.5f;
 			}
 				
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
@@ -501,7 +501,7 @@ namespace sv {
 				if (enhancedzombie.value)
 					flDamage = 400;
 				else
-					flDamage *= 3.0f;
+					flDamage *= 7.0f;
 			}
 			
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
@@ -518,7 +518,7 @@ namespace sv {
 				if (enhancedzombie.value)
 					flDamage = 14700;
 				else
-					flDamage *= 40.5f;
+					flDamage *= 100.5f;
 			}
 				
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
@@ -535,7 +535,7 @@ namespace sv {
 				if (enhancedzombie.value)
 					flDamage = 761;
 				else
-					flDamage *= 3.5f;
+					flDamage *= 10.5f;
 			}		
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1200.0f;
@@ -551,7 +551,7 @@ namespace sv {
 				if (enhancedzombie.value)
 					flDamage = 4350;
 				else
-					flDamage *= 30.5f;
+					flDamage *= 33.5f;
 			}		
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 20400.0f;

@@ -35,7 +35,7 @@ CZombieClass_MeatWall::CZombieClass_MeatWall(CBasePlayer* player, ZombieLevel iE
 	m_pPlayer->m_ZombieClass = "meatwall";
 	m_pPlayer->m_iBuff |= BUFF_IGNORE_KNOCKBACK;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieDogShoot>(m_pPlayer);
-	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieChargeSlash>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieRush>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -72,6 +72,9 @@ void CZombieClass_MeatWall::ResetMaxSpeed() const
 	m_pPlayer->pev->maxspeed = 170.0;
 
 	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity = 0.7f;
+
+	if (m_pPlayer->pev->velocity.Length2D() < 170.0f)
+		m_pPlayer->pev->maxspeed = 225.0f;
 
 	if (m_pZombieSkill2)
 		m_pZombieSkill2->ResetMaxSpeed();

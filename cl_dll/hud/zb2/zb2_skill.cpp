@@ -232,18 +232,24 @@ int CHudZB2_Skill::VidInit(void)
 					//PreInit SharedTexture
 					m_pTexture_RandomZbClass = R_LoadTextureShared("resource\\hud\\zombie\\zombietype_random");
 					gHUD.m_ZB2.SetSelectorIcon(i - 1, "resource\\hud\\zombie\\zombietype_random");
+					gHUD.m_ZB2.SetSelectorIconLevel(i - 1, 0);
 				}
 				else if (i == ((int)ZOMBIE_CLASS_MEATWALL))
 				{
 					//ZOMBIE_CLASS_SIREN
 					gHUD.m_ZB2.SetSelectorIcon(i - 1, Config::ZOMBIE_CLASS_HUD_ICON_NEW[ZOMBIE_CLASS_SIREN]);
+					gHUD.m_ZB2.SetSelectorIconLevel(i - 1, 0);
 				}
 				else
 				{
 					gHUD.m_ZB2.SetSelectorIcon(i - 1, Config::ZOMBIE_CLASS_HUD_ICON_NEW[i]);
+					gHUD.m_ZB2.SetSelectorIconLevel(i - 1, KeeperClassInfo[i - 1].level);
 
 					if (i == ((int)ZOMBIE_CLASS_TELEPORT) || i == ((int)ZOMBIE_CLASS_REVIVAL) || i == ((int)ZOMBIE_CLASS_NEMESIS) || i == ((int)ZOMBIE_CLASS_SPIDER) || i == ((int)ZOMBIE_CLASS_DEATHKNIGHT))
+					{
 						gHUD.m_ZB2.SetSelectorIconBan(i - 1);
+						gHUD.m_ZB2.SetSelectorIconLevel(i - 1, 0);
+					}
 				}
 			}
 		}

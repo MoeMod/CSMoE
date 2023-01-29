@@ -467,6 +467,8 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_cartfrag", GRENADE_CARTFRAG },
 	{ "weapon_sfgrenade", GRENADE_SFGRENADE },
 	{ "weapon_chaingren", GRENADE_CHAINGRENADE },
+	{ "weapon_sbmine", GRENADE_SBMINE },
+	{ "weapon_claymore", GRENADE_CLAYMORE },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -1487,7 +1489,9 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 						(pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE || 
 						pPlayer->m_pActiveItem->m_iId == WEAPON_PATROLDRONE || 
 						pPlayer->m_pActiveItem->m_iId == WEAPON_DIVINETITAN || 
-						pPlayer->m_pActiveItem->m_iId == WEAPON_BUNKERBUSTER);
+						pPlayer->m_pActiveItem->m_iId == WEAPON_BUNKERBUSTER ||
+						pPlayer->m_pActiveItem->m_iId == WEAPON_SBMINE ||
+						pPlayer->m_pActiveItem->m_iId == WEAPON_CLAYMORE);
 
 					if (iter->iID == WEAPON_PATROLDRONE)
 					{
@@ -1554,7 +1558,9 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
 								pGrenade->m_iId == WEAPON_PATROLDRONE ||
 								pGrenade->m_iId == WEAPON_DIVINETITAN ||
-								pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+								pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
+								pGrenade->m_iId == WEAPON_SBMINE ||
+								pGrenade->m_iId == WEAPON_CLAYMORE)
 							{
 								pGrenade->Kill();
 
@@ -1569,16 +1575,6 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 							pPlayer->RemovePlayerItem(iter);
 						}
 					}
-
-					/*switch (iter->iID)
-					{
-					case WEAPON_PATROLDRONE: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
-					case WEAPON_DIVINETITAN: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
-					case WEAPON_BUNKERBUSTER: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
-					default:
-						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
-						break;
-					}*/
 
 					pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
 
@@ -1596,7 +1592,9 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
 								pGrenade->m_iId == WEAPON_PATROLDRONE ||
 								pGrenade->m_iId == WEAPON_DIVINETITAN ||
-								pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+								pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
+								pGrenade->m_iId == WEAPON_SBMINE ||
+								pGrenade->m_iId == WEAPON_CLAYMORE)
 							{
 								pPlayer->m_pActiveItem = pGrenade;
 
@@ -1608,138 +1606,6 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 					}
 
 					return true;				
-#if 0
-			CBasePlayerItem* pItem = pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
-
-			if (pItem == NULL)
-				pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
-	
-			// have at least one weapon in this slot
-			while (pItem != NULL)
-			{
-				if (pPlayer->m_rgpPlayerItems[GRENADE_SLOT]->IsWeapon() && pPlayer->m_rgpPlayerItems[GRENADE_SLOT])
-				{
-					CBasePlayerWeapon* pGrenade = static_cast<CBasePlayerWeapon*>(pItem);
-
-					if (iter->iID == WEAPON_PATROLDRONE)
-					{
-						//buy patroldrone
-						if (pGrenade->m_iId == WEAPON_PATROLDRONE)
-						{
-							//add clip
-							if (pPlayer->m_rgAmmo[pGrenade->m_iPrimaryAmmoType] >= PATROLDRONE_MAX_CLIP)
-							{
-								//full ammo
-								ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
-								return false;
-							}
-
-							CPatrolDrone* pLinkWeapon = dynamic_cast<CPatrolDrone*>(pGrenade);
-							pPlayer->m_rgAmmo[pLinkWeapon->m_iPrimaryAmmoType]++;
-							for (int i = 0; i < PATROLDRONE_MAX_CLIP; i++)
-							{
-								if (pLinkWeapon->m_iClipAmmo[i] == -1)
-								{
-									pLinkWeapon->m_iClipAmmo[i] = 0;
-									MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
-									WRITE_BYTE(24);
-									WRITE_BYTE(i);
-									WRITE_SHORT(pLinkWeapon->m_iClipAmmo[i]);
-									WRITE_BYTE(PATROLDRONE_OFF);
-									MESSAGE_END();
-									break;
-								}							
-							}
-							pPlayer->AddAccount(-500);
-							pPlayer->BuildRebuyStruct();
-
-							return true;
-						}
-						else if (pGrenade->m_iId == WEAPON_DIVINETITAN ||
-							pGrenade->m_iId == WEAPON_HEGRENADE ||
-							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							pPlayer->RemovePlayerItem(pGrenade);
-							break;
-						}
-					}
-					else if(iter->iID == WEAPON_DIVINETITAN)
-					{
-						//buy divientitan
-						if (pGrenade->m_iId == WEAPON_DIVINETITAN)
-						{
-							ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
-							return false;
-							//already have
-						}
-						else if (pGrenade->m_iId == WEAPON_PATROLDRONE || 
-							pGrenade->m_iId == WEAPON_HEGRENADE ||
-							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							pPlayer->RemovePlayerItem(pGrenade);
-							break;
-						}
-					}
-					else if (iter->iID == WEAPON_BUNKERBUSTER)
-					{
-						//buy bunkerbuster
-						if (pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
-							return false;
-							//already have
-						}
-						else if (pGrenade->m_iId == WEAPON_PATROLDRONE || 
-							pGrenade->m_iId == WEAPON_HEGRENADE || 
-							pGrenade->m_iId == WEAPON_DIVINETITAN)
-						{
-							pPlayer->RemovePlayerItem(pGrenade);
-							break;
-						}
-					}
-					else
-					{
-						//buy grenande
-						if (pGrenade->m_iId == WEAPON_DIVINETITAN || 
-							pGrenade->m_iId == WEAPON_PATROLDRONE ||
-							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							//remove and add
-							pPlayer->RemovePlayerItem(pGrenade);
-						}
-
-						bool bGrenadeChanged = pPlayer->m_iGrenadeID != iter->iID;
-						bool bWasActiveItem = pPlayer->m_pActiveItem && pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE;
-
-						if (bGrenadeChanged)
-						{
-							CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
-							std::vector<CBasePlayerWeapon*> GrenadesToRemove;
-
-							while (pGrenade)
-							{
-								if (pGrenade->m_iId == WEAPON_HEGRENADE)
-								{
-									pGrenade->Kill();
-
-									GrenadesToRemove.push_back(pGrenade);
-								}
-
-								pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
-							}
-
-							for (auto iter : GrenadesToRemove)
-							{
-								pPlayer->RemovePlayerItem(iter);
-							}
-						}
-						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);					
-						break;
-					}
-				}
-				pItem = pItem->m_pNext;
-			}		
-#endif
 			}
 
 			break;

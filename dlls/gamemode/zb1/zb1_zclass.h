@@ -63,12 +63,7 @@ public:
 			m_tStunSpeedTime = invalid_time_point;
 			m_pPlayer->ResetMaxSpeed();
 		}
-		if (m_tBanSkillsTime != invalid_time_point && m_tBanSkillsTime <= gpGlobals->time)
-		{
-			m_tBanSkillsTime = invalid_time_point;
-			m_bForceStopSkills = false;
-			m_bCanUseSkills = true;
-		}
+	
 	}
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & data) override 
 	{ 
@@ -85,9 +80,6 @@ public:
 	float m_flStunGravity;
 	time_point_t m_tStunSpeedTime;
 	float m_flStunSpeed;
-	time_point_t m_tBanSkillsTime;
-	bool m_bForceStopSkills;
-	bool m_bCanUseSkills;
 };
 
 }

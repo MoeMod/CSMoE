@@ -658,8 +658,12 @@ namespace sv {
 			if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
 				continue;
 
-			pEntity->m_LastHitGroup = HITGROUP_CHEST;
+
 			ClearMultiDamage();
+
+			pEntity->m_LastHitGroup = HITGROUP_CHEST;
+			tr.iHitgroup = HITGROUP_CHEST;
+
 			pEntity->TraceAttack(m_pPlayer->pev, flDamage, (tr.vecEndPos - vecStart).Normalize(), &tr, DMG_BULLET);
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 

@@ -232,8 +232,10 @@ namespace sv {
 		void OnGetSkill() override {
 
 			m_pPlayer->pev->max_health = m_pPlayer->pev->health += m_pPlayer->m_bIsZombie ? GetZombieBonus() : GetBonus();
-			if (m_pPlayer->pev->max_health >= 32000)
-				m_pPlayer->pev->max_health = m_pPlayer->pev->health = 30000;
+			if (m_pPlayer->pev->max_health >= 32000.0f)
+				m_pPlayer->pev->max_health = m_pPlayer->pev->health = 32000.0f;
+
+			m_pPlayer->m_flZombieHealth = m_pPlayer->pev->health;
 			
 		}
 	private:
@@ -278,7 +280,9 @@ namespace sv {
 			{
 				if (pWeapon->m_iId == WEAPON_DIVINETITAN || 
 					pWeapon->m_iId == WEAPON_PATROLDRONE ||
-					pWeapon->m_iId == WEAPON_BUNKERBUSTER)
+					pWeapon->m_iId == WEAPON_BUNKERBUSTER ||
+					pWeapon->m_iId == WEAPON_CLAYMORE ||
+					pWeapon->m_iId == WEAPON_SBMINE)
 					return;
 
 				if (amount && pWeapon && pWeapon->m_iId != WEAPON_HEGRENADE)
@@ -2185,6 +2189,26 @@ namespace sv {
 	
 	};
 
+	class ZSkill_MoneyGrubber : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_MoneyGrubber(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "金融家"; }
+		const char* GetDesc() const override { return "回合开始时，获得更多$。"; }
+		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+
+		void OnSpawn() override 
+		{
+			m_pPlayer->AddAccount(GetBonus());
+		}
+		void OnGetSkill() override 
+		{
+			m_pPlayer->AddAccount(GetBonus());
+		}
+
+		float GetBonus() const { return 1000.0f + 500.0f * g_pGameRules->m_iTotalRoundsPlayed; }
+	};
+
 	//class ZSkill_HuntierInstinct : public CZombieZSkill_Base
 	//{bug
 	//public:
@@ -2430,6 +2454,7 @@ namespace sv {
 		{ Skill_GhostHunter, 50, MakeSkill<ZSkill_GhostHunter> },
 
 		{ Skill_StableGrip, 50, MakeSkill<ZSkill_StableGrip> },
+		{ Skill_MoneyGrubber, 100, MakeSkill<ZSkill_MoneyGrubber> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

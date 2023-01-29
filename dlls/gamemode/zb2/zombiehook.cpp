@@ -219,8 +219,6 @@ void CZombieHook::Init(void)
 
 	pPlayer->ResetMaxSpeed();
 	pPlayer->SendFOV(120);
-
-	EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "zombi/Zombi_Banshee_Pulling_Fire.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
 

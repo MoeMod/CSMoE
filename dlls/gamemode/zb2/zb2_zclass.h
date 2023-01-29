@@ -89,6 +89,10 @@ public:
 			return 14000.0f;
 	}
 
+	time_point_t m_tBanSkillsTime;
+	bool m_bForceStopSkills;
+	bool m_bCanUseSkills;
+
 protected:
 	std::unique_ptr<IZombieSkill> m_pZombieSkill;
 	std::unique_ptr<IZombieSkill> m_pZombieSkill2;

@@ -228,8 +228,10 @@ int CHudZBZ_Skill::VidInit(void)
 	m_iAlarmTypeBg[TYPE_ZOMBIE] = R_LoadTextureUnique("resource/zombiez/zmode_alarm_bg_zombie");
 
 
-	if (!m_iSlash_Center)
-		m_iSlash_Center = R_LoadTextureShared("resource/hud/hud_sb_num_center_slash");
+	//if (!m_iSlash_Center)
+	//	m_iSlash_Center = R_LoadTextureShared("resource/hud/hud_sb_num_center_slash");
+
+	m_hSprite_Slash.SetSpriteByName("zbz_slash");
 
 	m_iFirstReleaseBg = R_LoadTextureUnique("resource/zombiez/first_release_bg");
 
@@ -372,6 +374,8 @@ int CHudZBZ_Skill::Draw(float time)
 		int iMutationX = m_iLevelBg->w() + iSprRectLen + 2;
 		int iMutationY = ScreenHeight - m_iLevelBg->h() * 5;
 
+		SPR_Set(m_hSprite_Slash.spr, g_SkillIndexColor[0][0], g_SkillIndexColor[0][1], g_SkillIndexColor[0][2]);
+
 		//New CSO HUD?
 		if (gHUD.m_hudstyle->value == 2)
 		{
@@ -379,15 +383,16 @@ int CHudZBZ_Skill::Draw(float time)
 
 			iMutationX += 18 * 2 + 2;
 
-			m_iSlash_Center->Draw2DQuadScaled((iMutationX + iSprRectLen), iMutationY, (iMutationX + iSprRectLen + m_iSlash_Center->w()) * 0.5f, (iMutationY + m_iMutation->h()), 0.0f, 0.0f, 0.5f, 0.5f, g_SkillIndexColor[0][0], g_SkillIndexColor[0][1], g_SkillIndexColor[0][2]);
+			SPR_DrawAdditive(0, (iMutationX + iSprRectLen), iMutationY, &m_hSprite_Slash.rect);
 		}
 		//CSGO / Classic HUD
 		else
 		{
 			iMutationY += m_iLevelBg->h() * 2;
+			m_iMutation->Draw2DQuadScaled(iMutationX, iMutationY, iMutationX + iSprRectLen, iMutationY + m_iMutation->h(), 0.0f, 0.0f, 1.0f, 1.0f, g_SkillIndexColor[0][0], g_SkillIndexColor[0][1], g_SkillIndexColor[0][2]);
 			iMutationX += 18 * 2 + 2;
 
-			m_iSlash_Center->Draw2DQuadScaled(iMutationX + iSprRectLen, iMutationY, iMutationX + m_iSlash_Center->w(), iMutationY + m_iMutation->h(), 0.0f, 0.0f, 1.0f, 1.0f, g_SkillIndexColor[0][0], g_SkillIndexColor[0][1], g_SkillIndexColor[0][2]);
+			SPR_DrawAdditive(0, (iMutationX + iSprRectLen), iMutationY, &m_hSprite_Slash.rect);
 		}
 
 		iMutationX -= 18 * 2;
@@ -576,7 +581,9 @@ int CHudZBZ_Skill::Draw(float time)
 						char* SzSkillDes = new char[strlen(std::get<1>(FindSkillByIndex->second)) + 1];
 						sprintf(SzSkillDes, "%s", std::get<1>(FindSkillByIndex->second));
 
-						ZBZ_DrawHudText(SzSkillDes, iX - DrawUtils::HudStringLen(SzSkillDes) / 4 - 2, TextY, g_SkillIndexColor[FindSkillType][0], g_SkillIndexColor[FindSkillType][1], g_SkillIndexColor[FindSkillType][2], 1.2);
+						int iLenText = gHUD.m_DrawFontText.GetFontTextWide("Default", 20, gHUD.m_DeathInfo.UTF8ToUnicode(SzSkillDes));
+						gHUD.m_DrawFontText.DrawFontText("Default", 20, iX - iLenText / 2, TextY, g_SkillIndexColor[FindSkillType][0], g_SkillIndexColor[FindSkillType][1], g_SkillIndexColor[FindSkillType][2], 255, gHUD.m_DeathInfo.UTF8ToUnicode(SzSkillDes));
+						//ZBZ_DrawHudText(SzSkillDes, iX - DrawUtils::HudStringLen(SzSkillDes) / 4 - 2, TextY, g_SkillIndexColor[FindSkillType][0], g_SkillIndexColor[FindSkillType][1], g_SkillIndexColor[FindSkillType][2], 1.2);
 						TextY += 20;
 
 						delete[]SzSkillDes;
@@ -584,7 +591,9 @@ int CHudZBZ_Skill::Draw(float time)
 						SzSkillDes = new char[strlen(std::get<2>(FindSkillByIndex->second)) + 1];
 						sprintf(SzSkillDes, "%s", std::get<2>(FindSkillByIndex->second));
 
-						ZBZ_DrawHudText(SzSkillDes, iX - DrawUtils::HudStringLen(SzSkillDes) / 4 - 2, TextY, g_SkillIndexColor[FindSkillType][0], g_SkillIndexColor[FindSkillType][1], g_SkillIndexColor[FindSkillType][2], 0.5);
+						iLenText = gHUD.m_DrawFontText.GetFontTextWide("Default", 16, gHUD.m_DeathInfo.UTF8ToUnicode(SzSkillDes));
+						gHUD.m_DrawFontText.DrawFontText("Default", 16, iX - iLenText / 2, TextY, g_SkillIndexColor[FindSkillType][0], g_SkillIndexColor[FindSkillType][1], g_SkillIndexColor[FindSkillType][2], 255, gHUD.m_DeathInfo.UTF8ToUnicode(SzSkillDes));
+						//ZBZ_DrawHudText(SzSkillDes, iX - DrawUtils::HudStringLen(SzSkillDes) / 4 - 2, TextY, g_SkillIndexColor[FindSkillType][0], g_SkillIndexColor[FindSkillType][1], g_SkillIndexColor[FindSkillType][2], 0.5);
 
 						delete[]SzSkillDes;
 						//Skill Type Anim

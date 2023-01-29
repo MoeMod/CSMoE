@@ -2225,7 +2225,7 @@ int CHudAmmo::DrawNEWHudCurrentWpn(float flTime)
 
 		gEngfuncs.pfnDrawSetTextColor(1.0f, 1.0f, 1.0f);
 
-		char* szModifiedWpnName = m_pWeapon->szName;
+		const char* szModifiedWpnName = m_pWeapon->szName;
 		char szWeaponInfo[64];
 
 		// strip the monster_* or weapon_* from the inflictor's classname
@@ -2238,22 +2238,25 @@ int CHudAmmo::DrawNEWHudCurrentWpn(float flTime)
 		else if (!strncmp(szModifiedWpnName, "func_", 5))
 			szModifiedWpnName += 5;
 
-		if (!strcmp(szModifiedWpnName, "usp"))
-			strcpy(szModifiedWpnName, "USP45");
-		else if (!strcmp(szModifiedWpnName, "deagle"))
-			strcpy(szModifiedWpnName, "DesertEagle");
-		else if (!strcmp(szModifiedWpnName, "hegrenade"))
-			strcpy(szModifiedWpnName, "HE_Grenade");
+		char szModifiedWpnName2[64];
+		strcpy(szModifiedWpnName2, szModifiedWpnName);
+
+		if (!strcmp(szModifiedWpnName2, "usp"))
+			strcpy(szModifiedWpnName2, "USP45");
+		else if (!strcmp(szModifiedWpnName2, "deagle"))
+			strcpy(szModifiedWpnName2, "DesertEagle");
+		else if (!strcmp(szModifiedWpnName2, "hegrenade"))
+			strcpy(szModifiedWpnName2, "HE_Grenade");
 
 
 		//Vgui Localize
 		char SzWpnNameCn[64];
-		char SzText[64]; sprintf(SzText, "CSO_%s", szModifiedWpnName);
+		char SzText[64]; sprintf(SzText, "CSO_%s", szModifiedWpnName2);
 		if (vgui2::localize()->Find(SzText))
 			strcpy(SzWpnNameCn, HudDeathInfo().UnicodeToUTF8(vgui2::localize()->Find(SzText)));
 		else
 		{
-			sprintf(SzText, "#CSO_%s", szModifiedWpnName);
+			sprintf(SzText, "#CSO_%s", szModifiedWpnName2);
 			strcpy(SzWpnNameCn, SzText);
 		}
 

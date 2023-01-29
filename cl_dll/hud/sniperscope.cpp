@@ -72,6 +72,14 @@ int CHudSniperScope::Init()
 	return 1;
 }
 
+void CHudSniperScope::Reset()
+{
+	bHaloGunLoopRetinaOn = false;
+	bHaloGunHitRetinaOn = false;
+	bReviveGunLoopRetinaOn = false;
+	bReviveGunRetinaOn = false;
+}
+
 int CHudSniperScope::VidInit()
 {
 	R_InitTexture(m_iScopeArc[0], "sprites/scope_arc_nw.tga");

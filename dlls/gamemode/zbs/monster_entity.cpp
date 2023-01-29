@@ -33,12 +33,12 @@ std::shared_ptr<CBaseMonsterClass> MakeMonsterClass(CMonster* p)
 }
 const std::tuple<MonsterClass, unsigned int, std::shared_ptr<CBaseMonsterClass>(*)(CMonster*)> g_MonsterClassList[] = {
 	{MONSTER_CLASS_ZOMBIE, 100, MakeMonsterClass<CMonsterClass_Normal>},
+	{MONSTER_CLASS_ZOMBIEDOG, 100, MakeMonsterClass<CMonsterClass_Dog>},
 #ifdef XASH_DEDICATED
 	{MONSTER_CLASS_SPEED, 100, MakeMonsterClass<CMonsterClass_Speed>},
 	{MONSTER_CLASS_HEAVY, 100, MakeMonsterClass<CMonsterClass_Heavy>},
 	{MONSTER_CLASS_THROWER, 100, MakeMonsterClass<CMonsterClass_Thrower>},
 	{MONSTER_CLASS_HEAL, 100, MakeMonsterClass<CMonsterClass_Heal>},
-	{MONSTER_CLASS_ZOMBIEDOG, 100, MakeMonsterClass<CMonsterClass_Dog>},
 	{MONSTER_CLASS_BOOMER, 100, MakeMonsterClass<CMonsterClass_Boomer>},
 	{MONSTER_CLASS_RESIDENT, 100, MakeMonsterClass<CMonsterClass_Resident>},
 	{MONSTER_CLASS_DEIMOS, 100, MakeMonsterClass<CMonsterClass_Deimos>},

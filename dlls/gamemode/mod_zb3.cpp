@@ -173,21 +173,13 @@ void CPlayerModStrategy_ZB3::OnThink()
 	{
 		// respawn after 5 secs
 		if (!m_pPlayer->m_bHeadshotKilled && gpGlobals->time > m_flDeadTime + 1.0s)
-		{
-			
-			const float health = max(m_flBackupMaxHealth, 3000);
-			const float armor = m_flBackupArmor;
-
-			
+		{		
 			m_pPlayer->RoundRespawn();		
-			m_pPlayer->pev->armorvalue = armor;
+			
 			BecomeZombie(m_pPlayer->m_iZombieLevel);	//set health
 
-			if (!enhancedzombie.value)
-			{
-				if (m_pPlayer->pev->health < health)
-					m_pPlayer->pev->max_health = m_pPlayer->pev->health = health;
-			}
+			m_pPlayer->pev->max_health = m_pPlayer->pev->health = m_pPlayer->m_flZombieHealth;
+			m_pPlayer->pev->armorvalue = m_pPlayer->m_flZombieArmor;
 
 			m_pPlayer->SetScoreboardAttributes();
 
@@ -217,15 +209,18 @@ void CPlayerModStrategy_ZB3::OnKilled(entvars_t * pKiller, entvars_t * pInflicto
 		if(enhancedzombie.value)
 			m_pPlayer->pev->max_health = 15000.0f;
 		else
-			m_pPlayer->pev->max_health = 3000.0f;
+			m_pPlayer->pev->max_health = 4000.0f;
+		m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 		m_pPlayer->pev->armorvalue = 1000.0f;
 		m_flRagePercent = 0;
+
+		m_pPlayer->m_flZombieHealth = m_pPlayer->pev->max_health;
+		m_pPlayer->m_flZombieArmor = m_pPlayer->pev->armorvalue;
+
 		m_pModZB3->TeamCheck();
 	}
 
 	m_flDeadTime = gpGlobals->time;
-	m_flBackupMaxHealth = m_pPlayer->pev->max_health;
-	m_flBackupArmor = m_pPlayer->pev->armorvalue;
 
 	// TODO : Respawn effect
 
@@ -557,12 +552,17 @@ void CMod_ZombieHero::MakeZombieOrigin()
 		players[i]->m_ZombieClass = "random";
 		players[i]->pev->sequence = 0;
 		players[i]->m_iCustomSequence = -1;
-		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
 		if (enhancedzombie.value)
 			players[i]->pev->health = players[i]->pev->max_health = 20000.0f;
 		else
 			players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
+		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
+
+		players[i]->pev->armortype = ARMOR_TYPE_HELMET;
 		players[i]->pev->armorvalue = 1100;
+
+		players[i]->m_flZombieHealth = players[i]->pev->health;
+		players[i]->m_flZombieArmor = players[i]->pev->armorvalue;
 	}
 	TeamCheck();
 

@@ -171,6 +171,14 @@ void CBaseZombieClass_ZB2::Think()
 	{
 		m_bForceStopSkills = false;
 	}
+
+	if (m_tBanSkillsTime != invalid_time_point && m_tBanSkillsTime <= gpGlobals->time)
+	{
+		m_tBanSkillsTime = invalid_time_point;
+		m_bForceStopSkills = false;
+		m_bCanUseSkills = true;
+	}
+
 	if (m_pZombieSkill)
 		m_pZombieSkill->Think();
 	if (m_pZombieSkill2)
