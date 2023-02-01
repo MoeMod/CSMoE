@@ -33,7 +33,7 @@ namespace cl {
 void	XASH_VECTORCALL ConcatTransforms (cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out);
 void	XASH_VECTORCALL MatrixCopy( cmatrix3x4 in, matrix3x4_ref out );
 void	XASH_VECTORCALL QuaternionMatrix( const vec4_t quaternion, matrix3x4_ref matrix );
-void	XASH_VECTORCALL QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt );
+void	XASH_VECTORCALL QuaternionSlerp( const vec4_t p, vec4_t q, float t, vec4_t_ref qt );
 void	XASH_VECTORCALL AngleQuaternion( const vec3_t angles, vec4_t_ref quaternion );
 }
 

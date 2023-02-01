@@ -511,7 +511,7 @@ QuaternionSlerp
 
 ====================
 */
-void XASH_VECTORCALL QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt )
+void XASH_VECTORCALL QuaternionSlerp( const vec4_t p, vec4_t q, float t, vec4_t_ref qt )
 {
 	float	omega, sclp, sclq;
 	float	cosom, sinom;
