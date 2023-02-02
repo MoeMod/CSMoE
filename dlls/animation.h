@@ -57,7 +57,7 @@ void SetBodygroup(void *pmodel, entvars_t *pev, int iGroup, int iValue);
 int GetBodygroup(void *pmodel, entvars_t *pev, int iGroup);
 C_DLLEXPORT int Server_GetBlendingInterface(int version, struct sv_blending_interface_s **ppinterface, struct engine_studio_api_s *pstudio, matrix3x4 *transform, matrix3x4 (*bones)[MAXSTUDIOBONES]);
 void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion);
-void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt);
+void QuaternionSlerp(const vec4_t p, vec4_t q, float t, vec4_t_ref qt);
 void QuaternionMatrix(const vec4_t quaternion, float (*matrix)[4]);
 mstudioanim_t *StudioGetAnim(model_t *m_pSubModel, mstudioseqdesc_t *pseqdesc);
 mstudioanim_t *LookupAnimation(model_t *model, mstudioseqdesc_t *pseqdesc, int index);

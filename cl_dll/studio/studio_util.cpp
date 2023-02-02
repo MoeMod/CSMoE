@@ -151,8 +151,46 @@ QuaternionSlerp
 
 ====================
 */
-void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
+void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t q, float t, vec4_t_ref qt)
 {
+#if 0
+        float cosom, sclp, sclq;
+
+    // q = (cos(a/2), xsin(a/2), ysin(a/2), zsin(a/2))
+    // cos(a-b) = cosacosb+sinasinb
+    cosom = DotProduct(p, q);
+
+	if (cosom < 0)
+	{
+        q = -q;
+        cosom = -cosom;
+	}
+
+    if ((1.0 - cosom) > 0.000001)
+    {
+        float omega = acos(cosom);
+#ifdef XASH_SIMD
+        vec3_t x = { omega, (1.0f - t) * omega, t * omega };
+        vec3_t sinx = sin_ps(x);
+        float sinom = sinx[0];
+        sclp = sinx[1];
+        sclq = sinx[2];
+#else
+        float sinom = sin(omega);
+
+        sclp = sin((1.0 - t) * omega);
+        sclq = sin(t * omega);
+#endif
+        qt = (sclp * p + sclq * q) / sinom;
+    }
+    else
+    {
+        // cosom -> 1, sinom -> 0, sinx ~ x
+        sclp = 1.0 - t;
+        sclq = t;
+        qt = sclp * p + sclq * q;
+    }
+#else
 	int i;
 	float cosom, sclp, sclq;
 
@@ -205,6 +243,7 @@ void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4
 
         qt = sclp * p + sclq * qt;
 	}
+#endif
 }
 
 /*
@@ -213,8 +252,57 @@ QuaternionMatrix
 
 ====================
 */
+
+#if defined(XASH_SIMD) && U_VECTOR_NEON
+const matrix3x4	matrix3x4_identity =
+{
+        { 1, 0, 0, 0 },	// PITCH	[forward], org[0]
+        { 0, 1, 0, 0 },	// YAW	[right]  , org[1]
+        { 0, 0, 1, 0 },	// ROLL	[up]     , org[2]
+};
+#endif
 void XASH_VECTORCALL QuaternionMatrix(const vec4_t quaternion, matrix3x4_ref matrix)
 {
+#if defined(XASH_SIMD) && U_VECTOR_NEON
+    const uint32x4_t sign1 = vsetq_lane_u32(0x80000000, vdupq_n_u32(0x00000000), 0); // { 0x80000000, 0x00000000, 0x00000000, 0x00000000 };
+    const uint32x4_t sign2 = vsetq_lane_u32(0x80000000, vdupq_n_u32(0x00000000), 1); // { 0x00000000, 0x80000000, 0x00000000, 0x00000000 };
+	const uint32x4_t sign3 = vsetq_lane_u32(0x00000000, vdupq_n_u32(0x80000000), 2); // { 0x80000000, 0x80000000, 0x00000000, 0x80000000 };
+
+	float32x4_t q1032 = vrev64q_f32(quaternion);
+	float32x4_t q1032_signed = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q1032), sign1));
+	float32x4_t q2301 = vextq_f32(quaternion, quaternion, 2);
+	float32x4_t q2301_signed = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q2301), sign3));
+    float32x4_t q3210 = vrev64q_f32(q2301);
+    float32x4_t q3210_signed = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q3210), sign2));
+
+    auto v0 = vmulq_laneq_f32(q2301_signed, quaternion, 2);
+    v0 = vfmaq_laneq_f32(v0, q1032_signed, quaternion, 1);
+    matrix[0] = vfmaq_n_f32(matrix3x4_identity[0], v0, 2.0f);
+
+    auto v1 = vmulq_laneq_f32(q3210_signed, quaternion, 2);
+    v1 = vfmsq_laneq_f32(v1, q1032_signed, quaternion, 0);
+    matrix[1] = vfmaq_n_f32(matrix3x4_identity[1], v1, 2.0f);
+
+    auto v2 = vmulq_laneq_f32(q3210_signed, quaternion, 1);
+    v2 = vfmaq_laneq_f32(v2, q2301_signed, quaternion, 0);
+    matrix[2] = vfmsq_n_f32(matrix3x4_identity[2], v2, 2.0f);
+/*
+    matrix[0][0] = 1.0 + 2.0 * (  quaternion[1] * -quaternion[1] + -quaternion[2] * quaternion[2] );
+    matrix[0][1] = 0.0 + 2.0 * (  quaternion[1] *  quaternion[0] + -quaternion[3] * quaternion[2] );
+    matrix[0][2] = 0.0 + 2.0 * (  quaternion[1] *  quaternion[3] +  quaternion[0] * quaternion[2] );
+    matrix[0][3] = 0.0 + 2.0 * (  quaternion[1] *  quaternion[2] + -quaternion[1] * quaternion[2] );
+
+    matrix[1][0] = 0.0 + 2.0 * ( -quaternion[0] * -quaternion[1] +  quaternion[3] * quaternion[2] );
+    matrix[1][1] = 1.0 + 2.0 * ( -quaternion[0] *  quaternion[0] + -quaternion[2] * quaternion[2] );
+    matrix[1][2] = 0.0 + 2.0 * ( -quaternion[0] *  quaternion[3] +  quaternion[1] * quaternion[2] );
+    matrix[1][3] = 0.0 + 2.0 * ( -quaternion[0] *  quaternion[2] +  quaternion[0] * quaternion[2] );
+	
+    matrix[2][0] = 0.0 + 2.0 * ( -quaternion[0] * -quaternion[2] + -quaternion[3] * quaternion[1] );
+    matrix[2][1] = 0.0 + 2.0 * ( -quaternion[0] * -quaternion[3] +  quaternion[2] * quaternion[1] );
+    matrix[2][2] = 1.0 + 2.0 * ( -quaternion[0] *  quaternion[0] + -quaternion[1] * quaternion[1] );
+    matrix[2][3] = 0.0 + 2.0 * ( -quaternion[0] * -quaternion[1] + -quaternion[0] * quaternion[1] );
+*/
+#else
 	matrix[0][0] = 1.0 - 2.0 * quaternion[1] * quaternion[1] - 2.0 * quaternion[2] * quaternion[2];
 	matrix[1][0] = 2.0 * quaternion[0] * quaternion[1] + 2.0 * quaternion[3] * quaternion[2];
 	matrix[2][0] = 2.0 * quaternion[0] * quaternion[2] - 2.0 * quaternion[3] * quaternion[1];
@@ -226,6 +314,7 @@ void XASH_VECTORCALL QuaternionMatrix(const vec4_t quaternion, matrix3x4_ref mat
 	matrix[0][2] = 2.0 * quaternion[0] * quaternion[2] + 2.0 * quaternion[3] * quaternion[1];
 	matrix[1][2] = 2.0 * quaternion[1] * quaternion[2] - 2.0 * quaternion[3] * quaternion[0];
 	matrix[2][2] = 1.0 - 2.0 * quaternion[0] * quaternion[0] - 2.0 * quaternion[1] * quaternion[1];
+#endif
 }
 
 /*

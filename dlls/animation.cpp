@@ -590,7 +590,7 @@ void AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 	quaternion[3] = sp_ * sr * sy + ftmp2 * cy;
 }
 
-void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt)
+void QuaternionSlerp(const vec4_t p, vec4_t q, float t, vec4_t_ref qt)
 {
 	int i;
 

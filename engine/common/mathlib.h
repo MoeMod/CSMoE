@@ -170,7 +170,7 @@ qboolean XASH_VECTORCALL BoundsAndSphereIntersect(const vec3_t mins, const vec3_
 float XASH_VECTORCALL RadiusFromBounds(const vec3_t mins, const vec3_t maxs);
 
 void XASH_VECTORCALL AngleQuaternion(const vec3_t angles, vec4_t_ref q);
-void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt);
+void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t q, float t, vec4_t_ref qt);
 float RemapVal(float val, float A, float B, float C, float D);
 float ApproachVal(float target, float value, float speed);
 void XASH_VECTORCALL InterpolateAngles(const vec3_t start, const vec3_t end, vec3_t_ref output, float frac);
