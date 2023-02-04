@@ -16,6 +16,7 @@ enum GhostHunterClass
 	CLASS_ASCETICHERO,
 	CLASS_BACKGROUND,
 	CLASS_HEALHUNTER,
+	CLASS_MECHANICHERO,
 };
 
 class CHudZBZ_GhostHunter : public IBaseHudSub

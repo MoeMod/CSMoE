@@ -83,7 +83,7 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 		{"spider", 25, MakeZombieClass<CZombieClass_Spider>},
 		{"deathknight", 25, MakeZombieClass<CZombieClass_DeathKnight>},
 		{"siren", 50, MakeZombieClass<CZombieClass_Siren>},
-		//{"meatwall", 100, MakeZombieClass<CZombieClass_MeatWall>},
+		{"meatwall", 25, MakeZombieClass<CZombieClass_MeatWall>},
 };
 
 #else
@@ -232,7 +232,12 @@ float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
 
 	if (m_pPlayer->m_ZombieClass)
 	{
-		if (!stricmp(m_pPlayer->m_ZombieClass, "revival") || !stricmp(m_pPlayer->m_ZombieClass, "teleport") || !stricmp(m_pPlayer->m_ZombieClass, "spider") || !stricmp(m_pPlayer->m_ZombieClass, "deathknight") || !stricmp(m_pPlayer->m_ZombieClass, "nemesis"))
+		if (!stricmp(m_pPlayer->m_ZombieClass, "revival") || 
+			!stricmp(m_pPlayer->m_ZombieClass, "teleport") || 
+			!stricmp(m_pPlayer->m_ZombieClass, "spider") || 
+			!stricmp(m_pPlayer->m_ZombieClass, "deathknight") ||
+			!stricmp(m_pPlayer->m_ZombieClass, "nemesis") ||
+			!stricmp(m_pPlayer->m_ZombieClass, "meatwall"))
 			return 1000;
 	}
 		

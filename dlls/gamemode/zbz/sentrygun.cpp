@@ -61,7 +61,8 @@ void CSentryGun::Spawn(void)
 	ResetSequenceInfo();
 
 	m_flTurnRate = 10.0f;
-	m_iRange = 13000;
+	m_flVerticalTurnRate = 3.0f;
+	m_iRange = 1000;
 	m_flFireRate = invalid_time_point;
 	m_flFieldOfView = VIEW_FIELD_FULL;
 
@@ -73,6 +74,21 @@ void CSentryGun::Precache(void)
 {
 	PRECACHE_MODEL("models/z4b/sentrygun.mdl");
 
+}
+
+void CSentryGun::SetLife(duration_t flTime)
+{
+	m_flRemoveTime = gpGlobals->time + flTime;
+}
+
+void CSentryGun::Killed(entvars_t* pevAttacker, int iGib)
+{
+	if (!IsAlive())
+		return;
+
+	iGib = GIB_ALWAYS;
+
+	return CBaseMonster::Killed(pevAttacker, iGib);
 }
 
 void CSentryGun::Think()
@@ -93,6 +109,13 @@ void CSentryGun::Think()
 	else
 	{
 		Retire();
+	}
+
+	if (m_flRemoveTime < gpGlobals->time)
+	{
+		SetThink(nullptr);
+		UTIL_Remove(this);
+		return;
 	}
 }
 
@@ -133,18 +156,9 @@ void CSentryGun::Active()
 		vec.y -= 360;
 	if (vec.y < 0)
 		vec.y += 360;
-	// [-90...m_iMinPitch]
-	/*if (vec.x < -180)
-		vec.x += 360;
-	if (vec.x > 180)
-		vec.x -= 360;
-	if (vec.x > 90)
-		vec.x = 90;
-	else if (vec.x < m_iMinPitch)
-		vec.x = m_iMinPitch;*/
 
 	m_vecGoalAngles.y = vec.y;
-	//m_vecGoalAngles.x = vec.x;
+	m_vecGoalAngles.x = vec.x;
 	MoveTurret();
 	if (m_flFireRate > gpGlobals->time)
 		return;
@@ -160,7 +174,7 @@ void CSentryGun::Active()
 	SetAnim(2);
 	GetAttachment(0, vecLOS, vec);
 	vecDirToEnemy = vecMidEnemy - vecLOS;
-	FireBullets(1, vecLOS, vecDirToEnemy, g_vecZero, m_iRange, BULLET_MONSTER_9MM, 1, 10, pev);
+	FireBullets(1, vecLOS, vecDirToEnemy, g_vecZero, m_iRange, BULLET_MONSTER_9MM, 1, 10, m_pOwner->pev);
 
 	switch (RANDOM_LONG(0, 2))
 	{
@@ -191,6 +205,12 @@ CBaseEntity* CSentryGun::BestVisibleEnemy()
 	{
 		if (pNextEnt->IsAlive() && (pNextEnt->Classify() == CLASS_PLAYER_ALLY || pNextEnt->IsPlayer()))
 		{
+			if (pNextEnt == m_pOwner)
+				goto END_OF_SEARCH;
+
+			if (g_pGameRules->PlayerRelationship(m_pOwner, pNextEnt) == GR_TEAMMATE)
+				goto END_OF_SEARCH;
+
 			iDist = (pNextEnt->pev->origin - pev->origin).LengthSquared();
 
 			if (iDist <= iNearest)
@@ -200,6 +220,7 @@ CBaseEntity* CSentryGun::BestVisibleEnemy()
 			}
 		}
 
+	END_OF_SEARCH:
 		pNextEnt = pNextEnt->m_pLink;
 	}
 
@@ -209,45 +230,27 @@ CBaseEntity* CSentryGun::BestVisibleEnemy()
 bool CSentryGun::MoveTurret()
 {
 	bool state = false;
-	//if (m_vecCurAngles.x != m_vecGoalAngles.x)
-	//{
-	//	float flDir = m_vecGoalAngles.x > m_vecCurAngles.x ? 1 : -1 ;
+	if (m_vecCurAngles.x != m_vecGoalAngles.x)
+	{
+		float flDir = m_vecGoalAngles.x > m_vecCurAngles.x ? 1 : -1;
 
-	//	m_vecCurAngles.x += 0.1 * m_flTurnRate * flDir;
+		m_vecCurAngles.x += m_flVerticalTurnRate * flDir;
 
-	//	// if we started below the goal, and now we're past, peg to goal
-	//	if (flDir == 1)
-	//	{
-	//		if (m_vecCurAngles.x > m_vecGoalAngles.x)
-	//			m_vecCurAngles.x = m_vecGoalAngles.x;
-	//	} 
-	//	else
-	//	{
-	//		if (m_vecCurAngles.x < m_vecGoalAngles.x)
-	//			m_vecCurAngles.x = m_vecGoalAngles.x;
-	//	}
+		// if we started below the goal, and now we're past, peg to goal
+		if (flDir == 1)
+		{
+			if (m_vecCurAngles.x > m_vecGoalAngles.x)
+				m_vecCurAngles.x = m_vecGoalAngles.x;
+		}
+		else
+		{
+			if (m_vecCurAngles.x < m_vecGoalAngles.x)
+				m_vecCurAngles.x = m_vecGoalAngles.x;
+		}
 
-	//	SetBoneController(1, -m_vecCurAngles.x);
-	//	state = true;
-	//}
-
-	/*m_vecCurAngles.y -= int(m_vecCurAngles.y / 360.0) * 360.0;
-	m_vecGoalAngles.y -= int(m_vecGoalAngles.y / 360.0) * 360.0;
-
-	float delta = m_vecGoalAngles.y - m_vecCurAngles.y;
-	if (delta < 0.0) delta += 360.0;
-
-	if (delta <= 0.2 || delta >= 358.0) state = true;
-	else if (delta < 180.0) m_vecCurAngles.y += m_flTurnRate;
-	else {
-		if (m_vecCurAngles.y - m_flTurnRate < m_vecGoalAngles.y) m_vecCurAngles.y -= 8.0;
-		else m_vecCurAngles.y -= m_flTurnRate;
+		SetBoneController(1, m_vecCurAngles.x);
+		state = true;
 	}
-	if (delta <= m_flTurnRate) m_vecCurAngles.y = m_vecGoalAngles.y;
-	if (m_vecCurAngles.y >= 360.0) m_vecCurAngles.y -= 360.0;
-	else if (m_vecCurAngles.y < 0.0) m_vecCurAngles.y += 360.0;
-
-	if (!state) SetBoneController(0, m_vecCurAngles.y - pev->angles.y);*/
 
 	if (m_vecCurAngles.y != m_vecGoalAngles.y)
 	{

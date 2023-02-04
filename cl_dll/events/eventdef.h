@@ -296,3 +296,5 @@ HOOK_EVENT(at4, FireAT4);
 HOOK_EVENT(janus1, FireJANUS1);
 HOOK_EVENT(halogun, FireHaloGun);
 HOOK_EVENT(chainsr, FireChainSr);
+HOOK_EVENT(mechanicxm214, FireMechanicXM214);
+HOOK_EVENT(stickybomb, FireStickyBomb);

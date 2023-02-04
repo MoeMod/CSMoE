@@ -152,13 +152,15 @@ namespace sv {
 			for (int i = 0; i < sparkCount; i++)
 				Create("spark_shower", pev->origin, tr.vecPlaneNormal, NULL);
 		}
+
 		void ExplodeChainGrenade(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType)
 		{
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				RadiusDamage3(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * 0.65, iClassIgnore, bitsDamageType);
+				RadiusDamage4(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * 0.65, iClassIgnore, bitsDamageType);
 			else
-				RadiusDamage3(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * 3.5, iClassIgnore, bitsDamageType);
+				RadiusDamage4(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * 0.65, iClassIgnore, bitsDamageType);
 		}
+
 	public:
 		void Initialize(const Vector& vecVelocity, duration_t flTimeRemove, int iTeam)
 		{

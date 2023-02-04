@@ -2826,6 +2826,65 @@ void R_FollowingArrow(sizebuf_t* msg)
 	
 }
 
+
+void GrenadeFollow(TEMPENTITY* ent, float frametime, float currenttime)
+{
+
+	cl_entity_t* pPlayer = CL_GetEntityByIndex(ent->entity.curstate.iuser1);
+
+	if (pPlayer)
+	{
+		ent->entity.angles = pPlayer->angles + ent->entity.curstate.vuser1;
+	}
+}
+
+void R_FollowingGrenade(sizebuf_t* msg)
+{
+	int player, modelIndex;
+	vec3_t orgOffset, angOffset;
+
+	player = BF_ReadShort(msg);
+	modelIndex = BF_ReadShort(msg);
+
+	orgOffset.x = BF_ReadCoord(msg);
+	orgOffset.y = BF_ReadCoord(msg);
+	orgOffset.z = BF_ReadCoord(msg);
+
+	angOffset.x = BF_ReadCoord(msg);
+	angOffset.y = BF_ReadCoord(msg);
+	angOffset.z = BF_ReadCoord(msg);
+
+	float life = (float)BF_ReadShort(msg);
+	int body = BF_ReadByte(msg);
+	int skin = BF_ReadByte(msg);
+
+	TEMPENTITY* ent = CL_TempEntAlloc(vec3_t(0, 0, 0), Mod_Handle(modelIndex));
+
+	if (ent)
+	{
+		int frameCount;
+		Mod_GetFrames(modelIndex, &frameCount);
+
+		ent->flags |= FTENT_CLIENTCUSTOM | FTENT_PLYRATTACHMENT;
+		ent->tentOffset = orgOffset;
+		ent->clientIndex = player;
+		ent->entity.angles = vec3_t(0, 0, 0);
+		ent->frameMax = frameCount;
+		ent->entity.curstate.framerate = 1.0;
+		ent->entity.curstate.frame = 0;
+		ent->entity.curstate.animtime = cl.time;
+		ent->entity.curstate.iuser1 = player;
+		ent->entity.curstate.vuser1 = angOffset;
+		ent->entity.curstate.body = body;
+		ent->entity.curstate.skin = skin;	
+		
+
+		ent->die = cl.time + life;
+		ent->callback = GrenadeFollow;
+	}
+
+}
+
 void R_TempModel(sizebuf_t* msg)
 {
 	vec3_t pos, angles, velocity;
@@ -3498,6 +3557,8 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 		entityIndex = BF_ReadShort(&buf);	// playernum
 		CL_KillAttachedTentsFromEntity(entityIndex);
 		break;
+	case TE_FOLLOWINGGRENADE:
+		R_FollowingGrenade(&buf);
 	default:
 		MsgDev( D_ERROR, "ParseTempEntity: illegible TE message %i\n", type );
 		break;
