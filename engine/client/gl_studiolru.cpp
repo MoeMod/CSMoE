@@ -31,19 +31,25 @@ namespace xe {
     public:
         studiolru_vbo_cache(const char *debugname);
         ~studiolru_vbo_cache();
+        studiolru_vbo_cache(const studiolru_vbo_cache &) = delete;
+        studiolru_vbo_cache(studiolru_vbo_cache &&) = delete;
+        studiolru_vbo_cache &operator=(const studiolru_vbo_cache &) = delete;
+        studiolru_vbo_cache &operator=(studiolru_vbo_cache &&) = delete;
 
         void Bind();
         void Unbind();
         bool HasCachedData() const;
-        void Submit(int startArrayElems, int numArrayElems);
+        void Submit(int startArrayElems, int numArrayElems, int startArrayVerts, int numArrayVerts);
         void DrawElements() const;
 
     private:
         std::string name;
         GLuint studioverts;
         GLuint studioelems;
-        int start;
-        int num;
+        int startElems;
+        int numElems;
+        int startVerts;
+        int numVerts;
     };
 
     studiolru_vbo_cache::studiolru_vbo_cache(const char *debugname)
@@ -51,8 +57,10 @@ namespace xe {
         name = debugname;
         pglGenBuffersARB( 1, &studioverts );
         pglGenBuffersARB( 1, &studioelems);
-        start = 0;
-        num = 0;
+        startElems = 0;
+        numElems = 0;
+        startVerts = 0;
+        numVerts = 0;
 
         pglBindBufferARB( GL_ARRAY_BUFFER_ARB, studioverts );
         pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, studioelems);
@@ -84,13 +92,16 @@ namespace xe {
 
     bool studiolru_vbo_cache::HasCachedData() const
     {
-        return num > 0;
+        return numElems > 0;
     }
 
-    void studiolru_vbo_cache::Submit(int startArrayElems, int numArrayElems)
+    void studiolru_vbo_cache::Submit(int startArrayElems, int numArrayElems, int startArrayVerts, int numArrayVerts)
     {
-        start = startArrayElems;
-        num = numArrayElems;
+        Assert(startArrayVerts + numArrayVerts < 65535);
+        startElems = startArrayElems;
+        numElems = numArrayElems;
+        startVerts = startArrayVerts;
+        numVerts = numArrayVerts;
     }
 
     void studiolru_vbo_cache::DrawElements() const {
@@ -100,7 +111,7 @@ namespace xe {
         pglVertexAttribPointerARB(g_pstudioshader->attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, pos));
         pglVertexAttribPointerARB(g_pstudioshader->attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, coord));
         pglVertexAttribPointerARB(g_pstudioshader->attrib.vaNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, norm));
-        pglDrawElements( GL_TRIANGLES, num, GL_UNSIGNED_SHORT, (const GLvoid *)(start * sizeof(unsigned short)) );
+        pglDrawRangeElements( GL_TRIANGLES, startVerts, numVerts, numElems, GL_UNSIGNED_SHORT, (const GLvoid *)(startElems * sizeof(unsigned short)) );
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
@@ -133,9 +144,9 @@ namespace xe {
         current_studiolru_vbo = nullptr;
     }
 
-    void StudioLru_Submit(int startArrayElems, int numArrayElems)
+    void StudioLru_Submit(int startArrayElems, int numArrayElems, int startArrayVerts, int numArrayVerts)
     {
-        current_studiolru_vbo->Submit(startArrayElems, numArrayElems);
+        current_studiolru_vbo->Submit(startArrayElems, numArrayElems, startArrayVerts, numArrayVerts);
     }
 
     void StudioLru_DrawMesh()

@@ -55,6 +55,10 @@ qboolean	error_on_exit = false;	// arg for exit();
 #include <winbase.h>
 #endif
 
+#ifndef XASH_DEDICATED
+#include "client.h"
+#endif
+
 /*
 ================
 Sys_DoubleTime
@@ -928,9 +932,15 @@ void Sys_Print( const char *pMsg )
 	Rcon_Print( pMsg );
 }
 
+#ifndef XASH_DEDICATED
+extern void BoneQuatLru_Shrink();
+#endif
+
 void Sys_LowMemory()
 {
 #ifndef XASH_DEDICATED
+    if(cls.state != ca_active && cls.state != ca_disconnected)
+        return;
     qboolean CL_FreeLowPriorityTempEnt( void );
     void CL_ClearViewBeams( void );
     void CL_ClearParticles( void );
@@ -938,6 +948,7 @@ void Sys_LowMemory()
     MsgDev( D_INFO, "Sys_LowMemory: cleaning cache\n" );
     xe::TexLru_Shrink();
     xe::StudioLru_Shrink();
+    BoneQuatLru_Shrink();
     CL_FreeLowPriorityTempEnt();
     CL_ClearViewBeams ();
     CL_ClearParticles();

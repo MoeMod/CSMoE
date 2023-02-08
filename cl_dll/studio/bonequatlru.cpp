@@ -210,3 +210,8 @@ namespace cl {
 		}
 	}
 }
+
+void BoneQuatLru_Shrink()
+{
+    cl::bonequatlru.clear();
+}

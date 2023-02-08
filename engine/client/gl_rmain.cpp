@@ -40,6 +40,7 @@ GNU General Public License for more details.
 #endif
 
 #include <type_traits>
+#include <tuple>
 
 #define IsLiquidContents( cnt )	( cnt == CONTENTS_WATER || cnt == CONTENTS_SLIME || cnt == CONTENTS_LAVA )
 
@@ -157,7 +158,7 @@ Sorting opaque entities by model type
 static float R_CalcDistance(cl_entity_t *ent1)
 {
     vec3_t		vecLen, org;
-    if( ent1->model->type == mod_brush )
+    if( ent1->model && ent1->model->type == mod_brush )
     {
         VectorAverage( ent1->model->mins, ent1->model->maxs, org );
         VectorAdd( ent1->origin, org, org );
@@ -169,11 +170,7 @@ static float R_CalcDistance(cl_entity_t *ent1)
 
 static bool R_SolidEntityCompare( cl_entity_t *ent1, cl_entity_t *ent2 )
 {
-    // first sort by model type, first brush then studio
-    if(ent1->model->type != ent2->model->type)
-        return ent1->model->type < ent2->model->type;
-    // draw from near to far to avoid overdraw
-    return R_CalcDistance(ent1) < R_CalcDistance(ent2);
+    return std::make_pair(ent1->model->type, R_CalcDistance(ent1)) < std::make_pair(ent2->model->type, R_CalcDistance(ent2));
 }
 
 /*
@@ -187,10 +184,7 @@ static bool R_TransEntityCompare( cl_entity_t *ent1, cl_entity_t *ent2 )
 {
     // now sort by rendermode
     int render1 = R_RankForRenderMode(ent1), render2 = R_RankForRenderMode(ent2);
-    if(render1 != render2)
-        return render1 < render2;
-    // then by distance
-    return R_CalcDistance(ent1) > R_CalcDistance(ent2);
+    return std::make_pair(render1, R_CalcDistance(ent2)) < std::make_pair(render2, R_CalcDistance(ent1));
 }
 
 /*
@@ -816,12 +810,12 @@ static void R_SetupFrame( void )
     R_RunViewmodelEvents();
 
     // sort opaque entities by model type to avoid drawing model shadows under alpha-surfaces
-    std::sort( tr.solid_entities, tr.solid_entities + tr.num_solid_entities, R_SolidEntityCompare );
+    std::stable_sort( tr.solid_entities, tr.solid_entities + tr.num_solid_entities, R_SolidEntityCompare );
 
     if( !gl_nosort->integer )
     {
         // sort translucents entities by rendermode and distance
-        std::sort( tr.trans_entities, tr.trans_entities + tr.num_trans_entities, R_TransEntityCompare );
+        std::stable_sort( tr.trans_entities, tr.trans_entities + tr.num_trans_entities, R_TransEntityCompare );
     }
 
     // current viewleaf
@@ -1414,7 +1408,7 @@ void R_EndFrame( void )
     BOOL wrap_wglSwapBuffers(HDC);
     wrap_wglSwapBuffers(NULL);
 #elif defined(XASH_SDL)
-#if defined __ANDROID__ && (defined(XASH_WES) || defined(XASH_GL4ES))
+#if 0 && defined __ANDROID__ && (defined(XASH_WES) || defined(XASH_GL4ES))
     // skip useless lock
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);

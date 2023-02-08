@@ -142,8 +142,6 @@ static GLubyte		g_xarraycolor[MAXARRAYVERTS][4];
 static unsigned short		g_xarrayelems[MAXARRAYVERTS*6];
 static vec3_t		g_lightvalues[MAXSTUDIOVERTS];
 #endif
-static uint		g_nNumArrayVerts;
-static uint		g_nNumArrayElems;
 static studiolight_t	g_studiolight;
 int			g_nStudioCount;		// for chrome update
 int			g_iRenderMode;		// currentmodel rendermode
@@ -1426,8 +1424,10 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 {
 	GLubyte alpha = 255 * a;
 	int i;
-	uint startArrayVerts = g_nNumArrayVerts;
-	uint startArrayElems = g_nNumArrayElems;
+	uint startArrayVerts = 0;
+	uint startArrayElems = 0;
+	uint numArrayVerts = 0;
+	uint numArrayElems = 0;
 
     const byte *pvertbone = ((const byte *)m_pStudioHeader + m_pSubModel->vertinfoindex);
 
@@ -1461,7 +1461,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 			// build in indices
 			if( vertexState++ < 3 )
 			{
-                arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                arrayelems[numArrayElems++] = numArrayVerts;
 			}
 			else if( tri_strip )
 			{
@@ -1469,24 +1469,24 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				if( vertexState & 1 )
 				{
 					// draw triangle [n-2 n-1 n]
-                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
-                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                    arrayelems[numArrayElems++] = numArrayVerts - 2;
+                    arrayelems[numArrayElems++] = numArrayVerts - 1;
+                    arrayelems[numArrayElems++] = numArrayVerts;
 				}
 				else
 				{
 					// draw triangle [n-1 n-2 n]
-                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
-                    arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                    arrayelems[numArrayElems++] = numArrayVerts - 1;
+                    arrayelems[numArrayElems++] = numArrayVerts - 2;
+                    arrayelems[numArrayElems++] = numArrayVerts;
 				}
 			}
 			else
 			{
 				// draw triangle fan [0 n-1 n]
-                arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - ( vertexState - 1 );
-                arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-                arrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                arrayelems[numArrayElems++] = numArrayVerts - ( vertexState - 1 );
+                arrayelems[numArrayElems++] = numArrayVerts - 1;
+                arrayelems[numArrayElems++] = numArrayVerts;
 			}
 
 			vec3_t av, nv;
@@ -1512,13 +1512,13 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 			}
 #endif
 
-			ASSERT( g_nNumArrayVerts < MAXARRAYVERTS );
+			ASSERT( numArrayVerts < MAXARRAYVERTS );
 #ifdef XASH_SHADER
             {
-                R_MeshUV(ptricmds, vboattrs[g_nNumArrayVerts].coord, s, t);
-                VectorCopy(av, vboattrs[g_nNumArrayVerts].pos); // store off vertex
-                vboattrs[g_nNumArrayVerts].boneIdx = pvertbone[ptricmds[0]];
-                VectorCopy(nv, vboattrs[g_nNumArrayVerts].norm); // store off vertex
+                R_MeshUV(ptricmds, vboattrs[numArrayVerts].coord, s, t);
+                VectorCopy(av, vboattrs[numArrayVerts].pos); // store off vertex
+                vboattrs[numArrayVerts].boneIdx = pvertbone[ptricmds[0]];
+                VectorCopy(nv, vboattrs[numArrayVerts].norm); // store off vertex
             }
 #else
             {
@@ -1527,7 +1527,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
                 VectorCopy( av, g_xarrayverts[g_nNumArrayVerts] ); // store off vertex
             }
 #endif
-			g_nNumArrayVerts++;
+            numArrayVerts++;
 		}
 	}
 
@@ -1536,14 +1536,14 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 #ifdef XASH_SHADER_VBO
         //pglUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
         //pglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
-        pglBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, startArrayElems * sizeof(unsigned short), (g_nNumArrayElems - startArrayElems) * sizeof(unsigned short), arrayelems + startArrayElems);
-        pglBufferSubDataARB(GL_ARRAY_BUFFER_ARB, startArrayVerts * sizeof(studio_vertex_attrib_item_t), (g_nNumArrayVerts - startArrayVerts) * sizeof(studio_vertex_attrib_item_t), vboattrs + startArrayVerts);
+        pglBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, startArrayElems * sizeof(unsigned short), (numArrayElems - startArrayElems) * sizeof(unsigned short), arrayelems + startArrayElems);
+        pglBufferSubDataARB(GL_ARRAY_BUFFER_ARB, startArrayVerts * sizeof(studio_vertex_attrib_item_t), (numArrayVerts - startArrayVerts) * sizeof(studio_vertex_attrib_item_t), vboattrs + startArrayVerts);
 #else
         // no copy
 #endif
 
 #ifdef XASH_SHADER_VBO
-        xe::StudioLru_Submit(startArrayElems, g_nNumArrayElems - startArrayElems);
+        xe::StudioLru_Submit(startArrayElems, numArrayElems - startArrayElems, startArrayVerts, numArrayVerts - startArrayVerts);
 #else
         pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
         pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
@@ -1847,8 +1847,6 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	float		*lv, scale = 0.0f;
 
 	R_StudioSetupTextureHeader ();
-
-	g_nNumArrayVerts = g_nNumArrayElems = 0;
 
 	if( !m_pTextureHeader || !m_pTextureHeader->numskinfamilies ) return;
 	if( RI.currententity->curstate.renderfx == kRenderFxGlowShell )

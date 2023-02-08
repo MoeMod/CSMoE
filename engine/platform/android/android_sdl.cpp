@@ -66,6 +66,11 @@ DECLARE_JNI_INTERFACE_VOID( int, nativeGetBuildVersion )
 	return Q_buildnum();
 }
 
+DECLARE_JNI_INTERFACE_VOID( void, nativeOnLowMemory )
+{
+    return Sys_LowMemory();
+}
+
 void Android_SetupJNI()
 {
 	/* Init callbacks. */
