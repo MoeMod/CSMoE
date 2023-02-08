@@ -227,7 +227,9 @@ public:
 		EXPTYPE_THANATOS5ROCKET,
 		EXPTYPE_VULCANUS7ROCKET,
 		EXPTYPE_FIREBOMB,
-		EXPTYPE_HK121ROCKET
+		EXPTYPE_HK121ROCKET,
+		EXPTYPE_CHINAEVENTBOMB,
+		EXPTYPE_Y20S1GRENADE,
 	};
 
 	void Spawn() override;
@@ -297,7 +299,9 @@ public:
 	void EXPORT Detonate3();
 	void EXPORT DetonateCartFrag(void);
 	void EXPORT DetonateEventBomb(void);
+	void EXPORT DetonateChinaEventBomb(void);
 	void EXPORT DetonateMoonCake(void);
+	void EXPORT DetonateY20S1Grenade(void);
 	void EXPORT DetonateFireBomb(void);
 	void EXPORT ZombieBombExplosion();
 	void EXPORT DetonateUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
@@ -310,8 +314,10 @@ public:
 	void EXPORT HolyBombThink(void);
 	void EXPORT HolyBombTouch(CBaseEntity* pOther);
 	void ExplodeTouchHolyBomb(void);
-	static void HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
-	static void FireBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
+	void HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
+	void FireBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
+	void ChinaEventBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius);
+	void WaterBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius);
 	void EXPORT SFGrenadeExplodeThink(void);
 	void EXPORT SFGrenadeTouch(CBaseEntity* pOther);
 
@@ -1699,6 +1705,7 @@ extern int DamageDecal(CBaseEntity *pEntity, int bitsDamageType);
 extern void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage);
 extern void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
 extern void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType, bool bHasFalloff = 1, bool bDamageSelf = 1, bool DamageBsp = 1, int canheadshot = 0, bool bDamageMate = 0, int ExtraKnockBack = 0);
+extern bool RadiusDamage4(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
 extern void AddKickRate(CBaseEntity* pEntity, Vector vecSrc, float amount, float boost);
 }
 #else

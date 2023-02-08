@@ -690,6 +690,15 @@
 
 #define TE_FALLPARTICLE 138
 
+#define TE_FOLLOWINGGRENADE		150
+// short (entindex)
+// short (model)
+// coord coord coord (offset)
+// coord
+// coord
+// coord
+// byte (life)
+
 #define MSG_BROADCAST		0	// unreliable to all
 #define MSG_ONE			1	// reliable to one (msg_entity)
 #define MSG_ALL			2	// reliable to all

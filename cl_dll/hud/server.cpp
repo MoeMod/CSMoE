@@ -74,6 +74,7 @@ enum
 	SBMINE_DEBUFF,
 	CHAINSR_SHADOWSHOOT,
 	CHAINSR_SHADOWSHOOT2,
+	HOLYBOMBEX_BURN,
 };
 
 bool bHaloGunLoopRetinaOn;
@@ -756,6 +757,42 @@ void EV_Explosion(int type, Vector origin)
 		pEnt->die = gHUD.m_flTime + pEnt->entity.curstate.iuser1 / 15.0;
 		break;
 	}
+	case 3:
+	{
+		origin[2] += 25.0f;
+
+		struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_waterbomb2.spr", false);
+		if (pModel)
+		{
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+			pEnt->die = gHUD.m_flTime + 200.0f;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 230;
+			pEnt->entity.curstate.scale = 0.1;
+			pEnt->entity.curstate.frame = 0;
+			pEnt->entity.curstate.framerate = 0;
+			pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 1.0f;
+			pEnt->frameMax = ModelFrameCount(pModel) - 1;
+
+			pEnt->flags |= FTENT_CLIENTCUSTOM;
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+			{
+				if (pEnt->entity.curstate.fuser1 <= gHUD.m_flTime)
+				{
+					pEnt->die = gHUD.m_flTime;
+				}
+				else
+				{
+					float percent = pEnt->entity.curstate.fuser1 - gHUD.m_flTime;
+					pEnt->entity.curstate.frame = pEnt->frameMax * (1.0f - percent);
+					pEnt->entity.curstate.renderamt = 230 * percent;
+					pEnt->entity.curstate.scale += 0.025;
+				}
+			};
+		}
+
+		break;
+	}
 	}
 }
 
@@ -933,6 +970,12 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 	case HOLYBOMB_BURN:
 	{
 		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/holybomb_burn.spr"),
+			Vector(0.0, 0.0, 30.0), 5.0, TRUE, flags, 0.9, kRenderTransAdd, 10.0);
+		break;
+	}
+	case HOLYBOMBEX_BURN:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/holybombex_burn.spr"),
 			Vector(0.0, 0.0, 30.0), 5.0, TRUE, flags, 0.9, kRenderTransAdd, 10.0);
 		break;
 	}

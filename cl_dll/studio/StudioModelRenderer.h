@@ -150,6 +150,10 @@ public:
 	static struct model_s* s_pLaserSGPModel;
 	static struct model_s* s_pSPKnifeViewModel;
 	static struct model_s* s_pHaloGunPModel;
+	static struct model_s* s_pStickyBombViewModel;
+	static struct model_s* s_pStickyBombIdleRModel;
+	static struct model_s* s_pStickyBombIdleGModel;
+	static struct model_s* s_pStickyBombPModel;
 };
 
 }

@@ -266,6 +266,11 @@ int DLLEXPORT HUD_VidInit( void )
 
 	CStudioModelRenderer::s_pHaloGunPModel = IEngineStudio.Mod_ForName("models/p_halogun.mdl", FALSE);
 
+	CStudioModelRenderer::s_pStickyBombViewModel = IEngineStudio.Mod_ForName("models/v_stickybomb.mdl", FALSE);
+	CStudioModelRenderer::s_pStickyBombIdleRModel = IEngineStudio.Mod_ForName("sprites/ef_stickybomb_idle_r.spr", FALSE);
+	CStudioModelRenderer::s_pStickyBombIdleGModel = IEngineStudio.Mod_ForName("sprites/ef_stickybomb_idle_g.spr", FALSE);
+
+	CStudioModelRenderer::s_pStickyBombPModel = IEngineStudio.Mod_ForName("models/p_stickybomb.mdl", FALSE);
 
 	//VGui_Startup();
 

@@ -135,7 +135,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "tknifeex",	WEAPON_TKNIFEEX },
 	{ "tknifeex2",	WEAPON_TKNIFEEX2 },
 	{ "tknifedx",	WEAPON_Z4B_TKNIFEDX },
-	{ "malorian3516" , WEAPON_Z4B_MALORIAN3516},
+	{ "z4b_malorian3516" , WEAPON_Z4B_MALORIAN3516},
 	{ "dfpistol" , WEAPON_DFPISTOL},
 	{ "turbulent1" , WEAPON_TURBULENT1},
 	{ "vulcanus1" , WEAPON_VULCANUS1},
@@ -337,6 +337,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "laserminigun",	WEAPON_LASERMINIGUN },
 	{ "vulcanus7",	WEAPON_VULCANUS7 },
 	{ "hk121ex",	WEAPON_HK121EX },
+	{ "z4b_mechanicxm214",	WEAPON_Z4B_MECHANICXM214 },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -444,7 +445,7 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_turbulent9",	KNIFE_TURBULENT9 },
 	{ "knife_ironfan",	KNIFE_IRONFAN },
 	{ "knife_swordbombard",	KNIFE_SWORDBOMBARD },
-
+	{ "z4b_mechanichand",	KNIFE_MECHANICHAND },
 
 	
 };
@@ -469,6 +470,11 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_chaingren", GRENADE_CHAINGRENADE },
 	{ "weapon_sbmine", GRENADE_SBMINE },
 	{ "weapon_claymore", GRENADE_CLAYMORE },
+	{ "weapon_stickybomb", GRENADE_STICKYBOMB },
+	{ "weapon_holybomb_ex", GRENADE_HOLYBOMBEX },
+	{ "weapon_y20s1grenade", GRENADE_Y20S1GRENADE },
+	{ "weapon_waterbomb", GRENADE_WATERBOMB },
+	{ "weapon_chinaeventbomb", GRENADE_CHINAEVENTBOMB },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -606,7 +612,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "tknifeex",	WEAPONCLASS_PISTOL },
 	{ "tknifeex2",	WEAPONCLASS_PISTOL },
 	{ "tknifedx",	WEAPONCLASS_PISTOL },
-	{ "malorian3516" , WEAPONCLASS_PISTOL},
+	{ "z4b_malorian3516" , WEAPONCLASS_PISTOL},
 	{ "dfpistol" , WEAPONCLASS_PISTOL},
 	{ "turbulent1" , WEAPONCLASS_PISTOL},
 	{ "vulcanus1" , WEAPONCLASS_PISTOL},
@@ -812,6 +818,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "laserminigun",	WEAPONCLASS_MACHINEGUN },
 	{ "vulcanus7",	WEAPONCLASS_MACHINEGUN },
 	{ "hk121ex",	WEAPONCLASS_MACHINEGUN },
+	{ "z4b_mechanicxm214",	WEAPONCLASS_MACHINEGUN },
 
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsawm",	WEAPONCLASS_EQUIPMENT },

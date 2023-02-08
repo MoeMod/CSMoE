@@ -652,7 +652,14 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_janus1.cpp
 	../dlls/wpn_shared/wpn_halogun.cpp
 	../dlls/wpn_shared/wpn_chainsr.cpp
-	../dlls/wpn_shared/z4b_mechanichero.cpp
+	../dlls/wpn_shared/z4b_mechanicherogun.cpp
+	../dlls/wpn_shared/z4b_mechanicxm214.cpp
+	../dlls/wpn_shared/z4b_mechanichand.cpp
+	../dlls/wpn_shared/wpn_stickybomb.cpp
+	../dlls/wpn_shared/wpn_holybombex.cpp
+	../dlls/wpn_shared/wpn_waterbomb.cpp
+	../dlls/wpn_shared/wpn_y20s1grenade.cpp
+	../dlls/wpn_shared/wpn_chinaeventbomb.cpp
 	)
 
 set(PM_SRCS

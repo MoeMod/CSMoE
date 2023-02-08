@@ -119,6 +119,11 @@ struct model_s* CStudioModelRenderer::s_pSPKnifeViewModel;
 
 struct model_s* CStudioModelRenderer::s_pHaloGunPModel;
 
+struct model_s* CStudioModelRenderer::s_pStickyBombViewModel;
+struct model_s* CStudioModelRenderer::s_pStickyBombIdleRModel;
+struct model_s* CStudioModelRenderer::s_pStickyBombIdleGModel;
+struct model_s* CStudioModelRenderer::s_pStickyBombPModel;
+
 void CStudioModelRenderer::Init(void)
 {
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");

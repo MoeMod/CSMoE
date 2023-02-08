@@ -4132,6 +4132,26 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							killer_weapon_name = "chaingren";
 							break;
 
+						case GRENADE_STICKYBOMB:
+							killer_weapon_name = "stickybomb";
+							break;
+
+						case GRENADE_HOLYBOMBEX:
+							killer_weapon_name = "holybomb_ex";
+							break;
+
+						case GRENADE_Y20S1GRENADE:
+							killer_weapon_name = "y20s1grenade";
+							break;
+
+						case GRENADE_WATERBOMB:
+							killer_weapon_name = "waterbomb";
+							break;
+
+						case GRENADE_CHINAEVENTBOMB:
+							killer_weapon_name = "chinaeventbomb";
+							break;
+
 						default:
 							killer_weapon_name = "grenade";
 							break;
@@ -4353,6 +4373,26 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 
 					case GRENADE_CHAINGRENADE:
 						killer_weapon_name = "chaingren";
+						break;
+
+					case GRENADE_STICKYBOMB:
+						killer_weapon_name = "stickybomb";
+						break;
+
+					case GRENADE_HOLYBOMBEX:
+						killer_weapon_name = "holybomb_ex";
+						break;
+
+					case GRENADE_Y20S1GRENADE:
+						killer_weapon_name = "y20s1grenade";
+						break;
+
+					case GRENADE_WATERBOMB:
+						killer_weapon_name = "waterbomb";
+						break;
+
+					case GRENADE_CHINAEVENTBOMB:
+						killer_weapon_name = "chinaeventbomb";
 						break;
 
 					default:

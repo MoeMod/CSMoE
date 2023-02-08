@@ -1187,6 +1187,7 @@ Writes all update values to a bitbuf
 void SV_FullClientUpdate( sv_client_t *cl, sizebuf_t *msg )
 {
 	char	info[MAX_INFO_STRING];
+	info[0] = '\0';
 	int	i;
 
 	i = cl - svs.clients;

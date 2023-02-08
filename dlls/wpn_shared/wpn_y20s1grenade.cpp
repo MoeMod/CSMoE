@@ -3,7 +3,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-#include "z4b_mechanichero.h"
+#include "wpn_hegrenade.h"
 
 #include "monsters.h"
 #include "decals.h"
@@ -11,7 +11,7 @@
 #include "cbase/cbase_hash.h"
 
 #ifndef CLIENT_DLL
-#include "gamemode/zbz/sentrygun.h"
+#include "player/player_mod_strategy.h"
 #endif
 
 #ifdef CLIENT_DLL
@@ -20,28 +20,36 @@ namespace cl {
 namespace sv {
 #endif
 
-LINK_ENTITY_TO_CLASS(z4b_mechanicherogun, CMechanicHeroGun)
+LINK_ENTITY_TO_CLASS(weapon_y20s1grenade, CY20S1Grenade)
 
-void CMechanicHeroGun::Spawn(void)
+void CY20S1Grenade::Spawn(void)
 {
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
-	SET_MODEL(ENT(pev), "models/w_mechanicherogun.mdl");
+	SET_MODEL(ENT(pev), "models/w_y20s1grenade.mdl");
 
 	m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE;
 	m_flStartThrow = invalid_time_point;
 	m_flReleaseThrow = invalid_time_point;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
-
+	m_flExplodeTime = 1.5s;
+	m_flIdleSoundTime = invalid_time_point;
 	FallInit();
 }
 
-void CMechanicHeroGun::Precache(void)
+void CY20S1Grenade::Precache(void)
 {
-	PRECACHE_MODEL("models/z4b/v_sentrygun.mdl");
+	PRECACHE_MODEL("models/v_y20s1grenade.mdl");
+	PRECACHE_MODEL("models/p_y20s1grenade.mdl");
+	PRECACHE_MODEL("models/w_y20s1grenade.mdl");
+
+	PRECACHE_SOUND("weapons/y20s1grenade_idle.wav");
+	PRECACHE_SOUND("weapons/y20s1grenade_exp.wav");
+
+	m_usCreateExplosion = PRECACHE_EVENT(1, "events/createexplo.sc");
 }
 
-int CMechanicHeroGun::GetItemInfo(ItemInfo *p)
+int CY20S1Grenade::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "HEGrenade";
@@ -58,20 +66,20 @@ int CMechanicHeroGun::GetItemInfo(ItemInfo *p)
 	return 1;
 }
 
-BOOL CMechanicHeroGun::Deploy(void)
+BOOL CY20S1Grenade::Deploy(void)
 {
 	m_flReleaseThrow = invalid_time_point;
 	m_fMaxSpeed = 250;
 
-	return DefaultDeploy("models/z4b/v_sentrygun.mdl", "models/p_mechanicherogun.mdl", ANIM_DRAW, "grenade", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_y20s1grenade.mdl", "models/p_y20s1grenade.mdl", HEGRENADE_DRAW, "grenade", UseDecrement() != FALSE);
 }
 
-BOOL CMechanicHeroGun::CanHolster(void)
+BOOL CY20S1Grenade::CanHolster(void)
 {
 	return CBasePlayerWeapon::CanHolster();
 }
 
-void CMechanicHeroGun::Holster(int skiplocal)
+void CY20S1Grenade::Holster(int skiplocal)
 {
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
 
@@ -85,27 +93,50 @@ void CMechanicHeroGun::Holster(int skiplocal)
 	m_flReleaseThrow = invalid_time_point;
 }
 
-void CMechanicHeroGun::PrimaryAttack(void)
+void CY20S1Grenade::PrimaryAttack(void)
 {
 	if (m_flStartThrow == invalid_time_point && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
 	{
 		m_flStartThrow = gpGlobals->time;
 		m_flReleaseThrow = invalid_time_point;
-		SendWeaponAnim(ANIM_FIRE, UseDecrement() != FALSE);
+		SendWeaponAnim(HEGRENADE_PULLPIN, UseDecrement() != FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
 	}
 }
 
-void CMechanicHeroGun::WeaponIdle(void)
+void CY20S1Grenade::SecondaryAttack(void)
+{
+	if (m_flExplodeTime > 5s)
+		return;
+
+	SendWeaponAnim(4, UseDecrement() != FALSE);
+
+	m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
+
+	m_flExplodeTime = m_flExplodeTime + 1s;
+}
+
+void CY20S1Grenade::WeaponIdle(void)
 {
 	if (m_flReleaseThrow == invalid_time_point && m_flStartThrow != invalid_time_point)
 		m_flReleaseThrow = gpGlobals->time;
+
+	if (m_flIdleSoundTime < gpGlobals->time && pev->weaponanim == 0)
+	{
+		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/y20s1grenade_idle.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+		m_flIdleSoundTime = gpGlobals->time + 1s;
+	}
 
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
 	if (m_flStartThrow != invalid_time_point)
 	{	
+#ifndef CLIENT_DLL
+		m_pPlayer->Radio("%!MRAD_FIREINHOLE", "#Fire_in_the_hole");
+#endif
 		Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
 
 		if (angThrow.x < 0)
@@ -116,19 +147,20 @@ void CMechanicHeroGun::WeaponIdle(void)
 		float flVel = 750;
 
 		UTIL_MakeVectors(angThrow);
-		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 60;
+		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
+		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75s;
+
+		CGrenade::ShootTimed2(m_pPlayer->pev, vecSrc, vecThrow, m_flExplodeTime, m_pPlayer->m_iTeam, m_usCreateExplosion);
+
+#ifndef CLIENT_DLL
+		m_pPlayer->m_pModStrategy->ShootGrenade(std::bind(CGrenade::ShootTimed2, m_pPlayer->pev, vecSrc, vecThrow, m_flExplodeTime, m_pPlayer->m_iTeam, m_usCreateExplosion));
+#endif
+		SendWeaponAnim(HEGRENADE_THROW, UseDecrement() != FALSE);
+		SetPlayerShieldAnim();
 
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-
-		CSentryGun* pSentryGun = CSentryGun::Create(vecSrc, m_pPlayer->pev->v_angle, m_pPlayer->m_iTeam);
-
-		if (pSentryGun)
-		{
-			pSentryGun->m_iTeam = m_pPlayer->m_iTeam;
-			pSentryGun->m_pOwner = m_pPlayer;
-		}
 #endif
 		m_flStartThrow = invalid_time_point;
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
@@ -146,7 +178,9 @@ void CMechanicHeroGun::WeaponIdle(void)
 
 		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 		{
-			SendWeaponAnim(ANIM_DRAW, UseDecrement() != FALSE);
+			m_flExplodeTime = 1.5s;
+
+			SendWeaponAnim(HEGRENADE_DRAW, UseDecrement() != FALSE);
 			m_flReleaseThrow = invalid_time_point;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RandomDuration<float>(10s, 15s);
 		}
@@ -158,12 +192,12 @@ void CMechanicHeroGun::WeaponIdle(void)
 
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 	{
-		SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
+		SendWeaponAnim(HEGRENADE_IDLE, UseDecrement() != FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RandomDuration<float>(10s, 15s);
 	}
 }
 
-BOOL CMechanicHeroGun::CanDeploy(void)
+BOOL CY20S1Grenade::CanDeploy(void)
 {
 	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
 }

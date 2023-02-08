@@ -196,11 +196,15 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	case CT:
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
+		//m_pPlayer->GiveNamedItem("weapon_stickybomb");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
+		//m_pPlayer->GiveNamedItem("z4b_mechanicherogun");
 		m_pPlayer->GiveNamedItem("weapon_knife");
+		//m_pPlayer->GiveNamedItem("z4b_mechanicxm214");
+		//m_pPlayer->GiveNamedItem("z4b_mechanichand");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
@@ -496,7 +500,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 				TargetPlayer->GiveNamedItem("weapon_revivegun");
 				TargetPlayer->GiveNamedItem("weapon_y22s2sfpistol");
 				TargetPlayer->GiveNamedItem("knife_lance");
-
+				TargetPlayer->GiveNamedItem("weapon_stickybomb");
 				GiveSlotAmmo(TargetPlayer, 1);
 				GiveSlotAmmo(TargetPlayer, 2);
 				//TargetPlayer->m_iBuff |= BUFF_AVOID_INFECT;

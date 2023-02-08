@@ -335,4 +335,151 @@ public:
 	unsigned short m_usCreateExplosion;
 };
 
+
+class CStickyBomb : public CBasePlayerWeapon
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual int GetItemInfo(ItemInfo* p);
+	virtual BOOL CanDeploy();
+	virtual BOOL CanDrop() { return FALSE; }
+	virtual BOOL CanHolster();
+	virtual BOOL Deploy();
+	virtual void Holster(int skiplocal);
+	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
+	virtual int iItemSlot() { return GRENADE_SLOT; }
+	virtual void PrimaryAttack();
+	virtual void SecondaryAttack();
+	virtual void ItemPostFrame();
+	virtual void WeaponIdle();
+	virtual BOOL UseDecrement()
+	{
+#ifdef CLIENT_WEAPONS
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+public:
+	int m_iLastAnim;
+	int m_usFire;
+};
+
+class CHolyBombEX : public CBasePlayerWeapon
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual int GetItemInfo(ItemInfo* p);
+	virtual BOOL CanDeploy();
+	virtual BOOL CanDrop() { return FALSE; }
+	virtual BOOL CanHolster();
+	virtual BOOL Deploy();
+	virtual void Holster(int skiplocal);
+	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
+	virtual int iItemSlot() { return GRENADE_SLOT; }
+	virtual void PrimaryAttack();
+	virtual void WeaponIdle();
+	virtual BOOL UseDecrement()
+	{
+#ifdef CLIENT_WEAPONS
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+public:
+	unsigned short m_usCreateExplosion;
+};
+
+class CChinaEventBomb : public CBasePlayerWeapon
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual int GetItemInfo(ItemInfo* p);
+	virtual BOOL CanDeploy();
+	virtual BOOL CanDrop() { return FALSE; }
+	virtual BOOL CanHolster();
+	virtual BOOL Deploy();
+	virtual void Holster(int skiplocal);
+	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
+	virtual int iItemSlot() { return GRENADE_SLOT; }
+	virtual void PrimaryAttack();
+	virtual void WeaponIdle();
+	virtual BOOL UseDecrement()
+	{
+#ifdef CLIENT_WEAPONS
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+public:
+	unsigned short m_usCreateExplosion;
+};
+
+class CY20S1Grenade : public CBasePlayerWeapon
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual int GetItemInfo(ItemInfo* p);
+	virtual BOOL CanDeploy();
+	virtual BOOL CanDrop() { return FALSE; }
+	virtual BOOL CanHolster();
+	virtual BOOL Deploy();
+	virtual void Holster(int skiplocal);
+	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
+	virtual int iItemSlot() { return GRENADE_SLOT; }
+	virtual void PrimaryAttack();
+	virtual void SecondaryAttack();
+	virtual void WeaponIdle();
+	virtual BOOL UseDecrement()
+	{
+#ifdef CLIENT_WEAPONS
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+public:
+	duration_t m_flExplodeTime;
+	time_point_t m_flIdleSoundTime;
+	unsigned short m_usCreateExplosion;
+};
+
+class CWaterBomb : public CBasePlayerWeapon
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual int GetItemInfo(ItemInfo* p);
+	virtual BOOL CanDeploy();
+	virtual BOOL CanDrop() { return FALSE; }
+	virtual BOOL CanHolster();
+	virtual BOOL Deploy();
+	virtual void Holster(int skiplocal);
+	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
+	virtual int iItemSlot() { return GRENADE_SLOT; }
+	virtual void PrimaryAttack();
+	virtual void WeaponIdle();
+	virtual BOOL UseDecrement()
+	{
+#ifdef CLIENT_WEAPONS
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+public:
+	unsigned short m_usCreateExplosion;
+};
+
 }
