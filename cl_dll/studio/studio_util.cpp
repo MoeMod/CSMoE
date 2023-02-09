@@ -153,43 +153,28 @@ QuaternionSlerp
 */
 void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t q, float t, vec4_t_ref qt)
 {
-#if 0
-        float cosom, sclp, sclq;
-
+#if defined(XASH_SIMD) && U_VECTOR_NEON
     // q = (cos(a/2), xsin(a/2), ysin(a/2), zsin(a/2))
     // cos(a-b) = cosacosb+sinasinb
-    cosom = DotProduct(p, q);
+    const uint32x4_t signmask = vdupq_n_u32(0x80000000);
+    const float32x4_t one_minus_epsilon = vdupq_n_f32(1.0f - 0.00001f);
 
-	if (cosom < 0)
-	{
-        q = -q;
-        cosom = -cosom;
-	}
+    float32x4_t vcosom = vdupq_n_f32(DotProduct(p, q));
+    uint32x4_t sign =  vandq_u32(vreinterpretq_u32_f32(vcosom), signmask);
+    q = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q), sign));
+    vcosom = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(vcosom), sign));
 
-    if ((1.0 - cosom) > 0.000001)
-    {
-        float omega = acos(cosom);
-#ifdef XASH_SIMD
-        vec3_t x = { omega, (1.0f - t) * omega, t * omega };
-        vec3_t sinx = sin_ps(x);
-        float sinom = sinx[0];
-        sclp = sinx[1];
-        sclq = sinx[2];
-#else
-        float sinom = sin(omega);
+    vec4_t x = { (1.0f - t), t, 1, 0 }; // cosom -> 1, sinom -> 0, sinx ~ x
 
-        sclp = sin((1.0 - t) * omega);
-        sclq = sin(t * omega);
-#endif
-        qt = (sclp * p + sclq * q) / sinom;
-    }
-    else
-    {
-        // cosom -> 1, sinom -> 0, sinx ~ x
-        sclp = 1.0 - t;
-        sclq = t;
-        qt = sclp * p + sclq * q;
-    }
+    // if ((1.0 - cosom) > 0.000001) x = sin(x * omega)
+    uint32x4_t cosom_less_then_one = vcltq_f32(vcosom, one_minus_epsilon);
+    float32x4_t vomega = acos_ps(vcosom);
+    x = vbslq_f32(cosom_less_then_one, x, sin_ps(vmulq_f32(x, vomega)));
+
+    // qt = (x[0] * p + x[1] * q) / x[2];
+    qt = vmulq_laneq_f32(p, x, 0);
+    qt = vfmaq_laneq_f32(qt, q, x, 1);
+    qt = vdivq_f32(qt, vdupq_laneq_f32(x, 2)); // vdivq_laneq_f32 ?
 #else
 	int i;
 	float cosom, sclp, sclq;

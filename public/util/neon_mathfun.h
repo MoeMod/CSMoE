@@ -295,4 +295,63 @@ inline v4sf cos_ps(v4sf x) {
   return ycos;
 }
 
+static const float asinf_lut[7] = {
+        1.5707961728,
+        -0.2145852647,
+        0.0887556286,
+        -0.0488025043,
+        0.0268999482,
+        -0.0111462294,
+        0.0022959648
+};
+
+inline void asincos_ps(float32x4_t x, float32x4_t* yasin, float32x4_t* yacos)
+{
+    float32x4_t one = vdupq_n_f32(1);
+    float32x4_t negone = vdupq_n_f32(-1);
+    float32x4_t lut[7];
+    float32x4_t xv[5];
+    float32x4_t sat = vdupq_n_f32(0.9999999f);
+    float32x4_t m_pi_2 = vdupq_n_f32(1.570796326);
+    for (int i = 0; i <= 6; i++)
+        lut[i] = vdupq_n_f32(asinf_lut[i]);
+
+    uint32x4_t sign_mask_asin = vcltq_f32(x, vdupq_n_f32(0));
+    x = vabsq_f32(x);
+    uint32x4_t saturate = vcgeq_f32(x, one);
+    x = vbslq_f32(saturate, sat, x);
+    float32x4_t y = vsubq_f32(one, x);
+    y = vsqrtq_f32(y);
+
+    xv[0] = vmulq_f32(x, x);
+    for (int i = 1; i < 5; i++)
+        xv[i] = vmulq_f32(xv[i - 1], x);
+
+    float32x4_t a0 = vaddq_f32(lut[0], vmulq_f32(lut[1], x));
+    float32x4_t a1 = vaddq_f32(vmulq_f32(lut[2], xv[0]), vmulq_f32(lut[3], xv[1]));
+    float32x4_t a2 = vaddq_f32(vmulq_f32(lut[4], xv[2]), vmulq_f32(lut[5], xv[3]));
+    float32x4_t a3 = vmulq_f32(lut[6], xv[4]);
+    float32x4_t phx = vaddq_f32(vaddq_f32(a0, vaddq_f32(a1, a2)), a3);
+
+    float32x4_t arcsinx = vmulq_f32(y, phx);
+    arcsinx = vsubq_f32(m_pi_2, arcsinx);
+    float32x4_t arcnsinx = vmulq_f32(negone, arcsinx);
+    arcsinx = vbslq_f32(sign_mask_asin, arcnsinx, arcsinx);
+    *yasin = arcsinx;
+    *yacos = vsubq_f32(m_pi_2, arcsinx);
+}
+
+inline float32x4_t asin_ps(float32x4_t x)
+{
+    float32x4_t yasin, yacos;
+    asincos_ps(x, &yasin, &yacos);
+    return yasin;
+}
+
+inline float32x4_t acos_ps(float32x4_t x)
+{
+    float32x4_t yasin, yacos;
+    asincos_ps(x, &yasin, &yacos);
+    return yacos;
+}
 
