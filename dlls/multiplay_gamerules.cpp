@@ -23,7 +23,7 @@
 #include "weapons_moe_buy.h"
 #include "newmenus.h"
 #include "client/wdnmd.h"
-
+#include "wpn_shared/z4b_shovelex.h"
 #ifdef XASH_MYSQL
 #include "database/db_main.h"
 #endif
@@ -2543,9 +2543,17 @@ bool CHalfLifeMultiplay::AddToVIPQueue(CBasePlayer* toAdd)
 void CHalfLifeMultiplay::ResetCurrentVIP()
 {
 	char* infobuffer = GET_INFO_BUFFER(m_pVIP->edict());
+	
+	
+#if PLAYER_CLASS_SYSTEM
+	m_pVIP->m_iModelName = PlayerClassManager().PlayerClass_GetRandomClass();
+	m_pVIP->m_bIsFemale = PlayerClassManager().PlayerClass_IsFemale(m_pVIP->m_iModelName);
+	SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", PlayerClassManager().PlayerClass_GetModelName(m_pVIP->m_iModelName));
+#else
 	m_pVIP->m_iModelName = PlayerModel_GetRandomSkin();
 	m_pVIP->m_bIsFemale = PlayerModel_IsFemale(m_pVIP->m_iModelName, m_pVIP->m_iModelTeam);
 	SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", PlayerModel_GetApperance(m_pVIP->m_iModelName, m_pVIP->m_iModelTeam));
+#endif
 
 	m_pVIP->m_bIsVIP = false;
 	m_pVIP->m_bNotKilled = false;
@@ -4405,6 +4413,25 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 	}
 	else if (pevInflictor)
 		killer_weapon_name = STRING(pevInflictor->classname);
+
+	if (!Q_strcmp(killer_weapon_name, "z4b_shovelex"))
+	{
+		CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(CBaseEntity::Instance(pevInflictor));
+
+		switch (pWeapon->m_iWeaponState)
+		{
+		case 1:
+			killer_weapon_name = "knife_holysword"; break;
+		case 2:
+			killer_weapon_name = "knife_katana"; break;
+		case 3:
+			killer_weapon_name = "knife_janus9"; break;
+		case 4:
+			killer_weapon_name = "knife_axe"; break;
+		default:
+			break;
+		}	
+	}
 
 	// strip the monster_* or weapon_* from the inflictor's classname
 	if (!Q_strncmp(killer_weapon_name, "weapon_", 7))

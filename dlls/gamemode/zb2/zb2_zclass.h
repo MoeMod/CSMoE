@@ -67,7 +67,15 @@ class IZombieSkill;
 class CBaseZombieClass_ZB2 : public CZombie_ZB1, virtual public IZombieModeCharacter_ZB2
 {
 public:
-	explicit CBaseZombieClass_ZB2(CBasePlayer *player, ZombieLevel lv) : CZombie_ZB1(player, lv) {}
+	explicit CBaseZombieClass_ZB2(CBasePlayer *player, ZombieLevel lv) : CZombie_ZB1(player, lv) 
+	{
+		m_flInSmokeTime = invalid_time_point;
+		m_bSmokeReduceDamage = false;
+		m_flSmokeReduceDamageRate = 1.0;
+		m_bCanUseSkills = true;
+		m_tBanSkillsTime = invalid_time_point;
+		m_bForceStopSkills = false;
+	}
 	~CBaseZombieClass_ZB2() override;
 	float HealthRecoveryAmount() const override;
 	void ActivateSkill(ZombieSkillSlot which) override;
@@ -93,6 +101,9 @@ public:
 	bool m_bForceStopSkills;
 	bool m_bCanUseSkills;
 
+	time_point_t m_flInSmokeTime;
+	bool m_bSmokeReduceDamage;
+	float m_flSmokeReduceDamageRate;
 protected:
 	std::unique_ptr<IZombieSkill> m_pZombieSkill;
 	std::unique_ptr<IZombieSkill> m_pZombieSkill2;

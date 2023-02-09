@@ -56,12 +56,14 @@ namespace xe {
         auto& attr = g_textureAttrMap.at(ptexture);
         if ( ptexture->name[0] == '$' )
         {
+            attr.flags |= STUDIO_NF_FULLBRIGHT;
+
             if ( ptexture->name[1] == '0' && ptexture->name[2] == 'b' )
             {
-                attr.flags |= STUDIO_NF_ADDITIVE;
-                attr.flags |= STUDIO_NF_FULLBRIGHT;
+                attr.flags |= STUDIO_NF_ADDITIVE; 
             }
         }
+
 
         gltexture_t *gltex = R_GetTexture(attr.index);
         if (gltex)
@@ -77,10 +79,11 @@ namespace xe {
 
         if ( ptexture->name[0] == '$' )
         {
-            if ( ptexture->name[1] == '0' && ptexture->name[2] == 'b' )
+            attr.flags |= STUDIO_NF_FULLBRIGHT;
+
+            if (ptexture->name[1] == '0' && ptexture->name[2] == 'b')
             {
                 attr.flags |= STUDIO_NF_ADDITIVE;
-                attr.flags |= STUDIO_NF_FULLBRIGHT;
             }
         }
 
@@ -595,6 +598,14 @@ namespace xe {
         if(TexLru_Upload(attr.index))
             TexLru_UpdateAttr(ptexture);
         return GL_Bind( XASH_TEXTURE0, attr.index);
+    }
+
+    void TexLru_BindReplace(const mstudiotexture_t* ptexture, int texnum)
+    {
+        // set size for external texture
+        if (TexLru_Upload(texnum))
+            TexLru_UpdateAttr(ptexture);
+        return GL_Bind(XASH_TEXTURE0, texnum);
     }
 
     void TexLru_Bind(const mspriteframe_t *pspriteframe)

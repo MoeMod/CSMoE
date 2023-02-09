@@ -36,6 +36,7 @@ GNU General Public License for more details.
 #include "entity_state.h"
 #include "wpn_shared/wpn_zombielaw.h"
 #include "rushbox.h"
+#include "zombiesmoke.h"
 
 namespace sv {
 	void ZombieSkill_Precache()
@@ -857,12 +858,34 @@ namespace sv {
 	{
 		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
 		{
+			Vector vecOrigin = m_pPlayer->pev->origin;
+			if (m_pPlayer->pev->flags & FL_DUCKING)
+				vecOrigin.z -= 32;
+
+			CZombieSmoke* pSmoke = (CZombieSmoke*)CBaseEntity::Create("zombie_smoke", vecOrigin, g_vecZero, m_pPlayer->edict());
+			if (pSmoke)
+			{
+				pSmoke->SetLifespan(5.0s);
+				pSmoke->SetReduceRate(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 0.75 : 0.5);
+			}
+
 			PLAYBACK_EVENT_FULL(0, NULL, m_iSmokeEvent, 0, m_pPlayer->pev->origin - Vector(0, 0, 30), g_vecZero, 0, 0, 1, 0, TRUE, FALSE);
 			m_flTimeTriggerZombieSkill = invalid_time_point;
 			m_flTimeNextSmoke = gpGlobals->time + 1.5s;
 		}
 		if (m_flTimeNextSmoke != invalid_time_point && m_flTimeNextSmoke < gpGlobals->time)
 		{
+			Vector vecOrigin = m_pPlayer->pev->origin;
+			if (m_pPlayer->pev->flags & FL_DUCKING)
+				vecOrigin.z -= 32;
+
+			CZombieSmoke* pSmoke = (CZombieSmoke*)CBaseEntity::Create("zombie_smoke", vecOrigin, g_vecZero, m_pPlayer->edict());
+			if (pSmoke)
+			{
+				pSmoke->SetLifespan(5.0s);
+				pSmoke->SetReduceRate(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 0.75 : 0.5);
+			}
+
 			PLAYBACK_EVENT_FULL(0, NULL, m_iSmokeEvent, 0, m_pPlayer->pev->origin - Vector(0, 0, 30), g_vecZero, 0, 0, 1, 1, TRUE, FALSE);
 			m_flTimeNextSmoke = invalid_time_point;
 		}
@@ -894,6 +917,17 @@ namespace sv {
 		}
 
 		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_VOICE, "zombi/zombi_smoke.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
+		
+		Vector vecOrigin = m_pPlayer->pev->origin;
+		if (m_pPlayer->pev->flags & FL_DUCKING)
+			vecOrigin.z -= 32;
+
+		CZombieSmoke* pSmoke = (CZombieSmoke*)CBaseEntity::Create("zombie_smoke", vecOrigin, g_vecZero, m_pPlayer->edict());
+		if (pSmoke)
+		{
+			pSmoke->SetLifespan(5.0s);
+			pSmoke->SetReduceRate(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 0.75 : 0.5);
+		}
 
 		PLAYBACK_EVENT_FULL(0, NULL, m_iSmokeEvent, 0, m_pPlayer->pev->origin - Vector(0, 0, 30), g_vecZero, 0, 0, 1, 1, TRUE, FALSE);
 		

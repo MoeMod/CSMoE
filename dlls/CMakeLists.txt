@@ -265,6 +265,7 @@ set(HLDLL_SRCS
 	./gamemode/zbz/supersupplybox.cpp
 	./gamemode/zbz/sentrygun.cpp
 	./gamemode/zb2/rushbox.cpp
+	./gamemode/zb2/zombiesmoke.cpp
 	)
 
 set (HLWPN_SRCS
@@ -660,6 +661,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_waterbomb.cpp
 	../dlls/wpn_shared/wpn_y20s1grenade.cpp
 	../dlls/wpn_shared/wpn_chinaeventbomb.cpp
+	../dlls/wpn_shared/z4b_shovelex.cpp
 	)
 
 set(PM_SRCS

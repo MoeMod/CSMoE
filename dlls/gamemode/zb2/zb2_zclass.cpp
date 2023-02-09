@@ -179,6 +179,13 @@ void CBaseZombieClass_ZB2::Think()
 		m_bCanUseSkills = true;
 	}
 
+	if (m_flInSmokeTime != invalid_time_point && m_flInSmokeTime <= gpGlobals->time)
+	{
+		m_flInSmokeTime = invalid_time_point;
+		m_bSmokeReduceDamage = false;
+		m_flSmokeReduceDamageRate = 1.0;
+	}
+
 	if (m_pZombieSkill)
 		m_pZombieSkill->Think();
 	if (m_pZombieSkill2)
@@ -208,6 +215,10 @@ float CBaseZombieClass_ZB2::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t
 		flDamage *= m_pZombieSkill->GetDamageRatio();
 	if (m_pZombieSkill2)
 		flDamage *= m_pZombieSkill2->GetDamageRatio();
+
+	if (m_bSmokeReduceDamage)
+		flDamage *= m_flSmokeReduceDamageRate;
+
 	return CZombie_ZB1::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 

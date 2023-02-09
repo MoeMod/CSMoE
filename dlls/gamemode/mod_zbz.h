@@ -40,7 +40,8 @@ public:
 	void HumanWin() override;
 	void ZombieWin() override;
 	ModConfigData_t QueryModConfig(const char* key, ModConfigData_t defaultValue, CBaseEntity* invoker) override; 
-
+	void HumanInfectionByZombie(CBasePlayer* player, CBasePlayer* attacker) override;
+	void MakeZombieOrigin() override;
 protected:
 	void MakeSuperSupplyboxThink();
 	void RemoveAllSuperSupplybox();

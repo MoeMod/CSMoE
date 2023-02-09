@@ -404,8 +404,8 @@ void COptionsSubVideo::ApplyVidSettings(bool bForceRefresh)
 	engine->pfnClientCmd( szCmd );
 
 	// Set renderer
-	sprintf( szCmd, p->windowed ? "fullscreen 0" : "fullscreen 1" );
-	engine->pfnClientCmd(szCmd);
+	//sprintf( szCmd, p->windowed ? "fullscreen 0" : "fullscreen 1" );
+	//engine->pfnClientCmd(szCmd);
 	sprintf( szCmd, "_sethdmodels %d\n", p->hdmodels );
 	engine->pfnClientCmd(szCmd);
 	sprintf( szCmd, "_setaddons_folder %d\n", p->addons_folder );

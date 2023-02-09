@@ -43,6 +43,7 @@ public:
 	//dmg indicator
 	void DrawDmgIndicator();
 
+	void DrawBuffHealthBar();
 	//Alarm
 	void SendAlarmState(int iType, float flValue, int iValue2);
 
@@ -92,5 +93,13 @@ private:
 	//dmg indicator
 	UniqueTexture m_iDamageBg;
 	UniqueTexture m_iDamageText;
+
+	UniqueTexture m_iTargetMark;
+
+	int m_iLowHealthPlayer;
+	float m_flTraceHealthTime;
+
+
+
 };
 }

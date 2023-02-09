@@ -411,8 +411,6 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 				m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
 			}
 
-			SetBanSkillsTime(0s, false);
-
 			return true;
 		}
 		if (!Q_stricmp(pcmd, "BTE_ZombieSkill1"))
@@ -459,7 +457,6 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 void CPlayerModStrategy_ZB2::OnSpawn()
 {
 	UpdatePlayerEvolutionHUD();
-	SetBanSkillsTime(0s, false);
 
 	return CPlayerModStrategy_ZB1::OnSpawn();
 }
@@ -567,7 +564,11 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	WRITE_BYTE((!m_pPlayer->IsUsingPC()) ? 0 : 1);
 	MESSAGE_END();
 
-	SetBanSkillsTime(0s, false);
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+	WRITE_BYTE(ZB2_MESSAGE_RECORD_MAXHEALTH); // TYPE
+	WRITE_BYTE(m_pPlayer->entindex()); // TYPE
+	WRITE_COORD(m_pPlayer->pev->max_health);
+	MESSAGE_END();
 }
 
 void CPlayerModStrategy_ZB2::BecomeHuman()

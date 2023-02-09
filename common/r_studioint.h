@@ -183,6 +183,7 @@ typedef struct r_studio_interface_s
 	int version;
 	int (*StudioDrawModel)(int flags);
 	int (*StudioDrawPlayer)(int flags, struct entity_state_s *pplayer);
+	int (*StudioGetPlayerClassID)(model_s* mod, const studiohdr_t* phdr, const mstudiotexture_t* ptexture);
 
 } r_studio_interface_t;
 

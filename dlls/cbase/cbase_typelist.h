@@ -417,6 +417,7 @@ TL_ADD(CChinaEventBomb)
 TL_ADD(CHolyBombEX)
 TL_ADD(CWaterBomb)
 TL_ADD(CY20S1Grenade)
+TL_ADD(CKnifeShovelEX)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -799,6 +800,7 @@ TL_ADD(CZSHTurretGrenade)
 TL_ADD(CSentryGun)
 TL_ADD(CZombieRushBox)
 TL_ADD(CStickyGrenade)
+TL_ADD(CZombieSmoke)
 #endif
 
 TL_END(AllEntityTypeList)

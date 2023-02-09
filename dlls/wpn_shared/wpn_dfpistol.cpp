@@ -39,7 +39,7 @@ namespace sv {
     static constexpr const char *P_Model = "models/p_dfpistol.mdl";
     static constexpr const char *W_Model = "models/w_dfpistol.mdl";
     static constexpr const char *EventFile = "events/dfpistol.sc";
-    static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
+    static constexpr InventorySlotType ItemSlot = PISTOL_SLOT;
     static constexpr const char *ClassName = "weapon_dfpistol";
     static constexpr const char *AnimExtension = "onehanded";
     static constexpr int MaxClip = 4;

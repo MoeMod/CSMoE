@@ -31,9 +31,11 @@
 #include <memory.h>
 #include <math.h>
 
+#include <span>
+
 #include "studio_util.h"
 #include "r_studioint.h"
-
+#include "player/player_model.h"
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
 #include "pm_defs.h"
@@ -1355,6 +1357,16 @@ int R_StudioDrawModel(int flags)
 		}
 	}
 
+	// #LUNA_ADD
+	//studiohdr_t* pStudio = (studiohdr_t*)IEngineStudio.Mod_Extradata(viewent->model);
+	//std::span rgTexture{ (mstudiotexture_t*)(((byte*)pStudio) + pStudio->textureindex), pStudio->numtextures };
+
+	//for (auto&& Texture : rgTexture)
+	//{
+	//	if (std::string_view{ &Texture.name[0] }.find("hand") != std::string_view::npos)	// #UPDATE_AT_CPP23 requires .contains method.
+	//		Texture.index = 0xDEADBEEF;	// change to the texture you want.
+	//}
+
 	int iReturn = g_StudioRenderer.StudioDrawModel(flags);
 
 	if (curent == viewent)
@@ -2143,12 +2155,19 @@ int R_StudioDrawModel(int flags)
 
 	return iReturn;
 }
+
+int R_StudioGetPlayerClassID(model_t* mod, const studiohdr_t* phdr, const mstudiotexture_t* ptexture)
+{
+	return PlayerClassManager().Client_ModelToApperance(mod->name);
+}
+
 // The simple drawing interface we'll pass back to the engine
 r_studio_interface_t studio =
 {
 	STUDIO_INTERFACE_VERSION,
 	R_StudioDrawModel,
 	R_StudioDrawPlayer,
+	R_StudioGetPlayerClassID,
 };
 
 /*

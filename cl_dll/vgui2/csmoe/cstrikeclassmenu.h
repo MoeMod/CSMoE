@@ -52,6 +52,7 @@ public:
 	void OnSelectClassZombie(const char* name);
 
 	void SetTeam(TeamName team);
+	void SetupTeamPage(TeamName team, size_t iPage);
 	void SetupPage(size_t iPage);
 	void UpdateGameMode();
 	void UpdateClass(int i);

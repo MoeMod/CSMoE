@@ -38,7 +38,7 @@
 #include "wpn_shared/z4b_ar57amethyst.h"
 #include "wpn_shared/wpn_sgdrillex.h"
 #include "wpn_shared/wpn_guillotine.h"
-
+#include "wpn_shared/z4b_shovelex.h"
 // gamemode
 #include "gamemode/mods.h"
 
@@ -193,8 +193,14 @@ CBasePlayer::~CBasePlayer() = default;
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
 	char *infobuffer = GET_INFO_BUFFER(edict());
+	
+#if PLAYER_CLASS_SYSTEM
+	const char *model = PlayerClassManager().PlayerClass_GetModelName(m_iModelName);
+	m_bIsFemale = PlayerClassManager().PlayerClass_IsFemale(m_iModelName);
+#else
 	const char *model = PlayerModel_GetApperance(m_iModelName, m_iModelTeam);
 	m_bIsFemale = PlayerModel_IsFemale(m_iModelName, m_iModelTeam);
+#endif
 
 	if (Q_strcmp(GET_KEY_VALUE(infobuffer, "model"), model))
 	{
@@ -261,6 +267,40 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 	if (pev->deadflag != DEAD_NO && !IsBot())
 		return;
 
+	char radiomsg[256];
+	strcpy(radiomsg, msg_id);
+
+	if (m_bIsZombie)
+	{
+		if (!stricmp(m_ZombieClass, "speed") ||
+			!stricmp(m_ZombieClass, "booster") ||
+			!stricmp(m_ZombieClass, "teleport") ||
+			!stricmp(m_ZombieClass, "flying") ||
+			!stricmp(m_ZombieClass, "spider") ||
+			!stricmp(m_ZombieClass, "siren"))
+		{
+			strcat(radiomsg, "_ZW");
+		}
+		else
+			strcat(radiomsg, "_ZB");
+	}
+	else if (m_bIsFemale)
+	{
+		switch (m_iModelName)
+		{
+		case MODEL_JPNGIRL01:
+			strcat(radiomsg, "_CW");
+			break;
+			strcat(radiomsg, "_W_JIN");
+			break;
+
+		default:
+			strcat(radiomsg, "_W");
+			break;
+		}
+	}
+
+
 	CBaseEntity *pEntity = NULL;
 	while ((pEntity = UTIL_FindEntityByClassname(pEntity, "player")) != NULL)
 	{
@@ -311,7 +351,7 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 			{
 				MESSAGE_BEGIN(MSG_ONE, gmsgSendAudio, NULL, pEntity->pev);
 					WRITE_BYTE(ENTINDEX(edict()));
-					WRITE_STRING(msg_id);
+					WRITE_STRING(radiomsg);
 					WRITE_SHORT(pitch);
 				MESSAGE_END();
 
@@ -4551,6 +4591,32 @@ void CBasePlayer::PlayerDeathThink()
 	if (pev->modelindex && !m_fSequenceFinished && pev->deadflag == DEAD_DYING)
 	{
 		StudioFrameAdvance();
+
+		if (m_bIsZombie && m_fSequenceFinished)
+		{
+			if (!Q_strcmp(gamemode.string, "zb3") || !Q_strcmp(gamemode.string, "zbz"))
+			{
+				if (m_bHeadshotKilled)
+					ClientPrint(pev, HUD_PRINTCENTER, "#CSO_ZB3_CannotRespawnByHeadShot");
+				else
+				{
+					Vector vecOrigin, vecAngle;
+
+					GET_BONE_POSITION(edict(), 1, vecOrigin, vecAngle);
+
+					MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+					WRITE_BYTE(TE_SPRITE);
+					WRITE_COORD(vecOrigin.x);
+					WRITE_COORD(vecOrigin.y);
+					WRITE_COORD(vecOrigin.z);
+					WRITE_SHORT(g_sModelIndexZb3Respawn);
+					WRITE_BYTE(5);
+					WRITE_BYTE(255);
+					MESSAGE_END();
+				}
+			}
+		}
+
 		return;
 	}
 
@@ -6724,10 +6790,24 @@ void CBasePlayer::SelectItem(const char *pstr)
 		}
 	}
 
-	if (!pItem || pItem == m_pActiveItem)
+
+
+	if (!pItem)
+		return;
+
+	if (pItem == m_pActiveItem)
 	{
+		if (FClassnameIs(m_pActiveItem->pev, "z4b_shovelex"))
+		{
+			CKnifeShovelEX* pWeapon = (CKnifeShovelEX*)m_pActiveItem;
+			pWeapon->ChangeWeapon();
+			goto CHANGEMODE;
+		}
+
 		return;
 	}
+
+CHANGEMODE:
 
 	ResetAutoaim();
 
@@ -8618,8 +8698,15 @@ void CBasePlayer::SwitchTeam()
 	{
 		m_iTeam = m_iModelTeam = CT;
 	}
+	
+
+#if PLAYER_CLASS_SYSTEM
+	m_bIsFemale = PlayerClassManager().PlayerClass_IsFemale(m_iModelName);
+	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", PlayerClassManager().PlayerClass_GetModelName(m_iModelName));
+#else
 	m_bIsFemale = PlayerModel_IsFemale(m_iModelName, m_iModelTeam);
 	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", PlayerModel_GetApperance(m_iModelName, m_iModelTeam));
+#endif
 
 	MESSAGE_BEGIN(MSG_ALL, gmsgTeamInfo);
 		WRITE_BYTE(entindex());

@@ -104,7 +104,7 @@ void CPlayerModStrategy_ZB3::CheckEvolution()
 
 void CPlayerModStrategy_ZB3::Evolution(ZombieLevel iEvolutionLevel)
 {
-	m_flRagePercent = (m_flRagePercent - 100.0f) * 0.5f;
+	m_flRagePercent = 0.0f;
 	CPlayerModStrategy_ZB2::Evolution(iEvolutionLevel);
 }
 
@@ -211,7 +211,7 @@ void CPlayerModStrategy_ZB3::OnKilled(entvars_t * pKiller, entvars_t * pInflicto
 		else
 			m_pPlayer->pev->max_health = 4000.0f;
 		m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-		m_pPlayer->pev->armorvalue = 1000.0f;
+		m_pPlayer->pev->armorvalue = 100.0f;
 		m_flRagePercent = 0;
 
 		m_pPlayer->m_flZombieHealth = m_pPlayer->pev->max_health;

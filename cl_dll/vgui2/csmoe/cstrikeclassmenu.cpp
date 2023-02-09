@@ -33,24 +33,41 @@ struct ClassInfo
 
 const ClassInfo Class_TE[] = {
 	//介绍图片, 按钮, 介绍
-	{"yuri", "安娜","冠名：白白,QQ群：706711420"},
-	{"pirateboy", "渡鸦", "冠名：橘子,QQ群：706711420"},
-	{"marineboy", "恩佐", "冠名：維吉爾,QQ群：706711420"},
-	{"pirategirl", "米娜","冠名：樓哥,QQ群：706711420"},
-	{"rb", "红帽子","冠名：馬桶GIEGIE,QQ群：706711420"},
-	{"jpngirl01", "熏","冠名：掉下來的鴿子,QQ群：706711420"},
-	{"ritsuka", "伊琳娜", "冠名：南桐姥爷,QQ群：706711420"}
+	{"yuri"},
+	{"pirateboy"},
+	{"marineboy"},
+	{"pirategirl"},
+	{"rb"},
+	{"jpngirl01"},
+	{"ritsuka"},
+	{"terror","classic"},
+	{"leet","classic"},
+	{"arctic","classic"},
+	{"guerilla","classic"},
+	{"militia","classic"},
+	{"buffclassa"},
+	{"buffclasshunter"},
+	{"buffclassblair"},
 };
 
 const ClassInfo Class_CT[] = {
 	//介绍图片, 按钮, 介绍
-	{"saf", "丛林猛虎", "冠名：慕名病嬌：706711420"},
-	{"choijiyoon", "崔志云", "冠名：泡泡茶壶,QQ群：706711420"},
-	{"fernando", "费尔南多", "冠名：华强哥：QQ群：706711420"},
-	{"707", "707", "冠名：生化哥，直播间DI:PLAHF666,QQ群：706711420"},
-	{"sozo", "雷霆小组", "冠名：空位,QQ群：706711420"},
-	{"magui", "炎龙战术小队", "冠名：空位,QQ群：706711420"},
-	{"natasha", "娜塔莎", "冠名：空位,QQ群：706711420"}
+	{"saf"},
+	{"choijiyoon"},
+	{"fernando"},
+	{"707"},
+	{"sozo"},
+	{"magui"},
+	{"natasha"},
+	{"urban","classic"},
+	{"gsg9","classic"},
+	{"sas","classic"},
+	{"gign","classic"},
+	{"spetsnaz","classic"},
+	{"buffclassb"},
+	{"buffclasslycan"},
+	{"buffclassfernando"},
+
 };
 
 const ClassInfo Class_Zb[] = {
@@ -261,6 +278,108 @@ void CCSClassMenu::SetTeam(TeamName team)
 	m_iCurrentPage = 0;
 
 }
+void CCSClassMenu::SetupTeamPage(TeamName team, size_t iPage)
+{
+	m_pShowCT->SetActive(false);
+	m_pShowTER->SetActive(false);
+
+	const ClassInfo* info = nullptr;
+	int num = 0;
+	Color col = COL_NONE;
+
+	if (team == CT)
+	{
+		info = Class_CT;
+		num = sizeof(Class_CT) / sizeof(Class_CT[0]);
+		
+		col = COL_CT;
+	}
+	else if (team == TERRORIST)
+	{
+		info = Class_TE;
+		num = sizeof(Class_TE) / sizeof(Class_TE[0]);
+		col = COL_TR;
+	}
+
+	int totalpages = ((num + 1) - 1) / 9 ;
+	if ((num / 9) % 9 != 0)
+		totalpages++;
+
+	if (iPage <= 0) iPage = 0;
+	else if (iPage >= totalpages)
+		iPage = totalpages - 1;
+
+	m_pTitleLabel->SetText( "选择角色");
+	m_pTitleLabel->SizeToContents();
+
+	if (team == CT)
+		m_pShowCT->SetActive(true);
+	if (team == TERRORIST)
+		m_pShowTER->SetActive(true);
+
+	m_iCurrentTeamPage = team;
+	m_iCurrentPage = iPage;
+
+	// page buttons
+	m_pPrevBtn->SetVisible(iPage != 0);
+	m_pNextBtn->SetVisible(m_iCurrentPage != totalpages - 1);
+
+	for (int i = 0; i < 9; ++i)
+	{
+		int iElement = m_iCurrentPage * 9 + i;
+		if (iElement >= num)
+		{
+			m_pSlotButtons[i]->SetVisible(false);
+		}
+		else
+		{
+			const char* SzGfxName = info[iElement].model.c_str();
+			const char* SzIsClassic = info[iElement].name.c_str();
+
+			char buffer[64];
+			sprintf(buffer, "VGUI_ClassMenu_Select %d", iElement + 1);
+
+
+			// ClassImage Show
+			char szBuffer[64];
+			if(!strcmp(SzIsClassic ,"classic"))
+				sprintf(szBuffer, "#CSO_Item_Name_%s", SzGfxName);
+			else
+				sprintf(szBuffer, "#CSO_%s", SzGfxName);
+
+			auto SzCheckValidVguiString = vgui2::localize()->Find(szBuffer);
+			char* szBuffer2;
+
+			if (SzCheckValidVguiString != nullptr)
+			{
+				
+				m_pSlotButtons[i]->SetText(SzCheckValidVguiString);
+			}
+			else
+			{
+				//szBuffer2 = new char[std::char_traits<wchar_t>::length(vgui2::localize()->Find(szBuffer)) + 1];
+				m_pSlotButtons[i]->SetText(szBuffer);
+
+			}
+
+			m_pSlotButtons[i]->SetVisible(true);
+			m_pSlotButtons[i]->SetEnabled(true);
+			m_pSlotButtons[i]->SetHotkey('0' + i + 1);
+			m_pSlotButtons[i]->SetCommand(buffer);
+			m_pSlotButtons[i]->AddActionSignalTarget(this);
+
+
+		}
+	}
+	extern char* va(const char* format, ...);
+	m_pSlotButtons[9]->SetText("自动选择");
+	m_pSlotButtons[9]->SetVisible(true);
+	m_pSlotButtons[9]->SetEnabled(true);
+	m_pSlotButtons[9]->SetCommand(va("VGUI_ClassMenu_Select %d", RandomInt(1, num)));
+	m_pSlotButtons[9]->SetHotkey('0');
+	m_pSlotButtons[9]->AddActionSignalTarget(this);
+
+}
 
 void CCSClassMenu::SetupPage(size_t iPage)
 {
@@ -446,7 +565,9 @@ void CCSClassMenu::PerformLayout(void)
 	}
 	else
 	{
-		SetTeam(m_iCurrentTeamPage);
+		m_iCurrentPage = 0;
+		//SetTeam(m_iCurrentTeamPage);
+		SetupTeamPage(CT, 0);
 	}
 
 	BaseClass::PerformLayout();
@@ -501,7 +622,8 @@ void CCSClassMenu::OnCommand(const char* command)
 
 		if (!CheckShowType())
 		{
-			SetTeam(CT);
+			//SetTeam(CT);
+			SetupTeamPage(CT, 0);
 			m_iCurrentTeamPage = CT;
 		}
 
@@ -517,23 +639,29 @@ void CCSClassMenu::OnCommand(const char* command)
 	{
 		if (CheckShowType())
 			SetupPage(m_iCurrentPage - 1);
+		else
+			SetupTeamPage(m_iCurrentTeamPage, m_iCurrentPage - 1);
 		return;
 	}
 	else if (!Q_strcmp(command, "nextpage"))
 	{
 		if (CheckShowType())
 			SetupPage(m_iCurrentPage + 1);
+		else
+			SetupTeamPage(m_iCurrentTeamPage, m_iCurrentPage + 1);
 		return;
 	}
 	else if (!Q_strcmp(command, "showctclass"))
 	{
-		SetTeam(CT);
+		//SetTeam(CT);
+		SetupTeamPage(CT, 0);
 		m_iCurrentTeamPage = CT;
 		return;
 	}
 	else if (!Q_strcmp(command, "showterclass"))
 	{
-		SetTeam(TERRORIST);
+		//SetTeam(TERRORIST);
+		SetupTeamPage(TERRORIST, 0);
 		m_iCurrentTeamPage = TERRORIST;
 		return;
 	}
@@ -593,7 +721,9 @@ void CCSClassMenu::UpdateClass(int i)
 
 	int iElement = m_iCurrentPage * 9 + i;
 	if (iElement > 23)iElement = 0;
-	bool bEnabled = info[iElement].model.c_str() ? true : false;
+
+	const char* SzCheck = info[iElement].model.c_str();
+	bool bEnabled = (SzCheck[0] && SzCheck) ? true : false;
 
 	m_pClassImage->SetVisible(bEnabled);
 
@@ -602,12 +732,14 @@ void CCSClassMenu::UpdateClass(int i)
 
 	if (!CheckShowType())
 	{
-		if (i >= 7)
+	
+
+		if (i > 9)
 			return;
 		//ClassImage Show
 		char szBuffer[64];
 		sprintf(szBuffer, "gfx/vgui/%s", info[iElement].model.c_str());
-		m_pClassImage->SetImage(szBuffer);
+		m_pClassImage->SetImage((i == 9) ? (m_iCurrentTeamPage == CT? "gfx/vgui/ct_random" : "gfx/vgui/t_random"):szBuffer);
 
 		//ClassDesc Show
 		std::string szClassDesc; szClassDesc = info[iElement].model;
@@ -625,7 +757,8 @@ void CCSClassMenu::UpdateClass(int i)
 
 		m_pClassDesc->SetVisible(true);
 		m_pClassDesc->SetTextColorState(Label::CS_BRIGHT);
-		m_pClassDesc->SetText(SzCheckValidVguiString != nullptr ? szBuffer2 : szBuffer);
+		m_pClassDesc->SetText((i == 9) ? "随机选择人物" : (SzCheckValidVguiString != nullptr ? szBuffer2 : szBuffer));
+		m_pClassDesc->SizeToContents();
 
 		if (SzCheckValidVguiString != nullptr && szBuffer2)
 			delete[] szBuffer2;
@@ -641,6 +774,7 @@ void CCSClassMenu::UpdateClass(int i)
 		m_pClassDesc->SetVisible(true);
 		m_pClassDesc->SetTextColorState(Label::CS_BRIGHT);
 		m_pClassDesc->SetText((i == 9) ? "#CSO_RandomZombi_Z_Label" : info[iElement].desc.c_str());
+		m_pClassDesc->SizeToContents();
 
 		sprintf(szBuffer, (i == 9) ? "" : "resource/zombi/zombieskill_%s", info[iElement].skillname.c_str());
 		m_pSkillInfoImage[0]->SetImage(szBuffer);

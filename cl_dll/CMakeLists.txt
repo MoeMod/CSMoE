@@ -460,6 +460,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_waterbomb.cpp
 	../dlls/wpn_shared/wpn_y20s1grenade.cpp
 	../dlls/wpn_shared/wpn_chinaeventbomb.cpp
+	../dlls/wpn_shared/z4b_mechanichand.cpp
+	../dlls/wpn_shared/z4b_shovelex.cpp
 	)
 
 set (HUD_SRCS
@@ -530,6 +532,8 @@ set (HUD_SRCS
 	./hud/newhud/NewAlarm.cpp
 	./hud/newhud/NewDeathInfo.cpp
 	./hud/newhud/NewFontManager.cpp
+	./hud/followitem.cpp
+	../dlls/player/player_model.cpp
 )
 
 set (STUDIORENDER_SRCS

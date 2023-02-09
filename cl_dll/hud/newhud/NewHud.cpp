@@ -23,6 +23,7 @@
 #include "cl_util.h"
 #include "draw_util.h"
 #include "legacy/hud_scoreboard_legacy.h"
+#include "player/player_model.h"
 
 namespace cl {
 
@@ -115,30 +116,63 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 
 		iSpeed = g_velocity.Length();
 
-		iX = 120;
-		iY = iY - iH;
-		iW = m_iIcon_Speed->w();
-		iH = m_iIcon_Speed->h();
-		m_iIcon_Speed->Draw2DQuadScaled(iX, iY + 5, iX + iW, iY + 5 + iH);
+		int bitsShowState = PlayerClassManager().GetPlayerClass(gEngfuncs.GetLocalPlayer()->index).m_iBitsShowState;
 
-		iX = 180 - 30;
+		if ((bitsShowState & SHOW_SPEED) && (bitsShowState & SHOW_DAMAGE))
+		{
+			iX = 120;
+			iY = iY - iH;
+			iW = m_iIcon_Speed->w();
+			iH = m_iIcon_Speed->h();
+			m_iIcon_Speed->Draw2DQuadScaled(iX, iY + 5, iX + iW, iY + 5 + iH);
 
-		CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, iSpeed, iX, iY + 5, 0, 1, 1.0, 138, 193, 222);
+			iX = 180 - 30;
 
-		iX = 120;
-		iY = iY + 5 + iH;
-		iW = m_iIcon_Damage->w();
-		iH = m_iIcon_Damage->h();
-		m_iIcon_Damage->Draw2DQuadScaled(iX, iY + 5, iX + iW, iY + 5 + iH);
+			CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, iSpeed, iX, iY + 5, 0, 1, 1.0, 138, 193, 222);
+			iX = 120;
+			iY = iY + 5 + iH;
+			iW = m_iIcon_Damage->w();
+			iH = m_iIcon_Damage->h();
+			m_iIcon_Damage->Draw2DQuadScaled(iX, iY + 5, iX + iW, iY + 5 + iH);
 
-		iX = 180 - 30;
+			iX = 180 - 30;
 
-		int idx = gEngfuncs.GetLocalPlayer()->index;
-		cl_entity_t* ent = gEngfuncs.GetEntityByIndex(idx);
+			int idx = gEngfuncs.GetLocalPlayer()->index;
+			cl_entity_t* ent = gEngfuncs.GetEntityByIndex(idx);
 
-		CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, g_iDamage[idx]? g_iDamage[idx]:0, iX, iY + 5, 0, 1, 1.0, 255, 214, 110);
-		CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, g_iDamageTotal[idx] ? g_iDamageTotal[idx] : 0, iX + 45, iY + 5, 0, 1, 1.0, 218, 120, 120);
+			CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, g_iDamage[idx] ? g_iDamage[idx] : 0, iX, iY + 5, 0, 1, 1.0, 255, 214, 110);
+			CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, g_iDamageTotal[idx] ? g_iDamageTotal[idx] : 0, iX + 45, iY + 5, 0, 1, 1.0, 218, 120, 120);
 
+		}
+		else if (bitsShowState & SHOW_SPEED)
+		{
+			iX = 120;
+			iY = iY - iH;
+			iW = m_iIcon_Speed->w();
+			iH = m_iIcon_Speed->h();
+			m_iIcon_Speed->Draw2DQuadScaled(iX, iY + 5, iX + iW, iY + 5 + iH);
+
+			iX = 180 - 30;
+
+			CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, iSpeed, iX, iY + 5, 0, 1, 1.0, 138, 193, 222);
+		}
+		else if (bitsShowState & SHOW_DAMAGE)
+		{
+			iX = 120;
+			iY = iY - iH;
+			iW = m_iIcon_Damage->w();
+			iH = m_iIcon_Damage->h();
+			m_iIcon_Damage->Draw2DQuadScaled(iX, iY + 5, iX + iW, iY + 5 + iH);
+
+			iX = 180 - 30;
+
+			int idx = gEngfuncs.GetLocalPlayer()->index;
+			cl_entity_t* ent = gEngfuncs.GetEntityByIndex(idx);
+
+			CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, g_iDamage[idx] ? g_iDamage[idx] : 0, iX, iY + 5, 0, 1, 1.0, 255, 214, 110);
+			CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, g_iDamageTotal[idx] ? g_iDamageTotal[idx] : 0, iX + 45, iY + 5, 0, 1, 1.0, 218, 120, 120);
+
+		}
 	}
 	else
 	{

@@ -22,10 +22,11 @@ GNU General Public License for more details.
 #include "zb2.h"
 #include "zb2_skill.h"
 #include "hud_sub_impl.h"
-
+#include "player/player_model.h"
 #include "gamemode/zb2/zb2_const.h"
 
 #include <vector>
+#include <calcscreen.h>
 
 namespace cl {
 
@@ -197,6 +198,24 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		SendAlarmState(iType, flValue, iValue2);
 		break;
 	}
+	case ZB2_MESSAGE_TRACE_LOW_HEALTH:
+	{
+		m_iLowHealthPlayer = buf.ReadByte();
+		m_flTraceHealthTime = gHUD.m_flTime + buf.ReadCoord();
+		break;
+	}
+	case ZB2_MESSAGE_RECORD_MAXHEALTH:
+	{
+		int idx = buf.ReadByte();
+		float flMaxHealth = buf.ReadShort();
+		g_PlayerExtraInfoEx[idx].iMaxHealth = flMaxHealth;
+		break;
+	}
+	case ZB2_MESSAGE_TRAP:
+	{
+	
+		break;
+	}
 	}
 
 	return 1;
@@ -239,20 +258,22 @@ int CHudZB2::VidInit()
 	m_pBackGroundSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iBackGround);
 
 
-	R_InitTexture(m_iPrevOn, "resource\\hud\\zombie\\zbselect_prev_nor");
-	R_InitTexture(m_iPrevOff, "resource\\hud\\zombie\\zbselect_prev_dim");
-	R_InitTexture(m_iNextOn, "resource\\hud\\zombie\\zbselect_next_nor");
-	R_InitTexture(m_iNextOff, "resource\\hud\\zombie\\zbselect_next_dim");
-	R_InitTexture(m_iCancel, "resource\\hud\\zombie\\zbselect_close");
-	R_InitTexture(m_iBlank, "resource\\hud\\zombie\\zmrewalk_box");
-	R_InitTexture(m_iBanned, "resource\\hud\\zombie\\zombietype_cancel");
+	R_InitTexture(m_iPrevOn, "resource/hud/zombie/zbselect_prev_nor");
+	R_InitTexture(m_iPrevOff, "resource/hud/zombie/zbselect_prev_dim");
+	R_InitTexture(m_iNextOn, "resource/hud/zombie/zbselect_next_nor");
+	R_InitTexture(m_iNextOff, "resource/hud/zombie/zbselect_next_dim");
+	R_InitTexture(m_iCancel, "resource/hud/zombie/zbselect_close");
+	R_InitTexture(m_iBlank, "resource/hud/zombie/zmrewalk_box");
+	R_InitTexture(m_iBanned, "resource/hud/zombie/zombietype_cancel");
 
-	R_InitTexture(m_iLockedImage, "resource\\zombiez\\level_lock_l");
-	R_InitTexture(m_iLockedImageBg, "resource\\zombiez\\zombie_lock_bg");
-	R_InitTexture(m_iLockedImageBar, "resource\\zombiez\\level_lock_bg");
+	R_InitTexture(m_iLockedImage, "resource/zombiez/level_lock_l");
+	R_InitTexture(m_iLockedImageBg, "resource/zombiez/zombie_lock_bg");
+	R_InitTexture(m_iLockedImageBar, "resource/zombiez/level_lock_bg");
 
-	R_InitTexture(m_iDamageBg, "resource\\helperhud\\damagebg");
-	R_InitTexture(m_iDamageText, "resource\\helperhud\\damagetext");
+	R_InitTexture(m_iDamageBg, "resource/helperhud/damagebg");
+	R_InitTexture(m_iDamageText, "resource/helperhud/damagetext");
+
+	R_InitTexture(m_iTargetMark, "resource/zombi/targetmark");
 
 	m_flTimeEnd = 0.0f;
 	m_bCanDraw = false;
@@ -265,6 +286,7 @@ int CHudZB2::Draw(float time)
 	pimpl->for_each(&IBaseHudSub::Draw, time);
 	DrawBuffHP();
 	DrawDmgIndicator();
+	DrawBuffHealthBar();
 
 	if (!m_bCanDraw)
 		return 0;
@@ -593,6 +615,57 @@ void CHudZB2::DrawDmgIndicator()
 	}
 
 
+}
+
+void CHudZB2::DrawBuffHealthBar()
+{
+	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
+
+	cl_entity_t* pLocal = gEngfuncs.GetLocalPlayer();
+
+	if (PlayerClassManager().GetPlayerClass(pLocal->index).m_iBitsShowState & SHOW_TRACE_LOW_HEALTH)
+	{
+		for (int i = 0; i < 33; i++)
+		{
+			if (i == pLocal->index)
+				continue;
+
+			if (g_PlayerExtraInfo[i].dead)
+				continue;
+
+			if (!g_PlayerExtraInfo[i].zombie)
+				continue;
+
+			hud_player_info_t hPlayer;
+			gEngfuncs.pfnGetPlayerInfo(i, &hPlayer);
+
+			if (hPlayer.name)
+			{
+				float percent = g_PlayerExtraInfo[m_iLowHealthPlayer].health / (float)g_PlayerExtraInfoEx[m_iLowHealthPlayer].iMaxHealth;
+				if (percent > 0.2f)
+					continue;
+
+				cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(i);
+
+				if (!pPlayer)
+					continue;
+
+				vec3_t vecSub;
+				VectorSubtract(pPlayer->origin, pLocal->origin, vecSub);
+				if (VectorLength(vecSub) > 1024)
+					continue;
+
+				float vecScreen[2];
+				if (CalcScreen(pPlayer->origin, vecScreen))
+				{
+					int iX = (vecScreen[0] - m_iTargetMark->w() / 2);
+					int iY = (vecScreen[1] - m_iTargetMark->h() / 2);
+					m_iTargetMark->Draw2DQuadScaled(iX, iY, iX + m_iTargetMark->w(), iY + m_iTargetMark->h());
+				}
+				
+			}
+		}
+	}
 }
 
 void CHudZB2::Think()

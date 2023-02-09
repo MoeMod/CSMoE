@@ -379,7 +379,11 @@ void CPlayerModStrategy_ZBZ::BecomeZombie(ZombieLevel iEvolutionLevel)
 	if (m_pPlayer->pev->health > 32000.0f)
 		m_pPlayer->pev->health = 32000.0f;
 
-	
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+	WRITE_BYTE(ZB2_MESSAGE_RECORD_MAXHEALTH); // TYPE
+	WRITE_BYTE(m_pPlayer->entindex()); // TYPE
+	WRITE_COORD(m_pPlayer->pev->max_health);
+	MESSAGE_END();
 
 	SKILL_FUNCTION(m_vecSkill, OnBecomeZombie, iEvolutionLevel);
 }
@@ -733,6 +737,13 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_pModZBZ->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
 			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 3000.0f;
 			m_pPlayer->pev->armorvalue = 1100;
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_RECORD_MAXHEALTH); // TYPE
+			WRITE_BYTE(m_pPlayer->entindex()); // TYPE
+			WRITE_COORD(m_pPlayer->pev->max_health);
+			MESSAGE_END();
+
 			m_pModZBZ->TeamCheck();
 
 			// sound effect
@@ -812,6 +823,13 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_pPlayer->m_iCustomSequence = -1;
 			CPlayerModStrategy_ZB3::BecomeZombie(ZOMBIE_LEVEL_ORIGIN_LV2);
 			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 30000;
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_RECORD_MAXHEALTH); // TYPE
+			WRITE_BYTE(m_pPlayer->entindex()); // TYPE
+			WRITE_COORD(m_pPlayer->pev->max_health);
+			MESSAGE_END();
+
 			m_pPlayer->pev->armorvalue = 9000;
 
 			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
@@ -876,7 +894,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 				return;
 			}
 
-			m_flNextTimeChangeZombie = gpGlobals->time + 10.0s;
+			m_flNextTimeChangeZombie = gpGlobals->time + 5.0s;
 			m_pPlayer->m_ZombieClass = "random";
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
@@ -956,37 +974,6 @@ void CMod_ZombieZ::UpdateGameMode(CBasePlayer * pPlayer)
 	WRITE_BYTE(0); // Reserved. (MaxTime?)
 	MESSAGE_END();
 }
-
-#if 0
-CGhostHunterSupplyBox* CMod_ZombieZ::CreateGhostHunterSupplybox()
-{
-	auto supplybox = CreateClassPtr<CGhostHunterSupplyBox>();
-
-	Vector backup_v_angle = supplybox->pev->v_angle;
-	CSDM_DoRandomSpawn(supplybox);
-	supplybox->pev->v_angle = backup_v_angle;
-
-	supplybox->pev->spawnflags |= SF_NORESPAWN;
-
-	DispatchSpawn(supplybox->edict());
-	return supplybox;
-}
-
-
-CMechSupplyBox* CMod_ZombieZ::CreateMechSupplybox()
-{
-	auto supplybox = CreateClassPtr<CMechSupplyBox>();
-
-	Vector backup_v_angle = supplybox->pev->v_angle;
-	CSDM_DoRandomSpawn(supplybox);
-	supplybox->pev->v_angle = backup_v_angle;
-
-	supplybox->pev->spawnflags |= SF_NORESPAWN;
-
-	DispatchSpawn(supplybox->edict());
-	return supplybox;
-}
-#endif
 
 CSuperSupplyBox* CMod_ZombieZ::CreateSuperSupplybox(int iType)
 {
@@ -1072,6 +1059,95 @@ void CMod_ZombieZ::RestartRound()
 
 	m_flTimeNextMakeSuperSupplybox = gpGlobals->time + RandomDuration(50.0s, 60.0s);
 	return CMod_ZombieHero::RestartRound();
+}
+
+void CMod_ZombieZ::HumanInfectionByZombie(CBasePlayer* player, CBasePlayer* attacker)
+{
+	player->m_ZombieClass = "random";
+	player->pev->sequence = 0;
+	player->m_tLockBuffTime = invalid_time_point;
+	player->m_flLockSpeed = 0.0;
+	player->m_flLockGravity = 0.0;
+	player->m_iCustomSequence = -1;
+	if (enhancedzombie.value)
+		player->pev->health = player->pev->max_health = 15000.0f;
+	else
+		player->pev->health = player->pev->max_health = std::max(3000, static_cast<int>(attacker->pev->health * 1.0f)) + g_pGameRules->m_iTotalRoundsPlayed * 500;
+	MakeZombie(player, ZOMBIE_LEVEL_HOST);
+
+
+	player->m_iKevlar = ARMOR_TYPE_HELMET;
+	player->pev->armorvalue = std::min(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + g_pGameRules->m_iTotalRoundsPlayed * 100;
+
+	if (player->pev->health > 32000)
+		player->pev->health = 32000;
+
+	player->m_flZombieHealth = player->pev->health;
+	player->m_flZombieArmor = player->pev->armorvalue;
+
+	InfectionSound();
+	EmitHomoSound(player, attacker);
+
+	DeathNotice(player, attacker->pev, attacker->pev);
+	SetScoreAttrib(player, player);
+	TeamCheck();
+	CheckWinConditions();
+
+	player->m_iDeaths += 1;
+	player->AddPoints(0, FALSE);
+	attacker->m_iRoundInfect++;
+	attacker->AddPoints(1, FALSE);
+
+	m_eventInfection.dispatch(player, attacker);
+}
+
+void CMod_ZombieZ::MakeZombieOrigin()
+{
+	auto iNumZombies = ZombieOriginNum();
+	auto iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
+
+	// build alive player list
+	moe::range::PlayersList list;
+	std::vector<CBasePlayer*> players{ list.begin(), list.end() };
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer* player) {
+		auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(player->m_pModStrategy.get());
+	return !(strategy && strategy->IsPickAsZombie() && player->IsAlive() && !player->m_bIsZombie);
+		}), players.end());
+
+	if (players.empty())
+	{
+		if (iNumPlayers)
+		{
+			PickZombieOrigin();
+			MakeZombieOrigin();
+		}
+		return;
+	}
+
+	// pick them
+	for (size_t i = 0; i < players.size(); ++i)
+	{
+		players[i]->m_ZombieClass = "random";
+		players[i]->pev->sequence = 0;
+		players[i]->m_iCustomSequence = -1;
+		if (enhancedzombie.value)
+			players[i]->pev->health = players[i]->pev->max_health = 20000.0f;
+		else
+			players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + g_pGameRules->m_iTotalRoundsPlayed * 500;
+		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
+
+		players[i]->pev->armortype = ARMOR_TYPE_HELMET;
+		players[i]->pev->armorvalue = 1000 + g_pGameRules->m_iTotalRoundsPlayed * 100;
+
+		players[i]->m_flZombieHealth = players[i]->pev->health;
+		players[i]->m_flZombieArmor = players[i]->pev->armorvalue;
+	}
+	TeamCheck();
+
+	// sound effect
+	InfectionSound();
+	CheckWinConditions();
+	PickHero();
 }
 
 void CMod_ZombieZ::PlayerKilled(CBasePlayer * pVictim, entvars_t * pKiller, entvars_t * pInflictor)

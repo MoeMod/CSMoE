@@ -159,9 +159,9 @@ namespace sv {
             float flDamage = 110;
 #ifndef CLIENT_DLL
             if (g_pModRunning->DamageTrack() == DT_ZB)
-                flDamage = 1350;
+                flDamage = 300;
             else if (g_pModRunning->DamageTrack() == DT_ZBS)
-                flDamage = 1800;
+                flDamage = 450;
 #endif
             return flDamage;
         }

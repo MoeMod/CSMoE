@@ -28,7 +28,11 @@ public:
 
 	CHudMsgFunc(ZB3Msg);
 
+	int DrawHeroIcon();
+
 protected:
+	UniqueTexture m_iHero;
+
 	class impl_t;
 	impl_t *pimpl;
 };

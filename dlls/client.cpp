@@ -529,7 +529,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	pPlayer->m_iJoiningState = READINGLTEXT;
 	pPlayer->m_iTeam = UNASSIGNED;
 	pPlayer->pev->fixangle = 1;
-	pPlayer->m_iModelName = MODEL_TERROR_URBAN;
+	pPlayer->m_iModelName = MODEL_URBAN;
 	pPlayer->m_bContextHelp = true;
 	pPlayer->m_bHasNightVision = false;
 	pPlayer->m_iHostagesKilled = 0;
@@ -1624,8 +1624,12 @@ void BuyItem(CBasePlayer *pPlayer, int iSlot)
 void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 {
 	CHalfLifeMultiplay *mp = g_pGameRules;
-	int numSkins = PlayerModel_GetNumSkins()-1;
-
+#if PLAYER_CLASS_SYSTEM
+	int numSkins = PlayerClassManager().PlayerClass_GetNumClass() - 1;
+#else
+	int numSkins = PlayerModel_GetNumSkins() - 1;
+#endif
+	
 	struct
 	{
 		ModelName model_id;
@@ -1635,12 +1639,201 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 
 	Q_memset(&appearance, 0, sizeof(appearance));
 
+
+
+#if PLAYER_CLASS_SYSTEM
+	if (player->m_iTeam == TERRORIST)
+	{
+		int numTR = PlayerClassManager().PlayerClass_GetNumTR();
+		if ((slot > numTR || slot < 1) && (!TheBotProfiles->GetCustomSkin(slot) || !player->IsBot())) {
+			slot = RANDOM_LONG(1, numTR);
+		}
+
+		switch (slot)
+		{
+			case 1:
+			{
+				appearance.model_id = MODEL_YURI;
+				break;
+			}
+			case 2:
+			{
+				appearance.model_id = MODEL_PIRATEBOY;
+				break;
+			}
+			case 3:
+			{
+				appearance.model_id = MODEL_MARINEBOY;
+				break;
+			}
+			case 4:
+			{
+				appearance.model_id = MODEL_PIRATEGIRL;
+				break;
+			}
+			case 5:
+			{
+				appearance.model_id = MODEL_RB;
+				break;
+			}
+			case 6:
+			{
+				appearance.model_id = MODEL_JPNGIRL01;
+				break;
+			}
+			case 7:
+			{
+				appearance.model_id = MODEL_RITSUKA;
+				break;
+			}
+			case 8:
+			{
+				appearance.model_id = MODEL_TERROR;
+				break;
+			}
+			case 9:
+			{
+				appearance.model_id = MODEL_LEET;
+				break;
+			}
+			case 10:
+			{
+				appearance.model_id = MODEL_ARCTIC;
+				break;
+			}
+			case 11:
+			{
+				appearance.model_id = MODEL_GUERILLA;
+				break;
+			}
+			case 12:
+			{
+				appearance.model_id = MODEL_MILITIA;
+				break;
+			}
+			case 13:
+			{
+				appearance.model_id = MODEL_BUFFCLASSA;
+				break;
+			}
+			case 14:
+			{
+				appearance.model_id = MODEL_BUFFCLASSHUNTER;
+				break;
+			}
+			case 15:
+			{
+				appearance.model_id = MODEL_BUFFCLASSBLAIR;
+				break;
+			}
+			default:
+			{
+				appearance.model_id = MODEL_YURI;
+				break;
+			}
+		}
+	}
+	else if (player->m_iTeam == CT)
+	{
+		int numCT = PlayerClassManager().PlayerClass_GetNumCT();
+		if ((slot > numCT || slot < 1) && (!TheBotProfiles->GetCustomSkin(slot) || !player->IsBot())) {
+			slot = RANDOM_LONG(1, numCT);
+		}
+
+		switch (slot)
+		{
+		case 1:
+		{
+			appearance.model_id = MODEL_SAF;
+			break;
+		}
+		case 2:
+		{
+			appearance.model_id = MODEL_CHOIJIYOON;
+			break;
+		}
+		case 3:
+		{
+			appearance.model_id = MODEL_FERNANDO;
+			break;
+		}
+		case 4:
+		{
+			appearance.model_id = MODEL_707;
+			break;
+		}
+		case 5:
+		{
+			appearance.model_id = MODEL_SOZO;
+			break;
+		}
+		case 6:
+		{
+			appearance.model_id = MODEL_MAGUI;
+			break;
+		}
+		case 7:
+		{
+			appearance.model_id = MODEL_NATASHA;
+			break;
+		}
+		case 8:
+		{
+			appearance.model_id = MODEL_URBAN;
+			break;
+		}
+		case 9:
+		{
+			appearance.model_id = MODEL_GSG9;
+			break;
+		}
+		case 10:
+		{
+			appearance.model_id = MODEL_SAS;
+			break;
+		}
+		case 11:
+		{
+			appearance.model_id = MODEL_GIGN;
+			break;
+		}
+		case 12:
+		{
+			appearance.model_id = MODEL_SPETSNAZ;
+			break;
+		}
+		case 13:
+		{
+			appearance.model_id = MODEL_BUFFCLASSB;
+			break;
+		}
+		case 14:
+		{
+			appearance.model_id = MODEL_BUFFCLASSLYCAN;
+			break;
+		}
+		case 15:
+		{
+			appearance.model_id = MODEL_BUFFCLASSFERNADO;
+			break;
+		}
+		default:
+		{
+			appearance.model_id = MODEL_SAF;
+			break;
+		}
+		}
+	}
+
+	appearance.model_name = PlayerClassManager().PlayerClass_GetModelName(appearance.model_id);
+#else
 	if ((slot > numSkins || slot < 1) && (!TheBotProfiles->GetCustomSkin(slot) || !player->IsBot())) {
 		slot = RANDOM_LONG(1, numSkins);
 	}
 
 	appearance.model_id = (ModelName)slot;
 	appearance.model_name = PlayerModel_GetApperance(slot, player->m_iModelTeam);
+#endif
 	player->ResetMenu();
 
 	// Reset the player's state
@@ -1658,11 +1851,22 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 
 	player->pev->body = 0;
 	player->m_iModelName = appearance.model_id;
-	player->m_bIsFemale = PlayerModel_IsFemale(slot, player->m_iModelTeam);
 
+#if PLAYER_CLASS_SYSTEM
+	player->m_bIsFemale = PlayerClassManager().PlayerClass_IsFemale(slot);
+#else
+	player->m_bIsFemale = PlayerModel_IsFemale(slot, player->m_iModelTeam);
+#endif
+	
 	SET_CLIENT_KEY_VALUE(player->entindex(), GET_INFO_BUFFER(player->edict()), "model", appearance.model_name);
 	char path[128];
+	
+#if PLAYER_CLASS_SYSTEM
+	PlayerClassManager().Client_ApperanceToModel(path, slot);
+#else
 	Client_ApperanceToModel(path, slot, player->m_iModelTeam);
+#endif
+	
 	player->SetNewPlayerModel(path);
 
 	if (mp->m_iMapHasVIPSafetyZone == MAP_VIP_SAFETYZONE_UNINITIALIZED) {
@@ -2020,52 +2224,28 @@ void Radio1(CBasePlayer *player, int slot)
 
 	player->m_iRadioMessages--;
 	player->m_flRadioTime = gpGlobals->time + 1.5s;
-	if (player->m_bIsZombie)
-	{
-		switch (slot) {
-		case 1:
-			player->Radio("%!MRAD_COVERME_ZB", "#Cover_me");
-			break;
-		case 2:
-			player->Radio("%!MRAD_TAKEPOINT_ZB", "#You_take_the_point");
-			break;
-		case 3:
-			player->Radio("%!MRAD_POSITION_ZB", "#Hold_this_position");
-			break;
-		case 4:
-			player->Radio("%!MRAD_REGROUP_ZB", "#Regroup_team");
-			break;
-		case 5:
-			player->Radio("%!MRAD_FOLLOWME_ZB", "#Follow_me");
-			break;
-		case 6:
-			player->Radio("%!MRAD_HITASSIST_ZB", "#Taking_fire");
-			break;
-		}
+
+	switch (slot) {
+	case 1:
+		player->Radio("%!MRAD_COVERME", "#Cover_me");
+		break;
+	case 2:
+		player->Radio("%!MRAD_TAKEPOINT", "#You_take_the_point");
+		break;
+	case 3:
+		player->Radio("%!MRAD_POSITION", "#Hold_this_position");
+		break;
+	case 4:
+		player->Radio("%!MRAD_REGROUP", "#Regroup_team");
+		break;
+	case 5:
+		player->Radio("%!MRAD_FOLLOWME", "#Follow_me");
+		break;
+	case 6:
+		player->Radio("%!MRAD_HITASSIST", "#Taking_fire");
+		break;
 	}
-	else
-	{
-		switch (slot) {
-		case 1:
-			player->Radio("%!MRAD_COVERME", "#Cover_me");
-			break;
-		case 2:
-			player->Radio("%!MRAD_TAKEPOINT", "#You_take_the_point");
-			break;
-		case 3:
-			player->Radio("%!MRAD_POSITION", "#Hold_this_position");
-			break;
-		case 4:
-			player->Radio("%!MRAD_REGROUP", "#Regroup_team");
-			break;
-		case 5:
-			player->Radio("%!MRAD_FOLLOWME", "#Follow_me");
-			break;
-		case 6:
-			player->Radio("%!MRAD_HITASSIST", "#Taking_fire");
-			break;
-		}
-	}
+	
 	if (TheBots != NULL) {
 		TheBots->OnEvent((GameEventType) (EVENT_START_RADIO_1 + slot), player);
 	}
@@ -2084,51 +2264,25 @@ void Radio2(CBasePlayer *player, int slot)
 	player->m_iRadioMessages--;
 	player->m_flRadioTime = gpGlobals->time + 1.5s;
 
-	if (player->m_bIsZombie)
-	{
-		switch (slot) {
-		case 1:
-			player->Radio("%!MRAD_GO_ZB", "#Go_go_go");
-			break;
-		case 2:
-			player->Radio("%!MRAD_FALLBACK_ZB", "#Team_fall_back");
-			break;
-		case 3:
-			player->Radio("%!MRAD_STICKTOG_ZB", "#Stick_together_team");
-			break;
-		case 4:
-			player->Radio("%!MRAD_GETINPOS_ZB", "#Get_in_position_and_wait");
-			break;
-		case 5:
-			player->Radio("%!MRAD_STORMFRONT_ZB", "#Storm_the_front");
-			break;
-		case 6:
-			player->Radio("%!MRAD_REPORTIN_ZB", "#Report_in_team");
-			break;
-		}
-	}
-	else
-	{
-		switch (slot) {
-		case 1:
-			player->Radio("%!MRAD_GO", "#Go_go_go");
-			break;
-		case 2:
-			player->Radio("%!MRAD_FALLBACK", "#Team_fall_back");
-			break;
-		case 3:
-			player->Radio("%!MRAD_STICKTOG", "#Stick_together_team");
-			break;
-		case 4:
-			player->Radio("%!MRAD_GETINPOS", "#Get_in_position_and_wait");
-			break;
-		case 5:
-			player->Radio("%!MRAD_STORMFRONT", "#Storm_the_front");
-			break;
-		case 6:
-			player->Radio("%!MRAD_REPORTIN", "#Report_in_team");
-			break;
-		}
+	switch (slot) {
+	case 1:
+		player->Radio("%!MRAD_GO", "#Go_go_go");
+		break;
+	case 2:
+		player->Radio("%!MRAD_FALLBACK", "#Team_fall_back");
+		break;
+	case 3:
+		player->Radio("%!MRAD_STICKTOG", "#Stick_together_team");
+		break;
+	case 4:
+		player->Radio("%!MRAD_GETINPOS", "#Get_in_position_and_wait");
+		break;
+	case 5:
+		player->Radio("%!MRAD_STORMFRONT", "#Storm_the_front");
+		break;
+	case 6:
+		player->Radio("%!MRAD_REPORTIN", "#Report_in_team");
+		break;
 	}
 
 	if (TheBots != NULL) {
@@ -2149,78 +2303,40 @@ void Radio3(CBasePlayer *player, int slot)
 	player->m_iRadioMessages--;
 	player->m_flRadioTime = gpGlobals->time + 1.5s;
 
-	if (player->m_bIsZombie)
-	{
-		switch (slot) {
-		case 1:
-			if (RANDOM_LONG(0, 1))
-				player->Radio("%!MRAD_AFFIRM_ZB", "#Affirmative");
-			else
-				player->Radio("%!MRAD_ROGER_ZB", "#Roger_that");
+	switch (slot) {
+	case 1:
+		if (RANDOM_LONG(0, 1))
+			player->Radio("%!MRAD_AFFIRM", "#Affirmative");
+		else
+			player->Radio("%!MRAD_ROGER", "#Roger_that");
 
-			break;
-		case 2:
-			player->Radio("%!MRAD_ENEMYSPOT_ZB", "#Enemy_spotted");
-			break;
-		case 3:
-			player->Radio("%!MRAD_BACKUP_ZB", "#Need_backup");
-			break;
-		case 4:
-			player->Radio("%!MRAD_CLEAR_ZB", "#Sector_clear");
-			break;
-		case 5:
-			player->Radio("%!MRAD_INPOS_ZB", "#In_position");
-			break;
-		case 6:
-			player->Radio("%!MRAD_REPRTINGIN_ZB", "#Reporting_in");
-			break;
-		case 7:
-			player->Radio("%!MRAD_BLOW_ZB", "#Get_out_of_there");
-			break;
-		case 8:
-			player->Radio("%!MRAD_NEGATIVE_ZB", "#Negative");
-			break;
-		case 9:
-			player->Radio("%!MRAD_ENEMYDOWN_ZB", "#Enemy_down");
-			break;
-		}
+		break;
+	case 2:
+		player->Radio("%!MRAD_ENEMYSPOT", "#Enemy_spotted");
+		break;
+	case 3:
+		player->Radio("%!MRAD_BACKUP", "#Need_backup");
+		break;
+	case 4:
+		player->Radio("%!MRAD_CLEAR", "#Sector_clear");
+		break;
+	case 5:
+		player->Radio("%!MRAD_INPOS", "#In_position");
+		break;
+	case 6:
+		player->Radio("%!MRAD_REPRTINGIN", "#Reporting_in");
+		break;
+	case 7:
+		player->Radio("%!MRAD_BLOW", "#Get_out_of_there");
+		break;
+	case 8:
+		player->Radio("%!MRAD_NEGATIVE", "#Negative");
+		break;
+	case 9:
+		player->Radio("%!MRAD_ENEMYDOWN", "#Enemy_down");
+		break;
 	}
-	else
-	{
-		switch (slot) {
-		case 1:
-			if (RANDOM_LONG(0, 1))
-				player->Radio("%!MRAD_AFFIRM", "#Affirmative");
-			else
-				player->Radio("%!MRAD_ROGER", "#Roger_that");
-
-			break;
-		case 2:
-			player->Radio("%!MRAD_ENEMYSPOT", "#Enemy_spotted");
-			break;
-		case 3:
-			player->Radio("%!MRAD_BACKUP", "#Need_backup");
-			break;
-		case 4:
-			player->Radio("%!MRAD_CLEAR", "#Sector_clear");
-			break;
-		case 5:
-			player->Radio("%!MRAD_INPOS", "#In_position");
-			break;
-		case 6:
-			player->Radio("%!MRAD_REPRTINGIN", "#Reporting_in");
-			break;
-		case 7:
-			player->Radio("%!MRAD_BLOW", "#Get_out_of_there");
-			break;
-		case 8:
-			player->Radio("%!MRAD_NEGATIVE", "#Negative");
-			break;
-		case 9:
-			player->Radio("%!MRAD_ENEMYDOWN", "#Enemy_down");
-			break;
-		}
-	}
+	
 
 	if (TheBots != NULL) {
 		TheBots->OnEvent((GameEventType) (EVENT_START_RADIO_3 + slot), player);
@@ -2575,20 +2691,6 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				{
 					if(player->m_pActiveItem != NULL)
 						player->m_pActiveItem->Inspect();
-				}
-			}
-		}
-	}
-	else if (FStrEq(pcmd, "changemodel"))
-	{
-		if ((int)CVAR_GET_FLOAT("mp_csgoinspect"))
-		{
-			if (gpGlobals->time >= player->m_flLastCommandTime[7])
-			{
-				player->m_flLastCommandTime[7] = gpGlobals->time + 0.3s;
-				if (!player->m_bIsZombie)
-				{
-					player->m_pActiveItem->ChangeModel();
 				}
 			}
 		}
@@ -3539,7 +3641,15 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (((pstr = Q_strstr(pcmd, "z4b_")) != NULL) && (pstr == pcmd))
 			{
-				GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
+				if (FStrEq(pcmd, "z4b_kukriex") ||
+					FStrEq(pcmd, "z4b_normalknife") || 
+					FStrEq(pcmd, "z4b_hawlchicken") || 
+					FStrEq(pcmd, "z4b_lightknife"))
+				{
+					GetClassPtr<CBasePlayer>(pev)->SelectItem("z4b_shovelex");
+				}
+				else
+					GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
 			}
 			else if (((pstr = Q_strstr(pcmd, "csgo_")) != NULL) && (pstr == pcmd))
 			{
@@ -4071,6 +4181,7 @@ void ClientPrecache()
 	wdnmdmenu::WdnmdSoundPrecache();
 	PlayerZombie_Precache();
 	PlayerModel_Precache();
+	PlayerClassManager().PlayerModel_Precache();
 
 	if (g_bIsCzeroGame)
 	{

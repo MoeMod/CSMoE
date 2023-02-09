@@ -53,10 +53,8 @@ enum
 	MAX_HOSTAGES = 24,
 };
 
-extern const char *sPlayerModelFiles[];
 extern wrect_t nullrc;
 
-extern const char* sPlayerModelFiles[];
 extern wrect_t nullrc;
 extern bool g_bFirstBlood;
 extern float g_fLastAssist[MAX_CLIENTS + 1][MAX_CLIENTS + 1];
@@ -118,6 +116,7 @@ struct HUDLIST {
 //#include "voice_status.h"
 #include "hud_spectator.h"
 #include "followicon.h"
+#include "followitem.h"
 #include "scenariostatus.h"
 #include "health.h"
 #include "radar.h"
@@ -410,6 +409,8 @@ struct RoundPlayerInfo
 	float totaldmg[MAX_PLAYERS + 1];
 	int revenge;
 
+	int iHealth;
+	int iMaxHealth;
 };
 
 struct hostage_info_t
@@ -1491,6 +1492,7 @@ public:
 	CHudRadar       m_Radar;
 	CHudSpectatorGui m_SpectatorGui;
 	CHudFollowIcon	m_FollowIcon;
+	CHudFollowItem	m_FollowItem;
 	CHudScenarioStatus m_scenarioStatus;
 
 	CHudHeadName	m_HeadName;

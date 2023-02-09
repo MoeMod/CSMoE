@@ -348,9 +348,8 @@ namespace sv {
 			}
 
 			pev->owner = NULL;
-			float flDamage = pev->dmg;
 
-			StickGrenadeExplode(pev->origin, pev, m_pevOwner, flDamage, 0.1, 325);
+			StickGrenadeExplode(pev->origin, pev, m_pevOwner, m_flExplodeDamage, 0.1, 325);
 
 			pev->effects |= EF_NODRAW;
 			SetThink(&CStickyGrenade::Smoke);
@@ -517,8 +516,8 @@ namespace sv {
 				m_pevOwner = NULL;
 
 			m_pOwner = pOwner;
-			pev->dmg = 82;
-			m_flExplodeDamage = pev->dmg * 0.27;
+			pev->dmg = 100;
+			m_flExplodeDamage = GetExplodeDamage();
 
 			std::vector < std::pair<int, time_point_t >> vecEnt;
 			CBaseEntity* pEntity = NULL;
@@ -568,6 +567,44 @@ namespace sv {
 
 			SET_MODEL(ENT(pGrenade->pev), "models/w_stickybomb.mdl");
 			pGrenade->Initialize(vecVelocity, iTeam, iType, pOwner);
+		}
+
+		float GetExplodeDamage()
+		{
+			float flDamage;
+
+			switch (m_iType)
+			{
+			case 1:
+			{
+				flDamage = 120.0f;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 4000.0f;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 5200.0f;
+				break;
+			}
+			case 2:
+			{
+				flDamage = 110.0f;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 4000.0f;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 5200.0f;
+				break;
+			}
+			default:
+			{
+				flDamage = 100.0f;
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+					flDamage = 4000.0f;
+				else if (g_pModRunning->DamageTrack() == DT_ZBS)
+					flDamage = 5200.0f;
+				break;
+			}
+			
+			}
+			return flDamage;
 		}
 
 

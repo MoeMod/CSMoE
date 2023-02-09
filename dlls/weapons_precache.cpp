@@ -180,6 +180,7 @@ void W_Precache()
 	g_sModelIndexBoomerSprite = PRECACHE_MODEL("sprites/spr_boomer.spr");
 	g_sModelIndexPosionEffect = PRECACHE_MODEL("models/ef_poison03.mdl");
 	g_sModelIndexGuillotineGibs = PRECACHE_MODEL("models/gibs_guilotine.mdl");
+	g_sModelIndexZb3Respawn = PRECACHE_MODEL("sprites/zb3_respawn.spr");
 
 	g_sModelIndexEventBombExp = PRECACHE_MODEL("sprites/heart_bombexp.spr");
 	g_sModelIndexEventBombExp2 = PRECACHE_MODEL("sprites/cakeexp.spr");

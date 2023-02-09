@@ -239,6 +239,20 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		break;
 
 	}
+	case 7:
+	{
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+
+		bool bEnabled = reader.ReadByte() != 0;
+		float flLife = reader.ReadByte() * 0.1;
+		int iType = reader.ReadByte();
+
+		gHUD.m_FollowItem.SetIconItem(iType, pos, bEnabled, flLife);
+
+		break;
+	}
 	case 15:
 		switch (reader.ReadByte())
 		{

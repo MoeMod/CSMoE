@@ -159,6 +159,20 @@ public:
 			zombie->m_bForceStopSkills = forcestop;
 		}
 	}
+
+	void SetInSmokeTime(duration_t time, float rate)
+	{
+		if (!m_pCharacter)
+			return;
+
+		auto zombie = std::dynamic_pointer_cast<CBaseZombieClass_ZB2>(m_pCharacter);
+		if (!zombie)
+			return;
+
+		zombie->m_flInSmokeTime = gpGlobals->time + time;
+		zombie->m_bSmokeReduceDamage = true;
+		zombie->m_flSmokeReduceDamageRate = rate;
+	}
 };
 
 }

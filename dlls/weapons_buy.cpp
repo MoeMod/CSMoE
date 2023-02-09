@@ -446,6 +446,7 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_ironfan",	KNIFE_IRONFAN },
 	{ "knife_swordbombard",	KNIFE_SWORDBOMBARD },
 	{ "z4b_mechanichand",	KNIFE_MECHANICHAND },
+	{ "z4b_shovelex",	KNIFE_SHOVELEX },
 
 	
 };

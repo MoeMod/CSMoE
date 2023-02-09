@@ -368,6 +368,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 		case EXPTYPE_HK121ROCKET:
 		case EXPTYPE_THANATOS5ROCKET:
 		case EXPTYPE_VULCANUS7ROCKET:
+		case EXPTYPE_CHINAEVENTBOMB:
 
 			pev->origin = pTrace->vecEndPos + (pTrace->vecPlaneNormal * (100.0f - 24.0f) * 0.6f);
 			break;
@@ -386,7 +387,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 			m_iGrenadeID == GRENADE_CHINAEVENTBOMB)
 		{
 			if (m_iGrenadeID == GRENADE_CHINAEVENTBOMB)
-				pev->dmg *= 2;
+				pev->dmg *= 1.5;
 
 			MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
 			WRITE_BYTE(TE_EXPLOSION);
@@ -3054,8 +3055,8 @@ void CGrenade::ChinaEventBombExplode(Vector vecSrc, entvars_t* pevInflictor, ent
 		if (flDamage > 3000.0f)
 		{
 			ClearMultiDamage();
-			pEntity->TraceAttack(pevInflictor, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, (DMG_BULLET | DMG_NEVERGIB));
 			tr.iHitgroup = HITGROUP_HEAD;
+			pEntity->TraceAttack(pevInflictor, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, (DMG_BULLET | DMG_NEVERGIB));	
 			ApplyMultiDamage(pevInflictor, pevAttacker);
 		}
 		else

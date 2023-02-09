@@ -236,6 +236,12 @@ namespace sv {
 				m_pPlayer->pev->max_health = m_pPlayer->pev->health = 32000.0f;
 
 			m_pPlayer->m_flZombieHealth = m_pPlayer->pev->health;
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_RECORD_MAXHEALTH); // TYPE
+			WRITE_BYTE(m_pPlayer->entindex()); // TYPE
+			WRITE_COORD(m_pPlayer->pev->max_health);
+			MESSAGE_END();
 			
 		}
 	private:
@@ -697,6 +703,9 @@ namespace sv {
 		}
 		void OnGetSkill() override {
 			m_pPlayer->pev->armorvalue *= GetBonus();
+
+			m_pPlayer->m_flZombieArmor = m_pPlayer->pev->armorvalue;
+
 		}
 	private:
 		float GetBonus() const { return 1.0f + (0.2f + 0.05f * g_pGameRules->m_iTotalRoundsPlayed); }
@@ -2043,6 +2052,10 @@ namespace sv {
 					|| pWeapon->m_iId == WEAPON_DRILLGUN
 					|| pWeapon->m_iId == WEAPON_TURBULENT1
 					|| pWeapon->m_iId == WEAPON_Z4B_DEATHRAY
+					|| pWeapon->m_iId == WEAPON_M79
+					|| pWeapon->m_iId == WEAPON_M79G
+					|| pWeapon->m_iId == WEAPON_FIRECRACKER
+					|| pWeapon->m_iId == WEAPON_Z4B_MECHANICXM214
 					)
 					return;
 				switch (pWeapon->iItemSlot())

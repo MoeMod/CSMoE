@@ -47,21 +47,6 @@ extern client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, i
 
 wrect_t nullrc = { 0, 0, 0, 0 };
 float g_lastFOV = 0.0;
-const char *sPlayerModelFiles[12] =
-{
-	"models/player.mdl",
-	"models/player/leet/leet.mdl", // t
-	"models/player/gign/gign.mdl", // ct
-	"models/player/vip/vip.mdl", //ct
-	"models/player/gsg9/gsg9.mdl", // ct
-	"models/player/guerilla/guerilla.mdl", // t
-	"models/player/arctic/arctic.mdl", // t
-	"models/player/sas/sas.mdl", // ct
-	"models/player/terror/terror.mdl", // t
-	"models/player/urban/urban.mdl", // ct
-	"models/player/spetsnaz/spetsnaz.mdl", // ct
-	"models/player/militia/militia.mdl" // t
-};
 
 #define GHUD_DECLARE_MESSAGE(x) int __MsgFunc_##x(const char *pszName, int iSize, void *pbuf ) { return gHUD.MsgFunc_##x(pszName, iSize, pbuf); }
 
@@ -244,6 +229,7 @@ void CHud :: Init( void )
 	m_NewAlarm.Init();
 	m_TextMessage.Init();
 	m_FollowIcon.Init();
+	m_FollowItem.Init();
 	m_MOTD.Init();
 	m_scenarioStatus.Init();
 	m_HeadName.Init();

@@ -67,12 +67,12 @@ void CZombieClass_ZBS_Deimos2::ResetMaxSpeed() const
 {
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 	{
-		m_pPlayer->pev->maxspeed = 225;
+		m_pPlayer->pev->maxspeed = 275;
 		m_pPlayer->pev->gravity = 0.85f;
 	}
 	else
 	{
-		m_pPlayer->pev->maxspeed = 275;
+		m_pPlayer->pev->maxspeed = 308;
 		m_pPlayer->pev->gravity = 0.75f;
 	}
 
@@ -107,10 +107,10 @@ bool CZombieClass_ZBS_Deimos2::ApplyKnockback(CBasePlayer *attacker, const Knock
 	if (m_iCrazySkillStatus == SKILL_STATUS_USING)
 	{
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-		0.0f,
-		0.0f,
-		0.0f,
-		0.0f,
+		-1.0f,
+		-1.0f,
+		-1.0f,
+		-1.0f,
 		1.0f,
 			});
 

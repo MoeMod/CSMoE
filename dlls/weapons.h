@@ -389,7 +389,6 @@ public:
 	virtual float GetMaxSpeed() { return 260.0f; }
 	virtual int iItemSlot() { return 0; }
 	virtual void Inspect() {};
-	virtual void ChangeModel() {};
 	virtual duration_t GetInspectTime() { return 10.0s; }
 
 public:
@@ -554,7 +553,6 @@ public:
 	virtual BOOL ShouldWeaponIdle() { return FALSE; }
 	virtual BOOL UseDecrement() { return FALSE; }
 	virtual void Inspect() override {};
-	virtual void ChangeModel() override {};
 	virtual duration_t GetInspectTime() override { return 4.5s; }
 
 public:
@@ -1681,6 +1679,8 @@ extern short g_sModelIndexWind;
 extern short g_sModelIndexWindExp;
 
 extern short g_sModelIndexGuillotineGibs;
+
+extern short g_sModelIndexZb3Respawn;
 
 void AnnounceFlashInterval(float interval, float offset = 0);
 

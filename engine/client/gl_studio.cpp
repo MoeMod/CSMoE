@@ -1749,7 +1749,51 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
-            xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
+			
+
+
+			//if (!Q_stricmp(ptexture->name, "#M_L.bmp") ||
+			//	Q_stristr(ptexture->name, "cso_highq_hand__long_512.bmp"))
+			//{
+			//	char name[64];
+			//		strcpy(name, "buffclass21s3ct_malelong");
+			//		int index = GL_FindTexture(name);
+			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+
+			//}
+			//else if (!Q_stricmp(ptexture->name, "#M_O.bmp") ||
+			//	!Q_stricmp(ptexture->name, "hand.bmp") ||
+			//	Q_stristr(ptexture->name, "252246hand.bmp") ||
+			//	Q_stristr(ptexture->name, "256252hand.bmp") ||
+			//	Q_stristr(ptexture->name, "256256hand.bmp"))
+			//{
+			//	//512 Textrue need CHANGE TO 256
+
+			//	char name[64];
+			//		strcpy(name, "buffclass21s3ct_maleorg");
+			//		int index = GL_FindTexture(name);
+			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+			//}
+			//else if (!Q_stricmp(ptexture->name, "#M_S.bmp") || 
+			//	Q_stristr(ptexture->name, "cso_highq_hand_512"))
+			//{
+			//	char name[64];
+			//		strcpy(name, "buffclass21s3ct_maleshort");
+			//		int index = GL_FindTexture(name);
+			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+			//}
+			//else if (!Q_stricmp(ptexture->name, "F_L.bmp") ||
+			//	Q_stristr(ptexture->name, "cso_girl_hand_long.bmp"))
+			//{
+			//	xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
+			//}
+			//else if (!Q_stricmp(ptexture->name, "#M_S.bmp") || 
+			//	Q_stristr(ptexture->name, "cso_girl_hand.bmp"))
+			//{
+			//	
+			//}
+			
+			xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 
 		if (RI.currententity->curstate.renderfx == kRenderFxWallHack) {
@@ -3016,10 +3060,17 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 			}
 #endif
 
-			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
+			Q_snprintf(texname, sizeof(texname), "gfx/tattoo/%s.tga", name);
 			if (FS_FileExists(texname, false))
 			{
                 gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+				break;
+			}
+
+			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
+			if (FS_FileExists(texname, false))
+			{
+				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 				break;
 			}
 

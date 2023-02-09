@@ -69,7 +69,7 @@ int CHudFollowIcon::Draw(float time)
 					m_pTexture_Supplybox->Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
 
 					char szBuffer[16];
-					sprintf(szBuffer, "[%im]", static_cast<int>((g_HostageInfo[i].origin - gHUD.m_vecOrigin).Length() / 42.0f));
+					sprintf(szBuffer, "[%im]", static_cast<int>((g_HostageInfo[i].origin - gHUD.m_vecOrigin).Length() * 0.0254f));
 
 					int textlen = DrawUtils::HudStringLen(szBuffer);
 					int r, g, b;

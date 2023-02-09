@@ -133,14 +133,28 @@ void EXPORT CZombieTrap::OnTouch(CBaseEntity* pOther)
 	p->m_flLockSpeed = 1.0f;
 	p->ResetMaxSpeed();
 
-	CBasePlayer* owner = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pev->owner));
-	if (!owner)
-		return;
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBasePlayer* pl = (CBasePlayer*)UTIL_PlayerByIndex(i);
 
-	if (!owner->IsPlayer())
-		return;
+		if (!pl)
+			continue;
 
-	ClientPrint(owner->pev, HUD_PRINTCENTER, "你的陷阱抓住了人类!");
+		if (!pl->m_bIsZombie)
+			continue;
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pl->pev);
+		WRITE_BYTE(7);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_BYTE(1);
+		WRITE_BYTE(50);
+		WRITE_BYTE(3);
+		MESSAGE_END();
+
+		ClientPrint(pl->pev, HUD_PRINTCENTER, "#CSO_ZombiWaitScapegoat");
+	}
 }
 
 CBasePlayer* CZombieTrap::GetClosestPlayer() const

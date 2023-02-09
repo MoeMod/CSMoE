@@ -38,6 +38,7 @@ namespace xe {
     void TexLru_UpdateAttr(const mstudiotexture_t* ptexture);
     void TexLru_Bind(const mstudiotexture_t *ptexture);
     void TexLru_Bind(const mspriteframe_t *pspriteframe);
+    void TexLru_BindReplace(const mstudiotexture_t* ptexture, int texnum);
     void TexLru_CreateAttr(const mstudiotexture_t *ptexture, int gl_texturenum);
     //void TexLru_CreateAttr(const mspriteframe_t *pspriteframe, int gl_texturenum);
     void TexLru_FreeTexture(const mstudiotexture_t *ptexture);
