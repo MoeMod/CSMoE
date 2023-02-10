@@ -14,6 +14,133 @@
 
 namespace cl {
 
+
+/*
+====================
+AngleMatrix
+====================
+*/
+void XASH_VECTORCALL AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
+{
+    float		angle;
+    float		sr, sp, sy, cr, cp, cy;
+
+    angle = angles[YAW] * (M_PI*2 / 360);
+    sy = sin(angle);
+    cy = cos(angle);
+    angle = angles[PITCH] * (M_PI*2 / 360);
+    sp = sin(angle);
+    cp = cos(angle);
+    angle = angles[ROLL] * (M_PI*2 / 360);
+    sr = sin(angle);
+    cr = cos(angle);
+
+    // matrix = (YAW * PITCH) * ROLL
+    matrix[0][0] = cp*cy;
+    matrix[1][0] = cp*sy;
+    matrix[2][0] = -sp;
+    matrix[0][1] = sr*sp*cy+cr*-sy;
+    matrix[1][1] = sr*sp*sy+cr*cy;
+    matrix[2][1] = sr*cp;
+    matrix[0][2] = (cr*sp*cy+-sr*-sy);
+    matrix[1][2] = (cr*sp*sy+-sr*cy);
+    matrix[2][2] = cr*cp;
+    matrix[0][3] = 0.0;
+    matrix[1][3] = 0.0;
+    matrix[2][3] = 0.0;
+
+    float32x4x2_t sp_sy_sr_0_cp_cy_cr_1;
+    sincos_ps(angles * (M_PI*2 / 360), &sp_sy_sr_0_cp_cy_cr_1.val[0], &sp_sy_sr_0_cp_cy_cr_1.val[1]);
+
+    auto sp_sr_cp_cr_sy_0_cy_1 = vuzpq_f32(sp_sy_sr_0_cp_cy_cr_1.val[0], sp_sy_sr_0_cp_cy_cr_1.val[1]);
+    auto sp_cp_sy_cy_sr_cr_0_1 = vzipq_f32(sp_sy_sr_0_cp_cy_cr_1.val[0], sp_sy_sr_0_cp_cy_cr_1.val[1]);
+
+    matrix[0][0] =          cy*cp*1;
+    matrix[0][1] = sr*sp*cy-cr*sy*1;
+    matrix[0][2] = cr*sp*cy+sy*sr*1;
+    matrix[0][3] = 0.0;
+    matrix[1][0] =          cp*sy*1;
+    matrix[1][1] = sr*sp*sy+cr*cy*1;
+    matrix[1][2] = -sr*cy*1+sy*cr*sp;
+    matrix[1][3] = 0.0;
+    matrix[2][0] = -sp*1;
+    matrix[2][1] = sr*cp;
+    matrix[2][2] = cr*cp;
+    matrix[2][3] = 0.0;
+}
+
+/*
+====================
+VectorCompare
+====================
+*/
+int	XASH_VECTORCALL VectorCompare (const vec3_t v1, const vec3_t v2)
+{
+#if defined(XASH_SIMD) && U_VECTOR_NEON
+    return !vaddvq_u32(vceqq_f32(v1, v2));
+#elif defined(XASH_SIMD) && U_VECTOR_SSE
+    return 0xF == _mm_movemask_ps(_mm_cmpeq_ps(v1, v2));
+#else
+    int		i;
+
+    for (i=0 ; i<3 ; i++)
+        if (v1[i] != v2[i])
+            return 0;
+
+    return 1;
+#endif
+}
+
+/*
+====================
+CrossProduct
+====================
+*/
+void XASH_VECTORCALL CrossProduct (const vec3_t v1, const vec3_t v2, vec3_t_ref cross)
+{
+#if defined(XASH_SIMD) && U_VECTOR_NEON
+    float32x4_t yzxy_a = vextq_f32(vextq_f32(v1, v1, 3), v1, 2); // [aj, ak, ai, aj]
+    float32x4_t yzxy_b = vextq_f32(vextq_f32(v2, v2, 3), v2, 2); // [bj, bk, bi, bj]
+    float32x4_t zxyy_a = vextq_f32(yzxy_a, yzxy_a, 1); // [ak, ai, aj, aj]
+    float32x4_t zxyy_b = vextq_f32(yzxy_b, yzxy_b, 1); // [bk, ai, bj, bj]
+    cross = vfmsq_f32(vmulq_f32(yzxy_a, zxyy_b), zxyy_a, yzxy_b); // [ajbk-akbj, akbi-aibk, aibj-ajbi, 0]
+#elif defined(XASH_SIMD) && U_VECTOR_SSE
+    __m128 result = _mm_sub_ps(
+        _mm_mul_ps(v1, _mm_shuffle_ps(v1, v1, _MM_SHUFFLE(3, 0, 2, 1))),
+        _mm_mul_ps(v2, _mm_shuffle_ps(v2, v2, _MM_SHUFFLE(3, 0, 2, 1)))
+    );
+    cross = _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 0, 2, 1));
+#else
+    cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
+    cross[1] = v1[2]*v2[0] - v1[0]*v2[2];
+    cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
+#endif
+}
+
+/*
+====================
+VectorTransform
+====================
+*/
+void XASH_VECTORCALL VectorTransform (const vec3_t in1, cmatrix3x4 in2, vec3_t_ref out)
+{
+#if defined(XASH_SIMD) && U_VECTOR_NEON
+    float32x4x4_t in_t;
+    memcpy(&in_t, &in2, sizeof(in2));
+    //memset(&in_t.val[3], 0, sizeof(in_t.val[3]));
+    in_t = vld4q_f32((const float *)&in_t);
+
+    out = in_t.val[3];
+    out = vfmaq_laneq_f32(out, in_t.val[0], in1, 0);
+    out = vfmaq_laneq_f32(out, in_t.val[1], in1, 1);
+    out = vfmaq_laneq_f32(out, in_t.val[2], in1, 2);
+#else
+    out[0] = DotProduct(in1, in2[0]) + in2[0][3];
+    out[1] = DotProduct(in1, in2[1]) + in2[1][3];
+    out[2] = DotProduct(in1, in2[2]) + in2[2][3];
+#endif
+}
+
 /*
 ================
 ConcatTransforms
