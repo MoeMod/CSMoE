@@ -14,7 +14,6 @@ namespace cl {
 
 	struct bonequatlru_bone_data
 	{
-		vec4_t q1, q2;
 		vec3_t pos_start;
 		vec3_t pos1, pos2;
 		vec3_t pos_scale;
@@ -22,6 +21,7 @@ namespace cl {
 	struct bonequatlru_data
 	{
 		int numbones;
+        vec4_t q1[MAXSTUDIOBONES], q2[MAXSTUDIOBONES];
 		bonequatlru_bone_data bone[MAXSTUDIOBONES];
 	};
 
@@ -165,7 +165,7 @@ namespace cl {
 		for (int i = 0; i < numbones; i++, pbone++, panim++)
 		{
 			auto& bonedata = framecache.bone[i];
-			BoneQuatLru_StudioCalcBoneQuaterion2(frame, pbone, panim, bonedata.q1, bonedata.q2);
+			BoneQuatLru_StudioCalcBoneQuaterion2(frame, pbone, panim, framecache.q1[i], framecache.q2[i]);
 			BoneQuatLru_StudioCalcBonePosition2(frame, pbone, panim, bonedata.pos_start, bonedata.pos1, bonedata.pos2, bonedata.pos_scale);
 		}
 	}
@@ -186,18 +186,22 @@ namespace cl {
 		// write result
 		{
 			bonequatlru_data& framecache = *pcache;
-			for (int i = 0; i < framecache.numbones; i++)
-			{
-				auto& bonedata = framecache.bone[i];
-				if (bonedata.q1 != bonedata.q2)
-				{
-					QuaternionSlerp(bonedata.q1, bonedata.q2, s, q[i]);
-				}
-				else
-				{
-					q[i] = bonedata.q1;
-				}
+            switch(int i = 0; framecache.numbones % 4)
+            {
+                case 0: do {
+                    QuaternionSlerpX4(framecache.q1 + i, framecache.q2 + i, s, q + i); i+=4; continue;
+                case 3:
+                    QuaternionSlerp(framecache.q1[2], framecache.q2[2], s, q[2]); ++i;
+                case 2:
+                    QuaternionSlerp(framecache.q1[1], framecache.q2[1], s, q[1]); ++i;
+                case 1:
+                    QuaternionSlerp(framecache.q1[0], framecache.q2[0], s, q[0]); ++i;
+                } while(i < framecache.numbones);
+            }
 
+            for (int i = 0; i < framecache.numbones; i++)
+            {
+                auto& bonedata = framecache.bone[i];
 #if defined(XASH_SIMD) && U_VECTOR_NEON
 				pos[i] = vfmaq_f32(bonedata.pos_start, vfmaq_n_f32(bonedata.pos1, vsubq_f32(bonedata.pos2, bonedata.pos1), s), bonedata.pos_scale);
 #else

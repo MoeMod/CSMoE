@@ -358,6 +358,49 @@ void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t q, float t, vec4_t_r
 #endif
 }
 
+void XASH_VECTORCALL QuaternionSlerpX4(const vec4_t p[4], vec4_t q[4], float t, vec4_t qt[4])
+{
+#if defined(XASH_SIMD) && U_VECTOR_NEON
+    //float32x4_t cosom = { DotProduct(p[0], q[0]), DotProduct(p[1], q[1]), DotProduct(p[2], q[2]), DotProduct(p[3], q[3]) };
+    float32x4x4_t p_t = vld4q_f32((const float *)p);
+    float32x4x4_t q_t = vld4q_f32((const float *)q);
+    float32x4_t cosom = vmulq_f32(p_t.val[0], q_t.val[0]);
+    cosom = vfmaq_f32(cosom, p_t.val[1], q_t.val[1]);
+    cosom = vfmaq_f32(cosom, p_t.val[2], q_t.val[2]);
+    cosom = vfmaq_f32(cosom, p_t.val[3], q_t.val[3]);
+
+    // if(cosom < 0) q=-q, cosom=-cosom
+    uint32x4_t sign = vandq_u32(vreinterpretq_u32_f32(cosom), vdupq_n_u32(0x80000000));
+    q[0] = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q[0]), vdupq_laneq_f32(sign, 0)));
+    q[1] = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q[1]), vdupq_laneq_f32(sign, 1)));
+    q[2] = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q[2]), vdupq_laneq_f32(sign, 2)));
+    q[3] = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q[3]), vdupq_laneq_f32(sign, 3)));
+    cosom = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(cosom), sign));
+
+    float32x4_t sclp = vdupq_n_f32(1.0f - t);
+    float32x4_t sclq = vdupq_n_f32(t);
+    // if ((1.0 - cosom) > 0.000001) scl = sin(scl * omega)
+    uint32x4_t cosom_less_then_one = vcltq_f32(cosom, vdupq_n_f32(1.0f - 0.00001f));
+    float32x4_t omega = acos_ps(cosom);
+    sclp = vbslq_f32(cosom_less_then_one, sclp, sin_ps(vmulq_f32(sclp, omega)));
+    sclq = vbslq_f32(cosom_less_then_one, sclq, sin_ps(vmulq_f32(sclq, omega)));
+    float32x4_t sinom = vbslq_f32(cosom_less_then_one, vdupq_n_f32(1), sin_ps(omega));
+
+    // qt = (sclp * p + sclq * q) / sinom;
+    sclp = vdivq_f32(sclp, sinom);
+    sclq = vdivq_f32(sclq, sinom);
+    qt[0] = vfmaq_laneq_f32(vmulq_laneq_f32(p[0], sclp, 0), q[0], sclq, 0);
+    qt[1] = vfmaq_laneq_f32(vmulq_laneq_f32(p[1], sclp, 1), q[1], sclq, 1);
+    qt[2] = vfmaq_laneq_f32(vmulq_laneq_f32(p[2], sclp, 2), q[2], sclq, 2);
+    qt[3] = vfmaq_laneq_f32(vmulq_laneq_f32(p[3], sclp, 3), q[3], sclq, 3);
+#else
+    QuaternionSlerp(p[0],q[0], t, qt[0]);
+    QuaternionSlerp(p[1],q[1], t, qt[1]);
+    QuaternionSlerp(p[2],q[2], t, qt[2]);
+    QuaternionSlerp(p[3],q[3], t, qt[3]);
+#endif
+}
+
 /*
 ====================
 QuaternionMatrix
