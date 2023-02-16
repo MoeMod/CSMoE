@@ -22,6 +22,50 @@ AngleMatrix
 */
 void XASH_VECTORCALL AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
 {
+#if defined(XASH_SIMD) && U_VECTOR_NEON
+    float32x4x2_t sp_sy_sr_0_cp_cy_cr_1;
+    sincos_ps(angles * (M_PI*2 / 360), &sp_sy_sr_0_cp_cy_cr_1.val[0], &sp_sy_sr_0_cp_cy_cr_1.val[1]);
+
+    auto sp_sr_cp_cr_sy_0_cy_1 = vuzpq_f32(sp_sy_sr_0_cp_cy_cr_1.val[0], sp_sy_sr_0_cp_cy_cr_1.val[1]);
+    auto sp_cp_sy_cy_sr_cr_0_1 = vzipq_f32(sp_sy_sr_0_cp_cy_cr_1.val[0], sp_sy_sr_0_cp_cy_cr_1.val[1]);
+
+    auto _0_sr_cr_0 = vextq_f32(sp_sy_sr_0_cp_cy_cr_1.val[0], sp_cp_sy_cy_sr_cr_0_1.val[1], 3);
+    auto cp_cr_sr_0 = vcombine_f32(vget_high_f32(sp_sr_cp_cr_sy_0_cy_1.val[0]), vget_high_f32(sp_sy_sr_0_cp_cy_cr_1.val[0]));
+    auto cy_sy_sy_0 = vcombine_f32(vrev64_f32(vget_high_f32(sp_sy_sr_0_cp_cy_cr_1.val[0])), vget_low_f32(sp_sr_cp_cr_sy_0_cy_1.val[1]));
+    auto sy_cy_cy_1 = vcombine_f32(vget_high_f32(sp_sy_sr_0_cp_cy_cr_1.val[0]), vget_high_f32(sp_sr_cp_cr_sy_0_cy_1.val[1]));
+
+    auto _0_srsp_crsp_0 = vmulq_laneq_f32(_0_sr_cr_0, sp_sy_sr_0_cp_cy_cr_1.val[0], 0); // *sp
+    matrix[0] = vmulq_laneq_f32(_0_srsp_crsp_0, sp_sy_sr_0_cp_cy_cr_1.val[1], 1); // *cy
+    matrix[1] = vmulq_laneq_f32(_0_srsp_crsp_0, sp_sy_sr_0_cp_cy_cr_1.val[0], 1); // *sy
+
+    const auto sign0 = vreinterpretq_f32_u32(vsetq_lane_u32(0x80000000, vdupq_n_u32(0), 0));
+    const auto sign1 = vreinterpretq_f32_u32(vsetq_lane_u32(0x80000000, vdupq_n_u32(0), 1));
+    const auto sign2 = vreinterpretq_f32_u32(vsetq_lane_u32(0x80000000, vdupq_n_u32(0), 2));
+
+    cy_sy_sy_0 = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(cy_sy_sy_0), sign1));
+    sy_cy_cy_1 = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(sy_cy_cy_1), sign2));
+    matrix[0] = vfmaq_f32(matrix[0], cp_cr_sr_0, cy_sy_sy_0);
+    matrix[1] = vfmaq_f32(matrix[0], cp_cr_sr_0, sy_cy_cy_1);
+
+    auto cp_cr_0_1 = vcombine_f32(vget_high_f32(sp_sr_cp_cr_sy_0_cy_1.val[0]), vget_high_f32(sp_cp_sy_cy_sr_cr_0_1.val[1]));
+    auto _1_cp_cr_0 = vextq_f32(cp_cr_0_1, cp_cr_0_1, 3);
+    matrix[2] = vmulq_f32(sp_sr_cp_cr_sy_0_cy_1.val[0], _1_cp_cr_0);
+    matrix[2] = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(matrix[2]), sign0));
+/*
+    matrix[0][0] =          cp*cy;
+    matrix[0][1] = sr*sp*cy-cr*sy;
+    matrix[0][2] = cr*sp*cy+sr*sy;
+    matrix[0][3] = 0.0;
+    matrix[1][0] =          cp*sy;
+    matrix[1][1] = sr*sp*sy+cr*cy;
+    matrix[1][2] = cr*sp*sy-sr*cy;
+    matrix[1][3] = 0.0;
+    matrix[2][0] = -sp*1;
+    matrix[2][1] = sr*cp;
+    matrix[2][2] = cp*cr;
+    matrix[2][3] = cr*0;
+    */
+#else
     float		angle;
     float		sr, sp, sy, cr, cp, cy;
 
@@ -48,25 +92,7 @@ void XASH_VECTORCALL AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
     matrix[0][3] = 0.0;
     matrix[1][3] = 0.0;
     matrix[2][3] = 0.0;
-
-    float32x4x2_t sp_sy_sr_0_cp_cy_cr_1;
-    sincos_ps(angles * (M_PI*2 / 360), &sp_sy_sr_0_cp_cy_cr_1.val[0], &sp_sy_sr_0_cp_cy_cr_1.val[1]);
-
-    auto sp_sr_cp_cr_sy_0_cy_1 = vuzpq_f32(sp_sy_sr_0_cp_cy_cr_1.val[0], sp_sy_sr_0_cp_cy_cr_1.val[1]);
-    auto sp_cp_sy_cy_sr_cr_0_1 = vzipq_f32(sp_sy_sr_0_cp_cy_cr_1.val[0], sp_sy_sr_0_cp_cy_cr_1.val[1]);
-
-    matrix[0][0] =          cy*cp*1;
-    matrix[0][1] = sr*sp*cy-cr*sy*1;
-    matrix[0][2] = cr*sp*cy+sy*sr*1;
-    matrix[0][3] = 0.0;
-    matrix[1][0] =          cp*sy*1;
-    matrix[1][1] = sr*sp*sy+cr*cy*1;
-    matrix[1][2] = -sr*cy*1+sy*cr*sp;
-    matrix[1][3] = 0.0;
-    matrix[2][0] = -sp*1;
-    matrix[2][1] = sr*cp;
-    matrix[2][2] = cr*cp;
-    matrix[2][3] = 0.0;
+#endif
 }
 
 /*
