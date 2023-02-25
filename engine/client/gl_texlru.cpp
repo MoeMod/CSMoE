@@ -496,7 +496,7 @@ namespace xe {
             //GL_UploadTexture( pic, tex, false, filter );
 
             Assert(tex->target == GL_TEXTURE_CUBE_MAP_ARB);
-            pglActiveTextureARB(GL_TEXTURE2_ARB);
+            pglActiveTextureARB(GL_TEXTURE5_ARB);
             pglDisable(GL_TEXTURE_2D);
             pglEnable(GL_TEXTURE_CUBE_MAP_ARB);
             pglBindTexture(tex->target, tex->texnum);

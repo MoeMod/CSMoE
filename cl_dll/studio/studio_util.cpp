@@ -31,8 +31,8 @@ void XASH_VECTORCALL AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
 
     auto _0_sr_cr_0 = vextq_f32(sp_sy_sr_0_cp_cy_cr_1.val[0], sp_cp_sy_cy_sr_cr_0_1.val[1], 3);
     auto cp_cr_sr_0 = vcombine_f32(vget_high_f32(sp_sr_cp_cr_sy_0_cy_1.val[0]), vget_high_f32(sp_sy_sr_0_cp_cy_cr_1.val[0]));
-    auto cy_sy_sy_0 = vcombine_f32(vrev64_f32(vget_high_f32(sp_sy_sr_0_cp_cy_cr_1.val[0])), vget_low_f32(sp_sr_cp_cr_sy_0_cy_1.val[1]));
-    auto sy_cy_cy_1 = vcombine_f32(vget_high_f32(sp_sy_sr_0_cp_cy_cr_1.val[0]), vget_high_f32(sp_sr_cp_cr_sy_0_cy_1.val[1]));
+    auto cy_sy_sy_0 = vcombine_f32(vrev64_f32(vget_high_f32(sp_cp_sy_cy_sr_cr_0_1.val[0])), vget_low_f32(sp_sr_cp_cr_sy_0_cy_1.val[1]));
+    auto sy_cy_cy_1 = vcombine_f32(vget_high_f32(sp_cp_sy_cy_sr_cr_0_1.val[0]), vget_high_f32(sp_sr_cp_cr_sy_0_cy_1.val[1]));
 
     auto _0_srsp_crsp_0 = vmulq_laneq_f32(_0_sr_cr_0, sp_sy_sr_0_cp_cy_cr_1.val[0], 0); // *sp
     matrix[0] = vmulq_laneq_f32(_0_srsp_crsp_0, sp_sy_sr_0_cp_cy_cr_1.val[1], 1); // *cy
@@ -45,7 +45,7 @@ void XASH_VECTORCALL AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
     cy_sy_sy_0 = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(cy_sy_sy_0), sign1));
     sy_cy_cy_1 = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(sy_cy_cy_1), sign2));
     matrix[0] = vfmaq_f32(matrix[0], cp_cr_sr_0, cy_sy_sy_0);
-    matrix[1] = vfmaq_f32(matrix[0], cp_cr_sr_0, sy_cy_cy_1);
+    matrix[1] = vfmaq_f32(matrix[1], cp_cr_sr_0, sy_cy_cy_1);
 
     auto cp_cr_0_1 = vcombine_f32(vget_high_f32(sp_sr_cp_cr_sy_0_cy_1.val[0]), vget_high_f32(sp_cp_sy_cy_sr_cr_0_1.val[1]));
     auto _1_cp_cr_0 = vextq_f32(cp_cr_0_1, cp_cr_0_1, 3);
@@ -176,22 +176,24 @@ ConcatTransforms
 void XASH_VECTORCALL ConcatTransforms(cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out)
 {
 #if defined(XASH_SIMD) && U_VECTOR_NEON
-	memset(&out, 0, sizeof(out)); // out = {};
+    float32x4x3_t out_reg = {};
 
-	out[0] = vcopyq_laneq_f32(out[0], 3, in1[0], 3); // out[0][3] = in[0][3]
-	out[0] = vfmaq_laneq_f32(out[0], in2[0], in1[0], 0); // out[0][n] += in2[0][n] * in1[0][0]
-	out[0] = vfmaq_laneq_f32(out[0], in2[1], in1[0], 1); // out[0][n] += in2[1][n] * in1[0][1]
-	out[0] = vfmaq_laneq_f32(out[0], in2[2], in1[0], 2); // out[0][n] += in2[2][n] * in1[0][2]
+    out_reg.val[0] = vcopyq_laneq_f32(out_reg.val[0], 3, in1[0], 3); // out[0][3] = in[0][3]
+    out_reg.val[0] = vfmaq_laneq_f32(out_reg.val[0], in2[0], in1[0], 0); // out[0][n] += in2[0][n] * in1[0][0]
+    out_reg.val[0] = vfmaq_laneq_f32(out_reg.val[0], in2[1], in1[0], 1); // out[0][n] += in2[1][n] * in1[0][1]
+    out_reg.val[0] = vfmaq_laneq_f32(out_reg.val[0], in2[2], in1[0], 2); // out[0][n] += in2[2][n] * in1[0][2]
 
-	out[1] = vcopyq_laneq_f32(out[1], 3, in1[1], 3);
-	out[1] = vfmaq_laneq_f32(out[1], in2[0], in1[1], 0);
-	out[1] = vfmaq_laneq_f32(out[1], in2[1], in1[1], 1);
-	out[1] = vfmaq_laneq_f32(out[1], in2[2], in1[1], 2);
+    out_reg.val[1] = vcopyq_laneq_f32(out_reg.val[1], 3, in1[1], 3);
+    out_reg.val[1] = vfmaq_laneq_f32(out_reg.val[1], in2[0], in1[1], 0);
+    out_reg.val[1] = vfmaq_laneq_f32(out_reg.val[1], in2[1], in1[1], 1);
+    out_reg.val[1] = vfmaq_laneq_f32(out_reg.val[1], in2[2], in1[1], 2);
 
-	out[2] = vcopyq_laneq_f32(out[2], 3, in1[2], 3);
-	out[2] = vfmaq_laneq_f32(out[2], in2[0], in1[2], 0);
-	out[2] = vfmaq_laneq_f32(out[2], in2[1], in1[2], 1);
-	out[2] = vfmaq_laneq_f32(out[2], in2[2], in1[2], 2);
+    out_reg.val[2] = vcopyq_laneq_f32(out_reg.val[2], 3, in1[2], 3);
+    out_reg.val[2] = vfmaq_laneq_f32(out_reg.val[2], in2[0], in1[2], 0);
+    out_reg.val[2] = vfmaq_laneq_f32(out_reg.val[2], in2[1], in1[2], 1);
+    out_reg.val[2] = vfmaq_laneq_f32(out_reg.val[2], in2[2], in1[2], 2);
+
+    memcpy(&out, &out_reg, sizeof(out));
 #else
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] +
 		in1[0][2] * in2[2][0];

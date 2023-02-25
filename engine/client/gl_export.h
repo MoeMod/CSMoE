@@ -345,6 +345,11 @@ typedef float GLmatrix[16];
 #define GL_TEXTURE0_ARB			0x84C0
 #define GL_TEXTURE1_ARB			0x84C1
 #define GL_TEXTURE2_ARB                   	0x84C2
+#define GL_TEXTURE3_ARB                   	0x84C3
+#define GL_TEXTURE4_ARB                   	0x84C4
+#define GL_TEXTURE5_ARB                   	0x84C5
+#define GL_TEXTURE6_ARB                   	0x84C6
+#define GL_TEXTURE7_ARB                   	0x84C7
 #define GL_TEXTURE0_SGIS			0x835E
 #define GL_TEXTURE1_SGIS			0x835F
 #define GL_GENERATE_MIPMAP_SGIS           	0x8191

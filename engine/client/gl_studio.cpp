@@ -1588,7 +1588,7 @@ static void R_StudioSetupShader()
 	pglUniform4fARB(g_pstudioshader->uniform.texOffset, 0, 0, 1, 1);
 	pglUniformMatrix4fvARB(g_pstudioshader->uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
 	pglUniform4fvARB(g_pstudioshader->uniform.boneMat, 3 * MAXSTUDIOBONES, (const float*)g_bonestransform);
-	pglUniform1iARB(g_pstudioshader->uniform.texEnvMap, 2);
+	pglUniform1iARB(g_pstudioshader->uniform.texEnvMap, 5);
 	pglUniform4fvARB(g_pstudioshader->uniform.worldEye, 1, (const float*)&RI.vieworg);
 }
 
