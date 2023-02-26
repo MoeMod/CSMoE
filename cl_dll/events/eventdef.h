@@ -298,3 +298,5 @@ HOOK_EVENT(halogun, FireHaloGun);
 HOOK_EVENT(chainsr, FireChainSr);
 HOOK_EVENT(mechanicxm214, FireMechanicXM214);
 HOOK_EVENT(stickybomb, FireStickyBomb);
+HOOK_EVENT(y23s1sfsmg, FireY23S1SFSMG);
+HOOK_EVENT(dartpistol, FireDartPistol);

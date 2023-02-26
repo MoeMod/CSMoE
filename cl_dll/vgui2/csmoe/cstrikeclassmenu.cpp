@@ -45,7 +45,7 @@ const ClassInfo Class_TE[] = {
 	{"arctic","classic"},
 	{"guerilla","classic"},
 	{"militia","classic"},
-	{"buffclassa"},
+	{"buffclassb"},
 	{"buffclasshunter"},
 	{"buffclassblair"},
 };
@@ -64,7 +64,7 @@ const ClassInfo Class_CT[] = {
 	{"sas","classic"},
 	{"gign","classic"},
 	{"spetsnaz","classic"},
-	{"buffclassb"},
+	{"buffclassa"},
 	{"buffclasslycan"},
 	{"buffclassfernando"},
 

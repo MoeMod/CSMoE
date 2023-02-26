@@ -198,6 +198,7 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 		//m_pPlayer->GiveNamedItem("z4b_shovelex");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		//m_pPlayer->GiveNamedItem("weapon_stickybomb");
+		//m_pPlayer->GiveNamedItem("weapon_dartpistol");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
@@ -206,6 +207,7 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		//m_pPlayer->GiveNamedItem("z4b_mechanicxm214");
 		//m_pPlayer->GiveNamedItem("z4b_mechanichand");
+		//m_pPlayer->GiveNamedItem("weapon_y23s1sfsmg");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 

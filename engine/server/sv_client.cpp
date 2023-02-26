@@ -1199,7 +1199,10 @@ void SV_FullClientUpdate( sv_client_t *cl, sizebuf_t *msg )
 	{
 		BF_WriteOneBit( msg, 1 );
 
-		Q_strncpy( info, cl->userinfo, sizeof( info ));
+		//Q_strncpy( info, cl->userinfo, sizeof( info ));
+
+		Q_strncpy(info, cl->userinfo, sizeof(info) - 1);
+		info[sizeof(info) - 1] = '\0';
 
 		// remove server passwords, etc.
 		Info_RemovePrefixedKeys( info, '_' );

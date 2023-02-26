@@ -261,7 +261,10 @@ namespace sv {
 
 	void CWonderCannonEX::DoExpAttachVicStart(CBaseEntity* pVictim)
 	{
-		if (pVictim->m_iTeam != m_pPlayer->m_iTeam)
+		if (!pVictim->IsPlayer() && pVictim->Classify() != CLASS_PLAYER_ALLY)
+			return;
+
+		if (g_pGameRules->PlayerRelationship(m_pPlayer, pVictim) != GR_TEAMMATE)
 			UTIL_TempModel(Vector(0, 0, 0), pev->angles, g_vecZero, m_iHitEffect, 30, 0, 200, 0, 0, 195, kRenderTransAdd, pVictim, false, 0, 8, 0, 0);
 
 		CWonderCannonChain* pNewChain = CWonderCannonChain::Create(1, pVictim->pev->origin, g_vecZero, ENT(m_pPlayer->pev));

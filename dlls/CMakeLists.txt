@@ -662,6 +662,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_y20s1grenade.cpp
 	../dlls/wpn_shared/wpn_chinaeventbomb.cpp
 	../dlls/wpn_shared/z4b_shovelex.cpp
+	../dlls/wpn_shared/wpn_y23s1sfsmg.cpp
+	../dlls/wpn_shared/wpn_dartpistol.cpp
 	)
 
 set(PM_SRCS

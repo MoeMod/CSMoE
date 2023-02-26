@@ -57,4 +57,48 @@ private:
 	unsigned short m_usFireSFSMG;
 };
 
+#ifndef CLIENT_DLL
+class CEF_Y23S1SFSMG;
+#endif
+
+class CY23S1SFSMG : public CSFSMG
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	int GetItemInfo(ItemInfo* p) override;
+	BOOL Deploy() override;
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
+	void PrimaryAttack() override;
+	void SecondaryAttack() override;
+	void Reload() override;
+	void WeaponIdle() override;
+#ifndef CLIENT_DLL
+	void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace) override;
+#endif
+	BOOL UseDecrement() override {
+#ifdef CLIENT_WEAPONS
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+	const char* GetCSModelName() override { return "models/w_y23s1sfsmg.mdl"; }
+
+public:
+	void Y23S1SFSMGFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
+
+	float GetDamage() const;
+	float GetDamageB() const;
+	float GetDamageC() const;
+
+private:
+#ifndef CLIENT_DLL
+	EntityHandle<CEF_Y23S1SFSMG> m_pEffect;
+#endif
+	int m_iDefaultAmmo2;
+	unsigned short m_usFireY23S1SFSMG;
+};
+
 }

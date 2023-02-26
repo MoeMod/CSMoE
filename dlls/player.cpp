@@ -2778,7 +2778,23 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 			animDesired = LookupSequence(szAnim);
 
 			if (animDesired == -1)
-				animDesired = 0;
+			{
+				//cf model
+				switch (m_Activity)
+				{
+				case ACT_RANGE_ATTACK1:	
+				case ACT_RANGE_ATTACK2:
+					Q_strcpy(szAnim, "M-shoot-"); break;
+				case ACT_RELOAD:	Q_strcpy(szAnim, "M-reload-"); break;
+				default:		Q_strcpy(szAnim, "M-idle-"); break;
+				}
+	
+				Q_strcat(szAnim, m_szAnimExtention);
+				animDesired = LookupSequence(szAnim);
+
+				if (animDesired == -1)
+					animDesired = 0;
+			}
 		}
 			
 		if (pev->sequence != animDesired || !m_fSequenceLoops)
@@ -2806,8 +2822,21 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 
 		Q_strcat(szAnim, m_szAnimExtention);
 		animDesired = LookupSequence(szAnim);
+
 		if (animDesired == -1)
-			animDesired = 0;
+		{
+			//cf model
+			if (pev->flags & FL_DUCKING)
+				Q_strcpy(szAnim, "M-c-shoot-");
+			else
+				Q_strcpy(szAnim, "M-shoot-");
+
+			Q_strcat(szAnim, m_szAnimExtention);
+			animDesired = LookupSequence(szAnim);
+
+			if (animDesired == -1)
+				animDesired = 0;
+		}
 
 		pev->sequence = animDesired;
 		pev->frame = 0;
@@ -2828,7 +2857,19 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		Q_strcat(szAnim, m_szAnimExtention);
 		animDesired = LookupSequence(szAnim);
 		if (animDesired == -1)
-			animDesired = 0;
+		{
+			//cf model
+			if (pev->flags & FL_DUCKING)
+				Q_strcpy(szAnim, "M-c-shoot-");
+			else
+				Q_strcpy(szAnim, "M-shoot-");
+
+			Q_strcat(szAnim, m_szAnimExtention);
+			animDesired = LookupSequence(szAnim);
+
+			if (animDesired == -1)
+				animDesired = 0;
+		}
 
 		pev->sequence = animDesired;
 		pev->frame = 0;
@@ -2847,7 +2888,19 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		Q_strcat(szAnim, m_szAnimExtention);
 		animDesired = LookupSequence(szAnim);
 		if (animDesired == -1)
-			animDesired = 0;
+		{
+			//cf model
+			if (pev->flags & FL_DUCKING)
+				Q_strcpy(szAnim, "M-c-reload-");
+			else
+				Q_strcpy(szAnim, "M-reload-");
+
+			Q_strcat(szAnim, m_szAnimExtention);
+			animDesired = LookupSequence(szAnim);
+
+			if (animDesired == -1)
+				animDesired = 0;
+		}
 
 		if (pev->sequence != animDesired || !m_fSequenceLoops)
 			pev->frame = 0;
@@ -2868,7 +2921,19 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		Q_strcat(szAnim, m_szAnimExtention);
 		animDesired = LookupSequence(szAnim);
 		if (animDesired == -1)
-			animDesired = 0;
+		{
+			//cf model
+			if (pev->flags & FL_DUCKING)
+				Q_strcpy(szAnim, "M-c-idle-");
+			else
+				Q_strcpy(szAnim, "M-idle-");
+
+			Q_strcat(szAnim, m_szAnimExtention);
+			animDesired = LookupSequence(szAnim);
+
+			if (animDesired == -1)
+				animDesired = 0;
+		}
 
 		m_Activity = m_IdealActivity;
 		break;
@@ -2922,7 +2987,19 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 					animDesired = LookupSequence(szAnim);
 
 					if (animDesired == -1)
-						animDesired = 0;
+					{
+						//cf model
+						if (pev->flags & FL_DUCKING)
+							Q_strcpy(szAnim, "M-c-idle-");
+						else
+							Q_strcpy(szAnim, "M-idle-");
+
+						Q_strcat(szAnim, m_szAnimExtention);
+						animDesired = LookupSequence(szAnim);
+
+						if (animDesired == -1)
+							animDesired = 0;
+					}
 				}
 
 				m_Activity = ACT_WALK;
@@ -2959,7 +3036,19 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 						animDesired = LookupSequence(szAnim);
 
 						if (animDesired == -1)
-							animDesired = 0;
+						{
+							//cf model
+							if (pev->flags & FL_DUCKING)
+								Q_strcpy(szAnim, "M-c-idle-");
+							else
+								Q_strcpy(szAnim, "M-idle-");
+
+							Q_strcat(szAnim, m_szAnimExtention);
+							animDesired = LookupSequence(szAnim);
+
+							if (animDesired == -1)
+								animDesired = 0;
+						}
 					}
 
 					if (bMeatWallZombie)
@@ -3356,8 +3445,20 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 
 								animDesired = LookupSequence(szAnim);
 
-								if (animDesired == -1)		//ensure dummy
-									animDesired = 0;
+								if (animDesired == -1)
+								{
+									//cf model
+									if (pev->flags & FL_DUCKING)
+										Q_strcpy(szAnim, "M-c-idle-");
+									else
+										Q_strcpy(szAnim, "M-idle-");
+
+									Q_strcat(szAnim, m_szAnimExtention);
+									animDesired = LookupSequence(szAnim);
+
+									if (animDesired == -1)
+										animDesired = 0;
+								}
 							}
 						}
 						else

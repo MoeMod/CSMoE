@@ -1426,6 +1426,8 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_VULCANUS1:
 		case WEAPON_CROW1:
 		case WEAPON_THANATOS1:
+		case WEAPON_DARTPISTOL:
+		case WEAPON_Y23S1DARTPISTOL:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:

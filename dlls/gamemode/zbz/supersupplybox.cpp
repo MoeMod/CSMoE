@@ -275,7 +275,7 @@ void CSuperSupplyBox::SupplyboxTouch(CBaseEntity* pOther)
 
 	p->m_iBuff |= BUFF_MASTERHUNTER;
 	pev->effects |= EF_NODRAW;
-	SUB_Remove();
+	UTIL_Remove(this);
 	return;
 }
 
@@ -312,6 +312,14 @@ void CSuperSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYP
 	p->m_bHasPrimary = false;
 	p->m_bHolsterDisabled = true;
 
+	p->pev->max_health = 10000.0f;
+	p->pev->health += 6000.0f;
+	if (p->pev->health >= p->pev->max_health)
+		p->pev->health = p->pev->max_health;
+
+	p->pev->armorvalue = 1000.0f;
+
+	SET_CLIENT_KEY_VALUE(p->entindex(), GET_INFO_BUFFER(p->edict()), "model", "lasthero");
 	p->SetNewPlayerModel("models/player/lasthero/lasthero.mdl");
 	p->GiveNamedItem("weapon_herochainsaw");
 
@@ -320,7 +328,7 @@ void CSuperSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYP
 	EMIT_SOUND(ENT(p->pev), CHAN_BODY, "zombi/get_box.wav", VOL_NORM, ATTN_NORM);
 
 	pev->effects |= EF_NODRAW;
-	SUB_Remove();
+	UTIL_Remove(this);
 }
 
 

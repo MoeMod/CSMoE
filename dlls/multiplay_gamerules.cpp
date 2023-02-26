@@ -4418,19 +4418,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 	{
 		CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(CBaseEntity::Instance(pevInflictor));
 
-		switch (pWeapon->m_iWeaponState)
-		{
-		case 1:
-			killer_weapon_name = "knife_holysword"; break;
-		case 2:
-			killer_weapon_name = "knife_katana"; break;
-		case 3:
-			killer_weapon_name = "knife_janus9"; break;
-		case 4:
-			killer_weapon_name = "knife_axe"; break;
-		default:
-			break;
-		}	
+		killer_weapon_name = SHOVELEX_CLASSNAME[pWeapon->m_iWeaponState];
 	}
 
 	// strip the monster_* or weapon_* from the inflictor's classname

@@ -47,6 +47,12 @@ int CKnifeShovelEX::GetItemInfo(ItemInfo* p)
 	return 1;
 }
 
+int CKnifeShovelEX::AddToPlayer(CBasePlayer* pPlayer)
+{
+
+	return CBasePlayerWeapon::AddToPlayer(pPlayer);
+}
+
 void CKnifeShovelEX::Precache()
 {
 	for (int i = 0; i < SHOVELEX_MAX_TYPE; i++)
@@ -62,6 +68,8 @@ void CKnifeShovelEX::ItemPostFrame()
 {
 	if (m_pPlayer->pev->button & IN_RELOAD)
 	{
+		m_iStoredChange.clear();
+
 		m_iWeaponState = 0;
 		m_pPlayer->pev->button &= ~IN_RELOAD;
 
@@ -69,9 +77,8 @@ void CKnifeShovelEX::ItemPostFrame()
 		ItemInfo II;
 		GetItemInfo(&II);
 
-
 		MESSAGE_BEGIN(MSG_ONE, gmsgWeaponList2, NULL, m_pPlayer->pev);
-		WRITE_STRING("z4b_shovelex");
+		WRITE_STRING(CLASSNAME[m_iWeaponState]);
 		WRITE_SHORT(CBasePlayer::GetAmmoIndex(II.pszAmmo1));
 		WRITE_BYTE(II.iMaxAmmo1);
 		WRITE_SHORT(CBasePlayer::GetAmmoIndex(II.pszAmmo2));
@@ -92,13 +99,17 @@ void CKnifeShovelEX::ItemPostFrame()
 
 BOOL CKnifeShovelEX::Deploy()
 {
+#ifndef CLIENT_DLL
+	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "omoh_bl");
+	m_pPlayer->SetNewPlayerModel("models/player/omoh_bl/omoh_bl.mdl");
+#endif
 	m_fMaxSpeed = 250;
 	m_iSwing = 0;
 	ResetRunIdle();
 
 	if (DefaultDeploy(V_CUSTOM_MODEL[m_iWeaponState], P_CUSTOM_MODEL[m_iWeaponState], ANIM_DRAW, AnimExtension, UseDecrement() != FALSE))
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 		pev->body = m_pPlayer->m_bIsFemale ? 1 : 2;
 		return TRUE;
 	}
@@ -117,29 +128,29 @@ void CKnifeShovelEX::Spawn()
 
 void CKnifeShovelEX::ChangeWeapon()
 {
-	m_iWeaponState = RANDOM_LONG(0, SHOVELEX_MAX_TYPE - 1);
+	int iType = RANDOM_LONG(0, SHOVELEX_MAX_TYPE - 1);
 
+	if(m_iStoredChange.size() >= SHOVELEX_MAX_TYPE)
+	{
+		m_iStoredChange.clear();
+		m_iStoredChange.push_back(iType);
+	}
+	else
+	{
+		while (std::find(m_iStoredChange.begin(), m_iStoredChange.end(), iType) != m_iStoredChange.end())
+		{
+			iType = RANDOM_LONG(0, SHOVELEX_MAX_TYPE - 1);
+		}
+
+		m_iStoredChange.push_back(iType);
+	}
+	m_iWeaponState = iType;
 #ifndef CLIENT_DLL
 	ItemInfo II;
 	GetItemInfo(&II);
 
-	const char* pszName;
-	switch (m_iWeaponState)
-	{
-	case 1:
-		pszName = "z4b_kukriex"; break;
-	case 2:
-		pszName = "z4b_normalknife"; break;
-	case 3:
-		pszName = "z4b_hawlchicken"; break;
-	case 4:
-		pszName = "z4b_lightknife"; break;	
-	default:
-		pszName = "z4b_shovelex"; break;
-	}
-
 	MESSAGE_BEGIN(MSG_ONE, gmsgWeaponList2, NULL, m_pPlayer->pev);
-	WRITE_STRING(pszName);
+	WRITE_STRING(CLASSNAME[m_iWeaponState]);
 	WRITE_SHORT(CBasePlayer::GetAmmoIndex(II.pszAmmo1));
 	WRITE_BYTE(II.iMaxAmmo1);
 	WRITE_SHORT(CBasePlayer::GetAmmoIndex(II.pszAmmo2));
@@ -161,30 +172,91 @@ void CKnifeShovelEX::Holster(int skiplocal)
 
 void CKnifeShovelEX::PrimaryAttack(void)
 {
-	m_iSwing = 0;
-	SendWeaponAnim(pev->iuser1++ ? ANIM_SLASH1 : ANIM_SLASH2, UseDecrement() != FALSE);
-	if (pev->iuser1)
+	pev->iuser1 = 0;
+	switch (m_iWeaponState)
+	{
+	case TYPE_KNIFE:
+	case TYPE_KUKRI:
+	case TYPE_CLASSICKUKRI:
+		SendWeaponAnim(m_iSwing++ ? ANIM_SLASH2 : ANIM_SLASH1, UseDecrement() != FALSE);
+		break;
+	default:
+		SendWeaponAnim(m_iSwing++ ? ANIM_SLASH1 : ANIM_SLASH2, UseDecrement() != FALSE);
+		break;
+	}
+
+
+#ifndef CLIENT_DLL
+
+	if (m_iWeaponState == TYPE_CLASSICKUKRI)
+	{
+		strcpy(m_pPlayer->m_szCustomSequence, "M-shoot-kukri");
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.6s;
+	}
+	else if (m_iWeaponState == TYPE_AXE)
+	{
+		strcpy(m_pPlayer->m_szCustomSequence, "M-shoot-Axe");
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.6s;
+	}
+	else
+	{
+		strcpy(m_pPlayer->m_szCustomSequence, "M-shoot-Keris");
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.6s;
+	}
+
+	m_pPlayer->pev->frame = 0;
+	m_pPlayer->ResetSequenceInfo();
+#endif
+
+	if (m_iSwing)
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/shovelex/shovelex_Attack_1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	else
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/shovelex/shovelex_Attack_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-	pev->iuser1 %= 2;
+	m_iSwing %= 2;
 	SetThink(&CKnifeShovelEX::DelayPrimaryAttack);
-	pev->nextthink = gpGlobals->time + 0.17s;
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.8s;
+	pev->nextthink = gpGlobals->time + GetDelayPrimaryAttack();
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + GetNextPrimaryAttack();
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetPrimaryWeaponIdle();
 	ResetRunIdle();
 }
 
 void CKnifeShovelEX::SecondaryAttack(void)
 {
+	m_iSwing = 0;
+	pev->iuser1 = 0;
+
+#ifndef CLIENT_DLL
+	{
+		
+		if (m_iWeaponState == TYPE_SHOVELEX ||
+			m_iWeaponState == TYPE_SHOVEL ||
+			m_iWeaponState == TYPE_HAWLCHICKEN)
+		{
+			strcpy(m_pPlayer->m_szCustomSequence, "M-shoot-Shovel");
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.0s;
+		}
+		else
+		{
+			strcpy(m_pPlayer->m_szCustomSequence, "M-shoot-knuckle");
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.2s;
+		}
+
+	}
+		
+
+	m_pPlayer->pev->frame = 0;
+	m_pPlayer->ResetSequenceInfo();
+	
+#endif
+
 	SendWeaponAnim(RANDOM_LONG(0, 1)? ANIM_STAB1:ANIM_STAB2, UseDecrement() != FALSE);
 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/shovelex/Hero_ATTACK_3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	SetThink(&CKnifeShovelEX::DelaySecondaryAttack);
-	pev->nextthink = gpGlobals->time + 0.87s;
+	pev->nextthink = gpGlobals->time + GetDelaySecondaryAttack();
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
-	m_iSwing = 0;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + GetNextSecondaryAttack();
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetSecondaryWeaponIdle();
+
 	ResetRunIdle();
 }
 
@@ -206,6 +278,21 @@ void CKnifeShovelEX::DelayPrimaryAttack()
 	}
 	}
 #endif
+
+	if (m_iWeaponState == TYPE_KNUCKLE)
+	{
+		if (++pev->iuser1 & 1)
+		{
+			pev->nextthink = gpGlobals->time + 0.23s;
+			SetThink(&CKnifeShovelEX::DelayPrimaryAttack);
+		}
+		else
+		{
+			SetThink(nullptr);
+		}
+	}
+
+	
 }
 
 void CKnifeShovelEX::DelaySecondaryAttack()
@@ -232,16 +319,17 @@ void CKnifeShovelEX::DelaySecondaryAttack()
 
 void CKnifeShovelEX::WeaponIdle(void)
 {
-	ResetEmptySound();
 	if (m_flTimeWeaponIdle < UTIL_WeaponTimeBase())
 	{
+		m_iSwing = 0;
+
 		if (m_pPlayer->pev->button & (IN_FORWARD | IN_MOVELEFT | IN_MOVERIGHT | IN_BACK))
 		{
 			if (m_flNextRunIdle <= UTIL_WeaponTimeBase())
 			{
 				SendWeaponAnim(ANIM_RUN, UseDecrement() != FALSE);
 
-				m_flNextRunIdle = UTIL_WeaponTimeBase() + 0.8s;
+				m_flNextRunIdle = UTIL_WeaponTimeBase() + GetNextRunTime();
 			}
 
 			m_flNextIdle = UTIL_WeaponTimeBase();

@@ -311,6 +311,7 @@ void CHud :: VidInit( void )
 		AddPrivateSprList("d_halogun", "640hud225", PushBackSprRect(172, 0, 48, 16), 640);
 		AddPrivateSprList("d_claymore", "640hud14", PushBackSprRect(222, 48, 32, 16), 640);
 		AddPrivateSprList("d_sbmine", "640hud57", PushBackSprRect(172, 32, 48, 16), 640);
+		AddPrivateSprList("d_y23s1sfsmg", "640hud227", PushBackSprRect(172, 0, 48, 16), 640);
 
 		if( m_pSpriteList )
 		{

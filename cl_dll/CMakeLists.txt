@@ -462,6 +462,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_chinaeventbomb.cpp
 	../dlls/wpn_shared/z4b_mechanichand.cpp
 	../dlls/wpn_shared/z4b_shovelex.cpp
+	../dlls/wpn_shared/wpn_y23s1sfsmg.cpp
+	../dlls/wpn_shared/wpn_dartpistol.cpp
 	)
 
 set (HUD_SRCS

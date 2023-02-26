@@ -112,6 +112,18 @@ void CQbarrel::PrimaryAttack(void)
 	m_iInstantShots = 1;
 #ifndef CLIENT_DLL
 	m_pPlayer->FireBullets(6 * m_iClip, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetDamage());
+
+	if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+	{
+		CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(pEntity);
+		if (player)
+		{
+			if(player->m_bIsZombie)
+				pEntity->pev->velocity.z += 200.0f;
+		}
+		else
+			pEntity->pev->velocity.z += 200.0f;	
+	}
 #endif
 	int flags;
 #ifdef CLIENT_WEAPONS

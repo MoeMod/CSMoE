@@ -145,6 +145,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "m79g" , WEAPON_M79G},
 	{ "janus1" , WEAPON_JANUS1},
 	{ "firecracker" , WEAPON_FIRECRACKER},
+	{ "dartpistol",	WEAPON_DARTPISTOL },
+	{ "y23s1dartpistol",	WEAPON_Y23S1DARTPISTOL },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -207,6 +209,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "skull3",	WEAPON_SKULL3 },
 	{ "skull3d",	WEAPON_SKULL3D },
 	{ "thanatos3",	WEAPON_THANATOS3 },
+	{ "y23s1sfsmg",	WEAPON_Y23S1SFSMG },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -623,6 +626,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "m79g" , WEAPONCLASS_PISTOL},
 	{ "janus1" , WEAPONCLASS_PISTOL},
 	{ "firecracker" , WEAPONCLASS_PISTOL},
+	{ "dartpistol",	WEAPONCLASS_PISTOL },
+	{ "y23s1dartpistol",	WEAPONCLASS_PISTOL },
 
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
@@ -689,6 +694,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "skull3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "skull3d",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "thanatos3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "y23s1sfsmg",	WEAPONCLASS_SUBMACHINEGUN },
 
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
@@ -1275,6 +1281,8 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_M79G:
 	case WEAPON_JANUS1:
 	case WEAPON_FIRECRACKER:
+	case WEAPON_DARTPISTOL:
+	case WEAPON_Y23S1DARTPISTOL:
 		return true;
 	default:
 		break;

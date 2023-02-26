@@ -30,6 +30,21 @@ namespace cl {
 namespace sv {
 #endif
 
+#define SHOVELEX_MAX_TYPE	9
+
+static const char* SHOVELEX_CLASSNAME[SHOVELEX_MAX_TYPE] =
+{
+	"z4b_shovelex",
+	"z4b_kukri",
+	"z4b_classickukri",
+	"z4b_knife",
+	"z4b_axe",
+	"z4b_hawlchicken",
+	"z4b_shovel",
+	"z4b_knuckle",
+	"z4b_bcaxevip",
+};
+
 class CKnifeShovelEX: public LinkWeaponTemplate<CKnifeShovelEX,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type
@@ -47,7 +62,19 @@ public:
 	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.7f };
 
 public:
-#define SHOVELEX_MAX_TYPE	5
+
+	enum shovelex_type
+	{
+		TYPE_SHOVELEX,
+		TYPE_KUKRI,
+		TYPE_CLASSICKUKRI,
+		TYPE_KNIFE,
+		TYPE_AXE,
+		TYPE_HAWLCHICKEN,
+		TYPE_SHOVEL,
+		TYPE_KNUCKLE,
+		TYPE_BCAXE_VIP,
+	};
 
 	enum skullaxe_e
 	{
@@ -65,6 +92,7 @@ public:
 	void Precache() override;
 	BOOL Deploy() override;
 
+	int AddToPlayer(CBasePlayer* pPlayer) override;
 	void ItemPostFrame() override;
 	int GetItemInfo(ItemInfo* p) override;
 	void Holster(int skiplocal) override;
@@ -77,25 +105,46 @@ public:
 
 	void ChangeWeapon();
 
+	const char* CLASSNAME[SHOVELEX_MAX_TYPE] =
+	{
+		"z4b_shovelex",
+		"z4b_kukri",
+		"z4b_classickukri",
+		"z4b_knife",
+		"z4b_axe",
+		"z4b_hawlchicken",
+		"z4b_shovel",
+		"z4b_knuckle",
+		"z4b_bcaxevip",
+	};
+
 	const char* V_CUSTOM_MODEL[SHOVELEX_MAX_TYPE] =
 	{
-		"models/z4b/v_shovelice.mdl",
-		"models/z4b/v_kukriex.mdl",
-		"models/z4b/v_normalknife.mdl",
-		"models/z4b/v_hawlchicken.mdl",
-		"models/z4b/v_lightknife.mdl",	
+		"models/z4b/shovel_bornbeast/v_shovel_bornbeast.mdl",
+		"models/z4b/kukri/v_kukri.mdl",
+		"models/z4b/kukri/v_classickukri.mdl",
+		"models/z4b/knife/v_knife.mdl",
+		"models/z4b/axe/v_axe.mdl",	
+		"models/z4b/hawlchicken/v_hawlchicken.mdl",
+		"models/z4b/shovel/v_shovel.mdl",
+		"models/z4b/knuckle/v_knuckle.mdl",
+		"models/z4b/bcaxevip/v_bcaxevip.mdl",
 	};
 
 	const char* P_CUSTOM_MODEL[SHOVELEX_MAX_TYPE] =
 	{
-		"models/z4b/p_shovelice.mdl",
-		"models/z4b/p_kukriex.mdl",
-		"models/z4b/p_normalknife.mdl",
-		"models/z4b/p_hawlchicken.mdl",
-		"models/z4b/p_lightknife.mdl",
+		"models/z4b/shovel_bornbeast/p_shovel_bornbeast.mdl",
+		"models/z4b/kukri/p_kukri.mdl",
+		"models/z4b/kukri/p_kukri.mdl",
+		"models/z4b/knife/p_knife.mdl",
+		"models/z4b/axe/p_axe.mdl",
+		"models/z4b/hawlchicken/p_hawlchicken.mdl",
+		"models/z4b/shovel/p_shovel.mdl",
+		"models/z4b/knuckle/p_knuckle.mdl",
+		"models/z4b/bcaxevip/p_bcaxevip.mdl",
 	};
 
-
+	std::vector<int> m_iStoredChange;
 	duration_t m_flNextRunIdle;
 	duration_t m_flNextIdle;
 
@@ -119,6 +168,7 @@ public:
 #endif
 		return flDamage;
 	}
+
 	float GetSecondaryAttackDamage() const
 	{
 		float flDamage = 120;
@@ -130,7 +180,219 @@ public:
 #endif
 		return flDamage;
 	}
-	
+
+	duration_t GetDelayPrimaryAttack()
+	{
+		duration_t time;
+		switch (m_iWeaponState)
+		{
+		case TYPE_SHOVELEX:
+		case TYPE_KUKRI:
+		case TYPE_CLASSICKUKRI:
+			time = 0.28s;
+			break;
+		case TYPE_KNIFE:
+			time = 0.08s;
+			break;
+		case TYPE_AXE:
+			time = 0.17s;
+			break;
+		case TYPE_HAWLCHICKEN:
+		case TYPE_SHOVEL:
+			time = 0.2s;
+			break;
+		case TYPE_KNUCKLE:
+			time = 0.2s;
+			break;
+		default:
+			time = 0s;
+			break;
+		}
+
+		return time;
+	}
+
+	duration_t GetNextPrimaryAttack()
+	{
+		duration_t time;
+		switch (m_iWeaponState)
+		{
+		case TYPE_SHOVELEX:
+		case TYPE_KUKRI:
+		case TYPE_CLASSICKUKRI:
+			time = 0.53s;
+			break;
+		case TYPE_KNIFE:
+			time = 0.28s;
+			break;
+		case TYPE_AXE:
+			time = 0.7s;
+			break;
+		case TYPE_HAWLCHICKEN:
+		case TYPE_SHOVEL:
+			time = 0.55s;
+			break;
+		case TYPE_KNUCKLE:
+			time = 0.75s;
+			break;
+		default:
+			time = 0s;
+			break;
+		}
+
+		return time;
+	}
+
+	duration_t GetPrimaryWeaponIdle()
+	{
+		duration_t time;
+		switch (m_iWeaponState)
+		{
+		case TYPE_SHOVELEX:
+		case TYPE_KUKRI:
+		case TYPE_CLASSICKUKRI:
+			time = 0.55s;
+			break;
+		case TYPE_KNIFE:
+			time = 0.32s;
+			break;
+		case TYPE_AXE:
+			time = 0.73s;
+			break;
+		case TYPE_HAWLCHICKEN:
+		case TYPE_SHOVEL:
+			time = 0.57s;
+			break;
+		case TYPE_KNUCKLE:
+			time = 0.75s;
+			break;
+		default:
+			time = 0s;
+			break;
+		}
+
+		return time;
+	}
+
+	duration_t GetDelaySecondaryAttack()
+	{
+		duration_t time;
+		switch (m_iWeaponState)
+		{
+		case TYPE_SHOVELEX:
+		case TYPE_KUKRI:
+		case TYPE_CLASSICKUKRI:
+			time = 0.72s;
+			break;
+		case TYPE_KNIFE:
+			time = 0.52s;
+			break;
+		case TYPE_AXE:
+			time = 0.64s;
+			break;
+		case TYPE_HAWLCHICKEN:
+		case TYPE_SHOVEL:
+			time = 0.83s;
+			break;
+		case TYPE_KNUCKLE:
+			time = 0.45s;
+			break;
+		default:
+			time = 0s;
+			break;
+		}
+
+		return time;
+	}
+
+	duration_t GetNextSecondaryAttack()
+	{
+		duration_t time;
+		switch (m_iWeaponState)
+		{
+		case TYPE_SHOVELEX:
+		case TYPE_KUKRI:
+		case TYPE_CLASSICKUKRI:
+			time = 1.3s;
+			break;
+		case TYPE_KNIFE:
+			time = 1.2s;
+			break;
+		case TYPE_AXE:
+			time = 1.4s;
+			break;
+		case TYPE_HAWLCHICKEN:
+		case TYPE_SHOVEL:
+			time = 1.2s;
+			break;
+		case TYPE_KNUCKLE:
+			time = 1.1s;
+			break;
+		default:
+			time = 0s;
+			break;
+		}
+
+		return time;
+	}
+
+
+	duration_t GetSecondaryWeaponIdle()
+	{
+		duration_t time;
+		switch (m_iWeaponState)
+		{
+		case TYPE_SHOVELEX:
+		case TYPE_KUKRI:
+		case TYPE_CLASSICKUKRI:
+			time = 1.4s;
+			break;
+		case TYPE_KNIFE:
+			time = 1.3s;
+			break;
+		case TYPE_AXE:
+			time = 1.5s;
+			break;
+		case TYPE_HAWLCHICKEN:
+		case TYPE_SHOVEL:
+			time = 1.3s;
+			break;
+		case TYPE_KNUCKLE:
+			time = 1.2s;
+			break;
+		default:
+			time = 0s;
+			break;
+		}
+
+		return time;
+	}
+
+	duration_t GetNextRunTime()
+	{
+		duration_t time;
+		switch (m_iWeaponState)
+		{
+		case TYPE_SHOVELEX:
+		case TYPE_KUKRI:
+		case TYPE_CLASSICKUKRI:
+			time = 0.75s;
+			break;
+		case TYPE_KNIFE:
+		case TYPE_AXE:
+			time = 0.8s;
+			break;
+		case TYPE_HAWLCHICKEN:
+		case TYPE_SHOVEL:
+			time = 0.81s;
+			break;
+		default:
+			time = 0s;
+			break;
+		}
+
+		return time;
+	}
 
 };
 

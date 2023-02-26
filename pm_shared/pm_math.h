@@ -34,6 +34,9 @@ constexpr int nanmask = 255 << 23;
 
 inline bool IS_NAN(float x) { return ((*reinterpret_cast<int *>(&(x)) & nanmask) == nanmask); }
 
+#if defined(CLIENT_DLL)
+void	XASH_VECTORCALL VectorTransform(const vec3_t in1, cmatrix3x4 in2, vec3_t_ref out);
+#else
 inline void AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
 {
 	float angle;
@@ -63,6 +66,7 @@ inline void AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
 	matrix[1][3] = 0.0;
 	matrix[2][3] = 0.0;
 }
+#endif
 
 inline void AngleIMatrix(const vec3_t angles, matrix3x4_ref matrix)
 {
@@ -157,12 +161,16 @@ AngleBetweenVectors
 ===================
 */
 
+#if defined(CLIENT_DLL)
+void	XASH_VECTORCALL VectorTransform(const vec3_t in1, cmatrix3x4 in2, vec3_t_ref out);
+#else
 inline void VectorTransform(const vec3_t in1, cmatrix3x4 in2, vec3_t_ref out)
 {
 	out[0] = DotProduct( in1, vec3_t(in2[0][0], in2[0][1], in2[0][2]) ) + in2[0][3];
 	out[1] = DotProduct( in1, vec3_t(in2[1][0], in2[1][1], in2[1][2]) ) + in2[1][3];
 	out[2] = DotProduct( in1, vec3_t(in2[2][0], in2[2][1], in2[2][2]) ) + in2[2][3];
 }
+#endif
 
 inline int   Q_log2(int val)
 {

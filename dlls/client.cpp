@@ -45,7 +45,7 @@
 #include "newmenus.h"
 #include "client/admin.h"
 #include "client/wdnmd.h"
-
+#include "wpn_shared/z4b_shovelex.h"
 #include <tuple>
 
 namespace sv {
@@ -1713,7 +1713,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 			}
 			case 13:
 			{
-				appearance.model_id = MODEL_BUFFCLASSA;
+				appearance.model_id = MODEL_BUFFCLASSB;
 				break;
 			}
 			case 14:
@@ -1804,7 +1804,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 		}
 		case 13:
 		{
-			appearance.model_id = MODEL_BUFFCLASSB;
+			appearance.model_id = MODEL_BUFFCLASSA;
 			break;
 		}
 		case 14:
@@ -3641,10 +3641,14 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (((pstr = Q_strstr(pcmd, "z4b_")) != NULL) && (pstr == pcmd))
 			{
-				if (FStrEq(pcmd, "z4b_kukriex") ||
-					FStrEq(pcmd, "z4b_normalknife") || 
-					FStrEq(pcmd, "z4b_hawlchicken") || 
-					FStrEq(pcmd, "z4b_lightknife"))
+				if (FStrEq(pcmd, SHOVELEX_CLASSNAME[0]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[1]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[2]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[3]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[4]) || 
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[5]) || 
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[6]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[7]))
 				{
 					GetClassPtr<CBasePlayer>(pev)->SelectItem("z4b_shovelex");
 				}

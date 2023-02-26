@@ -40,6 +40,7 @@ static const char* sPlayerModelFiles[] =
 	"models/player/healhunter/healhunter.mdl",
 	"models/player/lasthero/lasthero.mdl",
 	"models/player/mechanichero/mechanichero.mdl",
+	"models/player/omoh_bl/omoh_bl.mdl",
 };
 
 

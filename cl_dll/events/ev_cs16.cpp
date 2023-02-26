@@ -43,6 +43,9 @@ float g_flY22s2SFPistolBeamTime[33];
 BEAM* g_pY22s2SFPistolBeams[33];
 TEMPENTITY* g_pY22s2SFPistolParticles[33];
 TEMPENTITY* g_pChainsawEXParticles[33];
+float g_flY23S1SFSMGBeamTime[33];
+BEAM* g_pY23S1SFSMGBeams[33];
+TEMPENTITY* g_pY23S1SFSMGParticles[33];
 
 // play a strike sound based on the texture that was hit by the attack traceline.  VecSrc/VecEnd are the
 // original traceline endpoints used by the attacker, iBulletType is the type of bullet that hit the texture.
@@ -1311,6 +1314,9 @@ void ResetSFPistolEntities(void)
 		g_pY22s2SFPistolBeams[i] = nullptr;
 		g_pY22s2SFPistolParticles[i] = nullptr;
 		g_pChainsawEXParticles[i] = nullptr;
+		g_flY23S1SFSMGBeamTime[i] = 0;
+		g_pY23S1SFSMGBeams[i] = nullptr;
+		g_pY23S1SFSMGParticles[i] = nullptr;
 	}
 }
 
@@ -1391,6 +1397,7 @@ void CreateSFPistolBeams(void)
 		}
 	}
 }
+
 void CreateSFPistolBeams2(void)
 {
 	for (int i = 0; i < 33; i++)
@@ -1469,10 +1476,95 @@ void CreateSFPistolBeams2(void)
 	}
 }
 
+void CreateY23S1SFSMGBeams(void)
+{
+	for (int i = 0; i < 33; i++)
+	{
+		if (g_pY23S1SFSMGBeams[i] == nullptr)
+			continue;
+
+		if (gHUD.m_flTime >= g_flY23S1SFSMGBeamTime[i])
+		{
+			if (g_pY23S1SFSMGBeams[i])
+				g_pY23S1SFSMGBeams[i] = nullptr;
+
+			continue;
+		}
+			
+		cl_entity_t* pl = gEngfuncs.GetEntityByIndex(i);
+
+		Vector pos, forward, right, up;
+		pmtrace_t tr;
+
+		if (!EV_IsLocal(i))
+		{
+			AngleVectors(pl->angles, forward, right, up);
+
+			pos = pl->origin + Vector(0, 0, 16) + forward * 30;
+		}
+		else
+		{
+			cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(i);
+
+			vec3_t viewangles;
+
+			gEngfuncs.GetViewAngles(viewangles);
+
+			gEngfuncs.pfnAngleVectors(viewangles, forward, right, up);
+
+			cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+			if (!viewent || !viewent->model || stricmp(viewent->model->name, "models/v_y23s1sfsmg.mdl"))
+			{
+				g_flY23S1SFSMGBeamTime[i] = 0;
+				g_pY23S1SFSMGBeams[i]->die = 0;
+				g_pY23S1SFSMGBeams[i] = nullptr;
+
+				if (g_pY23S1SFSMGParticles[i])
+				{
+					g_pY23S1SFSMGParticles[i]->die = gHUD.m_flTime;
+					g_pY23S1SFSMGParticles[i] = nullptr;
+				}
+
+				continue;
+			}
+
+			pos = viewent->attachment[0];
+		}
+
+		gEngfuncs.pEventAPI->EV_SetUpPlayerPrediction(false, true);
+		gEngfuncs.pEventAPI->EV_PushPMStates();
+		gEngfuncs.pEventAPI->EV_SetSolidPlayers(i - 1);
+		gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+		gEngfuncs.pEventAPI->EV_PlayerTrace(pos, pos + forward * 8192, PM_STUDIO_BOX, -1, &tr);
+		gEngfuncs.pEventAPI->EV_PopPMStates();
+
+		g_pY23S1SFSMGBeams[i]->source = pos;
+		g_pY23S1SFSMGBeams[i]->target = tr.endpos;
+		g_pY23S1SFSMGBeams[i]->delta = g_pY23S1SFSMGBeams[i]->target - pos;
+
+		/*if (!EV_IsLocal(i))
+		{
+			Vector dir = g_pY23S1SFSMGBeams[i]->delta.Normalize();
+			float dot = DotProduct(dir, Vector(0, 0, -1));
+
+			if (dot > 0.95 || dot < -0.95)
+			{
+				g_pY23S1SFSMGBeams[i]->brightness = 0.0;
+			}
+			else
+			{
+				g_pY23S1SFSMGBeams[i]->brightness = 1.0;
+			}
+		}*/
+	}
+}
+
 DLL_EXPORT void HUD_CreateBeams(void)
 {
 	CreateSFPistolBeams();
 	CreateSFPistolBeams2();
+	CreateY23S1SFSMGBeams();
 }
 
 }

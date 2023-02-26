@@ -23,9 +23,7 @@ namespace sv {
 		SET_MODEL(ENT(pev), "models/w_claymore.mdl");
 
 		pev->classname = MAKE_STRING("weapon_claymore");
-
-		m_iClip = -1;
-		m_iDefaultAmmo = 999;
+		m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE;
 		m_bDelayFire = false;
 
 
@@ -54,8 +52,8 @@ namespace sv {
 	int CClayMore::GetItemInfo(ItemInfo* p)
 	{
 		p->pszName = STRING(pev->classname);
-		p->pszAmmo1 = "claymore";
-		p->iMaxAmmo1 = 999;
+		p->pszAmmo1 = "HEGrenade";
+		p->iMaxAmmo1 = MAX_AMMO_HEGRENADE;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = WEAPON_NOCLIP;

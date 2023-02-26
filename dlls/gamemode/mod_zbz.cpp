@@ -811,12 +811,12 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 			m_iChangeClassTime[0] = -1;
 			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
-			switch (RANDOM_LONG(0, 3))
+			switch (RANDOM_LONG(0, 2))
 			{
 			case 0: m_pPlayer->m_ZombieClass = "nemesis"; break;
 			case 1: m_pPlayer->m_ZombieClass = "spider"; break;
 			case 2: m_pPlayer->m_ZombieClass = "deathknight"; break;
-			case 3: m_pPlayer->m_ZombieClass = "meatwall"; break;
+			//case 3: m_pPlayer->m_ZombieClass = "meatwall"; break;
 			}		
 			
 			m_pPlayer->pev->sequence = 0;
@@ -997,9 +997,8 @@ void CMod_ZombieZ::RemoveAllSuperSupplybox()
 		CSuperSupplyBox* sb = dynamic_ent_cast<CSuperSupplyBox*>(ent);
 		if (sb == nullptr)
 			continue;
-		sb->pev->effects |= EF_NODRAW;
-		sb->pev->flags |= FL_KILLME;
-		sb->SetThink(&CBaseEntity::SUB_Remove);
+
+		UTIL_Remove(sb);
 	}
 }
 
@@ -1163,6 +1162,9 @@ void CMod_ZombieZ::PlayerKilled(CBasePlayer * pVictim, entvars_t * pKiller, entv
 
 float CMod_ZombieZ::GetAdjustedEntityDamage(CBaseEntity* victim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
+	if (victim->Classify() == CLASS_PLAYER_ALLY)
+		return flDamage;
+
 	flDamage = CMod_ZombieMod2::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
 
 	CBasePlayer* pVictim = dynamic_ent_cast<CBasePlayer*>(victim);
@@ -1174,10 +1176,15 @@ float CMod_ZombieZ::GetAdjustedEntityDamage(CBaseEntity* victim, entvars_t* pevI
 
 HitBoxGroup CMod_ZombieZ::GetAdjustedTraceAttackHitgroup(CBaseEntity* victim, entvars_t* pevAttacker, float flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType)
 {
+	HitBoxGroup hbg = static_cast<HitBoxGroup>(ptr->iHitgroup);
+
+	if (victim->Classify() == CLASS_PLAYER_ALLY)
+		return hbg;
+
 	CBasePlayer* pVictim = dynamic_ent_cast<CBasePlayer*>(victim);
 	CBasePlayer* pAttacker = dynamic_ent_cast<CBasePlayer*>(pevAttacker);
 	m_eventTraceAttack.dispatch(pVictim, pAttacker, flDamage, vecDir, ptr, bitsDamageType);
-	HitBoxGroup hbg = static_cast<HitBoxGroup>(ptr->iHitgroup);
+	
 	hbg = CMod_ZombieMod2::GetAdjustedTraceAttackHitgroup(victim, pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 	return hbg;
 }

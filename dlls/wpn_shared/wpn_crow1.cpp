@@ -44,7 +44,7 @@ namespace sv {
     static constexpr const char *P_Model = "models/p_crow1.mdl";
     static constexpr const char *W_Model = "models/w_crow1.mdl";
     static constexpr const char *EventFile = "events/crow1.sc";
-    static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
+    static constexpr InventorySlotType ItemSlot = PISTOL_SLOT;
     static constexpr const char *ClassName = "weapon_crow1";
     static constexpr const char *AnimExtension = "onehanded";
     static constexpr int MaxClip = 50;

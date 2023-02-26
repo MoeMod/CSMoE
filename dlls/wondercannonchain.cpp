@@ -67,7 +67,7 @@ namespace sv {
 		if (m_pEnemyList->IsEmpty())
 			m_pEnemyList->AddToTail(m_pAttachedEnt);
 
-		if (m_pAttachedEnt->m_iTeam == m_iTeam)
+		if (g_pGameRules->PlayerRelationship(m_pOwner, m_pAttachedEnt) == GR_TEAMMATE)
 			m_flNextDamage = invalid_time_point;
 	}
 
@@ -157,7 +157,7 @@ namespace sv {
 				if (pNewEntity == m_pAttachedEnt)
 					continue;
 
-				if (pNewEntity->pev->takedamage == DAMAGE_NO)
+				if (!pNewEntity->IsPlayer() && pNewEntity->Classify() != CLASS_PLAYER_ALLY)
 					continue;
 
 				if (pNewEntity == m_pOwner)
@@ -169,24 +169,30 @@ namespace sv {
 				if(m_pEnemyList->Count() >= m_iTotalExpCount)
 					continue;
 
-				if (!m_iType && m_pAttachedEnt->m_iTeam != pNewEntity->m_iTeam && !pev->iuser1)
+				if (m_pAttachedEnt->IsPlayer() && !pev->iuser1)
 				{
-					m_pEnemyList->RemoveMultipleFromHead(1);
-					m_pEnemyList->AddToTail(pNewEntity);
+					CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(m_pAttachedEnt);
+					if (g_pGameRules->PlayerRelationship(player, pNewEntity) != GR_TEAMMATE)
+					{
+						m_pEnemyList->RemoveMultipleFromHead(1);
+						m_pEnemyList->AddToTail(pNewEntity);
 
-					MESSAGE_BEGIN(MSG_PVS, gmsgMPToCL, NULL);
-					WRITE_BYTE(19);
-					WRITE_SHORT(m_pAttachedEnt->entindex());
-					WRITE_SHORT(pNewEntity->entindex());
-					WRITE_BYTE(2);
-					MESSAGE_END();
+						MESSAGE_BEGIN(MSG_PVS, gmsgMPToCL, NULL);
+						WRITE_BYTE(19);
+						WRITE_SHORT(m_pAttachedEnt->entindex());
+						WRITE_SHORT(pNewEntity->entindex());
+						WRITE_BYTE(0);
+						MESSAGE_END();
 
-					m_flNextDamage = gpGlobals->time + 0.1s;
-					m_pAttachedEnt = pNewEntity;
-					m_tTimeRemove = gpGlobals->time + 5.0s;
-					pev->iuser1 = 1;
-					continue;
+						m_flNextDamage = gpGlobals->time + 0.1s;
+						m_pAttachedEnt = pNewEntity;
+						m_tTimeRemove = gpGlobals->time + 5.0s;
+						pev->iuser1 = 1;
+						continue;
+					}
 				}
+
+				
 
 				m_pEnemyList->AddToTail(pNewEntity);
 
