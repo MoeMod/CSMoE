@@ -113,8 +113,8 @@
 #define MENU_KEY_9			(1<<8)
 #define MENU_KEY_0			(1<<9)
 
-#define MAX_AMMO_TYPES			192		// ???
-#define MAX_AMMO_SLOTS			192		// not really slots
+#define MAX_AMMO_TYPES			255		// ???
+#define MAX_AMMO_SLOTS			255		// not really slots
 
 #define HUD_PRINTNOTIFY			1
 #define HUD_PRINTCONSOLE		2
@@ -174,6 +174,7 @@ enum VGUIMenuSlot
 #define MENU_RADIOSELECTOR 38
 #define MENU_NUMERICAL_MENU -1
 // -- cs16client extension end -- //
+#define MENU_MOBILE_ZOMBIEKEEPER 39
 
 constexpr size_t MAX_PLAYER_NAME_LENGTH =		32;
 constexpr size_t MAX_AUTOBUY_LENGTH =		256;

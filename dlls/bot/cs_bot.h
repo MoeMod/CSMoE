@@ -1564,6 +1564,7 @@ public:
     BOOL IsBot() override;
     void ExecuteCommand() override;
     void UpdateLookAngles() override;
+	BOOL IsNetClient() override { return TRUE; }
 	void Spawn() override;
 
 public:

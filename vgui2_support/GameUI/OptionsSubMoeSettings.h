@@ -29,6 +29,7 @@ public:
 	void RemapDamage(void);
 	void InitSiFiAmmoStyleList(CLabeledCommandComboBox* cb);
 	void InitHudStyleList(CLabeledCommandComboBox* cb);
+	void InitAlarmStyleList(CLabeledCommandComboBox* cb);
 	void InitTexlruList(CLabeledCommandComboBox* cb);
 	void InitHudScaleList(CLabeledCommandComboBox* cb);
 
@@ -43,6 +44,7 @@ private:
 	CLabeledCommandComboBox* m_pFloatingDamageType;
 	CLabeledCommandComboBox* m_pSiFiAmmoType;
 	CLabeledCommandComboBox* m_pHudStyle;
+	CLabeledCommandComboBox* m_pAlarmStyle;
 	CLabeledCommandComboBox* m_pTexlru;
 	CLabeledCommandComboBox* m_pHudScale;
 	CCvarSlider* m_pGammaSlider;

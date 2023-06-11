@@ -432,6 +432,38 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_turbulent9.cpp
 	../dlls/wpn_shared/knife_spknife.cpp
 	../dlls/wpn_shared/knife_swordbombard.cpp
+	../dlls/wpn_shared/knife_ironfan.cpp
+	../dlls/wpn_shared/wpn_thanatos3.cpp
+	../dlls/wpn_shared/wpn_dfpistol.cpp
+	../dlls/wpn_shared/wpn_turbulent1.cpp
+	../dlls/wpn_shared/wpn_vulcanus1.cpp
+	../dlls/wpn_shared/wpn_crow1.cpp
+	../dlls/wpn_shared/wpn_thanatos1.cpp
+	../dlls/wpn_shared/wpn_vulcanus5.cpp
+	../dlls/wpn_shared/wpn_m79.cpp
+	../dlls/wpn_shared/wpn_m79g.cpp
+	../dlls/wpn_shared/wpn_firecracker.cpp
+	../dlls/wpn_shared/wpn_hk121ex.cpp
+	../dlls/wpn_shared/wpn_claymore.cpp
+	../dlls/wpn_shared/wpn_at4.cpp
+	../dlls/wpn_shared/wpn_sbmine.cpp
+	../dlls/wpn_shared/wpn_at4ex.cpp
+	../dlls/wpn_shared/wpn_bazooka.cpp
+	../dlls/wpn_shared/wpn_janus1.cpp
+	../dlls/wpn_shared/wpn_halogun.cpp
+	../dlls/wpn_shared/wpn_chainsr.cpp
+	../dlls/wpn_shared/z4b_mechanicherogun.cpp
+	../dlls/wpn_shared/z4b_mechanicxm214.cpp
+	../dlls/wpn_shared/z4b_mechanichand.cpp
+	../dlls/wpn_shared/wpn_stickybomb.cpp
+	../dlls/wpn_shared/wpn_holybombex.cpp
+	../dlls/wpn_shared/wpn_waterbomb.cpp
+	../dlls/wpn_shared/wpn_y20s1grenade.cpp
+	../dlls/wpn_shared/wpn_chinaeventbomb.cpp
+	../dlls/wpn_shared/z4b_mechanichand.cpp
+	../dlls/wpn_shared/z4b_shovelex.cpp
+	../dlls/wpn_shared/wpn_y23s1sfsmg.cpp
+	../dlls/wpn_shared/wpn_dartpistol.cpp
 	)
 
 set (HUD_SRCS
@@ -499,12 +531,18 @@ set (HUD_SRCS
 	./hud/newhud/newhud.cpp
 	./hud/hud_centertips.cpp
 	./hud/zbz/zbz_ghosthunter.cpp
+	./hud/newhud/NewAlarm.cpp
+	./hud/newhud/NewDeathInfo.cpp
+	./hud/newhud/NewFontManager.cpp
+	./hud/followitem.cpp
+	../dlls/player/player_model.cpp
 )
 
 set (STUDIORENDER_SRCS
 	./studio/GameStudioModelRenderer.cpp
 	./studio/StudioModelRenderer.cpp
 	./studio/studio_util.cpp
+	./studio/bonequatlru.cpp
 
 )
 
@@ -570,6 +608,7 @@ if(XASH_VGUI2)
 		vgui2/csmoe/BuyMenu/WeaponImagePanel.cpp
 		vgui2/csmoe/zsh/zshelterteamhousingdlg.cpp
 		vgui2/csmoe/zsh/zshelterteamhousingsubdlg.cpp
+		vgui2/csmoe/zb2/Zb2ZombieSelector.cpp
 	)
 	add_definitions(-DXASH_VGUI2=1)
 else()

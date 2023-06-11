@@ -879,7 +879,7 @@ void GL_InitCommands( void )
 	r_dynamic = Cvar_Get( "r_dynamic", "1", CVAR_ARCHIVE, "allow dynamic lighting (dlights, lightstyles)" );
 	r_lightmap = Cvar_Get( "r_lightmap", "0", CVAR_CHEAT, "lightmap debugging tool" );
 	r_fastsky = Cvar_Get( "r_fastsky", "0", CVAR_ARCHIVE, "enable algorhytm fo fast sky rendering (for old machines)" );
-	r_drawentities = Cvar_Get( "r_drawentities", "1", CVAR_CHEAT|CVAR_ARCHIVE, "render entities" );
+	r_drawentities = Cvar_Get("r_drawentities", "1", CVAR_ARCHIVE, "render entities");
 	r_flaresize = Cvar_Get( "r_flaresize", "200", CVAR_ARCHIVE, "set flares size" );
 	r_lefthand = Cvar_Get( "hand", "0", CVAR_ARCHIVE, "viewmodel handedness" );
 	r_decals = Cvar_Get( "r_decals", "4096", 0, "sets the maximum number of decals" );
@@ -918,11 +918,7 @@ void GL_InitCommands( void )
 	gl_overbright = Cvar_Get( "gl_overbright", "0", CVAR_ARCHIVE, "Overbright mode (0-2)");
 	gl_overbright_studio = Cvar_Get( "gl_overbright_studio", "0", CVAR_ARCHIVE, "Overbright for studiomodels");
 	gl_fog = Cvar_Get("gl_fog", "1", CVAR_ARCHIVE, "Fog");
-#if TARGET_OS_IOS
-	r_texlru = Cvar_Get("r_texlru", "256", CVAR_ARCHIVE, "Texture LRU size");
-#else
 	r_texlru = Cvar_Get("r_texlru", "0", CVAR_ARCHIVE, "Texture LRU size");
-#endif
 
 	// these cvar not used by engine but some mods requires this
 	Cvar_Get( "gl_polyoffset", "-0.1", 0, "polygon offset for decals" );
@@ -1051,6 +1047,10 @@ static void R_CheckVBO( void )
 	// dlightmode 1 is not too much tested on android
 	// so better to left it off
 	dlightmode = "0";
+#endif
+
+#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
+	disable = true;
 #endif
 
 	if( disable )
@@ -1189,6 +1189,7 @@ void R_Shutdown( void )
 	}
 	Q_memset( clgame.sprites, 0, sizeof( clgame.sprites ));
 
+    R_StudioShutdown();
 	GL_RemoveCommands();
 	R_ShutdownImages();
 

@@ -3,32 +3,13 @@
 #include "cbase.h"
 #include "player.h"
 #include "gamerules.h"
+#include "player_model.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
 namespace sv {
-
-static const char *sPlayerModelFiles[] =
-{
-	"models/player.mdl",
-	"models/player/leet/leet.mdl",
-	"models/player/gign/gign.mdl",
-	"models/player/vip/vip.mdl",
-	"models/player/gsg9/gsg9.mdl",
-	"models/player/guerilla/guerilla.mdl",
-	"models/player/arctic/arctic.mdl",
-	"models/player/sas/sas.mdl",
-	"models/player/terror/terror.mdl",
-	"models/player/urban/urban.mdl",
-	"models/player/spetsnaz/spetsnaz.mdl",	// CZ
-	"models/player/militia/militia.mdl",	// CZ
-	"models/player/hero/hero.mdl",
-	"models/player/heroine/heroine.mdl",
-	"models/player/ghosthunter/ghosthunter.mdl",
-	"models/player/masterhunter/masterhunter.mdl",
-	"models/player/ascetichero/ascetichero.mdl",
-	"models/player/timehunter/timehunter.mdl",
-	"models/player/healhunter/healhunter.mdl",
-	"models/player/lasthero/lasthero.mdl",
-};
+#endif
 
 struct AppearanceInfo
 {
@@ -121,5 +102,147 @@ void PlayerModel_ForceUnmodified(const Vector &vMin, const Vector &vMax)
 	for (auto psz : sPlayerModelFiles)
 		ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, psz);
 }
+
+CPlayerClassManager& PlayerClassManager()
+{
+	static CPlayerClassManager x;
+	return x;
+}
+
+static CPlayerClassManager::ClassData gPlayerClass[] =
+{
+	{ MODEL_UNASSIGNED, NULL, UNASSIGNED },
+	{ MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SAF, "saf", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_PIRATEBOY, "pirateboy", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_CHOIJIYOON, "choijiyoon", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_MARINEBOY, "marineboy", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_FERNANDO, "fernando", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_PIRATEGIRL, "pirategirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_707, "707", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_RB, "rb", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SOZO, "sozo", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_JPNGIRL01, "jpngirl01", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_MAGUI, "magui", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_RITSUKA, "ritsuka", TERRORIST, true ,SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_NATASHA, "natasha", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_TERROR, "terror", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_URBAN, "urban", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_LEET, "leet", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_GSG9, "gsg9", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_ARCTIC, "arctic", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SAS, "sas", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_GUERILLA, "guerilla", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_GIGN, "gign", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_MILITIA, "militia", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SPETSNAZ, "spetsnaz", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_BUFFCLASSB, "buffclassb", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_BUFFCLASSA, "buffclassa", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_BUFFCLASSHUNTER, "buffclasshunter", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_BUFFCLASSLYCAN, "buffclasslycan", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_BUFFCLASSBLAIR, "buffclassblair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_BUFFCLASSFERNADO, "buffclassfernando", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+};
+
+constexpr auto NUM_CLASS = std::extent<decltype(gPlayerClass)>::value;
+
+void CPlayerClassManager::PlayerModel_Precache()
+{
+	char path[128];
+	for (int i = 1; i < NUM_CLASS; i++)
+	{
+		Client_ApperanceToModel(path, i);
+		PRECACHE_MODEL(path);
+	}
+}
+
+const char* CPlayerClassManager::PlayerClass_GetModelName(int iApperance)
+{
+	if (iApperance >= NUM_CLASS || iApperance < 1) {
+		iApperance = 1;
+	}
+
+	return gPlayerClass[iApperance].model_name;
+}
+
+bool CPlayerClassManager::PlayerClass_IsFemale(int iApperance)
+{
+	if (iApperance >= NUM_CLASS || iApperance < 1) {
+		iApperance = 1;
+	}
+
+	return gPlayerClass[iApperance].isFemale;
+}
+
+void CPlayerClassManager::Client_ApperanceToModel(char* buffer, int iApperance)
+{
+	auto model = gPlayerClass[iApperance].model_name;
+	Q_sprintf(buffer, "models/player/%s/%s.mdl", model, model);
+}
+
+int CPlayerClassManager::Client_ModelToApperance(const char* modelname)
+{
+	if (!strstr(modelname, "models/player/"))
+		return 0;	//cannot find
+	//return back modelname
+	char name[64];
+	strcpy(name, modelname + 14);
+	name[strlen(name) - 4] = 0;
+	name[strlen(name) / 2] = 0;
+
+	for (int i = 1; i < NUM_CLASS; i++)
+	{
+		if (!stricmp(name, gPlayerClass[i].model_name))
+			return i;
+	}
+
+	return 0;	//cannot find
+}
+
+ModelName CPlayerClassManager::PlayerClass_GetRandomClass()
+{
+	return (ModelName)RANDOM_LONG(1, NUM_CLASS - 1);
+}
+
+int CPlayerClassManager::PlayerClass_GetNumClass()
+{
+	return NUM_CLASS;
+}
+
+int CPlayerClassManager::PlayerClass_GetNumCT()
+{
+	int iCount = 0;
+	for (int i = 1; i < NUM_CLASS; i++)
+	{
+		if (gPlayerClass[i].team == CT)
+			iCount++;
+	}
+	return iCount;
+}
+
+int CPlayerClassManager::PlayerClass_GetNumTR()
+{
+	int iCount = 0;
+	for (int i = 1; i < NUM_CLASS; i++)
+	{
+		if (gPlayerClass[i].team == TERRORIST)
+			iCount++;
+	}
+	return iCount;
+}
+
+void CPlayerClassManager::SetPlayerClass(int index, char* name)
+{
+	if (index > 33 || index < 0)
+		return;
+
+	int ClassID = Client_ModelToApperance(name);
+	
+	if (!ClassID)
+		m_PlayerClass[index] = &m_NullClass;
+
+	m_PlayerClass[index] = &gPlayerClass[ClassID];
+}
+
 
 }

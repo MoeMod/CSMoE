@@ -42,6 +42,14 @@ CSBuyMouseOverPanelButton::CSBuyMouseOverPanelButton(vgui2::Panel *parent, const
 	m_pWeaponImage->SetShouldCenterImage(true);
 	m_pWeaponImage->SetMouseInputEnabled(false);
 	m_pWeaponImage->SetKeyBoardInputEnabled(false);
+
+	m_pLockedImage = new vgui2::ImagePanel(this, "LevelLock");
+	m_pLockedImageBg = new vgui2::ImagePanel(this, "LevelLock_Bg");
+
+	m_pBlankBg = new vgui2::ImagePanel(this, "Blank_Bg");
+	m_pBlankBg->SetShouldScaleImage(true);
+
+	m_pLevelText = new vgui2::Label(this, "LevelText", "");
 }
 
 void CSBuyMouseOverPanelButton::UpdateWeapon(const char *weapon)
@@ -60,7 +68,35 @@ void CSBuyMouseOverPanelButton::UpdateWeapon(const char *weapon)
         m_pWeaponImage->SetVisible(false);
     }
 }
+void CSBuyMouseOverPanelButton::SetBanWeapon(const char* weapon, int iLevel)
+{
+	if (weapon && weapon[0])
+	{
+		char SzLevel[32]; sprintf(SzLevel, "Lv.%d", iLevel);
+		m_pLevelText->SetText(SzLevel);
+		m_pLevelText->SetFgColor({ 255,99,71,255 });
 
+		m_pLockedImage->SetImage("resource/zombiez/level_lock_l");
+		m_pLockedImageBg->SetImage("resource/zombiez/level_lock_bg");
+
+		m_pBlankBg->SetImage("resource/pcbangpremium_bg_red");
+		m_pBlankBg->SetBgColor({ 255,99,71,255 });
+
+		m_pBlankBg->SetVisible(true);
+		m_pLevelText->SetVisible(true);
+		m_pLockedImage->SetVisible(true);
+		m_pLockedImageBg->SetVisible(true);
+	}
+	else
+	{
+		m_pLevelText->SetText("");
+		m_pLockedImage->SetImage("");
+		m_pLevelText->SetVisible(false);
+		m_pLockedImage->SetVisible(false);
+		m_pLockedImageBg->SetVisible(false);
+		m_pBlankBg->SetVisible(false);
+	}
+}
 void CSBuyMouseOverPanelButton::Paint()
 {
 	Color col(200, 200, 200, 255);
@@ -84,4 +120,11 @@ void CSBuyMouseOverPanelButton::PerformLayout()
 
 	int newWide = h * 2.9;
 	m_pWeaponImage->SetBounds(w - newWide, 0, newWide, h);
+
+	m_pLockedImage->SetPos(vgui2::scheme()->GetProportionalScaledValue(6), 0 + vgui2::scheme()->GetProportionalScaledValue(6));
+	m_pLockedImageBg->SetPos(w - newWide / 1.5 - vgui2::scheme()->GetProportionalScaledValue(3), vgui2::scheme()->GetProportionalScaledValue(8));
+	m_pLevelText->SetPos(w - newWide / 1.5 + vgui2::scheme()->GetProportionalScaledValue(3), vgui2::scheme()->GetProportionalScaledValue(5));
+
+	m_pBlankBg->SetSize(w, h);
+	m_pBlankBg->SetPos(0, 0);
 }

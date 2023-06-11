@@ -19,8 +19,11 @@
 #include "studio_event.h" // def. of mstudioevent_t
 #include "r_efx.h"
 #include "event_api.h"
+#include "player/player_model.h"
 
 namespace cl {
+
+extern engine_studio_api_t IEngineStudio;
 
 extern vec3_t v_origin;
 
@@ -102,6 +105,13 @@ playerstate structure
 */
 void DLLEXPORT HUD_ProcessPlayerState( struct entity_state_s *dst, const struct entity_state_s *src )
 {
+	if (src->modelindex != dst->modelindex)
+	{
+		model_t* pmodel = IEngineStudio.GetModelByIndex(src->modelindex);
+
+		PlayerClassManager().SetPlayerClass(src->number, pmodel->name);
+	}
+
 	// Copy in network data
 	VectorCopy( src->origin, dst->origin );
 	VectorCopy( src->angles, dst->angles );
@@ -705,6 +715,11 @@ void DLLEXPORT HUD_TempEntUpdate (
 					{
 						pTemp->die = client_time;			// If we can't draw it this frame, just dump it.
 						pTemp->flags &= ~FTENT_FADEOUT;	// Don't fade out, just die
+					}
+
+					if (pTemp->flags & FTENT_NOCULL)
+					{
+						pTemp->entity.curstate.effects |= EF_NOCULL;
 					}
 				}
 			}

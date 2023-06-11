@@ -367,12 +367,6 @@ void GL_MANGLE(glCompressedTexImage1DARB)(GLenum target, GLint level, GLenum int
 void GL_MANGLE(glCompressedTexSubImage3DARB)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const void *data);
 void GL_MANGLE(glCompressedTexSubImage2DARB)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void *data);
 void GL_MANGLE(glCompressedTexSubImage1DARB)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const void *data);
-void GL_MANGLE(glCompressedTexImage3D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const void *data);
-void GL_MANGLE(glCompressedTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border,  GLsizei imageSize, const void *data);
-void GL_MANGLE(glCompressedTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const void *data);
-void GL_MANGLE(glCompressedTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const void *data);
-void GL_MANGLE(glCompressedTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void *data);
-void GL_MANGLE(glCompressedTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const void *data);
 void GL_MANGLE(glDeleteObjectARB)(GLhandleARB obj);
 GLhandleARB GL_MANGLE(glGetHandleARB)(GLenum pname);
 void GL_MANGLE(glDetachObjectARB)(GLhandleARB containerObj, GLhandleARB attachedObj);
@@ -450,6 +444,74 @@ void GL_MANGLE(glGetQueryObjectuivARB)(GLuint id, GLenum pname, GLuint *params);
 void GL_MANGLE(glSelectTextureSGIS)( GLenum );
 void GL_MANGLE(glMTexCoord2fSGIS)( GLenum, GLfloat, GLfloat );
 void GL_MANGLE(glSwapInterval)( int interval );
+#ifdef XASH_GL4ES
+// gl4es provide non-arb functions, so redirect them
+void GL_MANGLE(glCompressedTexImage3D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const void *data);
+void GL_MANGLE(glCompressedTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border,  GLsizei imageSize, const void *data);
+void GL_MANGLE(glCompressedTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const void *data);
+void GL_MANGLE(glCompressedTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const void *data);
+void GL_MANGLE(glCompressedTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const void *data);
+void GL_MANGLE(glCompressedTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const void *data);
+void GL_MANGLE(glDeleteObject)(GLhandleARB obj);
+GLhandleARB GL_MANGLE(glGetHandle)(GLenum pname);
+void GL_MANGLE(glDetachObject)(GLhandleARB containerObj, GLhandleARB attachedObj);
+GLhandleARB GL_MANGLE(glCreateShaderObject)(GLenum shaderType);
+void GL_MANGLE(glShaderSource)(GLhandleARB shaderObj, GLsizei count, const GLcharARB **string, const GLint *length);
+void GL_MANGLE(glCompileShader)(GLhandleARB shaderObj);
+GLhandleARB GL_MANGLE(glCreateProgramObject)(void);
+void GL_MANGLE(glAttachObject)(GLhandleARB containerObj, GLhandleARB obj);
+void GL_MANGLE(glLinkProgram)(GLhandleARB programObj);
+void GL_MANGLE(glUseProgramObject)(GLhandleARB programObj);
+void GL_MANGLE(glValidateProgram)(GLhandleARB programObj);
+void GL_MANGLE(glBindProgram)(GLenum target, GLuint program);
+void GL_MANGLE(glDeletePrograms)(GLsizei n, const GLuint *programs);
+void GL_MANGLE(glGenPrograms)(GLsizei n, GLuint *programs);
+void GL_MANGLE(glProgramString)(GLenum target, GLenum format, GLsizei len, const GLvoid *string);
+void GL_MANGLE(glProgramEnvParameter4f)(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+void GL_MANGLE(glProgramLocalParameter4f)(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+void GL_MANGLE(glUniform1f)(GLint location, GLfloat v0);
+void GL_MANGLE(glUniform2f)(GLint location, GLfloat v0, GLfloat v1);
+void GL_MANGLE(glUniform3f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
+void GL_MANGLE(glUniform4f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+void GL_MANGLE(glUniform1i)(GLint location, GLint v0);
+void GL_MANGLE(glUniform2i)(GLint location, GLint v0, GLint v1);
+void GL_MANGLE(glUniform3i)(GLint location, GLint v0, GLint v1, GLint v2);
+void GL_MANGLE(glUniform4i)(GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
+void GL_MANGLE(glUniform1fv)(GLint location, GLsizei count, const GLfloat *value);
+void GL_MANGLE(glUniform2fv)(GLint location, GLsizei count, const GLfloat *value);
+void GL_MANGLE(glUniform3fv)(GLint location, GLsizei count, const GLfloat *value);
+void GL_MANGLE(glUniform4fv)(GLint location, GLsizei count, const GLfloat *value);
+void GL_MANGLE(glUniform1iv)(GLint location, GLsizei count, const GLint *value);
+void GL_MANGLE(glUniform2iv)(GLint location, GLsizei count, const GLint *value);
+void GL_MANGLE(glUniform3iv)(GLint location, GLsizei count, const GLint *value);
+void GL_MANGLE(glUniform4iv)(GLint location, GLsizei count, const GLint *value);
+void GL_MANGLE(glUniformMatrix2fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+void GL_MANGLE(glUniformMatrix3fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+void GL_MANGLE(glUniformMatrix4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+void GL_MANGLE(glGetObjectParameterfv)(GLhandleARB obj, GLenum pname, GLfloat *params);
+void GL_MANGLE(glGetObjectParameteriv)(GLhandleARB obj, GLenum pname, GLint *params);
+void GL_MANGLE(glGetInfoLog)(GLhandleARB obj, GLsizei maxLength, GLsizei *length, GLcharARB *infoLog);
+void GL_MANGLE(glGetAttachedObjects)(GLhandleARB containerObj, GLsizei maxCount, GLsizei *count, GLhandleARB *obj);
+GLint GL_MANGLE(glGetUniformLocation)(GLhandleARB programObj, const GLcharARB *name);
+void GL_MANGLE(glGetActiveUniform)(GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei *length, GLint *size, GLenum *type, GLcharARB *name);
+void GL_MANGLE(glGetUniformfv)(GLhandleARB programObj, GLint location, GLfloat *params);
+void GL_MANGLE(glGetUniformiv)(GLhandleARB programObj, GLint location, GLint *params);
+void GL_MANGLE(glGetShaderSource)(GLhandleARB obj, GLsizei maxLength, GLsizei *length, GLcharARB *source);
+void GL_MANGLE(glVertexAttribPointer)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
+void GL_MANGLE(glEnableVertexAttribArray)(GLuint index);
+void GL_MANGLE(glDisableVertexAttribArray)(GLuint index);
+void GL_MANGLE(glBindAttribLocation)(GLhandleARB programObj, GLuint index, const GLcharARB *name);
+void GL_MANGLE(glGetActiveAttrib)(GLhandleARB programObj, GLuint index, GLsizei maxLength, GLsizei *length, GLint *size, GLenum *type, GLcharARB *name);
+GLint GL_MANGLE(glGetAttribLocation)(GLhandleARB programObj, const GLcharARB *name);
+void GL_MANGLE(glBindBuffer)(GLenum target, GLuint buffer);
+void GL_MANGLE(glDeleteBuffers)(GLsizei n, const GLuint* buffers);
+void GL_MANGLE(glGenBuffers)(GLsizei n, GLuint* buffers);
+GLboolean GL_MANGLE(glIsBuffer)(GLuint buffer);
+GLvoid* GL_MANGLE(glMapBuffer)(GLenum target, GLenum access);
+GLboolean GL_MANGLE(glUnmapBuffer)(GLenum target);
+void GL_MANGLE(glBufferData)(GLenum target, GLsizeiptrARB size, const GLvoid* data, GLenum usage);
+void GL_MANGLE(glBufferSubData)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid* data);
+#endif
 };
 // mangle to xash3d style
 #ifndef WES_MANGLE_PREPEND
@@ -798,20 +860,12 @@ void GL_MANGLE(glSwapInterval)( int interval );
 #define pglMultiTexCoord2f GL_MANGLE(glMultiTexCoord2f)
 #define pglMultiTexCoord3f GL_MANGLE(glMultiTexCoord3f)
 #define pglMultiTexCoord4f GL_MANGLE(glMultiTexCoord4f)
-#define pglActiveTexture GL_MANGLE(glActiveTexture)
-#define pglClientActiveTexture GL_MANGLE(glClientActiveTexture)
 #define pglCompressedTexImage3DARB GL_MANGLE(glCompressedTexImage3DARB)
 #define pglCompressedTexImage2DARB GL_MANGLE(glCompressedTexImage2DARB)
 #define pglCompressedTexImage1DARB GL_MANGLE(glCompressedTexImage1DARB)
 #define pglCompressedTexSubImage3DARB GL_MANGLE(glCompressedTexSubImage3DARB)
 #define pglCompressedTexSubImage2DARB GL_MANGLE(glCompressedTexSubImage2DARB)
 #define pglCompressedTexSubImage1DARB GL_MANGLE(glCompressedTexSubImage1DARB)
-#define pglCompressedTexImage3D GL_MANGLE(glCompressedTexImage3D)
-#define pglCompressedTexImage2D GL_MANGLE(glCompressedTexImage2D)
-#define pglCompressedTexImage1D GL_MANGLE(glCompressedTexImage1D)
-#define pglCompressedTexSubImage3D GL_MANGLE(glCompressedTexSubImage3D)
-#define pglCompressedTexSubImage2D GL_MANGLE(glCompressedTexSubImage2D)
-#define pglCompressedTexSubImage1D GL_MANGLE(glCompressedTexSubImage1D)
 #define pglDeleteObjectARB GL_MANGLE(glDeleteObjectARB)
 #define pglGetHandleARB GL_MANGLE(glGetHandleARB)
 #define pglDetachObjectARB GL_MANGLE(glDetachObjectARB)
@@ -890,5 +944,212 @@ void GL_MANGLE(glSwapInterval)( int interval );
 #define pglMTexCoord2fSGIS GL_MANGLE(glMTexCoord2fSGIS)
 #define pglSwapInterval GL_MANGLE(glSwapInterval)
 #endif
+
+#ifdef XASH_GL4ES
+// redirect ARB alias
+#undef pglActiveTextureARB
+#define pglActiveTextureARB GL_MANGLE(glActiveTexture)
+
+#undef pglClientActiveTextureARB
+#define pglClientActiveTextureARB GL_MANGLE(glClientActiveTexture)
+
+#undef pglCompressedTexSubImage1DARB
+#define pglCompressedTexSubImage1DARB GL_MANGLE(glCompressedTexSubImage1D)
+
+#undef pglCompressedTexImage1DARB
+#define pglCompressedTexImage1DARB GL_MANGLE(glCompressedTexImage1D)
+
+#undef pglCompressedTexSubImage2DARB
+#define pglCompressedTexSubImage2DARB GL_MANGLE(glCompressedTexSubImage2D)
+
+#undef pglCompressedTexImage2DARB
+#define pglCompressedTexImage2DARB GL_MANGLE(glCompressedTexImage2D)
+
+#undef pglCompressedTexSubImage3DARB
+#define pglCompressedTexSubImage3DARB GL_MANGLE(glCompressedTexSubImage3D)
+
+#undef pglCompressedTexImage3DARB
+#define pglCompressedTexImage3DARB GL_MANGLE(glCompressedTexImage3D)
+
+#undef pglDeleteObjectARB
+#define pglDeleteObjectARB GL_MANGLE(glDeleteObject)
+
+#undef pglGetHandleARB
+#define pglGetHandleARB GL_MANGLE(glGetHandle)
+
+#undef pglDetachObjectARB
+#define pglDetachObjectARB GL_MANGLE(glDetachObject)
+
+#undef pglCreateShaderObjectARB
+#define pglCreateShaderObjectARB GL_MANGLE(glCreateShaderObject)
+
+#undef pglShaderSourceARB
+#define pglShaderSourceARB GL_MANGLE(glShaderSource)
+
+#undef pglCompileShaderARB
+#define pglCompileShaderARB GL_MANGLE(glCompileShader)
+
+#undef pglCreateProgramObjectARB
+#define pglCreateProgramObjectARB GL_MANGLE(glCreateProgramObject)
+
+#undef pglAttachObjectARB
+#define pglAttachObjectARB GL_MANGLE(glAttachObject)
+
+#undef pglLinkProgramARB
+#define pglLinkProgramARB GL_MANGLE(glLinkProgram)
+
+#undef pglUseProgramObjectARB
+#define pglUseProgramObjectARB GL_MANGLE(glUseProgramObject)
+
+#undef pglValidateProgramARB
+#define pglValidateProgramARB GL_MANGLE(glValidateProgram)
+
+#undef pglBindProgramARB
+#define pglBindProgramARB GL_MANGLE(glBindProgram)
+
+#undef pglDeleteProgramsARB
+#define pglDeleteProgramsARB GL_MANGLE(glDeletePrograms)
+
+#undef pglGenProgramsARB
+#define pglGenProgramsARB GL_MANGLE(glGenPrograms)
+
+#undef pglProgramStringARB
+#define pglProgramStringARB GL_MANGLE(glProgramString)
+
+#undef pglProgramEnvParameter4fARB
+#define pglProgramEnvParameter4fARB GL_MANGLE(glProgramEnvParameter4f)
+
+#undef pglProgramLocalParameter4fARB
+#define pglProgramLocalParameter4fARB GL_MANGLE(glProgramLocalParameter4f)
+
+#undef pglUniform1fARB
+#define pglUniform1fARB GL_MANGLE(glUniform1f)
+
+#undef pglUniform2fARB
+#define pglUniform2fARB GL_MANGLE(glUniform2f)
+
+#undef pglUniform3fARB
+#define pglUniform3fARB GL_MANGLE(glUniform3f)
+
+#undef pglUniform4fARB
+#define pglUniform4fARB GL_MANGLE(glUniform4f)
+
+#undef pglUniform1iARB
+#define pglUniform1iARB GL_MANGLE(glUniform1i)
+
+#undef pglUniform2iARB
+#define pglUniform2iARB GL_MANGLE(glUniform2i)
+
+#undef pglUniform3iARB
+#define pglUniform3iARB GL_MANGLE(glUniform3i)
+
+#undef pglUniform4iARB
+#define pglUniform4iARB GL_MANGLE(glUniform4i)
+
+#undef pglUniform1fvARB
+#define pglUniform1fvARB GL_MANGLE(glUniform1fv)
+
+#undef pglUniform2fvARB
+#define pglUniform2fvARB GL_MANGLE(glUniform2fv)
+
+#undef pglUniform3fvARB
+#define pglUniform3fvARB GL_MANGLE(glUniform3fv)
+
+#undef pglUniform4fvARB
+#define pglUniform4fvARB GL_MANGLE(glUniform4fv)
+
+#undef pglUniform1ivARB
+#define pglUniform1ivARB GL_MANGLE(glUniform1iv)
+
+#undef pglUniform2ivARB
+#define pglUniform2ivARB GL_MANGLE(glUniform2iv)
+
+#undef pglUniform3ivARB
+#define pglUniform3ivARB GL_MANGLE(glUniform3iv)
+
+#undef pglUniform4ivARB
+#define pglUniform4ivARB GL_MANGLE(glUniform4iv)
+
+#undef pglUniformMatrix2fvARB
+#define pglUniformMatrix2fvARB GL_MANGLE(glUniformMatrix2fv)
+
+#undef pglUniformMatrix3fvARB
+#define pglUniformMatrix3fvARB GL_MANGLE(glUniformMatrix3fv)
+
+#undef pglUniformMatrix4fvARB
+#define pglUniformMatrix4fvARB GL_MANGLE(glUniformMatrix4fv)
+
+#undef pglGetObjectParameterfvARB
+#define pglGetObjectParameterfvARB GL_MANGLE(glGetObjectParameterfv)
+
+#undef pglGetObjectParameterivARB
+#define pglGetObjectParameterivARB GL_MANGLE(glGetObjectParameteriv)
+
+#undef pglGetInfoLogARB
+#define pglGetInfoLogARB GL_MANGLE(glGetInfoLog)
+
+#undef pglGetAttachedObjectsARB
+#define pglGetAttachedObjectsARB GL_MANGLE(glGetAttachedObjects)
+
+#undef pglGetUniformLocationARB
+#define pglGetUniformLocationARB GL_MANGLE(glGetUniformLocation)
+
+#undef pglGetActiveUniformARB
+#define pglGetActiveUniformARB GL_MANGLE(glGetActiveUniform)
+
+#undef pglGetUniformfvARB
+#define pglGetUniformfvARB GL_MANGLE(glGetUniformfv)
+
+#undef pglGetUniformivARB
+#define pglGetUniformivARB GL_MANGLE(glGetUniformiv)
+
+#undef pglGetShaderSourceARB
+#define pglGetShaderSourceARB GL_MANGLE(glGetShaderSource)
+
+#undef pglVertexAttribPointerARB
+#define pglVertexAttribPointerARB GL_MANGLE(glVertexAttribPointer)
+
+#undef pglEnableVertexAttribArrayARB
+#define pglEnableVertexAttribArrayARB GL_MANGLE(glEnableVertexAttribArray)
+
+#undef pglDisableVertexAttribArrayARB
+#define pglDisableVertexAttribArrayARB GL_MANGLE(glDisableVertexAttribArray)
+
+#undef pglBindAttribLocationARB
+#define pglBindAttribLocationARB GL_MANGLE(glBindAttribLocation)
+
+#undef pglGetActiveAttribARB
+#define pglGetActiveAttribARB GL_MANGLE(glGetActiveAttrib)
+
+#undef pglGetAttribLocationARB
+#define pglGetAttribLocationARB GL_MANGLE(glGetAttribLocation)
+
+#undef pglBindBufferARB
+#define pglBindBufferARB GL_MANGLE(glBindBuffer)
+
+#undef pglDeleteBuffersARB
+#define pglDeleteBuffersARB GL_MANGLE(glDeleteBuffers)
+
+#undef pglGenBuffersARB
+#define pglGenBuffersARB GL_MANGLE(glGenBuffers)
+
+#undef pglIsBufferARB
+#define pglIsBufferARB GL_MANGLE(glIsBuffer)
+
+#undef pglMapBufferARB
+#define pglMapBufferARB GL_MANGLE(glMapBuffer)
+
+#undef pglUnmapBufferARB
+#define pglUnmapBufferARB GL_MANGLE(glUnmapBuffer)
+
+#undef pglBufferDataARB
+#define pglBufferDataARB GL_MANGLE(glBufferData)
+
+#undef pglBufferSubDataARB
+#define pglBufferSubDataARB GL_MANGLE(glBufferSubData)
+
+
+#endif
+
 #endif // GL_STATIC_H
 

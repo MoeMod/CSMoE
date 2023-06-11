@@ -31,6 +31,8 @@ GNU General Public License for more details.
 #include "platform/winrt/winrt_interop.h"
 #endif
 
+#include <map>
+
 #define PAK_LOAD_OK			0
 #define PAK_LOAD_COULDNT_OPEN		1
 #define PAK_LOAD_BAD_HEADER		2
@@ -3023,6 +3025,9 @@ byte *FS_LoadFile( const char *path, fs_offset_t *filesizeptr, qboolean gamediro
 	return buf;
 }
 
+std::map<const void*, off_t> s_AndroidRemap;
+#define XASH_ANDROID_PAGE_SIZE 4096 // 1<<12
+
 template<class ResultType = void *, void *(*pmmap)(xe::fs::fd_t, size_t, off_t, void*) = xe::fs::mmap_file>
 static ResultType FS_MapFileImpl(const char* path, fs_offset_t* filesizeptr, qboolean gamedironly)
 {
@@ -3066,7 +3071,7 @@ static ResultType FS_MapFileImpl(const char* path, fs_offset_t* filesizeptr, qbo
 #if __ANDROID__
     if(auto asset = file->asset)
     {
-#if 0 // mmap doesnt work correctly anyway
+#if 1 // mmap doesnt work correctly anyway
         off_t offset, filesize;
     #ifdef XASH_64BIT
         auto fd = AAsset_openFileDescriptor64(asset, &offset, &filesize);
@@ -3075,7 +3080,12 @@ static ResultType FS_MapFileImpl(const char* path, fs_offset_t* filesizeptr, qbo
     #endif
         if (fd >= 0)
         {
-            auto buf = (ResultType)(pmmap(fd, filesize, offset, nullptr));
+			auto padding = (offset & (XASH_ANDROID_PAGE_SIZE - 1));
+			auto map_size = filesize + padding;
+			auto map_offset = offset & ~(XASH_ANDROID_PAGE_SIZE - 1);
+            auto buf = (ResultType)(pmmap(fd, map_size, map_offset, nullptr));
+			buf += padding;
+			s_AndroidRemap.emplace((const void*)buf, padding);
             if (filesizeptr)
                 *filesizeptr = filesize;
             ::close(fd);
@@ -3121,6 +3131,13 @@ byte* FS_MapFileCOW(const char* path, fs_offset_t* filesizeptr, qboolean gamedir
 
 void FS_MapFree(const byte *data, fs_offset_t filesize)
 {
+	if (auto iter = s_AndroidRemap.find(data); iter != s_AndroidRemap.end())
+	{
+		auto padding = iter->second;
+		data -= padding;
+		filesize += padding;
+		s_AndroidRemap.erase(iter);
+	}
     if(data)
         xe::fs::munmap((void *)data, filesize);
 }

@@ -32,14 +32,19 @@ namespace xe {
     int TexLru_LoadTextureExternal(const char *name, int flags, imgfilter_t *filter);
 	int TexLru_LoadTextureInternal(const char *name, const char *model_name, const studiohdr_t *phdr, const mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter);
     int TexLru_LoadTextureSPR(const char *name, const dsprite_t *psprite, const byte *buf, const dspriteframe_t *frame, int flags, imgfilter_t *filter);
+    int TexLru_LoadTextureSkybox(const char *name, int flags, imgfilter_t *filter);
 
     const TextureAttr &TexLru_GetAttr(const mstudiotexture_t *ptexture);
+    void TexLru_UpdateAttr(const mstudiotexture_t* ptexture);
     void TexLru_Bind(const mstudiotexture_t *ptexture);
     void TexLru_Bind(const mspriteframe_t *pspriteframe);
+    void TexLru_BindReplace(const mstudiotexture_t* ptexture, int texnum);
     void TexLru_CreateAttr(const mstudiotexture_t *ptexture, int gl_texturenum);
     //void TexLru_CreateAttr(const mspriteframe_t *pspriteframe, int gl_texturenum);
     void TexLru_FreeTexture(const mstudiotexture_t *ptexture);
+    bool TexLru_Upload(int texnum);
 
+    void TexLru_Free( int texnum );
 	void TexLru_Shrink();
 	void TexLru_Clear();
 }

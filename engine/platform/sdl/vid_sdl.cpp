@@ -57,7 +57,7 @@ void *SDL_GetVideoDevice( void );
 
 static void SDLCALL GL_GetDrawableSize(SDL_Window* window, int* w, int* h)
 {
-#if defined(XASH_EGL)
+#if defined(XASH_EGL) && defined(XASH_ANGLE)
     SDL_GetRendererOutputSize(SDL_GetRenderer(window), w, h);
     // TODO macos hidpi
 #ifdef __APPLE__
@@ -546,7 +546,7 @@ qboolean VID_SetMode( void )
 
 	gl_swapInterval->modified = true;
 	fullscreen = Cvar_VariableInteger("fullscreen") != 0;
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) && defined(XASH_SDL)
 	fullscreen = true;
 #endif
 

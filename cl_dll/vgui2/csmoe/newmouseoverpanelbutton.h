@@ -285,6 +285,12 @@ public:
 		GetBounds(x, y, w, h);
 		DrawBox(x, y, w, h, { 255,255,255,255 }, 1.0, true);
 	}
+	virtual void OnCursorEntered(void)
+	{
+		BaseClass::OnCursorEntered();
+		PostActionSignal(new KeyValues("UpdateClass", "name", this->GetName()));
+
+	}
 
 	void GetText(char *textOut, int bufferLen)
 	{

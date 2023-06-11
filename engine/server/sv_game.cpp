@@ -1285,7 +1285,7 @@ pfnVecToYaw
 
 =================
 */
-float GAME_EXPORT pfnVecToYaw( const vec3_t rgflVector )
+float GAME_EXPORT XASH_VECTORCALL pfnVecToYaw( const vec3_t rgflVector )
 {
 	return SV_VecToYaw( rgflVector );
 }
@@ -1659,7 +1659,7 @@ pfnMakeVectors
 
 ==============
 */
-void GAME_EXPORT pfnMakeVectors( const vec3_t rgflVector )
+void GAME_EXPORT XASH_VECTORCALL pfnMakeVectors( const vec3_t rgflVector )
 {
 	AngleVectors( rgflVector, svgame.globals->v_forward, svgame.globals->v_right, svgame.globals->v_up );
 }

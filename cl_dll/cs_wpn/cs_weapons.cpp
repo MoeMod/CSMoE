@@ -523,6 +523,8 @@ bool isSniperRifle(CBasePlayerItem* item)
 	case WEAPON_MOSIN:
 	case WEAPON_Z4B_DEATHRAY:
 	case WEAPON_CARTBLUES:
+	case WEAPON_AT4:
+	case WEAPON_AT4EX:
 		return true;
 
 	default:
@@ -620,6 +622,12 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 
 		m_iClip += j;
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+
+		if (this->m_iId == WEAPON_TURBULENT1)
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+		else
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+
 		m_fInReload = FALSE;
 	}
 
@@ -695,7 +703,10 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 			&& m_iId != WEAPON_KINGCOBRAG
 			&& m_iId != WEAPON_SKULL2
 			&& m_iId != WEAPON_MUSKET
-			&& m_iId != WEAPON_Z4B_MALORIAN3516)
+			&& m_iId != WEAPON_Z4B_MALORIAN3516
+			&& m_iId != WEAPON_VULCANUS1
+			&& m_iId != WEAPON_CROW1
+			&& m_iId != WEAPON_THANATOS1)
 		{
 			if (m_iShotsFired > 0)
 			{

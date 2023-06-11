@@ -164,6 +164,8 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_SHOOTINGDOWN			(1<<10)
 #define BUFF_EMERGENCYESCAPE				(1<<11)
 #define BUFF_CLOAKING			(1<<12)
+#define BUFF_HALOGUN_AVOID_DEATH			(1<<13)
+#define BUFF_LASTHERO			(1<<14)
 
 #define COUNT_M32VENOM	0
 
@@ -448,6 +450,7 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	int m_iKnifeID;
 	int m_iGrenadeID;
 	int m_iZombieClass;
+	int m_iZombieZLevel;
 	int m_iNewMenuKeys;
 	int m_iNewMenuID;
 	int m_iNewMenuPage;
@@ -779,6 +782,7 @@ public:
 
 		return true;
 	}
+
 public:
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
@@ -815,12 +819,17 @@ public:
 	int m_iBuff;
 	int m_bHasBuffWpn;	//revivegun buffak buffm4 and more
 	float m_flAccumulateDamage[33];	//like m32venom
-	int m_iReviveGunShotsFired;
 
 	float m_flPlayerBuffData;
 	bool m_bBlockWdnmd;
 	std::map<uint32_t, PlayerItemData> m_ItemData;
 	time_point_t m_flCloaking;
+
+	std::vector <float> m_iVecOldHealth;
+	std::vector <int> m_iVecHitgroup;
+	float m_flOldHealth = 0.0;
+	float m_flZombieHealth;
+	float m_flZombieArmor;
 };
 
 }
@@ -838,6 +847,17 @@ extern CBaseEntity *g_pLastCTSpawn;
 extern CBaseEntity *g_pLastTerroristSpawn;
 extern BOOL gInitHUD;
 extern cvar_t *sv_aim;
+
+extern int iDeathInfo_Fire[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8], iDeathInfo_Body[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8];
+extern std::string SzDeathInfo_Wpn[MAX_CLIENTS + 1][MAX_CLIENTS + 1][2];
+extern float g_flZombieTankerDamage[MAX_CLIENTS + 1];
+extern int g_iZombieTankerCount[MAX_CLIENTS + 1];
+
+extern int g_iAttackerCount[MAX_CLIENTS + 1];
+extern float g_flAttackerDamage[MAX_CLIENTS + 1];
+extern float g_flRecordBestMoment[MAX_CLIENTS + 1];
+
+extern float g_flHoldOutDamage[MAX_CLIENTS + 1];
 
 void OLD_CheckBuyZone(CBasePlayer *player);
 void OLD_CheckBombTarget(CBasePlayer *player);

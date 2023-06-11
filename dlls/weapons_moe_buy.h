@@ -49,15 +49,17 @@ struct MoEWeaponBuyInfo_s
 	InventorySlotType iSlot;
 	TeamName iTeam;
     MoEWeaponBuyType iMenu;
+
+	int iLevel;
 };
 
 inline std::vector<MoEWeaponBuyInfo_s> g_MoEWeaponBuyInfo = {
-    { WEAPON_USP, "weapon_usp",      "USP45",    500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
-    { WEAPON_GLOCK18, "weapon_glock18",      "Glock-18",    400, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
-    { WEAPON_P228, "weapon_p228",      "P228",    600, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
-    { WEAPON_DEAGLE, "weapon_deagle",      "Deagle",    650, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
-    { WEAPON_ELITE, "weapon_elite",      "Elite",    800, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
-    { WEAPON_FIVESEVEN, "weapon_fiveseven",      "FiveSeven",    750, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL },
+    { WEAPON_USP, "weapon_usp",      "USP45",    500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL ,5},
+    { WEAPON_GLOCK18, "weapon_glock18",      "Glock-18",    400, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL ,55},
+    { WEAPON_P228, "weapon_p228",      "P228",    600, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL ,8},
+    { WEAPON_DEAGLE, "weapon_deagle",      "Deagle",    650, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL ,7},
+    { WEAPON_ELITE, "weapon_elite",      "Elite",    800, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL ,12},
+    { WEAPON_FIVESEVEN, "weapon_fiveseven",      "FiveSeven",    750, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL ,25},
     { WEAPON_M3, "weapon_m3",      "M3",    1700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
     { WEAPON_XM1014, "weapon_xm1014",      "XM1014",    3000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
     { WEAPON_MAC10, "weapon_mac10",      "MAC10",    1400, PRIMARY_WEAPON_SLOT, UNASSIGNED,  BUY_SMG },
@@ -363,6 +365,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_SKULL8, "weapon_skull8",        "碎魂利刃SKULL-8",                  6200, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_SKULL8, "weapon_skull6",        "碎魂骑士SKULL-6",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_HK23, "weapon_hk23",        "追击者HK23",                  4600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
+	{ WEAPON_HK121EX, "weapon_hk121ex",        "嗜血战狼HK121",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_M60, "weapon_m60",        "掠食者M60E4",                  4700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_MK48, "weapon_mk48",        "劫掠者MK48",                  5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 	{ WEAPON_K3, "weapon_k3",        "k3",                  4750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },

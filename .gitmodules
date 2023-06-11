@@ -33,7 +33,7 @@
 	url = https://github.com/libexpat/libexpat
 [submodule "3rdparty/lua-cmake"]
 	path = 3rdparty/lua-cmake
-	url = https://github.com/walterschell/lua
+	url = https://github.com/MoeMod/lua-cmake
 [submodule "3rdparty/gl4es"]
 	path = 3rdparty/gl4es
 	url = https://github.com/ptitSeb/gl4es
@@ -81,7 +81,7 @@
 	url = https://github.com/google/angle
 [submodule "3rdparty/chromium-zlib"]
 	path = 3rdparty/chromium-zlib
-	url = https://chromium.googlesource.com/chromium/src/third_party/zlib
+	url = https://github.com/xmake-mirror/chromium_zlib
 [submodule "3rdparty/SPIRV-Headers"]
 	path = 3rdparty/SPIRV-Headers
 	url = https://github.com/KhronosGroup/SPIRV-Headers

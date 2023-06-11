@@ -1272,7 +1272,7 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 #if defined XASH_GLES && !defined __EMSCRIPTEN__ && !TARGET_OS_IOS && defined SDL_HINT_OPENGL_ES_DRIVER
 	SDL_SetHint( SDL_HINT_OPENGL_ES_DRIVER, "1" );
 #endif
-#if defined __ANDROID__
+#if defined(__ANDROID__) && defined(XASH_SDL)
 	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 #endif
 #endif
@@ -1396,7 +1396,7 @@ int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bCh
  	switch_installdll_server();
 #endif
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) && defined(XASH_SDL)
  	void Android_SetupJNI();
 	Android_SetupJNI();
 #endif
@@ -1606,9 +1606,8 @@ void EXPORT Host_Shutdown( void )
 	SV_Shutdown( false );
 	SV_ShutdownFilter();
 	SV_UnloadProgs();
-	CL_Shutdown();
-
 	Mod_Shutdown();
+	CL_Shutdown();
 	NET_Shutdown();
 	HTTP_Shutdown();
 	Con_ClearAutoComplete();

@@ -102,7 +102,7 @@ GNU General Public License for more details.
 #define MAX_EVENT_BITS		10
 #define MAX_EVENTS			(1<<MAX_EVENT_BITS)	// 10 bits == 1024 events (the original Half-Life limit)
 
-#define MAX_MODEL_BITS		11
+#define MAX_MODEL_BITS		12
 #define MAX_MODELS			(1<<MAX_MODEL_BITS)	// 11 bits == 2048 models
 
 #define MAX_SOUND_BITS		11

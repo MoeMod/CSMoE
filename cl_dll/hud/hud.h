@@ -53,8 +53,13 @@ enum
 	MAX_HOSTAGES = 24,
 };
 
-extern const char *sPlayerModelFiles[];
 extern wrect_t nullrc;
+
+extern wrect_t nullrc;
+extern bool g_bFirstBlood;
+extern float g_fLastAssist[MAX_CLIENTS + 1][MAX_CLIENTS + 1];
+extern int g_iDefuser, g_iPlanter, g_CWcount[MAX_CLIENTS + 1][3];
+extern int g_lastsoldier[2];
 
 class CClientSprite;
 
@@ -111,6 +116,7 @@ struct HUDLIST {
 //#include "voice_status.h"
 #include "hud_spectator.h"
 #include "followicon.h"
+#include "followitem.h"
 #include "scenariostatus.h"
 #include "health.h"
 #include "radar.h"
@@ -124,9 +130,13 @@ struct HUDLIST {
 #include "moe/moe_touch.h"
 #include "hud_mvp.h"
 #include "newhud/NewHud.h"
+#include "newhud/NewAlarm.h"
+#include "newhud/NewFontManager.h"
 #include "hud_centertips.h"
 #include "weapons_const.h"
 #include "weapons_moe_buy.h"
+
+
 
 namespace cl {
 //
@@ -391,6 +401,18 @@ struct team_info_t
 	int teamnumber;
 };
 
+struct RoundPlayerInfo
+{
+	int kill[2];
+	int assist;
+	float assisttime[3][MAX_PLAYERS + 1];
+	float totaldmg[MAX_PLAYERS + 1];
+	int revenge;
+
+	int iHealth;
+	int iMaxHealth;
+};
+
 struct hostage_info_t
 {
 	vec3_t origin;
@@ -403,11 +425,160 @@ struct hostage_info_t
 
 extern hud_player_info_t	g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
 extern extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];   // additional player info sent directly to the client dll
+extern RoundPlayerInfo      g_PlayerExtraInfoEx[MAX_PLAYERS + 1];
 extern team_info_t			g_TeamInfo[MAX_TEAMS+1];
 extern hostage_info_t		g_HostageInfo[MAX_HOSTAGES+1];
 extern int					g_IsSpectator[MAX_PLAYERS+1];
 
+//
+//-----------------------------------------------------
+//
 
+class AlarmBasicdata
+{
+public:
+	AlarmBasicdata() {};
+public:
+	bool bInitialized;
+
+	char szName[32];
+	char szSound[64];
+
+	bool bHasMsgBox;
+	bool bHasAlarm;
+
+	wchar_t m_wcsAlarmText[64];
+	wchar_t m_wcsAlarmDesc[256];
+	wchar_t m_wcsRibbonText[64];
+	wchar_t m_wcsRibbonDesc[512];
+
+	SharedTexture iTexture;
+	int iRibbonRequire;
+	SharedTexture iTextureRibbon;
+
+
+	int index;
+
+};
+
+typedef struct AlarmDisplay_s
+{
+	bool m_bPlaying;
+	bool m_bReset;
+	bool m_bBackGround;
+	float m_flDisplayTime;
+
+	// Alarm, bRibbon
+	std::vector<std::pair<AlarmBasicdata, bool>> m_vecAlarm;
+
+	int m_iCount_Ribbon[ALARM_LAST];
+	std::vector<int> m_vecCountRibbonC;
+}AlarmDisplay_t;
+
+class CHudNewAlarm : public CHudBase
+{
+public:
+	CHudNewAlarm();
+	~CHudNewAlarm();
+public:
+	int Init(void);
+	int VidInit(void);
+	int Draw(float flTime);
+	void InitHUDData(void);
+	void Shutdown();
+
+	CHudMsgFunc(ResetRound);
+
+public:
+
+	//NewAlarm From Sme
+	AlarmBasicdata m_AlarmDefault[ALARM_LAST];
+
+	std::vector<AlarmBasicdata> m_vecAlarmCustom;
+	AlarmDisplay_t m_AlarmDisplay;
+	bool bFirstblood;
+
+	int RedrawAlarm(float flTime);
+	AlarmBasicdata InitAlarm(char* szName, int iType, bool bCustom);
+	void SetAlarm(int iAlarm, bool bCustom = false);
+
+	int FindAlarm(char* szName, int iType);
+	bool IsPlaying(void)
+	{
+		if (m_AlarmDisplay.m_vecAlarm.size())
+			return true;
+
+		return false;
+	}
+	bool IsPlaying(int iAlarm, bool bCustom);
+
+	int GetWide(const wchar_t* str);
+	void DrawVguiTexts(int x, int y, int r, int g, int b, int a, const wchar_t* str);
+private:
+	UniqueTexture m_iTextureBG;
+	UniqueTexture m_iTextureLogoBG;
+	bool bTextureLoaded;
+	bool bAlarmRead;
+
+};
+
+CHudNewAlarm& NewAlarm(void);
+
+
+//
+//-----------------------------------------------------
+//
+typedef struct deathinfo_s
+{
+	bool bDraw = false;
+	int iPlayer = 0;
+	int iDist = 0;
+	long iDamage[6]{ 0 };
+	int iShot[5]{};
+	char szWeapon[64]{};
+	int iHealth[2]{};
+	float fDisplaytime = 0.0;
+}
+deathinfo_t;
+
+class CHudDeathInfo
+{
+public:
+	CHudDeathInfo();
+	~CHudDeathInfo();
+
+	void Init(void);
+	void VidInit(void);
+	void Set(deathinfo_t data, int type); //killer = 1, victim = 2
+	void Redraw(void);
+
+	void ReplaceTokenFirst(char* szString, const char* szToken, const char* szSwitch);
+	void ReplaceTokenAll(char* szString, const char* szToken, const char* szSwitch);
+	char* UnicodeToUTF8(const wchar_t* str);
+	wchar_t* UTF8ToUnicode(const char* str);
+
+	void InitDeathInfo(deathinfo_t* temp);
+
+	CHudMsgFunc(DeathInfo);
+
+private:
+	deathinfo_t Killer;
+	deathinfo_t Victim;
+	deathinfo_t Victim2;
+
+	char m_szMsgEnemyDeath[64];
+	char m_szBody[5][32];
+	char m_szAmmoCount[16];
+
+	char m_szMsgDamageToKiller[64];
+	char m_szMsgKillerState[64];
+	char m_szMsgDamagedNone[64];
+
+	char m_szTempKiller[512], m_szTempVictim[512];
+	wchar_t m_wszTotalKillerText[512], m_wszTotalVictimText[512];
+};
+
+CHudDeathInfo& HudDeathInfo(void);
 //
 //-----------------------------------------------------
 //
@@ -811,6 +982,7 @@ public:
 	int Init( void );
 	int VidInit( void );
 	int Draw( float flTime );
+	void Reset(void);
 	void FuncDrawScope(const CTextureRef& tex, int type, int x, int y, int width, int height);
 	void FuncDrawCorner(const CTextureRef& tex, int type, int width, int height, int width2 = 0, int height2 = 0);
 	void FuncDraw2DQuadScaled(const CTextureRef& tex, int x, int y, int width, int height, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255);
@@ -838,6 +1010,9 @@ public:
 	int DrawDestroyerSniperScopeNumbers(int x, int y, int iFlags, int iNumber, int r, int g, int b);
 	int CalculateDistance();
 	void DrawStarChaserSRScope(float flTime);
+	void DrawHaloGunCrossHair(float flTime);
+	void SetHaloGunAmmo(int iClip, int iAmmo, int iMaxAmmo);
+	void DrawRetina(float flTime);
 private:
 
 	struct LockOnData
@@ -956,6 +1131,29 @@ private:
 
 	float m_flStarChaserSRAlpha;
 
+	UniqueTexture m_iHaloGun_Aim_Gauge;
+	UniqueTexture m_iHaloGun_Aim_BG;
+	UniqueTexture m_iHaloGun_Aim_01;
+	UniqueTexture m_iHaloGun_Aim_02;
+	UniqueTexture m_iHaloGun_Aim_03;
+
+	int m_iHaloGunClip;
+	int m_iHaloGunAmmo;
+	int m_iHaloGunMaxAmmo;
+
+	HSPRITE m_iHaloGunLoopSprite;
+	model_t* m_pHaloGunLoopSprite;
+	HSPRITE m_iHaloGunHitSprite;
+	model_t* m_pHaloGunHitSprite;
+
+	HSPRITE m_iReviveGunLoopSprite;
+	model_t* m_pReviveGunLoopSprite;
+	HSPRITE m_iReviveGunSprite;
+	model_t* m_pReviveGunSprite;
+
+	UniqueTexture m_iChainSrAimBg;
+	UniqueTexture m_iChainSrAimCenter;
+	UniqueTexture m_iChainSrAimDeco[4];
 };
 
 //
@@ -1214,6 +1412,9 @@ public:
 		return m_bIsCZero;
 	}
 
+	int FindPrivateSprList();
+	void AddPrivateSprList(const char* SzName, const char* szSprite, const wrect_t szWrect, const int iRes = 640);
+	wrect_t PushBackSprRect(int left, int top, int right, int bottom);
 
 	float   m_flTime;      // the current client time
 	float   m_fOldTime;    // the time at which the HUD was last redrawn
@@ -1229,6 +1430,7 @@ public:
 	cvar_t *m_pCvarDraw;
 	cvar_t *cl_shadows;
 	cvar_t *m_hudstyle;
+	cvar_t* m_alarmstyle;
 	cvar_t *fastsprites;
 	cvar_t *cl_predict;
 	cvar_t *cl_weapon_wallpuff;
@@ -1290,6 +1492,7 @@ public:
 	CHudRadar       m_Radar;
 	CHudSpectatorGui m_SpectatorGui;
 	CHudFollowIcon	m_FollowIcon;
+	CHudFollowItem	m_FollowItem;
 	CHudScenarioStatus m_scenarioStatus;
 
 	CHudHeadName	m_HeadName;
@@ -1303,6 +1506,9 @@ public:
 	CHudMVP m_MVP;
 	CHudNewHud m_NewHud;
     CHudCenterTips m_CenterTips;
+	CHudDeathInfo m_DeathInfo;
+	CHudNewAlarm  m_NewAlarm;
+	CHudDrawFontText m_DrawFontText;
 
 	// user messages
 	CHudMsgFunc(Damage);
@@ -1345,6 +1551,9 @@ public:
 	std::set<int> m_setBanKnife;
 	std::set<int> m_setBanGrenade;
 
+	int m_iZlevel;
+	float m_flZombieSelectTime;
+
 private:
 	HUDLIST	*m_pHudList;
 	HSPRITE	m_hsprLogo;
@@ -1364,6 +1573,8 @@ private:
 	HSPRITE *m_rghSprites;	/*[HUD_SPRITE_COUNT]*/			// the sprites loaded from hud.txt
 	wrect_t *m_rgrcRects;	/*[HUD_SPRITE_COUNT]*/
 	char *m_rgszSpriteNames; /*[HUD_SPRITE_COUNT][MAX_SPRITE_NAME_LENGTH]*/
+
+	std::vector<client_sprite_t> m_iAdditionalSprList;
 };
 
 extern CHud gHUD;

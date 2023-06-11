@@ -64,7 +64,7 @@ endif()
 if(NOT XASH_DEDICATED)
 	option(XASH_IMGUI "Imgui support for CSMoE" ON)
 	option(XASH_VGUI2 "VGUI2 support for CSMoE" ON)
-	option(XASH_RAGDOLL "Bullet3 RagDoll support for CSMoE" ON)
+	option(XASH_RAGDOLL "Bullet3 RagDoll support for CSMoE" OFF) # disable by default
 else()
 	set(XASH_IMGUI OFF)
 	set(XASH_VGUI2 OFF)

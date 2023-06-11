@@ -256,6 +256,16 @@ set(HLDLL_SRCS
 	./voidpistolblackhole.cpp
 	./throwingknifeentity.cpp
 	./magicsgcannon.cpp
+	./m79rocket.cpp
+	./claymoremine.cpp
+	./at4rocket.cpp
+	./gamemode/zsh/zsh_building_turret.cpp
+	./gamemode/zsh/zsh_building_turret_grenade.cpp
+	./gamemode/zsh/zsh_building_medical.cpp
+	./gamemode/zbz/supersupplybox.cpp
+	./gamemode/zbz/sentrygun.cpp
+	./gamemode/zb2/rushbox.cpp
+	./gamemode/zb2/zombiesmoke.cpp
 	)
 
 set (HLWPN_SRCS
@@ -623,6 +633,37 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_turbulent9.cpp
 	../dlls/wpn_shared/knife_spknife.cpp
 	../dlls/wpn_shared/knife_swordbombard.cpp
+	../dlls/wpn_shared/knife_ironfan.cpp
+	../dlls/wpn_shared/wpn_thanatos3.cpp
+	../dlls/wpn_shared/wpn_dfpistol.cpp
+	../dlls/wpn_shared/wpn_turbulent1.cpp
+	../dlls/wpn_shared/wpn_vulcanus1.cpp
+	../dlls/wpn_shared/wpn_crow1.cpp
+	../dlls/wpn_shared/wpn_thanatos1.cpp
+	../dlls/wpn_shared/wpn_vulcanus5.cpp
+	../dlls/wpn_shared/wpn_m79.cpp
+	../dlls/wpn_shared/wpn_m79g.cpp
+	../dlls/wpn_shared/wpn_firecracker.cpp
+	../dlls/wpn_shared/wpn_hk121ex.cpp
+	../dlls/wpn_shared/wpn_claymore.cpp
+	../dlls/wpn_shared/wpn_at4.cpp
+	../dlls/wpn_shared/wpn_sbmine.cpp
+	../dlls/wpn_shared/wpn_at4ex.cpp
+	../dlls/wpn_shared/wpn_bazooka.cpp
+	../dlls/wpn_shared/wpn_janus1.cpp
+	../dlls/wpn_shared/wpn_halogun.cpp
+	../dlls/wpn_shared/wpn_chainsr.cpp
+	../dlls/wpn_shared/z4b_mechanicherogun.cpp
+	../dlls/wpn_shared/z4b_mechanicxm214.cpp
+	../dlls/wpn_shared/z4b_mechanichand.cpp
+	../dlls/wpn_shared/wpn_stickybomb.cpp
+	../dlls/wpn_shared/wpn_holybombex.cpp
+	../dlls/wpn_shared/wpn_waterbomb.cpp
+	../dlls/wpn_shared/wpn_y20s1grenade.cpp
+	../dlls/wpn_shared/wpn_chinaeventbomb.cpp
+	../dlls/wpn_shared/z4b_shovelex.cpp
+	../dlls/wpn_shared/wpn_y23s1sfsmg.cpp
+	../dlls/wpn_shared/wpn_dartpistol.cpp
 	)
 
 set(PM_SRCS

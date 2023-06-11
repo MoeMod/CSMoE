@@ -71,7 +71,16 @@ enum
 	EF_ELEC_BLUE,
 	EF_ELEC_YELLOW,
 	MK3A1SE_BURN,
+	SBMINE_DEBUFF,
+	CHAINSR_SHADOWSHOOT,
+	CHAINSR_SHADOWSHOOT2,
+	HOLYBOMBEX_BURN,
 };
+
+bool bHaloGunLoopRetinaOn;
+bool bHaloGunHitRetinaOn;
+bool bReviveGunLoopRetinaOn;
+bool bReviveGunRetinaOn;
 
 TEMPENTITY *iHolyFistRingEffect[33];
 TEMPENTITY *iWingGunEffect[33];
@@ -84,6 +93,47 @@ void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int i
 TEMPENTITY* AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
 //void EnableWallHack(int enable, int iTarget);
 void EV_DragonTailFX(int iDidHit, int iType);
+void EV_Crow9FX(Vector angle);
+void EV_SPR3(struct tempent_s* ent, float frametime, float currenttime);
+void EV_Explosion(int type, Vector pos);
+
+int ModelFrameCount(model_t* mod)
+{
+	int count = 1;
+
+	if (!mod)
+		return count;
+
+	if (mod->type == mod_sprite)
+	{
+		count = ((msprite_t*)mod->cache.data)->numframes;
+
+		if (count > 0)
+			return count;
+
+		return 1;
+	}
+
+	if (mod->type != mod_studio)
+		return count;
+
+	studiohdr_t* pstudiohdr = (studiohdr_t*)IEngineStudio.Mod_Extradata(mod);
+
+	if (!pstudiohdr)
+		return 1;
+
+	mstudiobodyparts_t* pbodypart = (mstudiobodyparts_t*)((byte*)pstudiohdr + pstudiohdr->bodypartindex);
+
+	for (int i = 0; i < pstudiohdr->numbodyparts; i++)
+	{
+		count *= pbodypart[i].nummodels;
+	}
+
+	if (count > 0)
+		return count;
+
+	return 1;
+}
 
 int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 {
@@ -189,6 +239,20 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		break;
 
 	}
+	case 7:
+	{
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+
+		bool bEnabled = reader.ReadByte() != 0;
+		float flLife = reader.ReadByte() * 0.1;
+		int iType = reader.ReadByte();
+
+		gHUD.m_FollowItem.SetIconItem(iType, pos, bEnabled, flLife);
+
+		break;
+	}
 	case 15:
 		switch (reader.ReadByte())
 		{
@@ -213,21 +277,28 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	case 16:		
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadByte();
-
+		
 		switch (arg2)
 		{
 		case WINGGUN_WING:
 		{
-			if (iWingGunEffect[arg1])
-			{
-				iWingGunEffect[arg1]->die = gHUD.m_flTime;
-				iWingGunEffect[arg1] = nullptr;
-				break;
-			}
+			int bOn = reader.ReadByte();
 
-			if (!iWingGunEffect[arg1])
-				iWingGunEffect[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_idle.spr"),
-					Vector(0.0, 0.0, 50.0), 15.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.5, kRenderTransAdd, 30.0);
+			if (bOn)
+			{
+				if (!iWingGunEffect[arg1])
+					iWingGunEffect[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_winggun_idle.spr"),
+						Vector(0.0, 0.0, 50.0), 15.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.5, kRenderTransAdd, 30.0);
+			}
+			else
+			{
+				if (iWingGunEffect[arg1])
+				{
+					iWingGunEffect[arg1]->die = gHUD.m_flTime;
+					iWingGunEffect[arg1] = nullptr;
+				}
+			}
+	
 			break;
 		}
 		case HOLYFIST_GLITCH_RING:
@@ -495,6 +566,61 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		break;
 	}
+	case 34:
+	{
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+		EV_Crow9FX(pos);
+
+		break;
+	}
+	case 35:
+	{
+		arg1 = reader.ReadByte();
+
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+
+		EV_Explosion(arg1, pos);
+		break;
+	}
+	case 36:
+	{
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+
+		gEngfuncs.pEfxAPI->R_SparkEffect(pos, 8, -200, 200);
+		break;
+	}
+	case 37:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		int arg3 = reader.ReadByte();
+		m_SniperScope.SetHaloGunAmmo(arg1, arg2, arg3);
+		break;
+	}
+	case 38:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+
+		switch (arg1)
+		{
+		case 3: bReviveGunRetinaOn = arg2 ? true : false; break;
+		case 2: bReviveGunLoopRetinaOn = arg2 ? true : false; break;
+		case 1: bHaloGunHitRetinaOn = arg2 ? true : false; break;
+		case 0: bHaloGunLoopRetinaOn = arg2 ? true : false; break;
+		default:
+			break;
+		}
+
+
+		break;
+	}
 	case 44:
 	{
 		arg1 = reader.ReadByte();
@@ -556,6 +682,133 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 //		pEnt->curstate.renderfx = kRenderFxWallHack;
 //	}
 //}
+
+
+void EV_SPR3(struct tempent_s* ent, float frametime, float currenttime)
+{
+	if ((ent->die - gHUD.m_flTime) < ent->entity.curstate.fuser2)
+	{
+		ent->entity.curstate.renderamt = 255.0 * (ent->die - gHUD.m_flTime) / ent->entity.curstate.fuser2;
+	}
+
+	ent->entity.origin[2] += 0.7;
+	ent->entity.curstate.scale += 0.007;
+
+	if ((gHUD.m_flTime - ent->entity.curstate.fuser1) > (1.0 / ent->entity.curstate.framerate))
+	{
+		if (ent->entity.curstate.frame + 1 > ent->entity.curstate.iuser1)
+			ent->entity.curstate.frame = 0;
+		else
+			ent->entity.curstate.frame += 1;
+
+		ent->entity.curstate.fuser1 = gHUD.m_flTime;
+	}
+}
+
+void EV_Explosion(int type, Vector origin)
+{
+	switch (type)
+	{
+	case 2:
+	{
+		float vColor[3][3];
+
+		for (int i = 0; i < 3; i++)
+		{
+			vColor[i][0] = gEngfuncs.pfnRandomLong(70, 250);
+			vColor[i][1] = gEngfuncs.pfnRandomLong(70, 250);
+			vColor[i][2] = gEngfuncs.pfnRandomLong(70, 250);
+
+			vec3_t vOrigin;
+
+			vOrigin[0] = origin[0] + gEngfuncs.pfnRandomFloat(-100.0, 100.0);
+			vOrigin[1] = origin[1] + gEngfuncs.pfnRandomFloat(-100.0, 100.0);
+			vOrigin[2] = origin[2] + gEngfuncs.pfnRandomFloat(20.0, 70.0);
+
+			struct model_s* pModel;
+			TEMPENTITY* pEnt;
+
+			pModel = IEngineStudio.Mod_ForName("sprites/spark1.spr", 0);
+
+			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(vOrigin, pModel);
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 254;
+			pEnt->entity.curstate.scale = 0.7;
+			pEnt->entity.curstate.rendercolor.r = vColor[i][0];
+			pEnt->entity.curstate.rendercolor.g = vColor[i][1];
+			pEnt->entity.curstate.rendercolor.b = vColor[i][2];
+			pEnt->flags |= FTENT_CLIENTCUSTOM;
+			pEnt->callback = EV_SPR3;
+
+			pEnt->entity.curstate.iuser1 = ModelFrameCount(pModel);
+			pEnt->entity.curstate.framerate = 15.0;
+			pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+			pEnt->entity.curstate.fuser2 = 0.2;
+
+			pEnt->die = gHUD.m_flTime + pEnt->entity.curstate.iuser1 / 15.0;
+		}
+
+		struct model_s* pModel;
+		TEMPENTITY* pEnt;
+
+		pModel = IEngineStudio.Mod_ForName("sprites/spark1.spr", 0);
+
+		origin[2] += 10.0;
+
+		pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+		pEnt->entity.curstate.rendermode = kRenderTransAdd;
+		pEnt->entity.curstate.renderamt = 255;
+		pEnt->entity.curstate.scale = 0.7;
+		pEnt->entity.curstate.fuser2 = 0.6;
+		pEnt->flags |= FTENT_CLIENTCUSTOM;
+		pEnt->callback = EV_SPR3;
+
+		pEnt->entity.curstate.iuser1 =  ModelFrameCount(pModel);
+		pEnt->entity.curstate.framerate = 15.0;
+		pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+		pEnt->entity.curstate.fuser2 = 0.2;
+
+		pEnt->die = gHUD.m_flTime + pEnt->entity.curstate.iuser1 / 15.0;
+		break;
+	}
+	case 3:
+	{
+		origin[2] += 25.0f;
+
+		struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_waterbomb2.spr", false);
+		if (pModel)
+		{
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+			pEnt->die = gHUD.m_flTime + 200.0f;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 230;
+			pEnt->entity.curstate.scale = 0.1;
+			pEnt->entity.curstate.frame = 0;
+			pEnt->entity.curstate.framerate = 0;
+			pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 1.0f;
+			pEnt->frameMax = ModelFrameCount(pModel) - 1;
+
+			pEnt->flags |= FTENT_CLIENTCUSTOM;
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+			{
+				if (pEnt->entity.curstate.fuser1 <= gHUD.m_flTime)
+				{
+					pEnt->die = gHUD.m_flTime;
+				}
+				else
+				{
+					float percent = pEnt->entity.curstate.fuser1 - gHUD.m_flTime;
+					pEnt->entity.curstate.frame = pEnt->frameMax * (1.0f - percent);
+					pEnt->entity.curstate.renderamt = 230 * percent;
+					pEnt->entity.curstate.scale += 0.025;
+				}
+			};
+		}
+
+		break;
+	}
+	}
+}
 
 void FollowThink(tempent_s* ent, float frametime, float currenttime)
 {
@@ -734,6 +987,12 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 			Vector(0.0, 0.0, 30.0), 5.0, TRUE, flags, 0.9, kRenderTransAdd, 10.0);
 		break;
 	}
+	case HOLYBOMBEX_BURN:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/holybombex_burn.spr"),
+			Vector(0.0, 0.0, 30.0), 5.0, TRUE, flags, 0.9, kRenderTransAdd, 10.0);
+		break;
+	}
 	case LANCE_HIT:
 	{
 		flags = FTENT_PERSIST;
@@ -803,6 +1062,24 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 	{
 		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_mk3a1seburn.spr"),
 			Vector(0.0, 0.0, -5.0), 2.0, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
+		break;
+	}
+	case SBMINE_DEBUFF:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_sbmine_debuff.spr"),
+			Vector(0.0, 0.0, 40.0), 1.0, TRUE, flags, 0.3, kRenderTransAdd, 30.0);
+		break;
+	}
+	case CHAINSR_SHADOWSHOOT:
+	{
+		gEngfuncs.pEfxAPI->R_AttachTentToModel(entity, 0, 10, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_chainsr_shadowshoot1.spr"), 30.0, 255, kRenderTransAdd,
+			0.2, 22, FTENT_CLIENTCUSTOM, EFLAG_DEPTH_CHANGED);
+		break;
+	}
+	case CHAINSR_SHADOWSHOOT2:
+	{
+		gEngfuncs.pEfxAPI->R_AttachTentToModel(entity, 0, 10, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_chainsr_shadowshoot2.spr"), 30.0, 255, kRenderTransAdd,
+			0.2, 22, FTENT_CLIENTCUSTOM, EFLAG_DEPTH_CHANGED);
 		break;
 	}
 
@@ -933,5 +1210,44 @@ void EV_DragonTailFX(int iDidHit, int iType)
 	pTemp->entity.curstate.skin = iDidHit ? 0 : 1;
 	pTemp->entity.curstate.sequence = gHUD.cl_righthand->value > 0 ? iType : iType + 4;
 }
+
+
+void Crow9FXLock(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	ent->entity.angles = ent->entity.curstate.vuser1;
+	ent->entity.origin = ent->entity.curstate.vuser2;
+}
+
+void EV_Crow9FX(Vector angle)
+{
+	cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+	if (!viewent)
+		return;
+
+	TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->R_TempModel(viewent->attachment[0], Vector(0, 0, 0), angle, 0.5, gEngfuncs.pEventAPI->EV_FindModelIndex("models/crow9_wind.mdl"), 0);
+
+	if (!pTemp)
+		return;
+
+	pTemp->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+	pTemp->flags |= FTENT_CLIENTCUSTOM;
+
+	pTemp->tentOffset.z = 16;
+	pTemp->clientIndex = viewent->index;
+	pTemp->entity.curstate.animtime = gHUD.m_flTime;
+	pTemp->entity.curstate.framerate = 1.0;
+	pTemp->entity.curstate.frame = 0;
+	pTemp->entity.curstate.renderamt = 210;
+	pTemp->entity.curstate.rendermode = kRenderNormal;
+	pTemp->entity.curstate.vuser1 = angle;
+	pTemp->entity.curstate.vuser2 = viewent->attachment[0];
+	pTemp->entity.curstate.effects |= EF_NOCULL;
+	pTemp->entity.angles = angle;
+	pTemp->frameMax = 256;
+	pTemp->callback = Crow9FXLock;
+
+}
+
 
 }

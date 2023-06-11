@@ -23,7 +23,7 @@
 #include "weapons_moe_buy.h"
 #include "newmenus.h"
 #include "client/wdnmd.h"
-
+#include "wpn_shared/z4b_shovelex.h"
 #ifdef XASH_MYSQL
 #include "database/db_main.h"
 #endif
@@ -2361,6 +2361,11 @@ void CHalfLifeMultiplay::RestartRound()
 	m_bLevelInitialized = false;
 	m_bCompleteReset = false;
 	wdnmdmenu::WdnmdResetTime();
+
+
+	MESSAGE_BEGIN(MSG_ALL, gmsgResetRound, nullptr);
+	WRITE_BYTE(m_iTotalRoundsPlayed);
+	MESSAGE_END();
 }
 
 BOOL CHalfLifeMultiplay::IsThereABomber()
@@ -2538,9 +2543,17 @@ bool CHalfLifeMultiplay::AddToVIPQueue(CBasePlayer* toAdd)
 void CHalfLifeMultiplay::ResetCurrentVIP()
 {
 	char* infobuffer = GET_INFO_BUFFER(m_pVIP->edict());
+	
+	
+#if PLAYER_CLASS_SYSTEM
+	m_pVIP->m_iModelName = PlayerClassManager().PlayerClass_GetRandomClass();
+	m_pVIP->m_bIsFemale = PlayerClassManager().PlayerClass_IsFemale(m_pVIP->m_iModelName);
+	SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", PlayerClassManager().PlayerClass_GetModelName(m_pVIP->m_iModelName));
+#else
 	m_pVIP->m_iModelName = PlayerModel_GetRandomSkin();
 	m_pVIP->m_bIsFemale = PlayerModel_IsFemale(m_pVIP->m_iModelName, m_pVIP->m_iModelTeam);
 	SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", PlayerModel_GetApperance(m_pVIP->m_iModelName, m_pVIP->m_iModelTeam));
+#endif
 
 	m_pVIP->m_bIsVIP = false;
 	m_pVIP->m_bNotKilled = false;
@@ -4127,6 +4140,26 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							killer_weapon_name = "chaingren";
 							break;
 
+						case GRENADE_STICKYBOMB:
+							killer_weapon_name = "stickybomb";
+							break;
+
+						case GRENADE_HOLYBOMBEX:
+							killer_weapon_name = "holybomb_ex";
+							break;
+
+						case GRENADE_Y20S1GRENADE:
+							killer_weapon_name = "y20s1grenade";
+							break;
+
+						case GRENADE_WATERBOMB:
+							killer_weapon_name = "waterbomb";
+							break;
+
+						case GRENADE_CHINAEVENTBOMB:
+							killer_weapon_name = "chinaeventbomb";
+							break;
+
 						default:
 							killer_weapon_name = "grenade";
 							break;
@@ -4158,6 +4191,8 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "holysword";
 					else if (!Q_strcmp(killer_weapon_name, "summonknife_cannon"))
 						killer_weapon_name = "summonknife";
+					else if (!Q_strcmp(killer_weapon_name, "swordbombard_touchbox"))
+						killer_weapon_name = "swordbombard";
 				}
 				else
 				{
@@ -4261,6 +4296,38 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "vulcanus7";
 					else if (iId == WEAPON_VULCANUS11)
 						killer_weapon_name = "vulcanus11";
+					else if (iId == WEAPON_M79)
+						killer_weapon_name = "m79";
+					else if (iId == WEAPON_M79G)
+						killer_weapon_name = "m79g";
+					else if (iId == WEAPON_JANUS1)
+						killer_weapon_name = "janus1";
+					else if (iId == WEAPON_FIRECRACKER)
+						killer_weapon_name = "firecracker";
+					else if (iId == WEAPON_HK121EX)
+						killer_weapon_name = "hk121ex";
+					else if (iId == WEAPON_AT4)
+						killer_weapon_name = "at4";
+					else if (iId == WEAPON_AT4EX)
+						killer_weapon_name = "at4ex";
+					else if (iId == WEAPON_RPG7)
+						killer_weapon_name = "rpg7";
+					else if (iId == WEAPON_BAZOOKA)
+						killer_weapon_name = "bazooka";
+					else if (iId == WEAPON_HALOGUN)
+						killer_weapon_name = "halogun";
+					else if (iId == WEAPON_CHAINSR)
+						killer_weapon_name = "chainsr";
+					else if (!Q_strcmp(killer_weapon_name, "chainsr_shadow"))
+						killer_weapon_name = "chainsr";
+					else if (iId == WEAPON_SBMINE)
+						killer_weapon_name = "sbmine";
+					else if (!Q_strcmp(killer_weapon_name, "mine_sbmine"))
+						killer_weapon_name = "sbmine";
+					else if (iId == WEAPON_CLAYMORE)
+						killer_weapon_name = "claymore";
+					else if (!Q_strcmp(killer_weapon_name, "claymore_mine"))
+						killer_weapon_name = "claymore";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}
@@ -4316,6 +4383,26 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "chaingren";
 						break;
 
+					case GRENADE_STICKYBOMB:
+						killer_weapon_name = "stickybomb";
+						break;
+
+					case GRENADE_HOLYBOMBEX:
+						killer_weapon_name = "holybomb_ex";
+						break;
+
+					case GRENADE_Y20S1GRENADE:
+						killer_weapon_name = "y20s1grenade";
+						break;
+
+					case GRENADE_WATERBOMB:
+						killer_weapon_name = "waterbomb";
+						break;
+
+					case GRENADE_CHINAEVENTBOMB:
+						killer_weapon_name = "chinaeventbomb";
+						break;
+
 					default:
 						killer_weapon_name = "grenade";
 						break;
@@ -4326,6 +4413,13 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 	}
 	else if (pevInflictor)
 		killer_weapon_name = STRING(pevInflictor->classname);
+
+	if (!Q_strcmp(killer_weapon_name, "z4b_shovelex"))
+	{
+		CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(CBaseEntity::Instance(pevInflictor));
+
+		killer_weapon_name = SHOVELEX_CLASSNAME[pWeapon->m_iWeaponState];
+	}
 
 	// strip the monster_* or weapon_* from the inflictor's classname
 	if (!Q_strncmp(killer_weapon_name, "weapon_", 7))
@@ -4353,6 +4447,156 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 		WRITE_BYTE(iGotHeadshot);			// is killed headshot
 		WRITE_STRING(killer_weapon_name);		// what they were killed by (should this be a string?)
 		MESSAGE_END();
+
+		////For DeathInfo
+		if (ENTINDEX(pVictim->edict()) >= 1 && ENTINDEX(pVictim->edict()) <= 32)
+		{
+			int iAtt = killer_index;
+			int iVic = ENTINDEX(pVictim->edict());
+
+			CBasePlayer* pAttackPlayer = dynamic_cast<CBasePlayer*>(CBaseEntity::Instance(pKiller));
+
+			if (pAttackPlayer)
+			{
+
+				//DeathMsg
+				float flDistance = (pVictim->pev->origin - pAttackPlayer->pev->origin).Length();
+				flDistance /= 40.0;
+
+				//For Attacker
+				int iTotalDamage = 0;
+				for (int i = 1; i <= 7; i++)
+				{
+					iTotalDamage += iDeathInfo_Fire[iAtt][iVic][i];
+				}
+
+				if (!pAttackPlayer->m_bIsZombie)
+				{
+					SzDeathInfo_Wpn[iAtt][iVic][1] = /*SzModel*/killer_weapon_name;
+					if (SzDeathInfo_Wpn[iAtt][iVic][1] == "usp")
+						SzDeathInfo_Wpn[iAtt][iVic][1] = "USP45";
+					else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "deagle")
+						SzDeathInfo_Wpn[iAtt][iVic][1] = "DesertEagle";
+					else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "grenade")
+						SzDeathInfo_Wpn[iAtt][iVic][1] = "HE_Grenade";
+				}
+
+
+				//For Victim
+				int iTotalDamageFromAttacker = 0, iTotalDamageTake = 0;
+				for (int i = 1; i <= 7; i++)
+				{
+					iTotalDamageFromAttacker += iDeathInfo_Fire[iAtt][iVic][i];
+					iTotalDamageTake += iDeathInfo_Fire[iVic][iAtt][i];
+				}
+				float flVicHp = 0.0, flVicArmor = 0.0;
+				flVicHp = pVictim->pev->health;
+				flVicArmor = pVictim->pev->armorvalue;
+
+
+				if (pAttackPlayer->IsPlayer()) {
+					MESSAGE_BEGIN(MSG_ONE, gmsgDeathInfo, NULL, pAttackPlayer->pev);
+					WRITE_BYTE(1);
+					WRITE_BYTE(iVic);
+					WRITE_BYTE((int)flDistance);
+					WRITE_STRING(SzDeathInfo_Wpn[iAtt][iVic][1].c_str());
+					WRITE_LONG(iTotalDamage);
+
+					// HEAD
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][1]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][1]);
+					// CHEST
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][2]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][2]);
+					// STOMACH
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][3]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][3]);
+					// ARM
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][4] + iDeathInfo_Fire[iAtt][iVic][5]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][4] + iDeathInfo_Body[iAtt][iVic][5]);
+					// LEG
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][6] + iDeathInfo_Fire[iAtt][iVic][7]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][6] + iDeathInfo_Body[iAtt][iVic][7]);
+					MESSAGE_END();
+				}
+				if (CBaseEntity::Instance(pVictim->pev)->IsPlayer()) {
+					MESSAGE_BEGIN(MSG_ONE, gmsgDeathInfo, NULL, pVictim->pev);
+					WRITE_BYTE(2);
+					WRITE_BYTE(iAtt);
+					WRITE_BYTE((int)flDistance);
+					WRITE_STRING(SzDeathInfo_Wpn[iAtt][iVic][1].c_str());
+					WRITE_LONG(iTotalDamageFromAttacker);
+
+					// HEAD
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][1]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][1]);
+					// CHEST
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][2]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][2]);
+					// STOMACH
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][3]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][3]);
+					// ARM
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][4] + iDeathInfo_Fire[iAtt][iVic][5]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][4] + iDeathInfo_Body[iAtt][iVic][5]);
+					// LEG
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][6] + iDeathInfo_Fire[iAtt][iVic][7]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][6] + iDeathInfo_Body[iAtt][iVic][7]);
+
+					// Damage 2
+					WRITE_STRING(SzDeathInfo_Wpn[iVic][iAtt][1].c_str());
+					WRITE_LONG(iTotalDamageTake);
+					// HEAD
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][1]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][1]);
+					// CHEST
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][2]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][2]);
+					// STOMACH
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][3]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][3]);
+					// ARM
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][4] + iDeathInfo_Fire[iVic][iAtt][5]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][4] + iDeathInfo_Body[iVic][iAtt][6]);
+					// LEG
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][6] + iDeathInfo_Fire[iVic][iAtt][7]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][6] + iDeathInfo_Body[iVic][iAtt][7]);
+
+					WRITE_SHORT(floor((flVicHp)));
+					WRITE_SHORT(floor((flVicArmor)));
+
+					MESSAGE_END();
+				}
+			}
+		}
+		//Clear Last Data
+		auto ResetDeathInfo = [](int index1, int index2)
+		{
+			if (!index2)
+			{
+				for (int i = 1; i <= MAX_CLIENTS; i++)
+				{
+					for (int j = 1; j <= 7; j++)
+					{
+						iDeathInfo_Body[index1][i][j] = 0;
+						iDeathInfo_Fire[index1][i][j] = 0;
+					}
+				}
+			}
+			else
+			{
+				SzDeathInfo_Wpn[index1][index2][0].clear();
+				SzDeathInfo_Wpn[index1][index2][1].clear();
+
+				for (int j = 1; j <= 7; j++)
+				{
+					iDeathInfo_Body[index1][index2][j] = 0;
+					iDeathInfo_Fire[index1][index2][j] = 0;
+				}
+			}
+		};
+		ResetDeathInfo(killer_index, ENTINDEX(pVictim->edict()));
+		ResetDeathInfo(ENTINDEX(pVictim->edict()), 0);
 	}
 
 	// replace the code names with the 'real' names

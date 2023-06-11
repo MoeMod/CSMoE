@@ -40,6 +40,7 @@ struct DynamicRadiusDamageArgs
 	int RadiusDamageBitsDamageType = DMG_BULLET;
 	KnockbackData RadiusDamageKnockback = { 0.0, 0.0, 0.0, 0.0, 1.0 };
 	bool RadiusDamageCanHeadshot = false;
+	bool RadiusDamageHasFallOff = true;
 };
 
 namespace df {
@@ -48,6 +49,7 @@ DF_GENERATE_TEMPLATE_GETTER(RadiusDamageAmount)
 DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageBitsDamageType, DMG_BULLET)
 DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageKnockback, nullptr)
 DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageCanHeadshot, false)
+DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageHasFallOff, true)
 }
 
 namespace detail {
@@ -88,10 +90,11 @@ void RadiusDamage(DamageData &&data, Vector vecSrc, InflictorType Inflictor, Att
 	const auto bitsDamageType = df::RadiusDamageBitsDamageType::Get(data);
 	const auto knockback = df::RadiusDamageKnockback::Get(data); // KnockbackData or std::nullptr_t ?
 	const bool canheadshot = df::RadiusDamageCanHeadshot::Get(data); // must be bool
+	const bool hasfalloff = df::RadiusDamageHasFallOff::Get(data); // must be bool
 	entvars_t* const pevAttacker = static_ent_cast<entvars_t *>(std::move(Attacker));
 	entvars_t* const pevInflictor = static_ent_cast<entvars_t *>(std::move(Inflictor));
 
-	const float falloff = flRadius ? flDamage / flRadius : 1;
+	const float falloff = hasfalloff ? (flRadius ? flDamage / flRadius : 1) : 0;
 	const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
 	// in case grenade is lying on the ground
 	vecSrc.z += 1;

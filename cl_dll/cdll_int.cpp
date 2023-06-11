@@ -60,6 +60,7 @@ vec3_t g_velocity;
 vec3_t g_vecOrigin, g_vecEyePos, g_vecEye, g_vecVAngles;
 long g_iDamage[MAX_CLIENTS + 1];
 long g_iDamageTotal[MAX_CLIENTS + 1];
+double g_flDamageInAll;
 int g_iMobileAPIVersion = 0;
 void InitInput (void);
 void IN_Commands( void );
@@ -263,6 +264,13 @@ int DLLEXPORT HUD_VidInit( void )
 
 	CStudioModelRenderer::s_pSPKnifeViewModel = IEngineStudio.Mod_ForName("models/v_spknife.mdl", FALSE);
 
+	CStudioModelRenderer::s_pHaloGunPModel = IEngineStudio.Mod_ForName("models/p_halogun.mdl", FALSE);
+
+	CStudioModelRenderer::s_pStickyBombViewModel = IEngineStudio.Mod_ForName("models/v_stickybomb.mdl", FALSE);
+	CStudioModelRenderer::s_pStickyBombIdleRModel = IEngineStudio.Mod_ForName("sprites/ef_stickybomb_idle_r.spr", FALSE);
+	CStudioModelRenderer::s_pStickyBombIdleGModel = IEngineStudio.Mod_ForName("sprites/ef_stickybomb_idle_g.spr", FALSE);
+
+	CStudioModelRenderer::s_pStickyBombPModel = IEngineStudio.Mod_ForName("models/p_stickybomb.mdl", FALSE);
 
 	//VGui_Startup();
 

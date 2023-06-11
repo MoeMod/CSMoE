@@ -55,6 +55,7 @@
 		3DC1E4BF2289F18500114D80 /* Steam.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4BE2289F18500114D80 /* Steam.png */; };
 		3DC1E4C9228AE05000114D80 /* TutorStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4C8228AE05000114D80 /* TutorStoryboard.storyboard */; };
 		3DC8946F260FAC5600F7A4A5 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DC8946E260FAC5600F7A4A5 /* MainStoryboard.storyboard */; };
+		3DC98EEE295ADCB3008C9762 /* lib3rdparty-gl4es.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DFDDBBB28C2279E00351ACE /* lib3rdparty-gl4es.a */; };
 		3DDBD7F12843DC0100C4D2C9 /* libboost_container.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDBD7F02843DC0100C4D2C9 /* libboost_container.a */; };
 		3DDBD7F32843DC1700C4D2C9 /* libopus.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDBD7F22843DC1700C4D2C9 /* libopus.a */; };
 		3DDBD7F52843DC1F00C4D2C9 /* libpng16.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDBD7F42843DC1F00C4D2C9 /* libpng16.a */; };
@@ -725,6 +726,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DC98EEE295ADCB3008C9762 /* lib3rdparty-gl4es.a in Frameworks */,
 				3D006E9628AEA29D004C1F67 /* libLinearMath.a in Frameworks */,
 				3D006E9328AEA279004C1F67 /* libBullet3Collision.a in Frameworks */,
 				3D006E9428AEA27A004C1F67 /* libBullet3Dynamics.a in Frameworks */,
@@ -1674,7 +1676,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cmake -G \"Xcode\" -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../3rdparty/ios-cmake/ios.toolchain.cmake\" -DPLATFORM=OS64  -DXASH_STATIC_GAMELIB=1 -DXASH_WES=1 -DXASH_GLES=1  -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
+			shellScript = "cmake -G \"Xcode\" -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../3rdparty/ios-cmake/ios.toolchain.cmake\" -DPLATFORM=OS64  -DXASH_STATIC_GAMELIB=1 -DXASH_GL4ES=1 -DXASH_GLES=1  -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

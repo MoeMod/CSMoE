@@ -135,7 +135,18 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "tknifeex",	WEAPON_TKNIFEEX },
 	{ "tknifeex2",	WEAPON_TKNIFEEX2 },
 	{ "tknifedx",	WEAPON_Z4B_TKNIFEDX },
-	{ "malorian3516" , WEAPON_Z4B_MALORIAN3516},
+	{ "z4b_malorian3516" , WEAPON_Z4B_MALORIAN3516},
+	{ "dfpistol" , WEAPON_DFPISTOL},
+	{ "turbulent1" , WEAPON_TURBULENT1},
+	{ "vulcanus1" , WEAPON_VULCANUS1},
+	{ "crow1" , WEAPON_CROW1},
+	{ "thanatos1" , WEAPON_THANATOS1},
+	{ "m79" , WEAPON_M79},
+	{ "m79g" , WEAPON_M79G},
+	{ "janus1" , WEAPON_JANUS1},
+	{ "firecracker" , WEAPON_FIRECRACKER},
+	{ "dartpistol",	WEAPON_DARTPISTOL },
+	{ "y23s1dartpistol",	WEAPON_Y23S1DARTPISTOL },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -197,6 +208,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "vulcanus3",	WEAPON_VULCANUS3 },
 	{ "skull3",	WEAPON_SKULL3 },
 	{ "skull3d",	WEAPON_SKULL3D },
+	{ "thanatos3",	WEAPON_THANATOS3 },
+	{ "y23s1sfsmg",	WEAPON_Y23S1SFSMG },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -250,6 +263,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "cartblues",	WEAPON_CARTBLUES },
 	{ "cartredl",	WEAPON_CARTREDL },
 	{ "cartredh",	WEAPON_CARTREDH },
+	{ "vulcanus5",	WEAPON_VULCANUS5 },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -325,6 +339,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "y22s3janus7",	WEAPON_Y22S3JANUS7 },
 	{ "laserminigun",	WEAPON_LASERMINIGUN },
 	{ "vulcanus7",	WEAPON_VULCANUS7 },
+	{ "hk121ex",	WEAPON_HK121EX },
+	{ "z4b_mechanicxm214",	WEAPON_Z4B_MECHANICXM214 },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -365,6 +381,10 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "speargunm",	WEAPON_SPEARGUNM },
 	{ "wondercannonex",	WEAPON_WONDERCANNONEX },
 	{ "drillgun",	WEAPON_DRILLGUN },
+	{ "at4",	WEAPON_AT4 },
+	{ "at4ex",	WEAPON_AT4EX },
+	{ "rpg7",	WEAPON_RPG7 },
+	{ "bazooka",	WEAPON_BAZOOKA },
 
 	{ NULL,		WEAPON_NONE }
 };
@@ -428,7 +448,8 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_turbulent9",	KNIFE_TURBULENT9 },
 	{ "knife_ironfan",	KNIFE_IRONFAN },
 	{ "knife_swordbombard",	KNIFE_SWORDBOMBARD },
-
+	{ "z4b_mechanichand",	KNIFE_MECHANICHAND },
+	{ "z4b_shovelex",	KNIFE_SHOVELEX },
 
 	
 };
@@ -451,6 +472,13 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_cartfrag", GRENADE_CARTFRAG },
 	{ "weapon_sfgrenade", GRENADE_SFGRENADE },
 	{ "weapon_chaingren", GRENADE_CHAINGRENADE },
+	{ "weapon_sbmine", GRENADE_SBMINE },
+	{ "weapon_claymore", GRENADE_CLAYMORE },
+	{ "weapon_stickybomb", GRENADE_STICKYBOMB },
+	{ "weapon_holybomb_ex", GRENADE_HOLYBOMBEX },
+	{ "weapon_y20s1grenade", GRENADE_Y20S1GRENADE },
+	{ "weapon_waterbomb", GRENADE_WATERBOMB },
+	{ "weapon_chinaeventbomb", GRENADE_CHINAEVENTBOMB },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -588,7 +616,19 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "tknifeex",	WEAPONCLASS_PISTOL },
 	{ "tknifeex2",	WEAPONCLASS_PISTOL },
 	{ "tknifedx",	WEAPONCLASS_PISTOL },
-	{ "malorian3516" , WEAPONCLASS_PISTOL},
+	{ "z4b_malorian3516" , WEAPONCLASS_PISTOL},
+	{ "dfpistol" , WEAPONCLASS_PISTOL},
+	{ "turbulent1" , WEAPONCLASS_PISTOL},
+	{ "vulcanus1" , WEAPONCLASS_PISTOL},
+	{ "crow1" , WEAPONCLASS_PISTOL},
+	{ "thanatos1" , WEAPONCLASS_PISTOL},
+	{ "m79" , WEAPONCLASS_PISTOL},
+	{ "m79g" , WEAPONCLASS_PISTOL},
+	{ "janus1" , WEAPONCLASS_PISTOL},
+	{ "firecracker" , WEAPONCLASS_PISTOL},
+	{ "dartpistol",	WEAPONCLASS_PISTOL },
+	{ "y23s1dartpistol",	WEAPONCLASS_PISTOL },
+
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -653,6 +693,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "sterlingbayonet",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "skull3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "skull3d",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "thanatos3",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "y23s1sfsmg",	WEAPONCLASS_SUBMACHINEGUN },
 
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
@@ -709,6 +751,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "cartbluec",	WEAPONCLASS_RIFLE },
 	{ "cartredl",	WEAPONCLASS_RIFLE },
 	{ "cartredh",	WEAPONCLASS_RIFLE },
+	{ "vulcanus5",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -781,8 +824,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "y22s3janus7",	WEAPONCLASS_MACHINEGUN },
 	{ "laserminigun",	WEAPONCLASS_MACHINEGUN },
 	{ "vulcanus7",	WEAPONCLASS_MACHINEGUN },
+	{ "hk121ex",	WEAPONCLASS_MACHINEGUN },
+	{ "z4b_mechanicxm214",	WEAPONCLASS_MACHINEGUN },
 
-	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsawm",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsawex",	WEAPONCLASS_EQUIPMENT },
@@ -817,6 +861,10 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "speargunm",	WEAPONCLASS_EQUIPMENT },
 	{ "wondercannonex",	WEAPONCLASS_EQUIPMENT },
 	{ "drillgun",	WEAPONCLASS_EQUIPMENT },
+	{ "at4",	WEAPONCLASS_EQUIPMENT },
+	{ "at4ex",	WEAPONCLASS_EQUIPMENT },
+	{ "rpg7",	WEAPONCLASS_EQUIPMENT },
+	{ "bazooka",	WEAPONCLASS_EQUIPMENT },
 
 	{ "syringe",	WEAPONCLASS_EQUIPMENT },
 	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
@@ -1154,6 +1202,12 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_CARTBLUES:
 	case WEAPON_CARTREDL:
 	case WEAPON_CARTREDH:
+	case WEAPON_VULCANUS5:
+	case WEAPON_HK121EX:
+	case WEAPON_AT4:
+	case WEAPON_AT4EX:
+	case WEAPON_RPG7:
+	case WEAPON_BAZOOKA:
 		return true;
 	default:
 		break;
@@ -1218,6 +1272,17 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_TKNIFEEX2:
 	case WEAPON_Z4B_TKNIFEDX:
 	case WEAPON_Z4B_MALORIAN3516:
+	case WEAPON_DFPISTOL:
+	case WEAPON_TURBULENT1:
+	case WEAPON_VULCANUS1:
+	case WEAPON_CROW1:
+	case WEAPON_THANATOS1:
+	case WEAPON_M79:
+	case WEAPON_M79G:
+	case WEAPON_JANUS1:
+	case WEAPON_FIRECRACKER:
+	case WEAPON_DARTPISTOL:
+	case WEAPON_Y23S1DARTPISTOL:
 		return true;
 	default:
 		break;
@@ -1440,7 +1505,9 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 						(pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE || 
 						pPlayer->m_pActiveItem->m_iId == WEAPON_PATROLDRONE || 
 						pPlayer->m_pActiveItem->m_iId == WEAPON_DIVINETITAN || 
-						pPlayer->m_pActiveItem->m_iId == WEAPON_BUNKERBUSTER);
+						pPlayer->m_pActiveItem->m_iId == WEAPON_BUNKERBUSTER ||
+						pPlayer->m_pActiveItem->m_iId == WEAPON_SBMINE ||
+						pPlayer->m_pActiveItem->m_iId == WEAPON_CLAYMORE);
 
 					if (iter->iID == WEAPON_PATROLDRONE)
 					{
@@ -1507,7 +1574,9 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
 								pGrenade->m_iId == WEAPON_PATROLDRONE ||
 								pGrenade->m_iId == WEAPON_DIVINETITAN ||
-								pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+								pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
+								pGrenade->m_iId == WEAPON_SBMINE ||
+								pGrenade->m_iId == WEAPON_CLAYMORE)
 							{
 								pGrenade->Kill();
 
@@ -1522,16 +1591,6 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 							pPlayer->RemovePlayerItem(iter);
 						}
 					}
-
-					/*switch (iter->iID)
-					{
-					case WEAPON_PATROLDRONE: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
-					case WEAPON_DIVINETITAN: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
-					case WEAPON_BUNKERBUSTER: pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName); break;
-					default:
-						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
-						break;
-					}*/
 
 					pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
 
@@ -1549,7 +1608,9 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
 								pGrenade->m_iId == WEAPON_PATROLDRONE ||
 								pGrenade->m_iId == WEAPON_DIVINETITAN ||
-								pGrenade->m_iId == WEAPON_BUNKERBUSTER)
+								pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
+								pGrenade->m_iId == WEAPON_SBMINE ||
+								pGrenade->m_iId == WEAPON_CLAYMORE)
 							{
 								pPlayer->m_pActiveItem = pGrenade;
 
@@ -1561,138 +1622,6 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 					}
 
 					return true;				
-#if 0
-			CBasePlayerItem* pItem = pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
-
-			if (pItem == NULL)
-				pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
-	
-			// have at least one weapon in this slot
-			while (pItem != NULL)
-			{
-				if (pPlayer->m_rgpPlayerItems[GRENADE_SLOT]->IsWeapon() && pPlayer->m_rgpPlayerItems[GRENADE_SLOT])
-				{
-					CBasePlayerWeapon* pGrenade = static_cast<CBasePlayerWeapon*>(pItem);
-
-					if (iter->iID == WEAPON_PATROLDRONE)
-					{
-						//buy patroldrone
-						if (pGrenade->m_iId == WEAPON_PATROLDRONE)
-						{
-							//add clip
-							if (pPlayer->m_rgAmmo[pGrenade->m_iPrimaryAmmoType] >= PATROLDRONE_MAX_CLIP)
-							{
-								//full ammo
-								ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
-								return false;
-							}
-
-							CPatrolDrone* pLinkWeapon = dynamic_cast<CPatrolDrone*>(pGrenade);
-							pPlayer->m_rgAmmo[pLinkWeapon->m_iPrimaryAmmoType]++;
-							for (int i = 0; i < PATROLDRONE_MAX_CLIP; i++)
-							{
-								if (pLinkWeapon->m_iClipAmmo[i] == -1)
-								{
-									pLinkWeapon->m_iClipAmmo[i] = 0;
-									MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
-									WRITE_BYTE(24);
-									WRITE_BYTE(i);
-									WRITE_SHORT(pLinkWeapon->m_iClipAmmo[i]);
-									WRITE_BYTE(PATROLDRONE_OFF);
-									MESSAGE_END();
-									break;
-								}							
-							}
-							pPlayer->AddAccount(-500);
-							pPlayer->BuildRebuyStruct();
-
-							return true;
-						}
-						else if (pGrenade->m_iId == WEAPON_DIVINETITAN ||
-							pGrenade->m_iId == WEAPON_HEGRENADE ||
-							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							pPlayer->RemovePlayerItem(pGrenade);
-							break;
-						}
-					}
-					else if(iter->iID == WEAPON_DIVINETITAN)
-					{
-						//buy divientitan
-						if (pGrenade->m_iId == WEAPON_DIVINETITAN)
-						{
-							ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
-							return false;
-							//already have
-						}
-						else if (pGrenade->m_iId == WEAPON_PATROLDRONE || 
-							pGrenade->m_iId == WEAPON_HEGRENADE ||
-							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							pPlayer->RemovePlayerItem(pGrenade);
-							break;
-						}
-					}
-					else if (iter->iID == WEAPON_BUNKERBUSTER)
-					{
-						//buy bunkerbuster
-						if (pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Cstrike_Already_Own_Weapon");
-							return false;
-							//already have
-						}
-						else if (pGrenade->m_iId == WEAPON_PATROLDRONE || 
-							pGrenade->m_iId == WEAPON_HEGRENADE || 
-							pGrenade->m_iId == WEAPON_DIVINETITAN)
-						{
-							pPlayer->RemovePlayerItem(pGrenade);
-							break;
-						}
-					}
-					else
-					{
-						//buy grenande
-						if (pGrenade->m_iId == WEAPON_DIVINETITAN || 
-							pGrenade->m_iId == WEAPON_PATROLDRONE ||
-							pGrenade->m_iId == WEAPON_BUNKERBUSTER)
-						{
-							//remove and add
-							pPlayer->RemovePlayerItem(pGrenade);
-						}
-
-						bool bGrenadeChanged = pPlayer->m_iGrenadeID != iter->iID;
-						bool bWasActiveItem = pPlayer->m_pActiveItem && pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE;
-
-						if (bGrenadeChanged)
-						{
-							CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
-							std::vector<CBasePlayerWeapon*> GrenadesToRemove;
-
-							while (pGrenade)
-							{
-								if (pGrenade->m_iId == WEAPON_HEGRENADE)
-								{
-									pGrenade->Kill();
-
-									GrenadesToRemove.push_back(pGrenade);
-								}
-
-								pGrenade = (CBasePlayerWeapon*)pGrenade->m_pNext;
-							}
-
-							for (auto iter : GrenadesToRemove)
-							{
-								pPlayer->RemovePlayerItem(iter);
-							}
-						}
-						pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);					
-						break;
-					}
-				}
-				pItem = pItem->m_pNext;
-			}		
-#endif
 			}
 
 			break;

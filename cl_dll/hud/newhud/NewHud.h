@@ -18,6 +18,7 @@ namespace cl {
 extern vec3_t g_velocity;
 extern long g_iDamage[MAX_CLIENTS + 1];
 extern long g_iDamageTotal[MAX_CLIENTS + 1];
+extern double g_flDamageInAll;
 
 class CHudNewHud : public CHudBase
 {

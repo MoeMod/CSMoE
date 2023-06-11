@@ -25,15 +25,28 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "cl_tent.h"
 #include "gl_texlru.h"
+#include "gl_shader.h"
+#include "gl_cubemap.h"
+#include "gl_studioshader.h"
+#include "gl_studiolru.h"
 
 #ifdef XASH_RAGDOLL
 #include "physics.h"
 #endif
 
 #define EVENT_CLIENT	5000	// less than this value it's a server-side studio events
-#define MAXARRAYVERTS	20000	// used for draw shadows
 #define LEGS_BONES_COUNT	8
 #define MAX_LOCALLIGHTS	4
+
+// diable now
+#define XASH_SHADER
+#define XASH_SHADER_VBO
+#ifdef XASH_SHADER
+static const char* studioshadervariant_define[MAX_STUDIOSHADERVARIANTS] = {
+	"",
+	"#define CSO_ENV\n#define CSO_FINAL_WHITE\n"
+};
+#endif
 
 static vec3_t hullcolor[8] = 
 {
@@ -113,23 +126,23 @@ static vec2_t		g_chrome[MAXSTUDIOVERTS];	// texture coords for surface normals
 static sortedmesh_t		g_sortedMeshes[MAXSTUDIOMESHES];
 matrix3x4		g_bonestransform[MAXSTUDIOBONES];
 matrix3x4		g_lighttransform[MAXSTUDIOBONES];
-static matrix3x4		g_rgCachedBonesTransform[MAXSTUDIOBONES];
-static matrix3x4		g_rgCachedLightTransform[MAXSTUDIOBONES];
 static vec3_t		g_chromeright[MAXSTUDIOBONES];// chrome vector "right" in bone reference frames
 static vec3_t		g_chromeup[MAXSTUDIOBONES];	// chrome vector "up" in bone reference frames
 static int		g_chromeage[MAXSTUDIOBONES];	// last time chrome vectors were updated
-static vec3_t		g_xformverts[MAXSTUDIOVERTS];
-static vec3_t		g_xformnorms[MAXSTUDIOVERTS];
-static vec3_t		g_xarrayverts[MAXARRAYVERTS];
-static vec2_t		g_xarraycoord[MAXARRAYVERTS];
+#ifdef XASH_SHADER
+static studio_vertex_attrib_item_t		g_xarrayattrs[MAXARRAYVERTS];
+static unsigned short		g_xarrayelems[MAXARRAYVERTS*6];
+// moved to gl_studioshader.h
+studioshader_t g_studioshadervariant[MAX_STUDIOSHADERVARIANTS];
+studioshader_t *g_pstudioshader;
+#else
+static GLfloat		g_xarrayverts[MAXARRAYVERTS][3];
+static GLfloat		g_xarraycoord[MAXARRAYVERTS][2];
 static GLubyte		g_xarraycolor[MAXARRAYVERTS][4];
 static unsigned short		g_xarrayelems[MAXARRAYVERTS*6];
-static uint		g_nNumArrayVerts;
-static uint		g_nNumArrayElems;
 static vec3_t		g_lightvalues[MAXSTUDIOVERTS];
+#endif
 static studiolight_t	g_studiolight;
-char			g_nCachedBoneNames[MAXSTUDIOBONES][32];
-int			g_nCachedBones;		// number of bones in cache
 int			g_nStudioCount;		// for chrome update
 int			g_iRenderMode;		// currentmodel rendermode
 int			g_iBackFaceCull;
@@ -152,8 +165,13 @@ int			g_nTopColor, g_nBottomColor;	// remap colors
 int			g_nFaceFlags, g_nForceFaceFlags;
 
 // quick cache aligned
+#ifdef XASH_SIMD
 vec3_t pstudioverts[MAXSTUDIOVERTS]; // copied from m_pStudioHeader + m_pSubModel->vertindex
 vec3_t pstudionorms[MAXSTUDIOVERTS]; // copied from m_pStudioHeader + m_pSubModel->normindex
+#else
+const vec3_t *pstudioverts;
+const vec3_t *pstudionorms;
+#endif
 
 
 /*
@@ -193,6 +211,91 @@ void R_StudioInit( void )
 
 	g_nStudioCount = 0;
 	m_fDoRemap = false;
+
+#ifdef XASH_SHADER
+#ifdef XASH_SHADER_VBO
+    // Setup VBO
+    xe::StudioLru_Init();
+#endif
+
+	for (int i = SSV_NORMAL; i < MAX_STUDIOSHADERVARIANTS; ++i)
+	{
+		fs_offset_t length;
+		const byte* data;
+
+		data = FS_MapFile("shader/mdlrender.vs", &length, true);
+		const GLcharARB* vertex_shader_list[5] = {
+				xe::GetShaderVersionString(),
+				studioshadervariant_define[i],
+				"#define MAX_BONE_REG 128 * 3\n", // hack for cso shader
+				(const GLcharARB*)data
+		};
+		g_pstudioshader = &g_studioshadervariant[i];
+
+		g_pstudioshader->vertex_shader = pglCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+		pglShaderSourceARB(g_pstudioshader->vertex_shader, 4, vertex_shader_list, NULL);
+		pglCompileShaderARB(g_pstudioshader->vertex_shader);
+		FS_MapFree(data, length);
+		xe::CheckShader(g_pstudioshader->vertex_shader, "vertex shader");
+
+		data = FS_MapFile("shader/mdlrender.fs", &length, true);
+		const GLcharARB* fragment_shader_list[3] = {
+				xe::GetShaderVersionString(),
+				studioshadervariant_define[i],
+				(const GLcharARB*)data
+		};
+		g_pstudioshader->fragment_shader = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+		pglShaderSourceARB(g_pstudioshader->fragment_shader, 3, fragment_shader_list, NULL);
+		pglCompileShaderARB(g_pstudioshader->fragment_shader);
+		FS_MapFree(data, length);
+		xe::CheckShader(g_pstudioshader->fragment_shader, "fragment shader");
+
+		g_pstudioshader->program = pglCreateProgramObjectARB();
+		pglAttachObjectARB(g_pstudioshader->program, g_pstudioshader->vertex_shader);
+		pglAttachObjectARB(g_pstudioshader->program, g_pstudioshader->fragment_shader);
+		pglLinkProgramARB(g_pstudioshader->program);
+		xe::CheckProgram(g_pstudioshader->program, "shader program");
+
+		g_pstudioshader->uniform.texOffset = pglGetUniformLocationARB(g_pstudioshader->program, "texOffset");
+		g_pstudioshader->uniform.colorMix = pglGetUniformLocationARB(g_pstudioshader->program, "colorMix");
+		g_pstudioshader->uniform.lightInfo = pglGetUniformLocationARB(g_pstudioshader->program, "lightInfo");
+		g_pstudioshader->uniform.dLightDir = pglGetUniformLocationARB(g_pstudioshader->program, "dLightDir");
+		g_pstudioshader->uniform.boneMat = pglGetUniformLocationARB(g_pstudioshader->program, "boneMat");
+		g_pstudioshader->uniform.muWVP = pglGetUniformLocationARB(g_pstudioshader->program, "muWVP");
+		g_pstudioshader->uniform.worldEye = pglGetUniformLocationARB(g_pstudioshader->program, "worldEye");
+		g_pstudioshader->uniform.texDiffuseMap = pglGetUniformLocationARB(g_pstudioshader->program, "texDiffuseMap");
+		g_pstudioshader->uniform.texEnvMap = pglGetUniformLocationARB(g_pstudioshader->program, "texEnvMap");
+		g_pstudioshader->uniform.glowColor = pglGetUniformLocationARB(g_pstudioshader->program, "glowColor");
+
+		g_pstudioshader->attrib.vaPosition = pglGetAttribLocationARB(g_pstudioshader->program, "vaPosition");
+		g_pstudioshader->attrib.vaNormal = pglGetAttribLocationARB(g_pstudioshader->program, "vaNormal");
+		g_pstudioshader->attrib.vaTexCoord = pglGetAttribLocationARB(g_pstudioshader->program, "vaTexCoord");
+
+		g_pstudioshader = nullptr;
+	}
+    xe::CubeMap_Init();
+#endif
+}
+
+void R_StudioShutdown()
+{
+    xe::CubeMap_Shutdown();
+#ifdef XASH_SHADER
+#ifdef XASH_SHADER_VBO
+    xe::StudioLru_Shutdown();
+#endif
+
+	for (int i = SSV_NORMAL; i < MAX_STUDIOSHADERVARIANTS; ++i)
+	{
+		g_pstudioshader = &g_studioshadervariant[i];
+		pglDetachObjectARB(g_pstudioshader->program, g_pstudioshader->vertex_shader);
+		pglDetachObjectARB(g_pstudioshader->program, g_pstudioshader->fragment_shader);
+		pglDeleteObjectARB(g_pstudioshader->vertex_shader);
+		pglDeleteObjectARB(g_pstudioshader->fragment_shader);
+		pglDeleteObjectARB(g_pstudioshader->program);
+		g_pstudioshader = nullptr;
+	}
+#endif
 }
 
 /*
@@ -208,6 +311,51 @@ static void R_GenAlignedVertAndNormCache()
     const float* pstudionorms_unaligned = (const float*)((const byte*)m_pStudioHeader + m_pSubModel->normindex);
     float *pstudioverts_out = (float *)pstudioverts;
     float *pstudionorms_out = (float *)pstudionorms;
+#ifdef XASH_SIMD
+#if U_VECTOR_NEON
+	auto f = [](float* out, const float* in, int num) {
+
+		for (;num >= 4; num -= 4, out += 16, in += 12)
+		{
+			union {
+				float32x4x4_t out;
+				struct {
+					float32x4x3_t in;
+					float32x4_t padding;
+				};
+			} temp;
+			temp.in = vld3q_f32(in);
+			temp.padding = {};
+			vst4q_f32(out, temp.out);
+		}
+
+		switch (num)
+		{
+		case 3:
+			out[8] = in[6];
+			out[9] = in[7];
+			out[10] = in[8];
+			out[11] = 0;
+			[[fallthrough]];
+		case 2:
+			out[4] = in[3];
+			out[5] = in[4];
+			out[6] = in[5];
+			out[7] = 0;
+			[[fallthrough]];
+		case 1:
+			out[0] = in[0];
+			out[1] = in[1];
+			out[2] = in[2];
+			out[3] = 0;
+			[[fallthrough]];
+		default:
+			break;
+		}
+	};
+	f(pstudioverts_out, pstudioverts_unaligned, m_pSubModel->numverts);
+	f(pstudionorms_out, pstudionorms_unaligned, m_pSubModel->numnorms);
+#else
     for(int i = 0; i < m_pSubModel->numverts; ++i)
     {
         pstudioverts_out[i * 4 + 0] = pstudioverts_unaligned[i * 3 + 0];
@@ -222,6 +370,11 @@ static void R_GenAlignedVertAndNormCache()
         pstudionorms_out[i * 4 + 2] = pstudionorms_unaligned[i * 3 + 2];
         pstudionorms_out[i * 4 + 3] = 0;
     }
+#endif
+#else
+	pstudioverts = (const vec3_t*)((const byte*)m_pStudioHeader + m_pSubModel->vertindex);
+	pstudionorms = (const vec3_t*)((const byte*)m_pStudioHeader + m_pSubModel->normindex);
+#endif
 }
 
 /*
@@ -973,6 +1126,9 @@ void GAME_EXPORT R_StudioSetupLighting( alight_t *lightinfo )
 	g_studiolight.lightval = g_studiolight.lightcolor * (illum / 255.0f);
 }
 
+#ifdef XASH_SHADER
+// handled in shader
+#else
 /*
 ===============
 R_StudioLighting
@@ -1058,7 +1214,7 @@ void R_LightStrength( int bone, const vec3_t localpos, vec4_t light[MAX_LOCALLIG
         light[i][3] = 0.0f;
     }
 }
-
+#endif
 /*
 ===============
 R_StudioSetupTextureHeader
@@ -1094,6 +1250,7 @@ static void GAME_EXPORT R_StudioSetupSkin( mstudiotexture_t *ptexture, int index
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
 		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
 
+    xe::CubeMap_Bind(&ptexture[pskinref[index]]);
     xe::TexLru_Bind(&ptexture[pskinref[index]]);
 }
 
@@ -1149,7 +1306,7 @@ R_StudioRenderShadow
 just a prefab for render shadow
 ===============
 */
-void GAME_EXPORT R_StudioRenderShadow( int iSprite, float *p1, float *p2, float *p3, float *p4 )
+void GAME_EXPORT R_StudioRenderShadow( int iSprite, const vec3_t p1, const vec3_t p2, const vec3_t p3, const vec3_t p4 )
 {
 	if( !p1 || !p2 || !p3 || !p4 )
 		return;
@@ -1164,13 +1321,13 @@ void GAME_EXPORT R_StudioRenderShadow( int iSprite, float *p1, float *p2, float 
 
 		pglBegin( GL_QUADS );
 			pglTexCoord2f( 0.0f, 0.0f );
-			pglVertex3fv( p1 );
+			pglVertex3fv( p1.data() );
 			pglTexCoord2f( 0.0f, 1.0f );
-			pglVertex3fv( p2 );
+			pglVertex3fv( p2.data() );
 			pglTexCoord2f( 1.0f, 1.0f );
-			pglVertex3fv( p3 );
+			pglVertex3fv( p3.data() );
 			pglTexCoord2f( 1.0f, 0.0f );
-			pglVertex3fv( p4 );
+			pglVertex3fv( p4.data() );
 		pglEnd();
 
 		pglDisable( GL_BLEND );
@@ -1196,36 +1353,39 @@ R_StudioDrawMesh
 
 ===============
 */
-static void (*R_MeshUVFunc())(const short* ptricmds, vec2_t &uv, float s, float t)
+static void (*R_MeshUVFunc())(const short* ptricmds, GLfloat (&uv)[2], float s, float t)
 {
 	if (g_nFaceFlags & STUDIO_NF_CHROME || (g_nForceFaceFlags & STUDIO_NF_CHROME))
 	{
-		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+		return [](const short* ptricmds, GLfloat (&uv)[2], float s, float t) {
 			uv[0] = g_chrome[ptricmds[1]][0] * s;
 			uv[1] = g_chrome[ptricmds[1]][1] * t;
 		};
 	}
 	else if (g_nFaceFlags & STUDIO_NF_UV_COORDS)
 	{
-		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+		return [](const short* ptricmds, GLfloat (&uv)[2], float s, float t) {
 			uv[0] = HalfToFloat(ptricmds[2]);
 			uv[1] = HalfToFloat(ptricmds[3]);
 		};
 	}
 	else [[likely]]
 	{
-		return [](const short* ptricmds, vec2_t& uv, float s, float t) {
+		return [](const short* ptricmds, GLfloat (&uv)[2], float s, float t) {
 			uv[0] = ptricmds[2] * s;
 			uv[1] = ptricmds[3] * t;
 		};
 	}
 }
 
-static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], float alpha)
+#ifdef XASH_SHADER
+// done in shader
+#else
+static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], GLubyte alpha, const vec3_t &norm)
 {
 	if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha, const vec3_t &norm) {
 			cl[0] = alpha;
 			cl[1] = 0;
 			cl[2] = 0;
@@ -1234,7 +1394,7 @@ static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], float 
 	}
 	else if (g_iRenderMode == kRenderTransColor || (g_nForceFaceFlags & STUDIO_NF_CHROME))
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha, const vec3_t &norm) {
 			color24* clr;
 			clr = &RI.currententity->curstate.rendercolor;
 			cl[0] = clr->r;
@@ -1245,30 +1405,44 @@ static void (*R_MeshColorFunc())(const short* ptricmds, GLubyte (&cl)[4], float 
 	}
 	else if (g_iRenderMode == kRenderTransAdd || (g_nForceFaceFlags & STUDIO_NF_FULLBRIGHT))
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha, const vec3_t &norm) {
 			cl[0] = cl[1] = cl[2] = 255;
 			cl[3] = alpha;
 		};
 	}
 	else [[likely]]
 	{
-		return [](const short* ptricmds, GLubyte(&cl)[4], float alpha) {
-			vec3_t lv = g_lightvalues[ptricmds[1]];
-			R_LightLambert(g_studiolight.lightpos[ptricmds[0]], g_xformnorms[ptricmds[1]], lv, cl);
+		return [](const short* ptricmds, GLubyte(&cl)[4], GLubyte alpha, const vec3_t &norm) {
+			R_LightLambert(g_studiolight.lightpos[ptricmds[0]], norm, g_lightvalues[ptricmds[1]], cl);
 			cl[3] = alpha;
 		};
 	}
 }
+#endif
 
 static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float scale )
 {
 	GLubyte alpha = 255 * a;
 	int i;
-	uint startArrayVerts = g_nNumArrayVerts;
-	uint startArrayElems = g_nNumArrayElems;
+	uint startArrayVerts = 0;
+	uint startArrayElems = 0;
+	uint numArrayVerts = 0;
+	uint numArrayElems = 0;
 
+    const byte *pvertbone = ((const byte *)m_pStudioHeader + m_pSubModel->vertinfoindex);
+
+
+#ifdef XASH_SHADER
+    //studio_vertex_attrib_item_t *vboattrs = (studio_vertex_attrib_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
+    //auto arrayelems = (unsigned short *)pglMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
+    auto vboattrs = g_xarrayattrs;
+    auto arrayelems = g_xarrayelems;
+    const auto R_MeshUV = R_MeshUVFunc();
+#else
+    auto arrayelems = g_xarrayelems;
 	const auto R_MeshColor = R_MeshColorFunc();
 	const auto R_MeshUV = R_MeshUVFunc();
+#endif
 
 	while( ( i = *( ptricmds++ ) ) )
 	{
@@ -1284,11 +1458,10 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 
 		for( ; i > 0; i--, ptricmds += 4 )
 		{
-			GLubyte cl[4];
 			// build in indices
 			if( vertexState++ < 3 )
 			{
-				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                arrayelems[numArrayElems++] = numArrayVerts;
 			}
 			else if( tri_strip )
 			{
@@ -1296,66 +1469,134 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				if( vertexState & 1 )
 				{
 					// draw triangle [n-2 n-1 n]
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                    arrayelems[numArrayElems++] = numArrayVerts - 2;
+                    arrayelems[numArrayElems++] = numArrayVerts - 1;
+                    arrayelems[numArrayElems++] = numArrayVerts;
 				}
 				else
 				{
 					// draw triangle [n-1 n-2 n]
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 2;
-					g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                    arrayelems[numArrayElems++] = numArrayVerts - 1;
+                    arrayelems[numArrayElems++] = numArrayVerts - 2;
+                    arrayelems[numArrayElems++] = numArrayVerts;
 				}
 			}
 			else
 			{
 				// draw triangle fan [0 n-1 n]
-				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - ( vertexState - 1 );
-				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts - 1;
-				g_xarrayelems[g_nNumArrayElems++] = g_nNumArrayVerts;
+                arrayelems[numArrayElems++] = numArrayVerts - ( vertexState - 1 );
+                arrayelems[numArrayElems++] = numArrayVerts - 1;
+                arrayelems[numArrayElems++] = numArrayVerts;
 			}
 
-			R_MeshUV(ptricmds, g_xarraycoord[g_nNumArrayVerts], s, t);
-			R_MeshColor(ptricmds, g_xarraycolor[g_nNumArrayVerts], alpha);
+			vec3_t av, nv;
+#ifdef XASH_SHADER
+            VectorCopy(pstudioverts[ptricmds[0]], av);
+#else
+            Matrix3x4_VectorTransform(g_bonestransform[pvertbone[ptricmds[0]]], pstudioverts[ptricmds[0]], av);
+#endif
 
-			vec3_t av = g_xformverts[ptricmds[0]];
+#ifdef XASH_SHADER
+            const byte *pnormbone = ((const byte *)m_pStudioHeader + m_pSubModel->norminfoindex);
+            VectorCopy(pstudionorms[ptricmds[1]], nv);
+            if( g_nForceFaceFlags & STUDIO_NF_CHROME )
+            {
+                VectorMA( av, scale, nv, av );
+            }
+#else
 			if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 			{
-				vec3_t nv = g_xformnorms[ptricmds[1]];
+                const byte *pnormbone = ((const byte *)m_pStudioHeader + m_pSubModel->norminfoindex);
+                Matrix3x4_VectorRotate( g_bonestransform[pnormbone[ptricmds[1]]], pstudionorms[ptricmds[1]], nv );
 				VectorMA( av, scale, nv, av );
 			}
+#endif
 
-			ASSERT( g_nNumArrayVerts < MAXARRAYVERTS );
-			VectorCopy( av, g_xarrayverts[g_nNumArrayVerts] ); // store off vertex
-			g_nNumArrayVerts++;
+			ASSERT( numArrayVerts < MAXARRAYVERTS );
+#ifdef XASH_SHADER
+            {
+                R_MeshUV(ptricmds, vboattrs[numArrayVerts].coord, s, t);
+                VectorCopy(av, vboattrs[numArrayVerts].pos); // store off vertex
+                vboattrs[numArrayVerts].boneIdx = pvertbone[ptricmds[0]];
+                VectorCopy(nv, vboattrs[numArrayVerts].norm); // store off vertex
+            }
+#else
+            {
+                R_MeshUV(ptricmds, g_xarraycoord[g_nNumArrayVerts], s, t);
+                R_MeshColor(ptricmds, g_xarraycolor[g_nNumArrayVerts], alpha, nv);
+                VectorCopy( av, g_xarrayverts[g_nNumArrayVerts] ); // store off vertex
+            }
+#endif
+            numArrayVerts++;
 		}
 	}
 
-	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglVertexPointer( 3, GL_FLOAT, sizeof(vec3_t), g_xarrayverts );
-
-	pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );
-
-	if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
-	{
-		pglEnableClientState( GL_COLOR_ARRAY );
-		pglColorPointer( 4, GL_UNSIGNED_BYTE, 0, g_xarraycolor );
-	}
-
-#if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
-	if( pglDrawRangeElements )
-		pglDrawRangeElements( GL_TRIANGLES, startArrayVerts, g_nNumArrayVerts,
-			g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
-	else
+#ifdef XASH_SHADER
+    {
+#ifdef XASH_SHADER_VBO
+        //pglUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
+        //pglUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+        pglBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, startArrayElems * sizeof(unsigned short), (numArrayElems - startArrayElems) * sizeof(unsigned short), arrayelems + startArrayElems);
+        pglBufferSubDataARB(GL_ARRAY_BUFFER_ARB, startArrayVerts * sizeof(studio_vertex_attrib_item_t), (numArrayVerts - startArrayVerts) * sizeof(studio_vertex_attrib_item_t), vboattrs + startArrayVerts);
+#else
+        // no copy
 #endif
-		pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
-	pglDisableClientState( GL_VERTEX_ARRAY );
-	pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
-		pglDisableClientState( GL_COLOR_ARRAY );
+
+#ifdef XASH_SHADER_VBO
+        xe::StudioLru_Submit(startArrayElems, numArrayElems - startArrayElems, startArrayVerts, numArrayVerts - startArrayVerts);
+#else
+        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
+        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
+        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
+        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, pos));
+        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, coord));
+        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, norm));
+        pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const byte *)arrayelems + (startArrayElems * sizeof(unsigned short)) );
+        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
+        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
+        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
+#endif
+    }
+#else
+    {
+        pglEnableClientState( GL_VERTEX_ARRAY );
+        pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
+
+        pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+        pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );
+
+        if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
+        {
+            pglEnableClientState( GL_COLOR_ARRAY );
+            pglColorPointer( 4, GL_UNSIGNED_BYTE, 0, g_xarraycolor );
+        }
+
+        pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
+        pglDisableClientState( GL_VERTEX_ARRAY );
+        pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+        if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
+            pglDisableClientState( GL_COLOR_ARRAY );
+    }
+#endif
 }
+
+#ifdef XASH_SHADER
+static void R_StudioSetupShader()
+{
+	pglUseProgramObjectARB(g_pstudioshader->program);
+	pglUniform1iARB(g_pstudioshader->uniform.texDiffuseMap, 0);
+	pglUniform4fARB(g_pstudioshader->uniform.texOffset, 0, 0, 1, 1);
+	pglUniformMatrix4fvARB(g_pstudioshader->uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
+	pglUniform4fvARB(g_pstudioshader->uniform.boneMat, 3 * MAXSTUDIOBONES, (const float*)g_bonestransform);
+	pglUniform1iARB(g_pstudioshader->uniform.texEnvMap, 5);
+	pglUniform4fvARB(g_pstudioshader->uniform.worldEye, 1, (const float*)&RI.vieworg);
+}
+
+static void R_StudioRestoreShader()
+{
+	pglUseProgramObjectARB(0);
+}
+#endif
 
 /*
 ===============
@@ -1368,6 +1609,11 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 	int		j;
 	mstudiomesh_t	*pmesh;
 
+#ifdef XASH_SHADER
+	g_pstudioshader = &g_studioshadervariant[SSV_NORMAL];
+	R_StudioSetupShader();
+#endif
+
 	for( j = 0; j < m_pSubModel->nummesh; j++ )
 	{
 		float	s, t, alpha;
@@ -1376,7 +1622,30 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
 
-        auto &&attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		const auto& attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
+		if(xe::TexLru_Upload(attr.index))
+			xe::TexLru_UpdateAttr(&ptexture[pskinref[pmesh->skinref]]);
+		float envBrightMul = 1;
+		float envBrightAdd = 0;
+
+#ifdef XASH_SHADER
+		auto desired_shader = &g_studioshadervariant[SSV_NORMAL];
+		bool use_cubemap = xe::CubeMap_Bind(&ptexture[pskinref[pmesh->skinref]]);
+		if (use_cubemap)
+		{
+			desired_shader = &g_studioshadervariant[SSV_CUBEMAP];
+			// disabled due to strange looking
+			envBrightMul = 1; // xe::CubeMap_envBrightMul();
+			envBrightAdd = 0; // xe::CubeMap_envBrightAdd();
+		}
+
+		if (g_pstudioshader != desired_shader)
+		{
+			g_pstudioshader = desired_shader;
+			R_StudioSetupShader();
+		}
+#endif
+
 		g_nFaceFlags = attr.flags;
 		s = 1.0f / (float)attr.width;
 		t = 1.0f / (float)attr.height;
@@ -1480,7 +1749,51 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
-            xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
+			
+
+
+			//if (!Q_stricmp(ptexture->name, "#M_L.bmp") ||
+			//	Q_stristr(ptexture->name, "cso_highq_hand__long_512.bmp"))
+			//{
+			//	char name[64];
+			//		strcpy(name, "buffclass21s3ct_malelong");
+			//		int index = GL_FindTexture(name);
+			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+
+			//}
+			//else if (!Q_stricmp(ptexture->name, "#M_O.bmp") ||
+			//	!Q_stricmp(ptexture->name, "hand.bmp") ||
+			//	Q_stristr(ptexture->name, "252246hand.bmp") ||
+			//	Q_stristr(ptexture->name, "256252hand.bmp") ||
+			//	Q_stristr(ptexture->name, "256256hand.bmp"))
+			//{
+			//	//512 Textrue need CHANGE TO 256
+
+			//	char name[64];
+			//		strcpy(name, "buffclass21s3ct_maleorg");
+			//		int index = GL_FindTexture(name);
+			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+			//}
+			//else if (!Q_stricmp(ptexture->name, "#M_S.bmp") || 
+			//	Q_stristr(ptexture->name, "cso_highq_hand_512"))
+			//{
+			//	char name[64];
+			//		strcpy(name, "buffclass21s3ct_maleshort");
+			//		int index = GL_FindTexture(name);
+			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+			//}
+			//else if (!Q_stricmp(ptexture->name, "F_L.bmp") ||
+			//	Q_stristr(ptexture->name, "cso_girl_hand_long.bmp"))
+			//{
+			//	xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
+			//}
+			//else if (!Q_stricmp(ptexture->name, "#M_S.bmp") || 
+			//	Q_stristr(ptexture->name, "cso_girl_hand.bmp"))
+			//{
+			//	
+			//}
+			
+			xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 
 		if (RI.currententity->curstate.renderfx == kRenderFxWallHack) {
@@ -1508,9 +1821,57 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			pglStencilMask(0xFF);  // �����޸�ģ�建��			
 			pglStencilFunc(GL_ALWAYS, 1, 0xFF); //����Ƭ�ζ�Ҫд��ģ�建��
 		}
+#ifdef XASH_SHADER
+        vec3_t colormix = g_studiolight.lightcolor;
+        if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
+        {
+            colormix = { alpha, 0, 0 };
+        }
+        else if (g_iRenderMode == kRenderTransColor || (g_nForceFaceFlags & STUDIO_NF_CHROME))
+        {
+            colormix = { RI.currententity->curstate.rendercolor.r / 255.0f, RI.currententity->curstate.rendercolor.g / 255.0f, RI.currententity->curstate.rendercolor.b / 255.0f };
+        }
+        float ambient = (192 - g_studiolight.ambientlight) / 255.0f;
+        float shadeLight = 0; // - g_studiolight.shadelight / (255.0f);
+        vec3_t dLightDir = g_studiolight.lightvec;
 
+        if((g_nForceFaceFlags & STUDIO_NF_FULLBRIGHT))
+        {
+            ambient = 1;
+            shadeLight = 0;
+        }
+
+        pglUniform4fARB(g_pstudioshader->uniform.colorMix, colormix.x, colormix.y, colormix.z, envBrightMul);
+        pglUniform4fARB(g_pstudioshader->uniform.lightInfo, alpha, ambient, shadeLight, 0);
+        pglUniform4fvARB(g_pstudioshader->uniform.dLightDir, 1, (const float *)&dLightDir);
+		if (use_cubemap)
+		{
+			pglUniform4fARB(g_pstudioshader->uniform.glowColor, 1, 1, 1, envBrightAdd);
+			
+		}
+#endif
+#ifdef XASH_SHADER_VBO
+        xe::StudioLru_BindVBO(m_pStudioHeader, m_pSubModel, j, !(g_nForceFaceFlags & STUDIO_NF_CHROME));
+        if(!xe::StudioLru_HasCachedData())
+        {
+			R_StudioDrawMesh(ptricmds, s, t, alpha, scale);
+        }
+		xe::StudioLru_DrawMesh();
+		xe::StudioLru_UnbindVBO();
+#else
 		R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
+#endif
+
+		if (use_cubemap)
+		{
+			xe::CubeMap_Bind(nullptr);
+		}
+
 	}
+#ifdef XASH_SHADER
+	g_pstudioshader = nullptr;
+	R_StudioRestoreShader();
+#endif
 }
 
 /*
@@ -1530,8 +1891,6 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	float		*lv, scale = 0.0f;
 
 	R_StudioSetupTextureHeader ();
-
-	g_nNumArrayVerts = g_nNumArrayElems = 0;
 
 	if( !m_pTextureHeader || !m_pTextureHeader->numskinfamilies ) return;
 	if( RI.currententity->curstate.renderfx == kRenderFxGlowShell )
@@ -1557,32 +1916,9 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 	if( m_pSubModel->numverts > MAXSTUDIOVERTS )
 		m_pSubModel->numverts = MAXSTUDIOVERTS;
 
-#ifdef STUDIO_SKINNING_OMP_MIN
-#pragma omp parallel for private(i) if(m_pSubModel->numverts > STUDIO_SKINNING_OMP_MIN)
-#endif
-	for (int i = 0; i < m_pSubModel->numverts; ++i)
-	{
-		Matrix3x4_VectorTransform(g_bonestransform[pvertbone[i]], pstudioverts[i], g_xformverts[i]);
-	}
-
-	if (RI.currententity->curstate.scale != 1.0f)
-	{
-		//scale multi by Rentro
-		float scale_offset = -RI.currententity->curstate.mins[2];
-		for (int i = 0; i < m_pSubModel->numverts; ++i) 
-		{
-			float temp = RI.currententity->curstate.scale - 1.0f;
-			g_xformverts[i] = (g_xformverts[i] - RI.currententity->origin) * (temp * 2);
-			g_xformverts[i][2] += scale_offset * temp;
-		}
-	};
-
 	if( g_nForceFaceFlags & STUDIO_NF_CHROME )
 	{
 		scale = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
-
-		for(int i = 0; i < m_pSubModel->numnorms; i++ )
-			Matrix3x4_VectorRotate( g_bonestransform[pnormbone[i]], pstudionorms[i], g_xformnorms[i] );
 	}
 
 	for( int j = 0; j < m_pSubModel->nummesh; j++ )
@@ -1593,6 +1929,9 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 		// fill in sortedmesh info
 		g_sortedMeshes[j].mesh = &pmesh[j];
 		g_sortedMeshes[j].flags = g_nFaceFlags;
+#ifdef XASH_SHADER
+        // handled in shader
+#else
 		for (int i = 0; i < pmesh[j].numnorms; ++i)
 		{
 			R_StudioLighting(g_lightvalues[i], pnormbone[i], g_nFaceFlags, pstudionorms[i]);
@@ -1605,6 +1944,7 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 				R_StudioSetupChrome(g_chrome[i], pnormbone[i], pstudionorms[i]);
 			};
 		}
+#endif
 	}
 
 	if( r_studio_sort_textures->integer )
@@ -2327,6 +2667,10 @@ static int GAME_EXPORT pfnIsHardware( void )
 	return 1;	// 0 is Software, 1 is OpenGL, 2 is Direct3D
 }
 
+#ifdef XASH_SHADER
+// TODO : implement with vertex shader
+static void GAME_EXPORT GL_StudioDrawShadow( void ) {}
+#else
 /*
 ===============
 R_StudioDeformShadow
@@ -2342,12 +2686,11 @@ void R_StudioDeformShadow( void )
 	dist2 = -1.0f / DotProduct( g_mvShadowVec, g_shadowTrace.plane.normal );
 	VectorScale( g_mvShadowVec, dist2, g_mvShadowVec );
 
-	auto vert_calc_fn = [dist](vec3_t& v)
+	auto vert_calc_fn = [dist](float(&v)[3])
 	{
 		float dist3 = DotProduct(v, g_shadowTrace.plane.normal) - dist;
 		if (dist3 > 0.0f) VectorMA(v, dist3, g_mvShadowVec, v);
 	};
-
 #ifdef XASH_RENDER_PAR
 #ifdef XASH_TBBMALLOC
 	tbb::parallel_for_each(g_xarrayverts, g_xarrayverts + g_nNumArrayVerts, vert_calc_fn);
@@ -2370,7 +2713,7 @@ static void R_StudioDrawPlanarShadow( void )
 		pglEnable( GL_STENCIL_TEST );
 
 	pglEnableClientState( GL_VERTEX_ARRAY );
-	pglVertexPointer( 3, GL_FLOAT, sizeof(vec3_t), g_xarrayverts );
+	pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
 
 #if !defined XASH_NANOGL || defined XASH_WES && defined __EMSCRIPTEN__ // WebGL need to know array sizes
 	if( pglDrawRangeElements )
@@ -2378,7 +2721,6 @@ static void R_StudioDrawPlanarShadow( void )
 	else
 #endif
 		pglDrawElements( GL_TRIANGLES, g_nNumArrayElems, GL_UNSIGNED_SHORT, g_xarrayelems );
-
 	if( glState.stencilEnabled )
 		pglDisable( GL_STENCIL_TEST );
 
@@ -2433,7 +2775,7 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 		}
 	}
 }
-
+#endif
 /*
 =================
 R_DrawStudioModel
@@ -2464,17 +2806,10 @@ void R_DrawStudioModelInternal( cl_entity_t *e, qboolean follow_entity )
 
 	prevFrame = e->latched.prevframe;
 
-#ifdef XASH_RAGDOLL
-		// select the properly method
-		if (e->player)
-			result = GameStudioRenderer_StudioDrawPlayer(flags, &e->curstate);
-		else result = GameStudioRenderer_StudioDrawModel(flags);
-#else
-		// select the properly method
-		if (e->player)
-			result = pStudioDraw->StudioDrawPlayer(flags, &e->curstate);
-		else result = pStudioDraw->StudioDrawModel(flags);
-#endif
+	// select the properly method
+	if (e->player)
+		result = GameStudioRenderer_StudioDrawPlayer(flags, &e->curstate);
+	else result = GameStudioRenderer_StudioDrawModel(flags);
 	
 	// old frame must be restored
 	if( !RP_NORMALPASS( )) e->latched.prevframe = prevFrame;
@@ -2534,7 +2869,7 @@ void R_RunViewmodelEvents( void )
 		cl.weaponstarttime = cl.time;
 	RI.currententity->curstate.animtime = cl.weaponstarttime;
 	RI.currententity->curstate.sequence = cl.weaponseq;
-	pStudioDraw->StudioDrawModel( STUDIO_EVENTS );
+	GameStudioRenderer_StudioDrawModel( STUDIO_EVENTS );
 
 	RI.currententity = NULL;
 	RI.currentmodel = NULL;
@@ -2572,7 +2907,7 @@ void R_DrawViewModel( void )
 	RI.currententity->curstate.renderamt = R_ComputeFxBlend( RI.currententity );
 
 	// hack the depth range to prevent view model from poking into walls
-	pglDepthRange( gldepthmin, gldepthmin + 0.3f * ( gldepthmax - gldepthmin ));
+	pglDepthRange( gldepthmin, gldepthmin + 0.2f * ( gldepthmax - gldepthmin ));
 
 	// backface culling for left-handed weapons
 	if (R_AllowFlipViewModel(RI.currententity) || g_iBackFaceCull)
@@ -2587,7 +2922,7 @@ void R_DrawViewModel( void )
 		cl.weaponstarttime = cl.time;
 	RI.currententity->curstate.animtime = cl.weaponstarttime;
 	RI.currententity->curstate.sequence = cl.weaponseq;
-	pStudioDraw->StudioDrawModel( STUDIO_RENDER );
+	GameStudioRenderer_StudioDrawModel( STUDIO_RENDER );
 
 	// restore depth range
 	pglDepthRange( gldepthmin, gldepthmax );
@@ -2622,11 +2957,6 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 
 	if( ptexture->flags & STUDIO_NF_NORMALMAP )
 		flags |= (TF_NORMALMAP);
-
-#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
-	// dont build mipmap on iOS to reduce memory usage
-	flags |= TF_NOPICMIP|TF_NOMIPMAP;
-#endif
 
 #if 0 // Useless feature in CSMoE, removed for optimization
 	// store some textures for remapping
@@ -2730,10 +3060,17 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 			}
 #endif
 
-			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
+			Q_snprintf(texname, sizeof(texname), "gfx/tattoo/%s.tga", name);
 			if (FS_FileExists(texname, false))
 			{
                 gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+				break;
+			}
+
+			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
+			if (FS_FileExists(texname, false))
+			{
+				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 				break;
 			}
 

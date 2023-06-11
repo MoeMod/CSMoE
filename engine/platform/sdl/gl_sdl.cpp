@@ -677,7 +677,11 @@ void GL_InitExtensionsGLES( void )
 	GL_SetExtension( GL_ARB_DEPTH_FLOAT_EXT, false );
 	GL_SetExtension( GL_OCCLUSION_QUERIES_EXT,false );
 	GL_CheckExtension( "GL_OES_depth_texture", NULL, "gl_depthtexture", GL_DEPTH_TEXTURE );
+#ifdef XASH_GL4ES
+	GL_SetExtension(GL_ASTC_EXT, true);
+#else
     GL_CheckExtension( "GL_KHR_texture_compression_astc_ldr", NULL, "gl_astc_format", GL_ASTC_EXT );
+#endif
 
 	glConfig.texRectangle = glConfig.max_2d_rectangle_size = 0; // no rectangle
 
@@ -911,6 +915,7 @@ void GL_InitExtensions( void )
 
 #ifdef XASH_WES
 extern "C" void wes_init();
+extern "C" void wes_destroy();
 #endif
 #ifdef XASH_GL4ES
 void GL4ES_GetMainFBSize( int *width, int *height )
@@ -920,10 +925,13 @@ void GL4ES_GetMainFBSize( int *width, int *height )
 }
 void *GL4ES_GetProcAddress( const char *name )
 {
+#ifdef XASH_ANGLE
+    return (void *)eglGetProcAddress(name);
+#endif
 	if( !Q_strcmp(name, "glShadeModel") )
 		// combined gles/gles2/gl implementation exports this, but it is invalid
 		return NULL;
-	return (void *)eglGetProcAddress( name );
+	return SDL_GL_GetProcAddress( name );
 }
 #endif
 
@@ -1062,7 +1070,7 @@ qboolean GL_CreateContext( void )
 	glState.stencilEnabled = glConfig.stencil_bits ? true : false;
 
 	SDL_GL_GetAttribute( SDL_GL_MULTISAMPLESAMPLES, &glConfig.msaasamples );
-	
+
 #endif
 #ifdef XASH_WES
 	wes_init();
@@ -1130,16 +1138,27 @@ qboolean GL_DeleteContext( void )
 	HGLRC wrap_wglGetCurrentContext();
 	BOOL wrap_wglDeleteContext(HGLRC hglrc);
 	wrap_wglDeleteContext(wrap_wglGetCurrentContext());
-	void QindieGL_Destroy(void);
-	QindieGL_Destroy();
-#elif defined XASH_GL4ES
-	close_gl4es();
 #else
 	if (glw_state.context)
 	{
 		SDL_GL_DeleteContext(glw_state.context);
 		glw_state.context = NULL;
 	}
+#endif
+
+
+#ifdef XASH_NANOGL
+	nanoGL_Destroy();
+#endif
+#ifdef XASH_WES
+	wes_destroy();
+#endif
+#ifdef XASH_QINDIEGL
+	void QindieGL_Destroy(void);
+	QindieGL_Destroy();
+#endif
+#ifdef XASH_GL4ES
+	close_gl4es();
 #endif
 	
 	return false;

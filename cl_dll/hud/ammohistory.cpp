@@ -28,6 +28,9 @@
 #include "draw_util.h"
 #include "legacy/hud_scoreboard_legacy.h"
 
+#include "vgui_controls/controls.h"
+#include "vgui/ILocalize.h"
+
 namespace cl {
 
 HistoryResource gHR;
@@ -324,9 +327,44 @@ int HistoryResource::DrawNEWHudAmmoHistory(float flTime)
 
 				int iLength, iHeight;
 
+				const char* szModifiedWpnName = weap->szName;
+				char szWeaponInfo[64];
+
+				// strip the monster_* or weapon_* from the inflictor's classname
+				if (!strncmp(szModifiedWpnName, "weapon_", 7))
+					szModifiedWpnName += 7;
+
+				else if (!strncmp(szModifiedWpnName, "knife_", 6))
+					szModifiedWpnName += 6;
+
+				else if (!strncmp(szModifiedWpnName, "func_", 5))
+					szModifiedWpnName += 5;
+
+				char szModifiedWpnName2[64];
+				strcpy(szModifiedWpnName2, szModifiedWpnName);
+
+				if (!strcmp(szModifiedWpnName2, "usp"))
+					strcpy(szModifiedWpnName2, "USP45");
+				else if (!strcmp(szModifiedWpnName2, "deagle"))
+					strcpy(szModifiedWpnName2, "DesertEagle");
+				else if (!strcmp(szModifiedWpnName2, "hegrenade"))
+					strcpy(szModifiedWpnName2, "HE_Grenade");
+
+				//Vgui Localize
+				char SzWpnNameCn[64];
+				char SzText[64]; sprintf(SzText, "CSO_%s", szModifiedWpnName);
+				if (vgui2::localize()->Find(SzText))
+					strcpy(SzWpnNameCn, HudDeathInfo().UnicodeToUTF8(vgui2::localize()->Find(SzText)));
+				else
+				{
+					sprintf(SzText, "#CSO_%s", szModifiedWpnName);
+					strcpy(SzWpnNameCn, SzText);
+				}
+
+
 				gEngfuncs.pfnDrawSetTextColor(1.0f, 1.0f, 1.0f);
-				gEngfuncs.pfnDrawConsoleStringLen(weap->szName, &iLength, &iHeight);
-				gEngfuncs.pfnDrawConsoleString(xpos, ypos + abs(iH - iHeight) / 2, weap->szName);
+				gEngfuncs.pfnDrawConsoleStringLen(SzWpnNameCn, &iLength, &iHeight);
+				gEngfuncs.pfnDrawConsoleString(xpos, ypos + abs(iH - iHeight) / 2, SzWpnNameCn);
 			}
 		}
 	}

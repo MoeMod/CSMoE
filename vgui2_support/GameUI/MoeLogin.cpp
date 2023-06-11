@@ -33,7 +33,7 @@ MoeLogIn::MoeLogIn(void) : Frame(NULL, CMOELOGIN_NAME)
 
 	SetSizeable(false);
 
-	m_pAccount = new vgui2::TextEntry(this, "TextEntry_Account");
+	/*m_pAccount = new vgui2::TextEntry(this, "TextEntry_Account");
 	m_pPassword = new vgui2::TextEntry(this, "TextEntry_PassWord");
 
 	m_pValidation = new vgui2::Button(this, "validation", "#validation");
@@ -44,7 +44,7 @@ MoeLogIn::MoeLogIn(void) : Frame(NULL, CMOELOGIN_NAME)
 	m_pExit->SetCommand("Exit");
 
 	m_pAutoSave = new vgui2::CheckButton(this, "Password_AutoSave", "#Password_AutoSave");
-
+	*/
 	LoadControlSettings("resource/moelogin.res");
 
 }
@@ -70,7 +70,8 @@ void MoeLogIn::OnClose(void)
 
 void MoeLogIn::OnCommand(const char* command)
 {
-	char cmd[64];
+	BaseClass::OnCommand(command);
+	/*char cmd[64];
 	
 	if (!stricmp(command, "get_token"))
 	{
@@ -144,13 +145,6 @@ void MoeLogIn::OnCommand(const char* command)
 					//snprintf(cmd, sizeof(cmd), "setinfo token %s", szPassword);
 					snprintf(cmd, sizeof(cmd), "login %s %s", m_szAccount, szPassword);
 					engine->pfnClientCmd(cmd);
-
-					/*auto msgbox = new vgui2::MessageBox("#CSMoE_Tips", "#CSMoE_Login", this);
-					msgbox->SetOKButtonText("#CSO_OKl_Btn");
-					msgbox->SetBounds(GetWide() / 2 - 150, GetTall() / 2 - 100, 300, 200);
-					msgbox->DoModal();
-					msgbox->Activate();
-					msgbox->SetCommand("userlogin");*/
 					return;
 				}
 			}
@@ -179,7 +173,7 @@ void MoeLogIn::OnCommand(const char* command)
 	{
 		engine->pfnClientCmd("disconnect");
 		BaseClass::Close();
-	}
+	}*/
 }
 
 void MoeLogIn::OnSetFocus()

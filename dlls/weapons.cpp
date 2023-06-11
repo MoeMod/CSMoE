@@ -86,7 +86,7 @@ short g_sModelIndexShockWave;
 short g_sModelIndexWind;
 short g_sModelIndexWindExp;
 short g_sModelIndexGuillotineGibs;
-
+short g_sModelIndexZb3Respawn;
 int giAmmoIndex;
 
 MULTIDAMAGE gMultiDamage;
@@ -817,7 +817,12 @@ void CBasePlayerWeapon::ItemPostFrame()
 
 		// Add them to the clip
 		m_iClip += j;
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+		
+		if(this->m_iId == WEAPON_TURBULENT1)
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+		else
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+
 		m_pPlayer->TabulateAmmo();
 		m_fInReload = FALSE;
 	}
@@ -1418,6 +1423,11 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_WATERPISTOL:
 		case WEAPON_MONKEYWPNSET2:
 		case WEAPON_Z4B_MALORIAN3516:
+		case WEAPON_VULCANUS1:
+		case WEAPON_CROW1:
+		case WEAPON_THANATOS1:
+		case WEAPON_DARTPISTOL:
+		case WEAPON_Y23S1DARTPISTOL:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:
@@ -1730,7 +1740,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pOther);
 
-	if (pPlayer->m_bIsVIP || pPlayer->m_bShieldDrawn || pPlayer->m_bIsZombie || pPlayer->m_iBuff & BUFF_GHOSTHUNTER)
+	if (pPlayer->m_bIsVIP || pPlayer->m_bShieldDrawn || pPlayer->m_bIsZombie || pPlayer->m_iBuff & BUFF_GHOSTHUNTER || pPlayer->m_iBuff & BUFF_LASTHERO)
 		return;
 
 	pPlayer->OnTouchingWeapon(this);
@@ -1850,6 +1860,8 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					case WEAPON_DIVINETITAN:
 					case WEAPON_PATROLDRONE:
 					case WEAPON_BUNKERBUSTER:
+					case WEAPON_SBMINE:
+					case WEAPON_CLAYMORE:
 					case WEAPON_HEGRENADE:
 						grenadeName = "weapon_hegrenade";
 						maxGrenades = 1;

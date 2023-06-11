@@ -4,17 +4,29 @@
 
 #include "util/u_vector.hpp"
 
+#if U_VECTOR_SSE || U_VECTOR_NEON
+#define XASH_SIMD
+#endif
+
 typedef unsigned char byte;
 typedef int		sound_t;
 typedef float		vec_t;
 using vec2_t = moe::VectorBase<float, 2>;
 using vec2_t_ref = vec2_t &;
 
+#ifdef XASH_SIMD
 using vec3_t = moe::VectorBase<float, 3, 16>;
+#else
+using vec3_t = moe::VectorBase<float, 3>;
+#endif
 using vec3_c = moe::VectorBase<float, 3>;
 using vec3_t_ref = vec3_t &;
 
+#ifdef XASH_SIMD
 using vec4_t = moe::VectorBase<float, 4, 16>;
+#else
+using vec4_t = moe::VectorBase<float, 4>;
+#endif
 using vec4_t_ref = vec4_t &;
 
 typedef byte		rgba_t[4];	// unsigned byte colorpack
@@ -28,6 +40,12 @@ using matrix4x4_ref = matrix4x4 &;
 
 using cmatrix3x4 = const matrix3x4 &;
 using cmatrix4x4 = const matrix4x4 &;
+
+#ifdef _MSC_VER
+#define XASH_VECTORCALL __vectorcall
+#else
+#define XASH_VECTORCALL
+#endif
 
 #ifndef time_point_t
 typedef float		time_point_t;

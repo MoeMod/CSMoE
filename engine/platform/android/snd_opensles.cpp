@@ -306,4 +306,20 @@ void S_PrintDeviceName( void )
 {
 	Msg( "Audio: OpenSL\n" );
 }
+
+qboolean VoiceCapture_Init( void )
+{
+    return false;
+}
+
+qboolean VoiceCapture_RecordStart( void )
+{
+    return false;
+}
+
+void VoiceCapture_RecordStop( void )
+{
+    return;
+}
+
 #endif

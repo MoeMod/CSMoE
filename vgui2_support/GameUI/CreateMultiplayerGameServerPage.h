@@ -20,7 +20,15 @@ namespace vgui2
 {
 class ListPanel;
 }
-
+#ifdef DEBUG
+#define MAX_GAMEMODES 10
+static const char* g_szGameModeCode[MAX_GAMEMODES] = {
+	"none", "dm", "tdm", "zb1", "zb3", "zb3f2p", "zbs", "zb3zp", "zbz", "zsh"
+};
+static const wchar_t* g_szGameModeNames[MAX_GAMEMODES] = {
+	L"竞技模式", L"个人竞技模式", L"团队竞技模式", L"生化模式(感染)", L"生化模式(英雄)", L"生化模式(英雄)-炮房", L"大灾变", L"生化模式(ZombiePlague)", L"生化Z" ,L"昼夜求生"
+};
+#else
 #define MAX_GAMEMODES 8
 static const char* g_szGameModeCode[MAX_GAMEMODES] = {
 	"none", "dm", "tdm", "zb1", "zb3", "zb3f2p", "zbs", "zb3zp"
@@ -28,7 +36,7 @@ static const char* g_szGameModeCode[MAX_GAMEMODES] = {
 static const wchar_t* g_szGameModeNames[MAX_GAMEMODES] = {
 	L"竞技模式", L"个人竞技模式", L"团队竞技模式", L"生化模式(感染)", L"生化模式(英雄)", L"生化模式(英雄)-炮房", L"大灾变", L"生化模式(ZombiePlague)"
 };
-
+#endif
 //-----------------------------------------------------------------------------
 // Purpose: server options page of the create game server dialog
 //-----------------------------------------------------------------------------

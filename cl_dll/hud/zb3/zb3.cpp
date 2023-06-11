@@ -23,7 +23,8 @@ GNU General Public License for more details.
 #include "zb3.h"
 #include "zb3_morale.h"
 #include "zb3_rage.h"
-
+#include "draw_util.h"
+#include "calcscreen.h"
 #include "gamemode/mods_const.h"
 #include "gamemode/zb3/zb3_const.h"
 
@@ -89,12 +90,16 @@ int CHudZB3::VidInit(void)
 {
 	pimpl->for_each(&IBaseHudSub::VidInit);
 
+	R_InitTexture(m_iHero, "resource/helperhud/hero_s");
+
 	return 1;
 }
 
 int CHudZB3::Draw(float time)
 {
 	pimpl->for_each(&IBaseHudSub::Draw, time);
+	DrawHeroIcon();
+
 	return 1;
 }
 
@@ -117,5 +122,61 @@ void CHudZB3::Shutdown(void)
 {
 	delete pimpl;
 	pimpl = nullptr;
+}
+
+int CHudZB3::DrawHeroIcon()
+{
+	if (!gHUD.m_pCvarDraw->value)
+		return 0;
+
+	if (gHUD.m_iIntermission || gEngfuncs.IsSpectateOnly())
+		return 0;
+
+	if (g_iUser1)
+		return 0;
+
+	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
+		return 0;
+
+	int x = 0, y = 0;
+
+	for (int i = 0; i < 33; i++)
+	{
+		if (!g_PlayerExtraInfo[i].vip)
+			continue;
+
+		if (g_PlayerExtraInfo[i].zombie || g_PlayerExtraInfo[i].dead)
+			continue;
+
+		cl_entity_t* ent = gEngfuncs.GetEntityByIndex(i);
+
+		cl_entity_t* pLocal = gEngfuncs.GetLocalPlayer();
+
+		if (!ent)
+			continue;
+
+		int iDistance = (ent->origin - pLocal->origin).Length() * 0.0254f;
+	
+		float xyScreen[2];
+		if (CalcScreen(ent->origin, xyScreen))
+		{
+			if (iDistance > 10 && iDistance < 30)
+			{
+				m_iHero->Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
+
+				char szBuffer[16];
+				sprintf(szBuffer, "[%im]", iDistance);
+
+				int textlen = DrawUtils::HudStringLen(szBuffer);
+				int r = 182, g = 167, b = 254;
+				DrawUtils::ScaleColors(r, g, b, 255);
+				DrawUtils::DrawHudString(xyScreen[0] - textlen * 0.5f, xyScreen[1] + 25, gHUD.m_scrinfo.iWidth, szBuffer, r, g, b);
+			}
+		}
+	}
+
+	return 1;
+
+
 }
 }

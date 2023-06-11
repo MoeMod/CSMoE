@@ -44,8 +44,8 @@ public:
 	virtual void StudioFxTransform(cl_entity_t *ent, matrix3x4_ref transform);
 	virtual void StudioSlerpBones(vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s);
 	virtual void StudioCalcBoneAdj(float dadt, float *adj, const byte *pcontroller1, const byte *pcontroller2, byte mouthopen);
-	virtual void StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec4_t_ref q);
-	virtual void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos);
+	virtual void StudioCalcBoneQuaterion(int frame, float s, const mstudiobone_t *pbone, const mstudioanim_t *panim, const float *adj, vec4_t_ref q);
+	virtual void StudioCalcBonePosition(int frame, float s, const mstudiobone_t *pbone, const mstudioanim_t *panim, const float *adj, vec3_t_ref pos);
 	virtual void StudioCalcRotations(vec3_t pos[], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f);
 	virtual void StudioRenderModel(const vec3_t lightdir);
 	virtual void DrawOutLineBegin(int flag);
@@ -149,6 +149,11 @@ public:
 	static struct model_s* s_pWingGunPModel;
 	static struct model_s* s_pLaserSGPModel;
 	static struct model_s* s_pSPKnifeViewModel;
+	static struct model_s* s_pHaloGunPModel;
+	static struct model_s* s_pStickyBombViewModel;
+	static struct model_s* s_pStickyBombIdleRModel;
+	static struct model_s* s_pStickyBombIdleGModel;
+	static struct model_s* s_pStickyBombPModel;
 };
 
 }

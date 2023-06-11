@@ -360,6 +360,24 @@ int UTIL_EntitiesInBox(CBaseEntity **pList, int listMax, const Vector &mins, con
 
 int UTIL_EntitiesInRotatedBox(CBaseEntity** pList, int listMax, Vector vecBoxOrigin, Vector vecBoxAngle, float flLength, float flWidth, float flHeight, int flagMask)
 {
+	/*
+	玩家的三个朝向方向向量
+		U，F，R
+		玩家眼睛坐标A，目标坐标B
+		位置向量M＝B - A
+		直接分别M点乘那三个方向向量，分别得到数值u，f，r
+		用对称的盒子举例，盒子上平面距玩家眼睛坐标距离离为a，前平面距离b，右平面距离c
+		那么只需要同时满足
+		| u | ＜a
+		| f | ＜b
+		| r | ＜c
+		就能认定在盒子内
+
+		以玩家面对的盒子长度为长
+	*/
+
+	//vecBoxOrigin = GetGunPostion();
+	//vecBoxAngle = v_angle
 	UTIL_MakeVectors(vecBoxAngle);
 
 	Vector vecForward, vecRight, vecUp;
@@ -369,14 +387,34 @@ int UTIL_EntitiesInRotatedBox(CBaseEntity** pList, int listMax, Vector vecBoxOri
 	vecRight = gpGlobals->v_right;
 	vecUp = gpGlobals->v_up;
 
-
-	edict_t* pEdict = INDEXENT(1);
-	CBaseEntity* pEntity;
+	CBaseEntity* pEntity = nullptr;
 	int count = 0;
 
-	if (!pEdict)
-		return 0;
+	float flRadius = sqrt(flLength * flLength + flWidth * flWidth + flHeight * flHeight);
 
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecBoxOrigin, flRadius)) != nullptr)
+	{
+		if (flagMask && !(pEntity->pev->flags & flagMask))
+			continue;
+
+		Vector vecDelta = pEntity->pev->origin - vecBoxOrigin;
+
+		flForward = DotProduct(vecDelta, vecForward);
+		flRight = abs(DotProduct(vecDelta, vecRight));
+		flUp = abs(DotProduct(vecDelta, vecUp));
+
+		if (flUp > flHeight
+			|| flForward > flWidth
+			|| flForward < 0.0f
+			|| flRight > flLength)
+			continue;
+
+		pList[count++] = pEntity;
+
+		if (count >= listMax)
+			break;
+	}
+	/*
 	for (int i = 1; i < gpGlobals->maxEntities; ++i, ++pEdict)
 	{
 		if (pEdict->free)
@@ -387,12 +425,13 @@ int UTIL_EntitiesInRotatedBox(CBaseEntity** pList, int listMax, Vector vecBoxOri
 
 		Vector vecDelta = pEdict->v.origin - vecBoxOrigin;
 
-		flForward = DotProductAbs(vecDelta, vecForward);
+		flForward = DotProduct(vecDelta, vecForward);
 		flRight = DotProductAbs(vecDelta, vecRight);
 		flUp = DotProductAbs(vecDelta, vecUp);
 
 		if (flUp > flHeight
 			|| flForward > flWidth
+			|| flForward < 0.0f
 			|| flRight > flLength)
 			continue;
 
@@ -404,7 +443,7 @@ int UTIL_EntitiesInRotatedBox(CBaseEntity** pList, int listMax, Vector vecBoxOri
 
 		if (count >= listMax)
 			break;
-	}
+	}*/
 
 	return count;
 }
@@ -2498,9 +2537,9 @@ void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vect
 	WRITE_COORD(vecOrigin.x);
 	WRITE_COORD(vecOrigin.y);
 	WRITE_COORD(vecOrigin.z);
-	WRITE_ANGLE(vecAngles.x);
-	WRITE_ANGLE(vecAngles.y);
-	WRITE_ANGLE(vecAngles.z);
+	WRITE_COORD(vecAngles.x);
+	WRITE_COORD(vecAngles.y);
+	WRITE_COORD(vecAngles.z);
 	WRITE_COORD(vecVelocity.x);
 	WRITE_COORD(vecVelocity.y);
 	WRITE_COORD(vecVelocity.z);

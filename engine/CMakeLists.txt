@@ -164,12 +164,20 @@ if(NOT XASH_DEDICATED)
 		./platform/sdl/vid_sdl.cpp
 	)
 
-	set(XASH_ENGINE_ANDROID_SOURCES
-		common/launcher.cpp
-		platform/android/android_nosdl.cpp
-		platform/android/snd_opensles.cpp
-		platform/ime_stub.cpp
-	)
+	if(XASH_SDL)
+		set(XASH_ENGINE_ANDROID_SOURCES
+			common/launcher.cpp
+			platform/android/android_sdl.cpp
+			platform/ime_stub.cpp
+		)
+	else()
+		set(XASH_ENGINE_ANDROID_SOURCES
+			platform/android/vid_android.cpp
+			platform/android/android_nosdl.cpp
+			platform/android/snd_opensles.cpp
+			platform/ime_stub.cpp
+		)
+	endif()
 
 	if(IOS)
 	set(XASH_ENGINE_APPLE_SOURCES
@@ -240,6 +248,9 @@ set(XASH_ENGINE_CLIENT_SOURCES
    client/s_vox.cpp
    client/vgui/vgui_draw.cpp
    client/voice.cpp
+   client/gl_cubemap.cpp
+   client/gl_texlru.cpp
+   client/gl_studiolru.cpp
 )
 
 set(XASH_ENGINE_IMGUI_SOURCES

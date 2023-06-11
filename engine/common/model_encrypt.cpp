@@ -84,7 +84,7 @@ namespace xe {
             for (int j = 0; j < pbodypart[i].nummodels; j++)
             {
                 if (pmodel[j].numverts > 0)
-                    EncryptData(buffer + pmodel[j].vertindex, pmodel[j].numverts * sizeof(vec3_t));
+                    EncryptData(buffer + pmodel[j].vertindex, pmodel[j].numverts * sizeof(vec3_c));
             }
         }
     }

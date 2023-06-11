@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "net_encode.h"
 #include "cl_tent.h"
 #include "gl_local.h"
+#include "gl_cubemap.h"
 #include "input.h"
 #include "touch.h"
 #include "kbutton.h"
@@ -1602,6 +1603,9 @@ boost::asio::awaitable<void> CL_PrepVideo( void )
 
 	// update right muzzleflash indexes
 	CL_RegisterMuzzleFlashes ();
+
+	// Load Cubemap effect texture
+	xe::CubeMap_LoadTexture();
 
 	// invalidate all decal indexes
 	Q_memset( cl.decal_index, 0, sizeof( cl.decal_index ));

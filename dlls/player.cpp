@@ -38,7 +38,7 @@
 #include "wpn_shared/z4b_ar57amethyst.h"
 #include "wpn_shared/wpn_sgdrillex.h"
 #include "wpn_shared/wpn_guillotine.h"
-
+#include "wpn_shared/z4b_shovelex.h"
 // gamemode
 #include "gamemode/mods.h"
 
@@ -167,6 +167,17 @@ const char *CDeadHEV::m_szPoses[] =
 int gEvilImpulse101;
 char g_szMapBriefingText[512];
 
+int iDeathInfo_Fire[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8], iDeathInfo_Body[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8];
+std::string SzDeathInfo_Wpn[MAX_CLIENTS + 1][MAX_CLIENTS + 1][2];
+
+int g_iZombieTankerCount[MAX_CLIENTS + 1];
+float g_flZombieTankerDamage[MAX_CLIENTS + 1];
+
+int g_iAttackerCount[MAX_CLIENTS + 1];
+float g_flAttackerDamage[MAX_CLIENTS + 1];
+float g_flRecordBestMoment[MAX_CLIENTS + 1];
+float g_flHoldOutDamage[MAX_CLIENTS + 1];
+
 
 entvars_t *g_pevLastInflictor;
 
@@ -182,8 +193,14 @@ CBasePlayer::~CBasePlayer() = default;
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
 	char *infobuffer = GET_INFO_BUFFER(edict());
+	
+#if PLAYER_CLASS_SYSTEM
+	const char *model = PlayerClassManager().PlayerClass_GetModelName(m_iModelName);
+	m_bIsFemale = PlayerClassManager().PlayerClass_IsFemale(m_iModelName);
+#else
 	const char *model = PlayerModel_GetApperance(m_iModelName, m_iModelTeam);
 	m_bIsFemale = PlayerModel_IsFemale(m_iModelName, m_iModelTeam);
+#endif
 
 	if (Q_strcmp(GET_KEY_VALUE(infobuffer, "model"), model))
 	{
@@ -250,6 +267,40 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 	if (pev->deadflag != DEAD_NO && !IsBot())
 		return;
 
+	char radiomsg[256];
+	strcpy(radiomsg, msg_id);
+
+	if (m_bIsZombie)
+	{
+		if (!stricmp(m_ZombieClass, "speed") ||
+			!stricmp(m_ZombieClass, "booster") ||
+			!stricmp(m_ZombieClass, "teleport") ||
+			!stricmp(m_ZombieClass, "flying") ||
+			!stricmp(m_ZombieClass, "spider") ||
+			!stricmp(m_ZombieClass, "siren"))
+		{
+			strcat(radiomsg, "_ZW");
+		}
+		else
+			strcat(radiomsg, "_ZB");
+	}
+	else if (m_bIsFemale)
+	{
+		switch (m_iModelName)
+		{
+		case MODEL_JPNGIRL01:
+			strcat(radiomsg, "_CW");
+			break;
+			strcat(radiomsg, "_W_JIN");
+			break;
+
+		default:
+			strcat(radiomsg, "_W");
+			break;
+		}
+	}
+
+
 	CBaseEntity *pEntity = NULL;
 	while ((pEntity = UTIL_FindEntityByClassname(pEntity, "player")) != NULL)
 	{
@@ -300,7 +351,7 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 			{
 				MESSAGE_BEGIN(MSG_ONE, gmsgSendAudio, NULL, pEntity->pev);
 					WRITE_BYTE(ENTINDEX(edict()));
-					WRITE_STRING(msg_id);
+					WRITE_STRING(radiomsg);
 					WRITE_SHORT(pitch);
 				MESSAGE_END();
 
@@ -890,6 +941,15 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 
 		m_lastDamageAmount = flDamage;
+
+		if (m_lastDamageAmount)
+		{
+			int iAtt = ENTINDEX(ENT(pevAttacker));
+			int iVic = ENTINDEX(edict());
+
+			iDeathInfo_Fire[iAtt][iVic][2] += m_lastDamageAmount;
+			iDeathInfo_Body[iAtt][iVic][2] += 1;
+		}
 		
 		CBaseEntity* temp = GetClassPtr<CBaseEntity>(pevInflictor);
 
@@ -924,32 +984,20 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 		else
 		{
-			if (m_iBuff & BUFF_REVIVE)
+			if (m_pModStrategy->DeathCallBack(this, pevInflictor, pevAttacker, flDamage, bitsDamageType))
 			{
-				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-				
-				CSDM_DoRandomSpawn(this);
-				m_iBuff &= ~BUFF_REVIVE;
-				m_iReviveGunShotsFired = 0;
-				if (pWeapon)
-				{
-					if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
-						pWeapon->WeaponCallBack(1);
-				}
 				return flDamage;
 			}
-			else
-			{
-				if (CBaseEntity::Instance(this->pev)->IsPlayer()) {
-					MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, this->pev);
-					WRITE_LONG(-1);
-					WRITE_SHORT(ENTINDEX(edict()));
-					WRITE_BYTE(0);
-					WRITE_BYTE(1);
-					MESSAGE_END();
-				}
+		
+			if (CBaseEntity::Instance(this->pev)->IsPlayer()) {
+				MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, this->pev);
+				WRITE_LONG(-1);
+				WRITE_SHORT(ENTINDEX(edict()));
+				WRITE_BYTE(0);
+				WRITE_BYTE(1);
+				MESSAGE_END();
 			}
-
+			
 			if (m_bIsZombie && m_ZombieClass)
 			{
 				if (!stricmp(m_ZombieClass, "revival") && ~m_iBuff & BUFF_IGNORE_KNOCKBACK)
@@ -1349,20 +1397,136 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		WRITE_BYTE(0);
 		MESSAGE_END();
 	}
-
-
-	if (m_iBuff & BUFF_REVIVE && flDamage > pev->health)
+	//For DeathInfo TakeDamage Pre? Not work
+	if (ENTINDEX(edict()) >= 1 && ENTINDEX(edict()) <= 32)
 	{
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 
-		CSDM_DoRandomSpawn(this);
-		m_iBuff &= ~BUFF_REVIVE;
-		m_iReviveGunShotsFired = 0;
+		//Push Health & Body Data When taken damage.(Victim)
+		float flOldHealth; flOldHealth = this->pev->health;
+		// From CBaseMonster
+		int iOldHitGroup; iOldHitGroup = this->m_LastHitGroup;
+
+		this->m_iVecOldHealth.push_back(flOldHealth);
+		this->m_iVecHitgroup.push_back(iOldHitGroup);
+	}
+
+	//For DeathInfo TakeDamage Post
+	if (ENTINDEX(edict()) >= 1 && ENTINDEX(edict()) <= 32)
+	{
+		//TakeDamage Post
+		int iCurrentHitCount = this->m_iVecOldHealth.size() - 1;
+
+		float flOldHealth_Pre = this->m_iVecOldHealth.back();
+		int iOldHitGroup_Pre = this->m_iVecHitgroup.back();
+
+		if (!this->m_flOldHealth)
+			this->m_flOldHealth = this->pev->health;
+
+		//Delete Last Data
+		this->m_iVecOldHealth.pop_back();
+		this->m_iVecHitgroup.pop_back();
+
+		int iDamageAmount = (int)flDamage;//(int)(flOldHealth_Pre - this->m_flOldHealth);
+		this->m_flOldHealth = iCurrentHitCount ? flOldHealth_Pre : 0.0;
+
+		//Alarm Tanker Alarm Attacker
+		if (iDamageAmount && this->m_bIsZombie)
+		{
+			g_flZombieTankerDamage[ENTINDEX(edict())] += iDamageAmount;
+			if (g_flZombieTankerDamage[ENTINDEX(edict())] >= 3000.0 && g_iZombieTankerCount[ENTINDEX(edict())] <= 999)
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, this->pev);
+				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+				WRITE_BYTE(2);
+				WRITE_COORD(float(ENTINDEX(edict())));
+				MESSAGE_END();
+
+				g_flZombieTankerDamage[ENTINDEX(edict())] = 0.0;
+				g_iZombieTankerCount[ENTINDEX(edict())]++;
+			}
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, this->pev);
+			WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+			WRITE_BYTE(3);
+			WRITE_COORD(float(ENTINDEX(edict())));
+			MESSAGE_END();
+
+			g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] += iDamageAmount;
+			if (g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] >= 5000.0 && g_iAttackerCount[ENTINDEX(ENT(pevAttacker))] <= 999)
+			{
+				g_flAttackerDamage[ENTINDEX(ENT(pevAttacker))] = 0.0;
+				g_iAttackerCount[ENTINDEX(ENT(pevAttacker))]++;
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, pevAttacker);
+				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+				WRITE_BYTE(4);
+				WRITE_COORD(float(ENTINDEX(ENT(pevAttacker))));
+				MESSAGE_END();
+
+				
+			}
+
+			if (!g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))])
+				g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))] = iDamageAmount;
+
+			if (g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))] && g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))] < iDamageAmount)
+			{
+				g_flRecordBestMoment[ENTINDEX(ENT(pevAttacker))] = iDamageAmount;
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, pevAttacker);
+				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+				WRITE_BYTE(5);
+				WRITE_COORD(float(ENTINDEX(ENT(pevAttacker))));
+				MESSAGE_END();
+
+			}
+		}
+
+		if (iDamageAmount)
+		{
+			g_flHoldOutDamage[ENTINDEX(edict())] += iDamageAmount;
+			if (g_flHoldOutDamage[ENTINDEX(edict())] >= 5000.0)
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, this->pev);
+				WRITE_BYTE(8U);//ZB2_MESSAGE_ALARM
+				WRITE_BYTE(6);
+				WRITE_COORD(float(ENTINDEX(edict())));
+				MESSAGE_END();
+
+				g_flHoldOutDamage[ENTINDEX(edict())] = 0.0;
+			}
+		}
+
+
+		int iAtt = ENTINDEX(ENT(pevAttacker));
+		int iVic = ENTINDEX(edict());
+
+		if (iDamageAmount)
+		{
+			if (!iOldHitGroup_Pre || iOldHitGroup_Pre < 0 || iOldHitGroup_Pre > 7)
+				iOldHitGroup_Pre = 2;//HIT_CHEST
+
+			iDeathInfo_Fire[iAtt][iVic][iOldHitGroup_Pre] += iDamageAmount;
+			iDeathInfo_Body[iAtt][iVic][iOldHitGroup_Pre] += 1;
+		}
+
+		//End OF TakeDamage Post
+	}
+
+	CBasePlayer* pAttackPlayer = nullptr;
+	if (pAttacker && pAttacker->IsPlayer())
+		pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+	if (pAttackPlayer)
+	{
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttackPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 		if (pWeapon)
 		{
-			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
-				pWeapon->WeaponCallBack(1);
+			if (pWeapon->m_iId == WEAPON_CHAINSR)
+				pWeapon->EntityTakeDamageCallBack(WEAPON_CHAINSR, this, pevInflictor, pAttackPlayer, flDamage, bitsDamageType);
 		}
+	}
+
+	if (flDamage > pev->health && m_pModStrategy->DeathCallBack(this, pevInflictor, pevAttacker, flDamage, bitsDamageType))
+	{
 		return flDamage;
 	}
 
@@ -2419,8 +2583,17 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 	if (!pev->modelindex)
 		return;
 	
+	bool bMeatWallZombie = false;
 	if (m_bIsZombie)
+	{
 		speedLimit = 160.0;
+		if (!stricmp(this->m_ZombieClass, "meatwall"))
+		{
+			speedLimit = 300.0;
+			bMeatWallZombie = true;
+		}
+			
+	}
 	
 	if (pev->health > 0)
 	{
@@ -2605,7 +2778,23 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 			animDesired = LookupSequence(szAnim);
 
 			if (animDesired == -1)
-				animDesired = 0;
+			{
+				//cf model
+				switch (m_Activity)
+				{
+				case ACT_RANGE_ATTACK1:	
+				case ACT_RANGE_ATTACK2:
+					Q_strcpy(szAnim, "M-shoot-"); break;
+				case ACT_RELOAD:	Q_strcpy(szAnim, "M-reload-"); break;
+				default:		Q_strcpy(szAnim, "M-idle-"); break;
+				}
+	
+				Q_strcat(szAnim, m_szAnimExtention);
+				animDesired = LookupSequence(szAnim);
+
+				if (animDesired == -1)
+					animDesired = 0;
+			}
 		}
 			
 		if (pev->sequence != animDesired || !m_fSequenceLoops)
@@ -2633,8 +2822,21 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 
 		Q_strcat(szAnim, m_szAnimExtention);
 		animDesired = LookupSequence(szAnim);
+
 		if (animDesired == -1)
-			animDesired = 0;
+		{
+			//cf model
+			if (pev->flags & FL_DUCKING)
+				Q_strcpy(szAnim, "M-c-shoot-");
+			else
+				Q_strcpy(szAnim, "M-shoot-");
+
+			Q_strcat(szAnim, m_szAnimExtention);
+			animDesired = LookupSequence(szAnim);
+
+			if (animDesired == -1)
+				animDesired = 0;
+		}
 
 		pev->sequence = animDesired;
 		pev->frame = 0;
@@ -2655,7 +2857,19 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		Q_strcat(szAnim, m_szAnimExtention);
 		animDesired = LookupSequence(szAnim);
 		if (animDesired == -1)
-			animDesired = 0;
+		{
+			//cf model
+			if (pev->flags & FL_DUCKING)
+				Q_strcpy(szAnim, "M-c-shoot-");
+			else
+				Q_strcpy(szAnim, "M-shoot-");
+
+			Q_strcat(szAnim, m_szAnimExtention);
+			animDesired = LookupSequence(szAnim);
+
+			if (animDesired == -1)
+				animDesired = 0;
+		}
 
 		pev->sequence = animDesired;
 		pev->frame = 0;
@@ -2674,7 +2888,19 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		Q_strcat(szAnim, m_szAnimExtention);
 		animDesired = LookupSequence(szAnim);
 		if (animDesired == -1)
-			animDesired = 0;
+		{
+			//cf model
+			if (pev->flags & FL_DUCKING)
+				Q_strcpy(szAnim, "M-c-reload-");
+			else
+				Q_strcpy(szAnim, "M-reload-");
+
+			Q_strcat(szAnim, m_szAnimExtention);
+			animDesired = LookupSequence(szAnim);
+
+			if (animDesired == -1)
+				animDesired = 0;
+		}
 
 		if (pev->sequence != animDesired || !m_fSequenceLoops)
 			pev->frame = 0;
@@ -2695,7 +2921,19 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		Q_strcat(szAnim, m_szAnimExtention);
 		animDesired = LookupSequence(szAnim);
 		if (animDesired == -1)
-			animDesired = 0;
+		{
+			//cf model
+			if (pev->flags & FL_DUCKING)
+				Q_strcpy(szAnim, "M-c-idle-");
+			else
+				Q_strcpy(szAnim, "M-idle-");
+
+			Q_strcat(szAnim, m_szAnimExtention);
+			animDesired = LookupSequence(szAnim);
+
+			if (animDesired == -1)
+				animDesired = 0;
+		}
 
 		m_Activity = m_IdealActivity;
 		break;
@@ -2749,7 +2987,19 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 					animDesired = LookupSequence(szAnim);
 
 					if (animDesired == -1)
-						animDesired = 0;
+					{
+						//cf model
+						if (pev->flags & FL_DUCKING)
+							Q_strcpy(szAnim, "M-c-idle-");
+						else
+							Q_strcpy(szAnim, "M-idle-");
+
+						Q_strcat(szAnim, m_szAnimExtention);
+						animDesired = LookupSequence(szAnim);
+
+						if (animDesired == -1)
+							animDesired = 0;
+					}
 				}
 
 				m_Activity = ACT_WALK;
@@ -2786,17 +3036,46 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 						animDesired = LookupSequence(szAnim);
 
 						if (animDesired == -1)
-							animDesired = 0;
+						{
+							//cf model
+							if (pev->flags & FL_DUCKING)
+								Q_strcpy(szAnim, "M-c-idle-");
+							else
+								Q_strcpy(szAnim, "M-idle-");
+
+							Q_strcat(szAnim, m_szAnimExtention);
+							animDesired = LookupSequence(szAnim);
+
+							if (animDesired == -1)
+								animDesired = 0;
+						}
 					}
 
-					m_Activity = ACT_RUN;
-					pev->gaitsequence = LookupActivity(ACT_RUN);
+					if (bMeatWallZombie)
+					{
+						m_Activity = ACT_WALK;
+						pev->gaitsequence = LookupActivity(ACT_WALK);
+					}
+					else
+					{
+						m_Activity = ACT_RUN;
+						pev->gaitsequence = LookupActivity(ACT_RUN);
+					}
+					
 				}
 				else
 				{
-					m_Activity = ACT_RUN;
+					if (bMeatWallZombie)
+					{
+						m_Activity = ACT_WALK;
+					}
+					else
+					{
+						m_Activity = ACT_RUN;
+					}
 					pev->gaitsequence = animDesired;
 				}
+
 				if (m_Activity == ACT_RUN)
 				{
 					//TODO: maybe away used variable 'speed'?
@@ -2814,10 +3093,17 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		else
 			animDesired = pev->sequence;
 
-		if (speed > speedLimit)
-			pev->gaitsequence = LookupActivity(ACT_RUN);
-		else
+		if (bMeatWallZombie)
+		{
 			pev->gaitsequence = LookupActivity(ACT_WALK);
+		}
+		else
+		{
+			if (speed > speedLimit)
+				pev->gaitsequence = LookupActivity(ACT_RUN);
+			else
+				pev->gaitsequence = LookupActivity(ACT_WALK);
+		}
 		break;
 	}
 	case ACT_FLINCH:
@@ -3159,17 +3445,35 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 
 								animDesired = LookupSequence(szAnim);
 
-								if (animDesired == -1)		//ensure dummy
-									animDesired = 0;
+								if (animDesired == -1)
+								{
+									//cf model
+									if (pev->flags & FL_DUCKING)
+										Q_strcpy(szAnim, "M-c-idle-");
+									else
+										Q_strcpy(szAnim, "M-idle-");
+
+									Q_strcat(szAnim, m_szAnimExtention);
+									animDesired = LookupSequence(szAnim);
+
+									if (animDesired == -1)
+										animDesired = 0;
+								}
 							}
 						}
 						else
 							pev->gaitsequence = animDesired;
 
-						m_Activity = ACT_RUN;
+						if (bMeatWallZombie)
+							m_Activity = ACT_WALK;
+						else
+							m_Activity = ACT_RUN;
 					}
 				}
-				pev->gaitsequence = LookupActivity(ACT_RUN);
+				if (bMeatWallZombie)
+					pev->gaitsequence = LookupActivity(ACT_WALK);
+				else
+					pev->gaitsequence = LookupActivity(ACT_RUN);
 			}
 			else
 			{
@@ -4388,6 +4692,32 @@ void CBasePlayer::PlayerDeathThink()
 	if (pev->modelindex && !m_fSequenceFinished && pev->deadflag == DEAD_DYING)
 	{
 		StudioFrameAdvance();
+
+		if (m_bIsZombie && m_fSequenceFinished)
+		{
+			if (!Q_strcmp(gamemode.string, "zb3") || !Q_strcmp(gamemode.string, "zbz"))
+			{
+				if (m_bHeadshotKilled)
+					ClientPrint(pev, HUD_PRINTCENTER, "#CSO_ZB3_CannotRespawnByHeadShot");
+				else
+				{
+					Vector vecOrigin, vecAngle;
+
+					GET_BONE_POSITION(edict(), 1, vecOrigin, vecAngle);
+
+					MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+					WRITE_BYTE(TE_SPRITE);
+					WRITE_COORD(vecOrigin.x);
+					WRITE_COORD(vecOrigin.y);
+					WRITE_COORD(vecOrigin.z);
+					WRITE_SHORT(g_sModelIndexZb3Respawn);
+					WRITE_BYTE(5);
+					WRITE_BYTE(255);
+					MESSAGE_END();
+				}
+			}
+		}
+
 		return;
 	}
 
@@ -5966,11 +6296,6 @@ void CBasePlayer::Spawn()
 	m_iBuff = 0;
 	m_bHasBuffWpn = 0;
 
-	if(IsBot())
-		m_iReviveGunShotsFired = 79;
-	else
-		m_iReviveGunShotsFired = 0;
-
 	SpawnProtection_End();
 
 	if (m_iObserverC4State)
@@ -6107,6 +6432,12 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/z4b/v_deathray.mdl");
 		case WEAPON_CARTBLUES:
 			pev->viewmodel = MAKE_STRING("models/v_cartblue.mdl");
+		case WEAPON_AT4:
+			pev->viewmodel = MAKE_STRING("models/v_at4.mdl");
+		case WEAPON_AT4EX:
+			pev->viewmodel = MAKE_STRING("models/v_at4ex.mdl");
+		case WEAPON_BAZOOKA:
+			pev->viewmodel = MAKE_STRING("models/v_bazooka.mdl");
 
 		default:
 			break;
@@ -6560,10 +6891,24 @@ void CBasePlayer::SelectItem(const char *pstr)
 		}
 	}
 
-	if (!pItem || pItem == m_pActiveItem)
+
+
+	if (!pItem)
+		return;
+
+	if (pItem == m_pActiveItem)
 	{
+		if (FClassnameIs(m_pActiveItem->pev, "z4b_shovelex"))
+		{
+			CKnifeShovelEX* pWeapon = (CKnifeShovelEX*)m_pActiveItem;
+			pWeapon->ChangeWeapon();
+			goto CHANGEMODE;
+		}
+
 		return;
 	}
+
+CHANGEMODE:
 
 	ResetAutoaim();
 
@@ -8358,6 +8703,25 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 				((CGuillotineex*)pWeapon)->CrashAmmo();
 			}
 
+			if (FClassnameIs(pWeapon->pev, "weapon_halogun"))
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, this->pev);
+				WRITE_BYTE(38);
+				WRITE_BYTE(0);
+				WRITE_BYTE(0);
+				MESSAGE_END();
+			}
+
+			if (FClassnameIs(pWeapon->pev, "weapon_revivegun"))
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, this->pev);
+				WRITE_BYTE(38);
+				WRITE_BYTE(2);
+				WRITE_BYTE(0);
+				MESSAGE_END();
+			}
+
+
 			if (pWeapon->iFlags() & ITEM_FLAG_EXHAUSTIBLE)
 			{
 				int iAmmoIndex = GetAmmoIndex(pWeapon->pszAmmo1());
@@ -8435,8 +8799,15 @@ void CBasePlayer::SwitchTeam()
 	{
 		m_iTeam = m_iModelTeam = CT;
 	}
+	
+
+#if PLAYER_CLASS_SYSTEM
+	m_bIsFemale = PlayerClassManager().PlayerClass_IsFemale(m_iModelName);
+	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", PlayerClassManager().PlayerClass_GetModelName(m_iModelName));
+#else
 	m_bIsFemale = PlayerModel_IsFemale(m_iModelName, m_iModelTeam);
 	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", PlayerModel_GetApperance(m_iModelName, m_iModelTeam));
+#endif
 
 	MESSAGE_BEGIN(MSG_ALL, gmsgTeamInfo);
 		WRITE_BYTE(entindex());
@@ -9223,6 +9594,11 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_CARTREDL:
 		case WEAPON_CARTREDH:
 		case WEAPON_Z4B_MALORIAN3516:
+		case WEAPON_VULCANUS1:
+		case WEAPON_THANATOS1:
+		case WEAPON_VULCANUS5:
+		case WEAPON_HK121EX:
+		case WEAPON_Z4B_MECHANICXM214:
 			return TRUE;
 		}
 	}

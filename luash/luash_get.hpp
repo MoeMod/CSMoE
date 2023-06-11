@@ -150,6 +150,10 @@ namespace luash
 		out = nullptr;
 		return;
 	}
+	template<class T> auto GetStatelessLambda(lua_State* L, int N, T& const_mem_ptr) -> typename std::enable_if<IsStatelessLambda<T>::value>::type
+	{
+		// ignore stateless lambda
+	}
 	// just unsupported
 	template<class C, class U> void GetMemberPointer(lua_State* L, int N, U C::* &mem_ptr)
 	{
@@ -219,6 +223,10 @@ namespace luash
 		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<1>) -> decltype(GetMemberPointer(L, N, x))
 		{
 			return GetMemberPointer(L, N, x);
+		}
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<1>) -> decltype(GetStatelessLambda(L, N, x))
+		{
+			return GetStatelessLambda(L, N, x);
 		}
 		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<0>) -> decltype(GetPointer(L, N, x))
 		{

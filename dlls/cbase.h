@@ -389,6 +389,8 @@ public:
 	float m_flHealthDecreaseAmount;
 	int m_iHealthDecreaseCount;
 	entvars_t* m_pBuffAttacker;
+
+	std::vector<CBasePlayer*> m_vecTempAttackers;
 };
 
 inline int FNullEnt(CBaseEntity* ent) { return (!ent) || FNullEnt(ent->edict()); }

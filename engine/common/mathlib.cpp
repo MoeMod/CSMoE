@@ -256,7 +256,7 @@ void SinFastVector3(float r1, float r2, float r3,
 	*s2 = s4f_z(sin_vector);
 }
 #endif
-void VectorVectors( const vec3_t forward, vec3_t_ref right, vec3_t_ref up )
+void XASH_VECTORCALL VectorVectors( const vec3_t forward, vec3_t_ref right, vec3_t_ref up )
 {
 	float	d;
 
@@ -275,7 +275,7 @@ AngleVectors
 
 =================
 */
-void GAME_EXPORT AngleVectors( const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up )
+void GAME_EXPORT XASH_VECTORCALL AngleVectors( const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up )
 {
 	return moe::AngleVectors(angles, forward, right, up);
 }
@@ -286,7 +286,7 @@ VectorAngles
 
 =================
 */
-void VectorAngles( const vec3_t forward, vec3_t_ref angles )
+void XASH_VECTORCALL VectorAngles( const vec3_t forward, vec3_t_ref angles )
 {
 	return moe::VectorAngles(forward, angles);
 }
@@ -297,7 +297,7 @@ VectorsAngles
 
 =================
 */
-void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t_ref angles )
+void XASH_VECTORCALL VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t_ref angles )
 {
 	float	pitch, cpitch, yaw, roll;
 	
@@ -326,7 +326,7 @@ void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, v
 InterpolateAngles
 =================
 */
-void InterpolateAngles( const vec3_t start, const vec3_t end, vec3_t_ref out, float frac )
+void XASH_VECTORCALL InterpolateAngles( const vec3_t start, const vec3_t end, vec3_t_ref out, float frac )
 {
 	float	d, ang1, ang2;
 	int i;
@@ -351,7 +351,7 @@ void InterpolateAngles( const vec3_t start, const vec3_t end, vec3_t_ref out, fl
 ClearBounds
 =================
 */
-void ClearBounds( vec3_t_ref mins, vec3_t_ref maxs )
+void XASH_VECTORCALL ClearBounds( vec3_t_ref mins, vec3_t_ref maxs )
 {
 	// make bogus range
 	VectorSet(mins, 999999.0f, 999999.0f, 999999.0f);
@@ -363,7 +363,7 @@ void ClearBounds( vec3_t_ref mins, vec3_t_ref maxs )
 AddPointToBounds
 =================
 */
-void AddPointToBounds( const vec3_t v, vec3_t_ref out_mins, vec3_t_ref out_maxs )
+void XASH_VECTORCALL AddPointToBounds( const vec3_t v, vec3_t_ref out_mins, vec3_t_ref out_maxs )
 {
     out_mins = mins(v, out_mins);
     out_maxs = maxs(v, out_maxs);
@@ -374,7 +374,7 @@ void AddPointToBounds( const vec3_t v, vec3_t_ref out_mins, vec3_t_ref out_maxs 
 BoundsIntersect
 =================
 */
-qboolean BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2 )
+qboolean XASH_VECTORCALL BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2 )
 {
 	// TODO : SIMD
 	vec3_t maxs2_sub_mins1;
@@ -393,7 +393,7 @@ qboolean BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t m
 BoundsAndSphereIntersect
 =================
 */
-qboolean BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius )
+qboolean XASH_VECTORCALL BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius )
 {
 	vec3_t radius3;
 	VectorSet(radius3, radius, radius, radius);
@@ -419,7 +419,7 @@ qboolean BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const v
 RadiusFromBounds
 =================
 */
-float RadiusFromBounds( const vec3_t mins_v, const vec3_t maxs_v )
+float XASH_VECTORCALL RadiusFromBounds( const vec3_t mins_v, const vec3_t maxs_v )
 {
 	return maxs(abs(mins_v), abs(maxs_v)).Length();
 }
@@ -429,7 +429,7 @@ float RadiusFromBounds( const vec3_t mins_v, const vec3_t maxs_v )
 RotatePointAroundVector
 ====================
 */
-vec3_t RotatePointAroundVector( const vec3_t dir, const vec3_t point, float degrees )
+vec3_t XASH_VECTORCALL RotatePointAroundVector( const vec3_t dir, const vec3_t point, float degrees )
 {
 	float	t0, t1;
 	float	angle, c, s;
@@ -461,7 +461,7 @@ vec3_t RotatePointAroundVector( const vec3_t dir, const vec3_t point, float degr
     return dst;
 }
 
-void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees )
+void XASH_VECTORCALL RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees )
 {
     dst = RotatePointAroundVector(dir, point, degrees);
 }
@@ -475,11 +475,11 @@ AngleQuaternion
 
 ====================
 */
-void AngleQuaternion( const vec3_t angles, vec4_t_ref q )
+void XASH_VECTORCALL AngleQuaternion( const vec3_t angles, vec4_t_ref q )
 {
 	float	sr, sp, sy, cr, cp, cy;
 
-#ifdef U_VECTOR_SIMD
+#ifdef XASH_SIMD
 	vec3_t sina, cosa;
 	sincos_ps(angles * 0.5, &sina.m_xmm, &cosa.m_xmm);
 	sy = sina[2];
@@ -511,7 +511,7 @@ QuaternionSlerp
 
 ====================
 */
-void QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt )
+void XASH_VECTORCALL QuaternionSlerp( const vec4_t p, vec4_t q, float t, vec4_t_ref qt )
 {
 	float	omega, sclp, sclq;
 	float	cosom, sinom;

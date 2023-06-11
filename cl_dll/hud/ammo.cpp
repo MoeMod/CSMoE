@@ -36,6 +36,9 @@
 #include "triangleapi.h"
 #include "weapons_const.h"
 
+#include "vgui_controls/controls.h"
+#include "vgui/ILocalize.h"
+
 namespace cl {
 
 //#include "vgui_TeamFortressViewport.h"
@@ -1359,7 +1362,8 @@ int CHudAmmo::Draw(float flTime)
 
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 
-		if (pw->iClip >= 0)
+		if (pw->iClip >= 0 &&
+			m_pWeapon->iId != WEAPON_TURBULENT1)
 		{
 			// room for the number and the '|' and the current ammo
 
@@ -1404,24 +1408,30 @@ int CHudAmmo::Draw(float flTime)
 
 			// SPR_Draw a bullets only line
 
-		
-
-			if (gWR.CountAmmo(pw->iAmmoType) > 1500)
+			if (m_pWeapon->iId == WEAPON_TURBULENT1)
 			{
-				x = ScreenWidth - AmmoWidth - iIconWidth;
-				int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
-				x -= width;
-
-				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
-				SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
-				x = ScreenWidth - AmmoWidth - iIconWidth;
+				x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+				x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, pw->iClip, r, g, b);
 			}
 			else
 			{
-				if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+				if (gWR.CountAmmo(pw->iAmmoType) > 1500)
 				{
-					x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
-					x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
+					x = ScreenWidth - AmmoWidth - iIconWidth;
+					int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+					x -= width;
+
+					SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+					SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
+					x = ScreenWidth - AmmoWidth - iIconWidth;
+				}
+				else
+				{
+					if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+					{
+						x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+						x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
+					}
 				}
 			}
 		}
@@ -1531,7 +1541,10 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		|| weaponid == WEAPON_DESTROYER
 		|| weaponid == WEAPON_STARCHASERSR
 		|| weaponid == WEAPON_MOSIN
-		|| weaponid == WEAPON_CARTBLUES)
+		|| weaponid == WEAPON_CARTBLUES
+		|| weaponid == WEAPON_AT4
+		|| weaponid == WEAPON_AT4EX
+		|| weaponid == WEAPON_RPG7)
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )
@@ -1623,7 +1636,7 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	}*/
 	if (data.iAccuracyFlags & CROSSHAIR_COLOR_CUSTOM)
 	{
-		if(weaponid == WEAPON_JANUS11 || weaponid == WEAPON_JANUS3 || weaponid == WEAPON_Z4B_DEATHRAY)
+		if(weaponid == WEAPON_JANUS11 || weaponid == WEAPON_JANUS3 || weaponid == WEAPON_Z4B_DEATHRAY|| weaponid == WEAPON_JANUS3)
 			DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, m_bAdditive, 170, 83, 196, m_iAlpha);
 	}
 	else
@@ -2069,7 +2082,8 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 
-		if (pw->iClip >= 0)
+		if (pw->iClip >= 0 &&
+			m_pWeapon->iId != WEAPON_TURBULENT1)
 		{
 			// room for the number and the '|' and the current ammo
 
@@ -2104,20 +2118,28 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 
 			iX = ScreenWidth - 5 - iIconWidth;
 			// GL Seems to need this
-			if (gWR.CountAmmo(pw->iAmmoType) > 1500)
+			if (m_pWeapon->iId == WEAPON_TURBULENT1)
 			{
-				int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
-				iX -= width;
-
-				SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
-				SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iInfinite));
+				iX -= DrawUtils::GetNEWHudNumberWidth(0, pw->iClip, FALSE, 3, 0);
+				DrawUtils::DrawNEWHudNumber(0, iX, iY, pw->iClip, r, g, b, 255, FALSE, 3);
 			}
 			else
 			{
-				if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+				if (gWR.CountAmmo(pw->iAmmoType) > 1500)
 				{
-					iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
-					DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
+					int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+					iX -= width;
+
+					SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+					SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iInfinite));
+				}
+				else
+				{
+					if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+					{
+						iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
+						DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
+					}
 				}
 			}
 		}
@@ -2203,9 +2225,42 @@ int CHudAmmo::DrawNEWHudCurrentWpn(float flTime)
 
 		gEngfuncs.pfnDrawSetTextColor(1.0f, 1.0f, 1.0f);
 
+		const char* szModifiedWpnName = m_pWeapon->szName;
 		char szWeaponInfo[64];
 
-		sprintf(szWeaponInfo, "%d %s", m_pWeapon->iSlot + 1, m_pWeapon->szName);
+		// strip the monster_* or weapon_* from the inflictor's classname
+		if (!strncmp(szModifiedWpnName, "weapon_", 7))
+			szModifiedWpnName += 7;
+
+		else if (!strncmp(szModifiedWpnName, "knife_", 6))
+			szModifiedWpnName += 6;
+
+		else if (!strncmp(szModifiedWpnName, "func_", 5))
+			szModifiedWpnName += 5;
+
+		char szModifiedWpnName2[64];
+		strcpy(szModifiedWpnName2, szModifiedWpnName);
+
+		if (!strcmp(szModifiedWpnName2, "usp"))
+			strcpy(szModifiedWpnName2, "USP45");
+		else if (!strcmp(szModifiedWpnName2, "deagle"))
+			strcpy(szModifiedWpnName2, "DesertEagle");
+		else if (!strcmp(szModifiedWpnName2, "hegrenade"))
+			strcpy(szModifiedWpnName2, "HE_Grenade");
+
+
+		//Vgui Localize
+		char SzWpnNameCn[64];
+		char SzText[64]; sprintf(SzText, "CSO_%s", szModifiedWpnName2);
+		if (vgui2::localize()->Find(SzText))
+			strcpy(SzWpnNameCn, HudDeathInfo().UnicodeToUTF8(vgui2::localize()->Find(SzText)));
+		else
+		{
+			sprintf(SzText, "#CSO_%s", szModifiedWpnName2);
+			strcpy(SzWpnNameCn, SzText);
+		}
+
+		sprintf(szWeaponInfo, "%d %s", m_pWeapon->iSlot + 1, SzWpnNameCn);
 
 		gEngfuncs.pfnDrawConsoleStringLen(szWeaponInfo, &iLength, &iHeight);
 		gEngfuncs.pfnDrawConsoleString(iX, iY + 1, szWeaponInfo);

@@ -28,6 +28,7 @@
 #include "vgui_controls/KeyRepeat.h"
 #include "MoeLogin.h"
 #include "ModInfo.h"
+#include "MoEBulletIn.h"
 #include "LoadingDialog.h"
 #include "BackgroundMenuButton.h"
 #include "OptionsDialog.h"
@@ -766,6 +767,7 @@ CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 {
 	CGameMenu *menu = new CGameMenu(this, "GameMenu");
 
+	menu->AddMenuItem("#CSO_Bulletin_Notice", "#CSO_Bulletin_Notice", "OpenCSBTEBulletin", this, nullptr);
 	menu->AddMenuItem("#LOGIN_TITLE", "#LOGIN_TITLE", "MoeLogin", this, nullptr);
 	menu->AddMenuItem("#GameUI_CSMoESettings", "#GameUI_CSMoESettings", "OpenMoeSettings", this, nullptr);
     menu->AddMenuItem("#GameUI_Console", "#GameUI_Console", "OpenConsole", this, nullptr);
@@ -1021,6 +1023,11 @@ void CBasePanel::RunMenuCommand(const char *command)
 	{
 		OnOpenMoeLogin();
 	}
+	else if (!Q_stricmp(command, "OpenCSBTEBulletin"))
+	{
+		//OpenCSBTEBulletin();
+		OnOpenSubDialog<CCSBTEBulletin>();
+	}
 
 	else
 		BaseClass::OnCommand(command);
@@ -1140,6 +1147,15 @@ void CBasePanel::OnOpenMoeLogin(void)
 	}
 
 	m_hMoeLogin->Activate();
+}
+void CBasePanel::OpenCSBTEBulletin(void)
+{
+	if (!m_hCSBteBulletIn.Get())
+	{
+		PositionDialog(m_hCSBteBulletIn);
+	}
+
+	m_hCSBteBulletIn->Activate();
 }
 
 void CBasePanel::PositionDialog(vgui2::PHandle dlg)

@@ -320,6 +320,12 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
 							ClientCommand("BTE_ZombieSkill1");
 					}
+					else if (!stricmp(this->m_ZombieClass, "meatwall"))
+					{
+						skillUseRange = 1000;
+						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
+							ClientCommand("BTE_ZombieSkill2");
+					}
 						
 				}
                 else if (m_bIsZombie && event == EVENT_WEAPON_RELOADED)

@@ -142,6 +142,7 @@ public:
 	void OnGameUIHidden(void);
 	void OnOpenMoeSettings(void);
 	void OnOpenMoeLogin(void);
+	void OpenCSBTEBulletin(void);
 
 public:
 	KeyValues *GetConsoleControlSettings(void);
@@ -219,6 +220,7 @@ private:
 	vgui2::DHANDLE<vgui2::QueryBox> m_hQuitQueryBox;
 	vgui2::DHANDLE<vgui2::PropertyDialog> m_hMoeSettings;
 	vgui2::DHANDLE<vgui2::Frame> m_hMoeLogin;
+	vgui2::DHANDLE<vgui2::Frame> m_hCSBteBulletIn;
 	
 	vgui2::AnimationController *m_pConsoleAnimationController;
 	KeyValues *m_pConsoleControlSettings;
@@ -244,7 +246,34 @@ private:
 
 
 public:
-	//CCSBTEGameMenu *m_pGameMenu;
+	template<class T>
+	T* CreateSubDialog(const char* name)
+	{
+		return new T(this, name);
+	}
+	template<class T>
+	T* CreateSubDialog()
+	{
+		return new T(this, typeid(T).name() + 7); // "class CMiao" -> "Miao"
+	}
+	template<class T>
+	vgui2::DHANDLE<T>& GetSubPanelHandle()
+	{
+		static vgui2::DHANDLE<T> x;
+		return x;
+	}
+	template<class T, class...Args>
+	void OnOpenSubDialog(const Args&...args)
+	{
+		auto& handle = GetSubPanelHandle<T>();
+		if (!handle.Get())
+		{
+			handle = CreateSubDialog<T>(args...);
+			PositionDialog(handle);
+		}
+		handle->SetVisible(true);
+		handle->Activate();
+	}
 
 private:
 	CPanelAnimationVar(float, m_flBackgroundFillAlpha, "m_flBackgroundFillAlpha", "0");

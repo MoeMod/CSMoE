@@ -22,10 +22,11 @@ GNU General Public License for more details.
 #include "zb2.h"
 #include "zb2_skill.h"
 #include "hud_sub_impl.h"
-
+#include "player/player_model.h"
 #include "gamemode/zb2/zb2_const.h"
 
 #include <vector>
+#include <calcscreen.h>
 
 namespace cl {
 
@@ -149,6 +150,8 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER | CHudRetina::RETINA_DRAW_TYPE_BLACK, flHoldTime);
 			else if (skilltype == ZOMBIE_SKILL_SCREAM)
 				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER | CHudRetina::RETINA_DRAW_TYPE_BLACK, flHoldTime);
+			else if (skilltype == ZOMBIE_SKILL_RUSH)
+				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime);
 			else if (skilltype == ZOMBIE_SKILL_SHIELD)
 			{
 				int type = buf.ReadByte();
@@ -172,7 +175,45 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 	{
 
 		float flHoldTime = buf.ReadCoord();
-		SetSelectorDrawTime(gHUD.m_flTime, flHoldTime);
+		int iIsPc = buf.ReadByte();
+
+		cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + 10.0;
+		if (iIsPc)
+		{
+			SetSelectorDrawTime(gHUD.m_flTime, flHoldTime);
+		}
+		else
+		{
+			ClientCmd("showvguimenu2 ZombieKeeper");
+		}
+		
+		
+		break;
+	}
+	case ZB2_MESSAGE_ALARM:
+	{
+		int iType = buf.ReadByte();
+		float flValue = buf.ReadCoord();
+		int iValue2 = buf.ReadByte();
+		SendAlarmState(iType, flValue, iValue2);
+		break;
+	}
+	case ZB2_MESSAGE_TRACE_LOW_HEALTH:
+	{
+		m_iLowHealthPlayer = buf.ReadByte();
+		m_flTraceHealthTime = gHUD.m_flTime + buf.ReadCoord();
+		break;
+	}
+	case ZB2_MESSAGE_RECORD_MAXHEALTH:
+	{
+		int idx = buf.ReadByte();
+		float flMaxHealth = buf.ReadShort();
+		g_PlayerExtraInfoEx[idx].iMaxHealth = flMaxHealth;
+		break;
+	}
+	case ZB2_MESSAGE_TRAP:
+	{
+	
 		break;
 	}
 	}
@@ -217,13 +258,22 @@ int CHudZB2::VidInit()
 	m_pBackGroundSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iBackGround);
 
 
-	R_InitTexture(m_iPrevOn, "resource\\hud\\zombie\\zbselect_prev_nor");
-	R_InitTexture(m_iPrevOff, "resource\\hud\\zombie\\zbselect_prev_dim");
-	R_InitTexture(m_iNextOn, "resource\\hud\\zombie\\zbselect_next_nor");
-	R_InitTexture(m_iNextOff, "resource\\hud\\zombie\\zbselect_next_dim");
-	R_InitTexture(m_iCancel, "resource\\hud\\zombie\\zbselect_close");
-	R_InitTexture(m_iBlank, "resource\\hud\\zombie\\zmrewalk_box");
-	R_InitTexture(m_iBanned, "resource\\hud\\zombie\\zombietype_cancel");
+	R_InitTexture(m_iPrevOn, "resource/hud/zombie/zbselect_prev_nor");
+	R_InitTexture(m_iPrevOff, "resource/hud/zombie/zbselect_prev_dim");
+	R_InitTexture(m_iNextOn, "resource/hud/zombie/zbselect_next_nor");
+	R_InitTexture(m_iNextOff, "resource/hud/zombie/zbselect_next_dim");
+	R_InitTexture(m_iCancel, "resource/hud/zombie/zbselect_close");
+	R_InitTexture(m_iBlank, "resource/hud/zombie/zmrewalk_box");
+	R_InitTexture(m_iBanned, "resource/hud/zombie/zombietype_cancel");
+
+	R_InitTexture(m_iLockedImage, "resource/zombiez/level_lock_l");
+	R_InitTexture(m_iLockedImageBg, "resource/zombiez/zombie_lock_bg");
+	R_InitTexture(m_iLockedImageBar, "resource/zombiez/level_lock_bg");
+
+	R_InitTexture(m_iDamageBg, "resource/helperhud/damagebg");
+	R_InitTexture(m_iDamageText, "resource/helperhud/damagetext");
+
+	R_InitTexture(m_iTargetMark, "resource/zombi/targetmark");
 
 	m_flTimeEnd = 0.0f;
 	m_bCanDraw = false;
@@ -235,6 +285,8 @@ int CHudZB2::Draw(float time)
 {
 	pimpl->for_each(&IBaseHudSub::Draw, time);
 	DrawBuffHP();
+	DrawDmgIndicator();
+	DrawBuffHealthBar();
 
 	if (!m_bCanDraw)
 		return 0;
@@ -355,6 +407,19 @@ int CHudZB2::Draw(float time)
 				{
 					m_iIcon[index]->Draw2DQuadScaled(iX, iY, (iX + m_iIcon[index]->w()), (iY + m_iIcon[index]->h()));
 				}
+				if (m_iLevel[index] > gHUD.m_iZlevel)
+				{
+					if (m_iLockedImageBg)
+						m_iLockedImageBg->Draw2DQuadScaled(iX, iY, (iX + m_iIcon[index]->w()), (iY + m_iIcon[index]->h()));
+					if (m_iLockedImage)
+						m_iLockedImage->Draw2DQuadScaled(iX + (m_iIcon[index]->w() - m_iLockedImage->w()) / 2, iY + (m_iIcon[index]->h() - m_iLockedImage->h()) / 2, (iX + (m_iIcon[index]->w() - m_iLockedImage->w()) / 2 + m_iLockedImage->w()), (iY + (m_iIcon[index]->h() - m_iLockedImage->h()) / 2 + m_iLockedImage->h()));
+					if (m_iLockedImageBar)
+						m_iLockedImageBar->Draw2DQuadScaled(iX + (m_iIcon[index]->w() - m_iLockedImageBar->w()) / 2, iY + (m_iIcon[index]->h() - m_iLockedImageBar->h()), (iX + (m_iIcon[index]->w() - m_iLockedImageBar->w()) / 2 + m_iLockedImageBar->w()), (iY + (m_iIcon[index]->h() - m_iLockedImageBar->h()) + m_iLockedImageBar->h()));
+
+					char SzText[16]; sprintf(SzText, "Lv.%d", m_iLevel[index]);
+					gEngfuncs.pfnDrawSetTextColor(255 / 255.0f, 99 / 255.0f, 71 / 255.0f);
+					DrawUtils::DrawConsoleString(iX + 8, iY + 35, SzText);
+				}
 
 				if (m_bBanned[index])
 				{
@@ -466,6 +531,142 @@ int CHudZB2::DrawBuffHP()
 
 	return 1;
 }
+void CHudZB2::DrawDmgIndicator()
+{
+	int iTopRecordId[3]{};
+	float flTopRecordData[3]{};
+
+	//循环所有玩家
+	for (int iId = 1; iId <= gEngfuncs.GetMaxClients(); ++iId)
+	{
+		//循环排名前三的三个槽位
+		for (int i = 0; i < 3; i++)
+		{
+			float flDamage = (float)g_iDamageTotal[iId];
+			if (!iTopRecordId[i] || flTopRecordData[i] <= flDamage)
+			{
+				//前二名
+				if (i < 2)
+				{
+					for (int j = 1; j >= i; j--)
+					{
+						iTopRecordId[j + 1] = iTopRecordId[j];
+						flTopRecordData[j + 1] = flTopRecordData[j];
+					}
+				}
+				iTopRecordId[i] = iId;
+				flTopRecordData[i] = flDamage;
+				break;
+			}
+		}
+	}
+
+	if (!iTopRecordId[0] || !iTopRecordId[1] || !iTopRecordId[2])
+		return;
+
+	int iX = 30;
+	int iY = gHUD.m_iMapHeight + gHUD.m_NEWHUD_iFontHeight_Dollar * 2 + m_iDamageBg->h() * 0.75;
+
+	iY -= m_iDamageText->h();
+	m_iDamageText->Draw2DQuadScaled(iX, iY, (iX + m_iDamageText->w()), (iY + m_iDamageText->h()));
+	iY += m_iDamageText->h();
+
+	for (int iImage = 0; iImage < 3; ++iImage)
+	{
+		m_iDamageBg->Draw2DQuadScaled(iX, iY, (iX + m_iDamageBg->w()), (iY + m_iDamageBg->h()));
+
+		iX += 20;
+		
+		//Draw Rank Num
+		int iTextHeight = gHUD.m_DrawFontText.GetFontTextHeight("Default", 20);
+		const wchar_t* SzRank = gHUD.m_DeathInfo.UTF8ToUnicode(std::to_string(iImage + 1).c_str());
+		gHUD.m_DrawFontText.DrawFontText("Default", 20, iX, iY + iTextHeight / 2, 255, 255, 255, 255, SzRank);
+
+		const char* SzName = g_PlayerInfoList[iTopRecordId[iImage]].name;
+		const int IsZombie = g_PlayerExtraInfo[iTopRecordId[iImage]].zombie;
+
+		iX += 20;
+
+		//Draw Rank Name
+		int iTextLen = gHUD.m_DrawFontText.GetFontTextWide("Default", 16, gHUD.m_DeathInfo.UTF8ToUnicode(SzName));
+		iTextHeight = gHUD.m_DrawFontText.GetFontTextHeight("Default", 16);
+
+		if(SzName)
+			gHUD.m_DrawFontText.DrawFontText("Default", 16, iX, iY + iTextHeight, IsZombie ? 146 : 99, IsZombie ? 75 : 116, IsZombie ? 81 : 146, 255, gHUD.m_DeathInfo.UTF8ToUnicode(SzName));
+
+		float flPercent; flPercent = (flTopRecordData[iImage] / g_flDamageInAll);
+		char SzData[64]; sprintf(SzData, "%.1f K(%d%%)", flTopRecordData[iImage] / 1000.0, (int)(flPercent * 100.0));
+
+		int iWideBar = 120, iHeightBar = 12;
+		int iBarRect = int(min((float)iWideBar, (iWideBar * (flTopRecordData[iImage] / (flTopRecordData[0] > 0.0 ? flTopRecordData[0] : 1.0)))));
+		FillRGBABlend(iX, (iY + m_iDamageBg->h()) - iHeightBar - iTextHeight / 2, iBarRect, iHeightBar, IsZombie ? 146 : 99, IsZombie ? 75 : 116, IsZombie ? 81 : 146, 200);
+
+		//Draw Rank Data
+		if (flTopRecordData[iImage])
+		{
+			iTextLen = gHUD.m_DrawFontText.GetFontTextWide("ChatDefault", -1, gHUD.m_DeathInfo.UTF8ToUnicode(SzData));
+			int iTextX = m_iDamageBg->w() + 30 - iTextLen;
+
+			gHUD.m_DrawFontText.DrawFontText("ChatDefault", -1, iTextX, (iY + m_iDamageBg->h()) - iHeightBar - iTextHeight, 255, 255, 255, 255, gHUD.m_DeathInfo.UTF8ToUnicode(SzData));
+		}
+
+		iX -= 40;
+		iY += m_iDamageBg->h();
+	}
+
+
+}
+
+void CHudZB2::DrawBuffHealthBar()
+{
+	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
+
+	cl_entity_t* pLocal = gEngfuncs.GetLocalPlayer();
+
+	if (PlayerClassManager().GetPlayerClass(pLocal->index).m_iBitsShowState & SHOW_TRACE_LOW_HEALTH)
+	{
+		for (int i = 0; i < 33; i++)
+		{
+			if (i == pLocal->index)
+				continue;
+
+			if (g_PlayerExtraInfo[i].dead)
+				continue;
+
+			if (!g_PlayerExtraInfo[i].zombie)
+				continue;
+
+			hud_player_info_t hPlayer;
+			gEngfuncs.pfnGetPlayerInfo(i, &hPlayer);
+
+			if (hPlayer.name)
+			{
+				float percent = g_PlayerExtraInfo[m_iLowHealthPlayer].health / (float)g_PlayerExtraInfoEx[m_iLowHealthPlayer].iMaxHealth;
+				if (percent > 0.2f)
+					continue;
+
+				cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(i);
+
+				if (!pPlayer)
+					continue;
+
+				vec3_t vecSub;
+				VectorSubtract(pPlayer->origin, pLocal->origin, vecSub);
+				if (VectorLength(vecSub) > 1024)
+					continue;
+
+				float vecScreen[2];
+				if (CalcScreen(pPlayer->origin, vecScreen))
+				{
+					int iX = (vecScreen[0] - m_iTargetMark->w() / 2);
+					int iY = (vecScreen[1] - m_iTargetMark->h() / 2);
+					m_iTargetMark->Draw2DQuadScaled(iX, iY, iX + m_iTargetMark->w(), iY + m_iTargetMark->h());
+				}
+				
+			}
+		}
+	}
+}
 
 void CHudZB2::Think()
 {
@@ -557,6 +758,9 @@ bool CHudZB2::Selector(int item)
 			if (!m_bDraw[iNum] || m_bBanned[iNum])
 				return false;
 
+			if (m_iLevel[iNum] > gHUD.m_iZlevel)
+				return false;
+
 			sprintf(ch, "BTE_Zb_Select_Zombie%d\n", iNum);
 			gEngfuncs.pfnClientCmd(ch);
 
@@ -579,6 +783,10 @@ void CHudZB2::SetSelectorIconBan(int slot)
 {
 	m_bBanned[slot] = true;
 }
+void CHudZB2::SetSelectorIconLevel(int slot, int level)
+{
+	m_iLevel[slot] = level;
+}
 void CHudZB2::ClearSelector()
 {
 	memset(m_bDraw, false, sizeof(m_bDraw));
@@ -599,6 +807,97 @@ bool CHudZB2::SelectorCanDraw()
 {
 	return m_bCanDraw;
 
+}
+
+void CHudZB2::SendAlarmState(int iType, float flValue, int iValue2)
+{
+	if (!iType)
+	{
+		m_flAliveTime = 0.0;
+		for (int i = 0; i < MAX_CLIENTS + 1; i++)
+		{
+			g_fLastAssist[(int)flValue][i] = 0.0;
+		}
+	}
+	else
+	{
+		switch (iType)
+		{
+		case 1:
+		{
+			m_flAliveTime = gHUD.m_flTime + flValue;
+			break;
+		}
+		case 2:
+		{
+			if (flValue)
+			{
+				if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+					NewAlarm().SetAlarm(ALARM_ZOMBIETANKER);
+			}
+			break;
+		}
+		case 3:
+		{
+			g_fLastAssist[(int)flValue][gEngfuncs.GetLocalPlayer()->index] = gHUD.m_flTime + 5.0f;
+			break;
+		}
+		case 4:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_ATTACKER);
+			break;
+		}
+		case 5:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_BESTMOMENT);
+			break;
+		}
+		case 6:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_HOLDOUT);
+			break;
+		}
+		case 7:
+		{
+			g_PlayerExtraInfoEx[iValue2].assisttime[1][(int)flValue] = gHUD.m_flTime + 5.0f;
+			break;
+		}
+		case 8:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_DROPWEAPON);
+			break;
+		}
+		case 9:
+		{
+			if ((int)flValue == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_HIDE);
+			break;
+		}
+		case 10:
+		{
+			float flRecovery = flValue;
+			if (m_flRecoveryAmount < 4500.0)
+				m_flRecoveryAmount += flRecovery;
+			else
+			{
+				m_flRecoveryAmount = 0.0;
+				if (iValue2 == gEngfuncs.GetLocalPlayer()->index)
+					NewAlarm().SetAlarm(ALARM_HEALER);
+			}
+			break;
+		}
+		case 11:
+		{
+			if (iValue2 == gEngfuncs.GetLocalPlayer()->index)
+				NewAlarm().SetAlarm(ALARM_BATPULL);
+			break;
+		}
+		}
+	}
 }
 
 }

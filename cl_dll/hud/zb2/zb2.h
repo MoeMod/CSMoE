@@ -36,13 +36,26 @@ public:
 	void SetSelectorDrawTime(float flTime, float flDisplayTime);
 	void SetSelectorIcon(int slot, const char* name);
 	void SetSelectorIconBan(int slot);
+	void SetSelectorIconLevel(int slot, int level);
 	bool Selector(int i);
 	bool SelectorCanDraw();
+
+	//dmg indicator
+	void DrawDmgIndicator();
+
+	void DrawBuffHealthBar();
+	//Alarm
+	void SendAlarmState(int iType, float flValue, int iValue2);
 
 public:
 	class CHudZB2_impl_t *pimpl = nullptr;
 	float m_flBuffHealth;
 	int m_BuffHealthCross;
+
+	//Alarm
+	float m_flAliveTime;
+	float m_flPlayerMoveDis = 0.0;
+	float m_flRecoveryAmount = 0.0;
 
 	//zombie selector
 	bool m_bCanDraw;
@@ -50,6 +63,7 @@ public:
 	int m_iPage;
 	int m_iMax;
 	bool m_bBanned[64];
+	int m_iLevel[64];
 
 private:
 	//zombie selector
@@ -71,5 +85,21 @@ private:
 	UniqueTexture m_iBlank;
 	UniqueTexture m_iBanned;
 	UniqueTexture m_iCancel;
+
+	UniqueTexture m_iLockedImage;
+	UniqueTexture m_iLockedImageBg;
+	UniqueTexture m_iLockedImageBar;
+
+	//dmg indicator
+	UniqueTexture m_iDamageBg;
+	UniqueTexture m_iDamageText;
+
+	UniqueTexture m_iTargetMark;
+
+	int m_iLowHealthPlayer;
+	float m_flTraceHealthTime;
+
+
+
 };
 }

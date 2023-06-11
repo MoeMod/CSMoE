@@ -26,15 +26,17 @@ auto FDotProduct(VectorTypeA a, VectorTypeB b) -> decltype(fabs((a[0])*(b[0])) +
 }
 
 namespace cl {
-//void    AngleMatrix (const float *angles, float (*matrix)[4]);
-//int		VectorCompare (const float *v1, const float *v2);
-//void	CrossProduct (const float *v1, const float *v2, float *cross);
-//void	VectorTransform (const float *in1, float in2[3][4], float *out);
-void	ConcatTransforms (cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out);
-void	MatrixCopy( cmatrix3x4 in, matrix3x4_ref out );
-void	QuaternionMatrix( const vec4_t quaternion, matrix3x4_ref matrix );
-void	QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt );
-void	AngleQuaternion( const vec3_t angles, vec4_t_ref quaternion );
+void    XASH_VECTORCALL AngleMatrix (const vec3_t angles, matrix3x4_ref matrix);
+int		XASH_VECTORCALL VectorCompare (const vec3_t v1, const vec3_t v2);
+void	XASH_VECTORCALL CrossProduct (const vec3_t v1, const vec3_t v2, vec3_t_ref cross);
+void	XASH_VECTORCALL VectorTransform (const vec3_t in1, cmatrix3x4 in2, vec3_t_ref out);
+
+void	XASH_VECTORCALL ConcatTransforms (cmatrix3x4 in1, cmatrix3x4 in2, matrix3x4_ref out);
+void	XASH_VECTORCALL MatrixCopy( cmatrix3x4 in, matrix3x4_ref out );
+void	XASH_VECTORCALL QuaternionMatrix( const vec4_t quaternion, matrix3x4_ref matrix );
+void	XASH_VECTORCALL QuaternionSlerp( const vec4_t p, vec4_t q, float t, vec4_t_ref qt );
+void    XASH_VECTORCALL QuaternionSlerpX4(const vec4_t p[4], vec4_t q[4], float t, vec4_t qt[4]);
+void	XASH_VECTORCALL AngleQuaternion( const vec3_t angles, vec4_t_ref quaternion );
 }
 
 #endif // STUDIO_UTIL_H

@@ -33,7 +33,7 @@ namespace sv {
                 UTIL_ClientPrintAll(HUD_PRINTCENTER, "终极猎手 %s 出现了", STRING(adminid->pev->netname));
 
                 MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, adminid->edict());
-                WRITE_BYTE(7);
+                WRITE_BYTE(8);
                 WRITE_BYTE(1);
                 WRITE_BYTE(2);
                 MESSAGE_END();
@@ -52,7 +52,7 @@ namespace sv {
                 UTIL_ClientPrintAll(HUD_PRINTCENTER, "时空猎手 %s 出现了", STRING(adminid->pev->netname));
 
                 MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, adminid->edict());
-                WRITE_BYTE(7);
+                WRITE_BYTE(8);
                 WRITE_BYTE(2);
                 WRITE_BYTE(2);
                 MESSAGE_END();
@@ -71,7 +71,7 @@ namespace sv {
                 UTIL_ClientPrintAll(HUD_PRINTCENTER, "圣拳猎手 %s 出现了", STRING(adminid->pev->netname));
 
                 MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, adminid->edict());
-                WRITE_BYTE(7);
+                WRITE_BYTE(8);
                 WRITE_BYTE(3);
                 WRITE_BYTE(2);
                 MESSAGE_END();
@@ -90,22 +90,31 @@ namespace sv {
                 UTIL_ClientPrintAll(HUD_PRINTCENTER, "救赎猎手 %s 出现了", STRING(adminid->pev->netname));
 
                 MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, adminid->edict());
-                WRITE_BYTE(7);
+                WRITE_BYTE(8);
                 WRITE_BYTE(5);
                 WRITE_BYTE(2);
                 MESSAGE_END();
             }
-            if (context.item("LastHero", "动力机甲"))
+            /*if (context.item("MechanicHero", "机械猎手"))
             {
                 adminid->RemoveAllItems(FALSE);
-                adminid->m_bHasPrimary = false;
-                adminid->m_bHolsterDisabled = true;
-                SET_CLIENT_KEY_VALUE(adminid->entindex(), GET_INFO_BUFFER(adminid->edict()), "model", "lasthero");
-                adminid->SetNewPlayerModel("models/player/lasthero/lasthero.mdl");
-                adminid->GiveNamedItem("weapon_herochainsaw");
+                adminid->m_bHolsterDisabled = false;
+                SET_CLIENT_KEY_VALUE(adminid->entindex(), GET_INFO_BUFFER(adminid->edict()), "model", "mechanichero");
+                adminid->SetNewPlayerModel("models/player/mechanichero/mechanichero.mdl");
+                adminid->GiveNamedItem("z4b_mechanicherogun");
+                adminid->GiveNamedItem("z4b_mechanicxm214");
+                adminid->GiveNamedItem("z4b_mechanichand");
 
-                UTIL_ClientPrintAll(HUD_PRINTCENTER, "动力机甲 %s 已投放完毕", STRING(adminid->pev->netname));
-            }
+                EMIT_SOUND(adminid->edict(), CHAN_AUTO, "zombi/ghosthunterappear.wav", VOL_NORM, ATTN_NORM);
+
+                UTIL_ClientPrintAll(HUD_PRINTCENTER, "机械猎手 %s 出现了", STRING(adminid->pev->netname));
+
+                MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, adminid->edict());
+                WRITE_BYTE(8);
+                WRITE_BYTE(6);
+                WRITE_BYTE(2);
+                MESSAGE_END();
+            }*/
             context.end(adminid);
         });
     }

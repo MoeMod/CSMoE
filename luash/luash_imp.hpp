@@ -10,6 +10,7 @@
 #include "meta/StructBreak.hpp"
 #include <nameof.hpp>
 
+#include "luash_lambda.hpp"
 #include "luash_meta.hpp"
 #include "luash_ref.hpp"
 #include "luash_push.hpp"

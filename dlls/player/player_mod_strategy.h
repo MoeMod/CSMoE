@@ -85,6 +85,7 @@ public:
 	virtual void Holster_Post(CBasePlayerWeapon* weapon) = 0;
 	virtual void UpdateStatusBar(CBaseEntity *pEntity, char *sbuf0, int* newSBarState) = 0;
 	virtual BOOL OnReactToDeimosTail() = 0;
+	virtual int DeathCallBack(CBasePlayer* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) = 0;
 	
 };
 
@@ -137,6 +138,7 @@ public:
 	void Holster_Post(CBasePlayerWeapon* weapon) {};
 	void UpdateStatusBar(CBaseEntity* pEntity, char* sbuf0, int *newSBarState) override {};
 	BOOL OnReactToDeimosTail() override { return false; };
+	int DeathCallBack(CBasePlayer* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

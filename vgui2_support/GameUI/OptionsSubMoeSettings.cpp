@@ -28,6 +28,9 @@ COptionsSubMoeSettings::COptionsSubMoeSettings(vgui2::Panel *parent) : PropertyP
 	m_pHudStyle = new CLabeledCommandComboBox(this, "HudStyleComboBox");
 	InitHudStyleList(m_pHudStyle);
 
+	m_pAlarmStyle = new CLabeledCommandComboBox(this, "AlarmStyleComboBox");
+	InitAlarmStyleList(m_pAlarmStyle);
+
 	m_pTexlru = new CLabeledCommandComboBox(this, "TexlruComboBox");
 	InitTexlruList(m_pTexlru);
 
@@ -159,7 +162,25 @@ void COptionsSubMoeSettings::InitHudStyleList(CLabeledCommandComboBox* cb)
 
 	cb->SetInitialItem(initialType);
 }
+void COptionsSubMoeSettings::InitAlarmStyleList(CLabeledCommandComboBox* cb)
+{
+	if (cb == NULL)
+		return;
 
+	cb->Reset();
+
+	cb->AddItem("#CSMoE_AlarmStyle_New", "alarm_style 0");
+	cb->AddItem("#CSMoE_AlarmStyle_Old", "alarm_style 1");
+
+	auto value = engine->pfnGetCvarString("alarm_style");
+
+	if (!value)
+		return;
+
+	int initialType = atoi(value);
+
+	cb->SetInitialItem(initialType);
+}
 void COptionsSubMoeSettings::InitTexlruList(CLabeledCommandComboBox* cb)
 {
 	if (cb == NULL)
@@ -231,6 +252,7 @@ void COptionsSubMoeSettings::OnResetData()
 	m_pFloatingDamageType->Reset();
 	m_pSiFiAmmoType->Reset();
 	m_pHudStyle->Reset();
+	m_pAlarmStyle->Reset();
 	m_pTexlru->Reset();
 	m_pHudScale->Reset();
 	m_pGammaSlider->Reset();
@@ -248,6 +270,9 @@ void COptionsSubMoeSettings::OnApplyChanges()
 
 	if (m_pHudStyle)
 		m_pHudStyle->ApplyChanges();
+
+	if (m_pAlarmStyle)
+		m_pAlarmStyle->ApplyChanges();
 
 	if (m_pTexlru)
 		m_pTexlru->ApplyChanges();

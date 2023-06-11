@@ -8,7 +8,6 @@ import android.content.res.AssetManager;
 import android.view.*;
 import android.os.*;
 import android.util.*;
-import android.content.pm.*;
 import android.net.Uri;
 
 import java.io.File;
@@ -233,6 +232,16 @@ public class XashActivity extends SDLActivity {
 	{
 		DisplayMetrics metrics = XashActivity.getContext().getResources().getDisplayMetrics();
 		return metrics.density;
+	}
+
+	@Override
+	public void onTrimMemory(int level)
+	{
+		super.onTrimMemory(level);
+		if (level == TRIM_MEMORY_RUNNING_CRITICAL || level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_MODERATE)
+		{
+			nativeLowMemory();
+		}
 	}
 
 	public static void logToBugly(String str)

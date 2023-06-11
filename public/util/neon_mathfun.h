@@ -225,7 +225,7 @@ inline v4sf exp_ps(v4sf x) {
    sincos_ps..
   */
 inline void sincos_ps(v4sf x, v4sf *ysin, v4sf *ycos) { // any x
-  v4sf xmm1, xmm2, xmm3, y;
+  v4sf y;
 
   v4su emm2;
   
@@ -234,7 +234,7 @@ inline void sincos_ps(v4sf x, v4sf *ysin, v4sf *ycos) { // any x
   x = vabsq_f32(x);
 
   /* scale by 4/Pi */
-  y = vmulq_f32(x, vdupq_n_f32(c_cephes_FOPI));
+  y = vmulq_n_f32(x, c_cephes_FOPI);
 
   /* store the integer part of y in mm0 */
   emm2 = vcvtq_u32_f32(y);
@@ -253,12 +253,9 @@ inline void sincos_ps(v4sf x, v4sf *ysin, v4sf *ycos) { // any x
   
   /* The magic pass: "Extended precision modular arithmetic" 
      x = ((x - y * DP1) - y * DP2) - y * DP3; */
-  xmm1 = vmulq_n_f32(y, c_minus_cephes_DP1);
-  xmm2 = vmulq_n_f32(y, c_minus_cephes_DP2);
-  xmm3 = vmulq_n_f32(y, c_minus_cephes_DP3);
-  x = vaddq_f32(x, xmm1);
-  x = vaddq_f32(x, xmm2);
-  x = vaddq_f32(x, xmm3);
+  x = vfmaq_n_f32(x, y, c_minus_cephes_DP1);
+  x = vfmaq_n_f32(x, y, c_minus_cephes_DP2);
+  x = vfmaq_n_f32(x, y, c_minus_cephes_DP3);
 
   sign_mask_sin = veorq_u32(sign_mask_sin, vtstq_u32(emm2, vdupq_n_u32(4)));
   sign_mask_cos = vtstq_u32(vsubq_u32(emm2, vdupq_n_u32(2)), vdupq_n_u32(4));
@@ -268,20 +265,15 @@ inline void sincos_ps(v4sf x, v4sf *ysin, v4sf *ycos) { // any x
   v4sf z = vmulq_f32(x,x);
   v4sf y1, y2;
 
-  y1 = vmulq_n_f32(z, c_coscof_p0);
-  y2 = vmulq_n_f32(z, c_sincof_p0);
-  y1 = vaddq_f32(y1, vdupq_n_f32(c_coscof_p1));
-  y2 = vaddq_f32(y2, vdupq_n_f32(c_sincof_p1));
-  y1 = vmulq_f32(y1, z);
-  y2 = vmulq_f32(y2, z);
-  y1 = vaddq_f32(y1, vdupq_n_f32(c_coscof_p2));
-  y2 = vaddq_f32(y2, vdupq_n_f32(c_sincof_p2));
+  y1 = vfmaq_n_f32(vdupq_n_f32(c_coscof_p1), z, c_coscof_p0);
+  y2 = vfmaq_n_f32(vdupq_n_f32(c_sincof_p1), z, c_sincof_p0);
+  y1 = vfmaq_f32(vdupq_n_f32(c_coscof_p2), y1, z);
+  y2 = vfmaq_f32(vdupq_n_f32(c_sincof_p2), y2, z);
   y1 = vmulq_f32(y1, z);
   y2 = vmulq_f32(y2, z);
   y1 = vmulq_f32(y1, z);
-  y2 = vmulq_f32(y2, x);
-  y1 = vsubq_f32(y1, vmulq_f32(z, vdupq_n_f32(0.5f)));
-  y2 = vaddq_f32(y2, x);
+  y1 = vfmsq_n_f32(y1, z, 0.5f);
+  y2 = vfmaq_f32(x, y2, x);
   y1 = vaddq_f32(y1, vdupq_n_f32(1));
 
   /* select the correct result from the two polynoms */  
@@ -303,4 +295,63 @@ inline v4sf cos_ps(v4sf x) {
   return ycos;
 }
 
+static const float asinf_lut[7] = {
+        1.5707961728,
+        -0.2145852647,
+        0.0887556286,
+        -0.0488025043,
+        0.0268999482,
+        -0.0111462294,
+        0.0022959648
+};
+
+inline void asincos_ps(float32x4_t x, float32x4_t* yasin, float32x4_t* yacos)
+{
+    float32x4_t one = vdupq_n_f32(1);
+    float32x4_t negone = vdupq_n_f32(-1);
+    float32x4_t lut[7];
+    float32x4_t xv[5];
+    float32x4_t sat = vdupq_n_f32(0.9999999f);
+    float32x4_t m_pi_2 = vdupq_n_f32(1.570796326);
+    for (int i = 0; i <= 6; i++)
+        lut[i] = vdupq_n_f32(asinf_lut[i]);
+
+    uint32x4_t sign_mask_asin = vcltq_f32(x, vdupq_n_f32(0));
+    x = vabsq_f32(x);
+    uint32x4_t saturate = vcgeq_f32(x, one);
+    x = vbslq_f32(saturate, sat, x);
+    float32x4_t y = vsubq_f32(one, x);
+    y = vsqrtq_f32(y);
+
+    xv[0] = vmulq_f32(x, x);
+    for (int i = 1; i < 5; i++)
+        xv[i] = vmulq_f32(xv[i - 1], x);
+
+    float32x4_t a0 = vaddq_f32(lut[0], vmulq_f32(lut[1], x));
+    float32x4_t a1 = vaddq_f32(vmulq_f32(lut[2], xv[0]), vmulq_f32(lut[3], xv[1]));
+    float32x4_t a2 = vaddq_f32(vmulq_f32(lut[4], xv[2]), vmulq_f32(lut[5], xv[3]));
+    float32x4_t a3 = vmulq_f32(lut[6], xv[4]);
+    float32x4_t phx = vaddq_f32(vaddq_f32(a0, vaddq_f32(a1, a2)), a3);
+
+    float32x4_t arcsinx = vmulq_f32(y, phx);
+    arcsinx = vsubq_f32(m_pi_2, arcsinx);
+    float32x4_t arcnsinx = vmulq_f32(negone, arcsinx);
+    arcsinx = vbslq_f32(sign_mask_asin, arcnsinx, arcsinx);
+    *yasin = arcsinx;
+    *yacos = vsubq_f32(m_pi_2, arcsinx);
+}
+
+inline float32x4_t asin_ps(float32x4_t x)
+{
+    float32x4_t yasin, yacos;
+    asincos_ps(x, &yasin, &yacos);
+    return yasin;
+}
+
+inline float32x4_t acos_ps(float32x4_t x)
+{
+    float32x4_t yasin, yacos;
+    asincos_ps(x, &yasin, &yacos);
+    return yacos;
+}
 

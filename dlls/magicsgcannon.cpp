@@ -4,10 +4,10 @@
 #include "player.h"
 #include "weapons.h"
 
-#include "weapons/KnifeAttack.h"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
+#include <gamemode/mod_zb2.h>
 
 namespace sv {
 	LINK_ENTITY_TO_CLASS(magicsg_cannon, CMagicSgCannon)
@@ -208,7 +208,7 @@ namespace sv {
 								CBasePlayer* pPlayer = (CBasePlayer*)pOther;
 								if (pPlayer->m_bIsZombie)
 								{
-									auto pStrategy = dynamic_cast<CPlayerModStrategy_ZB1*>(pPlayer->m_pModStrategy.get());
+									auto pStrategy = dynamic_cast<CPlayerModStrategy_ZB2*>(pPlayer->m_pModStrategy.get());
 									if (pStrategy)
 									{
 										pStrategy->SetBanSkillsTime(5.0s);

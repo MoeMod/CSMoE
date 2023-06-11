@@ -145,7 +145,11 @@ stream_t *Stream_OpenMPG( const char *filename )
 	if( ret ) MsgDev( D_ERROR, "%s\n", get_error( mpeg ));
 #endif
 	// trying to open stream and read header
-	if( !open_mpeg_stream( mpeg, file, (pfread)FS_Read, (pfseek)FS_Seek, &sc ))
+	
+	if( !open_mpeg_stream( mpeg, file, 
+		(pfread)[](void* handle, void* buf, size_t count) -> mpg123_ssize_t { return FS_Read((file_t*)handle, buf, count); }, 
+		(pfseek)[](void* handle, off_t offset, int whence) -> off_t { return FS_Seek((file_t*)handle, offset, whence) == -1 ? -1 : FS_Tell((file_t*)handle); }, 
+		&sc))
 	{
 #ifdef _DEBUG
 		MsgDev( D_ERROR, "Stream_OpenMPG: failed to load (%s): %s\n", filename, get_error( mpeg ));

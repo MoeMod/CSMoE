@@ -353,7 +353,7 @@ void Con_CheckResize( void )
 {
 	int	i, j, width, numlines, numchars;
 	int	oldwidth, oldtotallines;
-	short	tbuf[CON_TEXTSIZE];
+	static short	tbuf[CON_TEXTSIZE];
 	int	charWidth = 8;
 
 	if( con.curFont && con.curFont->hFontTexture )

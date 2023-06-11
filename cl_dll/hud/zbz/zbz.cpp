@@ -48,7 +48,7 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 	{
 		int lv = buf.ReadByte();
 		int exp = buf.ReadShort();
-		int point = buf.ReadByte();
+		int point = buf.ReadShort();
 		pimpl->get<CHudZBZ_Skill>().UpdateLevel(lv, exp, point);
 		break;
 	}

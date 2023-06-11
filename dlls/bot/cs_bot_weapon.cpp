@@ -379,6 +379,8 @@ bool isSniperRifle(CBasePlayerItem *item)
 	case WEAPON_MOSIN:
 	case WEAPON_Z4B_DEATHRAY:
 	case WEAPON_CARTBLUES:
+	case WEAPON_AT4:
+	case WEAPON_AT4EX:
 		return true;
 
 	default:
@@ -514,7 +516,8 @@ bool CCSBot::IsUsingMachinegun() const
 		weapon->m_iId == WEAPON_POISONGUN ||
 		weapon->m_iId == WEAPON_WATERCANNON ||
 		weapon->m_iId == WEAPON_WONDERCANNONEX ||
-		weapon->m_iId == WEAPON_DRILLGUN)
+		weapon->m_iId == WEAPON_DRILLGUN || 
+		weapon->m_iId == WEAPON_BAZOOKA)
 		return true;
 
 	return false;
@@ -793,7 +796,9 @@ bool CCSBot::IsUsingGrenade() const
 		weapon->m_iId == WEAPON_HEGRENADE ||
 		weapon->m_iId == WEAPON_PATROLDRONE ||
 		weapon->m_iId == WEAPON_DIVINETITAN ||
-		weapon->m_iId == WEAPON_BUNKERBUSTER)
+		weapon->m_iId == WEAPON_BUNKERBUSTER ||
+		weapon->m_iId == WEAPON_SBMINE ||
+		weapon->m_iId == WEAPON_CLAYMORE)
 		return true;
 
 	return false;
@@ -806,7 +811,9 @@ bool CCSBot::IsUsingHEGrenade() const
 	if (weapon != NULL && (weapon->m_iId == WEAPON_HEGRENADE || 
 		weapon->m_iId == WEAPON_PATROLDRONE || 
 		weapon->m_iId == WEAPON_DIVINETITAN ||
-		weapon->m_iId == WEAPON_BUNKERBUSTER))
+		weapon->m_iId == WEAPON_BUNKERBUSTER ||
+		weapon->m_iId == WEAPON_SBMINE ||
+		weapon->m_iId == WEAPON_CLAYMORE))
 		return true;
 
 	return false;

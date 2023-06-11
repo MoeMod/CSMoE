@@ -39,6 +39,12 @@ typedef struct lua_State lua_State;
 #define U_VECTOR_SIMD U_VECTOR_NEON
 #endif
 
+#ifdef _MSC_VER
+#define U_VECTOR_FORCEINLINE __forceinline
+#else
+#define U_VECTOR_FORCEINLINE inline
+#endif
+
 namespace moe {
 
 template<class T, std::size_t N, std::size_t Align = alignof(T)>
@@ -56,7 +62,7 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align, Base> : Base
 	template<class U = std::nullptr_t>
 	constexpr VectorBase_Gen(typename std::type_identity<U>::type ) : Base()
 	{
-        std::fill_n(this->m_data, N, NAN);
+        (..., (this->m_data[I] = NAN));
 	}
 	constexpr VectorBase_Gen(std::initializer_list<T> il) : VectorBase_Gen(il.begin())
 	{
@@ -171,6 +177,7 @@ struct VectorBase_Storage<T, 3, Align> : VectorBase_Gen<T, 3, std::index_sequenc
 struct VectorBase4f_SIMD_Data
 {
     constexpr VectorBase4f_SIMD_Data() : m_data{} {}
+    constexpr VectorBase4f_SIMD_Data(float x1, float y1, float z1, float w1) : x(x1), y(y1), z(z1), w(w1) {}
     union
     {
         float m_data[4];
@@ -185,6 +192,7 @@ struct VectorBase4f_SIMD_Data
 struct VectorBase3f_SIMD_Data
 {
     constexpr VectorBase3f_SIMD_Data() : m_data{}, m_data_unused{} {}
+    constexpr VectorBase3f_SIMD_Data(float x1, float y1, float z1) : x(x1), y(y1), z(z1), w_ununsed() {}
     union
     {
         struct
@@ -247,7 +255,7 @@ template<> struct VectorBase_Storage<float, 3, 16> : VectorBase_Gen<float, 3, st
         this->m_xmm = xmm;
     }
 
-    operator xmm_t() const
+    operator const xmm_t &() const
     {
         return this->m_xmm;
     }
@@ -313,7 +321,7 @@ template<> struct VectorBase_Storage<float, 4, 16> : VectorBase_Gen<float, 4, st
         this->m_xmm = xmm;
     }
 
-    operator xmm_t() const
+    operator const xmm_t &() const
     {
         return this->m_xmm;
     }
@@ -628,7 +636,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
     template<std::size_t I> friend const T &get(const ThisClass &v) { return v.template get<I>(); }
     template<std::size_t I> friend const T &&get(const ThisClass &&v) { return std::move(v).template get<I>(); }
 
-    bool operator==(ThisClass v) const
+    U_VECTOR_FORCEINLINE bool operator==(ThisClass v) const
     {
 #if U_VECTOR_NEON
         return !vaddvq_u32(vceqq_f32(*this, v));
@@ -637,7 +645,13 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return 0xF == _mm_movemask_ps(_mm_cmpeq_ps(*this, v.m_xmm));
 #endif
     }
-    ThisClass operator+(ThisClass v) const
+#if !__cpp_impl_three_way_comparison
+    U_VECTOR_FORCEINLINE bool operator!=(ThisClass v) const
+    {
+        return !operator==(v);
+    }
+#endif
+    U_VECTOR_FORCEINLINE ThisClass operator+(ThisClass v) const
     {
 #if U_VECTOR_NEON
         return vaddq_f32(*this, v);
@@ -645,7 +659,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return _mm_add_ps(*this, v.m_xmm);
 #endif
     }
-    ThisClass operator-(ThisClass v) const
+    U_VECTOR_FORCEINLINE ThisClass operator-(ThisClass v) const
     {
 #if U_VECTOR_NEON
         return vsubq_f32(*this, v);
@@ -653,11 +667,11 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return _mm_sub_ps(*this, v.m_xmm);
 #endif
     }
-    ThisClass operator+() const
+    U_VECTOR_FORCEINLINE ThisClass operator+() const
     {
         return *this;
     }
-    ThisClass operator-() const
+    U_VECTOR_FORCEINLINE ThisClass operator-() const
     {
 #if U_VECTOR_NEON
         return vnegq_f32(*this);
@@ -665,7 +679,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return ThisClass(_mm_setzero_ps()) - (const ThisClass &)*this;
 #endif
     }
-    ThisClass operator*(float fl) const
+    U_VECTOR_FORCEINLINE ThisClass operator*(float fl) const
     {
 #ifdef U_VECTOR_NEON
         return vmulq_n_f32(*this, fl);
@@ -673,7 +687,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return _mm_mul_ps(*this, _mm_load_ps1(&fl));
 #endif
     }
-    ThisClass operator/(T fl) const
+    U_VECTOR_FORCEINLINE ThisClass operator/(T fl) const
     {
 #ifdef U_VECTOR_NEON
         return *this * (1 / fl);
@@ -681,28 +695,28 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return _mm_div_ps(*this, _mm_load_ps1(&fl));
 #endif
     }
-    friend ThisClass operator*(T fl, ThisClass vec)
+    U_VECTOR_FORCEINLINE friend ThisClass operator*(T fl, ThisClass vec)
     {
         return vec * fl;
     }
-    ThisClass &operator+=(ThisClass v)
+    U_VECTOR_FORCEINLINE ThisClass &operator+=(ThisClass v)
     {
         return (ThisClass &)*this = *this + v;
     }
-    ThisClass &operator-=(ThisClass v)
+    U_VECTOR_FORCEINLINE ThisClass &operator-=(ThisClass v)
     {
         return (ThisClass &)*this = *this - v;
     }
-    ThisClass &operator*=(T fl)
+    U_VECTOR_FORCEINLINE ThisClass &operator*=(T fl)
     {
         return (ThisClass &)*this = *this * fl;
     }
-    ThisClass &operator/=(T fl)
+    U_VECTOR_FORCEINLINE ThisClass &operator/=(T fl)
     {
         return (ThisClass &)*this = *this / fl;
     }
 
-    friend T DotProduct(ThisClass v1, ThisClass v2)
+    U_VECTOR_FORCEINLINE friend T DotProduct(ThisClass v1, ThisClass v2)
     {
 #if U_VECTOR_NEON
         return vaddvq_f32(vmulq_f32(v1, v2));
@@ -711,7 +725,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    friend ThisClass fma(T x, ThisClass y, ThisClass z)
+    U_VECTOR_FORCEINLINE friend ThisClass fma(T x, ThisClass y, ThisClass z)
     {
 #if U_VECTOR_NEON
         return vfmaq_n_f32(z, y, x);
@@ -723,7 +737,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
     }
 
     // (a*b)+c
-    friend ThisClass fma(ThisClass x, T y, ThisClass z)
+    U_VECTOR_FORCEINLINE friend ThisClass fma(ThisClass x, T y, ThisClass z)
     {
 #if U_VECTOR_NEON
         return vfmaq_n_f32(z, x, y);
@@ -735,18 +749,18 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
     }
 
     // t*(b-a) + a;
-    friend ThisClass lerp(ThisClass a, ThisClass b, T t)
+    U_VECTOR_FORCEINLINE friend ThisClass lerp(ThisClass a, ThisClass b, T t)
     {
         return fma(t, b - a, a);
     }
 
     // 0.5*(b-a) + a;
-    friend ThisClass midpoint(ThisClass a, ThisClass b)
+    U_VECTOR_FORCEINLINE friend ThisClass midpoint(ThisClass a, ThisClass b)
     {
         return lerp(a, b, 0.5f);
     }
 
-    friend ThisClass maxs(ThisClass a, ThisClass b)
+    U_VECTOR_FORCEINLINE friend ThisClass maxs(ThisClass a, ThisClass b)
     {
 #if U_VECTOR_NEON
         return vmaxq_f32(a, b);
@@ -755,7 +769,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    friend ThisClass mins(ThisClass a, ThisClass b)
+    U_VECTOR_FORCEINLINE friend ThisClass mins(ThisClass a, ThisClass b)
     {
 #if U_VECTOR_NEON
         return vminq_f32(a, b);
@@ -764,7 +778,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    friend T reduce(ThisClass a)
+    U_VECTOR_FORCEINLINE friend T reduce(ThisClass a)
     {
 #if U_VECTOR_NEON
         return vaddvq_f32(a);
@@ -777,7 +791,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    friend T max_element(ThisClass a)
+    U_VECTOR_FORCEINLINE friend T max_element(ThisClass a)
     {
         // warning: zero a.w can affect the result
 #if U_VECTOR_NEON
@@ -791,7 +805,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    friend T min_element(ThisClass a)
+    U_VECTOR_FORCEINLINE friend T min_element(ThisClass a)
     {
         // warning: zero a.w can affect the result
 #if U_VECTOR_NEON
@@ -805,7 +819,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    friend ThisClass abs(ThisClass a)
+    U_VECTOR_FORCEINLINE friend ThisClass abs(ThisClass a)
     {
 #if U_VECTOR_NEON
         static const int32x4_t mask = vsetq_lane_s32(0, vdupq_n_s32(0x7fffffff), 3); // {0x7fffffff, 0x7fffffff, 0x7fffffff, 0};
@@ -817,7 +831,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    T LengthSquared() const
+    U_VECTOR_FORCEINLINE T LengthSquared() const
     {
 #ifdef U_VECTOR_NEON
         return vaddvq_f32(vmulq_f32(*this, *this));
@@ -836,7 +850,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return (LengthSquared() > length * length);
     }
 
-    T Length() const
+    U_VECTOR_FORCEINLINE T Length() const
     {
 #if U_VECTOR_NEON
         return sqrt(vaddvq_f32(vmulq_f32(*this, *this))) ;
@@ -845,7 +859,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    T LengthReverse() const
+    U_VECTOR_FORCEINLINE T LengthReverse() const
     {
 #if U_VECTOR_NEON
         return vrsqrtes_f32(vaddvq_f32(vmulq_f32(*this, *this)));
@@ -854,7 +868,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    ThisClass Normalize() const
+    U_VECTOR_FORCEINLINE ThisClass Normalize() const
     {
 #if U_VECTOR_NEON
         return vmulq_n_f32(*this, vrsqrtes_f32(vaddvq_f32(vmulq_f32(*this, *this))));
@@ -863,7 +877,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
 #endif
     }
 
-    T NormalizeInPlace()
+    U_VECTOR_FORCEINLINE T NormalizeInPlace()
     {
         auto flLen = Length();
         if (!flLen)
@@ -872,7 +886,7 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return flLen;
     }
 
-    bool IsZero(T tolerance = std::numeric_limits<T>::epsilon()) const
+    U_VECTOR_FORCEINLINE bool IsZero(T tolerance = std::numeric_limits<T>::epsilon()) const
     {
         return LengthSquared() <= tolerance;
     }
@@ -882,21 +896,21 @@ struct VectorBaseSIMD<VectorBase<float, N, 16>, XmmMask, typename std::enable_if
         return {(*this)[0], (*this)[1]};
     }
 
-    T Length2D()
+    U_VECTOR_FORCEINLINE T Length2D()
     {
         return Make2D().Length();
     }
 
-    friend T DotProduct2D(ThisClass v1, ThisClass v2)
+    U_VECTOR_FORCEINLINE friend T DotProduct2D(ThisClass v1, ThisClass v2)
     {
         return DotProduct(v1.Make2D(), v2.Make2D());
     }
 
-    bool IsNaN() const
+    U_VECTOR_FORCEINLINE bool IsNaN() const
     {
         return IsNaN_impl(*this, std::make_index_sequence<N>());
     }
-    explicit operator bool() const
+    U_VECTOR_FORCEINLINE explicit operator bool() const
     {
         return !IsNaN();
     }
@@ -973,7 +987,7 @@ template<class T, std::size_t Align> constexpr VectorBase<T, 3, Align> CrossProd
 }
 
 #ifdef U_VECTOR_SIMD
-inline VectorBase<float, 3, 16> CrossProduct(VectorBase<float, 3, 16> a, VectorBase<float, 3, 16> b)
+U_VECTOR_FORCEINLINE VectorBase<float, 3, 16> CrossProduct(VectorBase<float, 3, 16> a, VectorBase<float, 3, 16> b)
 {
 #if U_VECTOR_NEON
     float32x4_t yzxy_a = vextq_f32(vextq_f32(a, a, 3), a, 2); // [aj, ak, ai, aj]

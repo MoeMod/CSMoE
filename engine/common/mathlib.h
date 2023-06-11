@@ -16,9 +16,6 @@ GNU General Public License for more details.
 #ifndef MATHLIB_H
 #define MATHLIB_H
 
-#ifdef XASH_SIMD
-#include <immintrin.h>
-#endif
 #include <math.h>
 
 #ifdef MSC_VER
@@ -158,25 +155,25 @@ int SignbitsForPlane(const vec3_t normal);
 int NearestPOW(int value, qboolean roundDown);
 void SinCos(float radians, float* sine, float* cosine);
 
-float VectorNormalizeLength2(const vec3_t v, vec3_t_ref out);
-void VectorVectors(const vec3_t forward, vec3_t_ref right, vec3_t_ref up);
-void VectorAngles(const vec3_t forward, vec3_t_ref angles);
-void AngleVectors(const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up);
-void VectorsAngles(const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t_ref angles);
-void RotatePointAroundVector(vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees);
-vec3_t RotatePointAroundVector( const vec3_t dir, const vec3_t point, float degrees );
+float XASH_VECTORCALL VectorNormalizeLength2(const vec3_t v, vec3_t_ref out);
+void XASH_VECTORCALL VectorVectors(const vec3_t forward, vec3_t_ref right, vec3_t_ref up);
+void XASH_VECTORCALL VectorAngles(const vec3_t forward, vec3_t_ref angles);
+void XASH_VECTORCALL AngleVectors(const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up);
+void XASH_VECTORCALL VectorsAngles(const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t_ref angles);
+void XASH_VECTORCALL RotatePointAroundVector(vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees);
+vec3_t XASH_VECTORCALL RotatePointAroundVector( const vec3_t dir, const vec3_t point, float degrees );
 
-void ClearBounds(vec3_t_ref mins, vec3_t_ref maxs);
-void AddPointToBounds(const vec3_t v, vec3_t_ref mins, vec3_t_ref maxs);
-qboolean BoundsIntersect(const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2);
-qboolean BoundsAndSphereIntersect(const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius);
-float RadiusFromBounds(const vec3_t mins, const vec3_t maxs);
+void XASH_VECTORCALL ClearBounds(vec3_t_ref mins, vec3_t_ref maxs);
+void XASH_VECTORCALL AddPointToBounds(const vec3_t v, vec3_t_ref mins, vec3_t_ref maxs);
+qboolean XASH_VECTORCALL BoundsIntersect(const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2);
+qboolean XASH_VECTORCALL BoundsAndSphereIntersect(const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius);
+float XASH_VECTORCALL RadiusFromBounds(const vec3_t mins, const vec3_t maxs);
 
-void AngleQuaternion(const vec3_t angles, vec4_t_ref q);
-void QuaternionSlerp(const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt);
+void XASH_VECTORCALL AngleQuaternion(const vec3_t angles, vec4_t_ref q);
+void XASH_VECTORCALL QuaternionSlerp(const vec4_t p, vec4_t q, float t, vec4_t_ref qt);
 float RemapVal(float val, float A, float B, float C, float D);
 float ApproachVal(float target, float value, float speed);
-void InterpolateAngles(const vec3_t start, const vec3_t end, vec3_t_ref output, float frac);
+void XASH_VECTORCALL InterpolateAngles(const vec3_t start, const vec3_t end, vec3_t_ref output, float frac);
 
 #define VectorTransform1(a, b, f) ((b)[0]=f(a[0]),(b)[1]= f(a[1]),f(b)[2]=(a)[2])
 #define VectorTransform2(a, b, c, f) ((c)[0] = f((a)[0], (b)[0]), (c)[1] = f((a)[1], (b)[1]), (c)[2] = f((a)[2], (b)[2]))
@@ -371,40 +368,39 @@ void SinCosFastVector2(float r1, float r2,
 // matrixlib.c
 //
 
-void Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix3x4_ConcatTransforms( matrix3x4_ref out, cmatrix3x4 in1, cmatrix3x4 in2 );
-void Matrix3x4_FromOriginQuat( matrix3x4_ref out, const vec4_t quaternion, const vec3_t origin );
-void Matrix3x4_CreateFromEntity( matrix3x4_ref out, const vec3_t angles, const vec3_t origin, float scale );
-void Matrix3x4_TransformPositivePlane( cmatrix3x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
-void Matrix3x4_SetOrigin( matrix3x4_ref out, float x, float y, float z );
-void Matrix3x4_Invert_Simple( matrix3x4_ref out, cmatrix3x4 in1 );
-void Matrix3x4_OriginFromMatrix( cmatrix3x4 in, vec3_t_ref out );
+void XASH_VECTORCALL Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
+void XASH_VECTORCALL Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
+void XASH_VECTORCALL Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
+void XASH_VECTORCALL Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
+void XASH_VECTORCALL Matrix3x4_ConcatTransforms( matrix3x4_ref out, cmatrix3x4 in1, cmatrix3x4 in2 );
+void XASH_VECTORCALL Matrix3x4_FromOriginQuat( matrix3x4_ref out, const vec4_t quaternion, const vec3_t origin );
+void XASH_VECTORCALL Matrix3x4_CreateFromEntity( matrix3x4_ref out, const vec3_t angles, const vec3_t origin, float scale );
+void XASH_VECTORCALL Matrix3x4_TransformPositivePlane( cmatrix3x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
+void XASH_VECTORCALL Matrix3x4_SetOrigin( matrix3x4_ref out, float x, float y, float z );
+void XASH_VECTORCALL Matrix3x4_Invert_Simple( matrix3x4_ref out, cmatrix3x4 in1 );
+void XASH_VECTORCALL Matrix3x4_OriginFromMatrix( cmatrix3x4 in, vec3_t_ref out );
 
-void Matrix4x4_VectorTransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix4x4_VectorITransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix4x4_VectorRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix4x4_VectorIRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
-void Matrix4x4_ConcatTransforms( matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 in2 );
-void Matrix4x4_FromOriginQuat( matrix4x4_ref out, const vec4_t quaternion, const vec3_t origin );
-void Matrix4x4_CreateFromEntity( matrix4x4_ref out, const vec3_t angles, const vec3_t origin, float scale );
-void Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
-vec3_t Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, float *dist );
-void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
-void Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t_ref angles, vec3_t_ref origin );
-void Matrix4x4_SetOrigin( matrix4x4_ref out, float x, float y, float z );
-void Matrix4x4_Invert_Simple( matrix4x4_ref out, cmatrix4x4 in1 );
-void Matrix4x4_OriginFromMatrix( cmatrix4x4 in, vec3_t_ref out );
-void Matrix4x4_Transpose( matrix4x4_ref out, cmatrix4x4 in1 );
-qboolean Matrix4x4_Invert_Full( matrix4x4_ref out, cmatrix4x4 in1 );
+void XASH_VECTORCALL Matrix4x4_VectorTransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
+void XASH_VECTORCALL Matrix4x4_VectorITransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
+void XASH_VECTORCALL Matrix4x4_VectorRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
+void XASH_VECTORCALL Matrix4x4_VectorIRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
+void XASH_VECTORCALL Matrix4x4_ConcatTransforms( matrix4x4_ref out, cmatrix4x4 in1, cmatrix4x4 in2 );
+void XASH_VECTORCALL Matrix4x4_FromOriginQuat( matrix4x4_ref out, const vec4_t quaternion, const vec3_t origin );
+void XASH_VECTORCALL Matrix4x4_CreateFromEntity( matrix4x4_ref out, const vec3_t angles, const vec3_t origin, float scale );
+void XASH_VECTORCALL Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
+void XASH_VECTORCALL Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
+void XASH_VECTORCALL Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t_ref angles, vec3_t_ref origin );
+void XASH_VECTORCALL Matrix4x4_SetOrigin( matrix4x4_ref out, float x, float y, float z );
+void XASH_VECTORCALL Matrix4x4_Invert_Simple( matrix4x4_ref out, cmatrix4x4 in1 );
+void XASH_VECTORCALL Matrix4x4_OriginFromMatrix( cmatrix4x4 in, vec3_t_ref out );
+void XASH_VECTORCALL Matrix4x4_Transpose( matrix4x4_ref out, cmatrix4x4 in1 );
+qboolean XASH_VECTORCALL Matrix4x4_Invert_Full( matrix4x4_ref out, cmatrix4x4 in1 );
 
 constexpr vec3_t		vec3_origin = { 0, 0, 0 };
 
 inline void Matrix3x4_Copy( matrix3x4_ref out, cmatrix3x4 in ) { out = in; }
-void Matrix3x4_LoadIdentity( matrix3x4_ref mat );
+void XASH_VECTORCALL Matrix3x4_LoadIdentity( matrix3x4_ref mat );
 inline void Matrix4x4_Copy( matrix4x4_ref out, cmatrix4x4 in ) { out = in; }
-void Matrix4x4_LoadIdentity( matrix4x4_ref mat );
+void XASH_VECTORCALL Matrix4x4_LoadIdentity( matrix4x4_ref mat );
 
 #endif//MATHLIB_H

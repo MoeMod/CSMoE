@@ -153,7 +153,7 @@ typedef struct engine_studio_api_s
 
 	void (*StudioSetRenderamt)(int iRenderamt);	//!!!CZERO added for rendering glass on viewmodels
 	void (*StudioSetCullState)(int iCull);
-	void (*StudioRenderShadow)(int iSprite, float *p1, float *p2, float *p3, float *p4);
+	void (*StudioRenderShadow)(int iSprite, const vec3_t p1, const vec3_t p2, const vec3_t p3, const vec3_t p4);
 
 	bool (*StudioSetupBones_Pre)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
 	void (*StudioSetupBones_Post)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
@@ -183,6 +183,7 @@ typedef struct r_studio_interface_s
 	int version;
 	int (*StudioDrawModel)(int flags);
 	int (*StudioDrawPlayer)(int flags, struct entity_state_s *pplayer);
+	int (*StudioGetPlayerClassID)(model_s* mod, const studiohdr_t* phdr, const mstudiotexture_t* ptexture);
 
 } r_studio_interface_t;
 

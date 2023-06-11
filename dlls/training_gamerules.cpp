@@ -223,7 +223,7 @@ void CHalfLifeTraining::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_iTeam = CT;
 	pPlayer->m_bNotKilled = true;
 	pPlayer->pev->body = 0;
-	pPlayer->m_iModelName = MODEL_TERROR_URBAN;
+	pPlayer->m_iModelName = MODEL_URBAN;
 
 	fVGUIMenus = pPlayer->m_bVGUIMenus;
 	SET_MODEL(ENT(pPlayer->pev), "models/player.mdl");

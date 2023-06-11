@@ -50,17 +50,7 @@ namespace luash {
 #endif
 	EXTERN_TEMPLATE_DEF(TraceResult)
 	EXTERN_TEMPLATE_DEF(KeyValueData)
-
-	EXTERN_TEMPLATE_DEF(void)
-	EXTERN_TEMPLATE_DEF(const void)
-	EXTERN_TEMPLATE_DEF(int)
-	EXTERN_TEMPLATE_DEF(const int)
-	EXTERN_TEMPLATE_DEF(char)
-	EXTERN_TEMPLATE_DEF(const char)
-	EXTERN_TEMPLATE_DEF(float)
-	EXTERN_TEMPLATE_DEF(const float)
 	EXTERN_TEMPLATE_DEF(Vector)
-	EXTERN_TEMPLATE_DEF(const Vector)
 
 }
 
