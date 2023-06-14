@@ -403,20 +403,21 @@ void XASH_VECTORCALL QuaternionSlerpX4(const vec4_t p[4], vec4_t q[4], float t, 
     q[1] = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q[1]), vdupq_laneq_f32(sign, 1)));
     q[2] = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q[2]), vdupq_laneq_f32(sign, 2)));
     q[3] = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(q[3]), vdupq_laneq_f32(sign, 3)));
-    cosom = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(cosom), sign));
+    cosom = vabsq_f32(cosom);
 
     float32x4_t sclp = vdupq_n_f32(1.0f - t);
     float32x4_t sclq = vdupq_n_f32(t);
-    // if ((1.0 - cosom) > 0.000001) scl = sin(scl * omega)
+    // if ((1.0 - cosom) > 0.000001) scl = sin(scl * omega) / sinom;
     uint32x4_t cosom_less_then_one = vcltq_f32(cosom, vdupq_n_f32(1.0f - 0.00001f));
     float32x4_t omega = acos_ps(cosom);
-    sclp = vbslq_f32(cosom_less_then_one, sclp, sin_ps(vmulq_f32(sclp, omega)));
-    sclq = vbslq_f32(cosom_less_then_one, sclq, sin_ps(vmulq_f32(sclq, omega)));
-    float32x4_t sinom = vbslq_f32(cosom_less_then_one, vdupq_n_f32(1), sin_ps(omega));
+    // 1/sinom = rsqrt(1-cosom*cosom)
+    float32x4_t sinom = sin_ps(omega);
+    float32x4_t sinom_reciprocal =  vrecpeq_f32(sinom); // vdivq_f32(vdupq_n_f32(1), sin_ps(omega));
+    sinom_reciprocal = vmulq_f32(sinom_reciprocal, vrecpsq_f32(sinom, sinom_reciprocal));
+    sclp = vbslq_f32(cosom_less_then_one, sclp, vmulq_f32(sin_ps(vmulq_f32(sclp, omega)), sinom_reciprocal));
+    sclq = vbslq_f32(cosom_less_then_one, sclq, vmulq_f32(sin_ps(vmulq_f32(sclq, omega)), sinom_reciprocal));
 
-    // qt = (sclp * p + sclq * q) / sinom;
-    sclp = vdivq_f32(sclp, sinom);
-    sclq = vdivq_f32(sclq, sinom);
+    // qt = (sclp * p + sclq * q);
     qt[0] = vfmaq_laneq_f32(vmulq_laneq_f32(p[0], sclp, 0), q[0], sclq, 0);
     qt[1] = vfmaq_laneq_f32(vmulq_laneq_f32(p[1], sclp, 1), q[1], sclq, 1);
     qt[2] = vfmaq_laneq_f32(vmulq_laneq_f32(p[2], sclp, 2), q[2], sclq, 2);

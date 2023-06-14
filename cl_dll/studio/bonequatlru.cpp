@@ -186,17 +186,17 @@ namespace cl {
 		// write result
 		{
 			bonequatlru_data& framecache = *pcache;
-            switch(int i = 0; framecache.numbones % 4)
+            switch(framecache.numbones % 4)
             {
-                case 0: do {
-                    QuaternionSlerpX4(framecache.q1 + i, framecache.q2 + i, s, q + i); i+=4; continue;
                 case 3:
-                    QuaternionSlerp(framecache.q1[2], framecache.q2[2], s, q[2]); ++i;
+                    QuaternionSlerp(framecache.q1[2], framecache.q2[2], s, q[2]);
                 case 2:
-                    QuaternionSlerp(framecache.q1[1], framecache.q2[1], s, q[1]); ++i;
+                    QuaternionSlerp(framecache.q1[1], framecache.q2[1], s, q[1]);
                 case 1:
-                    QuaternionSlerp(framecache.q1[0], framecache.q2[0], s, q[0]); ++i;
-                } while(i < framecache.numbones);
+                    QuaternionSlerp(framecache.q1[0], framecache.q2[0], s, q[0]);
+                case 0:
+                    for(int i = framecache.numbones % 4; i < framecache.numbones; i+=4)
+                        QuaternionSlerpX4(framecache.q1 + i, framecache.q2 + i, s, q + i);
             }
 
             for (int i = 0; i < framecache.numbones; i++)
