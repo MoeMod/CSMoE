@@ -160,7 +160,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, vec3_t *vert
 
 	for( i = 0; i < numverts; i++ )
 	{
-        verts[i] = poly->verts[i + 1].xyz;
+        poly->verts[i + 1].xyz = verts[i];
 		VectorAdd( total, verts[i], total );
 
 		if( warpface->flags & SURF_DRAWTURB )
