@@ -901,7 +901,7 @@ void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
         }
     }
 
-    if(( light.r + light.g + light.b ) < 16 ) // TESTTEST
+    if(( light.r + light.g + light.b ) == 0 ) // TESTTEST
     {
         colorVec	gcolor;
         float	grad[4];
@@ -909,45 +909,38 @@ void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
         VectorScale( lightDir, 2048.0f, vecEnd );
         VectorAdd( vecEnd, vecSrc, vecEnd );
 
-        light = R_LightVec( vecSrc, vecEnd, g_studiolight.lightspot, g_studiolight.lightvec );
+        vec3_t spot, vec;
+        light = R_LightVec( vecSrc, vecEnd, spot, vec );
 
-        if( VectorIsNull( g_studiolight.lightvec ))
-        {
-            vec3_t spot, vec;
-            vecSrc[0] -= 16.0f;
-            vecSrc[1] -= 16.0f;
-            vecEnd[0] -= 16.0f;
-            vecEnd[1] -= 16.0f;
+        vecSrc[0] -= 16.0f;
+        vecSrc[1] -= 16.0f;
+        vecEnd[0] -= 16.0f;
+        vecEnd[1] -= 16.0f;
 
-            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
-            grad[0] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
+        gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+        grad[0] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-            vecSrc[0] += 32.0f;
-            vecEnd[0] += 32.0f;
+        vecSrc[0] += 32.0f;
+        vecEnd[0] += 32.0f;
 
-            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
-            grad[1] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
+        gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+        grad[1] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-            vecSrc[1] += 32.0f;
-            vecEnd[1] += 32.0f;
+        vecSrc[1] += 32.0f;
+        vecEnd[1] += 32.0f;
 
-            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
-            grad[2] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
+        gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+        grad[2] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-            vecSrc[0] -= 32.0f;
-            vecEnd[0] -= 32.0f;
+        vecSrc[0] -= 32.0f;
+        vecEnd[0] -= 32.0f;
 
-            gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
-            grad[3] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
+        gcolor = R_LightVec( vecSrc, vecEnd, spot, vec );
+        grad[3] = ( gcolor.r + gcolor.g + gcolor.b ) / 768.0f;
 
-            lightDir[0] = grad[0] - grad[1] - grad[2] + grad[3];
-            lightDir[1] = grad[1] + grad[0] - grad[2] - grad[3];
-            VectorNormalize( lightDir );
-        }
-        else
-        {
-            VectorCopy( g_studiolight.lightvec, lightDir );
-        }
+        lightDir[0] = grad[0] - grad[1] - grad[2] + grad[3];
+        lightDir[1] = grad[1] + grad[0] - grad[2] - grad[3];
+        VectorNormalize( lightDir );
     }
 
     VectorSet( finalLight, light.r, light.g, light.b );
@@ -979,18 +972,25 @@ void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
 
             VectorAdd( lightDir, dist, lightDir );
 
-            finalLight[0] += ( dl->color.r ) * ( add / 256.0f ) * 2.0f;
-            finalLight[1] += ( dl->color.g ) * ( add / 256.0f ) * 2.0f;
-            finalLight[2] += ( dl->color.b ) * ( add / 256.0f ) * 2.0f;
+            finalLight[0] += ( dl->color.r ) * ( add / 256.0f );
+            finalLight[1] += ( dl->color.g ) * ( add / 256.0f );
+            finalLight[2] += ( dl->color.b ) * ( add / 256.0f );
         }
     }
 
-    add = 0.9f;
+    if ( ent->model->flags & STUDIO_DYNAMIC_LIGHT )
+    {
+        add = 0.6;
+    }
+    else
+    {
+        add = 0.9;
+    }
 
     VectorScale( lightDir, add, lightDir );
 
     lightinfo->shadelight = VectorLength( lightDir );
-    lightinfo->ambientlight = total - g_studiolight.shadelight;
+    lightinfo->ambientlight = total - lightinfo->shadelight;
 
     total = max_element(finalLight);
 
@@ -1005,8 +1005,8 @@ void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
     if( lightinfo->ambientlight > 128 )
         lightinfo->ambientlight = 128;
 
-    if( lightinfo->ambientlight + g_studiolight.shadelight > 255 )
-        lightinfo->shadelight = 255 - g_studiolight.ambientlight;
+    if( lightinfo->ambientlight + lightinfo->shadelight > 255 )
+        lightinfo->shadelight = 255 - lightinfo->ambientlight;
 
     *lightinfo->plightvec = lightDir.Normalize();
 }
@@ -1831,8 +1831,9 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
         {
             colormix = { RI.currententity->curstate.rendercolor.r / 255.0f, RI.currententity->curstate.rendercolor.g / 255.0f, RI.currententity->curstate.rendercolor.b / 255.0f };
         }
-        float ambient = (192 - g_studiolight.ambientlight) / 255.0f;
-        float shadeLight = 0; // - g_studiolight.shadelight / (255.0f);
+        float ambient = (g_studiolight.ambientlight + g_studiolight.shadelight) / 255.0f;
+        float shadeLight = g_studiolight.shadelight / 255.0f;
+        float aniTime = 0; // ?
         vec3_t dLightDir = g_studiolight.lightvec;
 
         if((g_nForceFaceFlags & STUDIO_NF_FULLBRIGHT))
@@ -1840,9 +1841,14 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
             ambient = 1;
             shadeLight = 0;
         }
+        else if((g_nForceFaceFlags & STUDIO_NF_FLATSHADE) || true) // TODO : fix shadelight
+        {
+            ambient = (g_studiolight.ambientlight + g_studiolight.shadelight * 0.8) / 255.0f;
+            shadeLight = 0;
+        }
 
         pglUniform4fARB(g_pstudioshader->uniform.colorMix, colormix.x, colormix.y, colormix.z, envBrightMul);
-        pglUniform4fARB(g_pstudioshader->uniform.lightInfo, alpha, ambient, shadeLight, 0);
+        pglUniform4fARB(g_pstudioshader->uniform.lightInfo, alpha, ambient, shadeLight, aniTime);
         pglUniform4fvARB(g_pstudioshader->uniform.dLightDir, 1, (const float *)&dLightDir);
 		if (use_cubemap)
 		{
