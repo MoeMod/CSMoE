@@ -588,11 +588,13 @@ void CHudZB2::DrawDmgIndicator()
 		iX += 20;
 
 		//Draw Rank Name
-		int iTextLen = gHUD.m_DrawFontText.GetFontTextWide("Default", 16, gHUD.m_DeathInfo.UTF8ToUnicode(SzName));
-		iTextHeight = gHUD.m_DrawFontText.GetFontTextHeight("Default", 16);
-
-		if(SzName)
-			gHUD.m_DrawFontText.DrawFontText("Default", 16, iX, iY + iTextHeight, IsZombie ? 146 : 99, IsZombie ? 75 : 116, IsZombie ? 81 : 146, 255, gHUD.m_DeathInfo.UTF8ToUnicode(SzName));
+        int iTextLen = 0;
+        if(SzName)
+        {
+            iTextLen = gHUD.m_DrawFontText.GetFontTextWide("Default", 16, gHUD.m_DeathInfo.UTF8ToUnicode(SzName));
+            iTextHeight = gHUD.m_DrawFontText.GetFontTextHeight("Default", 16);
+            gHUD.m_DrawFontText.DrawFontText("Default", 16, iX, iY + iTextHeight, IsZombie ? 146 : 99, IsZombie ? 75 : 116, IsZombie ? 81 : 146, 255, gHUD.m_DeathInfo.UTF8ToUnicode(SzName));
+        }
 
 		float flPercent; flPercent = (flTopRecordData[iImage] / g_flDamageInAll);
 		char SzData[64]; sprintf(SzData, "%.1f K(%d%%)", flTopRecordData[iImage] / 1000.0, (int)(flPercent * 100.0));

@@ -689,6 +689,7 @@ void CCSClassMenu::UpdateGameMode()
 {
 	//LoadControlSettings("Resource/UI/cso_classmenu_ver2.res", "GAME");
 	InvalidateLayout();
+    SetupControlSettings();
 
 	m_pShowCT->SetVisible(false);
 	m_pShowTER->SetVisible(false);

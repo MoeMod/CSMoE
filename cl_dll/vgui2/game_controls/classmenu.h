@@ -15,7 +15,7 @@
 #include "IViewportPanel.h"
 #include "IViewPort.h"
 
-#define PANEL_CLASS "class"
+#define PANEL_CLASS "ClassMenu"
 
 namespace vgui2
 {
