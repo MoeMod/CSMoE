@@ -542,7 +542,7 @@ namespace xe {
             return false; // unknown texture
 
         if (textureCache.contains_and_make_first((GLuint)texnum)) {
-            return false; // already present
+            return true; // already present
         }
 
         textureCache.set_capacity(r_texlru->integer);
