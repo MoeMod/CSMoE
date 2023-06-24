@@ -459,6 +459,8 @@ void EmitSkyLayers( msurface_t *fa );
 void EmitSkyPolys( msurface_t *fa );
 void EmitWaterPolys( glpoly_t *polys, qboolean noCull );
 void R_DrawSkyChain( msurface_t *s );
+void R_BspInit();
+void R_BspShutdown();
 
 //
 // gl_rstrobe.c

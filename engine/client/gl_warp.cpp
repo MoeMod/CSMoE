@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "com_model.h"
 #include "wadfile.h"
+#include "gl_shader.h"
 
 #define MAX_CLIP_VERTS	64 // skybox clip vertices
 #define TURBSCALE		( 256.0f / ( M_PI2 ))
@@ -591,6 +592,107 @@ void R_InitSky( const mip_t *mt, const byte *buf, texture_t *tx )
 	GL_SetTextureType( tr.solidskyTexture, TEX_BRUSH );
 	GL_SetTextureType( tr.alphaskyTexture, TEX_BRUSH );
 }
+#define XASH_SHADER
+#ifdef XASH_SHADER
+typedef struct watershader_s {
+    GLuint program;
+    GLuint vertex_shader;
+    GLuint fragment_shader;
+    struct {
+        GLint texWater;
+        GLint clTime;
+        GLint waveHeight;
+        GLint muWVP;
+    } uniform;
+    struct {
+        GLint vaPosition;
+        GLint vaTexCoord;
+    } attrib;
+
+    GLuint array_buffer;
+} watershader_t;
+watershader_t g_WaterShader;
+void R_InitSurfaceShader()
+{
+    const GLcharARB* vertex_shader_list[2] = {
+            xe::GetShaderVersionString(),
+R"(
+const float PI = 3.14159265;
+const float T = PI / 128.0;
+const float SUBDIVIDE_SCALE = 1.0 / 64.0;
+uniform float clTime;
+uniform float waveHeight;
+uniform mat4 muWVP;
+
+attribute vec3 vaPosition;
+attribute vec2 vaTexCoord;
+
+varying vec2 vvTexCoord;
+void main(void)
+{
+    vec3 temp = vec3(vaPosition.x, vaPosition.y, clTime);
+    vec2 temp2 = vec2(dot(temp, vec3(1.0, 1.0, 160.0)), dot(temp, vec3(5.0, -1.0, 171.0))) * T;
+    float nv = dot(sin(temp2), vec2(4.0, 3.2)) + 14.4;
+    //float nv = (4.0 * sin((clTime * 160.0f + vaPosition.y + vaPosition.x) * T) + 8.0) + (4.0 * sin((vaPosition.x * 5.0f + clTime * 171.0f - vaPosition.y) * T) + 8.0) * 0.8;
+    gl_Position = muWVP * vec4(vaPosition.x, vaPosition.y, vaPosition.z + nv * waveHeight, 1.0);
+
+    vec2 vaTexCoord2 = 4 * sin(vaTexCoord * 0.125 + clTime);
+    vvTexCoord = (vaTexCoord.xy + vaTexCoord2.yx) * SUBDIVIDE_SCALE;
+}
+)"
+    };
+    g_WaterShader.vertex_shader = pglCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+    pglShaderSourceARB(g_WaterShader.vertex_shader, 2, vertex_shader_list, NULL);
+    pglCompileShaderARB(g_WaterShader.vertex_shader);
+    xe::CheckShader(g_WaterShader.vertex_shader, "vertex shader");
+
+    const GLcharARB* fragment_shader_list[2] = {
+            xe::GetShaderVersionString(),
+R"(
+uniform sampler2D texWater;
+varying vec2 vvTexCoord;
+
+void main (void)
+{
+    gl_FragColor = texture2D(texWater, vvTexCoord);
+    gl_FragColor.a = 1; // TODO
+}
+)"
+    };
+    g_WaterShader.fragment_shader = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+    pglShaderSourceARB(g_WaterShader.fragment_shader, 2, fragment_shader_list, NULL);
+    pglCompileShaderARB(g_WaterShader.fragment_shader);
+    xe::CheckShader(g_WaterShader.fragment_shader, "fragment shader");
+
+    g_WaterShader.program = pglCreateProgramObjectARB();
+    pglAttachObjectARB(g_WaterShader.program, g_WaterShader.vertex_shader);
+    pglAttachObjectARB(g_WaterShader.program, g_WaterShader.fragment_shader);
+    pglLinkProgramARB(g_WaterShader.program);
+    xe::CheckProgram(g_WaterShader.program, "shader program");
+
+
+    g_WaterShader.uniform.clTime = pglGetUniformLocationARB(g_WaterShader.program, "clTime");
+    g_WaterShader.uniform.texWater = pglGetUniformLocationARB(g_WaterShader.program, "texWater");
+    g_WaterShader.uniform.waveHeight = pglGetUniformLocationARB(g_WaterShader.program, "waveHeight");
+    g_WaterShader.uniform.muWVP = pglGetUniformLocationARB(g_WaterShader.program, "muWVP");
+
+    g_WaterShader.attrib.vaPosition = pglGetAttribLocationARB(g_WaterShader.program, "vaPosition");
+    g_WaterShader.attrib.vaTexCoord = pglGetAttribLocationARB(g_WaterShader.program, "vaTexCoord");
+
+    pglGenBuffersARB( 1, &g_WaterShader.array_buffer);
+}
+
+void R_ShutdownSurfaceShader()
+{
+    pglDetachObjectARB(g_WaterShader.program, g_WaterShader.vertex_shader);
+    pglDetachObjectARB(g_WaterShader.program, g_WaterShader.fragment_shader);
+    pglDeleteObjectARB(g_WaterShader.vertex_shader);
+    pglDeleteObjectARB(g_WaterShader.fragment_shader);
+    pglDeleteObjectARB(g_WaterShader.program);
+
+    pglDeleteBuffersARB( 1, &g_WaterShader.array_buffer);
+}
+#endif
 
 /*
 =============
@@ -613,7 +715,27 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 
 	// reset fog color for nonlightmapped water
 	GL_ResetFogColor();
-
+#ifdef XASH_SHADER
+    pglUseProgramObjectARB(g_WaterShader.program);
+    pglUniform1iARB(g_WaterShader.uniform.texWater, glState.activeTMU);
+    pglUniform1fARB(g_WaterShader.uniform.clTime, cl.time);
+    pglUniform1fARB(g_WaterShader.uniform.waveHeight, waveHeight);
+    pglUniformMatrix4fvARB(g_WaterShader.uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_WaterShader.array_buffer );
+    pglEnableVertexAttribArrayARB(g_WaterShader.attrib.vaPosition);
+    pglEnableVertexAttribArrayARB(g_WaterShader.attrib.vaTexCoord);
+    pglVertexAttribPointerARB(g_WaterShader.attrib.vaPosition, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid *)offsetof(vertex_t, xyz));
+    pglVertexAttribPointerARB(g_WaterShader.attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid *)offsetof(vertex_t, s1t1));
+    for( p = polys; p; p = p->next )
+    {
+        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, p->numverts * sizeof(vertex_t), p->verts, GL_DYNAMIC_DRAW_ARB);
+        pglDrawArrays( GL_POLYGON, 0, p->numverts );
+    }
+    pglDisableVertexAttribArrayARB(g_WaterShader.attrib.vaPosition);
+    pglDisableVertexAttribArrayARB(g_WaterShader.attrib.vaTexCoord);
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+    pglUseProgramObjectARB(0);
+#else
 	for( p = polys; p; p = p->next )
 	{
 		pglBegin( GL_POLYGON );
@@ -644,7 +766,7 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 		}
 		pglEnd();
 	}
-
+#endif
 	// restore culling
 	if( noCull ) pglEnable( GL_CULL_FACE );
 
@@ -748,4 +870,18 @@ void EmitSkyLayers( msurface_t *fa )
 
 	pglDisable( GL_BLEND );
 }
+
+void R_BspInit()
+{
+#ifdef XASH_SHADER
+    R_InitSurfaceShader();
+#endif
+}
+void R_BspShutdown()
+{
+#ifdef XASH_SHADER
+    R_ShutdownSurfaceShader();
+#endif
+}
+
 #endif // XASH_DEDICATED

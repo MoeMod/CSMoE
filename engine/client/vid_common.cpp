@@ -1157,6 +1157,7 @@ qboolean R_Init( void )
 	R_InitImages();
 	R_SpriteInit();
 	R_StudioInit();
+    R_BspInit();
 
 	R_Strobe_Init();
 
@@ -1189,6 +1190,7 @@ void R_Shutdown( void )
 	}
 	Q_memset( clgame.sprites, 0, sizeof( clgame.sprites ));
 
+    R_BspShutdown();
     R_StudioShutdown();
 	GL_RemoveCommands();
 	R_ShutdownImages();
