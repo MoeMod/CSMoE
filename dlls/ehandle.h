@@ -76,10 +76,8 @@ public:
 	bool IsValid() const;
 	constexpr int GetSerialNumber() const;
 
-	bool operator==(T *pEntity) const;
-
 	// if(p), and also works for comparsion with NULL
-	operator bool() const { return IsValid(); }
+	explicit operator bool() const { return IsValid(); }
 	// Gets the Entity this handle refers to.
 	// Returns null if invalid.
 	// works for comparsion with nullptr
@@ -171,19 +169,6 @@ template<typename T>
 constexpr inline int EntityHandle<T>::GetSerialNumber() const
 {
 	return m_serialnumber;
-}
-
-template<typename T>
-inline bool EntityHandle<T>::operator==(T *pEntity) const
-{
-	//assert("EntityHandle<T>::operator==:  got a nullptr pointer!" && (pEntity != nullptr));
-	if (pEntity == nullptr)
-		return !IsValid();
-
-	if (m_serialnumber != pEntity->edict()->serialnumber)
-		return false;
-
-	return m_edict == pEntity->edict();
 }
 
 template<typename T>
