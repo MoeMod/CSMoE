@@ -608,9 +608,10 @@ namespace xe {
         return GL_Bind(XASH_TEXTURE0, texnum);
     }
 
-    void TexLru_Bind(const mspriteframe_t *pspriteframe)
+    void TexLru_Bind(const msprite_t *psprite, const mspriteframe_t *pspriteframe)
     {
-        TexLru_Upload(pspriteframe->gl_texturenum);
+        for(int i = 0; i < psprite->numframes; ++i)
+            TexLru_Upload(psprite->frames[i].frameptr->gl_texturenum);
         return GL_Bind(XASH_TEXTURE0, pspriteframe->gl_texturenum);
     }
 }

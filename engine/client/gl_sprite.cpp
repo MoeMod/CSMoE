@@ -1249,7 +1249,7 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	if (psprite->synctype == 233)
 	{
 		pglEnable(GL_TEXTURE_2D);
-		xe::TexLru_Bind(frame);
+		xe::TexLru_Bind(psprite, frame);
 
 		pglEnable(GL_BLEND);
 		pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1261,7 +1261,7 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	{
 		// draw the single non-lerped frame
 		pglColor4f(color[0], color[1], color[2], flAlpha);
-		if(psprite->synctype != 233) xe::TexLru_Bind(frame);
+		if(psprite->synctype != 233) xe::TexLru_Bind(psprite, frame);
 		R_DrawSpriteQuad(frame, origin, v_right, v_up, scale);
 	}
 	else
@@ -1273,13 +1273,13 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		if (ilerp != 0.0f)
 		{
 			pglColor4f(color[0], color[1], color[2], flAlpha * ilerp);
-			if (psprite->synctype != 233) xe::TexLru_Bind(oldframe);
+			if (psprite->synctype != 233) xe::TexLru_Bind(psprite, oldframe);
 			R_DrawSpriteQuad(oldframe, origin, v_right, v_up, scale);
 		}
 		if (lerp != 0.0f)
 		{
 			pglColor4f(color[0], color[1], color[2], flAlpha * lerp);
-			if (psprite->synctype != 233) xe::TexLru_Bind(frame);
+			if (psprite->synctype != 233) xe::TexLru_Bind(psprite, frame);
 			R_DrawSpriteQuad(frame, origin, v_right, v_up, scale);
 		}
 	}
