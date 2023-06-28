@@ -58,8 +58,9 @@ int R_GetSpriteTexture( const model_t *m_pSpriteModel, int frame )
 {
 	if( !m_pSpriteModel || m_pSpriteModel->type != mod_sprite || !m_pSpriteModel->cache.data )
 		return 0;
+    auto psprite = (msprite_t *)m_pSpriteModel->cache.data;
     auto pspriteframe = R_GetSpriteFrame( m_pSpriteModel, frame, 0.0f );
-    xe::TexLru_Bind(pspriteframe);
+    xe::TexLru_Bind(psprite, pspriteframe);
 	return pspriteframe->gl_texturenum;
 }
 
