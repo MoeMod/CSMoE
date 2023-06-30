@@ -95,11 +95,11 @@ namespace sv {
 			m_iCheck = 0;
 			m_iActSlash3 = 0;
 			m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
-			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.1s;
+
 			m_tTimeRestMaxSpeed = m_tTimeSoundEmit = m_flTimeCheckCharge = invalid_time_point;
 			m_pPlayer->m_bShieldDrawn = false;
 
-			return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "dragonsword", UseDecrement() != FALSE, 0.1s);
+			return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "dragontail", UseDecrement() != FALSE);
 		}
 
 		int GetItemInfo(ItemInfo* p) override;

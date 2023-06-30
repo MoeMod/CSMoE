@@ -76,7 +76,7 @@ public:
 		TYPE_BCAXE_VIP,
 	};
 
-	enum skullaxe_e
+	enum shovelex_e
 	{
 		ANIM_IDLE1 = 0,
 		ANIM_NONE,
@@ -89,6 +89,25 @@ public:
 		ANIM_RUN,
 		ANIM_SKILL,
 	};
+
+	enum bcaxevip_e
+	{
+		BCAXE_IDLE1 = 0,
+		BCAXE_NONE,
+		BCAXE_WSSB,
+		BCAXE_DRAW,
+		BCAXE_STAB1,
+		BCAXE_STAB2,
+		BCAXE_SLASH1,
+		BCAXE_SLASH2,
+		BCAXE_RUN,
+		BCAXE_THROW,
+		BCAXE_STAB3,
+		BCAXE_STABSTART,
+		BCAXE_STABLOOP,
+		BCAXE_STABSHOT,
+	};
+
 	void Precache() override;
 	BOOL Deploy() override;
 

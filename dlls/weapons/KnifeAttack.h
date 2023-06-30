@@ -317,6 +317,31 @@ inline bool bIsWallBetweenEntity(CBaseEntity* pEntity, CBasePlayer* pAttackPlaye
 	return false;
 }
 
+inline bool bIsWallBetweenPoint(Vector vecSrc, Vector vecEnd)
+{
+	TraceResult tr;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, NULL, &tr);
+
+	if (tr.flFraction < 1.0)
+	{
+		if (!tr.pHit)
+			return false;
+
+		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+		if (pHit)
+		{
+			if (!Q_strcmp(STRING(pHit->pev->classname), "holysword_parray") || !Q_strcmp(STRING(pHit->pev->classname), "y22s1holyswordmb_parray"))
+				return false;
+		}
+
+
+		return true;
+	}
+
+	return false;
+}
+
 inline
 bool AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr)
 {

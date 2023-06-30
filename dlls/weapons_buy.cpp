@@ -264,6 +264,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "cartredl",	WEAPON_CARTREDL },
 	{ "cartredh",	WEAPON_CARTREDH },
 	{ "vulcanus5",	WEAPON_VULCANUS5 },
+	{ "y23s2buffaug",	WEAPON_Y23S2BUFFAUG },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -341,6 +342,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "vulcanus7",	WEAPON_VULCANUS7 },
 	{ "hk121ex",	WEAPON_HK121EX },
 	{ "z4b_mechanicxm214",	WEAPON_Z4B_MECHANICXM214 },
+	{ "ozwpnset1",	WEAPON_OZWPNSET1 },
+	{ "ignitemg",	WEAPON_IGNITEMG},
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -450,7 +453,7 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_swordbombard",	KNIFE_SWORDBOMBARD },
 	{ "z4b_mechanichand",	KNIFE_MECHANICHAND },
 	{ "z4b_shovelex",	KNIFE_SHOVELEX },
-
+	{ "knife_tyrantmace",	KNIFE_TYRANTMACE },
 	
 };
 
@@ -752,6 +755,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "cartredl",	WEAPONCLASS_RIFLE },
 	{ "cartredh",	WEAPONCLASS_RIFLE },
 	{ "vulcanus5",	WEAPONCLASS_RIFLE },
+	{ "y23s2buffaug",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -826,6 +830,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "vulcanus7",	WEAPONCLASS_MACHINEGUN },
 	{ "hk121ex",	WEAPONCLASS_MACHINEGUN },
 	{ "z4b_mechanicxm214",	WEAPONCLASS_MACHINEGUN },
+	{ "ozwpnset1",	WEAPONCLASS_MACHINEGUN },
+	{ "ignitemg",	WEAPONCLASS_MACHINEGUN },
+
 
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsawm",	WEAPONCLASS_EQUIPMENT },
@@ -1208,6 +1215,9 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_AT4EX:
 	case WEAPON_RPG7:
 	case WEAPON_BAZOOKA:
+	case WEAPON_Y23S2BUFFAUG:
+	case WEAPON_OZWPNSET1:
+	case WEAPON_IGNITEMG:
 		return true;
 	default:
 		break;

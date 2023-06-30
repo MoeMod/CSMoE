@@ -1,0 +1,118 @@
+/*
+*
+*    This program is free software; you can redistribute it and/or modify it
+*    under the terms of the GNU General Public License as published by the
+*    Free Software Foundation; either version 2 of the License, or (at
+*    your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful, but
+*    WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program; if not, write to the Free Software Foundation,
+*    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*
+*    In addition, as a special exception, the author gives permission to
+*    link the code of this program with the Half-Life Game Engine ("HL
+*    Engine") and Modified Game Libraries ("MODs") developed by Valve,
+*    L.L.C ("Valve").  You must obey the GNU General Public License in all
+*    respects for all of the code used other than the HL Engine and MODs
+*    from Valve.  If you modify this file, you may extend this exception
+*    to your version of the file, but you are not obligated to do so.  If
+*    you do not wish to do so, delete this exception statement from your
+*    version.
+*
+*/
+#include "events.h"
+
+namespace cl::event::y23s2buffaug {
+
+enum buffaug_e
+{
+	ANIM_IDLE1 = 0,
+	ANIM_RELOAD1,
+	ANIM_DRAW1,
+	ANIM_SHOOT1,
+	ANIM_SHOOT2,
+	ANIM_SHOOT3,
+	ANIM_CHANGE1,
+	ANIM_IDLE2,
+	ANIM_RELOAD2,
+	ANIM_DRAW2,
+	ANIM_SHOOT21,
+	ANIM_SHOOT22,
+	ANIM_SHOOT23,
+	ANIM_CHANGE2,
+	ANIM_SKILL,
+};
+
+
+void EV_FireY23S2BuffAug( event_args_t *args )
+{
+	vec3_t ShellVelocity, ShellOrigin;
+	vec3_t vecSrc, vecAiming;
+
+	int idx = args->entindex;
+	Vector origin( args->origin );
+	Vector angles(
+		args->iparam1 / 100.0f + args->angles[0],
+		args->iparam2 / 100.0f + args->angles[1],
+		args->angles[2] );
+	Vector velocity( args->velocity );
+	Vector forward, right, up;
+	AngleVectors( angles, forward, right, up );
+	cl_entity_t* ent = gEngfuncs.GetViewModel();
+	int righthand = gHUD.cl_righthand->value;
+
+	if ( EV_IsLocal( args->entindex ) )
+	{
+		++g_iShotsFired;
+
+		int iAnim;
+		if (args->bparam1 > 40)
+			iAnim = Com_RandomLong(ANIM_SHOOT21, ANIM_SHOOT23);
+		else if (args->bparam1 == 40)
+			iAnim = ANIM_CHANGE1;
+		else
+			iAnim = Com_RandomLong(ANIM_SHOOT1, ANIM_SHOOT3);
+
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(iAnim, 2);
+		EV_MuzzleFlash();
+		float vecScale[3] = { 17.0, -8.0, -14.0 };
+
+		if (righthand == 0)
+			vecScale[2] = 0 - vecScale[2];
+
+		EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, vecScale[0], vecScale[1], vecScale[2], true);
+
+		VectorCopy(ent->attachment[1], ShellOrigin);
+		VectorScale(ShellVelocity, 1.25, ShellVelocity);
+		ShellVelocity[2] -= 122;
+
+		if( gHUD.cl_gunsmoke->value )
+			EV_HLDM_CreateSmoke(ent->attachment[0], forward, 3, 0.26, 15, 15, 15, 4, velocity, false, 35);
+	}
+	else
+	{
+		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
+	}
+
+
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iRShell, TE_BOUNCE_SHELL);
+
+	PLAY_EVENT_SOUND( "weapons/y23s2buffaug-1.wav" );
+
+	EV_GetGunPosition( args, vecSrc, origin );
+	VectorCopy( forward, vecAiming );
+
+	Vector vSpread( args->fparam1, args->fparam2, 0.0f );
+	EV_HLDM_FireBullets( idx,
+		forward, right,	up,
+		1, vecSrc, vecAiming,
+		vSpread, 8192.0, BULLET_PLAYER_556MM,
+		2 );
+}
+
+}

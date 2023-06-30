@@ -300,3 +300,7 @@ HOOK_EVENT(mechanicxm214, FireMechanicXM214);
 HOOK_EVENT(stickybomb, FireStickyBomb);
 HOOK_EVENT(y23s1sfsmg, FireY23S1SFSMG);
 HOOK_EVENT(dartpistol, FireDartPistol);
+HOOK_EVENT(y23s2buffaug, FireY23S2BuffAug);
+HOOK_EVENT(hk121ex, FireHK121EX);
+HOOK_EVENT(ozwpnset1, FireOzWpnSet1);
+HOOK_EVENT(ignitemg, FireIgniteMG);

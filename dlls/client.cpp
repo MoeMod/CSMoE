@@ -3648,7 +3648,8 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 					FStrEq(pcmd, SHOVELEX_CLASSNAME[4]) || 
 					FStrEq(pcmd, SHOVELEX_CLASSNAME[5]) || 
 					FStrEq(pcmd, SHOVELEX_CLASSNAME[6]) ||
-					FStrEq(pcmd, SHOVELEX_CLASSNAME[7]))
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[7]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[8]))
 				{
 					GetClassPtr<CBasePlayer>(pev)->SelectItem("z4b_shovelex");
 				}

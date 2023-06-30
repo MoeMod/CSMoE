@@ -110,6 +110,9 @@ TEMPENTITY* g_Vulcanus9PFlame[33][3];
 
 TEMPENTITY* g_StickBombIdle = NULL;
 
+TEMPENTITY* g_Y23S2BuffAugSmokeA = NULL;
+TEMPENTITY* g_Y23S2BuffAugSmokeB = NULL;
+
 float g_flBloodhunterAnimTime = 0.0;
 int g_iBloodhunterSecAnim = 0;
 int g_iBloodhunterState = 0;
@@ -1298,7 +1301,7 @@ int R_StudioDrawModel(int flags)
 			saveent = *curent;
 			curent->model = CStudioModelRenderer::s_pBloodHunterViewModel;
 
-			//´ÓCStudioModelRenderer::StudioEstimateFrame³­À´µÄf'(t)Î¢»ý·ÖQAQ
+			//ï¿½ï¿½CStudioModelRenderer::StudioEstimateFrameï¿½ï¿½ï¿½ï¿½ï¿½ï¿½f'(t)Î¢ï¿½ï¿½ï¿½ï¿½QAQ
 			//dfdt = (m_clTime - m_pCurrentEntity->curstate.animtime) * m_pCurrentEntity->curstate.framerate * pseqdesc->fps;
 
 			curent->curstate.animtime = g_flBloodhunterAnimTime;
@@ -2149,6 +2152,82 @@ int R_StudioDrawModel(int flags)
 			{
 				g_StickBombIdle->die = 0.0;
 				g_StickBombIdle = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pY23S2BuffAugViewModel && CStudioModelRenderer::s_pY23S2BuffAugSmokeAModel && curent->model == CStudioModelRenderer::s_pY23S2BuffAugViewModel)
+		{
+			if (curent->curstate.sequence <= 6)
+			{
+				if (g_Y23S2BuffAugSmokeB)
+				{
+					g_Y23S2BuffAugSmokeB->die = 0.0;
+					g_Y23S2BuffAugSmokeB = NULL;
+				}
+
+				if (!g_Y23S2BuffAugSmokeA)
+				{
+					g_Y23S2BuffAugSmokeA = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[2], CStudioModelRenderer::s_pY23S2BuffAugSmokeAModel);
+
+					g_Y23S2BuffAugSmokeA->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_Y23S2BuffAugSmokeA->entity.curstate.aiment = curent->index;
+					g_Y23S2BuffAugSmokeA->entity.curstate.body = 3;
+					g_Y23S2BuffAugSmokeA->entity.curstate.rendermode = kRenderTransAdd;
+					g_Y23S2BuffAugSmokeA->entity.curstate.renderamt = 255;
+					g_Y23S2BuffAugSmokeA->entity.curstate.renderfx = 0;
+					g_Y23S2BuffAugSmokeA->entity.curstate.scale = 0.05;
+					g_Y23S2BuffAugSmokeA->entity.curstate.framerate = 24;
+					g_Y23S2BuffAugSmokeA->entity.curstate.rendercolor.r = g_Y23S2BuffAugSmokeA->entity.curstate.rendercolor.g = g_Y23S2BuffAugSmokeA->entity.curstate.rendercolor.b = 255;
+					g_Y23S2BuffAugSmokeA->frameMax = 30;
+					g_Y23S2BuffAugSmokeA->die = gHUD.m_flTime + 9999.0f;
+					g_Y23S2BuffAugSmokeA->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_Y23S2BuffAugSmokeA->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_Y23S2BuffAugSmokeA->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+			else
+			{
+				if (g_Y23S2BuffAugSmokeA)
+				{
+					g_Y23S2BuffAugSmokeA->die = 0.0;
+					g_Y23S2BuffAugSmokeA = NULL;
+				}
+
+				if (!g_Y23S2BuffAugSmokeB)
+				{
+					g_Y23S2BuffAugSmokeB = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[2], CStudioModelRenderer::s_pY23S2BuffAugSmokeBModel);
+
+					g_Y23S2BuffAugSmokeB->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_Y23S2BuffAugSmokeB->entity.curstate.aiment = curent->index;
+					g_Y23S2BuffAugSmokeB->entity.curstate.body = 3;
+					g_Y23S2BuffAugSmokeB->entity.curstate.rendermode = kRenderTransAdd;
+					g_Y23S2BuffAugSmokeB->entity.curstate.renderamt = 255;
+					g_Y23S2BuffAugSmokeB->entity.curstate.renderfx = 0;
+					g_Y23S2BuffAugSmokeB->entity.curstate.scale = 0.05;
+					g_Y23S2BuffAugSmokeB->entity.curstate.framerate = 24;
+					g_Y23S2BuffAugSmokeB->entity.curstate.rendercolor.r = g_Y23S2BuffAugSmokeB->entity.curstate.rendercolor.g = g_Y23S2BuffAugSmokeB->entity.curstate.rendercolor.b = 255;
+					g_Y23S2BuffAugSmokeB->frameMax = 30;
+					g_Y23S2BuffAugSmokeB->die = gHUD.m_flTime + 9999.0f;
+					g_Y23S2BuffAugSmokeB->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_Y23S2BuffAugSmokeB->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_Y23S2BuffAugSmokeB->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+			}
+		}
+		else
+		{
+			if (g_Y23S2BuffAugSmokeA)
+			{
+				g_Y23S2BuffAugSmokeA->die = 0.0;
+				g_Y23S2BuffAugSmokeA = NULL;
+			}
+
+			if (g_Y23S2BuffAugSmokeB)
+			{
+				g_Y23S2BuffAugSmokeB->die = 0.0;
+				g_Y23S2BuffAugSmokeB = NULL;
 			}
 		}
 	}

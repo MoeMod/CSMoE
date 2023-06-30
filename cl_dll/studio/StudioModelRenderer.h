@@ -154,6 +154,9 @@ public:
 	static struct model_s* s_pStickyBombIdleRModel;
 	static struct model_s* s_pStickyBombIdleGModel;
 	static struct model_s* s_pStickyBombPModel;
+	static struct model_s* s_pY23S2BuffAugViewModel;
+	static struct model_s* s_pY23S2BuffAugSmokeAModel;
+	static struct model_s* s_pY23S2BuffAugSmokeBModel;
 };
 
 }

@@ -124,6 +124,10 @@ struct model_s* CStudioModelRenderer::s_pStickyBombIdleRModel;
 struct model_s* CStudioModelRenderer::s_pStickyBombIdleGModel;
 struct model_s* CStudioModelRenderer::s_pStickyBombPModel;
 
+struct model_s* CStudioModelRenderer::s_pY23S2BuffAugViewModel;
+struct model_s* CStudioModelRenderer::s_pY23S2BuffAugSmokeAModel;
+struct model_s* CStudioModelRenderer::s_pY23S2BuffAugSmokeBModel;
+
 void CStudioModelRenderer::Init(void)
 {
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");
@@ -366,24 +370,24 @@ void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, const mstu
 
 void CStudioModelRenderer::StudioSlerpBones(vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s)
 {
-    s = std::clamp( s, 0.0f, 1.0f );
+	s = std::clamp( s, 0.0f, 1.0f );
 
-    switch(m_pStudioHeader->numbones & 3)
-    {
-        case 3:
-            QuaternionSlerp(q1[2], q2[2], s, q1[2]);
-        case 2:
-            QuaternionSlerp(q1[1], q2[1], s, q1[1]);
-        case 1:
-            QuaternionSlerp(q1[0], q2[0], s, q1[0]);
-        case 0:
-            for(int i = m_pStudioHeader->numbones & 3; i < m_pStudioHeader->numbones; i+=4)
-                QuaternionSlerpX4(q1 + i, q2 + i, s, q1 + i);
-    }
+	switch(m_pStudioHeader->numbones & 3)
+	{
+	case 3:
+		QuaternionSlerp(q1[2], q2[2], s, q1[2]);
+	case 2:
+		QuaternionSlerp(q1[1], q2[1], s, q1[1]);
+	case 1:
+		QuaternionSlerp(q1[0], q2[0], s, q1[0]);
+	case 0:
+		for(int i = m_pStudioHeader->numbones & 3; i < m_pStudioHeader->numbones; i+=4)
+			QuaternionSlerpX4(q1 + i, q2 + i, s, q1 + i);
+	}
 
 	for (int i = 0; i < m_pStudioHeader->numbones; i++)
 	{
-        pos1[i] = lerp(pos1[i], pos2[i], s);
+		pos1[i] = lerp(pos1[i], pos2[i], s);
 	}
 }
 

@@ -420,6 +420,10 @@ TL_ADD(CY20S1Grenade)
 TL_ADD(CKnifeShovelEX)
 TL_ADD(CY23S1SFSMG)
 TL_ADD(CDartPistol)
+TL_ADD(CKnifeTyrantmace)
+TL_ADD(CY23S2BuffAug)
+TL_ADD(COZWpnSet1)
+TL_ADD(CIgniteMG)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -805,6 +809,7 @@ TL_ADD(CZombieRushBox)
 TL_ADD(CStickyGrenade)
 TL_ADD(CZombieSmoke)
 TL_ADD(CEF_Y23S1SFSMG)
+TL_ADD(CY23S2BuffAugSoldier)
 #endif
 
 TL_END(AllEntityTypeList)

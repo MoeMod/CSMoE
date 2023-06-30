@@ -28,7 +28,7 @@ namespace sv {
 		m_iId = WEAPON_SBMINE;
 		SET_MODEL(ENT(pev), "models/w_sbmine.mdl");
 
-		m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE * 999;
+		m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE * 2;
 		m_flStartThrow = invalid_time_point;
 		m_flReleaseThrow = invalid_time_point;
 
@@ -51,7 +51,7 @@ namespace sv {
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "SbMine";
-		p->iMaxAmmo1 = MAX_AMMO_HEGRENADE * 999;
+		p->iMaxAmmo1 = MAX_AMMO_HEGRENADE * 2;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = WEAPON_NOCLIP;

@@ -272,6 +272,10 @@ int DLLEXPORT HUD_VidInit( void )
 
 	CStudioModelRenderer::s_pStickyBombPModel = IEngineStudio.Mod_ForName("models/p_stickybomb.mdl", FALSE);
 
+	CStudioModelRenderer::s_pY23S2BuffAugViewModel = IEngineStudio.Mod_ForName("models/v_y23s2buffaug.mdl", FALSE);
+	CStudioModelRenderer::s_pY23S2BuffAugSmokeAModel = IEngineStudio.Mod_ForName("sprites/ef_y23s2buffaug_a.spr", FALSE);
+	CStudioModelRenderer::s_pY23S2BuffAugSmokeBModel = IEngineStudio.Mod_ForName("sprites/ef_y23s2buffaug_b.spr", FALSE);
+
 	//VGui_Startup();
 
 	return 1;
