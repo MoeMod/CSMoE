@@ -92,7 +92,7 @@ bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, int& pag
 		);
 	}
 
-	if (pPage->nextX + iWidth >= pPage->tall)
+	if (pPage->nextX + iWidth >= pPage->wide)
 	{
 		pPage->nextX = 0;
 		pPage->nextY += pPage->fontHeight;

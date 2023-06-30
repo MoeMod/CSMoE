@@ -16,13 +16,13 @@ private:
 	{
 		vgui2::HFont font;
 		uchar32 wch;
-		short page;
+		int page;
 		float texCoords[4];
 	};
 
 	struct page_t
 	{
-		short textureID;
+		int textureID;
 		short fontHeight;
 		short wide;
 		short tall;
