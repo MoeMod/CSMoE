@@ -395,6 +395,12 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 				m_pPlayer->m_ZombieClass = ZombieNameByClass((ZombieClassType)iZombieType);
 				auto AbsZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, m_pPlayer->m_ZombieClass);
 
+				if (!AbsZombie)
+				{
+					m_pPlayer->m_ZombieClass = ZombieNameByClass(ZOMBIE_CLASS_TANK);
+					AbsZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, m_pPlayer->m_ZombieClass);
+				}
+					
 				m_pCharacter_ZB2 = AbsZombie;
 				m_pCharacter = AbsZombie;
 				AbsZombie->InitHUD();
