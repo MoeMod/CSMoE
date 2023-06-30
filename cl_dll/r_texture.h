@@ -5,15 +5,16 @@
 	RAII wrap for GL texture in gRenderAPI
 */
 #include "render_api.h"
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI)
 #include "imgui.h"
+#define XASH_IMGUI_SURFACE
 #else
 #include "triangleapi.h"
 #endif
 
 #include <memory>
 
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 extern float g_ImGUI_DPI;
 extern void ImGui_Surface_SetRenderMode( int mode );
 #else
@@ -47,7 +48,7 @@ public:
 public:
 	void Draw2DQuadScaled( float x1, float y1, float x2, float y2, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255 ) const noexcept
 	{
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 		Draw2DQuad(x1 * g_ImGUI_DPI, y1 * g_ImGUI_DPI, x2 * g_ImGUI_DPI, y2 * g_ImGUI_DPI, s1, t1, s2, t2, r, g, b, a);
 #else
 		float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
@@ -57,7 +58,7 @@ public:
 
 	void Draw2DQuad(float x1, float y1, float x2, float y2, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255) const noexcept
 	{
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 		ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
 		ImGui_Surface_SetRenderMode(kRenderTransTexture);
 		drawlist->AddImage((ImTextureID)m_iInternalId, ImVec2(x1, y1), ImVec2(x2, y2), ImVec2(s1, t1), ImVec2(s2, t2), ImColor(r, g, b, a));

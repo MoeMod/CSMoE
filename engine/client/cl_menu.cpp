@@ -26,6 +26,7 @@ GNU General Public License for more details.
 
 #ifdef XASH_IMGUI
 #include "imgui_surface.h"
+#define XASH_IMGUI_SURFACE
 #endif
 
 static MENUAPI	GetMenuAPI;
@@ -351,7 +352,7 @@ static void PIC_DrawGeneric( float x, float y, float width, float height, const 
 		return;
 
 	PicAdjustSize( &x, &y, &width, &height );
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_DrawImage(menu.ds.gl_texturenum, x, y, x + width, y + height, s1, t1, s2, t2, menu.ds.picColor[0], menu.ds.picColor[1], menu.ds.picColor[2], menu.ds.picColor[3]);
 #else
 	pglColor4ub( menu.ds.picColor[0], menu.ds.picColor[1], menu.ds.picColor[2], menu.ds.picColor[3] );
@@ -446,13 +447,13 @@ pfnPIC_Draw
 */
 void pfnPIC_Draw( int x, int y, int width, int height, const wrect_t *prc )
 {
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_SetRenderMode(kRenderNormal);
 #else
 	GL_SetRenderMode( kRenderNormal );
 #endif
 	PIC_DrawGeneric( x, y, width, height, prc );
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_SetRenderMode(kRenderTransTexture);
 #endif
 }
@@ -465,13 +466,13 @@ pfnPIC_DrawTrans
 */
 void pfnPIC_DrawTrans( int x, int y, int width, int height, const wrect_t *prc )
 {
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_SetRenderMode(kRenderTransTexture);
 #else
 	GL_SetRenderMode( kRenderTransTexture );
 #endif
 	PIC_DrawGeneric( x, y, width, height, prc );
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_SetRenderMode(kRenderTransTexture);
 #endif
 }
@@ -484,13 +485,13 @@ pfnPIC_DrawHoles
 */
 void pfnPIC_DrawHoles( int x, int y, int width, int height, const wrect_t *prc )
 {
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_SetRenderMode(kRenderTransAlpha);
 #else
 	GL_SetRenderMode( kRenderTransAlpha );
 #endif
 	PIC_DrawGeneric( x, y, width, height, prc );
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_SetRenderMode(kRenderTransTexture);
 #endif
 }
@@ -503,13 +504,13 @@ pfnPIC_DrawAdditive
 */
 void pfnPIC_DrawAdditive( int x, int y, int width, int height, const wrect_t *prc )
 {
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_SetRenderMode(kRenderTransAdd);
 #else
 	GL_SetRenderMode( kRenderTransAdd );
 #endif
 	PIC_DrawGeneric( x, y, width, height, prc );
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_SetRenderMode(kRenderTransTexture);
 #endif
 }
@@ -558,7 +559,7 @@ pfnFillRGBA
 */
 static void pfnFillRGBA( int x, int y, int width, int height, int r, int g, int b, int a )
 {
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	float x1 = x, y1 = y, w1 = width, h1 = height;
 	ImGui_Surface_SetRenderMode(kRenderTransTexture);
 	ImGui_Surface_DrawRectangle(x1, y1, w1, h1, r, g, b, a);
@@ -643,7 +644,7 @@ static void pfnDrawCharacter( int ix, int iy, int iwidth, int iheight, int ch, i
 	if( menu.ds.scissor_test && !PIC_Scissor( &x, &y, &width, &height, &s1, &t1, &s2, &t2 ))
 		return;
 
-#ifdef XASH_IMGUI
+#ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_SetRenderMode(kRenderTransTexture);
 	ImGui_Surface_DrawImage(hFont, x, y, x + width, y + height, s1, t1, s2, t2, color[0], color[1], color[2], color[3]);
 #else

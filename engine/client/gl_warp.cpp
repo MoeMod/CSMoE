@@ -636,7 +636,7 @@ void main(void)
     //float nv = (4.0 * sin((clTime * 160.0f + vaPosition.y + vaPosition.x) * T) + 8.0) + (4.0 * sin((vaPosition.x * 5.0f + clTime * 171.0f - vaPosition.y) * T) + 8.0) * 0.8;
     gl_Position = muWVP * vec4(vaPosition.x, vaPosition.y, vaPosition.z + nv * waveHeight, 1.0);
 
-    vec2 vaTexCoord2 = 4 * sin(vaTexCoord * 0.125 + clTime);
+    vec2 vaTexCoord2 = 4.0 * sin(vaTexCoord * 0.125 + clTime);
     vvTexCoord = (vaTexCoord.xy + vaTexCoord2.yx) * SUBDIVIDE_SCALE;
 }
 )"
@@ -655,7 +655,7 @@ varying vec2 vvTexCoord;
 void main (void)
 {
     gl_FragColor = texture2D(texWater, vvTexCoord);
-    gl_FragColor.a = 1; // TODO
+    gl_FragColor.a = 1.0; // TODO
 }
 )"
     };

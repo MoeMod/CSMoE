@@ -19,8 +19,8 @@
 #include <string>
 #include <memory>
 
-//#define USE_IMGUI_SURFACE
-#ifdef USE_IMGUI_SURFACE
+#define XASH_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
 #include "client/imgui_surface.h"
 #endif
 
@@ -217,8 +217,8 @@ void BaseUISurface::PushMakeCurrent(vgui2::VPANEL panel, bool useInsets) {
 	paintState.iScissorBottom = clipRect[3] - m_iSurfaceBounds[1];
 
 	SetupPaintState(paintState);
-#ifdef USE_IMGUI_SURFACE
-    ImGui_Surface_EnableFullScreenScissor();
+#ifdef XASH_IMGUI_SURFACE
+    ImGui_Surface_EnableScissor(paintState.iScissorLeft, paintState.iScissorTop, paintState.iScissorRight - paintState.iScissorLeft, paintState.iScissorBottom - paintState.iScissorTop);
 #endif
 }
 
@@ -234,7 +234,7 @@ void BaseUISurface::PopMakeCurrent(vgui2::VPANEL panel) {
 	if (_paintStack.size()) {
 		SetupPaintState(_paintStack.back());
 	}
-#ifdef USE_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
     ImGui_Surface_DisableScissor();
 #endif
 }
@@ -326,7 +326,7 @@ void BaseUISurface::DrawFilledRect(int x0, int y0, int x1, int y1) {
 	if (!ClipRect(rect[0], rect[1], &clippedRect[0], &clippedRect[1])) {
 		return;
 	}
-#ifdef USE_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
     ImGui_Surface_SetRenderMode(kRenderTransAlpha);
     SPR_AdjustSize(&rect[0].point[0], &rect[0].point[1], &rect[1].point[0], &rect[1].point[1]);
     ImGui_Surface_DrawRectangle(rect[0].point[0], rect[0].point[1], rect[1].point[0] - rect[0].point[0], rect[1].point[1] - rect[0].point[1], _drawColor[0], _drawColor[1], _drawColor[2],  255 - _drawColor[3]);
@@ -571,11 +571,11 @@ void BaseUISurface::DrawSetTexture(int id) {
     {
         m_iCurrentTexture = id;
         DrawFlushText();
-#ifdef USE_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
         ImGui_Surface_Flush();
 #endif
     }
-#ifdef USE_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
     // nothing
 #else
 	g_api->BindTexture(id);
@@ -601,7 +601,7 @@ void BaseUISurface::DrawTexturedRect(int x0, int y0, int x1, int y1) {
 	if (!ClipRect(rect[0], rect[1], &clippedRect[0], &clippedRect[1])) {
 		return;
 	}
-#ifdef USE_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
     int id = m_iCurrentTexture;
     if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
     {
@@ -1321,7 +1321,7 @@ void BaseUISurface::DrawFlushText(void)
     {
         //DrawSetTexture(m_BatchedCharInfos[i].textureId);
         m_iCurrentTexture = m_BatchedCharInfos[i].textureId;
-#ifdef USE_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
         // nothing
 #else
         g_api->BindTexture(m_BatchedCharInfos[i].textureId);
@@ -1334,7 +1334,7 @@ void BaseUISurface::DrawFlushText(void)
 
 void BaseUISurface::DrawQuad(vpoint_t ul, vpoint_t lr, int *pColor)
 {
-#ifdef USE_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
     int id = m_iCurrentTexture;
     if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
     {
@@ -1355,7 +1355,7 @@ void BaseUISurface::DrawQuad(vpoint_t ul, vpoint_t lr, int *pColor)
 
 void BaseUISurface::DrawQuadBlend(vpoint_t ul, vpoint_t lr, int *pColor)
 {
-#ifdef USE_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
     int id = m_iCurrentTexture;
     if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
     {
@@ -1376,7 +1376,7 @@ void BaseUISurface::DrawQuadBlend(vpoint_t ul, vpoint_t lr, int *pColor)
 
 void BaseUISurface::DrawQuadArray(int quadCount, vpoint_t *pVerts, int *pColor)
 {
-#ifdef USE_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
     int id = m_iCurrentTexture;
     if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
     {

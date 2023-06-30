@@ -1308,15 +1308,17 @@ just a prefab for render shadow
 */
 void GAME_EXPORT R_StudioRenderShadow( int iSprite, const vec3_t p1, const vec3_t p2, const vec3_t p3, const vec3_t p4 )
 {
+#if XASH_GLES
+    // disabled for performance
+    // TODO : defer as additive
+    return;
+#else
 	if( !p1 || !p2 || !p3 || !p4 )
 		return;
 
 	if( TriSpriteTexture( Mod_Handle( iSprite ), 0 ))
 	{
-		pglEnable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
-		pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+        GL_SetRenderMode(kRenderTransTexture);
 		pglColor4f( 0.0f, 0.0f, 0.0f, 1.0f ); // render only alpha
 
 		pglBegin( GL_QUADS );
@@ -1330,9 +1332,9 @@ void GAME_EXPORT R_StudioRenderShadow( int iSprite, const vec3_t p1, const vec3_
 			pglVertex3fv( p4.data() );
 		pglEnd();
 
-		pglDisable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
+        GL_SetRenderMode(kRenderNormal);
 	}
+#endif
 }
 
 /*
