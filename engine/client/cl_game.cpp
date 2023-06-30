@@ -35,6 +35,7 @@ GNU General Public License for more details.
 #if XASH_IMGUI
 #include "imgui_console.h"
 #include "imgui_surface.h"
+#define XASH_IMGUI_SURFACE
 #endif
 
 #ifdef XASH_VGUI2
@@ -627,7 +628,7 @@ static void SPR_DrawGeneric( int frame, float x, float y, float width, float hei
 	// scale for screen sizes
 	SPR_AdjustSize( &x, &y, &width, &height );
 	texnum = R_GetSpriteTexture( clgame.ds.pSprite, frame );
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_DrawImage( texnum, x, y, x + width, y + height, s1, t1, s2, t2,  clgame.ds.spriteColor[0], clgame.ds.spriteColor[1], clgame.ds.spriteColor[2], clgame.ds.spriteColor[3] );
 #else
 	pglColor4ubv( clgame.ds.spriteColor );
@@ -663,12 +664,12 @@ void CL_DrawCenterPrint( void )
 	y = clgame.centerPrint.y; // start y
 	colorDefault = g_color_table[7];
 	pText = clgame.centerPrint.message;
-#ifdef XASH_VGUI2
+#ifdef XASH_VGUI2_SURFACE
    VGUI2_Surface_DrawStringLen(pText, &x, &y);
     x = clgame.scrInfo.iWidth / 2 - x / 2;
     y = clgame.scrInfo.iHeight / 4;
     VGUI2_Surface_DrawConsoleString(x, y, pText, colorDefault[0], colorDefault[1], colorDefault[2], colorDefault[3]);
-#elif defined XASH_IMGUI
+#elif defined XASH_IMGUI_SURFACE
     ImGui_Surface_DrawStringLen(pText, &x, &y);
 	x = scr_width->integer / 2 - x / 2;
 	y = scr_height->integer / 4;
@@ -751,7 +752,7 @@ void CL_DrawScreenFade( void )
 	}
 
 
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	if( sf->fadeFlags & FFADE_MODULATE )
 		ImGui_Surface_SetRenderMode( kRenderTransAdd );
 	else ImGui_Surface_SetRenderMode( kRenderTransTexture );
@@ -1001,7 +1002,7 @@ void CL_DrawCrosshair( void )
 
 	clgame.ds.pSprite = crosshair_state.pCrosshair;
 
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_SetRenderMode( kRenderTransTexture );
 	*(int *)clgame.ds.spriteColor = *(int *)crosshair_state.rgbaCrosshair;
 	ImGui_Surface_EnableScissor( x - 0.5f * width, y - 0.5f * height, width, height );
@@ -1043,7 +1044,7 @@ static void CL_DrawLoading( float percent )
 
 	if( cl_allow_levelshots->integer )
 	{
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 		ImGui_Surface_SetRenderMode( kRenderTransTexture );
 		ImGui_Surface_DrawImage( cls.loadingBar, x, y, x + width, y + height, 0, 0, 1, 1, 128, 128, 128, 255 );
 #else
@@ -1057,7 +1058,7 @@ static void CL_DrawLoading( float percent )
 		s2 = (float)right / width;
 		width = right;
 
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 		ImGui_Surface_SetRenderMode( kRenderTransTexture );
 		ImGui_Surface_DrawImage( cls.loadingBar, x, y, x + width, y + height, 0, 0, s2, 1, 208, 152, 0, 255 );
 #else
@@ -1069,7 +1070,7 @@ static void CL_DrawLoading( float percent )
 	}
 	else
 	{
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 		ImGui_Surface_SetRenderMode( kRenderTransTexture );
 		ImGui_Surface_DrawImage( cls.loadingBar, x, y, x + width, y + height, 0, 0, 1, 1, 255, 255, 255, 255 );
 #else
@@ -1104,7 +1105,7 @@ static void CL_DrawPause( void )
 	width *= xscale;
 	height *= yscale;
 
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_SetRenderMode( kRenderTransTexture );
 	ImGui_Surface_DrawImage( cls.pauseIcon, x, y, x + width, y + height, 0, 0, 1, 1, 255, 255, 255, 255 );
 #else
@@ -1116,7 +1117,7 @@ static void CL_DrawPause( void )
 
 void CL_DrawHUD( int state )
 {
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_SetRenderMode(kRenderNormal);
 #endif
 	if( state == CL_ACTIVE && !cl.video_prepped )
@@ -1151,7 +1152,7 @@ void CL_DrawHUD( int state )
 		}
 		break;
 	}
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_SetRenderMode(kRenderTransTexture);
 #endif
 }
@@ -1444,8 +1445,9 @@ static void GAME_EXPORT pfnSPR_Set( HSPRITE hPic, int r, int g, int b )
 	clgame.ds.spriteColor[3] = 255;
 
 	// set default state
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
-	ImGui_Surface_SetRenderMode( kRenderNormal );
+#if defined(XASH_IMGUI_SURFACE)
+    // you should set state by yourself !!
+	//ImGui_Surface_SetRenderMode( kRenderNormal );
 #else
 	pglDisable( GL_BLEND );
 	pglDisable( GL_ALPHA_TEST );
@@ -1461,7 +1463,7 @@ pfnSPR_Draw
 */
 static void GAME_EXPORT pfnSPR_Draw( int frame, int x, int y, const wrect_t *prc )
 {
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_SetRenderMode( kRenderTransAlpha );
 #else
 	pglEnable( GL_ALPHA_TEST );
@@ -1477,7 +1479,7 @@ pfnSPR_DrawHoles
 */
 static void GAME_EXPORT pfnSPR_DrawHoles( int frame, int x, int y, const wrect_t *prc )
 {
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_SetRenderMode( kRenderTransAlpha );
 #else
 	GL_SetRenderMode( kRenderTransAlpha );
@@ -1493,7 +1495,7 @@ pfnSPR_DrawAdditive
 */
 static void GAME_EXPORT pfnSPR_DrawAdditive( int frame, int x, int y, const wrect_t *prc )
 {
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_SetRenderMode( kRenderTransAdd );
 #else
 	GL_SetRenderMode( kRenderTransAdd );
@@ -1582,7 +1584,7 @@ pfnFillRGBA
 */
 void GAME_EXPORT CL_FillRGBA( int x, int y, int width, int height, int r, int g, int b, int a )
 {
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	float x1 = x, y1 = y, w1 = width, h1 = height;
 	SPR_AdjustSize( &x1, &y1, &w1, &h1 );
 	ImGui_Surface_SetRenderMode(kRenderTransAdd);
@@ -1836,18 +1838,17 @@ int GAME_EXPORT pfnDrawCharacter( int x, int y, int number, int r, int g, int b 
 	if( !cls.creditsFont.valid )
 		return 0;
 
-#ifdef XASH_VGUI2
+#ifdef XASH_VGUI2_SURFACE
 	clgame.ds.adjust_size = true;
 	int a = max(r, max(g, b));
 	rgba_t rgb = { (byte)r,(byte)g,(byte)b,(byte)a };
 	int w = VGUI2_Surface_DrawChar(x, y, number, r, g, b, a);
 	clgame.ds.adjust_size = false;
 	return w;
-#elif defined XASH_IMGUI
+#elif defined XASH_IMGUI_SURFACE
 	clgame.ds.adjust_size = true;
 	int a = max(r, max(g, b));
 	rgba_t rgb = { (byte)r,(byte)g,(byte)b,(byte)a };
-	ImGui_Surface_SetRenderMode( kRenderTransAdd );
 	int w = ImGui_Surface_DrawChar(x, y, number, r, g, b, a);
 	clgame.ds.adjust_size = false;
 	return w;
@@ -1884,9 +1885,9 @@ int GAME_EXPORT pfnDrawConsoleString( int x, int y, const char *string )
 	if( !string || !*string ) return 0; // silent ignore
 	clgame.ds.adjust_size = true;
 	Con_SetFont( con_fontsize->integer );
-#ifdef XASH_VGUI2
+#ifdef XASH_VGUI2_SURFACE
     drawLen = VGUI2_Surface_DrawConsoleString(x, y, string, clgame.ds.textColor[0], clgame.ds.textColor[1], clgame.ds.textColor[2], clgame.ds.textColor[3]);
-#elif defined XASH_IMGUI
+#elif defined XASH_IMGUI_SURFACE
 	drawLen = ImGui_Surface_DrawConsoleString(x, y, string, clgame.ds.textColor[0], clgame.ds.textColor[1], clgame.ds.textColor[2], clgame.ds.textColor[3]);
 #else
 	drawLen = Con_DrawString(x, y, string, clgame.ds.textColor);
@@ -1925,9 +1926,9 @@ void GAME_EXPORT pfnDrawConsoleStringLen( const char *pText, int *length, int *h
 {
 	Con_SetFont( con_fontsize->integer );
 	clgame.ds.adjust_size = true;
-#ifdef XASH_VGUI2
+#ifdef XASH_VGUI2_SURFACE
     VGUI2_Surface_DrawStringLen( pText, length, height );
-#elif defined XASH_IMGUI
+#elif defined XASH_IMGUI_SURFACE
 	ImGui_Surface_DrawStringLen( pText, length, height );
 #else
 	Con_DrawStringLen( pText, length, height );
@@ -2947,7 +2948,7 @@ pfnSPR_DrawGeneric
 */
 static void GAME_EXPORT pfnSPR_DrawGeneric( int frame, int x, int y, const wrect_t *prc, int blendsrc, int blenddst, int width, int height )
 {
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_SetCustomBlend( blendsrc, blenddst );
 #else
 	pglEnable( GL_BLEND );
@@ -2975,12 +2976,12 @@ pfnVGUI2DrawCharacter
 */
 static int GAME_EXPORT pfnVGUI2DrawCharacter( int x, int y, int number, unsigned int font )
 {
-#ifdef XASH_VGUI2
+#ifdef XASH_VGUI2_SURFACE
     clgame.ds.adjust_size = true;
     int w = VGUI2_Surface_DrawChar(x, y, number, g_color_table[7][0], g_color_table[7][1], g_color_table[7][2], g_color_table[7][3]);
     clgame.ds.adjust_size = false;
     return w;
-#elif defined XASH_IMGUI
+#elif defined XASH_IMGUI_SURFACE
 	clgame.ds.adjust_size = true;
 	int w = ImGui_Surface_DrawChar(x, y, number, g_color_table[7][0], g_color_table[7][1], g_color_table[7][2], g_color_table[7][3]);
 	clgame.ds.adjust_size = false;
@@ -3127,7 +3128,7 @@ pfnFillRGBABlend
 */
 void GAME_EXPORT CL_FillRGBABlend( int x, int y, int width, int height, int r, int g, int b, int a )
 {
-#if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
+#if defined(XASH_IMGUI_SURFACE)
 	float x1 = x, y1 = y, w1 = width, h1 = height;
 	SPR_AdjustSize( &x1, &y1, &w1, &h1 );
 	ImGui_Surface_SetRenderMode( kRenderTransTexture );

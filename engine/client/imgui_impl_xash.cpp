@@ -145,8 +145,8 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 		return;
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 	pglShadeModel(GL_SMOOTH);
-	g_imguiRenderMode = kRenderTransAlpha;
-	GL_SetRenderMode(kRenderTransAlpha);
+	g_imguiRenderMode = kRenderNormal;
+	GL_SetRenderMode(kRenderNormal);
 	// Render command lists
 
 #ifdef XASH_SHADER
@@ -179,7 +179,8 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
             else
             {
                 GL_Bind( XASH_TEXTURE0, (ptrdiff_t)pcmd->TextureId );
-                pglScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+                // removed for performance
+                //pglScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
                 pglDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
             }
         }

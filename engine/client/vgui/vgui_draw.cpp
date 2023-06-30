@@ -24,6 +24,13 @@ GNU General Public License for more details.
 #include <string.h>
 #include "../keydefs.h"
 
+#define XASH_IMGUI_SURFACE
+#ifdef XASH_IMGUI_SURFACE
+#include "imgui_surface.h"
+int g_iBoundColor[4];
+bool g_bEnableTexture = false;
+#endif
+
 int	g_textures[VGUI_MAX_TEXTURES];
 int	g_textureId = 0;
 int	g_iBoundTexture;
@@ -659,40 +666,79 @@ void GAME_EXPORT VGUI_UploadTextureBlock( int id, int drawX, int drawY, const by
 		return;
 	}
 
+    GL_Bind( XASH_TEXTURE0, g_textures[id] );
 	pglTexSubImage2D( GL_TEXTURE_2D, 0, drawX, drawY, blockWidth, blockHeight, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
 	g_iBoundTexture = id;
 }
 
 void GAME_EXPORT VGUI_SetupDrawingRect( int *pColor )
 {
+#ifdef XASH_IMGUI_SURFACE
+    ImGui_Surface_SetRenderMode(kRenderTransColor);
+    g_iBoundColor[0] = pColor[0];
+    g_iBoundColor[1] = pColor[1];
+    g_iBoundColor[2] = pColor[2];
+    g_iBoundColor[3] = 255 - pColor[3];
+    ImGui_Surface_Flush();
+#else
 	pglEnable( GL_BLEND );
 	pglDisable( GL_ALPHA_TEST );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	pglColor4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
+#endif
 }
 
 void GAME_EXPORT VGUI_SetupDrawingText( int *pColor )
 {
+#ifdef XASH_IMGUI_SURFACE
+    ImGui_Surface_SetRenderMode(kRenderTransAlpha);
+    g_iBoundColor[0] = pColor[0];
+    g_iBoundColor[1] = pColor[1];
+    g_iBoundColor[2] = pColor[2];
+    g_iBoundColor[3] = 255 - pColor[3];
+    ImGui_Surface_Flush();
+#else
 	pglEnable( GL_BLEND );
 	pglEnable( GL_ALPHA_TEST );
 	pglAlphaFunc( GL_GREATER, 0.0f );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	pglColor4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
+#endif
 }
 
 void GAME_EXPORT VGUI_SetupDrawingImage( int *pColor )
 {
+#ifdef XASH_IMGUI_SURFACE
+    ImGui_Surface_SetRenderMode(kRenderTransAlpha);
+    g_iBoundColor[0] = pColor[0];
+    g_iBoundColor[1] = pColor[1];
+    g_iBoundColor[2] = pColor[2];
+    g_iBoundColor[3] = 255 - pColor[3];
+    ImGui_Surface_Flush();
+#else
 	pglEnable( GL_BLEND );
 	pglEnable( GL_ALPHA_TEST );
 	pglAlphaFunc( GL_GREATER, 0.0f );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	pglColor4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
+#endif
 }
 
 void GAME_EXPORT VGUI_BindTexture( int id )
 {
+#ifdef XASH_IMGUI_SURFACE
+    if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
+    {
+        g_iBoundTexture = id;
+    }
+    else
+    {
+        // NOTE: same as bogus index 2700 in GoldSrc
+        id = g_iBoundTexture = 1;
+    }
+#else
 	if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
 	{
 		GL_Bind( XASH_TEXTURE0, g_textures[id] );
@@ -704,6 +750,7 @@ void GAME_EXPORT VGUI_BindTexture( int id )
 		id = g_iBoundTexture = 1;
 		GL_Bind( XASH_TEXTURE0, g_textures[id] );
 	}
+#endif
 }
 
 /*
@@ -736,8 +783,13 @@ disable texturemode for fill rectangle
 */
 void GAME_EXPORT VGUI_EnableTexture( qboolean enable )
 {
+#ifdef XASH_IMGUI_SURFACE
+    g_bEnableTexture = enable;
+    ImGui_Surface_Flush();
+#else
 	if( enable ) pglEnable( GL_TEXTURE_2D );
 	else pglDisable( GL_TEXTURE_2D );
+#endif
 }
 
 /*
@@ -754,6 +806,22 @@ void GAME_EXPORT VGUI_DrawQuad( const vpoint_t *ul, const vpoint_t *lr )
 
 	ASSERT( ul != NULL && lr != NULL );
 
+#ifdef XASH_IMGUI_SURFACE
+    if(g_bEnableTexture)
+    {
+        ImGui_Surface_SetRenderMode(kRenderTransTexture);
+        ImGui_Surface_DrawImage(g_textures[g_iBoundTexture],
+                                ul->point[0] * xscale, ul->point[1] * yscale, lr->point[0] * xscale, lr->point[1] * yscale,
+                                ul->coord[0], ul->coord[1], lr->coord[0], lr->coord[1],
+                                g_iBoundColor[0], g_iBoundColor[1], g_iBoundColor[2], g_iBoundColor[3]);
+
+    }
+    else
+    {
+        ImGui_Surface_DrawRectangle(ul->point[0] * xscale, ul->point[1] * yscale, lr->point[0] * xscale - ul->point[0] * xscale, lr->point[1] * yscale - ul->point[1] * yscale,
+                                    g_iBoundColor[0], g_iBoundColor[1], g_iBoundColor[2], g_iBoundColor[3]);
+    }
+#else
 	pglBegin( GL_QUADS );
 		pglTexCoord2f( ul->coord[0], ul->coord[1] );
 		pglVertex2f( ul->point[0] * xscale, ul->point[1] * yscale );
@@ -767,6 +835,7 @@ void GAME_EXPORT VGUI_DrawQuad( const vpoint_t *ul, const vpoint_t *lr )
 		pglTexCoord2f( ul->coord[0], lr->coord[1] );
 		pglVertex2f( ul->point[0] * xscale, lr->point[1] * yscale );
 	pglEnd();
+#endif
 }
 
 void VGui_Paint()
