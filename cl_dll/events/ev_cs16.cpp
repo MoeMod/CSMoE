@@ -1263,30 +1263,85 @@ void EV_CS16Client_KillEveryRound( TEMPENTITY *te, float frametime, float curren
 	}
 }
 
+
+void HitBody(TEMPENTITY* ent, pmtrace_s* ptr)
+{
+	if (ptr->plane.normal.z > 0.0)
+		ent->flags |= FTENT_NONE;
+}
+
 void RemoveBody(TEMPENTITY *te, float frametime, float current_time)
 {
+	float gravity = -frametime * 1.0;
+	vec3_t	traceNormal;
+	float	traceFraction = 1;
+
+	pmtrace_t pmtrace;
+
+	gEngfuncs.pEventAPI->EV_SetTraceHull(0);
+
+	gEngfuncs.pEventAPI->EV_PlayerTrace(te->entity.prevstate.origin, te->entity.origin, PM_STUDIO_BOX | PM_WORLD_ONLY, -1, &pmtrace);
+
+	if (pmtrace.fraction != 1)
+	{
+		traceFraction = pmtrace.fraction;
+		VectorCopy(pmtrace.plane.normal, traceNormal);
+
+		HitBody(te, &pmtrace);
+	
+	}
+
+	if (traceFraction != 1)	// Decent collision now, and damping works
+	{
+		float  proj, damp;
+
+		// Place at contact point
+		VectorMA(te->entity.prevstate.origin, traceFraction * frametime, te->entity.baseline.origin, te->entity.origin);
+		// Damp velocity
+		damp = te->bounceFactor;
+		if (te->flags & FTENT_GRAVITY)
+		{
+			damp *= 0.5;
+			if (traceNormal[2] > 0.9)		// Hit floor?
+			{
+				if (te->entity.baseline.origin[2] <= 0)
+				{
+					damp = 0;		// Stop
+					te->flags &= ~(FTENT_ROTATE | FTENT_GRAVITY | FTENT_SLOWGRAVITY | FTENT_COLLIDEWORLD | FTENT_SMOKETRAIL);
+					te->entity.angles[0] = 0;
+					te->entity.angles[2] = 0;
+				}
+			}
+		}
+	}
+
+	if (g_flRoundTime > te->entity.curstate.fuser4)
+	{
+		// Mark it die on next TempEntUpdate
+		te->die = 0.0f;
+		// Set null renderamt, so it will be invisible now
+		// Also it will die immediately, if FTEMP_FADEOUT was set
+		te->entity.curstate.renderamt = 0;
+	}
+
 	// go underground...
-	/*if ( current_time >= 2 * te->entity.curstate.fuser2 + 5.0 )
-		te->entity.origin.z -= 5.0 * frametime;*/
-}
+	if ( current_time >= 2 * te->entity.curstate.fuser2 + 5.0 )
+		te->entity.origin.z -= 5.0 * frametime;
 
-void HitBody(TEMPENTITY *ent, pmtrace_s *ptr)
-{
-	/*if ( ptr->plane.normal.z > 0.0 )
-		ent->flags |= FTENT_NONE;*/
 }
-
 
 void CreateCorpse(Vector *p_vOrigin, Vector *p_vAngles, const char *pModel, float flAnimTime, int iSequence, int iBody)
 {
 	int modelIdx = gEngfuncs.pEventAPI->EV_FindModelIndex(pModel);
 	vec3_t null(0, 0, 0);
-	TEMPENTITY *model = gEngfuncs.pEfxAPI->R_TempModel( *p_vOrigin,
-														null,
-														*p_vAngles,
-														gEngfuncs.pfnGetCvarFloat("cl_corpsestay"),
-														modelIdx,
-														0 );
+	//TEMPENTITY *model = gEngfuncs.pEfxAPI->R_TempModel( *p_vOrigin,
+	//													null,
+	//													*p_vAngles,
+	//													gEngfuncs.pfnGetCvarFloat("cl_corpsestay"),
+	//													modelIdx,
+	//													0 );
+
+	TEMPENTITY* model = gEngfuncs.pEfxAPI->R_TempCustomModel(*p_vOrigin, *p_vAngles, null, gEngfuncs.pfnGetCvarFloat("cl_corpsestay"), modelIdx, 0, 1.0, false, 255, kRenderNormal, 0, 0, false, 0, 1.0, 256,  FTENT_GRAVITY | FTENT_CLIENTCUSTOM);
 
 	if(model)
 	{
@@ -1298,6 +1353,7 @@ void CreateCorpse(Vector *p_vOrigin, Vector *p_vAngles, const char *pModel, floa
 		model->entity.curstate.body = iBody;
 		model->entity.curstate.fuser1 = gHUD.m_flTime + 1.0;
 		model->entity.curstate.fuser2 = gEngfuncs.pfnGetCvarFloat("cl_corpsestay") + gHUD.m_flTime;
+		model->entity.curstate.fuser4 = gEngfuncs.GetClientTime();
 		model->hitcallback = HitBody;
 		model->callback = RemoveBody;
 	}

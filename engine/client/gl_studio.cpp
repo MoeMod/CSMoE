@@ -1308,7 +1308,7 @@ just a prefab for render shadow
 */
 void GAME_EXPORT R_StudioRenderShadow( int iSprite, const vec3_t p1, const vec3_t p2, const vec3_t p3, const vec3_t p4 )
 {
-#if XASH_GLES
+#if def
     // disabled for performance
     // TODO : defer as additive
     return;

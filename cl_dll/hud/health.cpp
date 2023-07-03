@@ -21,7 +21,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
-
+#include "../dlls/player/player_model.h"
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
@@ -564,7 +564,7 @@ void CHudHealth::UpdateTiles(float flTime, long bitsDamage)
 
 int CHudHealth :: MsgFunc_ClCorpse(const char *pszName, int iSize, void *pbuf)
 {
-#if 0
+#if 1
 	BufferReader reader(pbuf, iSize);
 
 	char szModel[64];
@@ -584,7 +584,7 @@ int CHudHealth :: MsgFunc_ClCorpse(const char *pszName, int iSize, void *pbuf)
 	int teamID = reader.ReadByte();
 	int playerID = reader.ReadByte();
 
-	if( !cl_minmodels->value )
+	if( !gHUD.cl_minmodels->value )
 	{
 		if( !strstr(pModel, "models/") )
 		{
@@ -593,14 +593,14 @@ int CHudHealth :: MsgFunc_ClCorpse(const char *pszName, int iSize, void *pbuf)
 	}
 	else if( teamID == 1 ) // terrorists
 	{
-		int modelidx = cl_min_t->value;
+		int modelidx = gHUD.cl_min_t->value;
 		if( BIsValidTModelIndex(modelidx) )
 			strncpy(szModel, sPlayerModelFiles[modelidx], sizeof(szModel));
 		else strncpy(szModel, sPlayerModelFiles[1], sizeof(szModel) ); // set leet.mdl
 	}
 	else if( teamID == 2 ) // ct
 	{
-		int modelidx = cl_min_ct->value;
+		int modelidx = gHUD.cl_min_ct->value;
 
 		if( g_PlayerExtraInfo[playerID].vip )
 			strncpy( szModel, sPlayerModelFiles[3], sizeof(szModel) ); // vip.mdl
