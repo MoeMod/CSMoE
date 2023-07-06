@@ -648,7 +648,11 @@ void GL_InitExtensionsGLES( void )
 	GL_SetExtension( GL_ARB_VERTEX_BUFFER_OBJECT_EXT, true ); // gles specs
 
 	// hardware cubemaps
+#ifdef XASH_GL4ES
+	GL_CheckExtension( "GL_ARB_texture_cube_map", NULL, "gl_texture_cubemap", GL_TEXTURECUBEMAP_EXT );
+#else
 	GL_CheckExtension( "GL_OES_texture_cube_map", NULL, "gl_texture_cubemap", GL_TEXTURECUBEMAP_EXT );
+#endif
 
 	if( GL_Support( GL_TEXTURECUBEMAP_EXT ))
 		pglGetIntegerv( GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, &glConfig.max_cubemap_size );
@@ -656,7 +660,11 @@ void GL_InitExtensionsGLES( void )
 	GL_SetExtension( GL_ARB_SEAMLESS_CUBEMAP, false );
 
 	GL_SetExtension( GL_EXT_POINTPARAMETERS, false );
+#ifdef XASH_GL4ES
+	GL_CheckExtension( "GL_ARB_texture_non_power_of_two", NULL, "gl_texture_npot", GL_ARB_TEXTURE_NPOT_EXT );
+#else
 	GL_CheckExtension( "GL_OES_texture_npot", NULL, "gl_texture_npot", GL_ARB_TEXTURE_NPOT_EXT );
+#endif
 
 	GL_SetExtension( GL_TEXTURE_COMPRESSION_EXT, false );
 	GL_SetExtension( GL_CUSTOM_VERTEX_ARRAY_EXT, false );

@@ -1590,7 +1590,7 @@ static void R_StudioSetupShader()
 	pglUniform4fARB(g_pstudioshader->uniform.texOffset, 0, 0, 1, 1);
 	pglUniformMatrix4fvARB(g_pstudioshader->uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
 	pglUniform4fvARB(g_pstudioshader->uniform.boneMat, 3 * MAXSTUDIOBONES, (const float*)g_bonestransform);
-	pglUniform1iARB(g_pstudioshader->uniform.texEnvMap, 5);
+	pglUniform1iARB(g_pstudioshader->uniform.texEnvMap, 1); // pglActiveTextureARB(GL_TEXTURE1_ARB)
 	pglUniform4fvARB(g_pstudioshader->uniform.worldEye, 1, (const float*)&RI.vieworg);
 }
 
@@ -1751,7 +1751,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
-			
+
 
 
 			//if (!Q_stricmp(ptexture->name, "#M_L.bmp") ||
@@ -1794,7 +1794,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			//{
 			//	
 			//}
-			
+
 			xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 

@@ -96,7 +96,6 @@ GL_Bind
 */
 void GL_Bind( GLint tmu, GLenum texnum )
 {
-	gltexture_t	*texture;
 
 	// missed texture ?
 	if( texnum <= 0 ) texnum = tr.defaultTexture;
@@ -110,22 +109,27 @@ void GL_Bind( GLint tmu, GLenum texnum )
 	//if( tmu < 0 || tmu >= MAX_TEXTURE_UNITS )
 		//return;
 
-	texture = &r_textures[texnum];
+    int target = glState.currentTextureTargets[tmu];
+    if( texnum != GL_NONE )
+    {
+        gltexture_t	*texture = &r_textures[texnum];
+        target = texture->target;
+    }
 
-	if( glState.currentTextureTargets[tmu] != texture->target )
+	if( glState.currentTextureTargets[tmu] != target )
 	{
 		if( glState.currentTextureTargets[tmu] != GL_NONE )
 			pglDisable( glState.currentTextureTargets[tmu] );
 
-		glState.currentTextureTargets[tmu] = texture->target;
+		glState.currentTextureTargets[tmu] = target;
 		pglEnable( glState.currentTextureTargets[tmu] );
 	}
 
-	if( glState.currentTextures[tmu] == texture->texnum )
+	if( glState.currentTextures[tmu] == texnum )
 		return;
 
-	pglBindTexture( texture->target, texture->texnum );
-	glState.currentTextures[tmu] = texture->texnum;
+	pglBindTexture( target, texnum );
+	glState.currentTextures[tmu] = texnum;
 }
 
 /*
