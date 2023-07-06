@@ -5,6 +5,10 @@
 #include "gl_cubemap.h"
 #include "gl_texlru.h"
 
+#ifdef XASH_GL4ES
+extern "C" void realize_active();
+#endif
+
 namespace xe {
 
 #define MAX_SHADER_ENV 10
@@ -208,9 +212,11 @@ void CCubeMapManager::SetupTexture()
     auto textureID = m_EnvTextureId[m_iCubeMapID];
     xe::TexLru_Upload(textureID);
 
-    pglActiveTextureARB(GL_TEXTURE5_ARB);
-    pglEnable(GL_TEXTURE_2D);
-    pglEnable(GL_TEXTURE_CUBE_MAP_ARB);
+    pglActiveTextureARB(GL_TEXTURE1_ARB);
+#ifdef XASH_GL4ES
+    // gl4es workround
+    realize_active();
+#endif
     pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, textureID);
     pglActiveTextureARB(GL_TEXTURE0_ARB);
 }
@@ -220,10 +226,12 @@ void CCubeMapManager::UnloadTexture()
     if (!m_bEnabled || !m_bRendering)
         return;
 
-    pglActiveTextureARB(GL_TEXTURE5_ARB);
+    pglActiveTextureARB(GL_TEXTURE1_ARB);
+#ifdef XASH_GL4ES
+    // gl4es workround
+    realize_active();
+#endif
     pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);
-    pglDisable(GL_TEXTURE_2D);
-    pglDisable(GL_TEXTURE_CUBE_MAP_ARB);
     pglActiveTextureARB(GL_TEXTURE0_ARB);
 }
 

@@ -496,10 +496,7 @@ namespace xe {
             //GL_UploadTexture( pic, tex, false, filter );
 
             Assert(tex->target == GL_TEXTURE_CUBE_MAP_ARB);
-            pglActiveTextureARB(GL_TEXTURE5_ARB);
-            pglDisable(GL_TEXTURE_2D);
-            pglEnable(GL_TEXTURE_CUBE_MAP_ARB);
-            pglBindTexture(tex->target, tex->texnum);
+            pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, tex->texnum);
             tex->texType = TEX_CUBEMAP;
             for(int j = 0; j < 6; ++j)
             {
@@ -519,12 +516,13 @@ namespace xe {
                 pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                 pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+#ifdef XASH_GL4ES
+                // gl4es workround
+                pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP, 1);
+#endif
                 pglTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, 0, GL_RGBA, pic->width, pic->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pic->buffer);
             }
             pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);
-            pglDisable(GL_TEXTURE_2D);
-            pglDisable(GL_TEXTURE_CUBE_MAP_ARB);
-            pglActiveTextureARB(GL_TEXTURE0_ARB);
 
             GL_TexFilter( tex, false ); // update texture filter, wrap etc
 
