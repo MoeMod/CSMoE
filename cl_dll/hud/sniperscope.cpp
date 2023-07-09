@@ -285,6 +285,7 @@ void CHudSniperScope::FuncDrawCircle(int index, int width, int height, float gau
 	int pl;
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
+    gRenderAPI.GL_Upload(index);
 	gRenderAPI.GL_Bind(0, index);
 
 	const float defCoords[8][2] = {
@@ -1297,6 +1298,7 @@ void CHudSniperScope::DrawPatrolDroneScope(float flTime)
 			{
 				float drawoffset = imageoffset + fmax - percent;
 
+                gRenderAPI.GL_Upload(texid);
 				gRenderAPI.GL_Bind(0, texid);
 
 				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
@@ -1320,6 +1322,7 @@ void CHudSniperScope::DrawPatrolDroneScope(float flTime)
 			{
 				float drawoffset = imageoffset + fmax - percent;
 
+                gRenderAPI.GL_Upload(m_iPatrolDrone_Icon_Disabled->texnum());
 				gRenderAPI.GL_Bind(0, m_iPatrolDrone_Icon_Disabled->texnum());
 
 				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
@@ -1627,6 +1630,7 @@ void CHudSniperScope::DrawHaloGunCrossHair(float flTime)
 	iX = ScreenWidth / 2 - m_iHaloGun_Aim_BG->w() * 1.5;
 	iY = ScreenHeight / 2 - m_iHaloGun_Aim_BG->h();
 
+    gRenderAPI.GL_Upload(texid);
 	gRenderAPI.GL_Bind(0, texid);
 
 	gEngfuncs.pTriAPI->Begin(TRI_QUADS);

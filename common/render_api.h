@@ -218,7 +218,7 @@ typedef struct render_api_s
 	void		(*GL_TexCoordArrayMode)( unsigned int texmode );
 	void		(*GL_Reserved0)( void );	// for potential interface expansion without broken compatibility
 	void		(*GL_Reserved1)( void );
-	void		(*GL_Reserved2)( void );
+	bool		(*GL_Upload)( int texnum );
 	void		(*GL_Scissor)(int enable, int x, int y, int width, int height);
 		
 	// Misc renderer functions

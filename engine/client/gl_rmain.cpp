@@ -24,6 +24,7 @@ GNU General Public License for more details.
 #include "beamdef.h"
 #include "particledef.h"
 #include "entity_types.h"
+#include "gl_texlru.h"
 
 #ifdef XASH_RAGDOLL
 #include "physics.h"
@@ -1678,6 +1679,8 @@ const byte *GL_TextureData( unsigned int texnum )
 
 static int GL_LoadTextureNoFilter( const char *name, const byte *buf, size_t size, int flags )
 {
+    if(buf == nullptr)
+        return xe::TexLru_LoadTextureExternal(name, size, NULL);
     return GL_LoadTexture( name, buf, size, flags, NULL );
 }
 
@@ -1770,7 +1773,7 @@ static render_api_t gRenderAPI =
     GL_SetTexCoordArrayMode,
     NULL,
     NULL,
-    NULL,
+    xe::TexLru_Upload,
     GL_Scissor,
     CL_DrawParticlesExternal,
     R_EnvShot,

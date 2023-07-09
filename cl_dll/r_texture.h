@@ -58,6 +58,7 @@ public:
 
 	void Draw2DQuad(float x1, float y1, float x2, float y2, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255) const noexcept
 	{
+		gRenderAPI.GL_Upload(m_iInternalId);
 #if defined(XASH_IMGUI_SURFACE)
 		ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
 		ImGui_Surface_SetRenderMode(kRenderTransTexture);
@@ -82,7 +83,10 @@ public:
 	int GetParm(int parm = PARM_TEX_TYPE) const noexcept
 	{
 		if(g_iXash)
+		{
+			gRenderAPI.GL_Upload(m_iInternalId);
 			return gRenderAPI.RenderGetParm(parm, m_iInternalId);
+        }
 		return 0;
 	}
 	int w() const noexcept { return GetParm(PARM_TEX_WIDTH); }
