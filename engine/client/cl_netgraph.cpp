@@ -16,6 +16,8 @@ GNU General Public License for more details.
 #include "common.h"
 #include "client.h"
 #include "gl_local.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 #define NET_TIMINGS          BIT( 10 )
 #define NET_TIMINGS_MASK     (NET_TIMINGS - 1)
@@ -645,13 +647,13 @@ void SCR_DrawNetGraph( void )
 	{
 		GL_SetRenderMode( kRenderTransColor );
 		pglDisable( GL_TEXTURE_2D );
-		pglBegin( GL_QUADS ); // draw all the fills as a long solid sequence of quads for speedup reasons
+		gTriApi.Begin( GL_QUADS ); // draw all the fills as a long solid sequence of quads for speedup reasons
 
 		// NOTE: fill colors without texture at this point
 		NetGraph_DrawDataUsage( x, y, w );
 		NetGraph_DrawTimes( rect, x, w );
 
-		pglEnd();
+		gTriApi.End();
 		pglColor4ub( 255, 255, 255, 255 );
 		pglEnable( GL_TEXTURE_2D );
 	}

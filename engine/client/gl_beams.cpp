@@ -25,6 +25,8 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "studio.h"
 #include "cl_tent.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 #define CURVEDBEAM 0
 #define NOISE_DIVISIONS	64	// don't touch - many tripmines cause the crash when it equal 128
@@ -209,7 +211,7 @@ static void CL_DrawSegsStretch(int modelIndex, float frame, int rendermode, cons
 
 	SetBeamRenderMode(rendermode);
 	GL_Bind(XASH_TEXTURE0, m_hSprite);
-	pglBegin(GL_TRIANGLE_STRIP);
+	gTriApi.Begin(GL_TRIANGLE_STRIP);
 
 	// specify the next segment.
 	curSeg.width = nextSeg.width = width * 2.0f;
@@ -227,30 +229,30 @@ static void CL_DrawSegsStretch(int modelIndex, float frame, int rendermode, cons
 	VectorMA(curSeg.pos, (curSeg.width * 0.5f), vAveNormal, vPoint1);
 	VectorMA(curSeg.pos, (-curSeg.width * 0.5f), vAveNormal, vPoint2);
 
-	pglColor4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
-	pglTexCoord2f(0.0f, curSeg.texcoord);
+	gTriApi.Color4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
+	gTriApi.TexCoord2f(0.0f, curSeg.texcoord);
 	pglNormal3fv(vAveNormal.data());
-	pglVertex3fv(vPoint1.data());
+	gTriApi.Vertex3fv(vPoint1);
 
-	pglColor4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
-	pglTexCoord2f(1.0f, curSeg.texcoord);
+	gTriApi.Color4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
+	gTriApi.TexCoord2f(1.0f, curSeg.texcoord);
 	pglNormal3fv(vAveNormal.data());
-	pglVertex3fv(vPoint2.data());
+	gTriApi.Vertex3fv(vPoint2);
 
 	VectorMA(nextSeg.pos, (nextSeg.width * 0.5f), vAveNormal, vPoint1);
 	VectorMA(nextSeg.pos, (-nextSeg.width * 0.5f), vAveNormal, vPoint2);
 
-	pglColor4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
-	pglTexCoord2f(0.0f, nextSeg.texcoord);
+	gTriApi.Color4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
+	gTriApi.TexCoord2f(0.0f, nextSeg.texcoord);
 	pglNormal3fv(vAveNormal.data());
-	pglVertex3fv(vPoint1.data());
+	gTriApi.Vertex3fv(vPoint1);
 
-	pglColor4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
-	pglTexCoord2f(1.0f, nextSeg.texcoord);
+	gTriApi.Color4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
+	gTriApi.TexCoord2f(1.0f, nextSeg.texcoord);
 	pglNormal3fv(vAveNormal.data());
-	pglVertex3fv(vPoint2.data());
+	gTriApi.Vertex3fv(vPoint2);
 
-	pglEnd();
+	gTriApi.End();
 }
 
 /*
@@ -337,7 +339,7 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
-	pglBegin( GL_TRIANGLE_STRIP );
+	gTriApi.Begin( GL_TRIANGLE_STRIP );
 #if CURVEDBEAM
 	//	CurvedBeam Begin 1 of 3
 	vec3_t end, mid, ang;
@@ -478,15 +480,15 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 			VectorMA( curSeg.pos, ( curSeg.width * 0.5f ), vAveNormal, vPoint1 );
 			VectorMA( curSeg.pos, (-curSeg.width * 0.5f ), vAveNormal, vPoint2 );
 
-			pglColor4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
-			pglTexCoord2f( 0.0f, curSeg.texcoord );
+			gTriApi.Color4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
+			gTriApi.TexCoord2f( 0.0f, curSeg.texcoord );
 			pglNormal3fv( vAveNormal.data() );
-			pglVertex3fv( vPoint1.data() );
+			gTriApi.Vertex3fv( vPoint1 );
 
-			pglColor4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
-			pglTexCoord2f( 1.0f, curSeg.texcoord );
+			gTriApi.Color4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
+			gTriApi.TexCoord2f( 1.0f, curSeg.texcoord );
 			pglNormal3fv( vAveNormal.data() );
-			pglVertex3fv( vPoint2.data() );
+			gTriApi.Vertex3fv( vPoint2);
 		}
 
 		curSeg = nextSeg;
@@ -499,22 +501,22 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 			VectorMA( curSeg.pos, (-curSeg.width * 0.5f ), vLastNormal, vPoint2 );
 
 			// specify the points.
-			pglColor4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
-			pglTexCoord2f( 0.0f, curSeg.texcoord );
+			gTriApi.Color4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
+			gTriApi.TexCoord2f( 0.0f, curSeg.texcoord );
 			pglNormal3fv( vLastNormal.data() );
-			pglVertex3fv( vPoint1.data() );
+			gTriApi.Vertex3fv( vPoint1 );
 
-			pglColor4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
-			pglTexCoord2f( 1.0f, curSeg.texcoord );
+			gTriApi.Color4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
+			gTriApi.TexCoord2f( 1.0f, curSeg.texcoord );
 			pglNormal3fv( vLastNormal.data() );
-			pglVertex3fv( vPoint2.data() );
+			gTriApi.Vertex3fv( vPoint2 );
 		}
 
 		vLast += vStep; // Advance texture scroll (v axis only)
 		noiseIndex += noiseStep;
 	}
 
-	pglEnd();
+	gTriApi.End();
 }
 
 /*
@@ -555,7 +557,7 @@ static void CL_DrawDisk( int modelIndex, float frame, int rendermode, const vec3
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
 
-	pglBegin( GL_TRIANGLE_STRIP );
+	gTriApi.Begin( GL_TRIANGLE_STRIP );
 
 	// NOTE: We must force the degenerate triangles to be on the edge
 	for( i = 0; i < segments; i++ )
@@ -565,23 +567,23 @@ static void CL_DrawDisk( int modelIndex, float frame, int rendermode, const vec3
 		fraction = i * div;
 		VectorCopy( source, point );
 
-		pglColor4f( color[0], color[1], color[2], 1.0f );
-		pglTexCoord2f( 1.0f, vLast );
-		pglVertex3fv( point.data() );
+		gTriApi.Color4f( color[0], color[1], color[2], 1.0f );
+		gTriApi.TexCoord2f( 1.0f, vLast );
+		gTriApi.Vertex3fv( point );
 
 		SinCos( fraction * M_PI2, &s, &c );
 		point[0] = s * w + source[0];
 		point[1] = c * w + source[1];
 		point[2] = source[2];
 
-		pglColor4f( color[0], color[1], color[2], 1.0f );
-		pglTexCoord2f( 0.0f, vLast );
-		pglVertex3fv( point.data() );
+		gTriApi.Color4f( color[0], color[1], color[2], 1.0f );
+		gTriApi.TexCoord2f( 0.0f, vLast );
+		gTriApi.Vertex3fv( point);
 
 		vLast += vStep;	// Advance texture scroll (v axis only)
 	}
 
-	pglEnd();
+	gTriApi.End();
 }
 
 /*
@@ -621,7 +623,7 @@ static void CL_DrawCylinder( int modelIndex, float frame, int rendermode, const 
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
 
-	pglBegin( GL_TRIANGLE_STRIP );
+	gTriApi.Begin( GL_TRIANGLE_STRIP );
 
 	for( i = 0; i < segments; i++ )
 	{
@@ -634,22 +636,22 @@ static void CL_DrawCylinder( int modelIndex, float frame, int rendermode, const 
 		point[1] = c * freq * delta[2] + source[1];
 		point[2] = source[2] + width;
 
-		pglColor4f( 0.0f, 0.0f, 0.0f, 1.0f );
-		pglTexCoord2f( 1.0f, vLast );
-		pglVertex3fv( point.data() );
+		gTriApi.Color4f( 0.0f, 0.0f, 0.0f, 1.0f );
+		gTriApi.TexCoord2f( 1.0f, vLast );
+		gTriApi.Vertex3fv( point);
 
 		point[0] = s * freq * (delta[2] + width) + source[0];
 		point[1] = c * freq * (delta[2] + width) + source[1];
 		point[2] = source[2] - width;
 
-		pglColor4f( color[0], color[1], color[2], 1.0f );
-		pglTexCoord2f( 0.0f, vLast );
-		pglVertex3fv( point.data() );
+		gTriApi.Color4f( color[0], color[1], color[2], 1.0f );
+		gTriApi.TexCoord2f( 0.0f, vLast );
+		gTriApi.Vertex3fv( point );
 
 		vLast += vStep;	// Advance texture scroll (v axis only)
 	}
 
-	pglEnd();
+	gTriApi.End();
 	GL_Cull( GL_FRONT );
 }
 
@@ -733,7 +735,7 @@ void CL_DrawRing( int modelIndex, float frame, int rendermode, const vec3_t sour
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
 
-	pglBegin( GL_TRIANGLE_STRIP );
+	gTriApi.Begin( GL_TRIANGLE_STRIP );
 
 	for( i = 0; i < segments + 1; i++ )
 	{
@@ -772,13 +774,13 @@ void CL_DrawRing( int modelIndex, float frame, int rendermode, const vec3_t sour
 			VectorMA( point, -width, normal, last2 );
 
 			vLast += vStep;	// Advance texture scroll (v axis only)
-			pglColor4f( color[0], color[1], color[2], 1.0f );
-			pglTexCoord2f( 1.0f, vLast );
-			pglVertex3fv( last2.data() );
+			gTriApi.Color4f( color[0], color[1], color[2], 1.0f );
+			gTriApi.TexCoord2f( 1.0f, vLast );
+			gTriApi.Vertex3fv( last2 );
 
-			pglColor4f( color[0], color[1], color[2], 1.0f );
-			pglTexCoord2f( 0.0f, vLast );
-			pglVertex3fv( last1.data() );
+			gTriApi.Color4f( color[0], color[1], color[2], 1.0f );
+			gTriApi.TexCoord2f( 0.0f, vLast );
+			gTriApi.Vertex3fv( last1 );
 		}
 
 		VectorCopy( screen, screenLast );
@@ -792,7 +794,7 @@ void CL_DrawRing( int modelIndex, float frame, int rendermode, const vec3_t sour
 		}
 	}
 
-	pglEnd();
+	gTriApi.End();
 }
 
 /*
@@ -901,17 +903,17 @@ static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int re
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
 
-	pglBegin( GL_TRIANGLES );
+	gTriApi.Begin( GL_TRIANGLES );
 
 	while( pHead )
 	{
-		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
-		pglTexCoord2f( 1.0f, 1.0f );
-		pglVertex3fv( last2.data() );
+		gTriApi.Color4ub( nColor[0], nColor[1], nColor[2], 255 );
+		gTriApi.TexCoord2f( 1.0f, 1.0f );
+		gTriApi.Vertex3fv( last2 );
 
-		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
-		pglTexCoord2f( 0.0f, 1.0f );
-		pglVertex3fv( last1.data() );
+		gTriApi.Color4ub( nColor[0], nColor[1], nColor[2], 255 );
+		gTriApi.TexCoord2f( 0.0f, 1.0f );
+		gTriApi.Vertex3fv( last1 );
 
 		VectorCopy( last2, saved_last2 );
 		saved_nColor[0] = nColor[0];
@@ -961,28 +963,28 @@ static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int re
 			fraction = 0.0;
 		}
 
-		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
-		pglTexCoord2f( 0.0f, 0.0f );
-		pglVertex3fv( last1.data() );
+		gTriApi.Color4ub( nColor[0], nColor[1], nColor[2], 255 );
+		gTriApi.TexCoord2f( 0.0f, 0.0f );
+		gTriApi.Vertex3fv( last1 );
 
-		pglColor4ub( saved_nColor[0], saved_nColor[1], saved_nColor[2], 255 );
-		pglTexCoord2f( 1.0f, 1.0f );
-		pglVertex3fv( saved_last2.data() );
+		gTriApi.Color4ub( saved_nColor[0], saved_nColor[1], saved_nColor[2], 255 );
+		gTriApi.TexCoord2f( 1.0f, 1.0f );
+		gTriApi.Vertex3fv( saved_last2 );
 
-		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
-		pglTexCoord2f( 0.0f, 0.0f );
-		pglVertex3fv( last1.data() );
+		gTriApi.Color4ub( nColor[0], nColor[1], nColor[2], 255 );
+		gTriApi.TexCoord2f( 0.0f, 0.0f );
+		gTriApi.Vertex3fv( last1 );
 
-		pglColor4ub( nColor[0], nColor[1], nColor[2], 255 );
-		pglTexCoord2f( 1.0f, 0.0f );
-		pglVertex3fv( last2.data() );
+		gTriApi.Color4ub( nColor[0], nColor[1], nColor[2], 255 );
+		gTriApi.TexCoord2f( 1.0f, 0.0f );
+		gTriApi.Vertex3fv( last2 );
 
 		VectorCopy( screen, screenLast );
 
 		pHead = pHead->next;
 	}
 
-	pglEnd();
+	gTriApi.End();
 }
 
 /*

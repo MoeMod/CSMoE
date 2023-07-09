@@ -19,7 +19,8 @@ GNU General Public License for more details.
 #include "client.h"
 #include "gl_local.h"
 #include "mathlib.h"
-
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 char		r_speeds_msg[MAX_SYSPATH];
 ref_speeds_t	r_stats;	// r_speeds counters
 
@@ -730,22 +731,22 @@ rebuild_page:
 		if(( image->flags & TF_DEPTHMAP ) && !( image->flags & TF_NOCOMPARE ))
 			pglTexParameteri( image->target, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE );
 
-		pglBegin( GL_QUADS );
-		pglTexCoord2f( 0, 0 );
+		gTriApi.Begin( GL_QUADS );
+		gTriApi.TexCoord2f( 0, 0 );
 		pglVertex2f( x, y );
 		if( image->flags & TF_TEXTURE_RECTANGLE )
-			pglTexCoord2f( image->width, 0 );
-		else pglTexCoord2f( 1, 0 );
+			gTriApi.TexCoord2f( image->width, 0 );
+		else gTriApi.TexCoord2f( 1, 0 );
 		pglVertex2f( x + w, y );
 		if( image->flags & TF_TEXTURE_RECTANGLE )
-			pglTexCoord2f( image->width, image->height );
-		else pglTexCoord2f( 1, 1 );
+			gTriApi.TexCoord2f( image->width, image->height );
+		else gTriApi.TexCoord2f( 1, 1 );
 		pglVertex2f( x + w, y + h );
 		if( image->flags & TF_TEXTURE_RECTANGLE )
-			pglTexCoord2f( 0, image->height );
-		else pglTexCoord2f( 0, 1 );
+			gTriApi.TexCoord2f( 0, image->height );
+		else gTriApi.TexCoord2f( 0, 1 );
 		pglVertex2f( x, y + h );
-		pglEnd();
+		gTriApi.End();
 
 		if(( image->flags & TF_DEPTHMAP ) && !( image->flags & TF_NOCOMPARE ))
 			pglTexParameteri( image->target, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB );

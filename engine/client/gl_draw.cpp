@@ -19,6 +19,8 @@ GNU General Public License for more details.
 #include "client.h"
 #include "gl_local.h"
 #include "gl_texlru.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 /*
 =============
@@ -73,17 +75,17 @@ void R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, f
 {
 	GL_Bind( XASH_TEXTURE0, texnum );
 
-	pglBegin( GL_QUADS );
-		pglTexCoord2f( s1, t1 );
+	gTriApi.Begin( GL_QUADS );
+		gTriApi.TexCoord2f( s1, t1 );
 		pglVertex2f( x, y );
 
-		pglTexCoord2f( s2, t1 );
+		gTriApi.TexCoord2f( s2, t1 );
 		pglVertex2f( x + w, y );
 
-		pglTexCoord2f( s2, t2 );
+		gTriApi.TexCoord2f( s2, t2 );
 		pglVertex2f( x + w, y + h );
 
-		pglTexCoord2f( s1, t2 );
+		gTriApi.TexCoord2f( s1, t2 );
 		pglVertex2f( x, y + h );
 	pglEnd();
 }
@@ -102,23 +104,23 @@ void R_DrawTileClear( int x, int y, int w, int h )
 	gltexture_t	*glt;
 
 	GL_SetRenderMode( kRenderNormal );
-	pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	gTriApi.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
 	GL_Bind( XASH_TEXTURE0, cls.tileImage );
 
 	glt = R_GetTexture( cls.tileImage );
 	tw = glt->srcWidth;
 	th = glt->srcHeight;
 
-	pglBegin( GL_QUADS );
-		pglTexCoord2f( x / tw, y / th );
+	gTriApi.Begin( GL_QUADS );
+		gTriApi.TexCoord2f( x / tw, y / th );
 		pglVertex2f( x, y );
-		pglTexCoord2f((x + w) / tw, y / th );
+		gTriApi.TexCoord2f((x + w) / tw, y / th );
 		pglVertex2f( x + w, y );
-		pglTexCoord2f((x + w) / tw, (y + h) / th );
+		gTriApi.TexCoord2f((x + w) / tw, (y + h) / th );
 		pglVertex2f( x + w, y + h );
-		pglTexCoord2f( x / tw, (y + h) / th );
+		gTriApi.TexCoord2f( x / tw, (y + h) / th );
 		pglVertex2f( x, y + h );
-	pglEnd ();
+	gTriApi.End ();
 }
 
 /*
@@ -180,16 +182,16 @@ void R_DrawStretchRaw( float x, float y, float w, float h, int cols, int rows, c
 		}
 	}
 
-	pglBegin( GL_QUADS );
-	pglTexCoord2f( 0, 0 );
+	gTriApi.Begin( GL_QUADS );
+	gTriApi.TexCoord2f( 0, 0 );
 	pglVertex2f( x, y );
-	pglTexCoord2f( 1, 0 );
+	gTriApi.TexCoord2f( 1, 0 );
 	pglVertex2f( x + w, y );
-	pglTexCoord2f( 1, 1 );
+	gTriApi.TexCoord2f( 1, 1 );
 	pglVertex2f( x + w, y + h );
-	pglTexCoord2f( 0, 1 );
+	gTriApi.TexCoord2f( 0, 1 );
 	pglVertex2f( x, y + h );
-	pglEnd();
+	gTriApi.End();
 }
 
 /*

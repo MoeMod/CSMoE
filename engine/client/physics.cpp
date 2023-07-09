@@ -14,6 +14,8 @@
 #include "input.h"
 
 #include "physics.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 convar_t *bv_debug;
 convar_t* bv_enable;
@@ -289,7 +291,7 @@ namespace physics
 		clgame.ds.triColor[2] = (byte)bound(0, (color1.getZ() * 255.0f), 255);
 		clgame.ds.triColor[3] = (byte)bound(0, (1.0f * 255.0f), 255);
 		pglColor4ub(clgame.ds.triColor[0], clgame.ds.triColor[1], clgame.ds.triColor[2], clgame.ds.triColor[3]);
-		pglBegin(GL_LINES);
+		gTriApi.Begin(GL_LINES);
 
 		vec3_t from = { from1.getX(), from1.getY(), from1.getZ() };
 		vec3_t to = { to1.getX(), to1.getY(), to1.getZ() };
@@ -297,9 +299,9 @@ namespace physics
 		Vec3BulletToGoldSrc(from);
 		Vec3BulletToGoldSrc(to);
 
-		pglVertex3fv(from.data());
-		pglVertex3fv(to.data());
-		pglEnd();
+		gTriApi.Vertex3fv(from);
+		gTriApi.Vertex3fv(to);
+		gTriApi.End();
 		pglDisable(GL_ALPHA_TEST);
 
 		pglEnable(GL_DEPTH_TEST);
