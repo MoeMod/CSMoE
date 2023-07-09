@@ -725,7 +725,7 @@ rebuild_page:
 		x = k % base_w * w;
 		y = k / base_w * h;
 
-		pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+		gTriApi.Color4ub( 1.0f, 1.0f, 1.0f, 1.0f );
 		GL_Bind( XASH_TEXTURE0, i ); // NOTE: don't use image->texnum here, because skybox has a 'wrong' indexes
 
 		if(( image->flags & TF_DEPTHMAP ) && !( image->flags & TF_NOCOMPARE ))
@@ -733,19 +733,19 @@ rebuild_page:
 
 		gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( 0, 0 );
-		pglVertex2f( x, y );
+		gTriApi.Vertex3f( x, y, 0 );
 		if( image->flags & TF_TEXTURE_RECTANGLE )
 			gTriApi.TexCoord2f( image->width, 0 );
 		else gTriApi.TexCoord2f( 1, 0 );
-		pglVertex2f( x + w, y );
+		gTriApi.Vertex3f( x + w, y , 0 );
 		if( image->flags & TF_TEXTURE_RECTANGLE )
 			gTriApi.TexCoord2f( image->width, image->height );
 		else gTriApi.TexCoord2f( 1, 1 );
-		pglVertex2f( x + w, y + h );
+		gTriApi.Vertex3f( x + w, y + h, 0  );
 		if( image->flags & TF_TEXTURE_RECTANGLE )
 			gTriApi.TexCoord2f( 0, image->height );
 		else gTriApi.TexCoord2f( 0, 1 );
-		pglVertex2f( x, y + h );
+		gTriApi.Vertex3f( x, y + h , 0 );
 		gTriApi.End();
 
 		if(( image->flags & TF_DEPTHMAP ) && !( image->flags & TF_NOCOMPARE ))

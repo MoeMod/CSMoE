@@ -76,12 +76,11 @@ NetGraph_DrawRect
 */
 static void NetGraph_DrawRect( wrect_t *rect, byte colors[4] )
 {
-	pglColor4ubv( colors );	// color for this quad
-
-	pglVertex2f( rect->left, rect->top );
-	pglVertex2f( rect->left + rect->right, rect->top );
-	pglVertex2f( rect->left + rect->right, rect->top + rect->bottom );
-	pglVertex2f( rect->left, rect->top + rect->bottom );
+	gTriApi.Color4ub(colors[0], colors[1], colors[2], colors[3]);
+	gTriApi.Vertex3f( rect->left, rect->top, 0 );
+	gTriApi.Vertex3f( rect->left + rect->right, rect->top,0 );
+	gTriApi.Vertex3f( rect->left + rect->right, rect->top + rect->bottom,0 );
+	gTriApi.Vertex3f( rect->left, rect->top + rect->bottom,0 );
 }
 
 /*
@@ -654,7 +653,7 @@ void SCR_DrawNetGraph( void )
 		NetGraph_DrawTimes( rect, x, w );
 
 		gTriApi.End();
-		pglColor4ub( 255, 255, 255, 255 );
+		gTriApi.Color4ub( 255, 255, 255, 255 );
 		pglEnable( GL_TEXTURE_2D );
 	}
 }

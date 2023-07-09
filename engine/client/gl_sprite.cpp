@@ -1262,7 +1262,7 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	if( oldframe == frame )
 	{
 		// draw the single non-lerped frame
-		pglColor4f(color[0], color[1], color[2], flAlpha);
+		gTriApi.Color4f(color[0], color[1], color[2], flAlpha);
 		if(psprite->synctype != 233) xe::TexLru_Bind(psprite, frame);
 		R_DrawSpriteQuad(frame, origin, v_right, v_up, scale);
 	}
@@ -1274,13 +1274,13 @@ void R_DrawSpriteModel( cl_entity_t *e )
 
 		if (ilerp != 0.0f)
 		{
-			pglColor4f(color[0], color[1], color[2], flAlpha * ilerp);
+			gTriApi.Color4f(color[0], color[1], color[2], flAlpha * ilerp);
 			if (psprite->synctype != 233) xe::TexLru_Bind(psprite, oldframe);
 			R_DrawSpriteQuad(oldframe, origin, v_right, v_up, scale);
 		}
 		if (lerp != 0.0f)
 		{
-			pglColor4f(color[0], color[1], color[2], flAlpha * lerp);
+			gTriApi.Color4f(color[0], color[1], color[2], flAlpha * lerp);
 			if (psprite->synctype != 233) xe::TexLru_Bind(psprite, frame);
 			R_DrawSpriteQuad(frame, origin, v_right, v_up, scale);
 		}
@@ -1295,7 +1295,7 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		pglBlendFunc( GL_ZERO, GL_SRC_COLOR );
 		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-		pglColor4f( color2[0], color2[1], color2[2], flAlpha );
+		gTriApi.Color4f( color2[0], color2[1], color2[2], flAlpha );
 		GL_Bind( XASH_TEXTURE0, tr.whiteTexture );
 		R_DrawSpriteQuad( frame, origin, v_right, v_up, scale );
 

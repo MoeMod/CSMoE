@@ -1662,7 +1662,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		{
 			color24	*clr;
 			clr = &RI.currententity->curstate.rendercolor;
-			pglColor4ub( clr->r, clr->g, clr->b, 255 );
+			gTriApi.Color4ub( clr->r, clr->g, clr->b, 255 );
 			alpha = 1.0f;
 		}
 		else if (g_nForceFaceFlags & STUDIO_NF_OUTLINE)
@@ -2767,7 +2767,7 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 			pglShadeModel( GL_FLAT );
 			shadow_alpha2 = 1.0f - shadow_alpha;
 
-			pglColor4f( 0.0f, 0.0f, 0.0f, shadow_alpha2 );
+			gTriApi.Color4f( 0.0f, 0.0f, 0.0f, shadow_alpha2 );
 
 			depthmode = GL_LESS;
 			pglDepthFunc( depthmode );
@@ -2780,7 +2780,7 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 			pglEnable( GL_TEXTURE_2D );
 			pglDisable( GL_BLEND );
 
-			pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+			gTriApi.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
 			pglShadeModel( GL_SMOOTH );
 		}
 	}

@@ -945,7 +945,7 @@ void R_BlendLightmaps( void )
 		pglDisable( GL_ALPHA_TEST );
 
 		if( gl_overbright->integer == 1 )
-			pglColor4f( 1 / 1.5, 1 / 1.5, 1 / 1.5, 1.0 );
+			gTriApi.Color4f( 1 / 1.5, 1 / 1.5, 1 / 1.5, 1.0 );
 		if( gl_overbright->integer )
 			pglBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
 		else
@@ -1366,7 +1366,7 @@ void R_DrawTextureChains( void )
 	texture_t		*t;
 
 	// make sure what color is reset
-	pglColor4ub( 255, 255, 255, 255 );
+	gTriApi.Color4ub( 255, 255, 255, 255 );
 	R_LoadIdentity();	// set identity matrix
 
 	GL_SetupFogColorForSurfaces();
@@ -1432,7 +1432,7 @@ void R_DrawWaterSurfaces( void )
 	pglDisable( GL_ALPHA_TEST );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-	pglColor4f( 1.0f, 1.0f, 1.0f, cl.refdef.movevars->wateralpha );
+	gTriApi.Color4f( 1.0f, 1.0f, 1.0f, cl.refdef.movevars->wateralpha );
 
 	for( i = 0; i < cl.worldmodel->numtextures; i++ )
 	{
@@ -1458,7 +1458,7 @@ void R_DrawWaterSurfaces( void )
 	pglDepthMask( GL_TRUE );
 	pglDisable( GL_ALPHA_TEST );
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	pglColor4ub( 255, 255, 255, 255 );
+	gTriApi.Color4ub( 255, 255, 255, 255 );
 }
 
 /*
@@ -1604,11 +1604,11 @@ void R_DrawBrushModel( cl_entity_t *e )
 		need_sort = true;
 		allow_vbo = false;
 	case kRenderGlow:
-		pglColor4ub( 255, 255, 255, e->curstate.renderamt );
+		gTriApi.Color4ub( 255, 255, 255, e->curstate.renderamt );
 		break;
 	case kRenderTransColor:
 		pglDisable( GL_TEXTURE_2D );
-		pglColor4ub( e->curstate.rendercolor.r, e->curstate.rendercolor.g,
+		gTriApi.Color4ub( e->curstate.rendercolor.r, e->curstate.rendercolor.g,
 			e->curstate.rendercolor.b, e->curstate.renderamt );
 		allow_vbo = false;
 		break;
@@ -1616,7 +1616,7 @@ void R_DrawBrushModel( cl_entity_t *e )
 		// NOTE: brushes can't change renderamt for 'Solid' mode
 		pglAlphaFunc( GL_GEQUAL, 0.5f );
 	default:	
-		pglColor4ub( 255, 255, 255, 255 );
+		gTriApi.Color4ub( 255, 255, 255, 255 );
 		break;
 	}
 

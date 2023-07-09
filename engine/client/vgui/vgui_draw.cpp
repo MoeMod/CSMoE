@@ -686,7 +686,7 @@ void GAME_EXPORT VGUI_SetupDrawingRect( int *pColor )
 	pglEnable( GL_BLEND );
 	pglDisable( GL_ALPHA_TEST );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	pglColor4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
+	gTriApi.Color4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
 #endif
 }
 
@@ -705,7 +705,7 @@ void GAME_EXPORT VGUI_SetupDrawingText( int *pColor )
 	pglAlphaFunc( GL_GREATER, 0.0f );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-	pglColor4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
+	gTriApi.Color4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
 #endif
 }
 
@@ -724,7 +724,7 @@ void GAME_EXPORT VGUI_SetupDrawingImage( int *pColor )
 	pglAlphaFunc( GL_GREATER, 0.0f );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-	pglColor4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
+	gTriApi.Color4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
 #endif
 }
 
@@ -826,16 +826,16 @@ void GAME_EXPORT VGUI_DrawQuad( const vpoint_t *ul, const vpoint_t *lr )
 #else
 	gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( ul->coord[0], ul->coord[1] );
-		pglVertex2f( ul->point[0] * xscale, ul->point[1] * yscale );
+		gTriApi.Vertex3f( ul->point[0] * xscale, ul->point[1] * yscale,0 );
 
 		gTriApi.TexCoord2f( lr->coord[0], ul->coord[1] );
-		pglVertex2f( lr->point[0] * xscale, ul->point[1] * yscale );
+		gTriApi.Vertex3f( lr->point[0] * xscale, ul->point[1] * yscale,0 );
 
 		gTriApi.TexCoord2f( lr->coord[0], lr->coord[1] );
-		pglVertex2f( lr->point[0] * xscale, lr->point[1] * yscale );
+		gTriApi.Vertex3f( lr->point[0] * xscale, lr->point[1] * yscale,0 );
 
 		gTriApi.TexCoord2f( ul->coord[0], lr->coord[1] );
-		pglVertex2f( ul->point[0] * xscale, lr->point[1] * yscale );
+		gTriApi.Vertex3f( ul->point[0] * xscale, lr->point[1] * yscale ,0);
 	gTriApi.End();
 #endif
 }
