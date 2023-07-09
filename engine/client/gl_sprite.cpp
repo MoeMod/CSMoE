@@ -1031,7 +1031,7 @@ static void R_DrawSpriteQuad( mspriteframe_t *frame, vec3_t org, vec3_t v_right,
 
 	r_stats.c_sprite_polys++;
 
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( 0.0f, 1.0f );
 		VectorMA( org, frame->down * scale, v_up, point );
 		VectorMA( point, frame->left * scale, v_right, point );

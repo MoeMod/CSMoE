@@ -731,7 +731,7 @@ rebuild_page:
 		if(( image->flags & TF_DEPTHMAP ) && !( image->flags & TF_NOCOMPARE ))
 			pglTexParameteri( image->target, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE );
 
-		gTriApi.Begin( GL_QUADS );
+		gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( 0, 0 );
 		pglVertex2f( x, y );
 		if( image->flags & TF_TEXTURE_RECTANGLE )

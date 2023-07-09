@@ -647,7 +647,7 @@ void SCR_DrawNetGraph( void )
 	{
 		GL_SetRenderMode( kRenderTransColor );
 		pglDisable( GL_TEXTURE_2D );
-		gTriApi.Begin( GL_QUADS ); // draw all the fills as a long solid sequence of quads for speedup reasons
+		gTriApi.Begin( TRI_QUADS ); // draw all the fills as a long solid sequence of quads for speedup reasons
 
 		// NOTE: fill colors without texture at this point
 		NetGraph_DrawDataUsage( x, y, w );

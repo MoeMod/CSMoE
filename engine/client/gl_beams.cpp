@@ -211,7 +211,7 @@ static void CL_DrawSegsStretch(int modelIndex, float frame, int rendermode, cons
 
 	SetBeamRenderMode(rendermode);
 	GL_Bind(XASH_TEXTURE0, m_hSprite);
-	gTriApi.Begin(GL_TRIANGLE_STRIP);
+	gTriApi.Begin(TRI_TRIANGLE_STRIP);
 
 	// specify the next segment.
 	curSeg.width = nextSeg.width = width * 2.0f;
@@ -339,7 +339,7 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
-	gTriApi.Begin( GL_TRIANGLE_STRIP );
+	gTriApi.Begin( TRI_TRIANGLE_STRIP );
 #if CURVEDBEAM
 	//	CurvedBeam Begin 1 of 3
 	vec3_t end, mid, ang;
@@ -557,7 +557,7 @@ static void CL_DrawDisk( int modelIndex, float frame, int rendermode, const vec3
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
 
-	gTriApi.Begin( GL_TRIANGLE_STRIP );
+	gTriApi.Begin( TRI_TRIANGLE_STRIP );
 
 	// NOTE: We must force the degenerate triangles to be on the edge
 	for( i = 0; i < segments; i++ )
@@ -623,7 +623,7 @@ static void CL_DrawCylinder( int modelIndex, float frame, int rendermode, const 
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
 
-	gTriApi.Begin( GL_TRIANGLE_STRIP );
+	gTriApi.Begin( TRI_TRIANGLE_STRIP );
 
 	for( i = 0; i < segments; i++ )
 	{
@@ -735,7 +735,7 @@ void CL_DrawRing( int modelIndex, float frame, int rendermode, const vec3_t sour
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
 
-	gTriApi.Begin( GL_TRIANGLE_STRIP );
+	gTriApi.Begin( TRI_TRIANGLE_STRIP );
 
 	for( i = 0; i < segments + 1; i++ )
 	{
@@ -903,7 +903,7 @@ static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int re
 	SetBeamRenderMode( rendermode );
 	GL_Bind( XASH_TEXTURE0, m_hSprite );
 
-	gTriApi.Begin( GL_TRIANGLES );
+	gTriApi.Begin( TRI_TRIANGLES );
 
 	while( pHead )
 	{

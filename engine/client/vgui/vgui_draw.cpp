@@ -824,7 +824,7 @@ void GAME_EXPORT VGUI_DrawQuad( const vpoint_t *ul, const vpoint_t *lr )
                                     g_iBoundColor[0], g_iBoundColor[1], g_iBoundColor[2], g_iBoundColor[3]);
     }
 #else
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( ul->coord[0], ul->coord[1] );
 		pglVertex2f( ul->point[0] * xscale, ul->point[1] * yscale );
 

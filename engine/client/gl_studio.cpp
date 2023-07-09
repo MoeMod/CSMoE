@@ -1323,7 +1323,7 @@ void GAME_EXPORT R_StudioRenderShadow( int iSprite, const vec3_t p1, const vec3_
         GL_SetRenderMode(kRenderTransTexture);
 		gTriApi.Color4f( 0.0f, 0.0f, 0.0f, 1.0f ); // render only alpha
 
-		gTriApi.Begin( GL_QUADS );
+		gTriApi.Begin( TRI_QUADS );
 			gTriApi.TexCoord2f( 0.0f, 0.0f );
 			gTriApi.Vertex3fv( p1 );
 			gTriApi.TexCoord2f( 0.0f, 1.0f );
@@ -2041,19 +2041,19 @@ static void GAME_EXPORT R_StudioDrawHulls( void )
 		// set properly color for hull
 		gTriApi.Color4f( hullcolor[j][0], hullcolor[j][1], hullcolor[j][2], alpha );
 
-		gTriApi.Begin( GL_QUAD_STRIP );
+		gTriApi.Begin( TRI_QUAD_STRIP );
 		for( j = 0; j < 10; j++ )
 			gTriApi.Vertex3fv( v2[j & 7] );
 		gTriApi.End( );
 	
-		gTriApi.Begin( GL_QUAD_STRIP );
+		gTriApi.Begin( TRI_QUAD_STRIP );
 		gTriApi.Vertex3fv( v2[6]);
 		gTriApi.Vertex3fv( v2[0] );
 		gTriApi.Vertex3fv( v2[4] );
 		gTriApi.Vertex3fv( v2[2] );
 		gTriApi.End( );
 
-		gTriApi.Begin( GL_QUAD_STRIP );
+		gTriApi.Begin( TRI_QUAD_STRIP );
 		gTriApi.Vertex3fv( v2[1] );
 		gTriApi.Vertex3fv( v2[7] );
 		gTriApi.Vertex3fv( v2[3] );
@@ -2086,7 +2086,7 @@ static void GAME_EXPORT R_StudioDrawAbsBBox( void )
 	pglDisable( GL_DEPTH_TEST );
 
 	gTriApi.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );	// red bboxes for studiomodels
-	gTriApi.Begin( GL_LINES );
+	gTriApi.Begin( TRI_LINES );
 
 	for( i = 0; i < 2; i += 1 )
 	{
@@ -2129,7 +2129,7 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 		{
 			pglPointSize( 3.0f );
 			pglColor3f( 1, 0.7f, 0 );
-			gTriApi.Begin( GL_LINES );
+			gTriApi.Begin( TRI_LINES );
 			
 			Matrix3x4_OriginFromMatrix( g_bonestransform[pbones[i].parent], point );
 			gTriApi.Vertex3fv( point );
@@ -2139,7 +2139,7 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 			gTriApi.End();
 
 			pglColor3f( 0, 0, 0.8f );
-			gTriApi.Begin( GL_POINTS );
+			gTriApi.Begin( TRI_POINTS );
 			if( pbones[pbones[i].parent].parent != -1 )
 			{
 				Matrix3x4_OriginFromMatrix( g_bonestransform[pbones[i].parent], point );
@@ -2154,7 +2154,7 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 			// draw parent bone node
 			pglPointSize( 5.0f );
 			pglColor3f( 0.8f, 0, 0 );
-			gTriApi.Begin( GL_POINTS );
+			gTriApi.Begin( TRI_POINTS );
 			Matrix3x4_OriginFromMatrix( g_bonestransform[i], point );
 			gTriApi.Vertex3fv( point );
 			gTriApi.End();
@@ -2183,7 +2183,7 @@ static void R_StudioDrawAttachments( void )
 		Matrix3x4_VectorTransform( g_bonestransform[pattachments[i].bone], pattachments[i].vectors[1], v[2] );
 		Matrix3x4_VectorTransform( g_bonestransform[pattachments[i].bone], pattachments[i].vectors[2], v[3] );
 		
-		gTriApi.Begin( GL_LINES );
+		gTriApi.Begin( TRI_LINES );
 		pglColor3f( 1, 0, 0 );
 		gTriApi.Vertex3fv( v[0] );
 		pglColor3f( 1, 1, 1 );
@@ -2200,7 +2200,7 @@ static void R_StudioDrawAttachments( void )
 
 		pglPointSize( 5.0f );
 		pglColor3f( 0, 1, 0 );
-		gTriApi.Begin( GL_POINTS );
+		gTriApi.Begin( TRI_POINTS );
 		gTriApi.Vertex3fv( v[0] );
 		gTriApi.End();
 		pglPointSize( 1.0f );

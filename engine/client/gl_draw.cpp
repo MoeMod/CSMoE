@@ -75,7 +75,7 @@ void R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, f
 {
 	GL_Bind( XASH_TEXTURE0, texnum );
 
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( s1, t1 );
 		pglVertex2f( x, y );
 
@@ -111,7 +111,7 @@ void R_DrawTileClear( int x, int y, int w, int h )
 	tw = glt->srcWidth;
 	th = glt->srcHeight;
 
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( x / tw, y / th );
 		pglVertex2f( x, y );
 		gTriApi.TexCoord2f((x + w) / tw, y / th );
@@ -182,7 +182,7 @@ void R_DrawStretchRaw( float x, float y, float w, float h, int cols, int rows, c
 		}
 	}
 
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 	gTriApi.TexCoord2f( 0, 0 );
 	pglVertex2f( x, y );
 	gTriApi.TexCoord2f( 1, 0 );

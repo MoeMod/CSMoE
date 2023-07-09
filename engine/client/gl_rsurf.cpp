@@ -851,7 +851,7 @@ void DrawGLPoly( glpoly_t *p, float xScale, float yScale )
 	if( xScale != 0.0f && yScale != 0.0f )
 		hasScale = true;
 
-	gTriApi.Begin( GL_POLYGON );
+	gTriApi.Begin( TRI_POLYGON );
 
 	for( i = 0; i < p->numverts; i++ )
 	{
@@ -887,7 +887,7 @@ void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 	{
 		int	i;
 
-		gTriApi.Begin( GL_POLYGON );
+		gTriApi.Begin( TRI_POLYGON );
 
 		for( i = 0; i < p->numverts; i++ )
 		{
@@ -3583,7 +3583,7 @@ void R_DrawTriangleOutlines( void )
 			p = surf->polys;
 			for( ; p != NULL; p = p->chain )
 			{
-				gTriApi.Begin( GL_POLYGON );
+				gTriApi.Begin( TRI_POLYGON );
 				for( j = 0; j < p->numverts; j++ )
 					gTriApi.Vertex3fv( p->verts[i].xyz );
 				gTriApi.End ();
@@ -3598,7 +3598,7 @@ void R_DrawTriangleOutlines( void )
 
 		for( ; p != NULL; p = p->chain )
 		{
-			gTriApi.Begin( GL_POLYGON );
+			gTriApi.Begin( TRI_POLYGON );
 			for( j = 0; j < p->numverts; j++ )
 				gTriApi.Vertex3fv( p->verts[i].xyz );
 			gTriApi.End();
