@@ -1218,6 +1218,7 @@ void R_DrawEntitiesOnList( void )
             if (RI.currententity->curstate.eflags & EFLAG_DEPTH_CHANGED)
             {
                 pglDepthRange(gldepthmin, gldepthmin + 0.2f * (gldepthmax - gldepthmin));
+                pglDisable(GL_DEPTH_TEST);
             }
             switch (RI.currentmodel->type)
             {
@@ -1236,6 +1237,7 @@ void R_DrawEntitiesOnList( void )
             if (RI.currententity->curstate.eflags & EFLAG_DEPTH_CHANGED)
             {
                 pglDepthRange(gldepthmin, gldepthmax);
+                pglEnable(GL_DEPTH_TEST);
             }
         }
         glState.drawTrans = false;
