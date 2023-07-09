@@ -29,6 +29,8 @@ GNU General Public License for more details.
 #include "gl_cubemap.h"
 #include "gl_studioshader.h"
 #include "gl_studiolru.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 #ifdef XASH_RAGDOLL
 #include "physics.h"
@@ -1319,18 +1321,18 @@ void GAME_EXPORT R_StudioRenderShadow( int iSprite, const vec3_t p1, const vec3_
 	if( TriSpriteTexture( Mod_Handle( iSprite ), 0 ))
 	{
         GL_SetRenderMode(kRenderTransTexture);
-		pglColor4f( 0.0f, 0.0f, 0.0f, 1.0f ); // render only alpha
+		gTriApi.Color4f( 0.0f, 0.0f, 0.0f, 1.0f ); // render only alpha
 
-		pglBegin( GL_QUADS );
-			pglTexCoord2f( 0.0f, 0.0f );
-			pglVertex3fv( p1.data() );
-			pglTexCoord2f( 0.0f, 1.0f );
-			pglVertex3fv( p2.data() );
-			pglTexCoord2f( 1.0f, 1.0f );
-			pglVertex3fv( p3.data() );
-			pglTexCoord2f( 1.0f, 0.0f );
-			pglVertex3fv( p4.data() );
-		pglEnd();
+		gTriApi.Begin( GL_QUADS );
+			gTriApi.TexCoord2f( 0.0f, 0.0f );
+			gTriApi.Vertex3fv( p1 );
+			gTriApi.TexCoord2f( 0.0f, 1.0f );
+			gTriApi.Vertex3fv( p2 );
+			gTriApi.TexCoord2f( 1.0f, 1.0f );
+			gTriApi.Vertex3fv( p3 );
+			gTriApi.TexCoord2f( 1.0f, 0.0f );
+			gTriApi.Vertex3fv( p4 );
+		gTriApi.End();
 
         GL_SetRenderMode(kRenderNormal);
 	}
@@ -2037,26 +2039,26 @@ static void GAME_EXPORT R_StudioDrawHulls( void )
 		j = (pbboxes[i].group % 8);
 
 		// set properly color for hull
-		pglColor4f( hullcolor[j][0], hullcolor[j][1], hullcolor[j][2], alpha );
+		gTriApi.Color4f( hullcolor[j][0], hullcolor[j][1], hullcolor[j][2], alpha );
 
-		pglBegin( GL_QUAD_STRIP );
+		gTriApi.Begin( GL_QUAD_STRIP );
 		for( j = 0; j < 10; j++ )
-			pglVertex3fv( v2[j & 7].data() );
-		pglEnd( );
+			gTriApi.Vertex3fv( v2[j & 7] );
+		gTriApi.End( );
 	
-		pglBegin( GL_QUAD_STRIP );
-		pglVertex3fv( v2[6].data() );
-		pglVertex3fv( v2[0].data() );
-		pglVertex3fv( v2[4].data() );
-		pglVertex3fv( v2[2].data() );
-		pglEnd( );
+		gTriApi.Begin( GL_QUAD_STRIP );
+		gTriApi.Vertex3fv( v2[6]);
+		gTriApi.Vertex3fv( v2[0] );
+		gTriApi.Vertex3fv( v2[4] );
+		gTriApi.Vertex3fv( v2[2] );
+		gTriApi.End( );
 
-		pglBegin( GL_QUAD_STRIP );
-		pglVertex3fv( v2[1].data() );
-		pglVertex3fv( v2[7].data() );
-		pglVertex3fv( v2[3].data() );
-		pglVertex3fv( v2[5].data() );
-		pglEnd( );			
+		gTriApi.Begin( GL_QUAD_STRIP );
+		gTriApi.Vertex3fv( v2[1] );
+		gTriApi.Vertex3fv( v2[7] );
+		gTriApi.Vertex3fv( v2[3] );
+		gTriApi.Vertex3fv( v2[5] );
+		gTriApi.End( );			
 	}
 
 	pglEnable( GL_TEXTURE_2D );
@@ -2083,26 +2085,26 @@ static void GAME_EXPORT R_StudioDrawAbsBBox( void )
 	pglDisable( GL_TEXTURE_2D );
 	pglDisable( GL_DEPTH_TEST );
 
-	pglColor4f( 1.0f, 0.0f, 0.0f, 1.0f );	// red bboxes for studiomodels
-	pglBegin( GL_LINES );
+	gTriApi.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );	// red bboxes for studiomodels
+	gTriApi.Begin( GL_LINES );
 
 	for( i = 0; i < 2; i += 1 )
 	{
-		pglVertex3fv( bbox[i+0].data() );
-		pglVertex3fv( bbox[i+2].data() );
-		pglVertex3fv( bbox[i+4].data() );
-		pglVertex3fv( bbox[i+6].data() );
-		pglVertex3fv( bbox[i+0].data() );
-		pglVertex3fv( bbox[i+4].data() );
-		pglVertex3fv( bbox[i+2].data() );
-		pglVertex3fv( bbox[i+6].data() );
-		pglVertex3fv( bbox[i*2+0].data() );
-		pglVertex3fv( bbox[i*2+1].data() );
-		pglVertex3fv( bbox[i*2+4].data() );
-		pglVertex3fv( bbox[i*2+5].data() );
+		gTriApi.Vertex3fv( bbox[i+0] );
+		gTriApi.Vertex3fv( bbox[i+2] );
+		gTriApi.Vertex3fv( bbox[i+4] );
+		gTriApi.Vertex3fv( bbox[i+6] );
+		gTriApi.Vertex3fv( bbox[i+0] );
+		gTriApi.Vertex3fv( bbox[i+4] );
+		gTriApi.Vertex3fv( bbox[i+2] );
+		gTriApi.Vertex3fv( bbox[i+6] );
+		gTriApi.Vertex3fv( bbox[i*2+0] );
+		gTriApi.Vertex3fv( bbox[i*2+1] );
+		gTriApi.Vertex3fv( bbox[i*2+4] );
+		gTriApi.Vertex3fv( bbox[i*2+5] );
 	}
 
-	pglEnd();
+	gTriApi.End();
 	pglEnable( GL_TEXTURE_2D );
 	pglEnable( GL_DEPTH_TEST );
 }
@@ -2127,35 +2129,35 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 		{
 			pglPointSize( 3.0f );
 			pglColor3f( 1, 0.7f, 0 );
-			pglBegin( GL_LINES );
+			gTriApi.Begin( GL_LINES );
 			
 			Matrix3x4_OriginFromMatrix( g_bonestransform[pbones[i].parent], point );
-			pglVertex3fv( point.data() );
+			gTriApi.Vertex3fv( point );
 			Matrix3x4_OriginFromMatrix( g_bonestransform[i], point );
-			pglVertex3fv( point.data() );
+			gTriApi.Vertex3fv( point );
 			
-			pglEnd();
+			gTriApi.End();
 
 			pglColor3f( 0, 0, 0.8f );
-			pglBegin( GL_POINTS );
+			gTriApi.Begin( GL_POINTS );
 			if( pbones[pbones[i].parent].parent != -1 )
 			{
 				Matrix3x4_OriginFromMatrix( g_bonestransform[pbones[i].parent], point );
-				pglVertex3fv( point.data() );
+				gTriApi.Vertex3fv( point );
 			}
 			Matrix3x4_OriginFromMatrix( g_bonestransform[i], point );
-			pglVertex3fv( point.data() );
-			pglEnd();
+			gTriApi.Vertex3fv( point );
+			gTriApi.End();
 		}
 		else
 		{
 			// draw parent bone node
 			pglPointSize( 5.0f );
 			pglColor3f( 0.8f, 0, 0 );
-			pglBegin( GL_POINTS );
+			gTriApi.Begin( GL_POINTS );
 			Matrix3x4_OriginFromMatrix( g_bonestransform[i], point );
-			pglVertex3fv( point.data() );
-			pglEnd();
+			gTriApi.Vertex3fv( point );
+			gTriApi.End();
 		}
 	}
 
@@ -2181,26 +2183,26 @@ static void R_StudioDrawAttachments( void )
 		Matrix3x4_VectorTransform( g_bonestransform[pattachments[i].bone], pattachments[i].vectors[1], v[2] );
 		Matrix3x4_VectorTransform( g_bonestransform[pattachments[i].bone], pattachments[i].vectors[2], v[3] );
 		
-		pglBegin( GL_LINES );
+		gTriApi.Begin( GL_LINES );
 		pglColor3f( 1, 0, 0 );
-		pglVertex3fv( v[0].data() );
+		gTriApi.Vertex3fv( v[0] );
 		pglColor3f( 1, 1, 1 );
-		pglVertex3fv (v[1].data() );
+		gTriApi.Vertex3fv (v[1] );
 		pglColor3f( 1, 0, 0 );
-		pglVertex3fv (v[0].data() );
+		gTriApi.Vertex3fv (v[0] );
 		pglColor3f( 1, 1, 1 );
-		pglVertex3fv (v[2].data() );
+		gTriApi.Vertex3fv (v[2] );
 		pglColor3f( 1, 0, 0 );
-		pglVertex3fv (v[0].data() );
+		gTriApi.Vertex3fv (v[0] );
 		pglColor3f( 1, 1, 1 );
-		pglVertex3fv( v[3].data() );
-		pglEnd();
+		gTriApi.Vertex3fv( v[3] );
+		gTriApi.End();
 
 		pglPointSize( 5.0f );
 		pglColor3f( 0, 1, 0 );
-		pglBegin( GL_POINTS );
-		pglVertex3fv( v[0].data() );
-		pglEnd();
+		gTriApi.Begin( GL_POINTS );
+		gTriApi.Vertex3fv( v[0] );
+		gTriApi.End();
 		pglPointSize( 1.0f );
 	}
 

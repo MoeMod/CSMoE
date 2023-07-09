@@ -21,6 +21,8 @@ GNU General Public License for more details.
 #include "com_model.h"
 #include "wadfile.h"
 #include "gl_shader.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 #define MAX_CLIP_VERTS	64 // skybox clip vertices
 #define TURBSCALE		( 256.0f / ( M_PI2 ))
@@ -278,8 +280,8 @@ void MakeSkyVec( float s, float t, int axis )
 
 	t = 1.0f - t;
 
-	pglTexCoord2f( s, t );
-	pglVertex3fv( v.data() );
+	gTriApi.TexCoord2f( s, t );
+	gTriApi.Vertex3fv( v );
 }
 
 /*
@@ -401,12 +403,12 @@ void R_DrawSkyBox( void )
 
 		GL_Bind( XASH_TEXTURE0, tr.skyboxTextures[r_skyTexOrder[i]] );
 
-		pglBegin( GL_QUADS );
+		gTriApi.Begin( GL_QUADS );
 		MakeSkyVec( RI.skyMins[0][i], RI.skyMins[1][i], i );
 		MakeSkyVec( RI.skyMins[0][i], RI.skyMaxs[1][i], i );
 		MakeSkyVec( RI.skyMaxs[0][i], RI.skyMaxs[1][i], i );
 		MakeSkyVec( RI.skyMaxs[0][i], RI.skyMins[1][i], i );
-		pglEnd();
+		gTriApi.End();
 	}
 
 	R_LoadIdentity();
@@ -738,7 +740,7 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 #else
 	for( p = polys; p; p = p->next )
 	{
-		pglBegin( GL_POLYGON );
+		gTriApi.Begin( GL_POLYGON );
 
 		for( i = 0; i < p->numverts; i++ )
 		{
@@ -761,10 +763,10 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 
 			if( glState.activeTMU != 0 )
 				GL_MultiTexCoord2f( glState.activeTMU, s, t );
-			else pglTexCoord2f( s, t );
-			pglVertex3f( p->verts[i].xyz.x, p->verts[i].xyz.y, nv );
+			else gTriApi.TexCoord2f( s, t );
+			gTriApi.Vertex3f( p->verts[i].xyz.x, p->verts[i].xyz.y, nv );
 		}
-		pglEnd();
+		gTriApi.End();
 	}
 #endif
 	// restore culling
@@ -788,7 +790,7 @@ void EmitSkyPolys( msurface_t *fa )
 
 	for( p = fa->polys; p; p = p->next )
 	{
-		pglBegin( GL_POLYGON );
+		gTriApi.Begin( GL_POLYGON );
 
 		for( i = 0; i < p->numverts; i++ )
 		{
@@ -804,10 +806,10 @@ void EmitSkyPolys( msurface_t *fa )
 			s = ( speedscale + dir[0] ) * (1.0f / 128.0f);
 			t = ( speedscale + dir[1] ) * (1.0f / 128.0f);
 
-			pglTexCoord2f( s, t );
-			pglVertex3fv( p->verts[i].xyz.data() );
+			gTriApi.TexCoord2f( s, t );
+			gTriApi.Vertex3fv( p->verts[i].xyz );
 		}
-		pglEnd ();
+		gTriApi.End ();
 	}
 }
 

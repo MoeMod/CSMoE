@@ -24,6 +24,8 @@ GNU General Public License for more details.
 #include "entity_types.h"
 #include "cl_tent.h"
 #include "gl_texlru.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 // it's a Valve default value for LoadMapSprite (probably must be power of two)
 #define MAPSPRITE_SIZE	128
@@ -1029,24 +1031,24 @@ static void R_DrawSpriteQuad( mspriteframe_t *frame, vec3_t org, vec3_t v_right,
 
 	r_stats.c_sprite_polys++;
 
-	pglBegin( GL_QUADS );
-		pglTexCoord2f( 0.0f, 1.0f );
+	gTriApi.Begin( GL_QUADS );
+		gTriApi.TexCoord2f( 0.0f, 1.0f );
 		VectorMA( org, frame->down * scale, v_up, point );
 		VectorMA( point, frame->left * scale, v_right, point );
-		pglVertex3fv( point.data() );
-		pglTexCoord2f( 0.0f, 0.0f );
+		gTriApi.Vertex3fv( point );
+		gTriApi.TexCoord2f( 0.0f, 0.0f );
 		VectorMA( org, frame->up * scale, v_up, point );
 		VectorMA( point, frame->left * scale, v_right, point );
-		pglVertex3fv( point.data() );
-		pglTexCoord2f( 1.0f, 0.0f );
+		gTriApi.Vertex3fv( point );
+		gTriApi.TexCoord2f( 1.0f, 0.0f );
 		VectorMA( org, frame->up * scale, v_up, point );
 		VectorMA( point, frame->right * scale, v_right, point );
-		pglVertex3fv( point.data() );
-		pglTexCoord2f( 1.0f, 1.0f );
+		gTriApi.Vertex3fv( point);
+		gTriApi.TexCoord2f( 1.0f, 1.0f );
 		VectorMA( org, frame->down * scale, v_up, point );
 		VectorMA( point, frame->right * scale, v_right, point );
-		pglVertex3fv( point.data() );
-	pglEnd();
+		gTriApi.Vertex3fv( point );
+	gTriApi.End();
 }
 
 static qboolean R_SpriteHasLightmap( cl_entity_t *e, int texFormat )

@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "mod_local.h"
 #include "mathlib.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 			
 typedef struct
 {
@@ -849,18 +851,18 @@ void DrawGLPoly( glpoly_t *p, float xScale, float yScale )
 	if( xScale != 0.0f && yScale != 0.0f )
 		hasScale = true;
 
-	pglBegin( GL_POLYGON );
+	gTriApi.Begin( GL_POLYGON );
 
 	for( i = 0; i < p->numverts; i++ )
 	{
 		if( hasScale )
-			pglTexCoord2f(( p->verts[i].s1t1[0] + sOffset ) * xScale, ( p->verts[i].s1t1[1] + tOffset ) * yScale );
-		else pglTexCoord2f( p->verts[i].s1t1[0] + sOffset, p->verts[i].s1t1[1] + tOffset );
+			gTriApi.TexCoord2f(( p->verts[i].s1t1[0] + sOffset ) * xScale, ( p->verts[i].s1t1[1] + tOffset ) * yScale );
+		else gTriApi.TexCoord2f( p->verts[i].s1t1[0] + sOffset, p->verts[i].s1t1[1] + tOffset );
 
-		pglVertex3fv( p->verts[i].xyz.data() );
+		gTriApi.Vertex3fv( p->verts[i].xyz );
 	}
 
-	pglEnd();
+	gTriApi.End();
 
 	// special hack for non-lightmapped surfaces
 	if( p->flags & SURF_DRAWTILED )
@@ -885,15 +887,15 @@ void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 	{
 		int	i;
 
-		pglBegin( GL_POLYGON );
+		gTriApi.Begin( GL_POLYGON );
 
 		for( i = 0; i < p->numverts; i++ )
 		{
-			if( !dynamic ) pglTexCoord2f( p->verts[i].s2t2[0], p->verts[i].s2t2[1] );
-			else pglTexCoord2f( p->verts[i].s2t2[0] - soffset, p->verts[i].s2t2[1] - toffset );
-			pglVertex3fv( p->verts[i].xyz.data() );
+			if( !dynamic ) gTriApi.TexCoord2f( p->verts[i].s2t2[0], p->verts[i].s2t2[1] );
+			else gTriApi.TexCoord2f( p->verts[i].s2t2[0] - soffset, p->verts[i].s2t2[1] - toffset );
+			gTriApi.Vertex3fv( p->verts[i].xyz );
 		}
-		pglEnd ();
+		gTriApi.End ();
 	}
 }
 
@@ -3570,7 +3572,7 @@ void R_DrawTriangleOutlines( void )
 
 	pglDisable( GL_TEXTURE_2D );
 	pglDisable( GL_DEPTH_TEST );
-	pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	gTriApi.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
 	pglPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	// render static surfaces first
@@ -3581,10 +3583,10 @@ void R_DrawTriangleOutlines( void )
 			p = surf->polys;
 			for( ; p != NULL; p = p->chain )
 			{
-				pglBegin( GL_POLYGON );
+				gTriApi.Begin( GL_POLYGON );
 				for( j = 0; j < p->numverts; j++ )
-					pglVertex3fv( p->verts[i].xyz.data() );
-				pglEnd ();
+					gTriApi.Vertex3fv( p->verts[i].xyz );
+				gTriApi.End ();
 			}
 		}
 	}
@@ -3596,10 +3598,10 @@ void R_DrawTriangleOutlines( void )
 
 		for( ; p != NULL; p = p->chain )
 		{
-			pglBegin( GL_POLYGON );
+			gTriApi.Begin( GL_POLYGON );
 			for( j = 0; j < p->numverts; j++ )
-				pglVertex3fv( p->verts[i].xyz.data() );
-			pglEnd ();
+				gTriApi.Vertex3fv( p->verts[i].xyz );
+			gTriApi.End();
 		}
 	}
 

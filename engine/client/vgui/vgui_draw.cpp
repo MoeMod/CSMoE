@@ -23,6 +23,8 @@ GNU General Public License for more details.
 #include "library.h"
 #include <string.h>
 #include "../keydefs.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 #define XASH_IMGUI_SURFACE
 #ifdef XASH_IMGUI_SURFACE
@@ -822,19 +824,19 @@ void GAME_EXPORT VGUI_DrawQuad( const vpoint_t *ul, const vpoint_t *lr )
                                     g_iBoundColor[0], g_iBoundColor[1], g_iBoundColor[2], g_iBoundColor[3]);
     }
 #else
-	pglBegin( GL_QUADS );
-		pglTexCoord2f( ul->coord[0], ul->coord[1] );
+	gTriApi.Begin( GL_QUADS );
+		gTriApi.TexCoord2f( ul->coord[0], ul->coord[1] );
 		pglVertex2f( ul->point[0] * xscale, ul->point[1] * yscale );
 
-		pglTexCoord2f( lr->coord[0], ul->coord[1] );
+		gTriApi.TexCoord2f( lr->coord[0], ul->coord[1] );
 		pglVertex2f( lr->point[0] * xscale, ul->point[1] * yscale );
 
-		pglTexCoord2f( lr->coord[0], lr->coord[1] );
+		gTriApi.TexCoord2f( lr->coord[0], lr->coord[1] );
 		pglVertex2f( lr->point[0] * xscale, lr->point[1] * yscale );
 
-		pglTexCoord2f( ul->coord[0], lr->coord[1] );
+		gTriApi.TexCoord2f( ul->coord[0], lr->coord[1] );
 		pglVertex2f( ul->point[0] * xscale, lr->point[1] * yscale );
-	pglEnd();
+	gTriApi.End();
 #endif
 }
 

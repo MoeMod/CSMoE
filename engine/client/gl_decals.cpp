@@ -19,6 +19,8 @@ GNU General Public License for more details.
 #include "client.h"
 #include "gl_local.h"
 #include "cl_tent.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 #define DECAL_OVERLAP_DISTANCE	2
 #define DECAL_DISTANCE		4	// too big values produce more clipped polygons
@@ -951,15 +953,15 @@ void DrawSingleDecal( decal_t *pDecal, msurface_t *fa )
 
 	GL_Bind( XASH_TEXTURE0, pDecal->texture );
 
-	pglBegin( GL_POLYGON );
+	gTriApi.Begin( GL_POLYGON );
 
 	for( i = 0; i < numVerts; i++ )
 	{
-		pglTexCoord2f( v[i].s1t1[0], v[i].s1t1[1] );
-		pglVertex3fv( v[i].xyz.data() );
+		gTriApi.TexCoord2f( v[i].s1t1[0], v[i].s1t1[1] );
+		gTriApi.Vertex3fv( v[i].xyz );
 	}
 
-	pglEnd();
+	gTriApi.End();
 }
 
 void DrawSurfaceDecals( msurface_t *fa )
@@ -1007,30 +1009,30 @@ void DrawSurfaceDecals( msurface_t *fa )
 				pglColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
 
 				pglStencilOp( GL_KEEP, GL_KEEP, GL_REPLACE );
-				pglBegin( GL_POLYGON );
+				gTriApi.Begin( GL_POLYGON );
 
 				for( i = 0; i < numVerts; i++ )
 				{
 					o[i].s2t2[0] = ( DotProduct( o[i].xyz, tex->vecs[0] ) + tex->vecs[0][3] ) / tex->texture->width;
 					o[i].s2t2[1] = ( DotProduct( o[i].xyz, tex->vecs[1] ) + tex->vecs[1][3] ) / tex->texture->height;
 
-					pglTexCoord2f( o[i].s2t2[0], o[i].s2t2[1] );
-					pglVertex3fv( o[i].xyz.data() );
+					gTriApi.TexCoord2f( o[i].s2t2[0], o[i].s2t2[1] );
+					gTriApi.Vertex3fv( o[i].xyz );
 				}
 
-				pglEnd();
+				gTriApi.End();
 				pglStencilOp( GL_KEEP, GL_KEEP, GL_DECR );
 
 				pglEnable( GL_ALPHA_TEST );
-				pglBegin( GL_POLYGON );
+				gTriApi.Begin( GL_POLYGON );
 
 				for( i = 0; i < numVerts; i++ )
 				{
-					pglTexCoord2f( o[i].s2t2[0], o[i].s2t2[1] );
-					pglVertex3fv( o[i].xyz.data() );
+					gTriApi.TexCoord2f( o[i].s2t2[0], o[i].s2t2[1] );
+					gTriApi.Vertex3fv( o[i].xyz );
 				}
 
-				pglEnd();
+				gTriApi.End();
 				pglDisable( GL_ALPHA_TEST );
 
 				pglColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );

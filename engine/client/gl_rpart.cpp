@@ -24,6 +24,7 @@ GNU General Public License for more details.
 #include "triangleapi.h"
 #include "cl_tent.h"
 #include "studio.h"
+extern triangleapi_t gTriApi;
 
 /*
 ==============================================================
@@ -365,27 +366,27 @@ static void CL_BulletTracerDraw( particle_t *p, float frametime )
 	GL_SetRenderMode( kRenderTransTexture );
 
 	GL_Bind( XASH_TEXTURE0, cls.particleImage );
-	pglBegin( GL_QUADS );
+	gTriApi.Begin( GL_QUADS );
 
-	pglColor4ub( clgame.palette[p->color][0], clgame.palette[p->color][1], clgame.palette[p->color][2], alpha );
+	gTriApi.Color4ub( clgame.palette[p->color][0], clgame.palette[p->color][1], clgame.palette[p->color][2], alpha );
 
 	VectorMA( vecStart, -width, cross, tmp );	
-	pglTexCoord2f( 1.0f, 0.0f );
-	pglVertex3fv( tmp.data() );
+	gTriApi.TexCoord2f( 1.0f, 0.0f );
+	gTriApi.Vertex3fv( tmp );
 
 	VectorMA( vecStart, width, cross, tmp );
-	pglTexCoord2f( 0.0f, 0.0f );
-	pglVertex3fv( tmp.data() );
+	gTriApi.TexCoord2f( 0.0f, 0.0f );
+	gTriApi.Vertex3fv( tmp);
 
 	VectorMA( vecEnd, width, cross, tmp );
-	pglTexCoord2f( 0.0f, fOffset );
-	pglVertex3fv( tmp.data() );
+	gTriApi.TexCoord2f( 0.0f, fOffset );
+	gTriApi.Vertex3fv( tmp );
 
 	VectorMA( vecEnd, -width, cross, tmp );
-	pglTexCoord2f( 1.0f, fOffset );
-	pglVertex3fv( tmp.data() );
+	gTriApi.TexCoord2f( 1.0f, fOffset );
+	gTriApi.Vertex3fv( tmp );
 
-	pglEnd();
+	gTriApi.End();
 }
 
 /*
@@ -501,7 +502,7 @@ void CL_UpdateParticle( particle_t *p, float ft )
 	VectorSet( color, clgame.palette[p->color][0], clgame.palette[p->color][1], clgame.palette[p->color][2] );
 
 	GL_SetRenderMode( kRenderTransTexture );
-	pglColor4ub( color[0], color[1], color[2], alpha );
+	gTriApi.Color4ub( color[0], color[1], color[2], alpha );
 
 	if( r_oldparticles->integer == 1 )
 		GL_Bind( XASH_TEXTURE0, cls.oldParticleImage );
@@ -509,18 +510,18 @@ void CL_UpdateParticle( particle_t *p, float ft )
 		GL_Bind( XASH_TEXTURE0, cls.particleImage );
 
 	// add the 4 corner vertices.
-	pglBegin( GL_QUADS );
+	gTriApi.Begin( GL_QUADS );
 
-	pglTexCoord2f( 0.0f, 1.0f );
-	pglVertex3f( p->org[0] - right[0] + up[0], p->org[1] - right[1] + up[1], p->org[2] - right[2] + up[2] );
+	gTriApi.TexCoord2f( 0.0f, 1.0f );
+	gTriApi.Vertex3f( p->org[0] - right[0] + up[0], p->org[1] - right[1] + up[1], p->org[2] - right[2] + up[2] );
 	pglTexCoord2f( 0.0f, 0.0f );
-	pglVertex3f( p->org[0] + right[0] + up[0], p->org[1] + right[1] + up[1], p->org[2] + right[2] + up[2] );
-	pglTexCoord2f( 1.0f, 0.0f );
-	pglVertex3f( p->org[0] + right[0] - up[0], p->org[1] + right[1] - up[1], p->org[2] + right[2] - up[2] );
-	pglTexCoord2f( 1.0f, 1.0f );
-	pglVertex3f( p->org[0] - right[0] - up[0], p->org[1] - right[1] - up[1], p->org[2] - right[2] - up[2] );
+	gTriApi.Vertex3f( p->org[0] + right[0] + up[0], p->org[1] + right[1] + up[1], p->org[2] + right[2] + up[2] );
+	gTriApi.TexCoord2f( 1.0f, 0.0f );
+	gTriApi.Vertex3f( p->org[0] + right[0] - up[0], p->org[1] + right[1] - up[1], p->org[2] + right[2] - up[2] );
+	gTriApi.TexCoord2f( 1.0f, 1.0f );
+	gTriApi.Vertex3f( p->org[0] - right[0] - up[0], p->org[1] - right[1] - up[1], p->org[2] - right[2] - up[2] );
 
-	pglEnd();
+	gTriApi.End();
 
 	if( p->type != pt_clientcustom )
 	{
@@ -1464,24 +1465,24 @@ void CL_DrawTracer( vec3_t start, vec3_t delta, float width, rgb_t color, int al
 
 	GL_SetRenderMode( kRenderTransAdd );
 
-	pglColor4ub( color[0], color[1], color[2], alpha );
+	gTriApi.Color4ub( color[0], color[1], color[2], alpha );
 
 	GL_Bind( XASH_TEXTURE0, cls.particleImage );
-	pglBegin( GL_QUADS );
+	gTriApi.Begin( GL_QUADS );
 
-	pglTexCoord2f( 0.0f, endV );
-	pglVertex3fv( verts[2].data() );
+	gTriApi.TexCoord2f( 0.0f, endV );
+	gTriApi.Vertex3fv( verts[2]);
 
-	pglTexCoord2f( 1.0f, endV );
-	pglVertex3fv( verts[3].data() );
+	gTriApi.TexCoord2f( 1.0f, endV );
+	gTriApi.Vertex3fv( verts[3]);
 
-	pglTexCoord2f( 1.0f, startV );
-	pglVertex3fv( verts[1].data() );
+	gTriApi.TexCoord2f( 1.0f, startV );
+	gTriApi.Vertex3fv( verts[1] );
 
-	pglTexCoord2f( 0.0f, startV );
-	pglVertex3fv( verts[0].data() );
+	gTriApi.TexCoord2f( 0.0f, startV );
+	gTriApi.Vertex3fv( verts[0] );
 
-	pglEnd();
+	gTriApi.End();
 }
 
 /*
