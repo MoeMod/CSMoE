@@ -22,6 +22,8 @@ GNU General Public License for more details.
 #include "mod_local.h"
 #include "input.h"
 #include "gl_vidnt.h"
+#include <triangleapi.h>
+extern triangleapi_t gTriApi;
 
 #if defined(XASH_WINRT)
 #include "platform/winrt/winrt_interop.h"
@@ -756,7 +758,7 @@ static void GL_SetDefaults( void )
 	pglDepthFunc( GL_LEQUAL );
 	pglDepthMask( GL_FALSE );
 
-	pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	gTriApi.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
 
 	if( glState.stencilEnabled )
 	{

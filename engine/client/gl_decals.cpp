@@ -953,7 +953,7 @@ void DrawSingleDecal( decal_t *pDecal, msurface_t *fa )
 
 	GL_Bind( XASH_TEXTURE0, pDecal->texture );
 
-	gTriApi.Begin( GL_POLYGON );
+	gTriApi.Begin( TRI_POLYGON );
 
 	for( i = 0; i < numVerts; i++ )
 	{
@@ -1009,7 +1009,7 @@ void DrawSurfaceDecals( msurface_t *fa )
 				pglColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
 
 				pglStencilOp( GL_KEEP, GL_KEEP, GL_REPLACE );
-				gTriApi.Begin( GL_POLYGON );
+				gTriApi.Begin( TRI_POLYGON );
 
 				for( i = 0; i < numVerts; i++ )
 				{
@@ -1024,7 +1024,7 @@ void DrawSurfaceDecals( msurface_t *fa )
 				pglStencilOp( GL_KEEP, GL_KEEP, GL_DECR );
 
 				pglEnable( GL_ALPHA_TEST );
-				gTriApi.Begin( GL_POLYGON );
+				gTriApi.Begin( TRI_POLYGON );
 
 				for( i = 0; i < numVerts; i++ )
 				{

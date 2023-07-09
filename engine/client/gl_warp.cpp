@@ -403,7 +403,7 @@ void R_DrawSkyBox( void )
 
 		GL_Bind( XASH_TEXTURE0, tr.skyboxTextures[r_skyTexOrder[i]] );
 
-		gTriApi.Begin( GL_QUADS );
+		gTriApi.Begin( TRI_QUADS );
 		MakeSkyVec( RI.skyMins[0][i], RI.skyMins[1][i], i );
 		MakeSkyVec( RI.skyMins[0][i], RI.skyMaxs[1][i], i );
 		MakeSkyVec( RI.skyMaxs[0][i], RI.skyMaxs[1][i], i );
@@ -740,7 +740,7 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
 #else
 	for( p = polys; p; p = p->next )
 	{
-		gTriApi.Begin( GL_POLYGON );
+		gTriApi.Begin( TRI_POLYGON );
 
 		for( i = 0; i < p->numverts; i++ )
 		{
@@ -790,7 +790,7 @@ void EmitSkyPolys( msurface_t *fa )
 
 	for( p = fa->polys; p; p = p->next )
 	{
-		gTriApi.Begin( GL_POLYGON );
+		gTriApi.Begin( TRI_POLYGON );
 
 		for( i = 0; i < p->numverts; i++ )
 		{

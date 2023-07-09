@@ -75,18 +75,18 @@ void R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, f
 {
 	GL_Bind( XASH_TEXTURE0, texnum );
 
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( s1, t1 );
-		pglVertex2f( x, y );
+		gTriApi.Vertex3f( x, y, 0 );
 
 		gTriApi.TexCoord2f( s2, t1 );
-		pglVertex2f( x + w, y );
+		gTriApi.Vertex3f( x + w, y , 0 );
 
 		gTriApi.TexCoord2f( s2, t2 );
-		pglVertex2f( x + w, y + h );
+		gTriApi.Vertex3f( x + w, y + h , 0 );
 
 		gTriApi.TexCoord2f( s1, t2 );
-		pglVertex2f( x, y + h );
+		gTriApi.Vertex3f( x, y + h, 0  );
 	pglEnd();
 }
 
@@ -111,15 +111,15 @@ void R_DrawTileClear( int x, int y, int w, int h )
 	tw = glt->srcWidth;
 	th = glt->srcHeight;
 
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( x / tw, y / th );
-		pglVertex2f( x, y );
+		gTriApi.Vertex3f( x, y,0 );
 		gTriApi.TexCoord2f((x + w) / tw, y / th );
-		pglVertex2f( x + w, y );
+		gTriApi.Vertex3f( x + w, y,0 );
 		gTriApi.TexCoord2f((x + w) / tw, (y + h) / th );
-		pglVertex2f( x + w, y + h );
+		gTriApi.Vertex3f( x + w, y + h,0 );
 		gTriApi.TexCoord2f( x / tw, (y + h) / th );
-		pglVertex2f( x, y + h );
+		gTriApi.Vertex3f( x, y + h,0 );
 	gTriApi.End ();
 }
 
@@ -182,15 +182,15 @@ void R_DrawStretchRaw( float x, float y, float w, float h, int cols, int rows, c
 		}
 	}
 
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 	gTriApi.TexCoord2f( 0, 0 );
-	pglVertex2f( x, y );
+	gTriApi.Vertex3f( x, y,0 );
 	gTriApi.TexCoord2f( 1, 0 );
-	pglVertex2f( x + w, y );
+	gTriApi.Vertex3f( x + w, y,0 );
 	gTriApi.TexCoord2f( 1, 1 );
-	pglVertex2f( x + w, y + h );
+	gTriApi.Vertex3f( x + w, y + h,0 );
 	gTriApi.TexCoord2f( 0, 1 );
-	pglVertex2f( x, y + h );
+	gTriApi.Vertex3f( x, y + h,0 );
 	gTriApi.End();
 }
 
@@ -265,7 +265,7 @@ void R_Set2DMode( qboolean enable )
 
 		pglDepthMask( GL_FALSE );
 		pglDisable( GL_DEPTH_TEST );
-		pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+		gTriApi.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
 
 		glState.in2DMode = true;
 		RI.currententity = NULL;

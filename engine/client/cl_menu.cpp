@@ -355,9 +355,9 @@ static void PIC_DrawGeneric( float x, float y, float width, float height, const 
 #ifdef XASH_IMGUI_SURFACE
 	ImGui_Surface_DrawImage(menu.ds.gl_texturenum, x, y, x + width, y + height, s1, t1, s2, t2, menu.ds.picColor[0], menu.ds.picColor[1], menu.ds.picColor[2], menu.ds.picColor[3]);
 #else
-	pglColor4ub( menu.ds.picColor[0], menu.ds.picColor[1], menu.ds.picColor[2], menu.ds.picColor[3] );
+	gTriApi.Color4ub( menu.ds.picColor[0], menu.ds.picColor[1], menu.ds.picColor[2], menu.ds.picColor[3] );
 	R_DrawStretchPic( x, y, width, height, s1, t1, s2, t2, menu.ds.gl_texturenum );
-	pglColor4ub( 255, 255, 255, 255 );
+	gTriApi.Color4ub( 255, 255, 255, 255 );
 #endif
 }
 
@@ -568,10 +568,10 @@ static void pfnFillRGBA( int x, int y, int width, int height, int r, int g, int 
 	g = bound( 0, g, 255 );
 	b = bound( 0, b, 255 );
 	a = bound( 0, a, 255 );
-	pglColor4ub( r, g, b, a );
+	gTriApi.Color4ub( r, g, b, a );
 	GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cls.fillImage );
-	pglColor4ub( 255, 255, 255, 255 );
+	gTriApi.Color4ub( 255, 255, 255, 255 );
 #endif
 }
 
@@ -648,10 +648,10 @@ static void pfnDrawCharacter( int ix, int iy, int iwidth, int iheight, int ch, i
 	ImGui_Surface_SetRenderMode(kRenderTransTexture);
 	ImGui_Surface_DrawImage(hFont, x, y, x + width, y + height, s1, t1, s2, t2, color[0], color[1], color[2], color[3]);
 #else
-	pglColor4ubv( color );
+	gTriApi.Color4ub(color[0], color[1], color[2], color[3]);
 	GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( x, y, width, height, s1, t1, s2, t2, hFont );
-	pglColor4ub( 255, 255, 255, 255 );
+	gTriApi.Color4ub( 255, 255, 255, 255 );
 #endif
 }
 

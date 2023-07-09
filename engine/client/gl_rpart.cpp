@@ -366,7 +366,7 @@ static void CL_BulletTracerDraw( particle_t *p, float frametime )
 	GL_SetRenderMode( kRenderTransTexture );
 
 	GL_Bind( XASH_TEXTURE0, cls.particleImage );
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 
 	gTriApi.Color4ub( clgame.palette[p->color][0], clgame.palette[p->color][1], clgame.palette[p->color][2], alpha );
 
@@ -510,7 +510,7 @@ void CL_UpdateParticle( particle_t *p, float ft )
 		GL_Bind( XASH_TEXTURE0, cls.particleImage );
 
 	// add the 4 corner vertices.
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 
 	gTriApi.TexCoord2f( 0.0f, 1.0f );
 	gTriApi.Vertex3f( p->org[0] - right[0] + up[0], p->org[1] - right[1] + up[1], p->org[2] - right[2] + up[2] );
@@ -1468,7 +1468,7 @@ void CL_DrawTracer( vec3_t start, vec3_t delta, float width, rgb_t color, int al
 	gTriApi.Color4ub( color[0], color[1], color[2], alpha );
 
 	GL_Bind( XASH_TEXTURE0, cls.particleImage );
-	gTriApi.Begin( GL_QUADS );
+	gTriApi.Begin( TRI_QUADS );
 
 	gTriApi.TexCoord2f( 0.0f, endV );
 	gTriApi.Vertex3fv( verts[2]);
