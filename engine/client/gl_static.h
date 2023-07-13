@@ -433,6 +433,10 @@ GLvoid* GL_MANGLE(glMapBufferARB)(GLenum target, GLenum access);
 GLboolean GL_MANGLE(glUnmapBufferARB)(GLenum target);
 void GL_MANGLE(glBufferDataARB)(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage);
 void GL_MANGLE(glBufferSubDataARB)(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data);
+void GL_MANGLE(glBindVertexArray)(GLuint array);
+void GL_MANGLE(glDeleteVertexArrays)(GLsizei n, const GLuint *arrays);
+void GL_MANGLE(glGenVertexArrays)(GLsizei n, GLuint *arrays);
+GLboolean GL_MANGLE(glIsVertexArray)(GLuint array);
 void GL_MANGLE(glGenQueriesARB)(GLsizei n, GLuint *ids);
 void GL_MANGLE(glDeleteQueriesARB)(GLsizei n, const GLuint *ids);
 GLboolean GL_MANGLE(glIsQueryARB)(GLuint id);
@@ -932,6 +936,10 @@ void GL_MANGLE(glBufferSubData)(GLenum target, GLintptrARB offset, GLsizeiptrARB
 #define pglUnmapBufferARB GL_MANGLE(glUnmapBufferARB)
 #define pglBufferDataARB GL_MANGLE(glBufferDataARB)
 #define pglBufferSubDataARB GL_MANGLE(glBufferSubDataARB)
+#define pglBindVertexArray GL_MANGLE(glBindVertexArray)
+#define pglDeleteVertexArrays GL_MANGLE(glDeleteVertexArrays)
+#define pglGenVertexArrays GL_MANGLE(glGenVertexArrays)
+#define pglIsVertexArray GL_MANGLE(glIsVertexArray)
 #define pglGenQueriesARB GL_MANGLE(glGenQueriesARB)
 #define pglDeleteQueriesARB GL_MANGLE(glDeleteQueriesARB)
 #define pglIsQueryARB GL_MANGLE(glIsQueryARB)

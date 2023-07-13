@@ -24,6 +24,8 @@ GNU General Public License for more details.
 
 #include "util/lru_cache.h"
 
+#define XASH_SHADER_VAO
+
 namespace xe {
     using studiolru_key_t = std::tuple<const studiohdr_t *, const mstudiomodel_t *, int, int>; // model, submodel, mesh, flags
     class studiolru_vbo_cache
@@ -42,10 +44,19 @@ namespace xe {
         void Submit(int startArrayElems, int numArrayElems, int startArrayVerts, int numArrayVerts);
         void DrawElements() const;
 
+	private:
+		void EnableVA() const;
+		void DisableVA() const;
+		void BindVBO();
+		void UnbindVBO();
+
     private:
         std::string name;
         GLuint studioverts;
         GLuint studioelems;
+#ifdef XASH_SHADER_VAO
+		GLuint studiovao;
+#endif
         int startElems;
         int numElems;
         int startVerts;
@@ -55,6 +66,10 @@ namespace xe {
     studiolru_vbo_cache::studiolru_vbo_cache(const char *debugname)
     {
         name = debugname;
+#ifdef XASH_SHADER_VAO
+	    pglGenVertexArrays(1, &studiovao);
+	    pglBindVertexArray(studiovao);
+#endif
         pglGenBuffersARB( 1, &studioverts );
         pglGenBuffersARB( 1, &studioelems);
         startElems = 0;
@@ -62,12 +77,16 @@ namespace xe {
         startVerts = 0;
         numVerts = 0;
 
-        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, studioverts );
-        pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, studioelems);
+	    BindVBO();
         pglBufferDataARB( GL_ARRAY_BUFFER_ARB, MAXARRAYVERTS * sizeof(studio_vertex_attrib_item_t), nullptr, GL_STATIC_DRAW_ARB);
         pglBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, MAXARRAYVERTS * 6 * sizeof(unsigned short), nullptr, GL_STATIC_DRAW_ARB);
-        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
-        pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+#ifdef XASH_SHADER_VAO
+	    EnableVA();
+	    UnbindVBO();
+	    pglBindVertexArray(0);
+#else
+	    UnbindVBO();
+#endif
 
         MsgDev(D_INFO, "StudioLru : loading model vbo %s\n", name.c_str());
     }
@@ -75,20 +94,37 @@ namespace xe {
     studiolru_vbo_cache::~studiolru_vbo_cache() {
         pglDeleteBuffersARB( 1, &studioverts );
         pglDeleteBuffersARB( 1, &studioelems);
+#ifdef XASH_SHADER_VAO
+		pglDeleteVertexArrays(1, &studiovao);
+#endif
         MsgDev(D_INFO, "StudioLru : swap out model vbo %s\n", name.c_str());
     }
 
-    void studiolru_vbo_cache::Bind()
+    void studiolru_vbo_cache::BindVBO()
     {
         pglBindBufferARB( GL_ARRAY_BUFFER_ARB, studioverts );
         pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, studioelems );
     }
 
-    void studiolru_vbo_cache::Unbind()
+    void studiolru_vbo_cache::UnbindVBO()
     {
         pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
         pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, 0 );
     }
+
+	void studiolru_vbo_cache::Bind()
+	{
+#ifndef XASH_SHADER_VAO
+		return BindVBO();
+#endif
+	}
+
+	void studiolru_vbo_cache::Unbind()
+	{
+#ifndef XASH_SHADER_VAO
+		return UnbindVBO();
+#endif
+	}
 
     bool studiolru_vbo_cache::HasCachedData() const
     {
@@ -104,17 +140,36 @@ namespace xe {
         numVerts = numArrayVerts;
     }
 
-    void studiolru_vbo_cache::DrawElements() const {
-        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
-        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
-        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, pos));
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, coord));
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, norm));
+	void studiolru_vbo_cache::EnableVA() const
+	{
+		pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
+		pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
+		pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
+		pglVertexAttribPointerARB(g_pstudioshader->attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, pos));
+		pglVertexAttribPointerARB(g_pstudioshader->attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, coord));
+		pglVertexAttribPointerARB(g_pstudioshader->attrib.vaNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, norm));
+	}
+
+	void studiolru_vbo_cache::DisableVA() const
+	{
+		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
+		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
+		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
+	}
+
+    void studiolru_vbo_cache::DrawElements() const
+	{
+#ifdef XASH_SHADER_VAO
+		pglBindVertexArray(studiovao);
+#else
+	    EnableVA();
+#endif
         pglDrawRangeElements( GL_TRIANGLES, startVerts, numVerts, numElems, GL_UNSIGNED_SHORT, (const GLvoid *)(startElems * sizeof(unsigned short)) );
-        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
-        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
-        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
+#ifdef XASH_SHADER_VAO
+	    pglBindVertexArray(0);
+#else
+	    DisableVA();
+#endif
     }
 
     static lru_cache<studiolru_key_t, std::shared_ptr<studiolru_vbo_cache>> studiovbocache(512);
