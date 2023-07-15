@@ -204,6 +204,7 @@ struct efx_api_s
 	void		(*R_KillAttachedTentsFromEntity)		(int client);
 	TEMPENTITY* (*R_AttachTentToModel)			(int clientindex, int iAttachment, float life, int modelIndex, float framerate, int brightness, int rendermode, float scale, int frameMax, int flags, int eflags);
 	BEAM* (*R_BeamPoints_Tracer)		(const vec3_t start, const vec3_t end, int modelIndex, float life, float width, float length, float amplitude, float brightness, float speed, int startFrame, float framerate, float r, float g, float b);
+	void		(*R_KillNamedAttachedTents)		(int client, int modelIndex);
 };
 
 extern efx_api_t efx;

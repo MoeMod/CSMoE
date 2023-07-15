@@ -276,6 +276,18 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pY23S2BuffAugSmokeAModel = IEngineStudio.Mod_ForName("sprites/ef_y23s2buffaug_a.spr", FALSE);
 	CStudioModelRenderer::s_pY23S2BuffAugSmokeBModel = IEngineStudio.Mod_ForName("sprites/ef_y23s2buffaug_b.spr", FALSE);
 
+	CStudioModelRenderer::s_pDvhammerViewModel = IEngineStudio.Mod_ForName("models/v_y23s2buffaug.mdl", FALSE);
+	CStudioModelRenderer::s_pDvhammerRedModel = IEngineStudio.Mod_ForName("sprites/ef_dvhammer_red.spr", FALSE);
+	CStudioModelRenderer::s_pDvhammerBlueModel = IEngineStudio.Mod_ForName("sprites/ef_dvhammer_blue.spr", FALSE);
+
+	CStudioModelRenderer::s_pM3DragonEXViewModel = IEngineStudio.Mod_ForName("models/v_m3dragonex.mdl", FALSE);
+	CStudioModelRenderer::s_pM3DragonEXSmokeLModel = IEngineStudio.Mod_ForName("sprites/ef_m3dragonex_L.spr", FALSE);
+	CStudioModelRenderer::s_pM3DragonEXSmokeRModel = IEngineStudio.Mod_ForName("sprites/ef_m3dragonex_R.spr", FALSE);
+	CStudioModelRenderer::s_pM3DragonEXSmokeModel = IEngineStudio.Mod_ForName("sprites/ef_m3dragonex_smoke.spr", FALSE);
+
+	CStudioModelRenderer::s_pLeapStrikeGunViewModel = IEngineStudio.Mod_ForName("models/v_leapstrikegun.mdl", FALSE);
+	CStudioModelRenderer::s_pLeapStrikeGunPartModel = IEngineStudio.Mod_ForName("models/v_leapstrikegun_parts.mdl", FALSE);
+
 	//VGui_Startup();
 
 	return 1;

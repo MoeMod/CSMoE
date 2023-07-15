@@ -1589,7 +1589,6 @@ static void R_StudioSetupShader()
 {
 	pglUseProgramObjectARB(g_pstudioshader->program);
 	pglUniform1iARB(g_pstudioshader->uniform.texDiffuseMap, 0);
-	pglUniform4fARB(g_pstudioshader->uniform.texOffset, 0, 0, 1, 1);
 	pglUniformMatrix4fvARB(g_pstudioshader->uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
 	pglUniform4fvARB(g_pstudioshader->uniform.boneMat, 3 * MAXSTUDIOBONES, (const float*)g_bonestransform);
 	pglUniform1iARB(g_pstudioshader->uniform.texEnvMap, 1); // pglActiveTextureARB(GL_TEXTURE1_ARB)
@@ -1858,6 +1857,17 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		{
 			pglUniform4fARB(g_pstudioshader->uniform.glowColor, 1, 1, 1, envBrightAdd);
 			
+		}
+		if (!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_lockongun_lcd.bmp") ||
+			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$20_winggun_gold.bmp") ||
+			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_winggun_laser01.bmp") ||
+			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_winggun_laser02.bmp"))
+		{
+			pglUniform4fARB(g_pstudioshader->uniform.texOffset, cl.time, 0, 1, 1);
+		}
+		else
+		{
+			pglUniform4fARB(g_pstudioshader->uniform.texOffset, 0, 0, 1, 1);
 		}
 #endif
 #ifdef XASH_SHADER_VBO

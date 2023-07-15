@@ -147,6 +147,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "firecracker" , WEAPON_FIRECRACKER},
 	{ "dartpistol",	WEAPON_DARTPISTOL },
 	{ "y23s1dartpistol",	WEAPON_Y23S1DARTPISTOL },
+	{ "leapstrikegun",	WEAPON_LEAPSTRIKEGUN },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -179,6 +180,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "mk3a1",	WEAPON_MK3A1 },
 	{ "mk3a1se",	WEAPON_MK3A1SE },
 	{ "vulcanus11",	WEAPON_VULCANUS11 },
+	{ "m3dragonex",	WEAPON_M3DRAGONEX },
 
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
@@ -454,6 +456,7 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "z4b_mechanichand",	KNIFE_MECHANICHAND },
 	{ "z4b_shovelex",	KNIFE_SHOVELEX },
 	{ "knife_tyrantmace",	KNIFE_TYRANTMACE },
+	{ "knife_dvhammer",	KNIFE_DVHAMMER },
 	
 };
 
@@ -631,6 +634,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "firecracker" , WEAPONCLASS_PISTOL},
 	{ "dartpistol",	WEAPONCLASS_PISTOL },
 	{ "y23s1dartpistol",	WEAPONCLASS_PISTOL },
+	{ "leapstrikegun",	WEAPONCLASS_PISTOL },
 
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
@@ -666,6 +670,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "mk3a1",	WEAPONCLASS_SHOTGUN },
 	{ "mk3a1se",	WEAPONCLASS_SHOTGUN },
 	{ "vulcanus11",	WEAPONCLASS_SHOTGUN },
+	{ "m3dragonex",	WEAPONCLASS_SHOTGUN },
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -1218,6 +1223,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_Y23S2BUFFAUG:
 	case WEAPON_OZWPNSET1:
 	case WEAPON_IGNITEMG:
+	case WEAPON_M3DRAGONEX:
 		return true;
 	default:
 		break;
@@ -1293,6 +1299,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_FIRECRACKER:
 	case WEAPON_DARTPISTOL:
 	case WEAPON_Y23S1DARTPISTOL:
+	case WEAPON_LEAPSTRIKEGUN:
 		return true;
 	default:
 		break;

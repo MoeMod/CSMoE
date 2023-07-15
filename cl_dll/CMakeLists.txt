@@ -468,6 +468,10 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_y23s2buffaug.cpp
 	../dlls/wpn_shared/wpn_ozwpnset1.cpp
 	../dlls/wpn_shared/wpn_ignitemg.cpp
+	../dlls/wpn_shared/wpn_sfturret.cpp
+	../dlls/wpn_shared/wpn_m3dragonex.cpp
+	../dlls/wpn_shared/knife_dvhammer.cpp
+	../dlls/wpn_shared/wpn_leapstrikegun.cpp
 	)
 
 set (HUD_SRCS

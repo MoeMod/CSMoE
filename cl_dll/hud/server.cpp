@@ -621,6 +621,60 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		break;
 	}
+	case 39:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadShort();
+		int iPlayer = reader.ReadByte();
+		if (arg1 == 1)
+		{
+			TEMPENTITY* pEnt = AttachTentToEntity(arg2, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_m3dragonex_start.spr"),
+				Vector(0.0, 0.0, 0.0), 9999.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM, 0.5, kRenderTransAdd, 30.0);
+
+			
+			if (pEnt)
+			{
+				pEnt->entity.curstate.iuser1 = arg2;
+				pEnt->entity.curstate.iuser2 = iPlayer;
+				pEnt->entity.curstate.iuser3 = 1;
+
+
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+
+					if (pEnt->entity.curstate.frame >= 28 && pEnt->entity.curstate.iuser3)
+					{
+						pEnt->entity.curstate.iuser3 = 0;
+						pEnt->entity.curstate.modelindex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_m3dragonex_loop.spr");
+
+						model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_m3dragonex_loop.spr", false);
+						pEnt->entity.model = pModel;
+
+						pEnt->entity.curstate.frame = 0;
+					}
+
+					cl_entity_t* pTarget = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser1);
+					cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser2);
+
+					if (pPlayer && pTarget)
+					{
+						if (g_PlayerExtraInfo[pEnt->entity.curstate.iuser2].zombie)
+							pEnt->die = gHUD.m_flTime;
+
+						Vector vecDir = (pTarget->curstate.origin - pPlayer->curstate.origin).Normalize();
+						VectorAngles(vecDir, pEnt->entity.angles);
+						pEnt->entity.angles.x *= -1.0;
+					}
+					else
+						pEnt->die = gHUD.m_flTime;
+
+					};
+			}
+		}
+
+		
+
+		break;
+	}
 	case 44:
 	{
 		arg1 = reader.ReadByte();

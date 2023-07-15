@@ -157,6 +157,15 @@ public:
 	static struct model_s* s_pY23S2BuffAugViewModel;
 	static struct model_s* s_pY23S2BuffAugSmokeAModel;
 	static struct model_s* s_pY23S2BuffAugSmokeBModel;
+	static struct model_s* s_pDvhammerViewModel;
+	static struct model_s* s_pDvhammerRedModel;
+	static struct model_s* s_pDvhammerBlueModel;
+	static struct model_s* s_pM3DragonEXViewModel;
+	static struct model_s* s_pM3DragonEXSmokeLModel;
+	static struct model_s* s_pM3DragonEXSmokeRModel;
+	static struct model_s* s_pM3DragonEXSmokeModel;
+	static struct model_s* s_pLeapStrikeGunViewModel;
+	static struct model_s* s_pLeapStrikeGunPartModel;
 };
 
 }

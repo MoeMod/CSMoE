@@ -561,7 +561,8 @@ void CBasePlayerWeapon::EjectBrassLate()
 		|| m_iId == WEAPON_CSGO_MAG7
 		|| m_iId == WEAPON_CSGO_SAWEDOFF
 		|| m_iId == WEAPON_JANUS11
-		|| m_iId == WEAPON_THANATOS11)
+		|| m_iId == WEAPON_THANATOS11
+		|| m_iId == WEAPON_M3DRAGONEX)
 		? TE_BOUNCE_SHOTSHELL : TE_BOUNCE_SHELL;
 
 	EjectBrass(pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_up * -9 + gpGlobals->v_forward * 16, gpGlobals->v_right * -9,
@@ -1338,7 +1339,8 @@ void CBasePlayerWeapon::ReloadSound()
 				|| m_iId == WEAPON_SPAS12
 				|| m_iId == WEAPON_SPAS12EX
 				|| m_iId == WEAPON_SPAS12EX2
-				|| m_iId == WEAPON_VULCANUS11)
+				|| m_iId == WEAPON_VULCANUS11
+				|| m_iId == WEAPON_M3DRAGONEX)
 				WRITE_BYTE(0);
 			else
 				WRITE_BYTE(1);
@@ -1741,6 +1743,9 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pOther);
 
 	if (pPlayer->m_bIsVIP || pPlayer->m_bShieldDrawn || pPlayer->m_bIsZombie || pPlayer->m_iBuff & BUFF_GHOSTHUNTER || pPlayer->m_iBuff & BUFF_LASTHERO)
+		return;
+
+	if (!to_bool(g_pModRunning->QueryModConfig("CanPickWeapon", true)))
 		return;
 
 	pPlayer->OnTouchingWeapon(this);

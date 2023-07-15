@@ -51,14 +51,20 @@ namespace sv {
 		ResetSequenceInfo();
 
 		m_flRemoveTime = gpGlobals->time + GetLifeTime();
-		if (m_iType)
+		if (m_iType == 2)
+		{
+			m_flCreateSharkTime = gpGlobals->time + 0.5s;
+			SET_MODEL(ENT(pev), "models/ef_m3dragonex_sign.mdl");
+			EMIT_SOUND_DYN(ENT(this->pev), CHAN_AUTO, "weapons/m3dragonex_dragon_fx.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			SetThink(&CM3DragonCannon_Dragon::OnDragonEXThink);
+		}
+		else if (m_iType == 1)
 		{
 			m_flCreateSharkTime = gpGlobals->time + 1.0s;
 			SET_MODEL(ENT(pev), "models/ef_m3dragonm_sign.mdl");
 			EMIT_SOUND_DYN(ENT(this->pev), CHAN_AUTO, "weapons/m3dragonm_shark_fx.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			SetThink(&CM3DragonCannon_Dragon::OnSharkThink);
-		}
-			
+		}		
 		else
 		{
 			pev->rendermode = kRenderTransAdd;
@@ -83,9 +89,26 @@ namespace sv {
 		//WEAPON_M3DRAGON
 		PRECACHE_MODEL("models/m3dragon_effect.mdl");
 		PRECACHE_SOUND("weapons/m3dragon_dragon_fx.wav");
+
+		//WEAPON_M3DRAGONEX
+		PRECACHE_MODEL("models/ef_m3dragonex_sign.mdl");
+		m_iDragonEXEffect = PRECACHE_MODEL("models/ef_m3dragonex.mdl");
+		m_iSmokeEffect = PRECACHE_MODEL("sprites/ef_m3dragonex_smoke.spr");	//smoke
+		//PRECACHE_SOUND("weapons/m3dragonex_dragon_fx.wav");	unknown
+		PRECACHE_SOUND("weapons/m3dragonex_charge_fx_dragon.wav");
+
 	}
 
-	int CM3DragonCannon_Dragon::GetWeaponsId(void) { return m_iType ? WEAPON_M3DRAGONM : WEAPON_M3DRAGON; }
+	int CM3DragonCannon_Dragon::GetWeaponsId(void) 
+	{
+		if (m_iType == 2)
+			return WEAPON_M3DRAGONEX;
+		else if (m_iType == 1)
+			return WEAPON_M3DRAGONM;
+		else
+			return WEAPON_M3DRAGON;
+		
+	}
 
 	bool CM3DragonCannon_Dragon::CylinderDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, float flHeight, float flKnockBack, Vector vecDir, int bitsDamageType, bool bDistanceCheck)
 	{
@@ -303,10 +326,85 @@ namespace sv {
 		}
 	}
 
+	void CM3DragonCannon_Dragon::OnDragonEXThink()
+	{
+		pev->nextthink = gpGlobals->time + 0.1s;
+
+		if (m_flRemoveTime < gpGlobals->time)
+		{
+			SetThink(&CM3DragonCannon_Dragon::StartFadeOut);
+			m_flRemoveTime = invalid_time_point;
+			return;
+		}
+
+		if (m_flCreateSharkTime < gpGlobals->time)
+		{
+			UTIL_TempModel(pev->origin, g_vecZero, g_vecZero, m_iDragonEXEffect, 40, 0, 10, 0, 0, 255, kRenderNormal, NULL, false, 0, 0, 255, 0);
+
+			for (int i = 0; i < 4; i++)
+			{
+				Vector vecOrigin = pev->origin;
+				if (i % 2)
+				{
+					vecOrigin.x += (i == 1 ? -1.0 : 1.0) * 50.0;
+					vecOrigin.y += (i == 1 ? 1.0 : -1.0) * 50.0;
+				}
+				else
+				{
+					vecOrigin.x += (i == 1 ? -1.0 : 1.0) * 50.0;
+					vecOrigin.y += (i == 1 ? -1.0 : 1.0) * 50.0;
+				}
+				vecOrigin.z += 25.0;
+
+				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+				WRITE_BYTE(TE_TEMPSPRITE);
+				WRITE_COORD(vecOrigin.x);
+				WRITE_COORD(vecOrigin.y);
+				WRITE_COORD(vecOrigin.z);
+				WRITE_SHORT(m_iSmokeEffect);
+				WRITE_BYTE(8);
+				WRITE_BYTE(255);
+				WRITE_BYTE(15);
+				MESSAGE_END();
+			}
+
+
+			m_flCreateSharkTime = gpGlobals->time + 9999s;
+		}
+
+		if (m_flAttackInterval != invalid_time_point && m_flAttackInterval < gpGlobals->time)
+		{
+			Vector vecOrigin = pev->origin;
+			vecOrigin[2] -= 15;
+			float flHeight = 500;
+
+			flHeight *= (1.0 - (m_flRemoveTime - gpGlobals->time) / GetLifeTime());
+
+			entvars_t* pevOwner = VARS(pev->owner);
+
+			CylinderDamage(vecOrigin, this->pev, pevOwner, GetDamage(), GetAttackRange(), flHeight, 220, Vector{ 0.0, 0.0, 1.0 }, DMG_BULLET | DMG_NOMORALE | DMG_NEVERGIB, FALSE);
+
+			m_flAttackInterval = gpGlobals->time + 0.2s;
+		}
+	}
+
 	float CM3DragonCannon_Dragon::GetDamage()
 	{		
 		float flDamage;
-		if (m_iType)
+		if (m_iType == 2)
+		{
+			flDamage = 6;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+			{
+				if (enhancedzombie.value)
+					flDamage = 2000;
+				else
+					flDamage = 1600;
+			}
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 2800;
+		}
+		else if (m_iType == 1)
 		{
 			flDamage = 4;
 			if (g_pModRunning->DamageTrack() == DT_ZB)
@@ -337,7 +435,7 @@ namespace sv {
 
 	float CM3DragonCannon_Dragon::GetAttackRange()
 	{
-		return m_iType ? 140.0 : 160.0;
+		return m_iType == 1 ? 140.0 : 160.0;
 	}
 
 	duration_t CM3DragonCannon_Dragon::GetLifeTime()

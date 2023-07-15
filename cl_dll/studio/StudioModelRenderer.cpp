@@ -128,6 +128,18 @@ struct model_s* CStudioModelRenderer::s_pY23S2BuffAugViewModel;
 struct model_s* CStudioModelRenderer::s_pY23S2BuffAugSmokeAModel;
 struct model_s* CStudioModelRenderer::s_pY23S2BuffAugSmokeBModel;
 
+struct model_s* CStudioModelRenderer::s_pDvhammerViewModel;
+struct model_s* CStudioModelRenderer::s_pDvhammerRedModel;
+struct model_s* CStudioModelRenderer::s_pDvhammerBlueModel;
+
+struct model_s* CStudioModelRenderer::s_pM3DragonEXViewModel;
+struct model_s* CStudioModelRenderer::s_pM3DragonEXSmokeLModel;
+struct model_s* CStudioModelRenderer::s_pM3DragonEXSmokeRModel;
+struct model_s* CStudioModelRenderer::s_pM3DragonEXSmokeModel;
+
+struct model_s* CStudioModelRenderer::s_pLeapStrikeGunViewModel;
+struct model_s* CStudioModelRenderer::s_pLeapStrikeGunPartModel;
+
 void CStudioModelRenderer::Init(void)
 {
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");
@@ -1075,6 +1087,49 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 		IEngineStudio.StudioSetRemapColors(m_nTopColor, m_nBottomColor);
 
 		StudioRenderModel(dir);
+
+		cl_entity_s* viewent = IEngineStudio.GetViewEntity();
+		cl_entity_s* curent = IEngineStudio.GetCurrentEntity();
+
+		if (CStudioModelRenderer::s_pLeapStrikeGunPartModel && CStudioModelRenderer::s_pLeapStrikeGunViewModel && curent->model == CStudioModelRenderer::s_pLeapStrikeGunViewModel)
+		{
+			studiohdr_t* saveheader = m_pStudioHeader;
+			cl_entity_t saveent = *m_pCurrentEntity;
+			int saveseq = m_pCurrentEntity->curstate.sequence;
+
+			model_t* weaponpart = s_pLeapStrikeGunPartModel;
+
+			m_pStudioHeader = (studiohdr_t*)IEngineStudio.Mod_Extradata(weaponpart);
+			if (!m_pStudioHeader)
+				return 0;
+
+			m_pCurrentEntity->curstate.sequence = 0;
+			
+
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			StudioMergeBones(weaponpart);
+
+			IEngineStudio.StudioSetupLighting(&lighting);
+
+
+			StudioRenderModel(dir);
+
+			StudioCalcAttachments();
+
+			if (m_pCurrentEntity->index > 0)
+				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
+
+			*m_pCurrentEntity = saveent;
+			m_pStudioHeader = saveheader;
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			m_pCurrentEntity->curstate.sequence = saveseq;
+
+			if (flags & STUDIO_EVENTS)
+				IEngineStudio.StudioClientEvents();
+		}
+
 	}
 
 	return 1;

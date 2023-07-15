@@ -636,6 +636,7 @@ public:
 			|| m_iId == WEAPON_M79G
 			|| m_iId == WEAPON_JANUS1
 			|| m_iId == WEAPON_FIRECRACKER
+			|| m_iId == WEAPON_LEAPSTRIKEGUN
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -1035,6 +1036,7 @@ private:
 	int m_iType;
 	int m_iM3DragonmExp;
 	float m_flNumFrames;
+	int m_iM3DragonEXExp;
 };
 
 
@@ -1048,6 +1050,7 @@ public:
 public:
 	void EXPORT OnThink(void);
 	void EXPORT OnSharkThink(void);
+	void EXPORT OnDragonEXThink(void);
 	bool CylinderDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, float flHeight, float flKnockBack, Vector vecDir, int bitsDamageType, bool bDistanceCheck = true);	//SME
 	
 public:
@@ -1069,6 +1072,9 @@ private:
 	time_point_t m_flRemoveTime;
 	time_point_t m_flSplashTime;
 	time_point_t m_flCreateSharkTime;
+	int m_iDragonEXEffect;
+	int m_iSmokeEffect;
+	time_point_t m_flCreateDragonEXTime;
 };
 class CY22s2SFpistolField : public CBaseAnimating
 {

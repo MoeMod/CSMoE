@@ -50,12 +50,17 @@ namespace sv {
 		pev->rendermode = kRenderTransAdd;
 		pev->renderamt = 255;
 
-		if (m_iType)
+		if (m_iType == 2)
+		{
+			m_flNumFrames = 300.0;
+			pev->scale = 0.1;
+			SET_MODEL(ENT(pev), "sprites/ef_m3dragonex_bomb.spr");
+		}
+		else if (m_iType == 1)
 		{
 			m_flNumFrames = 300.0;
 			pev->scale = 0.1;
 			SET_MODEL(ENT(pev), "sprites/ef_m3water.spr");
-
 		}
 		else
 		{
@@ -75,9 +80,22 @@ namespace sv {
 		//WEAPON_M3DRAGON
 		PRECACHE_MODEL("models/ef_fireball2.mdl");
 		PRECACHE_SOUND("weapons/m3dragon_exp.wav");
+
+		//WEAPON_M3DRAGONEX
+		PRECACHE_MODEL("sprites/ef_m3dragonex_ball.spr");	//ent
+		m_iM3DragonEXExp = PRECACHE_MODEL("sprites/ef_m3dragonex_bomb.spr");	//exp spr
+		PRECACHE_SOUND("weapons/m3dragonex_dragon_fx.wav");
 	}
 
-	int CM3DragonCannon::GetWeaponsId(void) { return m_iType ? WEAPON_M3DRAGONM : WEAPON_M3DRAGON; }
+	int CM3DragonCannon::GetWeaponsId(void) 
+	{
+			if (m_iType == 2)
+				return WEAPON_M3DRAGONEX;
+			else if (m_iType == 1)
+				return WEAPON_M3DRAGONM;
+			else
+				return WEAPON_M3DRAGON;
+	}
 
 
 	void CM3DragonCannon::FlyingThink()
@@ -265,7 +283,7 @@ namespace sv {
 
 			CM3DragonCannon_Dragon* pDragon = CM3DragonCannon_Dragon::Create(0, vecOrigin, g_vecZero, pev->owner, m_iTeam);
 		}
-		else
+		else if (m_iType == 1)
 		{
 			MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
 			WRITE_BYTE(TE_TEMPSPRITE);
@@ -280,6 +298,21 @@ namespace sv {
 
 			CM3DragonCannon_Dragon* pDragon = CM3DragonCannon_Dragon::Create(1, vecOrigin, g_vecZero, pev->owner, m_iTeam);
 		}
+		else if (m_iType == 2)
+		{
+			MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_TEMPSPRITE);
+			WRITE_COORD(pev->origin.x);
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z + 20);
+			WRITE_SHORT(m_iM3DragonEXExp);
+			WRITE_BYTE(25);
+			WRITE_BYTE(255);
+			WRITE_BYTE(30);
+			MESSAGE_END();
+
+			CM3DragonCannon_Dragon* pDragon = CM3DragonCannon_Dragon::Create(2, vecOrigin, g_vecZero, pev->owner, m_iTeam);
+		}
 
 		EMIT_SOUND_DYN(ENT(pev), CHAN_AUTO, "weapons/m3dragon_exp.wav", VOL_NORM, 0.25, 0, PITCH_NORM);
 
@@ -292,7 +325,20 @@ namespace sv {
 	float CM3DragonCannon::GetDirectDamage()
 	{
 		float flDamage;
-		if (m_iType)
+		if (m_iType == 2)
+		{
+			flDamage = 150;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+			{
+				if (enhancedzombie.value)
+					flDamage = 3600;
+				else
+					flDamage = 2600.0f;
+			}		
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 10000;
+		}
+		else if (m_iType == 1)
 		{
 			flDamage = 100;
 			if (g_pModRunning->DamageTrack() == DT_ZB)
@@ -301,7 +347,7 @@ namespace sv {
 					flDamage = 2300;
 				else
 					flDamage = 1100.0f;
-			}		
+			}
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 8450;
 		}
@@ -324,7 +370,20 @@ namespace sv {
 	float CM3DragonCannon::GetExplodeDamage()
 	{	
 		float flDamage;
-		if (m_iType)
+		if (m_iType == 2)
+		{
+			flDamage = 100;
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+			{
+				if (enhancedzombie.value)
+					flDamage = 700;
+				else
+					flDamage = 550;
+			}
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 1000;
+		}
+		else if (m_iType == 1)
 		{
 			flDamage = 60;
 			if (g_pModRunning->DamageTrack() == DT_ZB)

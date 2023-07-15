@@ -21,20 +21,20 @@ namespace vgui2
 class ListPanel;
 }
 #ifdef DEBUG
-#define MAX_GAMEMODES 10
+#define MAX_GAMEMODES 11
 static const char* g_szGameModeCode[MAX_GAMEMODES] = {
-	"none", "dm", "tdm", "zb1", "zb3", "zb3f2p", "zbs", "zb3zp", "zbz", "zsh"
+	"none", "dm", "tdm", "gd", "zb1", "zb3", "zb3f2p", "zbs", "zb3zp", "zbz", "zsh"
 };
 static const wchar_t* g_szGameModeNames[MAX_GAMEMODES] = {
-	L"竞技模式", L"个人竞技模式", L"团队竞技模式", L"生化模式(感染)", L"生化模式(英雄)", L"生化模式(英雄)-炮房", L"大灾变", L"生化模式(ZombiePlague)", L"生化Z" ,L"昼夜求生"
+	L"竞技模式", L"个人竞技模式", L"团队竞技模式", L"枪王决战模式", L"生化模式(感染)", L"生化模式(英雄)", L"生化模式(英雄)-炮房", L"大灾变", L"生化模式(ZombiePlague)", L"生化Z" ,L"昼夜求生"
 };
 #else
-#define MAX_GAMEMODES 8
+#define MAX_GAMEMODES 9
 static const char* g_szGameModeCode[MAX_GAMEMODES] = {
-	"none", "dm", "tdm", "zb1", "zb3", "zb3f2p", "zbs", "zb3zp"
+	"none", "dm", "tdm", "gd", "zb1", "zb3", "zb3f2p", "zbs", "zb3zp"
 }; 
 static const wchar_t* g_szGameModeNames[MAX_GAMEMODES] = {
-	L"竞技模式", L"个人竞技模式", L"团队竞技模式", L"生化模式(感染)", L"生化模式(英雄)", L"生化模式(英雄)-炮房", L"大灾变", L"生化模式(ZombiePlague)"
+	L"竞技模式", L"个人竞技模式", L"团队竞技模式", L"枪王决战模式", L"生化模式(感染)", L"生化模式(英雄)", L"生化模式(英雄)-炮房", L"大灾变", L"生化模式(ZombiePlague)"
 };
 #endif
 //-----------------------------------------------------------------------------

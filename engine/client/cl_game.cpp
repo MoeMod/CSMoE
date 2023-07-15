@@ -3964,6 +3964,7 @@ static efx_api_t gEfxApi =
 	CL_KillAttachedTentsFromEntity,
 	CL_AttachTentToModel,
 	CL_BeamPoints_Tracer,
+	CL_KillNamedAttachedTents
 };
 
 static event_api_t gEventApi =

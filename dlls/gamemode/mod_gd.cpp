@@ -29,7 +29,7 @@ GNU General Public License for more details.
 namespace sv {
 
 constexpr int MAX_LEVEL = 18;
-constexpr int KILL_NUMS[MAX_LEVEL] = { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 2, 3, 3, 3, 3 };
+constexpr int KILL_NUMS[MAX_LEVEL] = { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 2, 3, 3, 3, 0 };
 constexpr const char *DEFAULT_WEAPONS[MAX_LEVEL][2] = {
 		{"weapon_m4a1","weapon_ak47"},
 		{"weapon_sg550","weapon_g3sg1"},
@@ -50,6 +50,48 @@ constexpr const char *DEFAULT_WEAPONS[MAX_LEVEL][2] = {
 		{"weapon_p228","weapon_fiveseven"},
 		{"weapon_glock18","weapon_glock18"}
 };
+constexpr const int DEFAULT_WEAPONS_RATE[MAX_LEVEL][2] = {
+		{45, 45},
+		{45, 45},
+		{50, 50},
+		{45, 45},
+		{50, 40},
+		{65, 25},
+		{50, 40},
+		{50, 40},
+		{60, 30},
+		{60, 30},
+		{30, 60},
+		{30, 60},
+		{50, 50},
+		{50, 50},
+		{50, 40},
+		{40, 50},
+		{40, 50},
+		{50, 50}
+};
+
+constexpr const char* WEAPON_LIMIT_RARE[MAX_LEVEL] =
+{
+	"weapon_m14ebr",
+	"weapon_mg36",
+	"",
+	"weapon_as50",
+	"weapon_stg44",
+	"weapon_trg42",
+	"weapon_m24",
+	"weapon_kriss",
+	"weapon_ksg15",
+	"weapon_tomason",
+	"weapon_dbarrel",
+	"weapon_m60",
+	"",
+	"",
+	"weapon_infinity",
+	"weapon_infinitya",
+	"weapon_infinityb"
+	""
+};
 
 class PlayerExtraHumanLevel_GD : public BasePlayerExtra
 {
@@ -61,7 +103,7 @@ public:
 
 	void OnKillEnemy()
 	{
-		if (m_iLevel >= MAX_LEVEL)
+		if (m_iLevel >= MAX_LEVEL - 1)
 		{
 			GiveGreande();
 			return;
@@ -85,10 +127,20 @@ public:
 		m_pPlayer->m_bHasPrimary = false;
 		// TODO : give new weapons
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		std::random_device rd;
-		m_pPlayer->GiveNamedItem(DEFAULT_WEAPONS[m_iLevel][rd() & 1]);
-		// TODO : give ammo
 
+		int iRd = RANDOM_LONG(0, 100);
+
+		if (iRd < DEFAULT_WEAPONS_RATE[m_iLevel][0])
+			m_pPlayer->GiveNamedItem(DEFAULT_WEAPONS[m_iLevel][0]);
+		else if (iRd <= (DEFAULT_WEAPONS_RATE[m_iLevel][0] + DEFAULT_WEAPONS_RATE[m_iLevel][1]))
+			m_pPlayer->GiveNamedItem(DEFAULT_WEAPONS[m_iLevel][1]);
+		else
+			m_pPlayer->GiveNamedItem(WEAPON_LIMIT_RARE[m_iLevel]);
+
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
+		{
+			m_pPlayer->m_pModStrategy->GiveSlotAmmo(m_pPlayer, iSlot);
+		}
 	}
 
 	void GiveGreande() const
@@ -129,6 +181,12 @@ private:
 	int m_iKillsRemaining;
 };
 
+CMod_GunDeath::CMod_GunDeath()
+{
+	m_iWinTeam = UNASSIGNED;
+	m_bGrenadeKilled = false;
+}
+
 class CMod_GunDeath::PlayerModStrategy : public CPlayerModStrategy_Default
 {
 public:
@@ -141,18 +199,93 @@ public:
 	bool CanPlayerBuy(bool display) override { return false; }
 	bool CanDropWeapon(const char *pszItemName) override { return false; }
 	void CheckBuyZone() override { /* */ }
+	void OnSpawn() override
+	{
+		lv.UpdateHUD();
+	}
 	void Event_OnPlayerKilled(CBasePlayer *pVictim, CBasePlayer *pKiller, entvars_t *pInflictor)
 	{
 		if (pKiller != m_pPlayer)
 			return;
+
 		lv.OnKillEnemy();
 	}
+	void GiveDefaultItems() override
+	{
+		lv.GiveWeaponsToPlayer();
+	}
+
+
 
 private:
 	CMod_GunDeath * const mp;
 	PlayerExtraHumanLevel_GD lv;
 	const EventListener m_eventPlayerKilledListener;
 };
+
+void SV_Start_VoteMaps();
+
+
+void CMod_GunDeath::Think(void)
+{
+	if ((m_bGrenadeKilled))
+	{
+		m_bGrenadeKilled = false;
+
+		if(m_iWinTeam == TERRORIST)
+			Broadcast("terwin");
+		else if(m_iWinTeam == CT)
+			Broadcast("ctwin");
+		else
+			Broadcast("rounddraw");
+
+		m_iWinTeam = UNASSIGNED;
+
+		ALERT(at_console, "Changing maps...one team has won the specified number of rounds\n");
+		if (CheckCanStartVoteMaps())
+		{
+			SV_Start_VoteMaps();
+		}
+		else
+		{
+			GoToIntermission();
+		}
+		return CMod_TeamDeathMatch::Think();
+	}
+
+
+	if (gpGlobals->time > m_tmNextPeriodicThink)
+	{
+		CheckRestartRound();
+		m_tmNextPeriodicThink = gpGlobals->time + 1.0s;
+
+		if (g_psv_accelerate->value != 5.0f)
+		{
+			CVAR_SET_FLOAT("sv_accelerate", 5.0);
+		}
+
+		if (g_psv_friction->value != 4.0f)
+		{
+			CVAR_SET_FLOAT("sv_friction", 4.0);
+		}
+
+		if (g_psv_stopspeed->value != 75.0f)
+		{
+			CVAR_SET_FLOAT("sv_stopspeed", 75.0);
+		}
+
+
+		m_iMaxRoundsWon = (int)maxkills.value;
+
+		if (m_iMaxRoundsWon < 0)
+		{
+			m_iMaxRoundsWon = 0;
+			CVAR_SET_FLOAT("mp_maxkills", 500);
+		}
+	}
+
+	CMod_TeamDeathMatch::Think();
+}
 
 void CMod_GunDeath::UpdateGameMode(CBasePlayer *pPlayer)
 {
@@ -171,10 +304,34 @@ void CMod_GunDeath::InstallPlayerModStrategy(CBasePlayer *player)
 }
 void CMod_GunDeath::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor)
 {
+	CMod_TeamDeathMatch::PlayerKilled(pVictim, pKiller, pInflictor);
 	CBasePlayer *pKillerPlayer = dynamic_ent_cast<CBasePlayer *>(pKiller);
 	if (pKillerPlayer)
 		m_eventPlayerKilled.dispatch(pVictim, pKillerPlayer, pInflictor);
-	CMod_TeamDeathMatch::PlayerKilled(pVictim, pKiller, pInflictor);
+
+	CBaseEntity* pEnt = CBaseEntity::Instance(pInflictor);
+	CGrenade* pGrenade = dynamic_cast<CGrenade*>(pEnt);
+	if (pGrenade && pVictim->pev != pKiller)
+	{
+		CBasePlayer* killer = GetClassPtr<CBasePlayer>(pKiller);
+		if (killer->m_iTeam != pVictim->m_iTeam)
+		{
+			m_iWinTeam = killer->m_iTeam;
+			m_bGrenadeKilled = true;
+		}
+	}
 }
+
+ModConfigData_t CMod_GunDeath::QueryModConfig(const char* key, ModConfigData_t defaultValue, CBaseEntity* invoker)
+{
+	if (!strcmp(key, "WeaponBoxLifeTime"))
+		return -1.0s;
+
+	if (!strcmp(key, "CanPickWeapon"))
+		return false;
+
+	return IBaseMod::QueryModConfig(key, defaultValue, invoker);
+}
+
 
 }

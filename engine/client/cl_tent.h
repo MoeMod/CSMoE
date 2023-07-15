@@ -58,6 +58,7 @@ void CL_BubbleTrail( const vec3_t start, const vec3_t end, float flWaterZ, int m
 void CL_AttachTentToPlayer( int client, int modelIndex, float zoffset, float life );
 void CL_KillAttachedTents( int client );
 void CL_KillAttachedTentsFromEntity(int client);
+void CL_KillNamedAttachedTents(int client, int iIndex);
 void CL_RicochetSprite( const vec3_t pos, model_t *pmodel, float duration, float scale );
 void CL_RocketFlare( const vec3_t pos );
 void CL_MuzzleFlash( int clientindex, int iAttachment, const char *type );

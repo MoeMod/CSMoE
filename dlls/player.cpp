@@ -39,6 +39,7 @@
 #include "wpn_shared/wpn_sgdrillex.h"
 #include "wpn_shared/wpn_guillotine.h"
 #include "wpn_shared/z4b_shovelex.h"
+#include "wpn_shared/wpn_leapstrikegun.h"
 // gamemode
 #include "gamemode/mods.h"
 
@@ -1226,7 +1227,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_BUFFNG7
 					|| pWeapon->m_iId == WEAPON_WONDERCANNONEX
 					|| pWeapon->m_iId == WEAPON_RESTRICTIONPISTOL
-					|| pWeapon->m_iId == WEAPON_VOIDPISTOLEX)
+					|| pWeapon->m_iId == WEAPON_VOIDPISTOLEX
+					|| pWeapon->m_iId == WEAPON_M3DRAGONEX
+					|| pWeapon->m_iId == WEAPON_LEAPSTRIKEGUN)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -1629,6 +1632,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 void packPlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem, bool packAmmo)
 {
 	if (pItem == NULL)
+		return;
+
+	if (to_duration(g_pModRunning->QueryModConfig("WeaponBoxLifeTime", 300s)) < 0s)
 		return;
 
 	const char *modelName = pItem->GetCSModelName();
@@ -7709,6 +7715,20 @@ void CBasePlayer::ItemPostFrame()
 		}
 	}
 
+	if (m_iBuff & BUFF_LEAPSTRIKEGUN)
+	{
+
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PISTOL_SLOT];
+
+		if (pWeapon)
+		{
+			if (pWeapon->m_iId == WEAPON_LEAPSTRIKEGUN && pWeapon != m_pActiveItem)
+				((CLeapStrikeGun*)pWeapon)->FlyThink();
+		}
+		else
+			m_iBuff &= ~BUFF_LEAPSTRIKEGUN;
+}
+
 #ifdef CLIENT_WEAPONS
 	if (m_flNextAttack > 0s)
 #else
@@ -9602,6 +9622,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_Y23S2BUFFAUG:
 		case WEAPON_OZWPNSET1:
 		case WEAPON_IGNITEMG:
+		case WEAPON_M3DRAGONEX:
 			return TRUE;
 		}
 	}

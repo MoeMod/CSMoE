@@ -856,6 +856,34 @@ void GAME_EXPORT CL_KillAttachedTentsFromEntity(int entity)
 	}
 }
 
+
+/*
+==============
+CL_KillNamedAttachedTents
+
+Detach named entity from entity
+==============
+*/
+void GAME_EXPORT CL_KillNamedAttachedTents(int entity, int iIndex)
+{
+	int	i;
+
+	for (i = 0; i < GI->max_tents; i++)
+	{
+		TEMPENTITY* pTemp = &cl_tempents[i];
+
+		if (pTemp->flags & FTENT_PLYRATTACHMENT)
+		{
+			// this TEMPENTITY is entity attached.
+			// if it is attached to this entity, set it to die instantly.
+			if (pTemp->clientIndex == entity)
+			{
+				if(pTemp->entity.index == iIndex)
+					pTemp->die = cl.time; // good enough, it will die on next tent update. 
+			}
+		}
+	}
+}
 /*
 ==============
 CL_RicochetSprite
@@ -946,6 +974,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	unsigned char idx = 0;
 	unsigned char cType = 0;
 	float fTemp;
+	byte eflags = 0;
 	do
 	{
 		if (isalpha(*pOptions)) {
@@ -990,6 +1019,8 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 				animateLoop = atoi(value) ? true : false;
 				break;
 			case 'U':
+				eflags |= EFLAG_DEPTH_CHANGED;
+				eflags |= EFLAG_AFTER_VIEWMODEL;
 				break;
 			case 'X':
 				iAttachment = atoi(value);
@@ -1033,6 +1064,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	pTemp->entity.curstate.framerate = framerate;
 	pTemp->entity.curstate.renderfx = 0;
 	pTemp->entity.curstate.eflags = 0;
+	pTemp->entity.curstate.eflags = eflags;
 	pTemp->die = cl.time + life;
 	pTemp->entity.curstate.frame = frame;
 	pTemp->entity.curstate.movetype = MOVETYPE_FOLLOW;
@@ -2930,6 +2962,9 @@ void R_TempModel(sizebuf_t* msg)
 	frameMax = BF_ReadShort(msg);
 	flags = BF_ReadLong(msg);
 
+	if (framerate > 25.0)
+		framerate = 30.0;
+
 	if (life > 25.0)
 		life = 999.0;
 
@@ -3556,6 +3591,11 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 	case TE_KILLENTITYATTACHMENTS:
 		entityIndex = BF_ReadShort(&buf);	// playernum
 		CL_KillAttachedTentsFromEntity(entityIndex);
+		break;
+	case TE_KILLNAMEDENTITYATTACHMENTS:
+		entityIndex = BF_ReadShort(&buf);	// playernum
+		modelIndex = BF_ReadShort(&buf);
+		CL_KillNamedAttachedTents(entityIndex, modelIndex);
 		break;
 	case TE_FOLLOWINGGRENADE:
 		R_FollowingGrenade(&buf);

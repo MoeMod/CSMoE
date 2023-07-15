@@ -25,12 +25,16 @@ namespace sv {
 class CMod_GunDeath : public CMod_TeamDeathMatch
 {
 public:
+	CMod_GunDeath();
+	void Think(void) override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
-
+	ModConfigData_t QueryModConfig(const char* key, ModConfigData_t defaultValue = {}, CBaseEntity* invoker = nullptr) override;
 	class PlayerModStrategy;
 
+	int m_iWinTeam;
+	bool m_bGrenadeKilled;
 private:
 	EventDispatcher<void(CBasePlayer *pVictim, CBasePlayer *pKiller, entvars_t *pInflictor)> m_eventPlayerKilled;
 };
