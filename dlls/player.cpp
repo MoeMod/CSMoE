@@ -2723,7 +2723,7 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 	case PLAYER_IDLE:
 	case PLAYER_WALK:
 	{
-		if (pev->flags & FL_ONGROUND || (m_Activity != ACT_HOP && m_Activity != ACT_LEAP))
+		if (pev->flags & FL_ONGROUND || (m_Activity != ACT_HOP && m_Activity != ACT_LEAP) || pev->iuser3)
 		{
 			if (pev->waterlevel <= 1)
 				m_IdealActivity = ACT_WALK;
@@ -6009,6 +6009,13 @@ void CBasePlayer::PostThink()
 				float flFallDamage = g_pGameRules->FlPlayerFallDamage(this);
 
 				//splat
+
+				if (m_iBuff & BUFF_LEAPSTRIKEGUN)
+				{
+					m_iBuff &= ~BUFF_LEAPSTRIKEGUN;
+					flFallDamage = 0;
+				}
+
 				if (flFallDamage > pev->health)
 				{
 					// note: play on item channel because we play footstep landing on body channel
@@ -6047,7 +6054,7 @@ void CBasePlayer::PostThink()
 	{
 		if (pev->velocity.x || pev->velocity.y)
 		{
-			if (((pev->velocity.x || pev->velocity.y) && (pev->flags & FL_ONGROUND)) || pev->waterlevel > 1)
+			if (((pev->velocity.x || pev->velocity.y) && (pev->flags & FL_ONGROUND || pev->iuser3)) || pev->waterlevel > 1)
 				SetAnimation(PLAYER_WALK);
 		}
 		else if (pev->gaitsequence != ACT_FLY)
@@ -7717,7 +7724,6 @@ void CBasePlayer::ItemPostFrame()
 
 	if (m_iBuff & BUFF_LEAPSTRIKEGUN)
 	{
-
 		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PISTOL_SLOT];
 
 		if (pWeapon)

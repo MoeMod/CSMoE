@@ -38,32 +38,26 @@ namespace sv {
         static constexpr const char* ClassName = "weapon_leapstrikegun";
         static constexpr const char* AnimExtension = "leapstrikegun";
         static constexpr int MaxClip = 50;
-        KnockbackData KnockBack = { 420.0f, 380.0f, 380.0f, 550.0f, 0.8f };
+        KnockbackData KnockBack = { 450.0f, 350.0f, 350.0f, 260.0f, 0.3f };
         enum
         {
-            ANIM_IDLEA = 0,
-            ANIM_IDLEB,
-            ANIM_IDLEC,
-            ANIM_SHOOTA,
-            ANIM_SHOOTA_EMPTY,
-            ANIM_SHOOTB,
-            ANIM_SHOOTB_EMPTY,
-            ANIM_SHOOTC,
-            ANIM_SHOOTC_EMPTY,
-            ANIM_RELOADA,
-            ANIM_RELOADB,
-            ANIM_RELOADC,
-            ANIM_DRAWA,
-            ANIM_DRAWB,
-            ANIM_DRAWC,
-            ANIM_CHANGEAB,
-            ANIM_CHANGEBC,
-            ANIM_CHANGEBA,
-            ANIM_CHANGECA,
-            ANIM_SHOOT_SPECIALB,
-            ANIM_SHOOT_SPECIALC,
+            ANIM_IDLE = 0,
+            ANIM_SHOOT1,
+            ANIM_SHOOT2,
+            ANIM_DRAW,
+            ANIM_RELOAD,
         };
 
+        enum part_e
+        {
+            PART_IDLE = 0,
+            PART_CHANGE_START,
+            PART_CHANGE,
+            PART_CHANGE_END,
+        };
+
+        int m_iJumpFXIndex;
+        int m_iLandingIndex;
         int m_iExpIndex;
         int m_iFieldIndex;
         int m_iChargingShotIndex[2];
@@ -120,18 +114,54 @@ namespace sv {
         void Holster(int skiplocal)
         {
             m_flTimeNextCharge = gpGlobals->time;
+
             return CBasePlayerWeapon::Holster(skiplocal);
         }
 
+        duration_t GetFlyingTime()
+        {
+            duration_t flTime = 8.5s;
+#ifndef CLIENT_DLL
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                flTime = 4.0s;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                flTime = 1.5s;
+#endif
+            return flTime;
+        }
+
+        duration_t GetAvoidInfectTime()
+        {
+            duration_t flTime = 0.0s;
+#ifndef CLIENT_DLL
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                flTime = 1.5s;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                flTime = 1.5s;
+#endif
+            return flTime;
+        }
+
+        duration_t GetChargeTime()
+        {
+            duration_t flTime = 0.05s;
+#ifndef CLIENT_DLL
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                flTime = 0.1s;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                flTime = 0.25s;
+#endif
+            return flTime;
+        }
 
         float GetPrimaryAttackDamage() const
         {
-            int flDamage = 15;
+            int flDamage = 20;
 #ifndef CLIENT_DLL
             if (g_pModRunning->DamageTrack() == DT_ZB)
-                flDamage = 355;
+                flDamage = 200;
             else if (g_pModRunning->DamageTrack() == DT_ZBS)
-                flDamage = 750;
+                flDamage = 310;
 #endif
             return flDamage;
         }
@@ -152,29 +182,29 @@ namespace sv {
         {
             float flDamage;
             if (iState == 2)
-                flDamage = 20.0;
+                flDamage = 11.0;
             else if (iState == 1)
-                flDamage = 15.0;
+                flDamage = 20.0;
             else
-                flDamage = 10.0;
+                flDamage = 32.0;
 #ifndef CLIENT_DLL
             if (g_pModRunning->DamageTrack() == DT_ZB)
             {
                 if (iState == 2)
-                    flDamage = 225.0;
+                    flDamage = 314.0;
                 else if (iState == 1)
-                    flDamage = 225.0;
+                    flDamage = 900.0;
                 else
-                    flDamage = 108.0;
+                    flDamage = 3200.0;
             }
             else if (g_pModRunning->DamageTrack() == DT_ZBS)
             {
                 if (iState == 2)
-                    flDamage = 1127.0;
+                    flDamage = 320.0;
                 else if (iState == 1)
-                    flDamage = 735.0;
+                    flDamage = 1400.0;
                 else
-                    flDamage = 280.0;
+                    flDamage = 4000.0;
             }
 #endif
             return flDamage;
@@ -185,11 +215,11 @@ namespace sv {
         {
             float flRadius;
             if (iState == 2)
-                flRadius = 618;
+                flRadius = 393.7;
             else if (iState == 1)
-                flRadius = 421;
+                flRadius = 157.48;
             else
-                flRadius = 224;
+                flRadius = 393.7;
             return flRadius;
         }
 

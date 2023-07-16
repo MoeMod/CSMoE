@@ -27,31 +27,29 @@
 */
 #include "events.h"
 
+namespace cl
+{
+	extern int g_iLeapStrikeGunAnim;
+	extern float g_iLeapStrikeGunAnimTime;
+}
+
 namespace cl::event::leapstrikegun {
 	
 enum leapstrikegun_e
 {
-	ANIM_IDLEA = 0,
-	ANIM_IDLEB,
-	ANIM_IDLEC,
-	ANIM_SHOOTA,
-	ANIM_SHOOTA_EMPTY,
-	ANIM_SHOOTB,
-	ANIM_SHOOTB_EMPTY,
-	ANIM_SHOOTC,
-	ANIM_SHOOTC_EMPTY,
-	ANIM_RELOADA,
-	ANIM_RELOADB,
-	ANIM_RELOADC,
-	ANIM_DRAWA,
-	ANIM_DRAWB,
-	ANIM_DRAWC,
-	ANIM_CHANGEAB,
-	ANIM_CHANGEBC,
-	ANIM_CHANGEBA,
-	ANIM_CHANGECA,
-	ANIM_SHOOT_SPECIALB,
-	ANIM_SHOOT_SPECIALC,
+	ANIM_IDLE = 0,
+	ANIM_SHOOT1,
+	ANIM_SHOOT2,
+	ANIM_DRAW,
+	ANIM_RELOAD,
+};
+
+enum part_e
+{
+	PART_IDLE = 0,
+	PART_CHANGE_START,
+	PART_CHANGE,
+	PART_CHANGE_END,
 };
 
 void EV_FireLeapStrikeGun( event_args_t *args )
@@ -76,7 +74,9 @@ void EV_FireLeapStrikeGun( event_args_t *args )
 		++g_iShotsFired;
 		EV_MuzzleFlash();
 
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(args->bparam1 ? ANIM_SHOOTB : ANIM_SHOOTA, 2 );
+		//g_iLeapStrikeGunAnim = args->bparam1 ? PART_CHANGE : PART_IDLE;
+
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1 , ANIM_SHOOT2), 2 );
 	}
 
 	PLAY_EVENT_SOUND("weapons/bufffiveseven-1.wav");

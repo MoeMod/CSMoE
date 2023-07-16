@@ -61,6 +61,7 @@ void CM3DragonEX::Precache(void)
 	PRECACHE_MODEL("sprites/ef_m3dragonex_shoot.spr");
 	PRECACHE_MODEL("sprites/ef_m3dragonex_smoke.spr");
 
+	PRECACHE_MODEL("sprites/muzzleflash326.spr");
 	PRECACHE_MODEL("sprites/muzzleflash327.spr");
 	PRECACHE_MODEL("sprites/muzzleflash328.spr");
 	PRECACHE_MODEL("sprites/muzzleflash329.spr");

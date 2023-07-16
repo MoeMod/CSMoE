@@ -47,6 +47,9 @@ namespace cl {
 	extern int g_iM95TigerState;
 
 	extern int g_iSPKnifeAmmo;
+
+	extern int g_iLeapStrikeGunAnim;
+	extern float g_iLeapStrikeGunAnimTime;
 enum
 {
 	HUMAN_SKILL_KNIFE2X,
@@ -670,9 +673,13 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 					};
 			}
 		}
-
-		
-
+		break;
+	}
+	case 40:
+	{
+		arg1 = reader.ReadByte();
+		g_iLeapStrikeGunAnimTime = gHUD.m_flTime;
+		g_iLeapStrikeGunAnim = arg1;
 		break;
 	}
 	case 44:

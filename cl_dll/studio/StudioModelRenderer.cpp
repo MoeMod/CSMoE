@@ -140,6 +140,9 @@ struct model_s* CStudioModelRenderer::s_pM3DragonEXSmokeModel;
 struct model_s* CStudioModelRenderer::s_pLeapStrikeGunViewModel;
 struct model_s* CStudioModelRenderer::s_pLeapStrikeGunPartModel;
 
+int g_iLeapStrikeGunAnim = 0;
+float g_iLeapStrikeGunAnimTime = 0.0;
+
 void CStudioModelRenderer::Init(void)
 {
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");
@@ -1096,6 +1099,8 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 			studiohdr_t* saveheader = m_pStudioHeader;
 			cl_entity_t saveent = *m_pCurrentEntity;
 			int saveseq = m_pCurrentEntity->curstate.sequence;
+			float saveanimtime = m_pCurrentEntity->curstate.animtime;
+			int save_interp = m_fDoInterp;
 
 			model_t* weaponpart = s_pLeapStrikeGunPartModel;
 
@@ -1103,8 +1108,9 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 			if (!m_pStudioHeader)
 				return 0;
 
-			m_pCurrentEntity->curstate.sequence = 0;
-			
+			m_pCurrentEntity->curstate.sequence = g_iLeapStrikeGunAnim;
+			m_pCurrentEntity->curstate.animtime = g_iLeapStrikeGunAnimTime;
+			m_fDoInterp = 1;
 
 			IEngineStudio.StudioSetHeader(m_pStudioHeader);
 
@@ -1125,6 +1131,8 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 			IEngineStudio.StudioSetHeader(m_pStudioHeader);
 
 			m_pCurrentEntity->curstate.sequence = saveseq;
+			m_pCurrentEntity->curstate.animtime = saveanimtime;
+			m_fDoInterp = save_interp;
 
 			if (flags & STUDIO_EVENTS)
 				IEngineStudio.StudioClientEvents();
