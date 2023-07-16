@@ -2723,7 +2723,7 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 	case PLAYER_IDLE:
 	case PLAYER_WALK:
 	{
-		if (pev->flags & FL_ONGROUND || (m_Activity != ACT_HOP && m_Activity != ACT_LEAP) || pev->iuser3)
+		if (pev->flags & FL_ONGROUND || (m_Activity != ACT_HOP && m_Activity != ACT_LEAP) || (pev->flags & FL_IMMUNE_LAVA))
 		{
 			if (pev->waterlevel <= 1)
 				m_IdealActivity = ACT_WALK;
@@ -6054,7 +6054,7 @@ void CBasePlayer::PostThink()
 	{
 		if (pev->velocity.x || pev->velocity.y)
 		{
-			if (((pev->velocity.x || pev->velocity.y) && (pev->flags & FL_ONGROUND || pev->iuser3)) || pev->waterlevel > 1)
+			if (((pev->velocity.x || pev->velocity.y) && (pev->flags & FL_ONGROUND || (pev->flags & FL_IMMUNE_LAVA))) || pev->waterlevel > 1)
 				SetAnimation(PLAYER_WALK);
 		}
 		else if (pev->gaitsequence != ACT_FLY)

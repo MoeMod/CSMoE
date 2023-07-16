@@ -266,7 +266,7 @@ namespace sv {
 
         if (m_iWeaponState == 3)
         {
-            m_pPlayer->pev->iuser3 = 0;
+            m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
             m_iWeaponState = 4;
 
             m_pPlayer->pev->velocity = g_vecZero;
@@ -434,7 +434,7 @@ namespace sv {
         if (m_flTimeFlying != invalid_time_point && m_flTimeFlying < gpGlobals->time)
         {
             m_pPlayer->m_iBuff &= ~BUFF_LEAPSTRIKEGUN;
-            m_pPlayer->pev->iuser3 = 0;
+            m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
             m_flTimeFlying = invalid_time_point;
             m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
             m_iWeaponState = 0;
@@ -443,7 +443,7 @@ namespace sv {
 
         if (FBitSet(m_pPlayer->pev->flags, FL_ONGROUND) && (m_iWeaponState == 3 || m_iWeaponState == 4))
         {
-            m_pPlayer->pev->iuser3 = 0;
+            m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
             if (m_iWeaponState == 4)
             {
                 m_pPlayer->m_iBuff |= BUFF_AVOID_INFECT;
@@ -469,7 +469,7 @@ namespace sv {
 
         if (m_iWeaponState == 3)
         {
-            m_pPlayer->pev->iuser3 = 1;
+            m_pPlayer->pev->flags |= FL_IMMUNE_LAVA;
         }
 
     }

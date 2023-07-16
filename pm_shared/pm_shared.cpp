@@ -1311,7 +1311,7 @@ void PM_Friction(void)
 	drop = 0;
 
 	// apply ground friction
-	if (pmove->onground != -1 || pmove->iuser3)  // On an entity that is the ground
+	if (pmove->onground != -1 || (pmove->flags & FL_IMMUNE_LAVA))  // On an entity that is the ground
 	{
 		vec3_t start, stop;
 		pmtrace_t trace;
@@ -1323,7 +1323,7 @@ void PM_Friction(void)
 
 		trace = pmove->PM_PlayerTrace(start, stop, PM_NORMAL, -1);
 
-		if (trace.fraction == 1.0 && !pmove->iuser3)
+		if (trace.fraction == 1.0 && !(pmove->flags & FL_IMMUNE_LAVA))
 			friction = pmove->movevars->friction*pmove->movevars->edgefriction;
 		else
 			friction = pmove->movevars->friction;
@@ -3208,7 +3208,7 @@ void PM_PlayerMove(qboolean server)
 
 			// Fricion is handled before we add in any base velocity. That way, if we are on a conveyor, 
 			//  we don't slow when standing still, relative to the conveyor.
-			if (pmove->onground != -1 || pmove->iuser3)
+			if (pmove->onground != -1 || (pmove->flags & FL_IMMUNE_LAVA))
 			{
 				pmove->velocity[2] = 0.0;
 				PM_Friction();
@@ -3218,7 +3218,7 @@ void PM_PlayerMove(qboolean server)
 			PM_CheckVelocity();
 
 			// Are we on ground now
-			if (pmove->onground != -1 || pmove->iuser3)
+			if (pmove->onground != -1 || (pmove->flags & FL_IMMUNE_LAVA))
 			{
 				PM_WalkMove();
 			}
