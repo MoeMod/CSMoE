@@ -276,7 +276,7 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pY23S2BuffAugSmokeAModel = IEngineStudio.Mod_ForName("sprites/ef_y23s2buffaug_a.spr", FALSE);
 	CStudioModelRenderer::s_pY23S2BuffAugSmokeBModel = IEngineStudio.Mod_ForName("sprites/ef_y23s2buffaug_b.spr", FALSE);
 
-	CStudioModelRenderer::s_pDvhammerViewModel = IEngineStudio.Mod_ForName("models/v_y23s2buffaug.mdl", FALSE);
+	CStudioModelRenderer::s_pDvhammerViewModel = IEngineStudio.Mod_ForName("models/v_dvhammer.mdl", FALSE);
 	CStudioModelRenderer::s_pDvhammerRedModel = IEngineStudio.Mod_ForName("sprites/ef_dvhammer_red.spr", FALSE);
 	CStudioModelRenderer::s_pDvhammerBlueModel = IEngineStudio.Mod_ForName("sprites/ef_dvhammer_blue.spr", FALSE);
 
