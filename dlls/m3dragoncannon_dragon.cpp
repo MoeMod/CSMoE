@@ -53,9 +53,12 @@ namespace sv {
 		m_flRemoveTime = gpGlobals->time + GetLifeTime();
 		if (m_iType == 2)
 		{
-			m_flCreateSharkTime = gpGlobals->time + 0.5s;
+			m_flCreateSharkTime = gpGlobals->time + 1.0s;
 			SET_MODEL(ENT(pev), "models/ef_m3dragonex_sign.mdl");
 			EMIT_SOUND_DYN(ENT(this->pev), CHAN_AUTO, "weapons/m3dragonex_dragon_fx.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+			UTIL_TempModel(pev->origin, g_vecZero, g_vecZero, m_iDragonEXEffect, 40, 0, 10, 0, 0, 255, kRenderNormal, NULL, false, true, 32, 255, 0);
+
 			SetThink(&CM3DragonCannon_Dragon::OnDragonEXThink);
 		}
 		else if (m_iType == 1)
@@ -339,8 +342,6 @@ namespace sv {
 
 		if (m_flCreateSharkTime < gpGlobals->time)
 		{
-			UTIL_TempModel(pev->origin, g_vecZero, g_vecZero, m_iDragonEXEffect, 40, 0, 10, 0, 0, 255, kRenderNormal, NULL, false, 0, 0, 255, 0);
-
 			for (int i = 0; i < 4; i++)
 			{
 				Vector vecOrigin = pev->origin;
@@ -362,14 +363,14 @@ namespace sv {
 				WRITE_COORD(vecOrigin.y);
 				WRITE_COORD(vecOrigin.z);
 				WRITE_SHORT(m_iSmokeEffect);
-				WRITE_BYTE(8);
+				WRITE_BYTE(10);
 				WRITE_BYTE(255);
-				WRITE_BYTE(15);
+				WRITE_BYTE(30);
 				MESSAGE_END();
 			}
 
 
-			m_flCreateSharkTime = gpGlobals->time + 9999s;
+			m_flCreateSharkTime = gpGlobals->time + 1.5s;
 		}
 
 		if (m_flAttackInterval != invalid_time_point && m_flAttackInterval < gpGlobals->time)

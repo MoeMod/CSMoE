@@ -67,7 +67,7 @@ public:
 	KnockbackData GetKnockBackData() override { return { 3000.0f, 480.0f, 900.0f, 1600.0f, 0.3f }; }
 
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M3); }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_m3dragonex" , 60 }; }
 #endif
 	float GetArmorRatioModifier() override { return 1.1; }
 	WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 6, 0 }; }
@@ -82,6 +82,7 @@ public:
 	int m_iState;
 
 #ifndef CLIENT_DLL
+	Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, entvars_t* pevAttacker, bool &bHit);
 	std::vector<EHANDLE> m_pEnemylist;
 	std::vector<int> m_iTargetID;
 	void SecondaryAttack_FindTargets();

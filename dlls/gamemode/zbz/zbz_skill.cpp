@@ -288,7 +288,8 @@ namespace sv {
 					pWeapon->m_iId == WEAPON_PATROLDRONE ||
 					pWeapon->m_iId == WEAPON_BUNKERBUSTER ||
 					pWeapon->m_iId == WEAPON_CLAYMORE ||
-					pWeapon->m_iId == WEAPON_SBMINE)
+					pWeapon->m_iId == WEAPON_SBMINE ||
+					pWeapon->m_iId == WEAPON_SFTURRET)
 					return;
 
 				if (amount && pWeapon && pWeapon->m_iId != WEAPON_HEGRENADE)

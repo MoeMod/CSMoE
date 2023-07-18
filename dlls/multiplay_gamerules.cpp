@@ -3921,6 +3921,32 @@ int CHalfLifeMultiplay::IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKil
 	return 1;
 }
 
+void ResetDeathInfo (int index1, int index2)
+{
+	if (!index2)
+	{
+		for (int i = 1; i <= MAX_CLIENTS; i++)
+		{
+			for (int j = 1; j <= 7; j++)
+			{
+				iDeathInfo_Body[index1][i][j] = 0;
+				iDeathInfo_Fire[index1][i][j] = 0;
+			}
+		}
+	}
+	else
+	{
+		SzDeathInfo_Wpn[index1][index2][0].clear();
+		SzDeathInfo_Wpn[index1][index2][1].clear();
+
+		for (int j = 1; j <= 7; j++)
+		{
+			iDeathInfo_Body[index1][index2][j] = 0;
+			iDeathInfo_Fire[index1][index2][j] = 0;
+		}
+	}
+};
+
 void CHalfLifeMultiplay::PlayerKilled(CBasePlayer* pVictim, entvars_t* pKiller, entvars_t* pInflictor)
 {
 	DeathNotice(pVictim, pKiller, pInflictor);
@@ -4333,7 +4359,11 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 					else if (iId == WEAPON_Y23S2BUFFAUG)
 						killer_weapon_name = "y23s2buffaug";
 					else if (iId == WEAPON_M3DRAGONEX)
-					killer_weapon_name = "m3dragonex";
+						killer_weapon_name = "m3dragonex";
+					else if (iId == WEAPON_LEAPSTRIKEGUN)
+						killer_weapon_name = "leapstrikegun";
+					else if (iId ==WEAPON_SFTURRET)
+						killer_weapon_name = "sfturret";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}
@@ -4476,18 +4506,15 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 					iTotalDamage += iDeathInfo_Fire[iAtt][iVic][i];
 				}
 
-				if (!pAttackPlayer->m_bIsZombie)
-				{
-					SzDeathInfo_Wpn[iAtt][iVic][1] = /*SzModel*/killer_weapon_name;
-					if (SzDeathInfo_Wpn[iAtt][iVic][1] == "usp")
-						SzDeathInfo_Wpn[iAtt][iVic][1] = "USP45";
-					else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "deagle")
-						SzDeathInfo_Wpn[iAtt][iVic][1] = "DesertEagle";
-					else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "grenade")
-						SzDeathInfo_Wpn[iAtt][iVic][1] = "HE_Grenade";
-				}
 
-
+				SzDeathInfo_Wpn[iAtt][iVic][1] = /*SzModel*/killer_weapon_name;
+				if (SzDeathInfo_Wpn[iAtt][iVic][1] == "usp")
+					SzDeathInfo_Wpn[iAtt][iVic][1] = "USP45";
+				else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "deagle")
+					SzDeathInfo_Wpn[iAtt][iVic][1] = "DesertEagle";
+				else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "grenade")
+					SzDeathInfo_Wpn[iAtt][iVic][1] = "HE_Grenade";
+				
 				//For Victim
 				int iTotalDamageFromAttacker = 0, iTotalDamageTake = 0;
 				for (int i = 1; i <= 7; i++)
@@ -4576,31 +4603,6 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 			}
 		}
 		//Clear Last Data
-		auto ResetDeathInfo = [](int index1, int index2)
-		{
-			if (!index2)
-			{
-				for (int i = 1; i <= MAX_CLIENTS; i++)
-				{
-					for (int j = 1; j <= 7; j++)
-					{
-						iDeathInfo_Body[index1][i][j] = 0;
-						iDeathInfo_Fire[index1][i][j] = 0;
-					}
-				}
-			}
-			else
-			{
-				SzDeathInfo_Wpn[index1][index2][0].clear();
-				SzDeathInfo_Wpn[index1][index2][1].clear();
-
-				for (int j = 1; j <= 7; j++)
-				{
-					iDeathInfo_Body[index1][index2][j] = 0;
-					iDeathInfo_Fire[index1][index2][j] = 0;
-				}
-			}
-		};
 		ResetDeathInfo(killer_index, ENTINDEX(pVictim->edict()));
 		ResetDeathInfo(ENTINDEX(pVictim->edict()), 0);
 	}

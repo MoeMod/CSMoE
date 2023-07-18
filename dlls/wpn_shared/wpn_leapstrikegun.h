@@ -22,7 +22,7 @@ namespace cl {
 #else
 namespace sv {
 #endif
-
+  
     class CLeapStrikeGun : public LinkWeaponTemplate< CLeapStrikeGun,
         TGeneralData,
         BuildTGetItemInfoFromCSW<WEAPON_GLOCK18>::template type,
@@ -38,7 +38,9 @@ namespace sv {
         static constexpr const char* ClassName = "weapon_leapstrikegun";
         static constexpr const char* AnimExtension = "leapstrikegun";
         static constexpr int MaxClip = 50;
-        KnockbackData KnockBack = { 450.0f, 350.0f, 350.0f, 260.0f, 0.3f };
+        static constexpr float PlayerMaxSpeed = 265;
+
+        KnockbackData KnockBack = { 500.0f, 450.0f, 450.0f, 320.0f, 0.35f };
         enum
         {
             ANIM_IDLE = 0,
@@ -56,11 +58,13 @@ namespace sv {
             PART_CHANGE_END,
         };
 
+        int m_iFlyIndex;
+        int m_iFallIndex;
+        int m_iJumpDashIndex;
         int m_iJumpFXIndex;
         int m_iLandingIndex;
         int m_iExpIndex;
         int m_iFieldIndex;
-        int m_iChargingShotIndex[2];
         int m_iDefaultAmmo2;
         time_point_t m_flTimeNextCharge;
         time_point_t m_flNextReload;
@@ -68,22 +72,21 @@ namespace sv {
 
         KnockbackData GetKnockBackData() override
         {
-            return  { 420.0f, 380.0f, 380.0f, 550.0f, 0.8f };
+            return  { 500.0f, 450.0f, 450.0f, 320.0f, 0.35f };
         }
 
 #ifndef CLIENT_DLL
-        WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_restrictionpistol" , 300 }; }
-        void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace) override;
+        WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_leapstrikegun" , 300 }; }
 #endif
-        float GetArmorRatioModifier() override { return 1.5; }
+        float GetArmorRatioModifier() override { return 1.6; }
         WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 3, 0 }; }
 
         int GetItemInfo(ItemInfo* p)
         {
             p->pszName = STRING(pev->classname);
-            p->pszAmmo1 = "restrictionpistol";
+            p->pszAmmo1 = "leapstrikegun";
             p->iMaxAmmo1 = 50;
-            p->pszAmmo2 = "leapstrikegun2";
+            p->pszAmmo2 = "leapstrikegun_b";
             p->iMaxAmmo2 = 100;
             p->iMaxClip = 50;
             p->iSlot = 1;
@@ -104,6 +107,7 @@ namespace sv {
         void SecondaryAttack() override;
         void ItemPostFrame() override;
         void WeaponIdle() override;
+        void Holster(int skiplocal) override;
 
         void RestrictionPistoFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
         void RadiusAttack1();
@@ -111,12 +115,7 @@ namespace sv {
         void DropAttack();
         void FlyThink();
 
-        void Holster(int skiplocal)
-        {
-            m_flTimeNextCharge = gpGlobals->time;
 
-            return CBasePlayerWeapon::Holster(skiplocal);
-        }
 
         duration_t GetFlyingTime()
         {

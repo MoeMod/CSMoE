@@ -285,7 +285,7 @@ int CHudZB2::Draw(float time)
 {
 	pimpl->for_each(&IBaseHudSub::Draw, time);
 	DrawBuffHP();
-	DrawDmgIndicator();
+	//DrawDmgIndicator();
 	DrawBuffHealthBar();
 
 	if (!m_bCanDraw)
