@@ -127,7 +127,7 @@ const KeeperInfo KeeperClassInfo[] = {
 	{"doctorzb", "#CSO_ZombieType_doctorzb",13},
 	{"deimoszb", "#CSO_ZombieType_deimoszb",31},
 	{"deimos2zb", "#CSO_ZombieType_deimos2zb",19},
-	{"deimos2zb", "#CSO_ZombieType_deimos2zb",41},
+	{"deimos2zb", "#CSO_ZombieType_deimos2zb",21},
 	{"teleportzb", "#CSO_ZombieType_teleportzb",41},
 	{"boosterzb", "#CSO_ZombieType_boosterzb",30},
 	{"chinazb", "#CSO_ZombieType_chinazb",14},
@@ -142,7 +142,7 @@ const KeeperInfo KeeperClassInfo[] = {
 	{"nemesiszb", "#CSO_ZombieType_nemesiszb",41},
 	{"spiderzb", "#CSO_ZombieType_spiderzb",41},
 	{"deathknightzb", "#CSO_ZombieType_deathknightzb",41},
-	{"sirenzb", "#CSO_ZombieType_sirenzb",41},
+	{"sirenzb", "#CSO_ZombieType_sirenzb",10},
 };
 
 

@@ -185,16 +185,22 @@ void CReviveGun::SecondaryAttack(void)
 
 bool CReviveGun::SecondaryAttack_CheckTargetAvailable(CBaseEntity* a2, Vector vecAngleDirection)
 {
-	if (!a2->IsAlive())
-		return false;
-
 #ifndef CLIENT_DLL
-	if (g_pGameRules->PlayerRelationship(m_pPlayer, a2) == GR_TEAMMATE)
+	if (!a2)
 		return false;
-#endif
 
 	if (a2->pev == m_pPlayer->pev)
 		return false;
+
+	if (!a2->IsAlive())
+		return false;
+
+	if (!a2->IsPlayer() && a2->Classify() != CLASS_PLAYER_ALLY)
+		return false;
+
+	if (g_pGameRules->PlayerRelationship(m_pPlayer, a2) == GR_TEAMMATE)
+		return false;
+
 
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDelta = (a2->Center() - vecSrc).Normalize();
@@ -215,8 +221,9 @@ bool CReviveGun::SecondaryAttack_CheckTargetAvailable(CBaseEntity* a2, Vector ve
 		if (tr.pHit != a2->edict())
 			return false;
 	}
-
+#endif
 	return true;
+
 }
 
 void CReviveGun::SecondaryAttack_FindTargets()
@@ -947,7 +954,7 @@ float CReviveGun::GetSecondaryAttackDamage() const
 		if (enhancedzombie.value)
 			flDamage = 1100.0f;
 		else
-			flDamage = 1100.0f;
+			flDamage = 800.0f;
 	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 265.0f;

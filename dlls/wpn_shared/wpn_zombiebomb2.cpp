@@ -87,6 +87,9 @@ BOOL CZombieBomb2::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
+
+	EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "zombi/zombi_bomb_deploy.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_hegrenade.mdl", "models/shield/p_shield_hegrenade.mdl", HEGRENADE_DRAW, "shieldgren", UseDecrement() != FALSE);

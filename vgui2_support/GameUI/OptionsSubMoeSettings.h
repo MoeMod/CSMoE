@@ -32,6 +32,8 @@ public:
 	void InitAlarmStyleList(CLabeledCommandComboBox* cb);
 	void InitTexlruList(CLabeledCommandComboBox* cb);
 	void InitHudScaleList(CLabeledCommandComboBox* cb);
+	void InitQZSoundList(CLabeledCommandComboBox* cb);
+	void InitAutoAnimList(CLabeledCommandComboBox* cb);
 
 	virtual void OnResetData();
 	virtual void OnApplyChanges();
@@ -48,8 +50,10 @@ private:
 	CLabeledCommandComboBox* m_pTexlru;
 	CLabeledCommandComboBox* m_pHudScale;
 	CCvarSlider* m_pGammaSlider;
-	CCvarToggleCheckButton* m_pQZSound;
-	CCvarToggleCheckButton* m_pAutoAim;
+	CLabeledCommandComboBox* m_pQZSound;
+	CLabeledCommandComboBox* m_pAutoAim;
+	//CCvarToggleCheckButton* m_pQZSound;
+	//CCvarToggleCheckButton* m_pAutoAim;
 
 	//CMenuSpinControl gridsize;
 

@@ -94,7 +94,8 @@ public:
 	void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) override;
 	void Holster_Post(CBasePlayerWeapon* weapon) override;
 	BOOL DeployWeapon(CBasePlayerItem* item) override;
-	BOOL OnReactToDeimosTail() override;
+	bool ReactToDeimosTail() override;
+	bool AddKickRateBoost() override;
 
 
 	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);

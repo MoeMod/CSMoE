@@ -304,7 +304,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 		ClearMultiDamage();
 		tr.iHitgroup = m_pLastHitGroup;
-		pEnemy->TraceAttack(m_pOwner->pev, GetDamage(m_iType)* m_iType? 1.0:0.9, vecDirection, &tr, DMG_NEVERGIB | DMG_BULLET);
+		pEnemy->TraceAttack(m_pOwner->pev, GetDamage(m_iType) * (m_iType? 1.0f : 0.9f), vecDirection, &tr, DMG_NEVERGIB | DMG_BULLET);
 		ApplyMultiDamage(this->pev, m_pOwner->pev);
 #endif
 		if (pEnemy)

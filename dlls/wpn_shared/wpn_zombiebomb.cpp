@@ -87,6 +87,9 @@ namespace sv {
 		m_fMaxSpeed = 250;
 		m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 		m_pPlayer->m_bShieldDrawn = false;
+
+		EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "zombi/zombi_bomb_deploy.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
 		return DefaultDeploy("models/v_zombibomb.mdl", "models/p_zombibomb.mdl", HEGRENADE_DRAW, "grenade", UseDecrement() != FALSE);
 	}
 

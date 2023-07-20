@@ -40,7 +40,13 @@ COptionsSubMoeSettings::COptionsSubMoeSettings(vgui2::Panel *parent) : PropertyP
 	m_pGammaSlider = new CCvarSlider(this, "GameUI_Brightness", "#GameUI_Brightness",
 		1.0f, 10.0f, "gamma");
 
-	m_pQZSound = new  CCvarToggleCheckButton(
+	m_pQZSound = new CLabeledCommandComboBox(this, "QZSoundComboBox");
+	InitQZSoundList(m_pQZSound);
+
+	m_pAutoAim = new CLabeledCommandComboBox(this, "AutoAimComboBox");
+	InitAutoAnimList(m_pAutoAim);
+
+	/*m_pQZSound = new  CCvarToggleCheckButton(
 		this,
 		"CheckButton1",
 		"#CSMoE_QZSound",
@@ -50,9 +56,49 @@ COptionsSubMoeSettings::COptionsSubMoeSettings(vgui2::Panel *parent) : PropertyP
 		this,
 		"CCvarToggleCheckButton1",
 		"#CSMoE_AutoAim",
-		"in_autoaim");
+		"in_autoaim");*/
 
 	LoadControlSettings("Resource/optionssubmoesettings.res");
+}
+
+void COptionsSubMoeSettings::InitQZSoundList(CLabeledCommandComboBox* cb)
+{
+	if (cb == NULL)
+		return;
+
+	cb->Reset();
+
+	cb->AddItem("#CSMoE_QZSoundOn", "cl_blockwdnmd 0");
+	cb->AddItem("#CSMoE_QZSoundOff", "cl_blockwdnmd 1");
+
+	auto value = engine->pfnGetCvarString("cl_blockwdnmd");
+
+	if (!value)
+		return;
+
+	int initialType = atoi(value);
+
+	cb->SetInitialItem(initialType);
+}
+
+void COptionsSubMoeSettings::InitAutoAnimList(CLabeledCommandComboBox* cb)
+{
+	if (cb == NULL)
+		return;
+
+	cb->Reset();
+
+	cb->AddItem("#CSMoE_AutoAimOn", "in_autoaim 1");
+	cb->AddItem("#CSMoE_AutoAimOff", "in_autoaim 0");
+
+	auto value = engine->pfnGetCvarString("in_autoaim");
+
+	if (!value)
+		return;
+
+	int initialType = atoi(value);
+
+	cb->SetInitialItem(initialType);
 }
 
 void COptionsSubMoeSettings::InitFloatingDamageTypeList(CLabeledCommandComboBox* cb, bool read)

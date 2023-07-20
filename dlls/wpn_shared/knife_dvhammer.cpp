@@ -188,6 +188,9 @@ namespace sv {
 			if (pEntity->edict() == pev->owner)
 				continue;
 
+			if (pev->origin.z - pEntity->pev->origin.z < 16.0f)
+				continue;
+
 			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
 			if ((pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY) && g_pGameRules->PlayerRelationship(pOwner, pPlayer) != GR_TEAMMATE)
 			{

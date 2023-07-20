@@ -387,8 +387,8 @@ struct Y20s2SCARD_WeaponData
 	int GetItemInfo(ItemInfo* p)
 	{
 		p->pszName = STRING(pev->classname);
-		p->pszAmmo1 = "762Nato";
-		p->iMaxAmmo1 = MAX_AMMO_762NATO;
+		p->pszAmmo1 = "556Nato";
+		p->iMaxAmmo1 = MAX_AMMO_556NATO;
 		p->pszAmmo2 = "SCARDGrenade";
 		p->iMaxAmmo2 = 10;
 		p->iMaxClip = 45;

@@ -3785,7 +3785,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 #ifdef XASH_DEDICATED
 			else if (FStrEq(pcmd, "moe_admin"))
 			{
-				if (!strcmp(CMD_ARGV_(1), "CPlayerModStrategy_ZB3"))
+				if (!strcmp(CMD_ARGV_(1), "leapstrikegun"))
 					admin::ShowAdminMenu(player);
 			}
 #endif

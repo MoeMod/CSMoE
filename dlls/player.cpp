@@ -8530,21 +8530,23 @@ bool CBasePlayer::ReactToDeimosTail()
 	if (m_bIsZombie)
 		return false;
 
-	//if (m_pModStrategy->ReactToDeimosTail())
-	//	return false;
+	if (m_pModStrategy->ReactToDeimosTail())
+		return false;
 
 	CBasePlayerItem* pItem = m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 
 	if (!pItem)
 		pItem = m_rgpPlayerItems[PISTOL_SLOT];
 
+	m_flNextAttack = UTIL_WeaponTimeBase() + 2.0s;
+
 	if (!pItem)
 	{
 		return false;
 	}
-	DropPlayerItem(STRING(pItem->pev->classname));
-	m_flNextAttack = UTIL_WeaponTimeBase() + 2.0s;
 
+	DropPlayerItem(STRING(pItem->pev->classname));
+	
 	return true;
 }
 

@@ -61,7 +61,8 @@ public:
 	virtual void OnEvolution(ZombieLevel iEvolutionLevel) = 0;
 	virtual void OnHolster_Post(CBasePlayerWeapon* weapon) = 0;
 	virtual void OnDeployWeapon(CBasePlayerItem* weapon) = 0;
-	virtual BOOL OnReactToDeimosTail() = 0;
+	virtual bool OnReactToDeimosTail(bool &bApply) = 0;
+	virtual bool OnAddKickRateBoost(bool &bApply) = 0;
 
 	virtual bool IsActivate() = 0;
 	virtual const char* GetName() const = 0;
@@ -105,7 +106,8 @@ public:
 	void OnEvolution(ZombieLevel iEvolutionLevel) override {}
 	void OnHolster_Post(CBasePlayerWeapon* weapon) override {}
 	void OnDeployWeapon(CBasePlayerItem* weapon) override {}
-	BOOL OnReactToDeimosTail() override { return false; }
+	bool OnReactToDeimosTail(bool &bApply) override { return false; }
+	bool OnAddKickRateBoost(bool &bApply) override { return false; }
 
 	bool IsActivate() override { 
 		return (GetType() == TYPE_HUMAN && !m_pPlayer->m_bIsZombie)

@@ -64,6 +64,20 @@ void EXPORT CZombieRushBox::BoxThink()
 		return;
 	}
 
+	if (stricmp(pOwner->m_ZombieClass, "meatwall"))
+	{
+		SetThink(NULL);
+		UTIL_Remove(this);;
+		return;
+	}
+
+	if (!pOwner->m_bIsZombie)
+	{
+		SetThink(NULL);
+		UTIL_Remove(this);;
+		return;
+	}
+
 	if (m_iState && m_fKillDelay < gpGlobals->time)
 	{
 		DoDamage();

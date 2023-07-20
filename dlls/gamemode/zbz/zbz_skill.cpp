@@ -570,6 +570,19 @@ namespace sv {
 		const char* GetName() const override { return "坚持不懈"; }
 		const char* GetDesc() const override { return "受到攻击时低概率忽略定身和击退"; }
 		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+
+		bool OnAddKickRateBoost(bool &bApply)
+		{
+			if (!IsActivate())
+				bApply = false;
+
+			if (m_flTime > gpGlobals->time)
+				bApply = true;
+
+
+			return bApply;
+		}
+
 		void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) override {
 			if (!IsActivate())
 				return;
@@ -2191,12 +2204,11 @@ namespace sv {
 		const char* GetDesc() const override { return "一定几率免疫恶魔猎手的震荡效果(50% + 回合数 * 3%)"; }
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
 
-		BOOL OnReactToDeimosTail()
+		bool OnReactToDeimosTail(bool &bApply)
 		{
-			bool bAvoidDebuff = false;
 			if (RANDOM_FLOAT(0, 1) > GetChance())
-				bAvoidDebuff = true;
-			return bAvoidDebuff;
+				bApply = true;
+			return bApply;
 		}
 	private:
 		float GetChance() const { return 0.5f + 0.03f * g_pGameRules->m_iTotalRoundsPlayed; }
