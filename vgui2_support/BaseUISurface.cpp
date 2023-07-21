@@ -1040,7 +1040,19 @@ void BaseUISurface::SetVGUI2MouseControl(bool state) {
 void BaseUISurface::DrawTexturedPolygon(vgui2::Vertex_t *pVertices, int n) {
     if( _drawColor[ 3 ] == 255 )
         return;
+#ifdef XASH_IMGUI_SURFACE
+    auto pNext = pVertices;
+    ImGui_Surface_PolygonBegin(n);
+    for( int i = 0; i < n; ++i, ++pNext )
+    {
+        vpoint_t point;
+        InitVertex(point, pNext->m_Position[0], pNext->m_Position[1], pNext->m_TexCoord[0], pNext->m_TexCoord[1]);
+        SPR_AdjustSize(&point.point[0], &point.point[1], nullptr, nullptr);
 
+        ImGui_Surface_PolygonPoint( point.point[0], point.point[1] );
+    }
+    ImGui_Surface_PolygonEnd(_drawColor[0], _drawColor[1], _drawColor[2],  255 - _drawColor[3]);
+#else
     g_api->EnableTexture(false);
     g_api->SetupDrawingImage(_drawColor);
 
@@ -1060,6 +1072,7 @@ void BaseUISurface::DrawTexturedPolygon(vgui2::Vertex_t *pVertices, int n) {
 
     gEngfuncs.pTriAPI->End();
     g_api->EnableTexture(true);
+#endif
 }
 
 int BaseUISurface::GetFontAscent(vgui2::HFont font, uchar32 ch) {

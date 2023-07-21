@@ -30,3 +30,7 @@ void ImGui_Surface_EnableScissor(float x, float y, float w, float h);
 void ImGui_Surface_EnableFullScreenScissor();
 void ImGui_Surface_DisableScissor();
 void ImGui_Surface_Flush();
+
+void ImGui_Surface_PolygonBegin(int pointnum);
+void ImGui_Surface_PolygonPoint(float x, float y);
+void ImGui_Surface_PolygonEnd(byte r, byte g, byte b, byte a);

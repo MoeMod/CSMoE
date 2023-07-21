@@ -23,6 +23,7 @@ GNU General Public License for more details.
 #include "imgui_console.h"
 
 #include <string>
+#include <vector>
 
 #include "client.h"
 
@@ -287,4 +288,23 @@ void ImGui_Surface_Flush()
 {
     //ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
     //drawlist->AddDrawCmd();
+}
+
+std::vector<ImVec2> g_imgui_polygon_points;
+
+void ImGui_Surface_PolygonBegin(int pointnum)
+{
+    g_imgui_polygon_points.clear();
+}
+
+void ImGui_Surface_PolygonPoint(float x, float y)
+{
+    g_imgui_polygon_points.emplace_back(x, y);
+}
+
+void ImGui_Surface_PolygonEnd(byte r, byte g, byte b, byte a)
+{
+    g_imgui_polygon_points.push_back(ImVec2(g_imgui_polygon_points.front()));
+    ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
+    drawlist->AddConvexPolyFilled(g_imgui_polygon_points.data(), g_imgui_polygon_points.size(), ImColor(r, g, b, a));
 }
