@@ -802,7 +802,11 @@ void GL_InitExtensionsBigGL()
 
 	GL_CheckExtension( "GL_EXT_stencil_two_side", stenciltwosidefuncs, "gl_stenciltwoside", GL_STENCILTWOSIDE_EXT );
 	GL_CheckExtension( "GL_ARB_vertex_buffer_object", vbofuncs, "gl_vertex_buffer_object", GL_ARB_VERTEX_BUFFER_OBJECT_EXT );
+#ifdef __APPLE__
+    GL_CheckExtension( "GL_APPLE_vertex_array_object", vaofuncs, "gl_vertex_array_object", GL_ARB_VERTEX_ARRAY_OBJECT_EXT );
+#else
 	GL_CheckExtension( "GL_ARB_vertex_array_object", vaofuncs, "gl_vertex_array_object", GL_ARB_VERTEX_ARRAY_OBJECT_EXT );
+#endif
 
 #ifndef XASH_GL_STATIC
 	// we don't care if it's an extension or not, they are identical functions, so keep it simple in the rendering code
