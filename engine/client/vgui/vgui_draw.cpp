@@ -668,9 +668,18 @@ void GAME_EXPORT VGUI_UploadTextureBlock( int id, int drawX, int drawY, const by
 		return;
 	}
 
-    GL_Bind( XASH_TEXTURE0, g_textures[id] );
-	pglTexSubImage2D( GL_TEXTURE_2D, 0, drawX, drawY, blockWidth, blockHeight, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
-	g_iBoundTexture = id;
+    if(auto tex = R_GetTexture(g_textures[id]))
+    {
+        pglBindTexture( tex->target, tex->texnum );
+        pglTexSubImage2D( tex->target, 0, drawX, drawY, blockWidth, blockHeight, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
+
+        // catch possible errors
+        auto err = pglGetError();
+
+        if( err != GL_NO_ERROR )
+            MsgDev( D_ERROR, "VGUI_UploadTextureBlock: error %x while uploading %s [%s]\n", err, tex->name, GL_Target( tex->target ));
+    }
+    g_iBoundTexture = id;
 }
 
 void GAME_EXPORT VGUI_SetupDrawingRect( int *pColor )

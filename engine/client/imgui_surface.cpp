@@ -285,6 +285,6 @@ void ImGui_Surface_DisableScissor()
 
 void ImGui_Surface_Flush()
 {
-    ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
-    drawlist->AddDrawCmd();
+    //ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
+    //drawlist->AddDrawCmd();
 }
