@@ -43,6 +43,8 @@ using cmatrix4x4 = const matrix4x4 &;
 
 #ifdef _MSC_VER
 #define XASH_VECTORCALL __vectorcall
+#elif defined __GNUC__ // for gcc on Linux/Apple OS X
+#define XASH_VECTORCALL __attribute__((vectorcall))
 #else
 #define XASH_VECTORCALL
 #endif

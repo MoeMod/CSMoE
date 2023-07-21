@@ -989,3 +989,93 @@ qboolean XASH_VECTORCALL Matrix4x4_Invert_Full( matrix4x4_ref out, cmatrix4x4 in
 	}
 	return false;
 }
+
+qboolean XASH_VECTORCALL Matrix4x4_Invert_Full2( matrix4x4_ref out, cmatrix4x4 in1 )
+{
+    Matrix4x4_LoadIdentity(out);
+    matrix4x4 in = in1;
+#if defined(XASH_SIMD) && U_VECTOR_NEON
+    uint32x4_t sign_mask = vdupq_n_u32(0x80000000);
+#define SWAP_LESS(N, A, B) do { \
+        uint32x4_t cond##A##B = vdupq_laneq_f32(vcltq_f32(in[A], in[B]), N); \
+        float32x4_t in##A = in[A]; \
+        float32x4_t out##A = out[A]; \
+        in[A] = vbslq_f32(cond##A##B, in[A], in[B]); \
+        out[A] = vbslq_f32(cond##A##B, out[A], out[B]); \
+        in[B] = vbslq_f32(cond##A##B, in[B], in##A); \
+        out[B] = vbslq_f32(cond##A##B, out[B], out##A); } while(0)
+#define SWAP_LESS_1(N, A, B) do { \
+        uint32x4_t cond##A##B = vdupq_laneq_f32(vcltq_f32(in[A], in[B]), N); \
+        uint32x4_t xor_in##A##B = veorq_u32(vreinterpretq_u32_f32(in[A]), vreinterpretq_u32_f32(in[B])); \
+        uint32x4_t xor_out##A##B = veorq_u32(vreinterpretq_u32_f32(out[A]), vreinterpretq_u32_f32(out[B])); \
+        in[A] = vbslq_f32(cond##A##B, in[A], in[B]); \
+        out[A] = vbslq_f32(cond##A##B, out[A], out[B]); \
+        in[B] = vreinterpretq_u32_f32(veorq_u32(vreinterpretq_u32_f32(in[A]), xor_in##A##B)); \
+        out[B] = vreinterpretq_u32_f32(veorq_u32(vreinterpretq_u32_f32(out[A]), xor_out##A##B)); } while(0)
+#define SWAP_LESS_2(N, A, B) do { \
+        uint32x4_t cond##A##B = vdupq_laneq_f32(vcltq_f32(in[A], in[B]), N); \
+        uint32x4_t xor_in##A##B = veorq_u32(vreinterpretq_u32_f32(in[A]), vreinterpretq_u32_f32(in[B])); \
+        uint32x4_t xor_out##A##B = veorq_u32(vreinterpretq_u32_f32(out[A]), vreinterpretq_u32_f32(out[B])); \
+        uint32x4_t in##A##B = vandq_u32(xor_in##A##B, cond##A##B); \
+        uint32x4_t out##A##B = vandq_u32(xor_out##A##B, cond##A##B); \
+        in[A] = vreinterpretq_u32_f32(veorq_u32(vreinterpretq_u32_f32(in[A]), in##A##B)); \
+        in[B] = vreinterpretq_u32_f32(veorq_u32(vreinterpretq_u32_f32(in[B]), in##A##B)); \
+        out[A] = vreinterpretq_u32_f32(veorq_u32(vreinterpretq_u32_f32(out[A]), out##A##B)); \
+        out[B] = vreinterpretq_u32_f32(veorq_u32(vreinterpretq_u32_f32(out[B]), out##A##B)); } while(0)
+#define ABS_INPLACE(N, A) do { \
+        uint32x4_t sign##A = vdupq_laneq_f32(vandq_u32(vreinterpretq_u32_f32(in[A]), sign_mask), N); \
+        in[A] = vreinterpretq_u32_f32(veorq_u32(vreinterpretq_u32_f32(in[A]), sign##A)); \
+        out[A] = vreinterpretq_u32_f32(veorq_u32(vreinterpretq_u32_f32(out[A]), sign##A)); } while(0)
+#define FMS_LANE_INPLACE(N, A, B) do { \
+        in[A] = vfmsq_laneq_f32(in[A], in[B], in[A], N); \
+        out[A] = vfmsq_laneq_f32(out[A], out[B], out[A], N); } while(0)
+#define NORMALIZE_INPLACE(N, A)  do { \
+        float32x4_t divisor = vdupq_laneq_f32(in[A], N); \
+        float32x4_t multipier =  vrecpeq_f32(divisor); \
+        multipier = vmulq_f32(multipier, vrecpsq_f32(divisor, multipier)); \
+        in[A] = vmulq_f32(in[A], multipier); \
+        out[A] = vmulq_f32(out[A], multipier); } while(0)
+#else
+#define SWAP_LESS(N, A, B) do { if(in[A][N] < in[B][N]) std::swap(in[A], in[B]), std::swap(out[A], out[B]); } while(0)
+#define ABS_INPLACE(N, A) do { if(in[A][N] < 0) in[A] = -in[A], out[A] = -out[A]; } while(0)
+#define FMS_LANE_INPLACE(N, A, B) do { in[A] = in[A] - in[B] * in[A][N]; out[A] = out[A] - in[B] * in[A][N]; } while(0)
+#define NORMALIZE_INPLACE(N, A) do { in[A] = in[A] / in[A][N]; out[A] = out[A] / in[A][N]; } while(0)
+#endif
+
+    ABS_INPLACE(0, 0);
+    ABS_INPLACE(0, 1);
+    ABS_INPLACE(0, 2);
+    ABS_INPLACE(0, 3);
+    SWAP_LESS(0, 0, 1);
+    SWAP_LESS(0, 0, 2);
+    SWAP_LESS(0, 0, 3);
+    SWAP_LESS(0, 1, 2);
+    SWAP_LESS(0, 1, 3);
+    SWAP_LESS(0, 2, 3);
+    NORMALIZE_INPLACE(0, 0);
+    FMS_LANE_INPLACE(0, 1, 0);
+    FMS_LANE_INPLACE(0, 2, 0);
+    FMS_LANE_INPLACE(0, 3, 0);
+    ABS_INPLACE(1, 1);
+    ABS_INPLACE(1, 2);
+    ABS_INPLACE(1, 3);
+    SWAP_LESS(1, 1, 2);
+    SWAP_LESS(1, 1, 3);
+    SWAP_LESS(1, 2, 3);
+    NORMALIZE_INPLACE(1, 1);
+    FMS_LANE_INPLACE(1, 2, 1);
+    FMS_LANE_INPLACE(1, 3, 1);
+    ABS_INPLACE(2, 2);
+    ABS_INPLACE(2, 3);
+    SWAP_LESS(2, 2, 3);
+    NORMALIZE_INPLACE(2, 2);
+    FMS_LANE_INPLACE(2, 3, 2);
+    NORMALIZE_INPLACE(3, 3);
+    FMS_LANE_INPLACE(1, 0, 1);
+    FMS_LANE_INPLACE(2, 0, 2);
+    FMS_LANE_INPLACE(3, 0, 3);
+    FMS_LANE_INPLACE(2, 1, 2);
+    FMS_LANE_INPLACE(3, 1, 3);
+    FMS_LANE_INPLACE(3, 2, 3);
+    return isnormal(in[3][3]);
+}
