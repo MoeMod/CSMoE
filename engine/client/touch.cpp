@@ -1827,12 +1827,14 @@ int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx
 			if( type == event_down && x < 0.1f && y > 0.9f )
 				Cbuf_AddText( "escape\n" );
 		}
+#ifndef XASH_VGUI2
 		UI_MouseMove( TO_SCRN_X(x), TO_SCRN_Y(y) );
 		//MsgDev( D_NOTE, "touch %d %d\n", TO_SCRN_X(x), TO_SCRN_Y(y) );
 		if( type == event_down )
 			Key_Event( K_MOUSE1, true );
 		if( type == event_up )
 			Key_Event( K_MOUSE1, false );
+#endif
 		return 0;
 	}
 
