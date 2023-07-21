@@ -9,7 +9,7 @@ namespace sv {
 //kronos12
 #define WPNSTATE_KRONOS12_SCAN_ACTIVATE	1
 #define WPNSTATE_KRONOS12_ZOOM_ACTIVATE	2
-#define KRONOS12_CHARGE_AMMO	3
+#define KRONOS12_CHARGE_AMMO	15
 
 class CKronos12 : public CBasePlayerWeapon
 {

@@ -41,6 +41,8 @@ typedef struct lua_State lua_State;
 
 #ifdef _MSC_VER
 #define U_VECTOR_FORCEINLINE __forceinline
+#elif defined __GNUC__ // for gcc on Linux/Apple OS X
+#define U_VECTOR_FORCEINLINE __inline__ __attribute__((always_inline))
 #else
 #define U_VECTOR_FORCEINLINE inline
 #endif

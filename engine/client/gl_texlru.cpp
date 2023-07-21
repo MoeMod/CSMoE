@@ -62,6 +62,12 @@ namespace xe {
             {
                 attr.flags |= STUDIO_NF_ADDITIVE; 
             }
+
+            if (ptexture->name[1] == '0' && ptexture->name[2] == 'a')
+            {
+                attr.flags |= STUDIO_NF_ADDITIVE;
+            }
+
         }
 
 
@@ -82,6 +88,11 @@ namespace xe {
             attr.flags |= STUDIO_NF_FULLBRIGHT;
 
             if (ptexture->name[1] == '0' && ptexture->name[2] == 'b')
+            {
+                attr.flags |= STUDIO_NF_ADDITIVE;
+            }
+
+            if (ptexture->name[1] == '0' && ptexture->name[2] == 'a')
             {
                 attr.flags |= STUDIO_NF_ADDITIVE;
             }

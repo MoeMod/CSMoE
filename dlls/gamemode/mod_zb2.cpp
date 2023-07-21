@@ -123,7 +123,8 @@ void CMod_ZombieMod2::MakeSupplyboxThink()
 		return;
 	m_flTimeNextMakeSupplybox = gpGlobals->time + RandomDuration(30.0s, 40.0s);
 
-	//RemoveAllSupplybox();
+	if(!randomwpn.value)
+		RemoveAllSupplybox();
 
 	int iSupplyboxCount = SupplyboxCount();
 	for (int i = 0; i < iSupplyboxCount; ++i)

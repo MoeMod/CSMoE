@@ -28,20 +28,182 @@ namespace cl {
 namespace sv {
 #endif
 
+#ifndef CLIENT_DLL
+    class CLeapStrikeGunProj : public CBaseEntity
+    {
+    public:
+        float GetArmorRatioModifier() { return 1.6; }
+        int GetWeaponsId(void) { return WEAPON_LEAPSTRIKEGUN; }
+        void Spawn() override
+        {
+            Precache();
+
+            m_fSequenceLoops = 0;
+            SetThink(&CLeapStrikeGunProj::FollowThink);
+            SetTouch(&CLeapStrikeGunProj::OnTouch);
+            SET_MODEL(this->edict(), "sprites/ef_leapstrikegun_projectile.spr");
+
+            pev->rendermode = kRenderTransAdd;
+            pev->renderfx = kRenderFxNone;
+            pev->renderamt = 180;
+            pev->framerate = 10;
+            pev->scale = 0.05;
+            pev->solid = SOLID_BBOX;
+            pev->movetype = MOVETYPE_FLYMISSILE;
+            pev->nextthink = gpGlobals->time + 0.1s;
+
+            m_flMaxFrames = float(MODEL_FRAMES(pev->modelindex) - 1);
+
+            UTIL_SetOrigin(pev, pev->origin);
+            UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
+        }
+
+        void Precache() override
+        {
+            PRECACHE_MODEL("sprites/ef_leapstrikegun_projectile.spr");
+
+            m_iExpIndex = PRECACHE_MODEL("sprites/ef_leapstrikegun_hit.spr");
+        }
+
+        void EXPORT OnTouch(CBaseEntity* pOther)
+        {
+            MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pev->origin);
+            WRITE_BYTE(TE_TEMPSPRITE);
+            WRITE_COORD(pev->origin.x);
+            WRITE_COORD(pev->origin.y);
+            WRITE_COORD(pev->origin.z);
+            WRITE_SHORT(m_iExpIndex);
+            WRITE_BYTE(6);
+            WRITE_BYTE(255);
+            WRITE_BYTE(30);
+            MESSAGE_END();
+
+            EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/leapstrikegun-1_exp.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+
+            if (pev->owner == pOther->edict())
+            {
+                SetTouch(NULL);
+                SetThink(NULL);
+                Remove();
+                return;
+            }
+
+
+            CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+            CBasePlayer* pAttackePlayer = nullptr;
+            if (pAttacker && pAttacker->IsPlayer())
+                pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
+
+            if (pAttackePlayer)
+            {
+                if (pOther->pev->takedamage != DAMAGE_NO && pOther->IsAlive())
+                {
+                    Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
+
+                    TraceResult tr;
+                    UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
+
+                    ClearMultiDamage();
+                    pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
+                    ApplyMultiDamage(pev, pAttackePlayer->pev);
+                }
+
+                TraceResult tr;
+                CBaseEntity* pEntity = NULL;
+
+                Vector vecEnd;
+                int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
+
+                while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 78.74)) != NULL)
+                {
+                    if (pEntity->edict() == pev->owner)
+                        continue;
+
+                    if (pEntity->IsDormant())
+                        continue;
+
+                    if (pEntity->pev->takedamage == DAMAGE_NO)
+                        continue;
+
+                    if (pEntity->Classify() == CLASS_NONE)
+                        continue;
+
+                    if (g_pGameRules->PlayerRelationship(pAttackePlayer, pEntity) == GR_TEAMMATE)
+                        continue;
+
+                    if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
+                        continue;
+
+                    vecEnd = pEntity->BodyTarget(pev->origin);
+
+                    UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
+
+                    if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+                        continue;
+
+                    pEntity->TakeDamage(pev, pAttackePlayer->pev, RadiusDamageAmount, DMG_EXPLOSION);
+
+                }
+            }
+
+            SetTouch(NULL);
+            SetThink(NULL);
+            Remove();
+        }
+
+        void EXPORT FollowThink()
+        {
+            pev->frame += pev->framerate * gpGlobals->frametime / 1s;
+
+            if (pev->frame > m_flMaxFrames)
+                pev->frame = fmod(pev->frame, m_flMaxFrames);
+
+            pev->nextthink = gpGlobals->time + 0.01s;
+        }
+
+        void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, int iTeam)
+        {
+            std::tie(m_flTouchDamage, RadiusDamageAmount, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, iTeam);
+            m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
+        }
+
+        KnockbackData GetKnockBackData() override { return  { 500.0f, 450.0f, 450.0f, 320.0f, 0.35f }; }
+
+        int m_fSequenceLoops;
+        time_point_t m_flRemoveTime;
+        float m_flMaxFrames;
+        float m_flTouchDamage;
+        float RadiusDamageAmount;
+        int m_iSprEffect;
+        int m_iExpIndex;
+        Vector m_vecStartVelocity;
+
+    protected:
+        void Remove()
+        {
+            SetThink(nullptr);
+            SetTouch(nullptr);
+            pev->effects |= EF_NODRAW; // 0x80u
+            return UTIL_Remove(this);
+        }
+    };
+    LINK_ENTITY_TO_CLASS(leapstrikegun_proj, CLeapStrikeGunProj)
+#endif
+
     LINK_ENTITY_TO_CLASS(weapon_leapstrikegun, CLeapStrikeGun)
 
     void CLeapStrikeGun::Precache(void)
     {
-        //m_iFieldIndex = PRECACHE_MODEL("sprites/ef_leapstrikegun_explo.spr");
-        m_iFieldIndex = PRECACHE_MODEL("sprites/ef_shockwave.spr");
-        m_iChargingShotIndex[0] = PRECACHE_MODEL("models/ef_halogun_chargingshot.mdl");
-        m_iChargingShotIndex[1] = PRECACHE_MODEL("models/ef_halogun_chargingshot2.mdl");
-        m_iExpIndex = PRECACHE_MODEL("sprites/ef_leapstrikegun_hit.spr");
+        m_iFlyIndex = PRECACHE_MODEL("models/ef_leapstrikegun_flying.mdl");
+
+        PRECACHE_MODEL("sprites/ef_leapstrikegun_fly.spr");
+
+        m_iFieldIndex = PRECACHE_MODEL("sprites/ef_leapstrikegun_explo.spr");
        
         PRECACHE_MODEL("models/v_leapstrikegun_parts.mdl");
-        PRECACHE_MODEL("models/ef_leapstrikegun_fall.mdl");
-        PRECACHE_MODEL("models/ef_leapstrikegun_flying.mdl");
-        PRECACHE_MODEL("models/ef_leapstrikegun_jumpdash.mdl");
+        m_iFallIndex = PRECACHE_MODEL("models/ef_leapstrikegun_fall.mdl");
+
+        m_iJumpDashIndex = PRECACHE_MODEL("models/ef_leapstrikegun_jumpdash.mdl");
         m_iJumpFXIndex = PRECACHE_MODEL("models/ef_leapstrikegun_jumpfx.mdl");
         m_iLandingIndex = PRECACHE_MODEL("models/ef_leapstrikegun_landing.mdl");
 
@@ -78,45 +240,18 @@ namespace sv {
         return CBasePlayerWeapon::ExtractAmmo(pWeapon);
     }
 
-#ifndef CLIENT_DLL
-    void CLeapStrikeGun::FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* tr)
+    void CLeapStrikeGun::Holster(int skiplocal)
     {
-        Vector vecEnd = tr->vecEndPos - vecDir * 10;
-        int iOriginalPenetration = 4;
-
-        if (iOriginalPenetration == iPenetration)
-        {
-            MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecEnd);
-            WRITE_BYTE(TE_TEMPSPRITE);
-            WRITE_COORD(vecEnd.x);
-            WRITE_COORD(vecEnd.y);
-            WRITE_COORD(vecEnd.z);
-            WRITE_SHORT(m_iExpIndex);
-            WRITE_BYTE(6);
-            WRITE_BYTE(255);
-            WRITE_BYTE(30);
-            MESSAGE_END();
-
-            EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/leapstrikegun-1_exp.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
-
-            CBaseEntity* pEntity = NULL;
-            while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecEnd, 78.74)) != NULL)
-            {
-                if (pEntity->IsDormant())
-                    continue;
-
-                if (pEntity->pev->takedamage == DAMAGE_NO)
-                    continue;
-
-                if (pEntity->pev == m_pPlayer->pev)
-                    continue;
-
-                pEntity->TraceAttack(m_pPlayer->pev, GetPrimaryAttackDamage(), vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
-
-            }
-        }
-    }
+        m_flTimeNextCharge = gpGlobals->time;
+#ifndef CLIENT_DLL
+        MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
+        WRITE_BYTE(TE_KILLENTITYATTACHMENTS);
+        WRITE_SHORT(m_pPlayer->entindex());
+        WRITE_SHORT(m_iFlyIndex);
+        MESSAGE_END();
 #endif
+        return CBasePlayerWeapon::Holster(skiplocal);
+    }
 
     BOOL CLeapStrikeGun::Deploy()
     {
@@ -173,40 +308,9 @@ namespace sv {
             float RadiusDamageAmount;
         } Data;
 
+        Vector angle = UTIL_VecToAngles({ 0, 0, 1 });
 
-        // screen aligned beam ring, expands to max radius over lifetime
-        // coord coord coord (center position) 
-        // coord coord coord (axis and radius) 
-        // short (sprite index) 
-        // byte (starting frame) 
-        // byte (frame rate in 0.1's) 
-        // byte (life in 0.1's) 
-        // byte (line width in 0.1's) 
-        // byte (noise amplitude in 0.01's) 
-        // byte,byte,byte (color)
-        // byte (brightness)
-        // byte (scroll speed in 0.1's)
-   
-        MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
-        WRITE_BYTE(TE_BEAMTORUS);
-        WRITE_COORD(m_pPlayer->pev->origin.x);
-        WRITE_COORD(m_pPlayer->pev->origin.y);
-        WRITE_COORD(m_pPlayer->pev->origin.z);
-        WRITE_COORD(m_pPlayer->pev->origin.x);
-        WRITE_COORD(m_pPlayer->pev->origin.y);
-        WRITE_COORD(m_pPlayer->pev->origin.z + 500);
-        WRITE_SHORT(m_iFieldIndex);
-        WRITE_BYTE(0);
-        WRITE_BYTE(30);
-        WRITE_BYTE(2);
-        WRITE_BYTE(20);
-        WRITE_BYTE(0);
-        WRITE_BYTE(10);
-        WRITE_BYTE(200);
-        WRITE_BYTE(255);
-        WRITE_BYTE(150);
-        WRITE_BYTE(0);
-        MESSAGE_END();
+        UTIL_TempModel({ 0, 0, 0 }, angle, g_vecZero, m_iFieldIndex, 2, 0, 255, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 15, 256, 0x20000000);
 
         Data.RadiusDamageRadius = GetRadius(2);
         Data.RadiusDamageBitsDamageType = DMG_BULLET;
@@ -266,11 +370,22 @@ namespace sv {
 
         if (m_iWeaponState == 3)
         {
+#ifndef CLIENT_DLL
+            MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
+            WRITE_BYTE(TE_KILLENTITYATTACHMENTS);
+            WRITE_SHORT(m_pPlayer->entindex());
+            WRITE_SHORT(m_iFlyIndex);
+            MESSAGE_END();
+#endif
             m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
             m_iWeaponState = 4;
 
             m_pPlayer->pev->velocity = g_vecZero;
             m_pPlayer->pev->velocity.z -= 600;
+
+#ifndef CLIENT_DLL
+            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f) }, g_vecZero, g_vecZero, m_iFallIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0);
+#endif
         }
         else if (m_iWeaponState == 1)
         {
@@ -289,7 +404,7 @@ namespace sv {
 
             UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
-            Vector vecForward = gpGlobals->v_forward * 175;
+            Vector vecForward = gpGlobals->v_forward * 260;
             vecForward.z += 800;
             m_pPlayer->pev->velocity = vecForward;
             RadiusAttack1();
@@ -299,6 +414,13 @@ namespace sv {
             EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/leapstrikegun_change_fly.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 
             m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2s;
+
+#ifndef CLIENT_DLL
+            Vector angle = UTIL_VecToAngles(vecForward.Normalize());
+
+
+            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f)}, angle, g_vecZero, m_iJumpDashIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0);
+#endif
         }
         else
         {
@@ -354,7 +476,17 @@ namespace sv {
         m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 
         Vector vecSrc = m_pPlayer->GetGunPosition();
-        Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 4, BULLET_PLAYER_9MM, GetPrimaryAttackDamage(), 0.8, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+        Vector vecDir = m_pPlayer->FireBullets3(vecSrc - gpGlobals->v_up * 2.0, gpGlobals->v_forward, flSpread, 8192.0, 0, BULLET_PLAYER_556MM, 0, 0.0, m_pPlayer->pev, false, m_pPlayer->random_seed);
+
+#ifndef CLIENT_DLL
+        Vector vecProjDir = gpGlobals->v_forward + gpGlobals->v_right * vecDir.x + gpGlobals->v_up * vecDir.y;
+
+        CLeapStrikeGunProj* pEnt = static_cast<CLeapStrikeGunProj*>(CBaseEntity::Create("leapstrikegun_proj", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+        if (pEnt)
+        {
+            pEnt->Init(vecProjDir * 2000, GetPrimaryAttackDamage(), GetPrimaryAttackDamage(), m_pPlayer->m_iTeam);
+        }
+#endif
 
         int flags;
 #ifdef CLIENT_WEAPONS
@@ -433,6 +565,13 @@ namespace sv {
     {
         if (m_flTimeFlying != invalid_time_point && m_flTimeFlying < gpGlobals->time)
         {
+#ifndef CLIENT_DLL
+            MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
+            WRITE_BYTE(TE_KILLENTITYATTACHMENTS);
+            WRITE_SHORT(m_pPlayer->entindex());
+            WRITE_SHORT(m_iFlyIndex);
+            MESSAGE_END();
+#endif
             m_pPlayer->m_iBuff &= ~BUFF_LEAPSTRIKEGUN;
             m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
             m_flTimeFlying = invalid_time_point;
@@ -463,6 +602,9 @@ namespace sv {
                 m_flTimeFlying = gpGlobals->time + GetFlyingTime();
                 m_pPlayer->m_iBuff |= BUFF_LEAPSTRIKEGUN;
                 m_iWeaponState = 3;
+#ifndef CLIENT_DLL
+                UTIL_TempModel({ 0, 0, -32 }, g_vecZero, g_vecZero, m_iFlyIndex, int(GetFlyingTime() / 1s * 10), 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0x20000000);
+#endif
             }
                 
         }

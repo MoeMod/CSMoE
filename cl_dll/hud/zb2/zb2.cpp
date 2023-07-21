@@ -177,7 +177,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		float flHoldTime = buf.ReadCoord();
 		int iIsPc = buf.ReadByte();
 
-		cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + 10.0;
+		cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + 6.0;
 		if (iIsPc)
 		{
 			SetSelectorDrawTime(gHUD.m_flTime, flHoldTime);
@@ -285,7 +285,7 @@ int CHudZB2::Draw(float time)
 {
 	pimpl->for_each(&IBaseHudSub::Draw, time);
 	DrawBuffHP();
-	DrawDmgIndicator();
+	//DrawDmgIndicator();
 	DrawBuffHealthBar();
 
 	if (!m_bCanDraw)

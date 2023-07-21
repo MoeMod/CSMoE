@@ -180,7 +180,8 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 						pGrenade->m_iId == WEAPON_DIVINETITAN ||
 						pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
 						pGrenade->m_iId == WEAPON_CLAYMORE ||
-						pGrenade->m_iId == WEAPON_SBMINE)
+						pGrenade->m_iId == WEAPON_SBMINE ||
+						pGrenade->m_iId == WEAPON_SFTURRET)
 					{
 						pGrenade->Kill();
 
@@ -307,7 +308,8 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 						pGrenade->m_iId == WEAPON_DIVINETITAN ||
 						pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
 						pGrenade->m_iId == WEAPON_CLAYMORE ||
-						pGrenade->m_iId == WEAPON_SBMINE)
+						pGrenade->m_iId == WEAPON_SBMINE ||
+						pGrenade->m_iId == WEAPON_SFTURRET)
 					{
 						pGrenade->Kill();
 

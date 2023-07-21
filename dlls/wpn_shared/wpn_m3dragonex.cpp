@@ -82,8 +82,8 @@ void CM3DragonEX::Precache(void)
 int CM3DragonEX::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "buckshot";
-	p->iMaxAmmo1 = MAX_AMMO_BUCKSHOT;
+	p->pszAmmo1 = "buckshot_m3dragonex";
+	p->iMaxAmmo1 = 45;
 	p->pszAmmo2 = "m3dragonex_b";
 	p->iMaxAmmo2 = 2;
 	p->iMaxClip = 15;
@@ -139,6 +139,89 @@ BOOL CM3DragonEX::Deploy(void)
 }
 
 #ifndef CLIENT_DLL
+Vector CM3DragonEX::KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, entvars_t* pevAttacker, bool &bHit)
+{
+	TraceResult tr;
+
+	const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
+
+	vecSrc.z += 1;
+
+	if (!pevAttacker)
+		pevAttacker = pevInflictor;
+
+	Vector vecEnd = vecSrc + vecDir.Normalize() * flAngleDegrees;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
+
+	if (tr.flFraction >= 1)
+	{
+		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(pevAttacker), &tr);
+
+		if (tr.flFraction < 1)
+		{
+			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+			if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO)
+			{
+				ClearMultiDamage();
+				pHit->TraceAttack(pevInflictor, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+				ApplyMultiDamage(pevInflictor, pevAttacker);
+			}
+			vecEnd = tr.vecEndPos;
+		}
+	}
+
+	CBaseEntity* pEntity = NULL;
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity->pev->takedamage != DAMAGE_NO)
+		{
+			if (bInWater && !pEntity->pev->waterlevel)
+				continue;
+
+			if (!bInWater && pEntity->pev->waterlevel == 3)
+				continue;
+
+			if (pEntity->IsBSPModel())
+				continue;
+
+			if (pEntity->pev == pevAttacker)
+				continue;
+
+			Vector vecSpot = pEntity->BodyTarget(vecSrc);
+			UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+			if (AngleBetweenVectors(tr.vecEndPos - vecSrc, vecDir) > flAngleDegrees)
+				continue;
+
+			if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
+			{
+				if (tr.fStartSolid)
+				{
+					tr.vecEndPos = vecSrc;
+					tr.flFraction = 0;
+				}
+
+				if (tr.flFraction == 1.0f)
+				{
+					pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+				}
+				else
+				{
+					tr.iHitgroup = HITGROUP_CHEST;
+					ClearMultiDamage();
+					pEntity->TraceAttack(pevAttacker, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+					ApplyMultiDamage(pevInflictor, pevAttacker);
+
+					if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+						bHit = true;
+				}
+			}
+		}
+	}
+	return vecDir;
+}
+
 void CM3DragonEX::ClearSign(CBaseEntity* pEntity, bool bExplode)
 {
 	MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
@@ -330,6 +413,8 @@ void CM3DragonEX::SecondaryAttack_SignExplode()
 	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/m3dragonex-3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 #ifndef CLIENT_DLL
+	bool bHit = false;
+
 	auto iter = m_pEnemylist.begin();
 	for (iter; iter != m_pEnemylist.end(); ++iter)
 	{
@@ -349,8 +434,32 @@ void CM3DragonEX::SecondaryAttack_SignExplode()
 			tr.iHitgroup = HITGROUP_CHEST;
 			pEntity->TraceAttack(m_pPlayer->pev, GetDamageC(), vecDirection, &tr, DMG_NEVERGIB | DMG_BULLET);
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+			bHit = true;
 		}
 	}
+
+	if (bHit)
+	{
+		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < 2)
+		{
+			pev->iuser1 += 1;
+		}
+	}
+
+	if (pev->iuser1 >= 8)
+	{
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
+		WRITE_BYTE(CBasePlayer::GetAmmoIndex("m3dragonex_b"));
+		WRITE_BYTE(1);
+		MESSAGE_END();
+#endif
+		pev->iuser1 = 0;
+		m_flNextPlaySound = gpGlobals->time + 0.1s;
+	}
+
 	m_pEnemylist.clear();
 	m_iTargetID.clear();
 #endif
@@ -424,9 +533,7 @@ void CM3DragonEX::OnAttack2Released(void)
 	}
 	case 2:
 	{
-#ifndef CLIENT_DLL	
 		SecondaryAttack_SignExplode();
-#endif
 		break;
 	}
 	}
@@ -464,9 +571,18 @@ void CM3DragonEX::PrimaryAttack(void)
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
-	m_pPlayer->FireBullets(10, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0, GetDamage());
+	bool bHit = false;
+	Vector vecDir = KnifeAttack2(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, GetDamageB(), 393.7f, 45.0f, DMG_BULLET, this->pev, m_pPlayer->pev, bHit);
 
-	if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+	m_pPlayer->FireBullets(10, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0, GetDamage());
+	if (bHit)
+	{
+		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < 2)
+		{
+			pev->iuser1 += 1;
+		}
+	}
+	else if (CBaseEntity* pEntity = gMultiDamage.pEntity)
 	{
 		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < 2)
 		{
@@ -476,6 +592,9 @@ void CM3DragonEX::PrimaryAttack(void)
 			}
 		}	
 	}
+
+#else
+	Vector vecDir = gpGlobals->v_forward;
 #endif
 
 	if (pev->iuser1 >= 8)
@@ -483,7 +602,7 @@ void CM3DragonEX::PrimaryAttack(void)
 		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
-		WRITE_BYTE(CBasePlayer::GetAmmoIndex("m3dragonexshot"));
+		WRITE_BYTE(CBasePlayer::GetAmmoIndex("m3dragonex_b"));
 		WRITE_BYTE(1);
 		MESSAGE_END();
 #endif
@@ -496,12 +615,6 @@ void CM3DragonEX::PrimaryAttack(void)
 	flags = FEV_NOTHOST;
 #else
 	flags = 0;
-#endif
-
-#ifndef CLIENT_DLL
-	Vector vecDir = KnifeAttack2(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, GetDamageB(), 393.7f, 45.0f, DMG_BULLET, this->pev, m_pPlayer->pev);
-#else
-	Vector vecDir = gpGlobals->v_forward;
 #endif
 
 	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] > 0);

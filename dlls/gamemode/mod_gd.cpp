@@ -37,7 +37,7 @@ constexpr const char *DEFAULT_WEAPONS[MAX_LEVEL][2] = {
 		{"weapon_aug","weapon_sg552"},
 		{"weapon_an94","weapon_m16a4"},
 		{"weapon_awp","weapon_svd"},
-		{"weapon_scar","weapon_xm8"},
+		{"weapon_scarl","weapon_xm8c"},
 		{"weapon_famas","weapon_galil"},
 		{"weapon_k1a","weapon_usas"},
 		{"weapon_mp5","weapon_mp7a1"},

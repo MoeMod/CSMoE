@@ -11,6 +11,7 @@
 #include "sound.h"
 #include "globals.h"
 #include "cbase/cbase_hash.h"
+#include "player/player_mod_strategy.h"
 
 unsigned int glSeed;
 
@@ -2660,6 +2661,9 @@ void UTIL_AddKickRateBoost(CBaseEntity* pEntity, const Vector2D& vecDir, float f
 	if (pEntity->IsPlayer())
 	{
 		CBasePlayer* player = (CBasePlayer*)pEntity;
+
+		if (player->m_pModStrategy->AddKickRateBoost())
+			return;
 
 		if (ApplyAll || (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK)))
 		{

@@ -27,7 +27,7 @@ android {
                 arguments "-DXASH_SDL=1",
                         "-DXASH_GL4ES=1",
                         "-DXASH_STATIC_GAMELIB=1"
-                version "3.18.1"
+                version "3.22.1"
             }
         }
         ndk {
@@ -50,7 +50,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('../../CMakeLists.txt')
-            version "3.18.1"
+            version "3.22.1"
         }
     }
     sourceSets {

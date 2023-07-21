@@ -258,12 +258,16 @@ void CSuperSupplyBox::SupplyboxTouch(CBaseEntity* pOther)
 
 	if (!(p->m_iBuff & BUFF_GHOSTHUNTER))
 		return;
-
 	if (p->m_iBuff & BUFF_LASTHERO)
 		return;
 
 	if (p->m_iBuff & BUFF_MASTERHUNTER)
+	{
+		p->pev->health += 1000.0f;
+		pev->effects |= EF_NODRAW;
+		UTIL_Remove(this);
 		return;
+	}
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, p->edict());
 	WRITE_BYTE(8);
@@ -298,9 +302,6 @@ void CSuperSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYP
 
 	auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(p->m_pModStrategy.get());
 	if (strategy && !strategy->IsHero())
-		return;
-
-	if (p->m_iBuff & (BUFF_GHOSTHUNTER | BUFF_MASTERHUNTER))
 		return;
 
 	if (p->m_iBuff & BUFF_LASTHERO)

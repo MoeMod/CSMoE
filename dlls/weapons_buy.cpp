@@ -485,6 +485,7 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_y20s1grenade", GRENADE_Y20S1GRENADE },
 	{ "weapon_waterbomb", GRENADE_WATERBOMB },
 	{ "weapon_chinaeventbomb", GRENADE_CHINAEVENTBOMB },
+	{ "weapon_sfturret", GRENADE_SFTURRET },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -1524,7 +1525,8 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 						pPlayer->m_pActiveItem->m_iId == WEAPON_DIVINETITAN || 
 						pPlayer->m_pActiveItem->m_iId == WEAPON_BUNKERBUSTER ||
 						pPlayer->m_pActiveItem->m_iId == WEAPON_SBMINE ||
-						pPlayer->m_pActiveItem->m_iId == WEAPON_CLAYMORE);
+						pPlayer->m_pActiveItem->m_iId == WEAPON_CLAYMORE ||
+						pPlayer->m_pActiveItem->m_iId == WEAPON_SFTURRET);
 
 					if (iter->iID == WEAPON_PATROLDRONE)
 					{
@@ -1593,7 +1595,8 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 								pGrenade->m_iId == WEAPON_DIVINETITAN ||
 								pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
 								pGrenade->m_iId == WEAPON_SBMINE ||
-								pGrenade->m_iId == WEAPON_CLAYMORE)
+								pGrenade->m_iId == WEAPON_CLAYMORE ||
+								pGrenade->m_iId == WEAPON_SFTURRET)
 							{
 								pGrenade->Kill();
 
@@ -1627,7 +1630,8 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 								pGrenade->m_iId == WEAPON_DIVINETITAN ||
 								pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
 								pGrenade->m_iId == WEAPON_SBMINE ||
-								pGrenade->m_iId == WEAPON_CLAYMORE)
+								pGrenade->m_iId == WEAPON_CLAYMORE ||
+								pGrenade->m_iId == WEAPON_SFTURRET)
 							{
 								pPlayer->m_pActiveItem = pGrenade;
 

@@ -195,6 +195,7 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	{
 	case CT:
 		m_pPlayer->GiveNamedItem("weapon_knife");
+		//m_pPlayer->GiveNamedItem("weapon_leapstrikegun");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		//m_pPlayer->GiveNamedItem("z4b_shovelex");
 

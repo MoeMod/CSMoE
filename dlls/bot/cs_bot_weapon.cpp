@@ -798,7 +798,8 @@ bool CCSBot::IsUsingGrenade() const
 		weapon->m_iId == WEAPON_DIVINETITAN ||
 		weapon->m_iId == WEAPON_BUNKERBUSTER ||
 		weapon->m_iId == WEAPON_SBMINE ||
-		weapon->m_iId == WEAPON_CLAYMORE)
+		weapon->m_iId == WEAPON_CLAYMORE ||
+		weapon->m_iId == WEAPON_SFTURRET)
 		return true;
 
 	return false;
@@ -813,7 +814,8 @@ bool CCSBot::IsUsingHEGrenade() const
 		weapon->m_iId == WEAPON_DIVINETITAN ||
 		weapon->m_iId == WEAPON_BUNKERBUSTER ||
 		weapon->m_iId == WEAPON_SBMINE ||
-		weapon->m_iId == WEAPON_CLAYMORE))
+		weapon->m_iId == WEAPON_CLAYMORE ||
+		weapon->m_iId == WEAPON_SFTURRET))
 		return true;
 
 	return false;

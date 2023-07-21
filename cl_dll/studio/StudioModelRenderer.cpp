@@ -1122,6 +1122,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 			StudioRenderModel(dir);
 
 			StudioCalcAttachments();
+			IEngineStudio.StudioClientEvents();
 
 			if (m_pCurrentEntity->index > 0)
 				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);

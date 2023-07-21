@@ -205,10 +205,18 @@ int CPlayerModStrategy_ZBZ::AdjustDefaultReloadClip(CBasePlayerWeapon* weapon, i
 	return iClip;
 }
 
-BOOL CPlayerModStrategy_ZBZ::OnReactToDeimosTail()
+bool CPlayerModStrategy_ZBZ::ReactToDeimosTail()
 {
-	SKILL_FUNCTION(m_vecSkill, OnReactToDeimosTail);
-	return false;
+	bool bApply = false;
+	SKILL_FUNCTION(m_vecSkill, OnReactToDeimosTail, bApply);
+	return bApply;
+}
+
+bool CPlayerModStrategy_ZBZ::AddKickRateBoost()
+{ 
+	bool bApply = false;
+	SKILL_FUNCTION(m_vecSkill, OnAddKickRateBoost, bApply);
+	return bApply;
 }
 
 void CPlayerModStrategy_ZBZ::UpdatePlayerEvolutionHUD()
@@ -811,12 +819,12 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 			m_iChangeClassTime[0] = -1;
 			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
-			switch (RANDOM_LONG(0, 2))
+			switch (RANDOM_LONG(0, 3))
 			{
 			case 0: m_pPlayer->m_ZombieClass = "nemesis"; break;
 			case 1: m_pPlayer->m_ZombieClass = "spider"; break;
 			case 2: m_pPlayer->m_ZombieClass = "deathknight"; break;
-			//case 3: m_pPlayer->m_ZombieClass = "meatwall"; break;
+			case 3: m_pPlayer->m_ZombieClass = "meatwall"; break;
 			}		
 			
 			m_pPlayer->pev->sequence = 0;
