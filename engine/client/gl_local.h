@@ -577,6 +577,7 @@ enum
 	GL_SHADOW_EXT,
 	GL_S3TC_EXT,
 	GL_ASTC_EXT,
+	GL_ARB_VERTEX_ARRAY_OBJECT_EXT,
 
 	GL_EXTCOUNT,		// must be last
 };

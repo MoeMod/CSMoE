@@ -330,6 +330,15 @@ static dllfunc_t vbofuncs[] =
 { NULL, NULL}
 };
 
+static dllfunc_t vaofuncs[] =
+{
+{ GL_CALL( glBindVertexArray ) },
+{ GL_CALL( glDeleteVertexArrays ) },
+{ GL_CALL( glGenVertexArrays ) },
+{ GL_CALL( glIsVertexArray ) },
+{ NULL, NULL}
+};
+
 static dllfunc_t occlusionfunc[] =
 {
 { GL_CALL( glGenQueriesARB ) },
@@ -793,6 +802,7 @@ void GL_InitExtensionsBigGL()
 
 	GL_CheckExtension( "GL_EXT_stencil_two_side", stenciltwosidefuncs, "gl_stenciltwoside", GL_STENCILTWOSIDE_EXT );
 	GL_CheckExtension( "GL_ARB_vertex_buffer_object", vbofuncs, "gl_vertex_buffer_object", GL_ARB_VERTEX_BUFFER_OBJECT_EXT );
+	GL_CheckExtension( "GL_ARB_vertex_array_object", vaofuncs, "gl_vertex_array_object", GL_ARB_VERTEX_ARRAY_OBJECT_EXT );
 
 #ifndef XASH_GL_STATIC
 	// we don't care if it's an extension or not, they are identical functions, so keep it simple in the rendering code
