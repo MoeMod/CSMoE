@@ -24,7 +24,7 @@ GNU General Public License for more details.
 
 #include "util/lru_cache.h"
 
-#define XASH_SHADER_VAO
+//#define XASH_SHADER_VAO
 
 namespace xe {
     using studiolru_key_t = std::tuple<const studiohdr_t *, const mstudiomodel_t *, int, int>; // model, submodel, mesh, flags
@@ -114,16 +114,12 @@ namespace xe {
 
 	void studiolru_vbo_cache::Bind()
 	{
-#ifndef XASH_SHADER_VAO
 		return BindVBO();
-#endif
 	}
 
 	void studiolru_vbo_cache::Unbind()
 	{
-#ifndef XASH_SHADER_VAO
 		return UnbindVBO();
-#endif
 	}
 
     bool studiolru_vbo_cache::HasCachedData() const
