@@ -31,12 +31,12 @@ namespace sv {
     {
     public:
         static constexpr const char* V_Model = "models/v_leapstrikegun.mdl";
-        static constexpr const char* P_Model = "models/p_bufffiveseven.mdl";
-        static constexpr const char* W_Model = "models/w_bufffiveseven.mdl";
+        static constexpr const char* P_Model = "models/p_leapstrikegun.mdl";
+        static constexpr const char* W_Model = "models/w_leapstrikegun.mdl";
         static constexpr const char* EventFile = "events/leapstrikegun.sc";
         static constexpr InventorySlotType ItemSlot = PISTOL_SLOT;
         static constexpr const char* ClassName = "weapon_leapstrikegun";
-        static constexpr const char* AnimExtension = "leapstrikegun";
+        static constexpr const char* AnimExtension = "onehanded";
         static constexpr int MaxClip = 50;
         static constexpr float PlayerMaxSpeed = 265;
 

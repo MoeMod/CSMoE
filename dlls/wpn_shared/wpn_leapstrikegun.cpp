@@ -600,15 +600,10 @@ namespace sv {
 #ifndef CLIENT_DLL
                 UTIL_TempModel({ 0, 0, -32 }, g_vecZero, g_vecZero, m_iFlyIndex, int(GetFlyingTime() / 1s * 10), 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0x20000000);
 #endif
+                m_pPlayer->pev->flags |= FL_IMMUNE_LAVA;
             }
                 
         }
-
-        if (m_iWeaponState == 3)
-        {
-            m_pPlayer->pev->flags |= FL_IMMUNE_LAVA;
-        }
-
     }
 
     void CLeapStrikeGun::ItemPostFrame()

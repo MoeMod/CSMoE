@@ -410,6 +410,7 @@ void CPlayerModStrategy_ZB1::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel 
 
 void CPlayerModStrategy_ZB1::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
+	m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
 	m_pCharacter = std::make_shared<CZombie_ZB1>(m_pPlayer, iEvolutionLevel);
 	m_pPlayer->m_iTeam = TERRORIST;
 	m_pPlayer->pev->team = TERRORIST;

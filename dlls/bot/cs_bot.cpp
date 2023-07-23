@@ -909,7 +909,7 @@ CMoePlayer::CMoePlayer() {
 
 BOOL CMoePlayer::IsBot()
 {
-    return IsAlive() && gpGlobals->time - m_flLastCommandTime > 20s;
+    return IsAlive() && gpGlobals->time - m_flLastCommandTime > 60s;
 }
 
 void CMoePlayer::ExecuteCommand()

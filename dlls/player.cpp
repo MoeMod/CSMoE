@@ -7732,7 +7732,11 @@ void CBasePlayer::ItemPostFrame()
 				((CLeapStrikeGun*)pWeapon)->FlyThink();
 		}
 		else
+		{
+			pev->flags &= ~FL_IMMUNE_LAVA;
 			m_iBuff &= ~BUFF_LEAPSTRIKEGUN;
+		}
+			
 }
 
 #ifdef CLIENT_WEAPONS

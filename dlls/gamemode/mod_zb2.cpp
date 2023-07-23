@@ -529,7 +529,7 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	auto sp = ZombieClassFactory(iEvolutionLevel, m_pPlayer->m_ZombieClass);
 	m_pCharacter_ZB2 = sp;
 	m_pCharacter = sp;
-	
+	m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
 	if (enhancedzombie.value)
 	{
 		switch (iEvolutionLevel)
