@@ -47,7 +47,7 @@ namespace sv {
             pev->renderfx = kRenderFxNone;
             pev->renderamt = 180;
             pev->framerate = 10;
-            pev->scale = 0.05;
+            pev->scale = 0.1;
             pev->solid = SOLID_BBOX;
             pev->movetype = MOVETYPE_FLYMISSILE;
             pev->nextthink = gpGlobals->time + 0.1s;
@@ -210,8 +210,8 @@ namespace sv {
 
         PRECACHE_MODEL("sprites/muzzleflash315.spr");
 
-        PRECACHE_SOUND("weapons/leapstrikegun_change_start.wav");
-        PRECACHE_SOUND("weapons/leapstrikegun_change_end.wav");
+        //PRECACHE_SOUND("weapons/leapstrikegun_change_start.wav");
+        //PRECACHE_SOUND("weapons/leapstrikegun_change_end.wav");
         PRECACHE_SOUND("weapons/leapstrikegun_change_star_fx.wav");
         PRECACHE_SOUND("weapons/leapstrikegun_change_idle.wav");
         PRECACHE_SOUND("weapons/leapstrikegun_change_fly_exp.wav");
@@ -227,6 +227,7 @@ namespace sv {
         m_iDefaultAmmo2 = 0;
         m_flTimeNextCharge = gpGlobals->time;
         m_flTimeFlying = invalid_time_point;
+        m_flTimeWeaponIdle2 = m_flTimeWeaponIdle3 = UTIL_WeaponTimeBase();
         Base::Spawn();
     }
 
@@ -268,12 +269,9 @@ namespace sv {
                 m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 100;
             }
         }
-#ifndef CLIENT_DLL
-        MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-        WRITE_BYTE(40);
-        WRITE_BYTE(m_iWeaponState == 1 ? PART_CHANGE : PART_IDLE);
-        MESSAGE_END();
-#endif
+
+        SendWeaponAnim2(m_iWeaponState == 1 ? PART_CHANGE : PART_IDLE);
+
         return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "onehanded", UseDecrement() != FALSE, 0.1s);
     }
 
@@ -384,22 +382,18 @@ namespace sv {
             m_pPlayer->pev->velocity.z -= 600;
 
 #ifndef CLIENT_DLL
-            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f) }, g_vecZero, g_vecZero, m_iFallIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0);
+            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f) }, g_vecZero, g_vecZero, m_iFallIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0, true);
 #endif
         }
         else if (m_iWeaponState == 1)
         {
             m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] -= 100;
 
-#ifndef CLIENT_DLL
-            MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-            WRITE_BYTE(40);
-            WRITE_BYTE(PART_CHANGE_END);
-            MESSAGE_END();
-#endif
+            SendWeaponAnim2(PART_CHANGE_END);
 
-            EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/leapstrikegun_change_end.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+            m_flTimeWeaponIdle2 = UTIL_WeaponTimeBase() + 1.0s;
 
+           
             m_iWeaponState = 2;
 
             UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -411,7 +405,7 @@ namespace sv {
 
             m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 
-            EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/leapstrikegun_change_fly.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+            EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/leapstrikegun_change_fly.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 
             m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 
@@ -419,7 +413,7 @@ namespace sv {
             Vector angle = UTIL_VecToAngles(vecForward.Normalize());
 
 
-            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f)}, angle, g_vecZero, m_iJumpDashIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0);
+            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f)}, angle, g_vecZero, m_iJumpDashIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0, true);
 #endif
         }
         else
@@ -431,17 +425,17 @@ namespace sv {
     void CLeapStrikeGun::PrimaryAttack(void)
     {
         if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-            RestrictionPistoFire((1.2) * (1 - m_flAccuracy), 0.22s, TRUE);
+            LeapStrikeGunFire((1.2) * (1 - m_flAccuracy), 0.22s, TRUE);
         else if (m_pPlayer->pev->velocity.Length2D() > 0)
-            RestrictionPistoFire((0.185) * (1 - m_flAccuracy), 0.22s, TRUE);
+            LeapStrikeGunFire((0.185) * (1 - m_flAccuracy), 0.22s, TRUE);
         else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-            RestrictionPistoFire((0.095) * (1 - m_flAccuracy), 0.22s, TRUE);
+            LeapStrikeGunFire((0.095) * (1 - m_flAccuracy), 0.22s, TRUE);
         else
-            RestrictionPistoFire((0.3) * (1 - m_flAccuracy), 0.22s, TRUE);
+            LeapStrikeGunFire((0.3) * (1 - m_flAccuracy), 0.22s, TRUE);
     }
 
 
-    void CLeapStrikeGun::RestrictionPistoFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+    void CLeapStrikeGun::LeapStrikeGunFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
         if (m_flLastFire != invalid_time_point)
         {
@@ -496,12 +490,13 @@ namespace sv {
 #endif
 
         PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), m_iWeaponState == 1 ? TRUE : FALSE, FALSE);
-        m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
+        m_flNextPrimaryAttack = m_flNextSecondaryAttack =  UTIL_WeaponTimeBase() + flCycleTime;
+        pev->skin = 1;
 #ifndef CLIENT_DLL
         if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-        m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.85s;
+        m_flTimeWeaponIdle = m_flTimeWeaponIdle3 = UTIL_WeaponTimeBase() + 0.85s;
         m_pPlayer->pev->punchangle.x -= 2;
     }
 
@@ -648,19 +643,11 @@ namespace sv {
                     m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
                     if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 90)
                     {
-                        //if (m_pPlayer->pev->weaponanim == ANIM_IDLE)
-                        {
-#ifndef CLIENT_DLL
-                            MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-                            WRITE_BYTE(40);
-                            WRITE_BYTE(PART_CHANGE_START);
-                            MESSAGE_END();
-#endif
 
-                            EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/leapstrikegun_change_start.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+                        SendWeaponAnim2(PART_CHANGE_START);
 
-                            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
-                        }
+                        m_flTimeWeaponIdle2 = UTIL_WeaponTimeBase() + 1.0s;
+                        
                        
                         m_iWeaponState = 1;
                         m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 100;
@@ -686,20 +673,38 @@ namespace sv {
         ResetEmptySound();
         m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
 
+        m_flTimeWeaponIdle2 -= 0.01s;
+        m_flTimeWeaponIdle3 -= 0.01s;
+
+        if (m_flTimeWeaponIdle3 < UTIL_WeaponTimeBase())
+        {
+            pev->skin = 0;
+        }
+
+        if (m_flTimeWeaponIdle2 < UTIL_WeaponTimeBase())
+        {
+            SendWeaponAnim2(m_iWeaponState == 1 ? PART_CHANGE : PART_IDLE);
+
+            m_flTimeWeaponIdle2 = UTIL_WeaponTimeBase() + 20s;
+        }
+
         if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
             return;
-
-#ifndef CLIENT_DLL
-        MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-        WRITE_BYTE(40);
-        WRITE_BYTE(m_iWeaponState == 1 ? PART_CHANGE : PART_IDLE);
-        MESSAGE_END();
-#endif
 
         SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
 
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
         
+    }
+
+    void CLeapStrikeGun::SendWeaponAnim2(int iAnim)
+    {
+#ifndef CLIENT_DLL
+        MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+        WRITE_BYTE(40);
+        WRITE_BYTE(iAnim);
+        MESSAGE_END();
+#endif
     }
 
 

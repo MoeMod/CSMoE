@@ -360,6 +360,28 @@ namespace xe {
         boost::asio::co_spawn(g_cook_ctx->ioc_cook, Cook_Initiate(), boost::asio::detached);
     }
 
+    void Cook_Single(const char *filename)
+    {
+        Cook_Stop();
+        g_cook_ctx = std::make_shared<CookContext>();
+        g_cook_ctx->ioc_cook_work_guard.emplace(boost::asio::make_work_guard(g_cook_ctx->ioc_cook));
+        g_cook_ctx->ioc_cook_worker_work_guard.emplace(boost::asio::make_work_guard(g_cook_ctx->ioc_cook_worker));
+
+        auto ext = FS_FileExtension(filename);
+        if(!Q_stricmp(ext, "mdl"))
+        {
+            Cook_SubmitMDL(g_cook_ctx, filename);
+        }
+        else if(!Q_stricmp(ext, "spr"))
+        {
+            Cook_SubmitSPR(g_cook_ctx, filename);
+        }
+        else if(!Q_stricmp(ext, "tga") || !Q_stricmp(ext, "bmp"))
+        {
+            Cook_SubmitTex(g_cook_ctx, filename);
+        }
+    }
+
     void Con_Cook_f()
     {
         if(Cmd_Argc() >= 2)
@@ -373,6 +395,11 @@ namespace xe {
             else if(!Q_stricmp(act, "stop"))
             {
                 Cook_Stop();
+                return;
+            }
+            else if(FS_FileExists(act, true))
+            {
+                Cook_Single(act);
                 return;
             }
         }

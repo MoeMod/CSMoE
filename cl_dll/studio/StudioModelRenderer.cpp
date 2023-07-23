@@ -1097,9 +1097,11 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 		if (CStudioModelRenderer::s_pLeapStrikeGunPartModel && CStudioModelRenderer::s_pLeapStrikeGunViewModel && curent->model == CStudioModelRenderer::s_pLeapStrikeGunViewModel)
 		{
 			studiohdr_t* saveheader = m_pStudioHeader;
+			
 			cl_entity_t saveent = *m_pCurrentEntity;
 			int saveseq = m_pCurrentEntity->curstate.sequence;
 			float saveanimtime = m_pCurrentEntity->curstate.animtime;
+			float saveframe = m_pCurrentEntity->curstate.frame;
 			int save_interp = m_fDoInterp;
 
 			model_t* weaponpart = s_pLeapStrikeGunPartModel;
@@ -1126,13 +1128,15 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 			if (m_pCurrentEntity->index > 0)
 				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
-
+			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
 			*m_pCurrentEntity = saveent;
+			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
 			m_pStudioHeader = saveheader;
 			IEngineStudio.StudioSetHeader(m_pStudioHeader);
 
 			m_pCurrentEntity->curstate.sequence = saveseq;
 			m_pCurrentEntity->curstate.animtime = saveanimtime;
+			m_pCurrentEntity->curstate.frame = saveframe;
 			m_fDoInterp = save_interp;
 
 			if (flags & STUDIO_EVENTS)

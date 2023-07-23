@@ -158,6 +158,9 @@ typedef struct engine_studio_api_s
 	bool (*StudioSetupBones_Pre)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
 	void (*StudioSetupBones_Post)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
 
+	// change entity that is set for rendering
+	struct cl_entity_s* (*ModCurrentEntity)(cl_entity_s* ent);
+
 } engine_studio_api_t;
 
 typedef struct server_studio_api_s

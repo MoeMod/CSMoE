@@ -2242,7 +2242,7 @@ int R_StudioDrawModel(int flags)
 
 		if (CStudioModelRenderer::s_pDvhammerViewModel && CStudioModelRenderer::s_pDvhammerRedModel && CStudioModelRenderer::s_pDvhammerBlueModel && curent->model == CStudioModelRenderer::s_pDvhammerViewModel)
 		{
-			if (!g_iM95TigerState)
+			if (!curent->curstate.skin)
 			{
 				if (g_DvhammerRed)
 				{
@@ -2256,14 +2256,14 @@ int R_StudioDrawModel(int flags)
 
 					g_DvhammerBlue->entity.curstate.movetype = MOVETYPE_FOLLOW;
 					g_DvhammerBlue->entity.curstate.aiment = curent->index;
-					g_DvhammerBlue->entity.curstate.body = 3;
+					g_DvhammerBlue->entity.curstate.body = 1;
 					g_DvhammerBlue->entity.curstate.rendermode = kRenderTransAdd;
 					g_DvhammerBlue->entity.curstate.renderamt = 255;
 					g_DvhammerBlue->entity.curstate.renderfx = 0;
-					g_DvhammerBlue->entity.curstate.scale = 0.05;
-					g_DvhammerBlue->entity.curstate.framerate = 24;
+					g_DvhammerBlue->entity.curstate.scale = 0.03;
+					g_DvhammerBlue->entity.curstate.framerate = 30;
 					g_DvhammerBlue->entity.curstate.rendercolor.r = g_DvhammerBlue->entity.curstate.rendercolor.g = g_DvhammerBlue->entity.curstate.rendercolor.b = 255;
-					g_DvhammerBlue->frameMax = 30;
+					g_DvhammerBlue->frameMax = 9;
 					g_DvhammerBlue->die = gHUD.m_flTime + 9999.0f;
 					g_DvhammerBlue->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
 					g_DvhammerBlue->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
@@ -2281,18 +2281,18 @@ int R_StudioDrawModel(int flags)
 
 				if (!g_DvhammerRed)
 				{
-					g_DvhammerRed = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[2], CStudioModelRenderer::s_pDvhammerRedModel);
+					g_DvhammerRed = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[0], CStudioModelRenderer::s_pDvhammerRedModel);
 
 					g_DvhammerRed->entity.curstate.movetype = MOVETYPE_FOLLOW;
 					g_DvhammerRed->entity.curstate.aiment = curent->index;
-					g_DvhammerRed->entity.curstate.body = 3;
+					g_DvhammerRed->entity.curstate.body = 1;
 					g_DvhammerRed->entity.curstate.rendermode = kRenderTransAdd;
 					g_DvhammerRed->entity.curstate.renderamt = 255;
 					g_DvhammerRed->entity.curstate.renderfx = 0;
-					g_DvhammerRed->entity.curstate.scale = 0.05;
-					g_DvhammerRed->entity.curstate.framerate = 24;
+					g_DvhammerRed->entity.curstate.scale = 0.03;
+					g_DvhammerRed->entity.curstate.framerate = 30;
 					g_DvhammerRed->entity.curstate.rendercolor.r = g_DvhammerRed->entity.curstate.rendercolor.g = g_DvhammerRed->entity.curstate.rendercolor.b = 255;
-					g_DvhammerRed->frameMax = 30;
+					g_DvhammerRed->frameMax = 9;
 					g_DvhammerRed->die = gHUD.m_flTime + 9999.0f;
 					g_DvhammerRed->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
 					g_DvhammerRed->entity.curstate.weaponmodel = curent->curstate.weaponmodel;

@@ -29,6 +29,7 @@ GNU General Public License for more details.
 #include "gl_cubemap.h"
 #include "gl_studioshader.h"
 #include "gl_studiolru.h"
+#include "gl_bindspr.h"
 #include <triangleapi.h>
 extern triangleapi_t gTriApi;
 
@@ -276,6 +277,8 @@ void R_StudioInit( void )
 		g_pstudioshader = nullptr;
 	}
     xe::CubeMap_Init();
+
+	BindSprManager().Vidinit();
 #endif
 }
 
@@ -511,6 +514,13 @@ static cl_entity_t *GAME_EXPORT pfnGetCurrentEntity( void )
 {
 	return RI.currententity;
 }
+
+cl_entity_t* GAME_EXPORT pfnModCurrentEntity(cl_entity_t* ent)
+{
+	RI.currententity = ent;
+	return RI.currententity;
+}
+
 
 /*
 ===============
@@ -1796,7 +1806,230 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			//	
 			//}
 
-			xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
+			bool bBindSpr = false;
+
+			for (auto iter = g_vecBindSprList.begin(); iter != g_vecBindSprList.end(); iter++)
+			{
+				if (!Q_stricmp(m_pStudioHeader->name, iter->mdlname) && !Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, iter->texname))
+				{
+					
+					int curSeq = RI.currententity->curstate.sequence;
+
+					for (auto iterseq = iter->vecSequence.begin(); iterseq != iter->vecSequence.end(); iterseq++)
+					{
+						if (curSeq == iterseq->index)
+						{
+							model_t* pModel = Mod_ForName(iter->sprname, false);
+
+							float frame = 0.0;
+							float framerate = iter->sprFPS;
+							int startFrame = iterseq->startFrame ? iterseq->startFrame : 0;
+							int maxframe = pModel->numframes - 1;
+
+							int endFrame = iterseq->endFrame ? iterseq->endFrame : maxframe;
+
+							bool isSyncFrame = iterseq->isSyncFrame;
+							if (isSyncFrame)
+							{
+								mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
+
+								frame = R_StudioEstimateFrame(RI.currententity, pseqdesc) / pseqdesc->numframes * (endFrame - startFrame)+ startFrame;
+
+								if (iterseq->isLoop)
+								{
+									frame = startFrame;
+								}
+							}
+							else
+							{
+								//double dt = (cl.time - cl.oldtime);
+								//frame += dt * framerate;
+
+								frame = framerate * (cl.time - RI.currententity->curstate.animtime) + startFrame;
+
+								if (frame > maxframe)
+								{
+									if (iterseq->isLoop)
+									{
+										frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
+										//frame = frame - (int)frame;
+										//frame = startFrame;
+									}
+									else
+										frame = maxframe;
+								}
+							}
+
+							auto pspriteframe = R_GetSpriteFrame(pModel, frame, 0.0);
+
+							int index = pspriteframe->gl_texturenum;
+
+							if (pspriteframe->gl_texturenum)
+								xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+
+							bBindSpr = true;
+							break;
+						}
+
+
+
+					}
+
+					if (bBindSpr)
+						break;
+
+
+
+					//
+					//model_t* pModel = Mod_ForName(iter->sprname, FALSE);
+
+					//float frame = 0.0;
+					//float framerate = iter->sprFPS;
+					//int startFrame = iter->sequence.startFrame ? iter->sequence.startFrame : 0;
+					//int maxframe = pModel->numframes - 1;
+
+					//int endFrame = iter->sequence.endFrame ? iter->sequence.endFrame : maxframe;
+
+					//bool isSyncFrame = iter->sequence.isSyncFrame;
+					//if (isSyncFrame)
+					//{
+					//	mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
+
+					//	frame = R_StudioEstimateFrame(RI.currententity, pseqdesc) / pseqdesc->numframes * maxframe;
+
+					//	if (iter->sequence.isLoop)
+					//	{
+					//		frame = startFrame;
+					//	}
+					//}
+					//else
+					//{
+					//	//double dt = (cl.time - cl.oldtime);
+					//	//frame += dt * framerate;
+
+					//	frame = framerate * (cl.time - RI.currententity->curstate.animtime) + startFrame;
+
+					//	if (frame > maxframe)
+					//	{
+					//		if (iter->sequence.isLoop)
+					//		{
+					//			frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
+					//			//frame = frame - (int)frame;
+					//			//frame = startFrame;
+					//		}
+					//		else
+					//			frame = maxframe;
+					//	}
+					//}
+
+					//auto pspriteframe = R_GetSpriteFrame(pModel, frame, 0.0);
+
+					//int index = pspriteframe->gl_texturenum;
+
+					//if (pspriteframe->gl_texturenum)
+					//	xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+
+					//bBindSpr = true;
+					//break;
+									
+				}
+
+			}
+			
+
+
+			//if (!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_leapstrikegun_v_effect01.bmp"))
+			//{
+
+			//	model_t* pLeapStrikeGunSprA = Mod_ForName("sprites/leapstrikegun_v_ef.spr", FALSE);
+			//	//bugs
+			//	static int frame = 0;
+			//	float framerate = 4.0;
+			//	int startFrame = 0;
+			//	int endFrame = 0;
+
+			//	int maxframe = pLeapStrikeGunSprA->numframes;
+
+			//	if (endFrame)
+			//		maxframe = endFrame;
+
+			//	if (!startFrame)
+			//		startFrame = frame;
+
+			//	bool isSyncFrame = false;
+			//	if (isSyncFrame)
+			//	{
+			//		mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
+
+			//		frame = R_StudioEstimateFrame(RI.currententity, pseqdesc);
+			//	}
+			//	else
+			//	{
+			//		frame += (cl.time - (int)cl.time) * framerate;
+
+			//		if (frame > maxframe)
+			//			frame = fmod(frame, maxframe);
+			//	}
+
+			//	auto pspriteframe = R_GetSpriteFrame(pLeapStrikeGunSprA, frame, 0.0);
+
+			//	int index = pspriteframe->gl_texturenum;
+
+			//	if (pspriteframe->gl_texturenum)
+			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+
+			//	special = true;
+
+			//	/*pTemp->entity.curstate.frame += frametime * pTemp->entity.curstate.framerate;
+			//	if (pTemp->entity.curstate.frame >= pTemp->frameMax)
+			//	{
+			//		pTemp->entity.curstate.frame = pTemp->entity.curstate.frame - (int)(pTemp->entity.curstate.frame);
+			//	}*/
+			//}
+			//if (!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_leapstrikegun_flying.bmp"))
+			//{
+			//	model_t* pLeapStrikeGunSprA = Mod_ForName("sprites/ef_leapstrikegun_fly.spr", FALSE);
+			//	//bugs
+			//	static int frame = 0;
+			//	float framerate = 30.0;
+			//	int startFrame = 0;
+			//	int endFrame = 0;
+
+			//	int maxframe = pLeapStrikeGunSprA->numframes;
+
+			//	if (endFrame)
+			//		maxframe = endFrame;
+
+			//	if (!startFrame)
+			//		startFrame = frame;
+
+			//	bool isSyncFrame = false;
+			//	if (isSyncFrame)
+			//	{
+			//		mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
+
+			//		frame = R_StudioEstimateFrame(RI.currententity, pseqdesc);
+			//	}
+			//	else
+			//	{
+			//		frame += (cl.time - (int)cl.time) * framerate;
+
+			//		if (frame > maxframe)
+			//			frame = fmod(frame, maxframe);
+			//	}
+
+			//	auto pspriteframe = R_GetSpriteFrame(pLeapStrikeGunSprA, frame, 0.0);
+
+			//	int index = pspriteframe->gl_texturenum;
+
+			//	if (pspriteframe->gl_texturenum)
+			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+
+			//	special = true;
+			//}
+			
+			if(!bBindSpr)
+				xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 
 		if (RI.currententity->curstate.renderfx == kRenderFxWallHack) {
@@ -3358,7 +3591,8 @@ static engine_studio_api_t gStudioAPI =
 	R_StudioSetCullState,
 	R_StudioRenderShadow,
 	StudioSetupBones_Pre,
-	StudioSetupBones_Post
+	StudioSetupBones_Post,
+	pfnModCurrentEntity,
 };
 
 static r_studio_interface_t gStudioDraw =

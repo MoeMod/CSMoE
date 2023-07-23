@@ -66,6 +66,8 @@ namespace sv {
         int m_iExpIndex;
         int m_iFieldIndex;
         int m_iDefaultAmmo2;
+        duration_t m_flTimeWeaponIdle2;
+        duration_t m_flTimeWeaponIdle3;
         time_point_t m_flTimeNextCharge;
         time_point_t m_flNextReload;
         time_point_t m_flTimeFlying;
@@ -109,13 +111,13 @@ namespace sv {
         void WeaponIdle() override;
         void Holster(int skiplocal) override;
 
-        void RestrictionPistoFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
+        void LeapStrikeGunFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
         void RadiusAttack1();
         void RadiusAttack2();
         void DropAttack();
         void FlyThink();
 
-
+        void SendWeaponAnim2(int iAnim);
 
         duration_t GetFlyingTime()
         {
