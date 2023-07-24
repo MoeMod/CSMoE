@@ -107,6 +107,8 @@ namespace xe {
         }
 
         auto [iter, succ] = g_textureAttrMap.emplace(ptexture, TextureAttr{  ptexture->flags, ptexture->width, ptexture->height, gl_texturenum });
+        if (!succ)
+         (*iter).second = TextureAttr{ ptexture->flags, ptexture->width, ptexture->height, gl_texturenum };
         return TexLru_UpdateAttr(ptexture);
     }
 
@@ -613,7 +615,7 @@ namespace xe {
     {
         // set size for external texture
         if (TexLru_Upload(texnum))
-            TexLru_UpdateAttr(ptexture);
+            TexLru_CreateAttr(ptexture, texnum);
         return GL_Bind(XASH_TEXTURE0, texnum);
     }
 

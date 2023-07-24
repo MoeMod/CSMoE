@@ -1635,6 +1635,57 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
 
+		int flags;
+		if (ptexture->flags & STUDIO_NF_NORMALMAP)
+			flags |= (TF_NORMALMAP);
+
+		bool bBindTex = false;
+
+		if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_L.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_highq_hand__long_512.bmp"))
+		{
+			int texnum = xe::TexLru_LoadTextureExternal("gfx/tattoo/tttiger22_MaleLong.tga", flags, NULL);
+			if (texnum)
+			{
+				xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+				bBindTex = true;
+			}
+
+		}
+		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_O.bmp") ||
+			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "hand.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "252246hand.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "256252hand.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "256256hand.bmp"))
+		{
+			//512 Textrue need CHANGE TO 256
+			int texnum = xe::TexLru_LoadTextureExternal("gfx/tattoo/tttiger22_MaleOrg.tga", flags, NULL);
+			if (texnum)
+			{
+				xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+				bBindTex = true;
+			}
+		}
+		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_S.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_highq_hand_512.bmp"))
+		{
+			int texnum = xe::TexLru_LoadTextureExternal("gfx/tattoo/tttiger22_MaleShort.tga", flags, NULL);
+			if (texnum)
+			{
+				xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+				bBindTex = true;
+			}
+		}
+		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "F_L.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_girl_hand_long.bmp"))
+		{
+
+		}
+		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_girl_hand.bmp"))
+		{
+
+		}
+
 		const auto& attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
 		if(xe::TexLru_Upload(attr.index))
 			xe::TexLru_UpdateAttr(&ptexture[pskinref[pmesh->skinref]]);
@@ -1658,7 +1709,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			R_StudioSetupShader();
 		}
 #endif
-
+	
 		g_nFaceFlags = attr.flags;
 		s = 1.0f / (float)attr.width;
 		t = 1.0f / (float)attr.height;
@@ -1763,48 +1814,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
 
-
-
-			//if (!Q_stricmp(ptexture->name, "#M_L.bmp") ||
-			//	Q_stristr(ptexture->name, "cso_highq_hand__long_512.bmp"))
-			//{
-			//	char name[64];
-			//		strcpy(name, "buffclass21s3ct_malelong");
-			//		int index = GL_FindTexture(name);
-			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
-
-			//}
-			//else if (!Q_stricmp(ptexture->name, "#M_O.bmp") ||
-			//	!Q_stricmp(ptexture->name, "hand.bmp") ||
-			//	Q_stristr(ptexture->name, "252246hand.bmp") ||
-			//	Q_stristr(ptexture->name, "256252hand.bmp") ||
-			//	Q_stristr(ptexture->name, "256256hand.bmp"))
-			//{
-			//	//512 Textrue need CHANGE TO 256
-
-			//	char name[64];
-			//		strcpy(name, "buffclass21s3ct_maleorg");
-			//		int index = GL_FindTexture(name);
-			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
-			//}
-			//else if (!Q_stricmp(ptexture->name, "#M_S.bmp") || 
-			//	Q_stristr(ptexture->name, "cso_highq_hand_512"))
-			//{
-			//	char name[64];
-			//		strcpy(name, "buffclass21s3ct_maleshort");
-			//		int index = GL_FindTexture(name);
-			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
-			//}
-			//else if (!Q_stricmp(ptexture->name, "F_L.bmp") ||
-			//	Q_stristr(ptexture->name, "cso_girl_hand_long.bmp"))
-			//{
-			//	xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
-			//}
-			//else if (!Q_stricmp(ptexture->name, "#M_S.bmp") || 
-			//	Q_stristr(ptexture->name, "cso_girl_hand.bmp"))
-			//{
-			//	
-			//}
+			
 
 			bool bBindSpr = false;
 
@@ -2028,7 +2038,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			//	special = true;
 			//}
 			
-			if(!bBindSpr)
+			if(!bBindSpr && !bBindTex)
 				xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 

@@ -112,7 +112,7 @@ void Bot_RegisterCvars()
 
 CCSBot::CCSBot() : m_gameState(this), m_chatter(this)
 {
-	;
+	m_state = nullptr;
 }
 
 // Prepare bot for action
