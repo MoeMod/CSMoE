@@ -24,8 +24,7 @@ GNU General Public License for more details.
 #include "entity_types.h"
 #include "cl_tent.h"
 #include "gl_texlru.h"
-#include <triangleapi.h>
-extern triangleapi_t gTriApi;
+#include "gl_sprbat.h"
 
 // it's a Valve default value for LoadMapSprite (probably must be power of two)
 #define MAPSPRITE_SIZE	128
@@ -1020,37 +1019,6 @@ qboolean R_SpriteOccluded( cl_entity_t *e, vec3_t origin, int *alpha, float *psc
 	return false;	
 }
 
-/*
-=================
-R_DrawSpriteQuad
-=================
-*/
-static void R_DrawSpriteQuad( mspriteframe_t *frame, vec3_t org, vec3_t v_right, vec3_t v_up, float scale )
-{
-	vec3_t	point;
-
-	r_stats.c_sprite_polys++;
-
-	gTriApi.Begin( TRI_QUADS );
-		gTriApi.TexCoord2f( 0.0f, 1.0f );
-		VectorMA( org, frame->down * scale, v_up, point );
-		VectorMA( point, frame->left * scale, v_right, point );
-		gTriApi.Vertex3fv( point );
-		gTriApi.TexCoord2f( 0.0f, 0.0f );
-		VectorMA( org, frame->up * scale, v_up, point );
-		VectorMA( point, frame->left * scale, v_right, point );
-		gTriApi.Vertex3fv( point );
-		gTriApi.TexCoord2f( 1.0f, 0.0f );
-		VectorMA( org, frame->up * scale, v_up, point );
-		VectorMA( point, frame->right * scale, v_right, point );
-		gTriApi.Vertex3fv( point);
-		gTriApi.TexCoord2f( 1.0f, 1.0f );
-		VectorMA( org, frame->down * scale, v_up, point );
-		VectorMA( point, frame->right * scale, v_right, point );
-		gTriApi.Vertex3fv( point );
-	gTriApi.End();
-}
-
 static qboolean R_SpriteHasLightmap( cl_entity_t *e, int texFormat )
 {
 	if( !r_sprite_lighting->integer )
@@ -1136,14 +1104,12 @@ void R_DrawSpriteModel( cl_entity_t *e )
 
 	r_stats.c_sprite_models_drawn++;
 
-	if( psprite->texFormat == SPR_ALPHTEST && e->curstate.rendermode != kRenderTransAdd )
-	{
-		pglEnable( GL_ALPHA_TEST );
-		pglAlphaFunc( GL_GREATER, 0.0f );
-	}
+	int pass = xe::SprBatPass_Opaque;
+	if( psprite->texFormat == SPR_ALPHTEST )
+		pass |= xe::SprBatPass_AlphaTest;
 
-	if( e->curstate.rendermode == kRenderGlow || e->curstate.rendermode == kRenderWorldGlow )
-		pglDisable( GL_DEPTH_TEST );
+	if( psprite->texFormat == SPR_INDEXALPHA )
+		pass |= xe::SprBatPass_Blend;
 
 	// select properly rendermode
 	switch( e->curstate.rendermode )
@@ -1151,52 +1117,35 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	case kRenderTransAlpha:
 	case kRenderTransColor:
 	case kRenderTransTexture:
-		pglEnable( GL_BLEND );
-		pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		pass |= xe::SprBatPass_Blend;
+		break;
+	case kRenderTransAdd:
+		pass |= xe::SprBatPass_Blend | xe::SprBatPass_Src_One;
+		pass &= ~xe::SprBatPass_AlphaTest;
 		break;
 	case kRenderGlow:
-	case kRenderTransAdd:
 	case kRenderWorldGlow:
-		pglDisable( GL_FOG );
-		pglEnable( GL_BLEND );
-		pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
+		pass |= xe::SprBatPass_Blend | xe::SprBatPass_Src_One;
+		pass |= xe::SprBatPass_NoDepthTest;
 		break;
 	case kRenderNormal:
 	default:
-		if( psprite->texFormat == SPR_INDEXALPHA )
-		{
-			pglEnable( GL_BLEND );
-			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-		}
-		else pglDisable( GL_BLEND );
 		break;
 	}
 
-	// all sprites can have color
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	if (psprite->synctype == 233)
+		pass |= xe::SprBatPass_Blend | xe::SprBatPass_Src_One;
+
+	if( psprite->facecull == SPR_CULL_NONE )
+		pass |= xe::SprBatPass_NoCull;
+
+	if( RI.currententity->curstate.eflags & EFLAG_DEPTH_CHANGED )
+		pass |= xe::SprBatPass_NoDepthTest;
 
 	// add basecolor (any rendermode can colored sprite)
 	color[0] = (float)e->curstate.rendercolor.r * ( 1.0f / 255.0f );
 	color[1] = (float)e->curstate.rendercolor.g * ( 1.0f / 255.0f );
 	color[2] = (float)e->curstate.rendercolor.b * ( 1.0f / 255.0f );
-
-	if( R_SpriteHasLightmap( e, psprite->texFormat ))
-	{
-		color24	lightColor;
-		qboolean	invLight;
-
-		invLight = (e->curstate.effects & EF_INVLIGHT) ? true : false;
-		R_LightForPoint( origin, &lightColor, invLight, true, sprite_radius );
-		color2[0] = (float)lightColor.r * ( 1.0f / 255.0f );
-		color2[1] = (float)lightColor.g * ( 1.0f / 255.0f );
-		color2[2] = (float)lightColor.b * ( 1.0f / 255.0f );
-
-		if( glState.drawTrans )
-			pglDepthMask( GL_TRUE );
-
-		// NOTE: sprites with 'lightmap' looks ugly when alpha func is GL_GREATER 0.0
-		pglAlphaFunc( GL_GEQUAL, 0.5f );
-	}
 
     float lerp = 1.0f, ilerp;
 
@@ -1245,26 +1194,11 @@ void R_DrawSpriteModel( cl_entity_t *e )
 
 	flAlpha = (float)alpha * ( 1.0f / 255.0f );
 
-	if( psprite->facecull == SPR_CULL_NONE )
-		GL_Cull( GL_NONE );
-		
-	if (psprite->synctype == 233)
-	{
-		pglEnable(GL_TEXTURE_2D);
-		xe::TexLru_Bind(psprite, frame);
-
-		pglEnable(GL_BLEND);
-		pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//pglBlendFunc(GL_ONE, GL_ONE);
-		pglDepthMask(GL_FALSE);
-	}
-
 	if( oldframe == frame )
 	{
 		// draw the single non-lerped frame
-		gTriApi.Color4f(color[0], color[1], color[2], flAlpha);
-		if(psprite->synctype != 233) xe::TexLru_Bind(psprite, frame);
-		R_DrawSpriteQuad(frame, origin, v_right, v_up, scale);
+		vec4_t color2(color[0], color[1], color[2], flAlpha);
+		xe::SprBat_AddDrawList(pass, psprite, frame, origin, v_right, v_up, scale, color2);
 	}
 	else
 	{
@@ -1274,50 +1208,14 @@ void R_DrawSpriteModel( cl_entity_t *e )
 
 		if (ilerp != 0.0f)
 		{
-			gTriApi.Color4f(color[0], color[1], color[2], flAlpha * ilerp);
-			if (psprite->synctype != 233) xe::TexLru_Bind(psprite, oldframe);
-			R_DrawSpriteQuad(oldframe, origin, v_right, v_up, scale);
+			vec4_t color2(color[0], color[1], color[2], flAlpha * ilerp);
+			xe::SprBat_AddDrawList(pass, psprite, oldframe, origin, v_right, v_up, scale, color2);
 		}
 		if (lerp != 0.0f)
 		{
-			gTriApi.Color4f(color[0], color[1], color[2], flAlpha * lerp);
-			if (psprite->synctype != 233) xe::TexLru_Bind(psprite, frame);
-			R_DrawSpriteQuad(frame, origin, v_right, v_up, scale);
+			vec4_t color2(color[0], color[1], color[2], flAlpha * lerp);
+			xe::SprBat_AddDrawList(pass, psprite, frame, origin, v_right, v_up, scale, color2);
 		}
 	}
-
-	// draw the sprite 'lightmap' :-)
-	if( R_SpriteHasLightmap( e, psprite->texFormat ))
-	{
-		pglEnable( GL_BLEND );
-		pglDepthFunc( GL_EQUAL );
-		pglDisable( GL_ALPHA_TEST );
-		pglBlendFunc( GL_ZERO, GL_SRC_COLOR );
-		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-		gTriApi.Color4f( color2[0], color2[1], color2[2], flAlpha );
-		GL_Bind( XASH_TEXTURE0, tr.whiteTexture );
-		R_DrawSpriteQuad( frame, origin, v_right, v_up, scale );
-
-		if( glState.drawTrans ) 
-			pglDepthMask( GL_FALSE );
-	}
-
-	if( psprite->facecull == SPR_CULL_NONE )
-		GL_Cull( GL_FRONT );
-
-	if( e->curstate.rendermode == kRenderGlow || e->curstate.rendermode == kRenderWorldGlow )
-		pglEnable( GL_DEPTH_TEST );
-
-	if( psprite->texFormat == SPR_ALPHTEST && e->curstate.rendermode != kRenderTransAdd )
-		pglDisable( GL_ALPHA_TEST );
-
-	pglDisable( GL_BLEND );
-	pglDepthFunc( GL_LEQUAL );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	pglColor4ub( 255, 255, 255, 255 );
-
-	if( RI.fogCustom || ( RI.fogEnabled && !glState.drawTrans ))
-		pglEnable( GL_FOG );
 }
 #endif // XASH_DEDICATED

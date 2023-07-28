@@ -252,6 +252,7 @@ set(XASH_ENGINE_CLIENT_SOURCES
    client/gl_texlru.cpp
    client/gl_studiolru.cpp
    client/gl_bindspr.cpp
+   client/gl_sprbat.cpp
 )
 
 set(XASH_ENGINE_IMGUI_SOURCES

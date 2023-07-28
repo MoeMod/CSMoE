@@ -25,6 +25,7 @@ GNU General Public License for more details.
 #include "particledef.h"
 #include "entity_types.h"
 #include "gl_texlru.h"
+#include "gl_sprbat.h"
 
 #ifdef XASH_RAGDOLL
 #include "physics.h"
@@ -1124,6 +1125,7 @@ void R_DrawEntitiesOnList( void )
 
     if( !RI.refdef.onlyClientDraw )
     {
+	    xe::SprBat_RenderDrawList();
         CL_DrawBeams( false );
     }
 
@@ -1184,6 +1186,7 @@ void R_DrawEntitiesOnList( void )
 
     if( !RI.refdef.onlyClientDraw )
     {
+	    xe::SprBat_RenderDrawList();
         CL_DrawBeams( true );
         CL_DrawParticles();
     }
@@ -1240,6 +1243,7 @@ void R_DrawEntitiesOnList( void )
                 pglEnable(GL_DEPTH_TEST);
             }
         }
+	    xe::SprBat_RenderDrawList();
         glState.drawTrans = false;
         pglDepthMask(GL_TRUE);
         pglDisable(GL_BLEND);	// Trinity Render issues
