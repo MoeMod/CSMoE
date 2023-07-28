@@ -6,8 +6,6 @@
 extern triangleapi_t gTriApi;
 #include "gl_sprbat.h"
 
-#include <vector>
-
 namespace xe {
 	void SprBat_SetupRenderState(int pass, int last_pass)
 	{
@@ -124,7 +122,9 @@ namespace xe {
 		vec3_t org, v_right, v_up;
 		vec4_t color;
 	};
-	std::vector<DrawData> drawlist;
+    const int drawlist_maxnum = MAX_VISIBLE_PACKET * 4;
+    DrawData drawlist[MAX_VISIBLE_PACKET * 4];
+    int drawlist_num = 0;
 	int sprbat_current_pass;
 
 	void SprBat_RenderDrawData(const DrawData &data)
@@ -140,8 +140,10 @@ namespace xe {
 
 	void SprBat_AddDrawList( int pass, msprite_t *psprite, mspriteframe_t *frame, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color )
 	{
+        if(drawlist_num >= drawlist_maxnum)
+            return;
 		DrawData data{ pass, psprite, frame, scale, org, v_right, v_up, color };
-		drawlist.emplace_back(data);
+		drawlist[drawlist_num++] = data;
 	}
 
 	void SprBat_RenderDrawList()
@@ -149,33 +151,34 @@ namespace xe {
 		sprbat_current_pass = SprBatPass_Opaque;
 		// all sprites can have color
 		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-		auto iter = drawlist.begin();
+		auto iter = drawlist;
+        auto end = drawlist + drawlist_num;
 		// render opaque first
-		auto mid = std::stable_partition(iter, drawlist.end(), [](const DrawData & a){
+		auto mid = std::stable_partition(iter, end, [](const DrawData & a){
 			return !(a.pass & SprBatPass_AlphaTest) && !(a.pass & SprBatPass_Blend);
 		});
 		std::sort(iter, mid, SprBat_DrawDataCompare);
 		std::for_each(iter, mid, SprBat_RenderDrawData);
 		iter = mid;
 		// render alpha test
-		mid = std::stable_partition(iter, drawlist.end(), [](const DrawData & a){
+		mid = std::stable_partition(iter, end, [](const DrawData & a){
 			return (a.pass & SprBatPass_AlphaTest) && !(a.pass & SprBatPass_Blend);
 		});
 		std::sort(iter, mid, SprBat_DrawDataCompare);
 		std::for_each(iter, mid, SprBat_RenderDrawData);
 		iter = mid;
 		// render blend (no sort!)
-		mid = std::stable_partition(iter, drawlist.end(), [](const DrawData & a){
+		mid = std::stable_partition(iter, end, [](const DrawData & a){
             return (a.pass & SprBatPass_Blend);
 		});
 		//std::sort(iter, mid, SprBat_DrawDataCompare);
 		std::for_each(iter, mid, SprBat_RenderDrawData);
 		iter = mid;
-		assert(iter == drawlist.end());
+        Assert(iter == end);
 		if(sprbat_current_pass != SprBatPass_Opaque)
 			SprBat_RestoreRenderState(sprbat_current_pass);
 		sprbat_current_pass = SprBatPass_Opaque;
-		drawlist.clear();
+        drawlist_num = 0;
 		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 		gTriApi.Color4f( 1, 1, 1, 1 );
 	}
