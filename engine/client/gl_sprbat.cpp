@@ -68,7 +68,7 @@ namespace xe {
 		}
 	}
 
-	void SprBat_RestoreRenderState(DrawSpritePassType last_pass)
+	void SprBat_RestoreRenderState(int last_pass)
 	{
 		if( last_pass & SprBatPass_NoDepthTest )
 			pglEnable( GL_DEPTH_TEST );
@@ -152,21 +152,21 @@ namespace xe {
 		auto iter = drawlist.begin();
 		// render opaque first
 		auto mid = std::stable_partition(iter, drawlist.end(), [](const DrawData & a){
-			return a.pass & ~SprBatPass_AlphaTest & ~SprBatPass_Blend;
+			return !(a.pass & SprBatPass_AlphaTest) && !(a.pass & SprBatPass_Blend);
 		});
 		std::sort(iter, mid, SprBat_DrawDataCompare);
 		std::for_each(iter, mid, SprBat_RenderDrawData);
 		iter = mid;
 		// render alpha test
 		mid = std::stable_partition(iter, drawlist.end(), [](const DrawData & a){
-			return a.pass & SprBatPass_AlphaTest & ~SprBatPass_Blend;
+			return (a.pass & SprBatPass_AlphaTest) && !(a.pass & SprBatPass_Blend);
 		});
 		std::sort(iter, mid, SprBat_DrawDataCompare);
 		std::for_each(iter, mid, SprBat_RenderDrawData);
 		iter = mid;
 		// render blend (no sort!)
 		mid = std::stable_partition(iter, drawlist.end(), [](const DrawData & a){
-			return a.pass & SprBatPass_Blend;
+            return (a.pass & SprBatPass_Blend);
 		});
 		//std::sort(iter, mid, SprBat_DrawDataCompare);
 		std::for_each(iter, mid, SprBat_RenderDrawData);
