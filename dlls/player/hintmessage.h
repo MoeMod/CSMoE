@@ -14,7 +14,6 @@
 ****/
 
 #pragma once
-#include <UtlVector.h>
 #include <vector>
 
 typedef struct lua_State lua_State;

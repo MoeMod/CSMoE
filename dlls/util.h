@@ -42,12 +42,6 @@
 #include "enginecallback.h"
 #endif
 
-#ifdef CLIENT_DLL
-#include <UtlVector.h>
-#else
-#include <vector>
-#endif
-
 #define _LOG_TRACE\
 	static int iNumPassed = 0;\
 	printf2(__FUNCTION__":: iNumPassed - %d", iNumPassed++);

@@ -27,8 +27,6 @@
 #include "luash_class.hpp"
 #include "player/player_knockback.h"
 
-#include <UtlVector.h>
-
 #ifndef CLIENT_DLL
 #undef CREATE_NAMED_ENTITY
 #undef REMOVE_ENTITY
