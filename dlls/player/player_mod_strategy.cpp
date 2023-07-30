@@ -492,7 +492,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 		}
 		m_pPlayer->GiveNamedItem("weapon_hegrenade");
 
-#if 0
+#if 1
 		if (m_pPlayer->entindex() == 1)
 		{
 
@@ -502,11 +502,11 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 				CBasePlayer* TargetPlayer = static_cast<CBasePlayer*>(Entity);
 
 				TargetPlayer->RemoveAllItems(FALSE);
-				TargetPlayer->GiveNamedItem("weapon_revivegun");
-				TargetPlayer->GiveNamedItem("weapon_y22s2sfpistol");
+				TargetPlayer->GiveNamedItem("weapon_zombielaw");
+				TargetPlayer->GiveNamedItem("weapon_leapstrikegun");
 				TargetPlayer->GiveNamedItem("knife_lance");
 				TargetPlayer->GiveNamedItem("weapon_stickybomb");
-				GiveSlotAmmo(TargetPlayer, 1);
+				//GiveSlotAmmo(TargetPlayer, 1);
 				GiveSlotAmmo(TargetPlayer, 2);
 				//TargetPlayer->m_iBuff |= BUFF_AVOID_INFECT;
 

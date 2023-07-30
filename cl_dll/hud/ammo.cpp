@@ -38,6 +38,7 @@
 
 #include "vgui_controls/controls.h"
 #include "vgui/ILocalize.h"
+#include <legacy/hud_scoreboard_legacy.h>
 
 namespace cl {
 
@@ -415,6 +416,28 @@ int CHudAmmo::VidInit(void)
 
 	if (!m_iWeapon_OffBG)
 		m_iWeapon_OffBG = R_LoadTextureUnique("resource/hud/hud_weapon_off_bg");
+
+	//APEX HUD
+	if(!m_iSlotBG)
+		m_iSlotBG = R_LoadTextureUnique("resource/hud/custom/hud_apex/hud_iteminfo_bg");
+
+	if (!m_iCharacterStateBG)
+		m_iCharacterStateBG = R_LoadTextureShared("resource/hud/custom/hud_apex/hud_player_bg");
+
+	if (!m_iSlotBGFilled)
+		m_iSlotBGFilled = R_LoadTextureUnique("resource/hud/custom/hud_apex/hud_weapon_bg_blue");
+
+	if (!m_iSlotBGAmmo)
+		m_iSlotBGAmmo = R_LoadTextureUnique("resource/hud/custom/hud_apex/hud_weapon_bg2");
+
+	if (!m_iNum_BigWhite)
+		m_iNum_BigWhite = R_LoadTextureShared("resource/hud/hud_sb_num_big_white");
+
+	if (!m_iNum_Center)
+		m_iNum_Center = R_LoadTextureShared("resource/hud/hud_sb_num_center");
+
+	CHudScoreBoardLegacy::BuildNumberRC(m_iNum_BigWhiteC, 18, 22);
+	CHudScoreBoardLegacy::BuildNumberRC(m_iNum_CenterC, 11, 13);
 
 	R_InitTexture(m_pTexture_Black, "resource/hud/csgo/blacka");
 	// If we've already loaded weapons, let's get new sprites
@@ -1323,11 +1346,13 @@ int CHudAmmo::Draw(float flTime)
 	if (!m_pWeapon)
 		return 0;
 
-	WEAPON *pw = m_pWeapon; // shorthand
+	WEAPON* pw = m_pWeapon; // shorthand
 	if (gHUD.m_hudstyle->value == 1)
 		DrawWpnList(flTime);
 	else if (gHUD.m_hudstyle->value == 2)
 		DrawNEWHudCurrentWpn(flTime);
+	else if (gHUD.m_hudstyle->value == 3)
+		DrawApexHudWpnList(flTime);
 
 	// SPR_Draw Ammo
 	if ((pw->iAmmoType < 0) && (pw->iAmmo2Type < 0))
@@ -1336,6 +1361,10 @@ int CHudAmmo::Draw(float flTime)
 	if (gHUD.m_hudstyle->value == 2)
 	{
 		DrawNEWHudAmmo(flTime);
+		return 1;
+	}
+	else if (gHUD.m_hudstyle->value == 3)
+	{
 		return 1;
 	}
 
@@ -2271,7 +2300,622 @@ int CHudAmmo::DrawNEWHudCurrentWpn(float flTime)
 	return 1;
 
 }
+void CHudAmmo::DrawSpriteTexture(const HSPRITE m_hSpr, int iX, int iY, int iW, int iH, wrect_t Rc, int a, int r, int g, int b)
+{
+	float s1, t1, s2, t2;
 
+	gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+
+	model_t* pPointer = (struct model_s*)gEngfuncs.GetSpritePointer(m_hSpr);
+	auto pWidth = ((msprite_t*)pPointer->cache.data)->frames[0].frameptr->width;
+	auto pHeight = ((msprite_t*)pPointer->cache.data)->frames[0].frameptr->height;
+
+	// calc user-defined rectangle
+	wrect_t rc = Rc;
+	//		hud.txt顶点信息		//Spr文件的总宽度和高度
+	s1 = (float)rc.left / (pWidth);
+	t1 = (float)rc.top / (pHeight);
+	s2 = (float)rc.right / (pWidth);
+	t2 = (float)rc.bottom / (pHeight);
+
+
+	gEngfuncs.pTriAPI->SpriteTexture(pPointer, 0);
+	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+	gEngfuncs.pTriAPI->Color4ub(r, g, b, a);
+
+	gEngfuncs.pTriAPI->TexCoord2f(s1, t2);
+	gEngfuncs.pTriAPI->Vertex3f(iX * gHUD.m_flScale, (iY + iH) * gHUD.m_flScale, 0);
+
+	gEngfuncs.pTriAPI->TexCoord2f(s2, t2);
+	gEngfuncs.pTriAPI->Vertex3f((iX + iW) * gHUD.m_flScale, (iY + iH) * gHUD.m_flScale, 0);
+
+	gEngfuncs.pTriAPI->TexCoord2f(s2, t1);
+	gEngfuncs.pTriAPI->Vertex3f((iX + iW) * gHUD.m_flScale, iY * gHUD.m_flScale, 0);
+
+	gEngfuncs.pTriAPI->TexCoord2f(s1, t1);
+	gEngfuncs.pTriAPI->Vertex3f(iX * gHUD.m_flScale, iY * gHUD.m_flScale, 0);
+
+	gEngfuncs.pTriAPI->End();
+
+}
+int CHudAmmo::DrawApexHudWpnList(float flTime)
+{
+	//Basic Bar Definations
+	const int iPlayerStateBarWidth = floor(m_iCharacterStateBG->w() * 1.2f);
+	const int iPlayerStateBarHeight = floor(m_iCharacterStateBG->h() * 0.8f);
+	const int iDrawOffset = 6;
+
+	const int iAmmoWidth = gHUD.GetSpriteRect(gHUD.m_NEWHUD_dollar_number_0).right - gHUD.GetSpriteRect(gHUD.m_NEWHUD_dollar_number_0).left;
+	const int iAmmoHeight = gHUD.GetSpriteRect(gHUD.m_NEWHUD_dollar_number_0).bottom - gHUD.GetSpriteRect(gHUD.m_NEWHUD_dollar_number_0).top;
+
+	const int iAmmoBigWidth = gHUD.GetSpriteRect(gHUD.m_NEWHUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_NEWHUD_number_0).left;
+	const int iAmmoBigHeight = gHUD.GetSpriteRect(gHUD.m_NEWHUD_number_0).bottom - gHUD.GetSpriteRect(gHUD.m_NEWHUD_number_0).top;
+
+	int iWpnBarHeight = m_iWeapon_OffBG->h() + m_iWeaponList->h();
+	int iWpnBarWidth = floor(iPlayerStateBarWidth * 0.6f);
+
+	int iX = floor(ScreenWidth * 0.5f);
+	int iY = ScreenHeight - 40;
+	iY -= (iPlayerStateBarHeight + (iWpnBarHeight + 20));
+
+	int iW, iH;
+	int iLength, iHeight;
+
+	int r, g, b, a;
+	a = max(MIN_ALPHA, (int)m_fFade);
+
+	if (m_fFade > 0)
+		m_fFade -= (gHUD.m_flTimeDelta * 20);
+
+	int a2;
+
+	auto ConstructModifiedWpnName = [](char(&SzModifiedName)[], const char* SzOriginalName, int iModifiyType)
+	{
+
+		if (!strncmp(SzOriginalName, "weapon_", 7))
+			SzOriginalName += 7;
+		else if (!strncmp(SzOriginalName, "knife_", 6))
+			SzOriginalName += 6;
+		else if (!strncmp(SzOriginalName, "z4b_", 4))
+			SzOriginalName += 4;
+		else if (!strncmp(SzOriginalName, "csgo_", 5))
+			SzOriginalName += 5;
+
+		strcpy(SzModifiedName, SzOriginalName);
+
+		if (iModifiyType)
+		{
+			if (!strcmp(SzModifiedName, "usp"))
+				strcpy(SzModifiedName, "USP45");
+			else if (!strcmp(SzModifiedName, "deagle"))
+				strcpy(SzModifiedName, "DesertEagle");
+			else if (!strcmp(SzModifiedName, "hegrenade"))
+				strcpy(SzModifiedName, "HE_Grenade");
+		}
+	};
+
+	auto LocalizeWpnName = [](char(&SzModifiedName)[], const char* SzOriginalName, int iWpnSlot)
+	{
+		//Vgui Localize
+		char SzWpnNameCn[64];
+		char SzText[64];
+
+		if (SzOriginalName && SzOriginalName[0])
+			sprintf(SzText, "CSO_%s", SzOriginalName);
+		else
+			sprintf(SzText, "CSO_");
+
+		if (vgui2::localize()->Find(SzText))
+			strcpy(SzWpnNameCn, HudDeathInfo().UnicodeToUTF8(vgui2::localize()->Find(SzText)));
+		else
+		{
+			if (SzOriginalName && SzOriginalName[0])
+			{
+				sprintf(SzText, "#CSO_%s", SzOriginalName);
+			}
+			strcpy(SzWpnNameCn, SzText);
+		}
+
+		sprintf(SzModifiedName, "\t%d. %s", iWpnSlot, SzWpnNameCn);
+	};
+
+	auto ResizeImage = [](int& iModified)
+	{
+		if (iModified % 2 != 0)
+			iModified--;
+	};
+
+	for (int i = 0; i < MAX_WEAPON_SLOTS; i++)
+	{
+		WEAPON* pWeapon = gWR.GetFirstPos(i);
+
+		for (int iPos = 0; iPos < MAX_WEAPON_POSITIONS; iPos++)
+		{
+			pWeapon = gWR.GetWeaponSlot(i, iPos);
+
+			if (!pWeapon || !pWeapon->iId)
+				continue;
+
+			if (m_iWeapon[i])
+				m_iWeapon[i] = nullptr;
+
+			//For WeaponIcon
+			char SzWeaponName[64];
+			ConstructModifiedWpnName(SzWeaponName, pWeapon->szName, 0);
+
+			//For Localize Because some names are unformatted.
+			char SzWeaponNameFormated[64];
+			ConstructModifiedWpnName(SzWeaponNameFormated, pWeapon->szName, 1);
+
+			char SzWeaponFullName[64];
+			LocalizeWpnName(SzWeaponFullName, SzWeaponNameFormated, (pWeapon->iSlot + 1));
+
+			if (SzWeaponName)
+			{
+				std::string szWeaponIcon = "gfx/vgui/basket/";
+				szWeaponIcon.append(SzWeaponName);
+
+				m_iWeapon[i] = R_LoadTextureUnique(szWeaponIcon.c_str());
+			}
+
+			//For Primary/Secondary Slot
+			if (i < 2)
+			{
+				// Draw WeaponSlot BackGround
+				iX += (i == 1) ? 0 : (-iWpnBarWidth);
+				iX += (i == 1) ? iDrawOffset : (-iDrawOffset);
+
+				m_iWeapon_OffBG->Draw2DQuadScaled(iX, iY, iX + iWpnBarWidth, iY + iWpnBarHeight);
+
+				iW = iWpnBarWidth;
+				iH = iWpnBarHeight - (m_iWeaponList->h() + iDrawOffset);
+
+				m_iSlotBGFilled->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0.0, 0.0, 1.0, 1.0, 255, 255, 255, 255);
+
+				// Draw WeaponIcon
+				if (m_iWeapon[i])
+				{
+					iW = floor(m_iWeapon[i]->w() * 0.5f);
+					iH = floor(m_iWeapon[i]->h() * 0.5f);
+
+					m_iWeapon[i]->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0, 0, 1, 1, 255, 255, 255, 225);
+				}
+
+				// Draw WeaponName
+				if (SzWeaponFullName && SzWeaponFullName[0])
+				{
+					gEngfuncs.pfnDrawSetTextColor(1.0f, 1.0f, 1.0f);
+					gEngfuncs.pfnDrawConsoleStringLen(SzWeaponFullName, &iLength, &iHeight);
+
+					iY += (iWpnBarHeight);
+					iY -= iHeight;
+
+					iW = iWpnBarWidth;
+					iH = m_iWeaponList->h() * 1.5f - iDrawOffset;
+
+					iY -= iDrawOffset * 2.0f;
+					m_iWeaponList->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH);
+					iY += iDrawOffset * 2.0f;
+
+					iY -= iHeight * 0.5f;
+					gEngfuncs.pfnDrawConsoleString(iX, iY, SzWeaponFullName);
+					iY += iHeight * 0.5f;
+
+					iY -= (iWpnBarHeight);
+					iY += iHeight;
+				}
+
+				iX -= (i == 1) ? 0 : (-iWpnBarWidth);
+				iX -= (i == 1) ? iDrawOffset : (-iDrawOffset);
+
+				iY += iDrawOffset;
+				// Draw HudAmmo ?
+				// Does weapon have any ammo at all?
+				if (pWeapon->iAmmoType > 0)
+				{
+					iX += (i == 1) ? (iWpnBarWidth + iDrawOffset) : 0;
+					int iAmmoIconWidth = pWeapon->rcAmmo.right - pWeapon->rcAmmo.left;
+
+					iX -= iAmmoWidth;
+					iX -= iAmmoIconWidth;
+
+					if (pWeapon->iClip >= 0 && pWeapon->iId != WEAPON_TURBULENT1)
+					{
+						//Draw Clip
+
+						DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
+
+						//DrawUtils...
+#if 0
+						iX -= DrawUtils::GetNEWHudNumberWidth(0, pWeapon->iClip, FALSE, 3, 0);
+						DrawUtils::DrawNEWHudNumber(0, iX, iY, pWeapon->iClip, r, g, b, 255, FALSE, 3);
+						iX += DrawUtils::GetNEWHudNumberWidth(0, pWeapon->iClip, FALSE, 3, 0);
+#else
+						int iClipSafe = 0;
+						iClipSafe = pWeapon->iClip >= 0 ? pWeapon->iClip : 0;
+
+						iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * 0.7f);
+						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iClipSafe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b);
+						iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * 0.7f);
+#endif
+
+						//Draw BpAmmo
+
+						int iAmmoSafe = 0;
+						iAmmoSafe = gWR.CountAmmo(pWeapon->iAmmoType) >= 0 ? gWR.CountAmmo(pWeapon->iAmmoType) : 0;
+
+						iX -= iDrawOffset * 0.5f;
+						iY += iAmmoBigHeight;
+						iY += iDrawOffset;
+
+#if 0
+						iX -= DrawUtils::GetNEWHudNumberWidth(1, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 4, 0);
+#else
+						iX -= floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 1, 11) * 0.7f);
+#endif
+
+#if 0
+						DrawUtils::DrawNEWHudNumber(1, iX, iY, gWR.CountAmmo(pWeapon->iAmmoType), r, g, b, 255, FALSE, 4);
+#else
+						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Center, m_iNum_CenterC, iAmmoSafe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b, 230);
+#endif
+
+#if 0
+						iX += DrawUtils::GetNEWHudNumberWidth(1, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 4, 0);
+#else
+						iX += floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 1, 11) * 0.7f);
+#endif
+
+						iX += iDrawOffset * 0.5f;
+
+						iY -= iAmmoBigHeight;
+						iY -= iDrawOffset;
+					}
+					//Draw Special Ammo (Like Cannon ?
+					else
+					{
+						int iClipSafe = 0;
+						iClipSafe = pWeapon->iClip >= 0 ? pWeapon->iClip : 0;
+
+						int iAmmoSafe = 0;
+						iAmmoSafe = gWR.CountAmmo(pWeapon->iAmmoType) >= 0 ? gWR.CountAmmo(pWeapon->iAmmoType) : 0;
+
+
+						if (pWeapon->iSlot < 3)
+							DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
+
+						// GL Seems to need this
+						if (pWeapon->iId == WEAPON_TURBULENT1)
+						{
+#if 0
+							iX -= DrawUtils::GetNEWHudNumberWidth(0, pWeapon->iClip, FALSE, 3, 0);
+							DrawUtils::DrawNEWHudNumber(0, iX, iY, pWeapon->iClip, r, g, b, 255, FALSE, 3);
+							iX += DrawUtils::GetNEWHudNumberWidth(0, pWeapon->iClip, FALSE, 3, 0);
+#else
+
+							iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * 0.7f);
+							CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iClipSafe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b);
+							iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * 0.7f);
+#endif
+						}
+						else
+						{
+
+							if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+							{
+#if 0
+								iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 3, 0);
+								DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pWeapon->iAmmoType), r, g, b, 255, FALSE, 3);
+								iX += DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 3, 0);
+#else
+								iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * 0.7f);
+								CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iAmmoSafe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b);
+								iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * 0.7f);
+#endif
+							}
+						}
+					}
+					iX -= (i == 1) ? (iWpnBarWidth + iDrawOffset) : 0;
+
+					iX += iAmmoWidth;
+					iX += iAmmoIconWidth;
+				}
+
+				// Draw the ammo Icon
+				if (pWeapon->iId != WEAPON_PATROLDRONE)
+				{
+					auto pRcAmmo = pWeapon->rcAmmo;
+					auto pHAmmo = pWeapon->hAmmo;
+
+					int iAmmoIconWidth = pRcAmmo.right - pRcAmmo.left;
+
+					iX += (i == 1) ? (iWpnBarWidth + iDrawOffset * 1.2f) : 0;
+
+					int iScaleWidth = floor((pRcAmmo.right - pRcAmmo.left) * 0.8f);
+					int iScaleHeight = floor((pRcAmmo.bottom - pRcAmmo.top) * 0.8f);
+
+					iX -= iScaleWidth;
+					DrawSpriteTexture(pHAmmo, iX - iAmmoIconWidth, iY, iScaleWidth, iScaleHeight, pRcAmmo, 255, r, g, b);
+					iX += iScaleWidth;
+
+					bool bEnabled = (gWR.CountAmmo(pWeapon->iAmmoType) > 999) ? true : false;
+
+					auto pHSprite = gHUD.GetSprite(m_iInfinite);
+					auto pRSprite = gHUD.GetSpriteRect(m_iInfinite);
+
+					iScaleWidth = floor((pRSprite.right - pRSprite.left) * 0.7f);
+					iScaleHeight = floor((pRSprite.bottom - pRSprite.top) * 0.7f);
+
+					iX -= (iScaleWidth - 2);
+					iY += iAmmoBigHeight;
+					iY += floor(iScaleHeight * 0.5f);
+					DrawSpriteTexture(pHSprite, iX - iAmmoIconWidth, iY, iScaleWidth, iScaleHeight, pRSprite, bEnabled ? 255 : 125, r, g, b);
+					iY -= iAmmoBigHeight;
+					iY -= floor(iScaleHeight * 0.5f);
+					iX += (iScaleWidth + 2);
+
+
+					iX -= (i == 1) ? (iWpnBarWidth + iDrawOffset * 1.2f) : 0;
+				}
+				iY -= iDrawOffset;
+
+				// Does weapon have seconday ammo?
+				if (pWeapon->iAmmo2Type > 0)
+				{
+					iX += (i == 1) ? (iWpnBarWidth + iDrawOffset) : (-iDrawOffset);
+					iX -= (i == 1) ? 2 : 3;
+
+					DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
+
+					iW = m_iSlotBGAmmo->w() * 0.6f;
+					iH = m_iSlotBGAmmo->h() * 0.6f;
+
+					m_iSlotBGAmmo->Draw2DQuadScaled(iX - iW, iY - iH, iX, iY);
+
+					iY -= iAmmoBigHeight;
+					iY += iDrawOffset * 0.5f;
+
+					//Draw Ammo2 Sprite ? 
+
+					int iAmmo2Safe = 0;
+					iAmmo2Safe = gWR.CountAmmo(pWeapon->iAmmo2Type) >= 0 ? gWR.CountAmmo(pWeapon->iAmmo2Type) : 0;
+
+					auto pRcAmmo2 = pWeapon->rcAmmo2;
+					auto pHAmmo2 = pWeapon->hAmmo2;
+
+					int iIconWidth = pRcAmmo2.right - pRcAmmo2.left;
+
+					iX -= iDrawOffset;
+					iX -= floor(iIconWidth * ((i == 1) ? 1.5f : 1.2f));
+
+					int iScaleWidth = floor((pRcAmmo2.right - pRcAmmo2.left) * 0.8f);
+					int iScaleHeight = floor((pRcAmmo2.bottom - pRcAmmo2.top) * 0.8f);
+
+					if (iAmmo2Safe)
+					{
+						DrawSpriteTexture(pHAmmo2, iX, iY, iScaleWidth, iScaleHeight, pRcAmmo2, 255, r, g, b);
+
+						iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmo2Safe, FALSE, 3, 1) * 0.7f);
+						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iAmmo2Safe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b);
+						iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmo2Safe, FALSE, 3, 1) * 0.7f);
+					}
+
+					iX += iDrawOffset;
+					iX += floor(iIconWidth * ((i == 1) ? 1.5f : 1.2f));
+					iX -= (i == 1) ? (iWpnBarWidth + iDrawOffset) : (-iDrawOffset);
+					iX += (i == 1) ? 2 : 3;
+
+					iY += iAmmoBigHeight;
+					iY -= iDrawOffset * 0.5f;
+				}
+			}
+			else
+			{
+				switch (i)
+				{
+					//Knife Slot
+				case 2:
+					iW = floor(m_iSlotBG->w() * 0.4f);
+					iH = floor(m_iSlotBG->h() * 0.4f);
+
+					iX += iWpnBarWidth;
+					iX += iDrawOffset * 2.0f;
+
+					iY += (iPlayerStateBarHeight + (iWpnBarHeight + 20));
+
+					//m_iSlotBG->Draw2DQuadScaled(iX, iY - iH, iX + iW, iY);
+					if (m_iWeapon[i])
+					{
+						iW = floor(m_iWeapon[i]->w() * 0.65f);
+						iH = floor(m_iWeapon[i]->h() * 0.65f);
+
+						iX += iW;
+						iY += iH;
+						m_iWeapon[i]->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0, 0, 1, 1, 255, 255, 255, 225);
+						// Draw WeaponName
+						if (SzWeaponFullName && SzWeaponFullName[0])
+						{
+							gEngfuncs.pfnDrawSetTextColor(1.0f, 1.0f, 1.0f);
+							gEngfuncs.pfnDrawConsoleStringLen(SzWeaponFullName, &iLength, &iHeight);
+
+							iY += (iH);
+							iY += iHeight;
+
+							gEngfuncs.pfnDrawConsoleString(iX, iY, SzWeaponFullName);
+
+							iY -= (iH);
+							iY -= iHeight;
+						}
+
+						iX -= iW;
+						iY -= iH;
+					}
+
+					iY -= (iPlayerStateBarHeight + (iWpnBarHeight + 20));
+
+					iX -= iWpnBarWidth;
+					iX -= iDrawOffset * 2.0f;
+
+					break;
+
+
+					//Grenade Slot
+				case 3:
+					iW = floor(m_iSlotBG->w() * 0.4f);
+					iH = floor(m_iSlotBG->h() * 0.4f);
+
+					iX -= iWpnBarWidth;
+					iX -= iDrawOffset * 3.0f;
+
+					iY += (iPlayerStateBarHeight + (iWpnBarHeight + 20));
+
+					m_iSlotBG->Draw2DQuadScaled(iX - iW, iY - iH, iX, iY);
+
+					iY -= (iPlayerStateBarHeight + (iWpnBarHeight + 20));
+
+
+					// Draw WeaponIcon
+					if (m_iWeapon[i])
+					{
+						iW = floor(m_iWeapon[i]->w() * 0.65f);
+						iH = floor(m_iWeapon[i]->h() * 0.65f);
+
+						iX -= iW;
+						iY += iH;
+						m_iWeapon[i]->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0, 0, 1, 1, 255, 255, 255, 225);
+						// Draw WeaponName
+						if (SzWeaponFullName && SzWeaponFullName[0])
+						{
+							gEngfuncs.pfnDrawSetTextColor(1.0f, 1.0f, 1.0f);
+							gEngfuncs.pfnDrawConsoleStringLen(SzWeaponFullName, &iLength, &iHeight);
+
+							iY += (iH);
+							iY += iHeight;
+
+							iW = floor(m_iSlotBG->w() * 0.4f);
+							gEngfuncs.pfnDrawConsoleString(iX + (iW - iLength) * 0.5f, iY, SzWeaponFullName);
+							iW = floor(m_iWeapon[i]->w() * 0.65f);
+
+							iY -= (iH);
+							iY -= iHeight;
+						}
+
+						iX += iW;
+						iY -= iH;
+					}
+
+
+					iX += iWpnBarWidth;
+					iX += iDrawOffset;
+
+					break;
+
+				default:break;
+				}
+			}
+		}
+	}
+
+#if 0
+	int iX, iY, iX2, iY2, i;
+	int iW, iH;
+
+	const int iPlayerStateBarWidth = 430;
+	const int iPlayerStateBarHeight = 85;
+
+	int iWpnBarHeight = m_iWeapon_OffBG->h();
+	int iWpnBarWidth = iPlayerStateBarWidth / 2;
+
+	iX = iX2 = ScreenWidth * 0.5f;
+	iY = iY2 = ScreenHeight - 40;
+	iY -= (iPlayerStateBarHeight + (iWpnBarHeight + 20));
+
+
+	for (i = 0; i < MAX_WEAPON_SLOTS; i++)
+	{
+		iX += ((i % 2 == 0) ? (-iWpnBarWidth) : (5));
+		iY += (i / 2) * iWpnBarHeight;
+
+		WEAPON* p = gWR.GetFirstPos(i);
+		for (int iPos = 0; iPos < MAX_WEAPON_POSITIONS; iPos++)
+		{
+			p = gWR.GetWeaponSlot(i, iPos);
+
+			if (!p || !p->iId)
+				continue;
+
+
+			if (m_iWeapon[i])
+				m_iWeapon[i] = nullptr;
+
+			const char* szModifiedWpnName = p->szName;
+			if (!strncmp(szModifiedWpnName, "weapon_", 7))
+				szModifiedWpnName += 7;
+			else if (!strncmp(szModifiedWpnName, "knife_", 6))
+				szModifiedWpnName += 6;
+			else if (!strncmp(szModifiedWpnName, "z4b_", 4))
+				szModifiedWpnName += 4;
+			else if (!strncmp(szModifiedWpnName, "csgo_", 5))
+				szModifiedWpnName += 5;
+
+			char szModifiedWpnName2[64];
+			strcpy(szModifiedWpnName2, szModifiedWpnName);
+			std::string szWeaponName;
+			szWeaponName.append(szModifiedWpnName2);
+
+			std::string szWeapon = "gfx/vgui/basket/" + szWeaponName;
+			m_iWeapon[i] = R_LoadTextureUnique(szWeapon.c_str());
+
+
+			if (i < 2)
+			{
+				iW = m_iWeapon[i]->w();
+				iH = m_iWeapon[i]->h();
+
+				m_iWeapon_OffBG->Draw2DQuadScaled(iX, iY, iX + iWpnBarWidth, iY + iWpnBarHeight);
+			}
+			else
+			{
+				switch (i)
+				{
+				case 2:
+
+					iW = m_iSlotBG->w() / 2;
+					iH = m_iSlotBG->h() / 2;
+
+					iX2 += iWpnBarWidth + 10;
+					m_iSlotBG->Draw2DQuadScaled(iX2, iY2 - iH, iX2 + iW, iY2);
+					iX2 -= iWpnBarWidth + 10;
+					break;
+				case 3:
+
+					iW = m_iSlotBG->w() / 2;
+					iH = m_iSlotBG->h() / 2;
+
+					iX2 -= iWpnBarWidth + 5;
+					m_iSlotBG->Draw2DQuadScaled(iX2 - iW, iY2 - iH, iX2, iY2);
+					iX2 += iWpnBarWidth + 5;
+					break;
+				default:
+					break;
+				}
+			}
+
+			iW = m_iWeapon[i]->w() / 2;
+			iH = m_iWeapon[i]->h() / 2;
+			m_iWeapon[i]->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0, 0, 1, 1, 255, 255, 255, 225);
+
+		}
+
+		iX -= ((i % 2 == 0) ? (-iWpnBarWidth - 10) : (10));
+		iY -= (i / 2) * iWpnBarHeight;
+
+		iX += 20;
+	}
+#endif
+	return 1;
+}
 //
 // Draw Weapon Menu
 //

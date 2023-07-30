@@ -259,7 +259,42 @@ int DrawUtils::DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int 
 	return x;
 }
 
+int DrawUtils::GetHudNumberWidthCustom(int number, int iDrawZero, int maxsize, int widthplus, int iW2)
+{
+	if (maxsize <= 0)
+	{
+		maxsize = 1;
 
+		for (int num = 10; (number / num) > 0; num *= 10)
+			maxsize++;
+	}
+
+	if (maxsize > 255)
+		maxsize = 255;
+
+	int iW = 0;
+	int width = iW2;
+
+	bool bShouldDraw = false;
+
+	for (int i = 0; i < maxsize; i++)
+	{
+		int div = 1;
+		for (int j = 0; j < maxsize - i; j++)
+			div *= 10;
+
+		int iNum = (number % div * 10) / div;
+
+		if (iNum)
+			bShouldDraw = true;
+
+		if (!iDrawZero && !iNum && !bShouldDraw && i != maxsize - 1)
+			continue;
+
+		iW += width + widthplus;
+	}
+	return iW;
+}
 int DrawUtils::GetNEWHudNumberWidth(int type, int number, int iDrawZero, int maxsize, int widthplus)
 {
 	if (maxsize <= 0)

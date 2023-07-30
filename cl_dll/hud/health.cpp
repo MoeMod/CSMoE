@@ -31,6 +31,8 @@
 #include "draw_util.h"
 #include "const/const_client.h"
 
+#include "legacy/hud_scoreboard_legacy.h"
+
 namespace cl {
 
 DECLARE_MESSAGE(m_Health, Health )
@@ -132,6 +134,13 @@ int CHudHealth::VidInit(void)
 	R_InitTexture(m_pTexture_Black, "resource/hud/csgo/blackleft");
 	giDmgHeight = gHUD.GetSpriteRect(m_HUD_dmg_bio).right - gHUD.GetSpriteRect(m_HUD_dmg_bio).left;
 	giDmgWidth = gHUD.GetSpriteRect(m_HUD_dmg_bio).bottom - gHUD.GetSpriteRect(m_HUD_dmg_bio).top;
+
+	m_iNum_Character = R_LoadTextureShared("resource/hud/hud_character_num");
+	CHudScoreBoardLegacy::BuildNumberRC(m_iNum_CharacterC, 7, 16);
+
+	//APEX HUD
+	if (!m_iCharacterStateBG)
+		m_iCharacterStateBG = R_LoadTextureShared("resource/hud/custom/hud_apex/hud_player_bg");
 
 	return 1;
 }
@@ -283,10 +292,12 @@ void CHudHealth::GetPainColor(int& r, int& g, int& b, int& a)
 
 int CHudHealth::Draw(float flTime)
 {
-	if( !(gHUD.m_iHideHUDDisplay & HIDEHUD_HEALTH ) && !gEngfuncs.IsSpectateOnly() )
+	if (!(gHUD.m_iHideHUDDisplay & HIDEHUD_HEALTH) && !gEngfuncs.IsSpectateOnly())
 	{
 		if (gHUD.m_hudstyle->value == 2)
 			DrawNewHudHealth(flTime);
+		else if (gHUD.m_hudstyle->value == 3)
+			DrawApexHudHealth(flTime);
 		else
 			DrawHealthBar(flTime);
 		DrawDamage(flTime);
@@ -316,6 +327,36 @@ void CHudHealth::DrawNewHudHealth(float flTime)
 		iX += CrossWidth + 3;
 
 		DrawUtils::DrawNEWHudNumber(0, iX, iY, m_iHealth, r, g, b, 255, FALSE, 5);
+	}
+}
+void CHudHealth::DrawApexHudHealth(float flTime)
+{
+	if (gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT)))
+	{
+
+		//Basic Bar Definations
+		const int iPlayerStateBarWidth = m_iCharacterStateBG->w() * 1.2f;
+		const int iPlayerStateBarHeight = m_iCharacterStateBG->h() * 0.8f;
+
+		const int iCharacterIconWidth = 99 * 0.6f;
+		const int iHealthBarHeight = 22;
+		const int iDrawOffset = 5;
+
+		int iX = ScreenWidth * 0.5f;
+		int iY = ScreenHeight - 40;
+
+		int iOriginalHealthBar = iPlayerStateBarWidth - iCharacterIconWidth - 20;
+
+		int iHealth = m_iHealth < 0 ? 0 : m_iHealth;
+		int iHealthBar = min(iOriginalHealthBar, (int)(iHealth / (float)m_iMaxHealth * iOriginalHealthBar));
+
+		iX -= iPlayerStateBarWidth * 0.5f;
+		iX += iCharacterIconWidth + iDrawOffset;
+		FillRGBABlend(iX, iY - iHealthBarHeight, iHealthBar, iHealthBarHeight - 2, 225, 0, 0, 225);
+
+		iX += iDrawOffset * 0.5f;
+		iY += iDrawOffset * 0.5f;
+		CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, iHealth, iX, iY - iHealthBarHeight, 0, 1, 1.0, 255, 255, 255);
 	}
 }
 

@@ -66,6 +66,10 @@ int CHudNewHud::VidInit(void)
 	if(!m_iWeaponBG)
 		m_iWeaponBG = R_LoadTextureUnique("resource/hud/hud_weapon_bg");
 
+	//APEX HUD
+	if (!m_iCharacterStateBG)
+		m_iCharacterStateBG = R_LoadTextureShared("resource/hud/custom/hud_apex/hud_player_bg");
+
 	return 1;
 }
 
@@ -91,10 +95,14 @@ int CHudNewHud::Draw(float flTime)
 	if (g_iUser1)
 		return 0;
 
-	if (gHUD.m_hudstyle->value != 2)
+	if (gHUD.m_hudstyle->value != 2 && gHUD.m_hudstyle->value != 3)
 		return 0;
 
-	DrawNewHudCharacterBG(flTime);
+	if (gHUD.m_hudstyle->value == 2)
+		DrawNewHudCharacterBG(flTime);
+	else if (gHUD.m_hudstyle->value == 3)
+		DrawApexHudCharacterBG(flTime);
+
 	return 1;
 }
 
@@ -212,7 +220,89 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 	}
 	return 1;
 }
+int CHudNewHud::DrawApexHudCharacterBG(float flTime)
+{
+	//Basic Bar Definations
+	const int iPlayerStateBarWidth = floor(m_iCharacterStateBG->w() * 1.2f);
+	const int iPlayerStateBarHeight = floor(m_iCharacterStateBG->h() * 0.8f);
 
+	int iX = ScreenWidth * 0.5f;
+	int iY = ScreenHeight - 40;
+
+	iX -= iPlayerStateBarWidth * 0.5f;
+	m_iCharacterStateBG->Draw2DQuadScaled(iX, iY - iPlayerStateBarHeight, iX + iPlayerStateBarWidth, iY);
+
+	int iIndex = gEngfuncs.GetLocalPlayer()->index;
+	if (!g_PlayerInfoList[iIndex].model)
+	{
+		return 1;
+	}
+
+	if (m_szLastModel != g_PlayerInfoList[iIndex].model)
+	{
+		m_szLastModel = g_PlayerInfoList[iIndex].model;
+		if (m_iCharacter)
+			m_iCharacter = nullptr;
+
+		std::string tmp = "resource/hud/portrait/hud_" + m_szLastModel;
+		m_iCharacter = R_LoadTextureUnique(tmp.c_str());
+	}
+	if (m_iCharacter)
+	{
+		int iW = m_iCharacter->w() * 0.6f;
+		int iH = m_iCharacter->h() * 0.6f;
+
+		m_iCharacter->Draw2DQuadScaled(iX, iY - iH, iX + iW, iY - iH + iH, 0, 0, 1, 1, 255, 255, 255, 225);
+	}
+
+
+
+
+#if 0
+	const int iWpnBarWidth = 215;
+	const int iWpnBarHeight = 80;
+
+	const int iPlayerStateBarWidth = 430 + 30;
+	const int iPlayerStateBarHeight = 85;
+
+	int iX = ScreenWidth * 0.5f;
+	int iY = ScreenHeight - 40;
+
+	if (gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ || gHUD.m_iModRunning == MOD_DM || gHUD.m_iModRunning == MOD_TDM)
+	{
+		m_iCharacterStateBG->Draw2DQuadScaled(iX - iPlayerStateBarWidth / 2, iY - iPlayerStateBarHeight, iX + iPlayerStateBarWidth / 2, iY);
+		iX -= iPlayerStateBarWidth / 2;
+		iY += 2;
+
+		int idx = gEngfuncs.GetLocalPlayer()->index;
+		if (!g_PlayerInfoList[idx].model)
+		{
+			return 1;
+		}
+
+		if (m_szLastModel != g_PlayerInfoList[idx].model)
+		{
+			m_szLastModel = g_PlayerInfoList[idx].model;
+			if (m_iCharacter)
+				m_iCharacter = nullptr;
+
+			std::string tmp = "resource/hud/portrait/hud_" + m_szLastModel;
+			m_iCharacter = R_LoadTextureUnique(tmp.c_str());
+		}
+
+		if (m_iCharacter)
+		{
+			int iW = m_iCharacter->w();
+			int iH = m_iCharacter->h();
+
+			m_iCharacter->Draw2DQuadScaled(iX, iY - iH, iX + iW, iY - iH + iH, 0, 0, 1, 1, 255, 255, 255, 225);
+		}
+
+		//int iHealthBar = min(iPlayerStateBarWidth - (m_iCharacter ? m_iCharacter->w() : 0),);
+	}
+#endif
+	return 1;
+}
 int CHudNewHud::MsgFunc_NewHudMsg(const char* pszName, int iSize, void* pbuf)
 {
 	BufferReader reader(pszName, pbuf, iSize);

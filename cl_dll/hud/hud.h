@@ -165,6 +165,9 @@ public:
 	int DrawWpnList(float flTime);
 	int DrawNEWHudCurrentWpn(float flTime);
 	int DrawNEWHudAmmo(float flTime);
+	int DrawApexHudWpnList(float flTime);
+
+	void DrawSpriteTexture(const HSPRITE m_hSpr, int iX, int iY, int iW, int iH, wrect_t Rc, int a = 255, int r = 255, int g = 255, int b = 255);
 	CHudMsgFunc(CurWeapon);
 	CHudMsgFunc(WeaponList);
 	CHudMsgFunc(WeaponList2);
@@ -238,6 +241,17 @@ public:
 	int m_iWeaponSelect;
 	UniqueTexture m_iWeaponList;
 	UniqueTexture m_iWeapon_OffBG;
+	UniqueTexture m_iWeapon[MAX_WEAPON_SLOTS];
+	UniqueTexture m_iSlotBG;
+
+	SharedTexture m_iCharacterStateBG;
+	UniqueTexture m_iSlotBGFilled;
+	UniqueTexture m_iSlotBGAmmo;
+
+	SharedTexture m_iNum_BigWhite;
+	wrect_t m_iNum_BigWhiteC[10];
+	SharedTexture m_iNum_Center;
+	wrect_t m_iNum_CenterC[10];
 };
 
 //

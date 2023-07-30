@@ -66,6 +66,7 @@ public:
 	float m_fFade;
 private:
 	void DrawNewHudHealth(float fTime);
+	void DrawApexHudHealth(float fTime);
 	void DrawPain( float fTime );
 	void DrawDamage( float fTime );
 	void DrawHealthBar( float flTime );
@@ -80,5 +81,8 @@ private:
 	int	m_bitsDamage;
 	cvar_t *cl_radartype;
 	UniqueTexture m_pTexture_Black;
+	SharedTexture m_iNum_Character;
+	SharedTexture m_iCharacterStateBG;
+	wrect_t m_iNum_CharacterC[10];
 };
 }

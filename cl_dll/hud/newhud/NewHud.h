@@ -28,11 +28,14 @@ public:
 	int VidInit(void);
 	int Draw(float flTime);
 	int DrawNewHudCharacterBG(float flTime);
+	int DrawApexHudCharacterBG(float flTime);
 
 	void InitHUDData(void);
 	CHudMsgFunc(NewHudMsg);
 
 private:
+	SharedTexture m_iCharacterStateBG;
+
 	UniqueTexture m_iCharacterBG;
 	UniqueTexture m_iCharacterBG_New_Bottom;
 	UniqueTexture m_iCharacterBG_New_Top;
