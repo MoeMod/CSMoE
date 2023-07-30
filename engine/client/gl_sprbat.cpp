@@ -30,7 +30,7 @@ namespace xe {
 			pglEnable( GL_BLEND );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		}
-		else if(add_cap & SprBatPass_Blend)
+		else if(remove_cap & SprBatPass_Blend)
 		{
 			pglDisable( GL_BLEND );
 		}
@@ -74,8 +74,8 @@ namespace xe {
 		if( last_pass & SprBatPass_AlphaTest )
 			pglDisable( GL_ALPHA_TEST );
 
-		if( last_pass & SprBatPass_Blend )
-			pglDisable( GL_BLEND );
+		//if( last_pass & SprBatPass_Blend )
+		//    pglDisable( GL_BLEND );
 
 		if( RI.fogCustom || ( RI.fogEnabled && !glState.drawTrans ))
 			pglEnable( GL_FOG );
@@ -130,6 +130,7 @@ namespace xe {
 	void SprBat_RenderDrawData(const DrawData &data)
 	{
 		SprBat_SetupRenderState(data.pass, sprbat_current_pass);
+        sprbat_current_pass = data.pass;
 		SprBat_DrawSpriteQuad(data.psprite, data.frame, data.org, data.v_right, data.v_up, data.scale, data.color);
 	}
 
@@ -179,6 +180,8 @@ namespace xe {
 			SprBat_RestoreRenderState(sprbat_current_pass);
 		sprbat_current_pass = SprBatPass_Opaque;
         drawlist_num = 0;
+        pglDisable( GL_BLEND );
+        pglDepthFunc( GL_LEQUAL );
 		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 		gTriApi.Color4f( 1, 1, 1, 1 );
 	}
