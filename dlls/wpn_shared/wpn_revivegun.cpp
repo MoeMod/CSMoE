@@ -954,7 +954,7 @@ float CReviveGun::GetSecondaryAttackDamage() const
 		if (enhancedzombie.value)
 			flDamage = 1100.0f;
 		else
-			flDamage = 800.0f;
+			flDamage = 600.0f;
 	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 265.0f;

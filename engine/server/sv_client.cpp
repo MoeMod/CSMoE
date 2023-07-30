@@ -276,6 +276,17 @@ gotnewcl:
 			return;
 		}
 
+		const char* szname = Info_ValueForKey(userinfo, "name");
+		int nameLength = strlen(szname);
+
+		if (nameLength > 28)
+		{
+			Netchan_OutOfBandPrint(NS_SERVER, from, "print\nName too long,Your name length : %i.\n", nameLength);
+			Netchan_OutOfBandPrint(NS_SERVER, from, "errormsg\n本名字过长,请修改您的名字长度:%i,\n", nameLength);
+			Netchan_OutOfBandPrint(NS_SERVER, from, "disconnect\n");
+			return;
+		}
+
         const char *cl_os = Info_ValueForKey(newcl->useragent, "o");
         if(!cl_os || !cl_os[0])
         {

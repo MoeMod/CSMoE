@@ -382,7 +382,7 @@ namespace sv {
             m_pPlayer->pev->velocity.z -= 600;
 
 #ifndef CLIENT_DLL
-            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f) }, g_vecZero, g_vecZero, m_iFallIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0, true);
+            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f) }, g_vecZero, g_vecZero, m_iFallIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0);
 #endif
         }
         else if (m_iWeaponState == 1)
@@ -413,7 +413,7 @@ namespace sv {
             Vector angle = UTIL_VecToAngles(vecForward.Normalize());
 
 
-            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f)}, angle, g_vecZero, m_iJumpDashIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0, true);
+            UTIL_TempModel({ 0, 0, (m_pPlayer->pev->flags & FL_DUCKING ? -16.0f : -32.0f)}, angle, g_vecZero, m_iJumpDashIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pPlayer, false, 0, 0, 256, 0);
 #endif
         }
         else

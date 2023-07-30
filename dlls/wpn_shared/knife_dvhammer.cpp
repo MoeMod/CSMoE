@@ -188,7 +188,7 @@ namespace sv {
 			if (pEntity->edict() == pev->owner)
 				continue;
 
-			if (pev->origin.z - pEntity->pev->origin.z < -16.0f)
+			if (pev->origin.z - pEntity->pev->origin.z > 16.0f)
 				continue;
 
 			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;

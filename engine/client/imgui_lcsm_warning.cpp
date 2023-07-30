@@ -120,7 +120,7 @@ void ImGui_LCSM_OnGUI(void)
 		ImGui::SameLine(ImGuiUtils::GetScaledValue(40));
 		char buf[32] = {};
 		strncpy(buf, Cvar_VariableString("name"), 32);
-		if (ImGui::InputText(xorstr("<- 请修改名字后再进服联机").crypt_get(), buf, 32, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_CallbackCharFilter, [](ImGuiInputTextCallbackData* data)
+		if (ImGui::InputText(xorstr("<- 请修改名字后再进服联机").crypt_get(), buf, 28, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_CallbackCharFilter, [](ImGuiInputTextCallbackData* data)
 		{
 			return (int)CheckIsNameValid(data->Buf);
 		}))

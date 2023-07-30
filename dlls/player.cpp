@@ -168,17 +168,15 @@ const char *CDeadHEV::m_szPoses[] =
 int gEvilImpulse101;
 char g_szMapBriefingText[512];
 
-int iDeathInfo_Fire[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8], iDeathInfo_Body[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8];
-std::string SzDeathInfo_Wpn[MAX_CLIENTS + 1][MAX_CLIENTS + 1][2];
+extern int iDeathInfo_Fire[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8], iDeathInfo_Body[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8];
+extern float g_flZombieTankerDamage[MAX_CLIENTS + 1];
+extern int g_iZombieTankerCount[MAX_CLIENTS + 1];
 
-int g_iZombieTankerCount[MAX_CLIENTS + 1];
-float g_flZombieTankerDamage[MAX_CLIENTS + 1];
+extern int g_iAttackerCount[MAX_CLIENTS + 1];
+extern float g_flAttackerDamage[MAX_CLIENTS + 1];
+extern float g_flRecordBestMoment[MAX_CLIENTS + 1];
 
-int g_iAttackerCount[MAX_CLIENTS + 1];
-float g_flAttackerDamage[MAX_CLIENTS + 1];
-float g_flRecordBestMoment[MAX_CLIENTS + 1];
-float g_flHoldOutDamage[MAX_CLIENTS + 1];
-
+extern float g_flHoldOutDamage[MAX_CLIENTS + 1];
 
 entvars_t *g_pevLastInflictor;
 

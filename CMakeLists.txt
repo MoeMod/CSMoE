@@ -113,6 +113,9 @@ if(MSVC)
 	# MultiByte charset
 	add_compile_options(/utf-8)
 
+	# fix align
+	add_definitions(-D_ENABLE_EXTENDED_ALIGNED_STORAGE)
+
 	# static CRT
 	if(XASH_STATIC_GAMELIB)
 		set(CompilerFlags

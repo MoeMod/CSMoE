@@ -5,7 +5,6 @@
 #include "player.h"
 #include "monsters.h"
 #include "trains.h"
-
 #include "sentrygun.h"
 
 #include "gamemode/mods.h"
@@ -47,14 +46,15 @@ void CSentryGun::Spawn(void)
 
 	SET_MODEL(ENT(pev), "models/z4b/sentrygun.mdl");
 	UTIL_SetOrigin(pev, pev->origin);
-	UTIL_SetSize(pev, { -11, -26, -28 }, { 11, 16, 23 });
+	UTIL_SetSize(pev, { -23, -26, -26 }, { 33, 26, 25 });
 	pev->angles = g_vecZero;
 	pev->gravity = 1.0;
-	pev->health = 200.0f;
+	pev->health = 2000.0f;
 	pev->movetype = MOVETYPE_PUSHSTEP;
 	pev->solid = SOLID_SLIDEBOX;
 	pev->flags |= FL_MONSTER;
 	pev->deadflag = DEAD_NO;
+	pev->takedamage = DAMAGE_YES;
 
 	pev->frame = 0;
 	pev->sequence = 0;
@@ -150,7 +150,21 @@ void CSentryGun::Active()
 		return;
 	}
 
+	float flCos1 = DotProduct(vecDirToEnemy.Normalize(), { 0, 0, 1 });
+
+	if (flCos1 > 0.5 || flCos1 < -0.5)
+	{
+		m_hEnemy = NULL;
+		return;
+	}
+
 	Vector vec = UTIL_VecToAngles(vecDirToEnemy);
+
+	if (vec.x > 360)
+		vec.x -= 360;
+	if (vec.x < 0)
+		vec.x += 360;
+
 	// [1...360]
 	if (vec.y > 360)
 		vec.y -= 360;
@@ -159,6 +173,11 @@ void CSentryGun::Active()
 
 	m_vecGoalAngles.y = vec.y;
 	m_vecGoalAngles.x = vec.x;
+
+	if (m_vecGoalAngles.x > 180)
+		m_vecGoalAngles.x -= 360;
+
+
 	MoveTurret();
 	if (m_flFireRate > gpGlobals->time)
 		return;
@@ -230,9 +249,14 @@ CBaseEntity* CSentryGun::BestVisibleEnemy()
 bool CSentryGun::MoveTurret()
 {
 	bool state = false;
+
+	if (m_vecCurAngles.x > 180)
+		m_vecCurAngles.x -= 360;
+
 	if (m_vecCurAngles.x != m_vecGoalAngles.x)
 	{
 		float flDir = m_vecGoalAngles.x > m_vecCurAngles.x ? 1 : -1;
+		float flDist = fabs(m_vecGoalAngles.x - m_vecCurAngles.x);
 
 		m_vecCurAngles.x += m_flVerticalTurnRate * flDir;
 
@@ -247,6 +271,9 @@ bool CSentryGun::MoveTurret()
 			if (m_vecCurAngles.x < m_vecGoalAngles.x)
 				m_vecCurAngles.x = m_vecGoalAngles.x;
 		}
+
+		if (flDist < m_flVerticalTurnRate)
+			m_vecCurAngles.x = m_vecGoalAngles.x;
 
 		SetBoneController(1, m_vecCurAngles.x);
 		state = true;
@@ -266,10 +293,21 @@ bool CSentryGun::MoveTurret()
 
 		m_vecCurAngles.y += m_flTurnRate * flDir;
 
-		if (m_vecCurAngles.y < 0)
+		if (flDir == 1)
+		{
+			if (m_vecCurAngles.y > m_vecGoalAngles.y)
+				m_vecCurAngles.y = m_vecGoalAngles.y;
+		}
+		else
+		{
+			if (m_vecCurAngles.y < m_vecGoalAngles.y)
+				m_vecCurAngles.y = m_vecGoalAngles.y;
+		}
+
+	/*	if (m_vecCurAngles.y < 0)
 			m_vecCurAngles.y += 360;
 		else if (m_vecCurAngles.y >= 360)
-			m_vecCurAngles.y -= 360;
+			m_vecCurAngles.y -= 360;*/
 
 		if (flDist < m_flTurnRate)
 			m_vecCurAngles.y = m_vecGoalAngles.y;

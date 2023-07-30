@@ -28,7 +28,7 @@ void CMechanicHeroGun::Spawn(void)
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_mechanicherogun.mdl");
 
-	m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE;
+	m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE * 999;
 	m_flStartThrow = invalid_time_point;
 	m_flReleaseThrow = invalid_time_point;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
@@ -45,7 +45,7 @@ int CMechanicHeroGun::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "HEGrenade";
-	p->iMaxAmmo1 = MAX_AMMO_HEGRENADE;
+	p->iMaxAmmo1 = MAX_AMMO_HEGRENADE * 999;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = WEAPON_NOCLIP;

@@ -40,6 +40,19 @@ DLL_GLOBAL cvar_t *sv_clienttrace = NULL;
 DLL_GLOBAL CCStrikeGameMgrHelper g_GameMgrHelper;
 DLL_GLOBAL CHalfLifeMultiplay *g_pMPGameRules = NULL;
 
+
+int iDeathInfo_Fire[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8], iDeathInfo_Body[MAX_CLIENTS + 1][MAX_CLIENTS + 1][8];
+std::string SzDeathInfo_Wpn[MAX_CLIENTS + 1][MAX_CLIENTS + 1][2];
+
+int g_iZombieTankerCount[MAX_CLIENTS + 1];
+float g_flZombieTankerDamage[MAX_CLIENTS + 1];
+
+int g_iAttackerCount[MAX_CLIENTS + 1];
+float g_flAttackerDamage[MAX_CLIENTS + 1];
+float g_flRecordBestMoment[MAX_CLIENTS + 1];
+float g_flHoldOutDamage[MAX_CLIENTS + 1];
+
+
 // Menu
 MenuMngr g_MenuMgr;
 
@@ -4484,127 +4497,128 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 		WRITE_STRING(killer_weapon_name);		// what they were killed by (should this be a string?)
 		MESSAGE_END();
 
-		//////For DeathInfo
-		//if (ENTINDEX(pVictim->edict()) >= 1 && ENTINDEX(pVictim->edict()) <= 32)
-		//{
-		//	int iAtt = killer_index;
-		//	int iVic = ENTINDEX(pVictim->edict());
+		////For DeathInfo
+		if (killer_index >= 1 && killer_index <= 32 &&
+			ENTINDEX(pVictim->edict()) >= 1 && ENTINDEX(pVictim->edict()) <= 32)
+		{
+			int iAtt = killer_index;
+			int iVic = ENTINDEX(pVictim->edict());
 
-		//	CBasePlayer* pAttackPlayer = dynamic_cast<CBasePlayer*>(CBaseEntity::Instance(pKiller));
+			CBasePlayer* pAttackPlayer = dynamic_cast<CBasePlayer*>(CBaseEntity::Instance(pKiller));
 
-		//	if (pAttackPlayer)
-		//	{
+			if (pAttackPlayer)
+			{
 
-		//		//DeathMsg
-		//		float flDistance = (pVictim->pev->origin - pAttackPlayer->pev->origin).Length();
-		//		flDistance /= 40.0;
+				//DeathMsg
+				float flDistance = (pVictim->pev->origin - pAttackPlayer->pev->origin).Length();
+				flDistance /= 40.0;
 
-		//		//For Attacker
-		//		int iTotalDamage = 0;
-		//		for (int i = 1; i <= 7; i++)
-		//		{
-		//			iTotalDamage += iDeathInfo_Fire[iAtt][iVic][i];
-		//		}
-
-
-		//		SzDeathInfo_Wpn[iAtt][iVic][1] = /*SzModel*/killer_weapon_name;
-		//		if (SzDeathInfo_Wpn[iAtt][iVic][1] == "usp")
-		//			SzDeathInfo_Wpn[iAtt][iVic][1] = "USP45";
-		//		else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "deagle")
-		//			SzDeathInfo_Wpn[iAtt][iVic][1] = "DesertEagle";
-		//		else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "grenade")
-		//			SzDeathInfo_Wpn[iAtt][iVic][1] = "HE_Grenade";
-		//		
-		//		//For Victim
-		//		int iTotalDamageFromAttacker = 0, iTotalDamageTake = 0;
-		//		for (int i = 1; i <= 7; i++)
-		//		{
-		//			iTotalDamageFromAttacker += iDeathInfo_Fire[iAtt][iVic][i];
-		//			iTotalDamageTake += iDeathInfo_Fire[iVic][iAtt][i];
-		//		}
-		//		float flVicHp = 0.0, flVicArmor = 0.0;
-		//		flVicHp = pVictim->pev->health;
-		//		flVicArmor = pVictim->pev->armorvalue;
+				//For Attacker
+				int iTotalDamage = 0;
+				for (int i = 1; i <= 7; i++)
+				{
+					iTotalDamage += iDeathInfo_Fire[iAtt][iVic][i];
+				}
 
 
-		//		if (pAttackPlayer->IsPlayer()) {
-		//			MESSAGE_BEGIN(MSG_ONE, gmsgDeathInfo, NULL, pAttackPlayer->pev);
-		//			WRITE_BYTE(1);
-		//			WRITE_BYTE(iVic);
-		//			WRITE_BYTE((int)flDistance);
-		//			WRITE_STRING(SzDeathInfo_Wpn[iAtt][iVic][1].c_str());
-		//			WRITE_LONG(iTotalDamage);
+				SzDeathInfo_Wpn[iAtt][iVic][1] = /*SzModel*/killer_weapon_name;
+				if (SzDeathInfo_Wpn[iAtt][iVic][1] == "usp")
+					SzDeathInfo_Wpn[iAtt][iVic][1] = "USP45";
+				else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "deagle")
+					SzDeathInfo_Wpn[iAtt][iVic][1] = "DesertEagle";
+				else if (SzDeathInfo_Wpn[iAtt][iVic][1] == "grenade")
+					SzDeathInfo_Wpn[iAtt][iVic][1] = "HE_Grenade";
+				
+				//For Victim
+				int iTotalDamageFromAttacker = 0, iTotalDamageTake = 0;
+				for (int i = 1; i <= 7; i++)
+				{
+					iTotalDamageFromAttacker += iDeathInfo_Fire[iAtt][iVic][i];
+					iTotalDamageTake += iDeathInfo_Fire[iVic][iAtt][i];
+				}
+				float flVicHp = 0.0, flVicArmor = 0.0;
+				flVicHp = pVictim->pev->health;
+				flVicArmor = pVictim->pev->armorvalue;
 
-		//			// HEAD
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][1]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][1]);
-		//			// CHEST
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][2]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][2]);
-		//			// STOMACH
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][3]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][3]);
-		//			// ARM
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][4] + iDeathInfo_Fire[iAtt][iVic][5]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][4] + iDeathInfo_Body[iAtt][iVic][5]);
-		//			// LEG
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][6] + iDeathInfo_Fire[iAtt][iVic][7]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][6] + iDeathInfo_Body[iAtt][iVic][7]);
-		//			MESSAGE_END();
-		//		}
-		//		if (CBaseEntity::Instance(pVictim->pev)->IsPlayer()) {
-		//			MESSAGE_BEGIN(MSG_ONE, gmsgDeathInfo, NULL, pVictim->pev);
-		//			WRITE_BYTE(2);
-		//			WRITE_BYTE(iAtt);
-		//			WRITE_BYTE((int)flDistance);
-		//			WRITE_STRING(SzDeathInfo_Wpn[iAtt][iVic][1].c_str());
-		//			WRITE_LONG(iTotalDamageFromAttacker);
 
-		//			// HEAD
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][1]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][1]);
-		//			// CHEST
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][2]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][2]);
-		//			// STOMACH
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][3]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][3]);
-		//			// ARM
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][4] + iDeathInfo_Fire[iAtt][iVic][5]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][4] + iDeathInfo_Body[iAtt][iVic][5]);
-		//			// LEG
-		//			WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][6] + iDeathInfo_Fire[iAtt][iVic][7]);
-		//			WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][6] + iDeathInfo_Body[iAtt][iVic][7]);
+				if (pAttackPlayer->IsPlayer()) {
+					MESSAGE_BEGIN(MSG_ONE, gmsgDeathInfo, NULL, pAttackPlayer->pev);
+					WRITE_BYTE(1);
+					WRITE_BYTE(iVic);
+					WRITE_BYTE((int)flDistance);
+					WRITE_STRING(SzDeathInfo_Wpn[iAtt][iVic][1].c_str());
+					WRITE_LONG(iTotalDamage);
 
-		//			// Damage 2
-		//			WRITE_STRING(SzDeathInfo_Wpn[iVic][iAtt][1].c_str());
-		//			WRITE_LONG(iTotalDamageTake);
-		//			// HEAD
-		//			WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][1]);
-		//			WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][1]);
-		//			// CHEST
-		//			WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][2]);
-		//			WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][2]);
-		//			// STOMACH
-		//			WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][3]);
-		//			WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][3]);
-		//			// ARM
-		//			WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][4] + iDeathInfo_Fire[iVic][iAtt][5]);
-		//			WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][4] + iDeathInfo_Body[iVic][iAtt][6]);
-		//			// LEG
-		//			WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][6] + iDeathInfo_Fire[iVic][iAtt][7]);
-		//			WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][6] + iDeathInfo_Body[iVic][iAtt][7]);
+					// HEAD
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][1]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][1]);
+					// CHEST
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][2]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][2]);
+					// STOMACH
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][3]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][3]);
+					// ARM
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][4] + iDeathInfo_Fire[iAtt][iVic][5]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][4] + iDeathInfo_Body[iAtt][iVic][5]);
+					// LEG
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][6] + iDeathInfo_Fire[iAtt][iVic][7]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][6] + iDeathInfo_Body[iAtt][iVic][7]);
+					MESSAGE_END();
+				}
+				if (CBaseEntity::Instance(pVictim->pev)->IsPlayer()) {
+					MESSAGE_BEGIN(MSG_ONE, gmsgDeathInfo, NULL, pVictim->pev);
+					WRITE_BYTE(2);
+					WRITE_BYTE(iAtt);
+					WRITE_BYTE((int)flDistance);
+					WRITE_STRING(SzDeathInfo_Wpn[iAtt][iVic][1].c_str());
+					WRITE_LONG(iTotalDamageFromAttacker);
 
-		//			WRITE_SHORT(floor((flVicHp)));
-		//			WRITE_SHORT(floor((flVicArmor)));
+					// HEAD
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][1]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][1]);
+					// CHEST
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][2]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][2]);
+					// STOMACH
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][3]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][3]);
+					// ARM
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][4] + iDeathInfo_Fire[iAtt][iVic][5]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][4] + iDeathInfo_Body[iAtt][iVic][5]);
+					// LEG
+					WRITE_LONG(iDeathInfo_Fire[iAtt][iVic][6] + iDeathInfo_Fire[iAtt][iVic][7]);
+					WRITE_BYTE(iDeathInfo_Body[iAtt][iVic][6] + iDeathInfo_Body[iAtt][iVic][7]);
 
-		//			MESSAGE_END();
-		//		}
-		//	}
-		//}
-		////Clear Last Data
-		//ResetDeathInfo(killer_index, ENTINDEX(pVictim->edict()));
-		//ResetDeathInfo(ENTINDEX(pVictim->edict()), 0);
+					// Damage 2
+					WRITE_STRING(SzDeathInfo_Wpn[iVic][iAtt][1].c_str());
+					WRITE_LONG(iTotalDamageTake);
+					// HEAD
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][1]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][1]);
+					// CHEST
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][2]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][2]);
+					// STOMACH
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][3]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][3]);
+					// ARM
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][4] + iDeathInfo_Fire[iVic][iAtt][5]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][4] + iDeathInfo_Body[iVic][iAtt][6]);
+					// LEG
+					WRITE_LONG(iDeathInfo_Fire[iVic][iAtt][6] + iDeathInfo_Fire[iVic][iAtt][7]);
+					WRITE_BYTE(iDeathInfo_Body[iVic][iAtt][6] + iDeathInfo_Body[iVic][iAtt][7]);
+
+					WRITE_SHORT(floor((flVicHp)));
+					WRITE_SHORT(floor((flVicArmor)));
+
+					MESSAGE_END();
+				}
+			}
+		}
+		//Clear Last Data
+		ResetDeathInfo(killer_index, ENTINDEX(pVictim->edict()));
+		ResetDeathInfo(ENTINDEX(pVictim->edict()), 0);
 	}
 
 	// replace the code names with the 'real' names

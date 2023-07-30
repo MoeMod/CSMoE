@@ -1634,7 +1634,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
-
+#if 0
 		int flags;
 		if (ptexture->flags & STUDIO_NF_NORMALMAP)
 			flags |= (TF_NORMALMAP);
@@ -1685,7 +1685,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		{
 
 		}
-
+#endif
 		const auto& attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
 		if(xe::TexLru_Upload(attr.index))
 			xe::TexLru_UpdateAttr(&ptexture[pskinref[pmesh->skinref]]);
@@ -2038,7 +2038,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			//	special = true;
 			//}
 			
-			if(!bBindSpr && !bBindTex)
+			if(!bBindSpr)
 				xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
 		}
 
@@ -2082,12 +2082,12 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
         float aniTime = 0; // ?
         vec3_t dLightDir = g_studiolight.lightvec;
 
-        if((g_nForceFaceFlags & STUDIO_NF_FULLBRIGHT))
+        if((g_nFaceFlags & STUDIO_NF_FULLBRIGHT))
         {
             ambient = 1;
             shadeLight = 0;
         }
-        else if((g_nForceFaceFlags & STUDIO_NF_FLATSHADE) || true) // TODO : fix shadelight
+        else if((g_nFaceFlags & STUDIO_NF_FLATSHADE) || true) // TODO : fix shadelight
         {
             ambient = (g_studiolight.ambientlight + g_studiolight.shadelight * 0.8) / 255.0f;
             shadeLight = 0;
