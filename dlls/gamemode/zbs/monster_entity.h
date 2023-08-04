@@ -55,17 +55,17 @@ private:
 	std::random_device rd;
 	std::mt19937 gen;
 
-// Ë½ÓÐ¹¹Ôìº¯Êý£¬·ÀÖ¹Íâ²¿´´½¨ÊµÀý
+// Ë½ï¿½Ð¹ï¿½ï¿½ìº¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½â²¿ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½
 RandomHelper() : gen(rd()) {}
 
 public:
-	// È«¾Ö·ÃÎÊµã£¬·µ»ØÎ¨Ò»ÊµÀý
+	// È«ï¿½Ö·ï¿½ï¿½Êµã£¬ï¿½ï¿½ï¿½ï¿½Î¨Ò»Êµï¿½ï¿½
 	static RandomHelper& getInstance() {
 		static RandomHelper instance;
 		return instance;
 	}
 
-	// ¸ù¾ÝÈ¨ÖØËæ»úÑ¡ÔñÒ»¸öÏî
+	// ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½
 	template<typename T>
 	const T& randomWeightedChoice(const std::vector<std::pair<T, int>>& items) {
 		std::vector<int> weights;
@@ -170,9 +170,9 @@ public:
 		if (m_task_running)
 		{
 			m_ioc.stop();
-			m_task_running = false;	
+			m_task_running = false;
 		}
-			
+
 	}
 
 protected:
@@ -324,7 +324,6 @@ public:
 	EngineClock::time_point m_flStop;
 
 	std::map<std::string, int> m_mapLookupSequenceCache;
-	std::mutex m_mutexSetAnimation;
 
 	time_point_t m_flCustomSequenceUntilTime;
 	int m_iCustomSequence;

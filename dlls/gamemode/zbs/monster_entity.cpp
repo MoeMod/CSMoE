@@ -200,8 +200,7 @@ LINK_ENTITY_TO_CLASS(monster_entity, CMonster);
 class CMonsterImprov : public CHostageImprov
 {
 public:
-	CMonsterImprov(CBaseEntity *entity) : CHostageImprov(entity), 
-		m_bCalculatingPath(false)
+	CMonsterImprov(CBaseEntity *entity) : CHostageImprov(entity)
 	{
 	}
 	CMonsterImprov(CBaseEntity* entity, float turnTolerance) : CHostageImprov(entity),
@@ -372,18 +371,7 @@ public:
 		{
 			if (m_path.GetSegmentCount() <= 0)
 			{
-				if (m_bCalculatingPath == false)
-				{
-					m_bCalculatingPath = true;
-					m_fbCalcPathResult = std::async([&] {
-						HostagePathCost pathCost;
-						bool result = m_path.Compute(&GetFeet(), &m_moveGoal, pathCost);
-						m_bCalculatingPath = false;
-						return result;
-					});
-				}
-
-				if(m_fbCalcPathResult.valid() && m_fbCalcPathResult.get())
+				if(HostagePathCost pathCost; m_path.Compute(&GetFeet(), &m_moveGoal, pathCost))
 				{
 					m_follower.SetPath(&m_path);
 					m_follower.SetImprov(this);
@@ -572,26 +560,13 @@ public:
 
 			if (player->IsAlive() && (team == UNASSIGNED || player->m_iTeam == team))
 			{
-				if (m_bCalculatingPath == false)
+				Vector vecCenter = player->Center();
+				ShortestPathCost cost;
+				float range = NavAreaTravelDistance(GetLastKnownArea(), TheNavAreaGrid.GetNearestNavArea(&vecCenter), cost);
+				if (range > 0 && range < closeRange)
 				{
-					m_bCalculatingPath = true;
-					m_ffCalcDistResult = std::async([&] {
-						Vector vecCenter = player->Center();
-						ShortestPathCost cost;
-						float result = NavAreaTravelDistance(GetLastKnownArea(), TheNavAreaGrid.GetNearestNavArea(&vecCenter), cost);
-						m_bCalculatingPath = false;
-						return result;
-					});
-				}
-
-				if (m_ffCalcDistResult.valid())
-				{
-					float range = m_ffCalcDistResult.get();
-					if (range > 0 && range < closeRange)
-					{
-						closeRange = range;
-						close = player;
-					}
+					closeRange = range;
+					close = player;
 				}
 			}
 		}
@@ -618,10 +593,6 @@ public:
 
 		return check.IsBlocked();
 	}
-
-	std::atomic<bool> m_bCalculatingPath;
-	std::future<bool> m_fbCalcPathResult;
-	std::future<float> m_ffCalcDistResult;
 };
 
 void CMonster::Spawn()
@@ -845,7 +816,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 				SetAnimation(MONSTERANIM_FLINCH);
 			}
 		}
-		
+
 		if(m_iPriority > 1)
 		{
 			float flPer = (float)(pev->health / pev->max_health);
@@ -889,7 +860,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 			}
 		}
 
-		if (this && FClassnameIs(this->pev, "monster_entity"))
+		if (FClassnameIs(this->pev, "monster_entity"))
 		{
 			if (this->m_vecTempAttackers.size())
 			{
@@ -970,9 +941,8 @@ CMonster::CMonster() : CHostage(),
 	m_szIdleAnim("zbs_idle1"),
 	m_szWalkAnim("zbs_walk"),
 	m_szRunAnim("zbs_run"),
-	m_iKillBonusMoney(500), 
-	m_iKillBonusFrags(1), 
-	m_flTimeLastActive(0.0s), 
+	m_iKillBonusMoney(500),
+	m_iKillBonusFrags(1),
 	m_iClass(MONSTER_CLASS_ZOMBIE),
 	m_pMonsterStrategy(new CMonsterModStrategy_Default(this)),
 	m_turnTolerance(300.0f)
@@ -1108,19 +1078,14 @@ bool CMonster::CheckTarget()
 
 std::pair<CBasePlayer *, bool> CMonster::FindTarget() const
 {
-	std::future<CBasePlayer *> fpNear = std::async(&CMonster::GetClosestPlayer, this, true);
-	// TODO: fix for async
-	//std::future<CBasePlayer*> fpFar = std::async(&CMonsterImprov::GetClosestPlayerByTravelDistance, m_improv, UNASSIGNED, nullptr);
-	std::future<CBasePlayer*> fpFar = std::async(&CMonster::GetClosestPlayer, this, false);
-
 	CBasePlayer *player = nullptr;
 
-	if ((player = fpNear.get()))
+	if ((player = GetClosestPlayer(true)))
 	{
 		// abandon fpFar...
 		return { player, true };
 	}
-	else if ((player = fpFar.get()))
+	else if ((player = GetClosestPlayer(false)))
 	{
 		return { player, false };
 	}
@@ -1236,7 +1201,7 @@ void CMonster::SetEntAnim(int ianim, float framerate, duration_t animtime, bool 
 		}
 	}
 	else
-	{	
+	{
 		pev->animtime = gpGlobals->time;
 		pev->framerate = framerate;
 		m_iCustomSequence = ianim;
@@ -1276,9 +1241,6 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 
 	if (anim != MONSTERANIM_FLINCH && anim != MONSTERANIM_LARGE_FLINCH && m_flFlinchTime > gpGlobals->time && pev->health > 0.0f)
 		return;
-
-	// may be called from both CheckAttack and CheckSequence
-	std::lock_guard<std::mutex> lock(m_mutexSetAnimation);
 
 	speed = pev->velocity.Length2D();
 
@@ -1720,7 +1682,7 @@ void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float fl
 	}
 	else
 		falloff = 1;
-	
+
 	vecSrc.z += 1;
 
 
@@ -1764,11 +1726,11 @@ void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float fl
 				{
 					UTIL_ScreenShakeOne(player, 10, 3, 10);
 				}
-					
+
 			}
 		}
 
-		
+
 
 	}
 }
@@ -1858,7 +1820,7 @@ void CMonster::SetModel(const char* appearance)
 		hullMin = VEC_HULL_MIN;
 		hullMax = VEC_HULL_MAX;
 	}
-		
+
 	PRECACHE_MODEL(szModelPath);
 	SET_MODEL(this->edict(), szModelPath);
 	UTIL_SetSize(pev, hullMin, hullMax);
@@ -1896,7 +1858,7 @@ void CMonster::SetSkill(int iSkill)
 		ptr = std::make_unique<CMonsterSkill_Boomer>(this);
 		break;
 	case 12:
-		ptr = std::make_unique<CMonsterSkill_Dog>(this);	
+		ptr = std::make_unique<CMonsterSkill_Dog>(this);
 		break;
 	default:
 		return;
@@ -2650,7 +2612,7 @@ void CMonsterSkill_Deimos2::OnTouch(CBaseEntity* other)
 		other->pev->velocity.y = vecKickRateDir.y * 800;
 		other->pev->velocity.z += 150.0;
 	}
-		
+
 }
 
 float CMonsterSkill_Deimos2::GetDamage()
