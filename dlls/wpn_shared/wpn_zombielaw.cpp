@@ -290,11 +290,12 @@ void CZombieLaw::WeaponIdle(void)
 	if (pev->iuser1)
 	{
 		RetireWeapon();
+		return;
 	}
 
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 	{
-		m_flNextTimeCanHolster = gpGlobals->time + 1.7s;
+		m_flNextTimeCanHolster = gpGlobals->time + 1.2s;
 		SendWeaponAnim(ZOMBIELAW_DISCARD, UseDecrement() != FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
 		pev->iuser1 = 1;	//mark remove
@@ -304,6 +305,11 @@ void CZombieLaw::WeaponIdle(void)
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 		SendWeaponAnim(ZOMBIELAW_IDLE, UseDecrement() != FALSE);
 	}
+}
+
+BOOL CZombieLaw::CanDeploy(void)
+{
+	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
 }
 
 }

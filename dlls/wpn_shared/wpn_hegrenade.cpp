@@ -289,7 +289,7 @@ void CHEGrenade::WeaponIdle(void)
 		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
 		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75s;
-
+		SendWeaponAnim(HEGRENADE_THROW, UseDecrement() != FALSE);
 #endif
 		auto time = 1.5s;
 		CGrenade::ShootTimed2(m_pPlayer->pev, vecSrc, vecThrow, time, m_pPlayer->m_iTeam, m_usCreateExplosion);
@@ -297,6 +297,7 @@ void CHEGrenade::WeaponIdle(void)
 #ifndef CLIENT_DLL
 		m_pPlayer->m_pModStrategy->ShootGrenade(std::bind(CGrenade::ShootTimed2, m_pPlayer->pev, vecSrc, vecThrow, time, m_pPlayer->m_iTeam, m_usCreateExplosion));
 #endif
+		
 		SetPlayerShieldAnim();
 
 #ifndef CLIENT_DLL

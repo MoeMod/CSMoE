@@ -27,6 +27,8 @@ enum MonsterClass
 	MONSTER_CLASS_DEIMOS,
 	MONSTER_CLASS_HELMET,
 	MONSTER_CLASS_DEIMOS2,
+	MONSTER_CLASS_PC,
+	BOSS_CLASS_BIG00,
 };
 
 enum MonsterAnim
@@ -170,11 +172,13 @@ public:
 	
 public:
 	void SetClass(MonsterClass iClass);
+	void SetClass(const char* appearance);
 	void SetSkill(std::unique_ptr<IBaseMonsterSkill> ptr)
 	{
 		m_pSkill = std::move(ptr);
 	}
 	std::shared_ptr<CBaseMonsterClass> MonsterClassFactory(MonsterClass iClass);
+	std::shared_ptr<CBaseMonsterClass> MonsterClassFactory(const char* appearance);
 };
 
 class CMonster : public CHostage
@@ -241,6 +245,8 @@ public:
 	std::shared_ptr<CMonster *> m_pLifeCycleHolder; // auto release with RAII
 public:
 	void SetClass(MonsterClass iClass);
+	void SetClass(const char* appearance);
+	void SetModel(const char* appearance);
 	void SetSkill(std::unique_ptr<IBaseMonsterSkill> ptr);
 };
 
@@ -407,6 +413,7 @@ public:
 	void FireZombieSkill();
 	float GetDamage();
 	time_point_t m_flTimeTriggerZombieSkill;
+	Vector vecStartOrigin;
 
 };
 
@@ -417,6 +424,14 @@ public:
 
 	void OnInit() override;
 	void OnSpawn() override;
+};
+
+class CMonsterClass_PC : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_PC(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
 };
 
 }

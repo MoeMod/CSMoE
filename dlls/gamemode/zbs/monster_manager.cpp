@@ -10,7 +10,7 @@
 #include <iterator>
 
 //#define __AUTO_RESIZE__
-#define __MAX_NPC_COUNT 256
+#define __MAX_NPC_COUNT 64
 
 namespace sv {
 
@@ -31,13 +31,12 @@ public:
 				[](const std::weak_ptr<CMonster *> &p) { return p.lock(); });
 		vecAvailable.erase(std::remove(vecAvailable.begin(), vecAvailable.end(), nullptr), vecAvailable.end());
 
-#ifdef XASH_DEDICATED
 		if (vecAvailable.size() <= new_size)
 		{
 			m_vecEntities.assign(vecAvailable.begin(), vecAvailable.end());
 			return;
 		}
-#endif
+
 		std::nth_element(vecAvailable.begin(), vecAvailable.begin() + new_size, vecAvailable.end(),
 				[](const std::shared_ptr<CMonster *> &a, const std::shared_ptr<CMonster *> &b) { return (*a)->m_flTimeLastActive > (*b)->m_flTimeLastActive; });
 

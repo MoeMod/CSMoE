@@ -41,6 +41,7 @@ void CZombiDogEgg::Precache(void)
 {
 	PRECACHE_MODEL("models/meatwall_egg.mdl");
 	m_iExplodeEffect = PRECACHE_MODEL("sprites/ef_meatwall_egg.spr");
+	m_iBossBig01Index = PRECACHE_MODEL("models/monster/zbs_bossl_big01.mdl");
 }
 
 void EXPORT CZombiDogEgg::OnThink(void)
@@ -80,8 +81,7 @@ void EXPORT CZombiDogEgg::OnTouch(CBaseEntity* pOther)
 
 	SetTouch(NULL);
 	pev->effects |= EF_NODRAW;
-
-	UTIL_Remove(this);
+	pev->velocity = g_vecZero;
 
 	CMonster* monster = GetClassPtr<CMonster>(nullptr);
 
@@ -101,6 +101,85 @@ void EXPORT CZombiDogEgg::OnTouch(CBaseEntity* pOther)
 	monster->pev->maxspeed = 160.0f;
 	monster->m_flAttackDamage = 100.0f;
 
+
+	if (!RANDOM_LONG(0, 5))
+	{
+		UTIL_TempModel(pev->origin, g_vecZero, g_vecZero, m_iBossBig01Index, 30, 9, 10, true, 64, 255, kRenderNormal, NULL, false, 0, 0, 256, 0);
+
+		SetThink(&CZombiDogEgg::DropGunEX);
+		pev->nextthink = gpGlobals->time + 2.1s;
+	}
+	else
+	{
+		SetThink(nullptr);
+		UTIL_Remove(this);
+	}
+}
+
+void CZombiDogEgg::DropGunEX()
+{
+	SetThink(nullptr);
+
+	TraceResult tr;
+	float flDamage;
+	CBaseEntity* pList[100];
+	Vector vecStart;
+
+	vecStart = pev->origin + Vector(0.0, 0.0, 5.0);
+
+	const float flRange = 2.5 * 39.37;
+	int iCount = UTIL_EntitiesInBox(pList, 100, vecStart - Vector(flRange, flRange, flRange), vecStart + Vector(flRange, flRange, flRange), FL_CLIENT | FL_MONSTER);
+
+	flDamage = 500.0;
+
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecStart);
+	WRITE_BYTE(TE_BEAMCYLINDER);
+	WRITE_COORD(vecStart[0]);
+	WRITE_COORD(vecStart[1]);
+	WRITE_COORD(vecStart[2]);
+	WRITE_COORD(vecStart[0]);
+	WRITE_COORD(vecStart[1]);
+	WRITE_COORD(vecStart[2] + 200);
+	WRITE_SHORT(g_sModelIndexShockWave);
+	WRITE_BYTE(0); // Start Frame
+	WRITE_BYTE(0); // Framerate
+	WRITE_BYTE(5); // Live Time
+	WRITE_BYTE(60); // Width
+	WRITE_BYTE(0); // Noise
+	WRITE_BYTE(130); // R
+	WRITE_BYTE(139); // G
+	WRITE_BYTE(253); // B
+	WRITE_BYTE(150); // Bright
+	WRITE_BYTE(0); // Speed
+	MESSAGE_END();
+	
+	for (int i = 0; i < iCount; i++)
+	{
+		CBaseEntity* pEntity = pList[i];
+
+		if (pEntity == this)
+			continue;
+
+		if (!pEntity->IsPlayer())
+			continue;
+
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (pEntity->edict() == pev->owner)
+			continue;
+
+		UTIL_TraceLine(vecStart, pEntity->BodyTarget(vecStart), dont_ignore_monsters, edict(), &tr);
+
+		if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+			continue;
+
+		pEntity->TakeDamage(pev, VARS(pev->owner), flDamage, DMG_EXPLOSION);
+
+		((CBasePlayer*)pEntity)->ReactToDeimosTail();
+	}
+
+	UTIL_Remove(this);
 }
 
 }

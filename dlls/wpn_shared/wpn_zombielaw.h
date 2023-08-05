@@ -80,6 +80,7 @@ public:
 	bool HasSecondaryAttack(void) override { return true; }
 	void Reload() override;
 	BOOL CanHolster(void) override;
+	BOOL CanDeploy(void) override;
 	BOOL CanDrop() override { return false; }
 	void WeaponIdle() override;
 	void Holster(int skiplocal) override;
@@ -92,10 +93,8 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f }; }
 	const char* GetCSModelName() override { return "models/w_zombielaw.mdl"; }
-
 public:
 	time_point_t m_flNextTimeCanHolster;
-
 private:
 	unsigned short m_usFirezombielaw;
 };

@@ -9,9 +9,10 @@ public:
 
 	void EXPORT OnThink(void);
 	void EXPORT OnTouch(CBaseEntity* pOther);
-	void Slowdown();
+	void DropGunEX();
 
 private:
 	int m_iExplodeEffect;
+	int m_iBossBig01Index;
 };
 }

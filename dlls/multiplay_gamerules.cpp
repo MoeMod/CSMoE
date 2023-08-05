@@ -3218,6 +3218,9 @@ void CHalfLifeMultiplay::CheckLevelInitialized()
 		while ((ent = UTIL_FindEntityByClassname(ent, "info_player_deathmatch")) != NULL)
 			++m_iSpawnPointCount_Terrorist;
 
+		while ((ent = UTIL_FindEntityByClassname(ent, "playerspawn")) != NULL)
+			++m_iSpawnPointCount_CT;
+
 		while ((ent = UTIL_FindEntityByClassname(ent, "info_player_start")) != NULL)
 			++m_iSpawnPointCount_CT;
 
@@ -4812,6 +4815,25 @@ edict_t* CHalfLifeMultiplay::GetPlayerSpawnSpot(CBasePlayer* pPlayer)
 {
 	// gat valid spawn point
 	edict_t* pentSpawnSpot = CGameRules::GetPlayerSpawnSpot(pPlayer);
+
+	if (!pentSpawnSpot)
+	{
+		CBaseEntity* pEntity = NULL;
+
+		pPlayer->SelectSpawnSpot("playerspawn", pEntity);
+
+		if (pEntity)
+		{
+			pentSpawnSpot = pEntity->edict();
+
+			pPlayer->pev->origin = pEntity->pev->origin + Vector(0, 0, 1);
+			pPlayer->pev->v_angle = g_vecZero;
+			pPlayer->pev->velocity = g_vecZero;
+			pPlayer->pev->angles = pEntity->pev->angles;
+			pPlayer->pev->punchangle = g_vecZero;
+			pPlayer->pev->fixangle = TRUE;
+		}
+	}
 
 	if (IsMultiplayer())
 	{

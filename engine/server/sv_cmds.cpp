@@ -252,7 +252,7 @@ void SV_Map_f( void )
 			Sys_Warn( "SV_NewMap: map %s doesn't have a valid spawnpoint\n", mapname );
 		else
 			Msg( "SV_NewMap: map %s doesn't have a valid spawnpoint\n", mapname );
-		return;
+		//return;
 	}
 
 	// init network stuff

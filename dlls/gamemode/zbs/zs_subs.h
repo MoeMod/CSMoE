@@ -6,6 +6,7 @@
 #endif
 
 #include "func_break.h" // CBreakable
+#include "triggers.h"
 
 namespace sv {
 
@@ -24,14 +25,31 @@ public:
 class CZBSBreak : public CBreakable
 {
 public:
+	void Spawn() override;
 	void KeyValue(KeyValueData *pkvd) override;
 	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
-
+	void EXPORT BreakTouch(CBaseEntity *pOther);
 public:
 	float m_flHumanDamageRatio;
 	float m_flZombiDamageRatio;
 
 };
+
+class CZBSTrigger : public CBaseTrigger
+{
+public:
+	void Spawn() override;
+	void EXPORT TriggerThink();
+	void EXPORT TriggerTouch(CBaseEntity* pOther);
+	void KeyValue(KeyValueData* pkvd) override;
+
+public:
+	int m_iRound;
+	int m_iCurentRound;
+	int m_iTriggerId;
+	std::vector<int> m_iPlayerInTrigger;
+};
+
 
 }
 

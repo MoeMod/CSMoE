@@ -195,8 +195,9 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	{
 	case CT:
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		//m_pPlayer->GiveNamedItem("knife_dragonsword");
+		//m_pPlayer->GiveNamedItem("weapon_halogun");
 		//m_pPlayer->GiveNamedItem("weapon_leapstrikegun");
+		//m_pPlayer->GiveNamedItem("knife_dvhammer");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		//m_pPlayer->GiveNamedItem("z4b_shovelex");
 
@@ -492,7 +493,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 		}
 		m_pPlayer->GiveNamedItem("weapon_hegrenade");
 
-#if 1
+#if 0
 		if (m_pPlayer->entindex() == 1)
 		{
 

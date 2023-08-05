@@ -3189,14 +3189,28 @@ void FireBulletsForMobile(Vector vecSrc, Vector vecDir, float flDistance, float 
 			WRITE_BYTE(255);
 			MESSAGE_END();
 #endif
-
-
+			CBasePlayer* pAttack = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pevAttacker));
 			vecSrc = tr.vecEndPos + (vecDir * iPenetrationPower);
 			flDistance = (flDistance - flCurrentDistance) * flDistanceModifier;
 			vecEnd = vecSrc + (vecDir * flDistance);
 
+			if (pAttack)
+			{
+				if (pAttack->m_iBuff & BUFF_CLOAKING)
+					tr.iHitgroup = HITGROUP_HEAD;
+			}
 			pEntity->TraceAttack(pevAttacker, iCurrentDamage, vecDir, &tr, (DMG_BULLET | DMG_NEVERGIB));
 			iCurrentDamage *= flDamageModifier;
+
+
+			if (pAttack)
+			{
+				if (pAttack->m_pActiveItem)
+				{
+					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
+					pWeapon->FireBullet3CallBack(iPenetration + 1, vecDir, &tr);
+				}
+			}
 		}
 		else
 			iPenetration = 0;

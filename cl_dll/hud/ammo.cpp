@@ -2339,6 +2339,63 @@ void CHudAmmo::DrawSpriteTexture(const HSPRITE m_hSpr, int iX, int iY, int iW, i
 	gEngfuncs.pTriAPI->End();
 
 }
+
+void CHudAmmo::ConstructModifiedWpnName(char *SzModifiedName, const char* SzOriginalName, int iModifiyType)
+{
+
+	if (!strncmp(SzOriginalName, "weapon_", 7))
+		SzOriginalName += 7;
+	else if (!strncmp(SzOriginalName, "knife_", 6))
+		SzOriginalName += 6;
+	else if (!strncmp(SzOriginalName, "z4b_", 4))
+		SzOriginalName += 4;
+	else if (!strncmp(SzOriginalName, "csgo_", 5))
+		SzOriginalName += 5;
+
+	strcpy(SzModifiedName, SzOriginalName);
+
+	if (iModifiyType)
+	{
+		if (!strcmp(SzModifiedName, "usp"))
+			strcpy(SzModifiedName, "USP45");
+		else if (!strcmp(SzModifiedName, "deagle"))
+			strcpy(SzModifiedName, "DesertEagle");
+		else if (!strcmp(SzModifiedName, "hegrenade"))
+			strcpy(SzModifiedName, "HE_Grenade");
+	}
+};
+
+void CHudAmmo::LocalizeWpnName(char *SzModifiedName, const char* SzOriginalName, int iWpnSlot)
+{
+	//Vgui Localize
+	char SzWpnNameCn[64];
+	char SzText[64];
+
+	if (SzOriginalName && SzOriginalName[0])
+		sprintf(SzText, "CSO_%s", SzOriginalName);
+	else
+		sprintf(SzText, "CSO_");
+
+	if (vgui2::localize()->Find(SzText))
+		strcpy(SzWpnNameCn, HudDeathInfo().UnicodeToUTF8(vgui2::localize()->Find(SzText)));
+	else
+	{
+		if (SzOriginalName && SzOriginalName[0])
+		{
+			sprintf(SzText, "#CSO_%s", SzOriginalName);
+		}
+		strcpy(SzWpnNameCn, SzText);
+	}
+
+	sprintf(SzModifiedName, "\t%d. %s", iWpnSlot, SzWpnNameCn);
+};
+
+void CHudAmmo::ResizeImage(int& iModified)
+{
+	if (iModified % 2 != 0)
+		iModified--;
+};
+
 int CHudAmmo::DrawApexHudWpnList(float flTime)
 {
 	//Basic Bar Definations
@@ -2369,62 +2426,6 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 		m_fFade -= (gHUD.m_flTimeDelta * 20);
 
 	int a2;
-
-	auto ConstructModifiedWpnName = [](char(&SzModifiedName)[], const char* SzOriginalName, int iModifiyType)
-	{
-
-		if (!strncmp(SzOriginalName, "weapon_", 7))
-			SzOriginalName += 7;
-		else if (!strncmp(SzOriginalName, "knife_", 6))
-			SzOriginalName += 6;
-		else if (!strncmp(SzOriginalName, "z4b_", 4))
-			SzOriginalName += 4;
-		else if (!strncmp(SzOriginalName, "csgo_", 5))
-			SzOriginalName += 5;
-
-		strcpy(SzModifiedName, SzOriginalName);
-
-		if (iModifiyType)
-		{
-			if (!strcmp(SzModifiedName, "usp"))
-				strcpy(SzModifiedName, "USP45");
-			else if (!strcmp(SzModifiedName, "deagle"))
-				strcpy(SzModifiedName, "DesertEagle");
-			else if (!strcmp(SzModifiedName, "hegrenade"))
-				strcpy(SzModifiedName, "HE_Grenade");
-		}
-	};
-
-	auto LocalizeWpnName = [](char(&SzModifiedName)[], const char* SzOriginalName, int iWpnSlot)
-	{
-		//Vgui Localize
-		char SzWpnNameCn[64];
-		char SzText[64];
-
-		if (SzOriginalName && SzOriginalName[0])
-			sprintf(SzText, "CSO_%s", SzOriginalName);
-		else
-			sprintf(SzText, "CSO_");
-
-		if (vgui2::localize()->Find(SzText))
-			strcpy(SzWpnNameCn, HudDeathInfo().UnicodeToUTF8(vgui2::localize()->Find(SzText)));
-		else
-		{
-			if (SzOriginalName && SzOriginalName[0])
-			{
-				sprintf(SzText, "#CSO_%s", SzOriginalName);
-			}
-			strcpy(SzWpnNameCn, SzText);
-		}
-
-		sprintf(SzModifiedName, "\t%d. %s", iWpnSlot, SzWpnNameCn);
-	};
-
-	auto ResizeImage = [](int& iModified)
-	{
-		if (iModified % 2 != 0)
-			iModified--;
-	};
 
 	for (int i = 0; i < MAX_WEAPON_SLOTS; i++)
 	{

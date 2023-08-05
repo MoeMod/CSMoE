@@ -586,6 +586,7 @@ namespace xe {
         tex->texlru_extdata = nullptr;
         if(textureCache.contains(texnum))
             textureCache.remove(texnum);
+        std::erase_if(g_textureAttrMap, [texnum](auto& x) { return x.second.index == texnum; });
     }
 
     void TexLru_Shrink()

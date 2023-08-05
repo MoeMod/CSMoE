@@ -83,7 +83,7 @@ namespace sv {
 
 #define WPNSTATE_KRONOS3_SCAN_ACTIVATE	1
 #define WPNSTATE_KRONOS3_ZOOM_ACTIVATE	2
-#define KRONOS3_CHARGE_AMMO	4
+#define KRONOS3_CHARGE_AMMO	30
 
 #ifndef CLIENT_DLL
     std::vector<EHANDLE> m_pEnemylist;

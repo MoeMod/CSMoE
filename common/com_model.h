@@ -154,7 +154,7 @@ struct decal_s
 	float		dx;				// Offsets into surface texture (in texture coordinates, so we don't need floats)
 	float		dy;
 	float		scale;		// Pixel scale
-	short		texture;		// Decal texture
+	int		texture;		// Decal texture
 	byte		flags;			// Decal flags
 
 	short		entityIndex;	// Entity this is attached to

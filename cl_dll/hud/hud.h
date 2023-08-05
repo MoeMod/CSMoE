@@ -167,6 +167,10 @@ public:
 	int DrawNEWHudAmmo(float flTime);
 	int DrawApexHudWpnList(float flTime);
 
+	void ConstructModifiedWpnName(char *SzModifiedName, const char* SzOriginalName, int iModifiyType);
+	void LocalizeWpnName(char* SzModifiedName, const char* SzOriginalName, int iWpnSlot);
+	void ResizeImage(int& iModified);
+
 	void DrawSpriteTexture(const HSPRITE m_hSpr, int iX, int iY, int iW, int iH, wrect_t Rc, int a = 255, int r = 255, int g = 255, int b = 255);
 	CHudMsgFunc(CurWeapon);
 	CHudMsgFunc(WeaponList);

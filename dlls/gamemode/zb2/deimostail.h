@@ -13,8 +13,10 @@ public:
 public:
 	void EXPORT Kill();
 	void Initialize(duration_t tLifespan);
+	void DropGunEX();
 
 public:
+	int m_iBossBig00Index;
 	int m_bIsZombieSkill;
 	int m_iSmokeTrail;
 	bool m_bHitHuman;

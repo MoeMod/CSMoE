@@ -1505,8 +1505,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			if (!iOldHitGroup_Pre || iOldHitGroup_Pre < 0 || iOldHitGroup_Pre > 7)
 				iOldHitGroup_Pre = 2;//HIT_CHEST
 
-			iDeathInfo_Fire[iAtt][iVic][iOldHitGroup_Pre] += iDamageAmount;
-			iDeathInfo_Body[iAtt][iVic][iOldHitGroup_Pre] += 1;
+			//iDeathInfo_Fire[iAtt][iVic][iOldHitGroup_Pre] += iDamageAmount;
+			//iDeathInfo_Body[iAtt][iVic][iOldHitGroup_Pre] += 1;
 		}
 
 		//End OF TakeDamage Post

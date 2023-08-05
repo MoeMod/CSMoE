@@ -16,6 +16,7 @@
 #include "world.h"
 #include "game.h"
 #include "gamemode/mods.h"
+#include "gamemode/zbs/zbs_map_manager.h"
 #include "player/csdm_randomspawn.h"
 #include "cbase/cbase_hash.h"
 #include "luash_sv/luash_sv.h"
@@ -502,7 +503,11 @@ void CWorld::Precache()
 	CSDM_LoadSpawnPoints();
 	MapMgr_LoadMapList();
 	MapMgr_LoadMapSafeArea();
-	
+	ZBS_LoadSpawnArea();
+	ZBS_LoadWaveData();
+	ZBS_LoadZombiTypeData();
+	ZBS_LoadZBSRoundData();
+	ZBS_LoadTriggerData();
 
 	// UNDONE why is there so much Spawn code in the Precache function? I'll just keep it here
 

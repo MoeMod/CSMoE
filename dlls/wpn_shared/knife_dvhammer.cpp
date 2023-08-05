@@ -188,6 +188,9 @@ namespace sv {
 			if (pEntity->edict() == pev->owner)
 				continue;
 
+			if (pEntity->IsPlayer() && bIsWallBetweenPoint(pEntity->pev->origin, pev->origin))
+				continue;
+
 			if (pev->origin.z - pEntity->pev->origin.z > 16.0f)
 				continue;
 
@@ -542,7 +545,7 @@ namespace sv {
 			pAttackPlayer->m_iWeaponVolume = 128;
 
 			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
-			if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
+			if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie && !(pPlayer->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 			{
 				Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
 

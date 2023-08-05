@@ -585,6 +585,9 @@ namespace sv {
 				if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, m_pPlayer))
 					continue;
 
+				if (m_pPlayer->pev->origin.z - pEntity->pev->origin.z > 16.0f)
+					continue;
+
 				m_pPlayer->m_iWeaponVolume = 128;
 
 				pEntity->TakeDamage(pev, m_pPlayer->pev, GetSecondaryAttackDamage(), DMG_GENERIC);
