@@ -1857,10 +1857,27 @@ void GL_FreeTexture( GLenum texnum )
 
 /*
 ================
+GL_FreeTextureIgnoreLru
+================
+*/
+void GL_FreeTextureIgnoreLru(GLenum texnum)
+{
+	// number 0 it's already freed
+	if( texnum <= 0 || !glw_state.initialized )
+		return;
+
+	ASSERT( texnum > 0 && texnum < R_TextureNum() );
+	if (texnum >= R_TextureNum())
+		return;
+	R_FreeImage( &r_textures[texnum], true);
+}
+
+/*
+================
 R_FreeImage
 ================
 */
-void R_FreeImage( gltexture_t *image )
+void R_FreeImage( gltexture_t *image, bool ignoreLru )
 {
 	uint		hash;
 	gltexture_t	*cur;
@@ -1887,7 +1904,7 @@ void R_FreeImage( gltexture_t *image )
 		return;
 	}
 
-	xe::TexLru_Free( image->texnum );
+	if (!ignoreLru) xe::TexLru_Free( image->texnum );
 
 	// remove from hash table
 	iter = r_texturesHashTable.find(image->name);

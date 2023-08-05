@@ -180,40 +180,43 @@ void EV_FireHolySword(event_args_t *args)
 						return;
 
 					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[0], pModel);
-
-					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-					pEnt->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM;
-					pEnt->entity.curstate.frame = 0.0f;
-					pEnt->entity.curstate.framerate = 30.0f;
-					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-					pEnt->entity.curstate.aiment = clientindex;
-					pEnt->entity.curstate.solid = SOLID_NOT;
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.renderfx = kRenderFxNone;
-					pEnt->frameMax = 11.0;
-					pEnt->entity.curstate.scale = 0.04f;
-					pEnt->entity.curstate.renderamt = 255;
-					pEnt->entity.curstate.body = 1;
-					pEnt->die = gHUD.m_flTime + 999;
-					pEnt->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
-					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
-
-					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+					
+					if (pEnt)
 					{
-						cl_entity_t* viewent = gEngfuncs.GetViewModel();
-						if (viewent->curstate.sequence != ANIM_CHARGE_START && viewent->curstate.sequence != ANIM_CHARGE_LOOP && viewent->curstate.sequence != ANIM_FULLSTACK_CHARGE_START && viewent->curstate.sequence != ANIM_FULLSTACK_CHARGE_LOOP)
-						{
-							pEnt->entity.curstate.renderamt = 0;
-							pEnt->die = gHUD.m_flTime;
-						}
+						pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+						pEnt->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM;
+						pEnt->entity.curstate.frame = 0.0f;
+						pEnt->entity.curstate.framerate = 30.0f;
+						pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+						pEnt->entity.curstate.aiment = clientindex;
+						pEnt->entity.curstate.solid = SOLID_NOT;
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.renderfx = kRenderFxNone;
+						pEnt->frameMax = 11.0;
+						pEnt->entity.curstate.scale = 0.04f;
+						pEnt->entity.curstate.renderamt = 255;
+						pEnt->entity.curstate.body = 1;
+						pEnt->die = gHUD.m_flTime + 999;
+						pEnt->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
+						pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-						cl_entity_t* parent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.aiment);
-						if (pEnt->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
+						pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime)
 						{
-							pEnt->entity.curstate.renderamt = 0;
-							pEnt->die = gHUD.m_flTime;
-						}						
-					};
+							cl_entity_t* viewent = gEngfuncs.GetViewModel();
+							if (viewent->curstate.sequence != ANIM_CHARGE_START && viewent->curstate.sequence != ANIM_CHARGE_LOOP && viewent->curstate.sequence != ANIM_FULLSTACK_CHARGE_START && viewent->curstate.sequence != ANIM_FULLSTACK_CHARGE_LOOP)
+							{
+								pEnt->entity.curstate.renderamt = 0;
+								pEnt->die = gHUD.m_flTime;
+							}
+
+							cl_entity_t* parent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.aiment);
+							if (pEnt->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
+							{
+								pEnt->entity.curstate.renderamt = 0;
+								pEnt->die = gHUD.m_flTime;
+							}
+						};
+					}
 				}
 			}
 

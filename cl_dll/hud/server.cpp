@@ -792,21 +792,25 @@ void EV_Explosion(int type, Vector origin)
 			pModel = IEngineStudio.Mod_ForName("sprites/spark1.spr", 0);
 
 			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(vOrigin, pModel);
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 254;
-			pEnt->entity.curstate.scale = 0.7;
-			pEnt->entity.curstate.rendercolor.r = vColor[i][0];
-			pEnt->entity.curstate.rendercolor.g = vColor[i][1];
-			pEnt->entity.curstate.rendercolor.b = vColor[i][2];
-			pEnt->flags |= FTENT_CLIENTCUSTOM;
-			pEnt->callback = EV_SPR3;
 
-			pEnt->entity.curstate.iuser1 = ModelFrameCount(pModel);
-			pEnt->entity.curstate.framerate = 15.0;
-			pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
-			pEnt->entity.curstate.fuser2 = 0.2;
+			if (pEnt)
+			{
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 254;
+				pEnt->entity.curstate.scale = 0.7;
+				pEnt->entity.curstate.rendercolor.r = vColor[i][0];
+				pEnt->entity.curstate.rendercolor.g = vColor[i][1];
+				pEnt->entity.curstate.rendercolor.b = vColor[i][2];
+				pEnt->flags |= FTENT_CLIENTCUSTOM;
+				pEnt->callback = EV_SPR3;
 
-			pEnt->die = gHUD.m_flTime + pEnt->entity.curstate.iuser1 / 15.0;
+				pEnt->entity.curstate.iuser1 = ModelFrameCount(pModel);
+				pEnt->entity.curstate.framerate = 15.0;
+				pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+				pEnt->entity.curstate.fuser2 = 0.2;
+
+				pEnt->die = gHUD.m_flTime + pEnt->entity.curstate.iuser1 / 15.0;
+			}
 		}
 
 		struct model_s* pModel;
@@ -817,19 +821,22 @@ void EV_Explosion(int type, Vector origin)
 		origin[2] += 10.0;
 
 		pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-		pEnt->entity.curstate.rendermode = kRenderTransAdd;
-		pEnt->entity.curstate.renderamt = 255;
-		pEnt->entity.curstate.scale = 0.7;
-		pEnt->entity.curstate.fuser2 = 0.6;
-		pEnt->flags |= FTENT_CLIENTCUSTOM;
-		pEnt->callback = EV_SPR3;
+		if (pEnt)
+		{
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.scale = 0.7;
+			pEnt->entity.curstate.fuser2 = 0.6;
+			pEnt->flags |= FTENT_CLIENTCUSTOM;
+			pEnt->callback = EV_SPR3;
 
-		pEnt->entity.curstate.iuser1 =  ModelFrameCount(pModel);
-		pEnt->entity.curstate.framerate = 15.0;
-		pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
-		pEnt->entity.curstate.fuser2 = 0.2;
+			pEnt->entity.curstate.iuser1 = ModelFrameCount(pModel);
+			pEnt->entity.curstate.framerate = 15.0;
+			pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+			pEnt->entity.curstate.fuser2 = 0.2;
 
-		pEnt->die = gHUD.m_flTime + pEnt->entity.curstate.iuser1 / 15.0;
+			pEnt->die = gHUD.m_flTime + pEnt->entity.curstate.iuser1 / 15.0;
+		}
 		break;
 	}
 	case 3:
@@ -840,30 +847,33 @@ void EV_Explosion(int type, Vector origin)
 		if (pModel)
 		{
 			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-			pEnt->die = gHUD.m_flTime + 200.0f;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 230;
-			pEnt->entity.curstate.scale = 0.1;
-			pEnt->entity.curstate.frame = 0;
-			pEnt->entity.curstate.framerate = 0;
-			pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 1.0f;
-			pEnt->frameMax = ModelFrameCount(pModel) - 1;
-
-			pEnt->flags |= FTENT_CLIENTCUSTOM;
-			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+			if (pEnt)
 			{
-				if (pEnt->entity.curstate.fuser1 <= gHUD.m_flTime)
+				pEnt->die = gHUD.m_flTime + 200.0f;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 230;
+				pEnt->entity.curstate.scale = 0.1;
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.framerate = 0;
+				pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 1.0f;
+				pEnt->frameMax = ModelFrameCount(pModel) - 1;
+
+				pEnt->flags |= FTENT_CLIENTCUSTOM;
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime)
 				{
-					pEnt->die = gHUD.m_flTime;
-				}
-				else
-				{
-					float percent = pEnt->entity.curstate.fuser1 - gHUD.m_flTime;
-					pEnt->entity.curstate.frame = pEnt->frameMax * (1.0f - percent);
-					pEnt->entity.curstate.renderamt = 230 * percent;
-					pEnt->entity.curstate.scale += 0.025;
-				}
-			};
+					if (pEnt->entity.curstate.fuser1 <= gHUD.m_flTime)
+					{
+						pEnt->die = gHUD.m_flTime;
+					}
+					else
+					{
+						float percent = pEnt->entity.curstate.fuser1 - gHUD.m_flTime;
+						pEnt->entity.curstate.frame = pEnt->frameMax * (1.0f - percent);
+						pEnt->entity.curstate.renderamt = 230 * percent;
+						pEnt->entity.curstate.scale += 0.025;
+					}
+				};
+			}
 		}
 
 		break;

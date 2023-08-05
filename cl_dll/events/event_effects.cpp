@@ -1769,6 +1769,10 @@ void EV_WpnEffects(event_args_s* args)
 			pModel = IEngineStudio.Mod_ForName("sprites/balrogcritical.spr", 0);
 
 			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+
+			if (!pEnt)
+				return;
+
 			pEnt->entity.curstate.rendermode = kRenderTransAdd;
 			pEnt->entity.curstate.renderamt = 255;
 			pEnt->entity.curstate.scale = 0.3;
@@ -1797,6 +1801,10 @@ void EV_WpnEffects(event_args_s* args)
 			pModel = IEngineStudio.Mod_ForName("sprites/balrogcritical.spr", 0);
 
 			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+
+			if (!pEnt)
+				return;
+
 			pEnt->entity.curstate.rendermode = kRenderTransAdd;
 			pEnt->entity.curstate.renderamt = 255;
 			pEnt->entity.curstate.scale = 0.5;
@@ -1826,30 +1834,39 @@ void EV_WpnEffects(event_args_s* args)
 		{
 			//touch
 			pModel = IEngineStudio.Mod_ForName("sprites/ef_boomer_ex.spr", 0);
-			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-			pEnt->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.curstate.scale = 0.5f;
-			pEnt->die = gHUD.m_flTime + 0.1f;
+
+			if (pEnt)
+			{
+
+				pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+				pEnt->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.curstate.scale = 0.5f;
+				pEnt->die = gHUD.m_flTime + 0.1f;
+			}
 
 			pModel = IEngineStudio.Mod_ForName("sprites/ef_m32_poison.spr", 0);
 			TEMPENTITY* pEnt2;
 			pEnt2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-			pEnt2->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt2->entity.curstate.renderamt = 210;
-			pEnt2->entity.curstate.scale = 2.0f;
-			pEnt2->entity.curstate.fuser1 = args->fparam1;
-			pEnt2->die = gHUD.m_flTime + args->fparam1;
-			pEnt2->entity.curstate.animtime = gHUD.m_flTime;
-			pEnt2->frameMax = 23;
-			pEnt2->flags |= FTENT_CLIENTCUSTOM;
-			
-			pEnt2->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+
+			if (pEnt2)
 			{
-				pEnt->entity.curstate.frame = pEnt->frameMax * (pEnt->die - gHUD.m_flTime) / pEnt->entity.curstate.fuser1;
-				pEnt->entity.curstate.renderamt = 200 * (pEnt->die - gHUD.m_flTime) / pEnt->entity.curstate.fuser1;
-			};
+				pEnt2->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt2->entity.curstate.renderamt = 210;
+				pEnt2->entity.curstate.scale = 2.0f;
+				pEnt2->entity.curstate.fuser1 = args->fparam1;
+				pEnt2->die = gHUD.m_flTime + args->fparam1;
+				pEnt2->entity.curstate.animtime = gHUD.m_flTime;
+				pEnt2->frameMax = 23;
+				pEnt2->flags |= FTENT_CLIENTCUSTOM;
+
+				pEnt2->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+				{
+					pEnt->entity.curstate.frame = pEnt->frameMax * (pEnt->die - gHUD.m_flTime) / pEnt->entity.curstate.fuser1;
+					pEnt->entity.curstate.renderamt = 200 * (pEnt->die - gHUD.m_flTime) / pEnt->entity.curstate.fuser1;
+				};
+			}
 		}
 		else
 		{
@@ -1863,26 +1880,31 @@ void EV_WpnEffects(event_args_s* args)
 				pModel = IEngineStudio.Mod_ForName("sprites/ef_smoke_poison.spr", 0);	//poison	
 								
 			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 210;
-			pEnt->entity.curstate.scale = 2.0f;
-			pEnt->entity.curstate.fuser1 = args->fparam1;
-			pEnt->die = gHUD.m_flTime + args->fparam1;
-			pEnt->entity.curstate.animtime = gHUD.m_flTime;
-			pEnt->frameMax = args->bparam2 ? 23 : 39;
-			pEnt->entity.curstate.framerate = 0.5;
-			pEnt->flags |= FTENT_CLIENTCUSTOM;
-			if (args->bparam2)
+
+			if (pEnt)
 			{
-				pEnt->flags |= FTENT_PLYRATTACHMENT;
-				pEnt->clientIndex = args->iparam2;
-				pEnt->tentOffset = Vector(0, 0, 20);
+
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 210;
+				pEnt->entity.curstate.scale = 2.0f;
+				pEnt->entity.curstate.fuser1 = args->fparam1;
+				pEnt->die = gHUD.m_flTime + args->fparam1;
+				pEnt->entity.curstate.animtime = gHUD.m_flTime;
+				pEnt->frameMax = args->bparam2 ? 23 : 39;
+				pEnt->entity.curstate.framerate = 0.5;
+				pEnt->flags |= FTENT_CLIENTCUSTOM;
+				if (args->bparam2)
+				{
+					pEnt->flags |= FTENT_PLYRATTACHMENT;
+					pEnt->clientIndex = args->iparam2;
+					pEnt->tentOffset = Vector(0, 0, 20);
+				}
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+				{
+					pEnt->entity.curstate.frame = pEnt->frameMax * (pEnt->die - gHUD.m_flTime) / pEnt->entity.curstate.fuser1;
+					pEnt->entity.curstate.renderamt = 210 * (pEnt->die - gHUD.m_flTime) / pEnt->entity.curstate.fuser1;
+				};
 			}
-			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime)
-			{
-				pEnt->entity.curstate.frame = pEnt->frameMax * (pEnt->die - gHUD.m_flTime) / pEnt->entity.curstate.fuser1;
-				pEnt->entity.curstate.renderamt = 210 * (pEnt->die - gHUD.m_flTime) / pEnt->entity.curstate.fuser1;
-			};
 		}	
 		break;
 	}
@@ -2264,32 +2286,38 @@ void EV_WpnEffects(event_args_s* args)
 			pModel = IEngineStudio.Mod_ForName("sprites/claymore_explosion1.spr", 0);
 
 			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.curstate.scale = 4.0f;
-			pEnt->entity.curstate.iuser1 = 1;
-			pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 2.0f;
-			pEnt->die = gHUD.m_flTime + 100.0f;
-			pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_PERSIST;;
-			pEnt->callback = Claymore_CallBack;
-			pEnt->frameMax = 46;
-			origin[2] -= 400.0f;
 
+			if (pEnt)
+			{
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.curstate.scale = 4.0f;
+				pEnt->entity.curstate.iuser1 = 1;
+				pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 2.0f;
+				pEnt->die = gHUD.m_flTime + 100.0f;
+				pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_PERSIST;;
+				pEnt->callback = Claymore_CallBack;
+				pEnt->frameMax = 46;
+				origin[2] -= 400.0f;
+			}
 			TEMPENTITY* pEnt2;
 
 			origin[2] += 200.0f;
 			pModel = IEngineStudio.Mod_ForName("sprites/claymore_explosion2.spr", 0);
 
 			pEnt2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-			pEnt2->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt2->entity.curstate.renderamt = 255;
-			pEnt2->entity.curstate.scale = 1.5f;
-			pEnt2->entity.curstate.fuser1 = gHUD.m_flTime + 1.5f;
-			pEnt2->die = gHUD.m_flTime + 100.0f;
-			pEnt2->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_PERSIST;;
-			pEnt2->callback = Claymore_CallBack;
-			pEnt2->frameMax = 40;
 
+			if (pEnt2)
+			{
+				pEnt2->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt2->entity.curstate.renderamt = 255;
+				pEnt2->entity.curstate.scale = 1.5f;
+				pEnt2->entity.curstate.fuser1 = gHUD.m_flTime + 1.5f;
+				pEnt2->die = gHUD.m_flTime + 100.0f;
+				pEnt2->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_PERSIST;;
+				pEnt2->callback = Claymore_CallBack;
+				pEnt2->frameMax = 40;
+			}
 			origin[2] -= 200.0f;
 		}
 		break;

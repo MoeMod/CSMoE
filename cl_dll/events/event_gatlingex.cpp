@@ -77,14 +77,17 @@ void EV_FireGatlingex(event_args_s* args)
 			{
 				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/gatlingex-2_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.framerate = 30.0;
+				if (pEnt)
+				{
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.framerate = 30.0;
 
-				pEnt->entity.curstate.scale = 1.0;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 1.33;
-				pEnt->flags |= FTENT_SPRANIMATE;
+					pEnt->entity.curstate.scale = 1.0;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->die = gHUD.m_flTime + 1.33;
+					pEnt->flags |= FTENT_SPRANIMATE;
+				}
 
 			}
 		}

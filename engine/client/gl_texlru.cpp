@@ -575,7 +575,11 @@ namespace xe {
         auto iter = g_textureAttrMap.find(ptexture);
         if(iter != g_textureAttrMap.end())
         {
-            GL_FreeTexture(iter->second.index);
+            GL_FreeTextureIgnoreLru(iter->second.index);
+            gltexture_t	*tex = R_GetTexture(iter->second.index);
+            tex->texlru_extdata = nullptr;
+            if(textureCache.contains(iter->second.index))
+                textureCache.remove(iter->second.index);
             g_textureAttrMap.erase(iter);
         }
     }

@@ -122,8 +122,12 @@ void EV_FireBalrog7(event_args_s *args)
 		TEMPENTITY* pEnt;
 
 		pModel = IEngineStudio.Mod_ForName("sprites/balrogcritical.spr", 0);
-
+		
 		pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(VecOrigin, pModel);
+
+		if (!pEnt)
+			return;
+
 		pEnt->entity.curstate.rendermode = kRenderTransAdd;
 		pEnt->entity.curstate.renderamt = 255;
 		pEnt->entity.curstate.scale = 0.5;
