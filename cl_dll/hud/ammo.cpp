@@ -65,6 +65,8 @@ WeaponsResource gWR;
 int g_weaponselect = 0;
 int g_iShotsFired;
 
+std::vector<GrenadeSlot_t> m_vecGrenadeSuit;
+
 
 void WeaponsResource :: LoadAllWeaponSprites( void )
 {
@@ -417,9 +419,12 @@ int CHudAmmo::VidInit(void)
 	if (!m_iWeapon_OffBG)
 		m_iWeapon_OffBG = R_LoadTextureUnique("resource/hud/hud_weapon_off_bg");
 
+
 	//APEX HUD
-	if(!m_iSlotBG)
-		m_iSlotBG = R_LoadTextureUnique("resource/hud/custom/hud_apex/hud_iteminfo_bg");
+	if (!m_iSlotBG[0])
+		m_iSlotBG[0] = R_LoadTextureUnique("resource/hud/custom/hud_apex/hud_iteminfo_bg");
+	if (!m_iSlotBG[1])
+		m_iSlotBG[1] = R_LoadTextureUnique("resource/hud/custom/hud_apex/hud_iteminfo_bg2");
 
 	if (!m_iCharacterStateBG)
 		m_iCharacterStateBG = R_LoadTextureShared("resource/hud/custom/hud_apex/hud_player_bg");
@@ -431,13 +436,21 @@ int CHudAmmo::VidInit(void)
 		m_iSlotBGAmmo = R_LoadTextureUnique("resource/hud/custom/hud_apex/hud_weapon_bg2");
 
 	if (!m_iNum_BigWhite)
-		m_iNum_BigWhite = R_LoadTextureShared("resource/hud/hud_sb_num_big_white");
+		m_iNum_BigWhite = R_LoadTextureShared("resource/hud/custom/hud_apex/hud_hud3d_number");//hud_sb_num_big_white
 
 	if (!m_iNum_Center)
 		m_iNum_Center = R_LoadTextureShared("resource/hud/hud_sb_num_center");
 
-	CHudScoreBoardLegacy::BuildNumberRC(m_iNum_BigWhiteC, 18, 22);
+	if (!m_iReloading)
+	{
+		m_iReloading = R_LoadTextureUnique("resource/hud/custom/hud_apex/hud_reloading2");
+	}
+
+	CHudScoreBoardLegacy::BuildNumberRC(m_iNum_BigWhiteC, 150, 150);//18|32
 	CHudScoreBoardLegacy::BuildNumberRC(m_iNum_CenterC, 11, 13);
+
+	m_iFadeLoopSprite = SPR_Load("sprites/summonknifeex_loop2.spr");
+	m_pFadeLoopSprite = (struct model_s*)gEngfuncs.GetSpritePointer(m_iFadeLoopSprite);
 
 	R_InitTexture(m_pTexture_Black, "resource/hud/csgo/blacka");
 	// If we've already loaded weapons, let's get new sprites
@@ -2339,7 +2352,43 @@ void CHudAmmo::DrawSpriteTexture(const HSPRITE m_hSpr, int iX, int iY, int iW, i
 	gEngfuncs.pTriAPI->End();
 
 }
+void CHudAmmo::DrawLoopSpriteTexture(model_t* m_hSpr, int& frame, int framemax, int iX, int iY, int iW, int iH, int a, int r, int g, int b)
+{
+	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
 
+	if (m_hSpr)
+	{
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+
+		gEngfuncs.pTriAPI->SpriteTexture(m_hSpr, frame);
+		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, (iY + iH) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iW) * flScale, (iY + iH) * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+		gEngfuncs.pTriAPI->Vertex3f((iX + iW) * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+		gEngfuncs.pTriAPI->Vertex3f(iX * flScale, iY * flScale, 0);
+
+		gEngfuncs.pTriAPI->End();
+
+		if (1.0 / (30.0 * 1.0) <= gHUD.m_flTime - m_flLastFrameTime)
+		{
+			frame++;
+			m_flLastFrameTime = gHUD.m_flTime;
+		}
+
+		if (frame > framemax)
+		{
+			frame = 0;
+		}
+	}
+}
 void CHudAmmo::ConstructModifiedWpnName(char *SzModifiedName, const char* SzOriginalName, int iModifiyType)
 {
 
@@ -2409,6 +2458,8 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 	const int iAmmoBigWidth = gHUD.GetSpriteRect(gHUD.m_NEWHUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_NEWHUD_number_0).left;
 	const int iAmmoBigHeight = gHUD.GetSpriteRect(gHUD.m_NEWHUD_number_0).bottom - gHUD.GetSpriteRect(gHUD.m_NEWHUD_number_0).top;
 
+	const float flFontProportion = 0.1f;
+
 	int iWpnBarHeight = m_iWeapon_OffBG->h() + m_iWeaponList->h();
 	int iWpnBarWidth = floor(iPlayerStateBarWidth * 0.6f);
 
@@ -2427,6 +2478,11 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 
 	int a2;
 
+	if (!m_vecGrenadeSuit.empty())
+	{
+		m_vecGrenadeSuit.clear();
+	}
+
 	for (int i = 0; i < MAX_WEAPON_SLOTS; i++)
 	{
 		WEAPON* pWeapon = gWR.GetFirstPos(i);
@@ -2440,6 +2496,8 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 
 			if (m_iWeapon[i])
 				m_iWeapon[i] = nullptr;
+
+			bool bIsCurrentWeapon = (pWeapon == m_pWeapon) ? true : false;
 
 			//For WeaponIcon
 			char SzWeaponName[64];
@@ -2458,6 +2516,32 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 				szWeaponIcon.append(SzWeaponName);
 
 				m_iWeapon[i] = R_LoadTextureUnique(szWeaponIcon.c_str());
+			}
+
+			//Only Grenade -> One Slot Current Only !!!!!
+			if (i == 3)
+			{
+				//将手雷槽位所有手雷信息记录下来
+				GrenadeSlot_t pNext = { };
+				pNext.iPositon = iPos;
+				pNext.szWeaponName.append(SzWeaponName);
+				pNext.pWeapon = pWeapon;
+
+				auto iter = std::find(m_vecGrenadeSuit.begin(), m_vecGrenadeSuit.end(), pNext);
+				if (iter == m_vecGrenadeSuit.end())
+				{
+					m_vecGrenadeSuit.emplace_back(pNext);
+				}
+				else
+				{
+					*iter = pNext;
+				}
+
+				if (iPos > 1)
+				{
+					//Do not Draw the subsidiary.
+					break;
+				}
 			}
 
 			//For Primary/Secondary Slot
@@ -2507,6 +2591,32 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 					iY += iHeight;
 				}
 
+				if (i == m_iReloadingSlot)
+				{
+					int iAlpha = 150;
+
+					if (m_flReloadTimeDelta && m_flReloadTimeDelta > gHUD.m_flTime)
+					{
+						if (m_flReloadTimeDelta - gHUD.m_flTime > 0.5f)
+							iW = max(0, (iWpnBarWidth * (1.0f - float((m_flReloadTimeDelta - 0.5f) - gHUD.m_flTime) / m_flReloadingTime)));
+						else
+						{
+							iW = iWpnBarWidth;
+
+							iAlpha = 150.0f * (m_flReloadTimeDelta - flTime) / 0.5f;
+							if (iAlpha <= 0)
+							{
+								iAlpha = 0;
+								m_iReloadingSlot = -1;
+							}
+					}
+
+						iH = iWpnBarHeight - (m_iWeaponList->h() + iDrawOffset);
+
+						m_iReloading->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0, 0, 1, 1, 255, 255, 255, iAlpha);
+				}
+			}
+
 				iX -= (i == 1) ? 0 : (-iWpnBarWidth);
 				iX -= (i == 1) ? iDrawOffset : (-iDrawOffset);
 
@@ -2536,9 +2646,11 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 						int iClipSafe = 0;
 						iClipSafe = pWeapon->iClip >= 0 ? pWeapon->iClip : 0;
 
-						iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * 0.7f);
-						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iClipSafe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b);
-						iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * 0.7f);
+						//iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
+						iX -= floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
+						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iClipSafe, iX + 3, iY, DHN_CENTERALIGNED, 0, flFontProportion, r, g, b);
+						//iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
+						iX += floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
 #endif
 
 						//Draw BpAmmo
@@ -2553,19 +2665,20 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 #if 0
 						iX -= DrawUtils::GetNEWHudNumberWidth(1, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 4, 0);
 #else
-						iX -= floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 1, 11) * 0.7f);
+						iX -= floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 0, 150 * flFontProportion) * 0.8f);
 #endif
 
 #if 0
 						DrawUtils::DrawNEWHudNumber(1, iX, iY, gWR.CountAmmo(pWeapon->iAmmoType), r, g, b, 255, FALSE, 4);
 #else
-						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Center, m_iNum_CenterC, iAmmoSafe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b, 230);
+						//CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Center, m_iNum_CenterC, iAmmoSafe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b, 230);
+						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iAmmoSafe, iX + 3, iY, DHN_CENTERALIGNED, 0, flFontProportion * 0.8f, r, g, b, 200);
 #endif
 
 #if 0
 						iX += DrawUtils::GetNEWHudNumberWidth(1, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 4, 0);
 #else
-						iX += floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 1, 11) * 0.7f);
+						iX += floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 0, 150 * flFontProportion) * 0.8f);
 #endif
 
 						iX += iDrawOffset * 0.5f;
@@ -2595,9 +2708,11 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 							iX += DrawUtils::GetNEWHudNumberWidth(0, pWeapon->iClip, FALSE, 3, 0);
 #else
 
-							iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * 0.7f);
-							CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iClipSafe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b);
-							iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * 0.7f);
+							//iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
+							iX -= floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
+							CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iClipSafe, iX + 3, iY, DHN_CENTERALIGNED, 0, flFontProportion, r, g, b);
+							//iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
+							iX += floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
 #endif
 						}
 						else
@@ -2610,9 +2725,11 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 								DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pWeapon->iAmmoType), r, g, b, 255, FALSE, 3);
 								iX += DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 3, 0);
 #else
-								iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * 0.7f);
-								CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iAmmoSafe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b);
-								iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * 0.7f);
+								//iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * flFontProportion);
+								iX -= floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 0, 150 * flFontProportion));
+								CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iAmmoSafe, iX + 3, iY, DHN_CENTERALIGNED, 0, flFontProportion, r, g, b);
+								//iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * flFontProportion);
+								iX += floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 0, 150 * flFontProportion));
 #endif
 							}
 						}
@@ -2697,9 +2814,11 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 					{
 						DrawSpriteTexture(pHAmmo2, iX, iY, iScaleWidth, iScaleHeight, pRcAmmo2, 255, r, g, b);
 
-						iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmo2Safe, FALSE, 3, 1) * 0.7f);
-						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iAmmo2Safe, iX, iY, DHN_CENTERALIGNED, 1, 0.7, r, g, b);
-						iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmo2Safe, FALSE, 3, 1) * 0.7f);
+						//iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmo2Safe, FALSE, 3, 1) * flFontProportion);
+						iX -= floor(DrawUtils::GetHudNumberWidthCustom(iAmmo2Safe, 0, 3, 0, 150 * flFontProportion));
+						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iAmmo2Safe, iX + 3, iY, DHN_CENTERALIGNED, 0, flFontProportion, r, g, b);
+						//iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmo2Safe, FALSE, 3, 1) * flFontProportion);
+						iX += floor(DrawUtils::GetHudNumberWidthCustom(iAmmo2Safe, 0, 3, 0, 150 * flFontProportion));
 					}
 
 					iX += iDrawOffset;
@@ -2716,206 +2835,141 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 				switch (i)
 				{
 					//Knife Slot
-				case 2:
-					iW = floor(m_iSlotBG->w() * 0.4f);
-					iH = floor(m_iSlotBG->h() * 0.4f);
-
-					iX += iWpnBarWidth;
-					iX += iDrawOffset * 2.0f;
-
-					iY += (iPlayerStateBarHeight + (iWpnBarHeight + 20));
-
-					//m_iSlotBG->Draw2DQuadScaled(iX, iY - iH, iX + iW, iY);
-					if (m_iWeapon[i])
-					{
-						iW = floor(m_iWeapon[i]->w() * 0.65f);
-						iH = floor(m_iWeapon[i]->h() * 0.65f);
-
-						iX += iW;
-						iY += iH;
-						m_iWeapon[i]->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0, 0, 1, 1, 255, 255, 255, 225);
-						// Draw WeaponName
-						if (SzWeaponFullName && SzWeaponFullName[0])
-						{
-							gEngfuncs.pfnDrawSetTextColor(1.0f, 1.0f, 1.0f);
-							gEngfuncs.pfnDrawConsoleStringLen(SzWeaponFullName, &iLength, &iHeight);
-
-							iY += (iH);
-							iY += iHeight;
-
-							gEngfuncs.pfnDrawConsoleString(iX, iY, SzWeaponFullName);
-
-							iY -= (iH);
-							iY -= iHeight;
-						}
-
-						iX -= iW;
-						iY -= iH;
-					}
-
-					iY -= (iPlayerStateBarHeight + (iWpnBarHeight + 20));
-
-					iX -= iWpnBarWidth;
-					iX -= iDrawOffset * 2.0f;
-
-					break;
-
-
 					//Grenade Slot
-				case 3:
-					iW = floor(m_iSlotBG->w() * 0.4f);
-					iH = floor(m_iSlotBG->h() * 0.4f);
+				case 2: case 3:
+				{
+					iW = floor(m_iSlotBG[0]->w() * 0.35f);
+					if (i != 3)
+						iH = floor(m_iSlotBG[0]->h() * 0.4f);
+					else
+						iH = floor(m_iSlotBG[0]->h() * 0.25f);
 
-					iX -= iWpnBarWidth;
-					iX -= iDrawOffset * 3.0f;
+					iX -= (i != 3) ? (iWpnBarWidth) : (-iWpnBarWidth);
+					iX -= (i != 3) ? (iDrawOffset * 2.0f) : (-iDrawOffset);
+					iX += (i != 3) ? (-floor(iW * 0.3f)) : floor(iW * 0.3f);
 
 					iY += (iPlayerStateBarHeight + (iWpnBarHeight + 20));
 
-					m_iSlotBG->Draw2DQuadScaled(iX - iW, iY - iH, iX, iY);
+					if (i != 3)
+					{
+						m_iSlotBG[0]->Draw2DQuadScaled(iX - iW, iY - iH, iX, iY);
+						m_iSlotBG[1]->Draw2DQuadScaled(iX - iW, iY - iH, iX, iY);
+					}
+					else
+					{
+						m_iSlotBG[0]->Draw2DQuadScaled(iX, iY - iH, iX + iW, iY);
+						m_iSlotBG[1]->Draw2DQuadScaled(iX, iY - iH, iX + iW, iY);
+						if (pWeapon->iAmmo2Type > 0)
+						{
+							int iAmmo2Safe;
+							iAmmo2Safe = gWR.CountAmmo(pWeapon->iAmmo2Type) >= 0 ? gWR.CountAmmo(pWeapon->iAmmo2Type) : 0;
 
-					iY -= (iPlayerStateBarHeight + (iWpnBarHeight + 20));
-
+							if (iAmmo2Safe)
+								DrawLoopSpriteTexture(m_pFadeLoopSprite, m_flFrames, 30, iX, iY - iH, iW, iH);
+						}
+					}
 
 					// Draw WeaponIcon
 					if (m_iWeapon[i])
 					{
-						iW = floor(m_iWeapon[i]->w() * 0.65f);
-						iH = floor(m_iWeapon[i]->h() * 0.65f);
-
-						iX -= iW;
-						iY += iH;
-						m_iWeapon[i]->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0, 0, 1, 1, 255, 255, 255, 225);
-						// Draw WeaponName
-						if (SzWeaponFullName && SzWeaponFullName[0])
+						if (i != 3)
 						{
-							gEngfuncs.pfnDrawSetTextColor(1.0f, 1.0f, 1.0f);
-							gEngfuncs.pfnDrawConsoleStringLen(SzWeaponFullName, &iLength, &iHeight);
+							iW = floor(m_iWeapon[i]->h() * 0.6f);
+							iH = floor(m_iWeapon[i]->w() * 0.45f);
 
-							iY += (iH);
-							iY += iHeight;
+							iX -= floor(iH * 0.1f);
+							iY -= floor(m_iSlotBG[0]->h() * 0.25f * 0.25f);
+							m_iWeapon[i]->Draw2DQuadRotatedScaled(iX - iW, iY - iH, iX, iY, 0, 0, 1, 1, 255, 255, 255, 225);
+							iY += floor(m_iSlotBG[0]->h() * 0.25f * 0.25f);
+							iX += floor(iH * 0.1f);
 
-							iW = floor(m_iSlotBG->w() * 0.4f);
-							gEngfuncs.pfnDrawConsoleString(iX + (iW - iLength) * 0.5f, iY, SzWeaponFullName);
-							iW = floor(m_iWeapon[i]->w() * 0.65f);
+						}
+						else
+						{
+							iW = floor(m_iWeapon[i]->w() * 0.55f);
+							iH = floor(m_iWeapon[i]->h() * 0.55f);
 
-							iY -= (iH);
-							iY -= iHeight;
+							iX += floor(iW * 0.08f);
+							iY -= floor(m_iSlotBG[0]->h() * 0.25f * 0.25f);
+							m_iWeapon[i]->Draw2DQuadScaled(iX, iY - iH, iX + iW, iY, 0, 0, 1, 1, 255, 255, 255, 225);
+							iY += floor(m_iSlotBG[0]->h() * 0.25f * 0.25f);
+							iX -= floor(iW * 0.08f);
+
 						}
 
-						iX += iW;
-						iY -= iH;
+						iX += (i == 3) ? floor(m_iSlotBG[0]->w() * 0.35f) : 0;
+					
+						//Draw Ammo
+
+						DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
+
+						int iAmmoSafe;
+						iAmmoSafe = gWR.CountAmmo(pWeapon->iAmmoType) >= 0 ? gWR.CountAmmo(pWeapon->iAmmoType) : 0;
+
+						if (pWeapon->iAmmoType > 0)
+						{
+							auto pRcAmmo = pWeapon->rcAmmo;
+							auto pHAmmo = pWeapon->hAmmo;
+
+							int iAmmoIconWidth = pRcAmmo.right - pRcAmmo.left;
+							int iAmmoIconHeight = pRcAmmo.bottom - pRcAmmo.top;
+
+							int iScaleWidth = floor((pRcAmmo.right - pRcAmmo.left) * 0.6f);
+							int iScaleHeight = floor((pRcAmmo.bottom - pRcAmmo.top) * 0.6f);
+
+							iY -= iAmmoIconHeight;
+							iY += iDrawOffset;
+
+							DrawSpriteTexture(pHAmmo, iX - iAmmoIconWidth, iY, iScaleWidth, iScaleHeight, pRcAmmo, 255, r, g, b);
+
+							iX -= iScaleWidth;
+
+							//iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * flFontProportion);
+							iX -= floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 0, 150 * flFontProportion * 0.8f));
+							CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iAmmoSafe, iX, iY, DHN_CENTERALIGNED, 0, flFontProportion * 0.8f, r, g, b);
+							//iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * flFontProportion);
+							iX += floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 0, 150 * flFontProportion * 0.8f));
+
+							iX += iScaleWidth;
+
+							iY += iAmmoIconHeight;
+							iY -= iDrawOffset;
+						}
 					}
+					iY -= (iPlayerStateBarHeight + (iWpnBarHeight + 20));
 
-
-					iX += iWpnBarWidth;
-					iX += iDrawOffset;
+					iX += (i != 3) ? (iWpnBarWidth) : (-iWpnBarWidth);
+					iX += (i != 3) ? (iDrawOffset * 2.0f) : (-iDrawOffset);
+					iX -= (i != 3) ? (-floor(iW * 0.5f)) : floor(iW * 0.5f);
 
 					break;
-
+				}
 				default:break;
-				}
-			}
 		}
 	}
-
-#if 0
-	int iX, iY, iX2, iY2, i;
-	int iW, iH;
-
-	const int iPlayerStateBarWidth = 430;
-	const int iPlayerStateBarHeight = 85;
-
-	int iWpnBarHeight = m_iWeapon_OffBG->h();
-	int iWpnBarWidth = iPlayerStateBarWidth / 2;
-
-	iX = iX2 = ScreenWidth * 0.5f;
-	iY = iY2 = ScreenHeight - 40;
-	iY -= (iPlayerStateBarHeight + (iWpnBarHeight + 20));
-
-
-	for (i = 0; i < MAX_WEAPON_SLOTS; i++)
-	{
-		iX += ((i % 2 == 0) ? (-iWpnBarWidth) : (5));
-		iY += (i / 2) * iWpnBarHeight;
-
-		WEAPON* p = gWR.GetFirstPos(i);
-		for (int iPos = 0; iPos < MAX_WEAPON_POSITIONS; iPos++)
-		{
-			p = gWR.GetWeaponSlot(i, iPos);
-
-			if (!p || !p->iId)
-				continue;
-
-
-			if (m_iWeapon[i])
-				m_iWeapon[i] = nullptr;
-
-			const char* szModifiedWpnName = p->szName;
-			if (!strncmp(szModifiedWpnName, "weapon_", 7))
-				szModifiedWpnName += 7;
-			else if (!strncmp(szModifiedWpnName, "knife_", 6))
-				szModifiedWpnName += 6;
-			else if (!strncmp(szModifiedWpnName, "z4b_", 4))
-				szModifiedWpnName += 4;
-			else if (!strncmp(szModifiedWpnName, "csgo_", 5))
-				szModifiedWpnName += 5;
-
-			char szModifiedWpnName2[64];
-			strcpy(szModifiedWpnName2, szModifiedWpnName);
-			std::string szWeaponName;
-			szWeaponName.append(szModifiedWpnName2);
-
-			std::string szWeapon = "gfx/vgui/basket/" + szWeaponName;
-			m_iWeapon[i] = R_LoadTextureUnique(szWeapon.c_str());
-
-
-			if (i < 2)
-			{
-				iW = m_iWeapon[i]->w();
-				iH = m_iWeapon[i]->h();
-
-				m_iWeapon_OffBG->Draw2DQuadScaled(iX, iY, iX + iWpnBarWidth, iY + iWpnBarHeight);
-			}
-			else
-			{
-				switch (i)
-				{
-				case 2:
-
-					iW = m_iSlotBG->w() / 2;
-					iH = m_iSlotBG->h() / 2;
-
-					iX2 += iWpnBarWidth + 10;
-					m_iSlotBG->Draw2DQuadScaled(iX2, iY2 - iH, iX2 + iW, iY2);
-					iX2 -= iWpnBarWidth + 10;
-					break;
-				case 3:
-
-					iW = m_iSlotBG->w() / 2;
-					iH = m_iSlotBG->h() / 2;
-
-					iX2 -= iWpnBarWidth + 5;
-					m_iSlotBG->Draw2DQuadScaled(iX2 - iW, iY2 - iH, iX2, iY2);
-					iX2 += iWpnBarWidth + 5;
-					break;
-				default:
-					break;
-				}
-			}
-
-			iW = m_iWeapon[i]->w() / 2;
-			iH = m_iWeapon[i]->h() / 2;
-			m_iWeapon[i]->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0, 0, 1, 1, 255, 255, 255, 225);
-
-		}
-
-		iX -= ((i % 2 == 0) ? (-iWpnBarWidth - 10) : (10));
-		iY -= (i / 2) * iWpnBarHeight;
-
-		iX += 20;
+}
 	}
-#endif
+
+
 	return 1;
+}
+void CHudAmmo::PushApexHudData(int iType, float Var)
+{
+
+
+	switch (iType)
+	{
+	case 1:
+
+		m_flReloadingTime = (float)(Var);
+		m_flReloadTimeDelta = gHUD.m_flTime + m_flReloadingTime + (0.5f);
+		m_iReloadingSlot = m_pWeapon->iSlot;
+
+		break;
+
+	default:break;
+	}
+
 }
 //
 // Draw Weapon Menu

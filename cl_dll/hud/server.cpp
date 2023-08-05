@@ -682,6 +682,12 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		g_iLeapStrikeGunAnim = arg1;
 		break;
 	}
+	case 41:
+	{
+		arg1 = reader.ReadByte();
+		float arg3 = reader.ReadCoord();
+		m_Ammo.PushApexHudData(arg1, arg3);
+	}
 	case 44:
 	{
 		arg1 = reader.ReadByte();

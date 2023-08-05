@@ -142,6 +142,21 @@ namespace cl {
 //
 //-----------------------------------------------------
 //
+
+	typedef struct GrenadeSlot_s
+	{
+		std::string szWeaponName;
+		int iPositon;
+		bool bCurrentSelected;
+		WEAPON* pWeapon;
+
+		bool operator==(const GrenadeSlot_s& obj) const
+		{
+			return obj.szWeaponName == szWeaponName;
+		};
+	}GrenadeSlot_t;
+
+	extern std::vector<GrenadeSlot_t> m_vecGrenadeSuit;
 class CHudAmmo: public CHudBase
 {
 	friend class WeaponsResource;
@@ -166,12 +181,15 @@ public:
 	int DrawNEWHudCurrentWpn(float flTime);
 	int DrawNEWHudAmmo(float flTime);
 	int DrawApexHudWpnList(float flTime);
+	void DrawLoopSpriteTexture(model_t* m_hSpr, int& frame, int framemax, int iX, int iY, int iW, int iH, int a = 255, int r = 255, int g = 255, int b = 255);
+	void DrawSpriteTexture(const HSPRITE m_hSpr, int iX, int iY, int iW, int iH, wrect_t Rc, int a = 255, int r = 255, int g = 255, int b = 255);
+
+	void PushApexHudData(int iType, float Var);
 
 	void ConstructModifiedWpnName(char *SzModifiedName, const char* SzOriginalName, int iModifiyType);
 	void LocalizeWpnName(char* SzModifiedName, const char* SzOriginalName, int iWpnSlot);
 	void ResizeImage(int& iModified);
 
-	void DrawSpriteTexture(const HSPRITE m_hSpr, int iX, int iY, int iW, int iH, wrect_t Rc, int a = 255, int r = 255, int g = 255, int b = 255);
 	CHudMsgFunc(CurWeapon);
 	CHudMsgFunc(WeaponList);
 	CHudMsgFunc(WeaponList2);
@@ -246,7 +264,7 @@ public:
 	UniqueTexture m_iWeaponList;
 	UniqueTexture m_iWeapon_OffBG;
 	UniqueTexture m_iWeapon[MAX_WEAPON_SLOTS];
-	UniqueTexture m_iSlotBG;
+	UniqueTexture m_iSlotBG[2];
 
 	SharedTexture m_iCharacterStateBG;
 	UniqueTexture m_iSlotBGFilled;
@@ -256,6 +274,18 @@ public:
 	wrect_t m_iNum_BigWhiteC[10];
 	SharedTexture m_iNum_Center;
 	wrect_t m_iNum_CenterC[10];
+
+	HSPRITE m_iFadeLoopSprite;
+	model_t* m_pFadeLoopSprite;
+	int m_flFrames;
+
+	float m_flLastFrameTime;
+
+	float m_flReloadingTime;
+	float m_flReloadTimeDelta;
+	int m_iReloadingSlot;
+	UniqueTexture m_iReloading;
+	UniqueTexture m_iReloadingState;
 };
 
 //

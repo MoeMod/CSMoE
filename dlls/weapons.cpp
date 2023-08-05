@@ -1372,6 +1372,12 @@ int CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, duration_t fDelay
 	m_fInReload = TRUE;
 	m_flTimeWeaponIdle = fDelay + 0.5s;
 
+	MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+	WRITE_BYTE(41);
+	WRITE_BYTE(1);
+	WRITE_COORD(float(fNewDelay / 1.0s));		// framerate
+	MESSAGE_END();
+
 	return TRUE;
 }
 
