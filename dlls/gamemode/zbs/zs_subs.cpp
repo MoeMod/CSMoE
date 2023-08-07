@@ -4,6 +4,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "zbs_map_manager.h"
+#include "monster_entity.h"
 #include "zs_subs.h"
 #include "gamerules.h"
 #include "../dlls/gamemode/mod_zbs.h"
@@ -99,21 +100,31 @@ void CZBSBreak::Spawn()
 
 void CZBSBreak::BreakTouch(CBaseEntity* pOther)
 {
-	if (pev->health < 2.0)
+	
+
+	CMonster* pMonster = static_cast<CMonster*>(pOther);
+	
+	if (pMonster)
 	{
-		pev->takedamage = DAMAGE_NO;
-		pev->deadflag = DEAD_DEAD;
-		pev->effects = EF_NODRAW;
-
-		Die();
-
-		if (m_flDelay == 0.0s)
+		if (pev->health < 2.0)
 		{
-			m_flDelay = 0.1s;
+			if (pOther->IsPlayer())
+				return;
+
+			pev->takedamage = DAMAGE_NO;
+			pev->deadflag = DEAD_DEAD;
+			pev->effects = EF_NODRAW;
+
+			Die();
+
+			if (m_flDelay == 0.0s)
+			{
+				m_flDelay = 0.1s;
+			}
+
+			pev->nextthink = pev->ltime + m_flDelay;
+
 		}
-
-		pev->nextthink = pev->ltime + m_flDelay;
-
 	}
 
 	CBreakable::BreakTouch(pOther);
@@ -253,6 +264,17 @@ void CZBSTrigger::TriggerTouch(CBaseEntity* pOther)
 									else if (wave->wavestate != WAVE_KILL && !strcmp(trigger->type.c_str(), "k"))
 									{
 										//todo kill all wave zombi
+										CBaseEntity* npc = nullptr;
+										while ((npc = UTIL_FindEntityByClassname(npc, "monster_entity")) != nullptr)
+										{
+											CMonster* pMonster = static_cast<CMonster *>(npc);
+											if (pMonster && pMonster->m_iWaveID == wave->waveID)
+											{
+												pMonster->Killed(nullptr, GIB_NORMAL);
+											}
+											
+										}
+
 									}
 								}
 

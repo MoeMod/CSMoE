@@ -29,6 +29,7 @@ enum MonsterClass
 	MONSTER_CLASS_DEIMOS2,
 	MONSTER_CLASS_PC,
 	BOSS_CLASS_BIG00,
+	BOSS_CLASS_BIG02,
 };
 
 enum MonsterAnim
@@ -240,6 +241,8 @@ public:
 
 	time_point_t m_flCustomSequenceUntilTime;
 	int m_iCustomSequence;
+	int m_iWaveID;
+	int m_iPriority;
 public:
 	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;
 	std::shared_ptr<CMonster *> m_pLifeCycleHolder; // auto release with RAII
@@ -248,6 +251,9 @@ public:
 	void SetClass(const char* appearance);
 	void SetModel(const char* appearance);
 	void SetSkill(std::unique_ptr<IBaseMonsterSkill> ptr);
+	void SetEntAnim(int ianim, float framerate, duration_t animtime, bool resetframe);
+	bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector origin, float angle, float flMinimumCosine);
+	void RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool falloff = false);
 };
 
 class CMonsterClass_Normal : public CBaseMonsterClass

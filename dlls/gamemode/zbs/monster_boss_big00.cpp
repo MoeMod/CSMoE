@@ -1,83 +1,236 @@
 
-
 #include "monster_boss_big00.h"
+
+std::random_device rd;
+std::mt19937 gen(rd());
+
+// 根据权重随机选择一个项
+template<typename T>
+const T& randomWeightedChoice(const std::vector<std::pair<T, int>>& items) {
+	std::vector<int> weights;
+	int totalWeight = 0;
+
+	for (const auto& item : items) {
+		totalWeight += item.second;
+		weights.push_back(totalWeight);
+	}
+
+	std::uniform_int_distribution<> distribution(1, totalWeight);
+	int randomNumber = distribution(gen);
+
+	auto it = std::lower_bound(weights.begin(), weights.end(), randomNumber);
+	int index = std::distance(weights.begin(), it);
+
+	return items[index].first;
+}
+
 
 namespace sv {
 
+extern std::vector<BossData> g_BossData;
+
+
 void CBossSkill_Big00::OnThink()
 {
-	if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
-	{
-		FireZombieSkill();
-	}
 	CBaseMonsterSkill::OnThink();
-}
 
-void CBossSkill_Big00::FireZombieSkill()
-{
-	UTIL_MakeAimVectors(m_pMonster->pev->angles);
+	if (m_pMonster->m_flStop > gpGlobals->time)
+		return;
 
-	Vector velocity = gpGlobals->v_forward;
-
-	velocity.x *= 1000.0f;
-	velocity.y *= 1000.0f;
-
-	m_pMonster->pev->velocity = velocity;
-	m_flTimeTriggerZombieSkill = invalid_time_point;
+	switch (m_iBossSkillStatus)
+	{
+	case sv::CBossSkill_Big00::NONE:
+		if (m_pMonster->pev->movetype != MOVETYPE_STEP)
+			m_pMonster->pev->movetype = MOVETYPE_STEP;
+		break;
+	case sv::CBossSkill_Big00::SWING:
+		m_pMonster->pev->movetype = MOVETYPE_NONE;
+		m_iBossSkillStatus = SWING_DMG;
+		m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, m_CurSkillData.aniTime, false);
+		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay;
+		break;
+	case sv::CBossSkill_Big00::SWING_DMG:
+		m_pMonster->RadiusDamage(m_pMonster->pev->origin, m_CurSkillData.damage, m_CurSkillData.damageDegree, m_CurSkillData.damageDist, m_CurSkillData.damageHeight, DMG_SLASH, m_CurSkillData.kickSide, m_CurSkillData.kickUp, m_CurSkillData.rushPower, false);
+		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
+		m_iBossSkillStatus = NONE;
+		break;
+	case sv::CBossSkill_Big00::SHOCKWAVE:
+		m_pMonster->pev->movetype = MOVETYPE_NONE;
+		m_iBossSkillStatus = SHOCKWAVE_DMG;
+		m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, m_CurSkillData.aniTime, false);
+		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay + 0.16s;
+		break;
+	case sv::CBossSkill_Big00::SHOCKWAVE_DMG:
+		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
+		ShockWave(m_CurSkillData);
+		m_iBossSkillStatus = NONE;
+		break;
+	case sv::CBossSkill_Big00::DASH:
+		m_pMonster->pev->movetype = MOVETYPE_NONE;
+		m_iBossSkillStatus = DASH_ACTION;
+		m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, 2.2s, false);
+		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay;
+		break;
+	case sv::CBossSkill_Big00::DASH_ACTION:
+		Dash(m_CurSkillData, m_pMonster->m_hTargetEnt);
+		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
+		m_iBossSkillStatus = DASH_END;
+		break;
+	case sv::CBossSkill_Big00::DASH_END:
+		m_iBossSkillStatus = NONE;
+		break;
+	default:
+		break;
+	}
 }
 
 void CBossSkill_Big00::OnActivate(CBaseEntity* target)
 {
-	if (!(m_pMonster->pev->flags & FL_ONGROUND)) return;
-	if (!target) return;
-	if (!target->IsAlive()) return;
-	if (!target->IsPlayer()) return;
-
-	Vector vecDelta = target->pev->origin - m_pMonster->pev->origin;
-	if (vecDelta.IsLengthGreaterThan(1500.0f))
+	if (m_iBossSkillStatus != NONE)
 		return;
 
-	const duration_t flSkillTime = 2.2s;
+	if (!m_pMonster->m_hTargetEnt) return;
+	if (!m_pMonster->m_hTargetEnt->IsAlive()) return;
+	if (!m_pMonster->m_hTargetEnt->IsPlayer()) return;
 
-	m_pMonster->m_iCustomSequence = m_pMonster->LookupSequence("zbs_skill_mahadash");
-	m_pMonster->pev->velocity = g_vecZero;
-	m_pMonster->pev->maxspeed = 1.0f;
-	m_pMonster->m_flCustomSequenceUntilTime = gpGlobals->time + 2.2s;
+	std::vector<BossData> skill;
+	for (auto iter = g_BossData.begin(); iter != g_BossData.end(); iter++)
+	{
+		//根据血量筛选技能,血量区间的技能type必定唯一
+		float flHealth = (m_pMonster->pev->health / m_pMonster->pev->max_health) * 100;
+		if (flHealth < iter->startHealthMin || flHealth > iter->startHealthMax)
+			continue;
 
-	m_pMonster->SetAnimation(MONSTERANIM_IDLE);
+		float dis = (m_pMonster->m_hTargetEnt->pev->origin - m_pMonster->pev->origin).Length();
+		if (dis < iter->startDistMin || dis > iter->startDistMax)
+			continue;
 
-	m_pMonster->m_flStop = gpGlobals->time + flSkillTime;
+		auto it = m_MapSkillTime.find(iter->type);
+		if (it != m_MapSkillTime.end() && it->second > gpGlobals->time)
+			continue;
 
-	m_flTimeTriggerZombieSkill = gpGlobals->time + 0.65s;
-	m_iSkillStatus = SKILL_STATUS_USING;
-	m_flTimeSkillEnd = m_pMonster->m_flStop;
+		skill.push_back(*iter);
+	}
+
+	if (skill.empty())
+		return;
+
+	//根据ratio选技能释放
+	std::vector<std::pair<BossData, int>> items;
+	for (auto iter = skill.begin(); iter != skill.end(); iter++)
+	{
+		items.push_back(std::pair(*iter, iter->ratio));
+	}
+
+	BossData useskill = randomWeightedChoice(items);
+	if (useskill.id == 0)
+		return;
+
+	m_CurSkillData = useskill;
+	m_iSkillStatus = SKILL_STATUS_FREEZING;
+	m_flTimeSkillEnd = gpGlobals->time + 1.0s;
+	m_MapSkillTime[useskill.type] = gpGlobals->time + useskill.cooltime;
+
+	//使用技能
+	if (useskill.type == 0)
+	{
+		m_iBossSkillStatus = SHOCKWAVE;
+	}
+	if (useskill.type == 1)
+	{
+		m_iBossSkillStatus = SWING;
+	}
+	else if (useskill.type == 2)
+	{
+		m_iBossSkillStatus = DASH;
+	}
 }
 
-void CBossSkill_Big00::OnSkillEnd()
+void CBossSkill_Big00::Dash(const BossData& sk, CBaseEntity* target)
 {
-	m_iSkillStatus = SKILL_STATUS_FREEZING;
-	m_pMonster->pev->maxspeed = 225.0f;
-	m_flTimeSkillNext = gpGlobals->time + 7s;
+	m_pMonster->pev->movetype = MOVETYPE_FLY;
+	g_engfuncs.pfnWalkMove(m_pMonster->edict(), m_pMonster->pev->angles.y, 10.0, WALKMOVE_NORMAL);
+	UTIL_MakeVectors(m_pMonster->pev->angles);
+	Vector vecVelocity = gpGlobals->v_forward;
+	vecVelocity *= 1000.0;
+	m_pMonster->pev->velocity = vecVelocity;
+}
+
+void CBossSkill_Big00::ShockWave(const BossData& sk)
+{
+	TraceResult tr;
+	float flDamage;
+	CBaseEntity* pList[100];
+	Vector vecStart;
+
+	vecStart = m_pMonster->pev->origin + Vector(0.0, 0.0, 5.0);
+
+	const float flRange = sk.damageDist / 2.0;
+	int iCount = UTIL_EntitiesInBox(pList, 100, vecStart - Vector(flRange, flRange, flRange), vecStart + Vector(flRange, flRange, flRange), FL_CLIENT | FL_MONSTER);
+
+	flDamage = sk.damage;
+
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecStart);
+	WRITE_BYTE(TE_BEAMCYLINDER);
+	WRITE_COORD(vecStart[0]);
+	WRITE_COORD(vecStart[1]);
+	WRITE_COORD(vecStart[2]);
+	WRITE_COORD(vecStart[0]);
+	WRITE_COORD(vecStart[1]);
+	WRITE_COORD(vecStart[2] + flRange);
+	WRITE_SHORT(g_sModelIndexShockWave);
+	WRITE_BYTE(0); // Start Frame
+	WRITE_BYTE(0); // Framerate
+	WRITE_BYTE(5); // Live Time
+	WRITE_BYTE(60); // Width
+	WRITE_BYTE(0); // Noise
+	WRITE_BYTE(130); // R
+	WRITE_BYTE(139); // G
+	WRITE_BYTE(253); // B
+	WRITE_BYTE(150); // Bright
+	WRITE_BYTE(0); // Speed
+	MESSAGE_END();
+
+	for (int i = 0; i < iCount; i++)
+	{
+		CBaseEntity* pEntity = pList[i];
+
+		if (pEntity == m_pMonster)
+			continue;
+
+		if (!pEntity->IsPlayer())
+			continue;
+
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if(pEntity->pev->origin.z - vecStart.z > sk.damageHeight)
+			continue;
+
+		UTIL_TraceLine(vecStart, pEntity->BodyTarget(vecStart), dont_ignore_monsters, m_pMonster->edict(), &tr);
+
+		if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+			continue;
+
+		pEntity->TakeDamage(m_pMonster->pev, m_pMonster->pev, flDamage, DMG_SLASH);
+
+		((CBasePlayer*)pEntity)->ReactToDeimosTail();
+	}
 }
 
 void CBossSkill_Big00::OnTouch(CBaseEntity* other)
 {
-	if (m_iSkillStatus != SKILL_STATUS_USING)
+	if (m_iBossSkillStatus != DASH_END)
 		return;
 
 	Vector2D vecKickRateDir = (other->pev->origin.Make2D() - m_pMonster->pev->origin.Make2D()).Normalize();
 
-	other->pev->velocity.x = vecKickRateDir.x * 800;
-	other->pev->velocity.y = vecKickRateDir.y * 800;
+	other->pev->velocity.x = vecKickRateDir.x * m_CurSkillData.rushPower;
+	other->pev->velocity.y = vecKickRateDir.y * m_CurSkillData.rushPower;
 	other->pev->velocity.z += 150.0;
 
 	if(other->IsPlayer())
-		other->TakeDamage(m_pMonster->pev, m_pMonster->pev, GetDamage(), DMG_BULLET);
-}
-
-float CBossSkill_Big00::GetDamage()
-{
-	return 2.0;
+		other->TakeDamage(m_pMonster->pev, m_pMonster->pev, m_CurSkillData.damage, DMG_SLASH);
 }
 
 void CBossClass_Big00::OnSpawn()
@@ -96,5 +249,7 @@ void CBossClass_Big00::OnInit()
 	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	m_pMonster->SetSkill(std::make_unique<CBossSkill_Big00>(m_pMonster));
 }
+
+
 
 }

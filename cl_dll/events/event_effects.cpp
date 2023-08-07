@@ -1834,11 +1834,9 @@ void EV_WpnEffects(event_args_s* args)
 		{
 			//touch
 			pModel = IEngineStudio.Mod_ForName("sprites/ef_boomer_ex.spr", 0);
-
+			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 			if (pEnt)
 			{
-
-				pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 				pEnt->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
 				pEnt->entity.curstate.rendermode = kRenderTransAdd;
 				pEnt->entity.curstate.renderamt = 255;

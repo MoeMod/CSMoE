@@ -268,6 +268,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zombiesmoke.cpp
 	./gamemode/zbs/monster_boss_big00.cpp
 	./gamemode/zbs/zbs_map_manager.cpp
+	./gamemode/zbs/monster_boss_big02.cpp
 	)
 
 set (HLWPN_SRCS

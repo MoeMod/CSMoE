@@ -68,7 +68,7 @@ public:
 	CBaseEntity *MakeZombieNPC();
 	void ClearZombieNPC();
 
-	CBaseEntity *MakeZombieNPC(int spawnid, std::map<int, int> vecZombi);
+	CBaseEntity *MakeZombieNPC(int waveid, int spawnid, std::map<int, int> vecZombi);
 
 public:
 	std::vector<CZombieSpawn *> m_vecZombieSpawns;

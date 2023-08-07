@@ -17,6 +17,7 @@ std::vector<ZombiTypeData> g_ZBSZombiTypeData;
 ZBSData g_ZBSData;
 std::vector<ZBSRoundData> g_ZBSRoundData;
 std::vector<TriggerData> g_ZBSTriggerData;
+std::vector<BossData> g_BossData;
 
 void ZBS_LoadSpawnArea()
 {
@@ -456,6 +457,113 @@ void ZBS_LoadTriggerData()
 
 		g_ZBSTriggerData.push_back(trg);
 
+	}
+}
+
+
+void ZBS_LoadBossData()
+{
+	g_BossData.clear();
+
+	static char filename[256];
+	Q_sprintf(filename, "maps\\zbs_sk_%s.csv", STRING(gpGlobals->mapname));
+
+	SteamFile file(filename);
+
+	if (!file.IsValid())
+		return;
+
+	auto readline = [](SteamFile& sf) {
+		std::string ret;
+		char ch = '\0';
+		while (sf.Read((void*)&ch, sizeof(char)))
+		{
+			if (ch == '\n')
+				return std::make_pair(true, ret);
+			ret.push_back(ch);
+		}
+		return std::make_pair(false, ret);
+	};
+
+	bool bFirstLine = true;
+	std::pair<bool, std::string> linedata;
+	while ((linedata = readline(file)).first)
+	{
+		if (bFirstLine) {
+			bFirstLine = false;
+			continue;
+		}
+		std::istringstream ss(linedata.second);
+		std::string data;
+
+		BossData sk;
+		//temp useless
+		std::getline(ss, data, ',');
+
+		std::getline(ss, data, ',');
+		sk.id = atoi(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.type = atoi(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.ratio = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.cooltime = atof(data.c_str()) * 1s;
+
+		std::getline(ss, data, ',');
+		sk.aniTime = atof(data.c_str()) * 1s;
+
+		std::getline(ss, data, ',');
+		sk.aniSeq = data;
+
+		std::getline(ss, data, ',');
+		sk.damageDelay = atof(data.c_str()) * 1s;
+
+		std::getline(ss, data, ',');
+		sk.damage = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.damageDegree = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.damageHeight = atof(data.c_str()) * 39.37;
+
+		std::getline(ss, data, ',');
+		sk.damageDist = atof(data.c_str()) * 39.37;
+
+		std::getline(ss, data, ',');
+		sk.forceAttackTime = atof(data.c_str()) * 1s;
+
+		std::getline(ss, data, ',');
+		sk.startDistMin = atof(data.c_str()) * 39.37;
+
+		std::getline(ss, data, ',');
+		sk.startDistMax = atof(data.c_str()) * 39.37;
+
+		std::getline(ss, data, ',');
+		sk.startHealthMin = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.startHealthMax = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.approachDist = atof(data.c_str()) * 39.37;
+
+		std::getline(ss, data, ',');
+		sk.startMsg = atoi(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.kickSide = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.kickUp = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		sk.rushPower = atof(data.c_str());
+
+		g_BossData.push_back(sk);
 	}
 }
 }

@@ -24,7 +24,7 @@ GNU General Public License for more details.
 #include "zbs_level.h"
 #include "zbs_scoreboard.h"
 #include "zbs_roundclear.h"
-
+#include "zbs_message.h"
 #include "zbs_kill.h"
 
 #include "gamemode/zbs/zbs_const.h"
@@ -79,12 +79,15 @@ int CHudZBS::Init(void)
 	HOOK_MESSAGE(ZBSTip);
 	HOOK_MESSAGE(ZBSLevel);
 
+	ZBS_LoadMessageData();
+
 	return 1;
 }
 
 int CHudZBS::VidInit(void)
 {
 	pimpl->for_each(&IBaseHudSub::VidInit);
+
 	return 1;
 }
 

@@ -5,6 +5,7 @@
 #pragma once
 #endif
 
+#include "zbs_map_manager.h"
 #include "monster_entity.h"
 
 namespace sv {
@@ -21,17 +22,35 @@ public:
 
 class CBossSkill_Big00 : public CBaseMonsterSkill
 {
+	enum BossSkillStatus : byte
+	{
+		NONE,
+		SWING,
+		SWING_DMG,
+		SHOCKWAVE,
+		SHOCKWAVE_DMG,
+		DASH,
+		DASH_ACTION,
+		DASH_END
+	};
+
 public:
-	CBossSkill_Big00(CMonster* p) : CBaseMonsterSkill(p) { m_flTimeTriggerZombieSkill = invalid_time_point; }
+	CBossSkill_Big00(CMonster* p) : CBaseMonsterSkill(p) , m_iBossSkillStatus(NONE)
+	{ 	}
 
 	void OnThink() override;
 	void OnActivate(CBaseEntity* target) override;
 	void OnTouch(CBaseEntity* other) override;
-	void OnSkillEnd() override;
-	void FireZombieSkill();
-	float GetDamage();
+
+	void Dash(const BossData& sk, CBaseEntity* target);
+	void ShockWave(const BossData& sk);
+
 	time_point_t m_flTimeTriggerZombieSkill;
 
+protected:
+	BossData m_CurSkillData;
+	BossSkillStatus m_iBossSkillStatus;
+	std::unordered_map<int, EngineClock::time_point> m_MapSkillTime;
 };
 
 

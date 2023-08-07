@@ -19,7 +19,9 @@
 #include "gamemode/mods.h"
 #include "gamemode/zb2/deimostail.h"
 #include "gamemode/zb2/zombietrap.h"
+#include "gamemode/mod_zbs.h"
 #include "monster_boss_big00.h"
+#include "monster_boss_big02.h"
 #include <future>
 #include <atomic>
 #include <algorithm>
@@ -47,7 +49,7 @@ const std::tuple<MonsterClass, unsigned int, std::shared_ptr<CBaseMonsterClass>(
 	{MONSTER_CLASS_HELMET, 100, MakeMonsterClass<CMonsterClass_Helmet>},
 	{MONSTER_CLASS_DEIMOS2, 100, MakeMonsterClass<CMonsterClass_Deimos2>},
 	{BOSS_CLASS_BIG00, 0, MakeMonsterClass<CBossClass_Big00>},
-
+	{BOSS_CLASS_BIG02, 0, MakeMonsterClass<CBossClass_Big02>},
 };
 
 constexpr auto NUM_MONSTERCLASSES = std::extent<decltype(g_MonsterClassList)>::value;
@@ -141,6 +143,10 @@ std::shared_ptr<CBaseMonsterClass> CMonsterModStrategy_Default::MonsterClassFact
 		{
 			iClass = BOSS_CLASS_BIG00;
 		}
+		else if (strstr(appearance, "bossL_big02"))
+		{
+			iClass = BOSS_CLASS_BIG02;
+		}
 	}
 
 	if (iClass == MONSTER_CLASS_RANDOM)
@@ -215,6 +221,7 @@ public:
 	}
 	bool CanJump() const override
 	{
+		return false;
 		CBasePlayer *player = NULL;
 		if (IsFollowing())
 		{
@@ -676,7 +683,7 @@ void CMonster::Spawn()
 	pev->team = TEAM_TERRORIST; // allow bot attack...
 
 	m_flAttackDist = 35.0f;
-	m_flAttackDamage = 1.0f;
+	m_flAttackDamage = 3.0f;
 	m_flAttackRate = 2.0s;
 	m_flAttackAnimTime = 0.6s;
 	m_flTimeLastActive = gpGlobals->time;
@@ -783,11 +790,14 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 	if (pev->health > 0)
 	{
 		// if attacking then dont play flinch anim
-		if (m_timeNextAttack <= gpGlobals->time)
+		if (m_iClass <= MONSTER_CLASS_PC)
 		{
-			m_flFlinchTime = gpGlobals->time + 0.25s;
-			//SetFlinchActivity();
-			SetAnimation(MONSTERANIM_FLINCH);
+			if (m_timeNextAttack <= gpGlobals->time)
+			{
+				m_flFlinchTime = gpGlobals->time + 0.25s;
+				//SetFlinchActivity();
+				SetAnimation(MONSTERANIM_FLINCH);
+			}
 		}
 
 		if (pAttacker != NULL)
@@ -1073,7 +1083,7 @@ bool CMonster::CheckAttack()
 		}
 	}
 
-	if (m_timeNextAttack > gpGlobals->time || !m_flAttackDamage)
+	if (m_timeNextAttack > gpGlobals->time || m_flAttackDamage < 2.0f)
 		return false;
 
 	if (!m_hTargetEnt)
@@ -1151,6 +1161,33 @@ void CMonster::Wander()
 			m_improv->SetFollowRange(6000.0f, 3000.0f, 50.0f);
 			return;
 		}
+	}
+}
+
+void CMonster::SetEntAnim(int ianim, float framerate, duration_t animtime, bool resetframe)
+{
+	if (!resetframe)
+	{
+		if (pev->sequence != ianim)
+		{
+			pev->frame = 0.0;
+			pev->animtime = gpGlobals->time;
+			pev->framerate = framerate;
+			m_iCustomSequence = ianim;
+			m_flCustomSequenceUntilTime = gpGlobals->time + animtime;
+
+			SetAnimation(MONSTERANIM_IDLE);
+		}
+	}
+	else
+	{	
+		pev->animtime = gpGlobals->time;
+		pev->framerate = framerate;
+		m_iCustomSequence = ianim;
+		m_flCustomSequenceUntilTime = gpGlobals->time + animtime;
+
+		SetAnimation(MONSTERANIM_IDLE);
+
 	}
 }
 
@@ -1596,6 +1633,71 @@ CBasePlayer *CMonster::GetClosestPlayer(bool bVisible) const
 	return close;
 }
 
+bool CMonster::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, float angle, float flMinimumCosine)
+{
+	UTIL_MakeVectors(pAttacker->pev->angles);
+
+	Vector vecForward = gpGlobals->v_forward;
+	Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+	Vector vecEnd = pEntity->BodyTarget(vecSrc);
+
+	if (flMinimumCosine > DotProduct(vecForward2D, (vecEnd.Make2D() - vecSrc.Make2D()).Normalize()))
+		return false;
+
+	return true;
+}
+
+void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool bFalloff)
+{
+	CBaseEntity* pEntity = NULL;
+	float flAdjustedDamage, falloff;
+
+	if (bFalloff)
+	{
+		if (flRadius)
+			falloff = flDamage / flRadius;
+		else
+			falloff = 1;
+	}
+	else
+		falloff = 1;
+	
+	vecSrc.z += 1;
+
+	float c = cos(90.0 * 0.5 * M_PI / 180.0);
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (!AngularCheck(pEntity, this, vecSrc, angle, c))
+			continue;
+
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (!pEntity->IsAlive())
+			continue;
+
+		flAdjustedDamage = (vecSrc - pEntity->pev->origin).Length() * falloff;
+		flAdjustedDamage = flDamage - flAdjustedDamage;
+
+		if (flAdjustedDamage < 0)
+			flAdjustedDamage = 0;
+
+		pEntity->TakeDamage(this->pev, this->pev, bFalloff ? flAdjustedDamage : flDamage, bitsDamageType);
+
+		if (pEntity->IsPlayer())
+		{
+			Vector2D vecDir2D = (pEntity->pev->origin.Make2D() - this->pev->origin.Make2D()).Normalize();
+
+			pEntity->pev->velocity.x = vecDir2D.x * flRushPower;
+			pEntity->pev->velocity.y = vecDir2D.y * flRushPower;
+			//pEntity->pev->velocity.z += pEntity->pev->flags & FL_ONGROUND ? flKickSide : flKickUp;
+		}
+
+	}
+}
+
 void CMonster::SetClass(MonsterClass iClass)
 {
 	auto p = (CMonsterModStrategy_Default*)m_pMonsterStrategy.get();
@@ -1623,10 +1725,25 @@ void CMonster::SetModel(const char* appearance)
 			hullMin = { -32.0, -32.0, -36.0 };
 			hullMax = { 32.0, 32.0, 100.0 };
 		}
-		else if(strstr(appearance, "jun00"))
+		else if (strstr(appearance, "jun01"))
 		{
 			hullMin = VEC_HULL_MIN;
 			hullMax = VEC_HULL_MAX;
+		}
+		else if (strstr(appearance, "big00"))
+		{
+			hullMin = { -50.0, -50.0, -36.0 };
+			hullMax = { 50.0, 50.0, 200.0 };
+		}
+		else if (strstr(appearance, "big01"))
+		{
+			hullMin = { -32.0, -32.0, -36.0 };
+			hullMax = { 32.0, 32.0, 150.0 };
+		}
+		else if (strstr(appearance, "big02"))
+		{
+			hullMin = { -50.0, -50.0, -36.0 };
+			hullMax = { 50.0, 50.0, 150.0 };
 		}
 	}
 	else if (strstr(appearance, "dog"))
@@ -1677,6 +1794,14 @@ void CMonsterModStrategy_Default::OnKilled(entvars_t* pKiller, int iGib)
 {
 	if (m_pSkill) {
 		m_pSkill->OnKilled(pKiller, iGib);
+	}
+
+	CMod_ZombieScenario* pModZBS = dynamic_cast<CMod_ZombieScenario*>(g_pModRunning);
+
+	if (pModZBS)
+	{
+		if (m_pMonster->m_iPriority > 1)
+			pModZBS->HumanWin();
 	}
 }
 

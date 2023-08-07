@@ -87,6 +87,10 @@ bool PlayerModStrategy_ZBS::ClientCommand(const char *pcmd)
 		m_HumanLevel.LevelUpAttack();
 		return true;
 	}
+	else if (FStrEq(pcmd, "humanwin"))
+	{
+		m_pModZBS->HumanWin();
+	}
 	return CPlayerModStrategy_Default::ClientCommand(pcmd);
 }
 
@@ -409,7 +413,7 @@ void CMod_ZombieScenario::Think()
 					}
 					else if((*iter).wavestate == WAVE_OPEN)
 					{
-						MakeZombieNPC(iter->spawnPoint, iter->vecZombi);
+						MakeZombieNPC(iter->waveID, iter->spawnPoint, iter->vecZombi);
 					}
 
 					if (iter->startTime >= iter->endTime)
@@ -742,11 +746,25 @@ int randomByWeight(std::map<int, int> _mapWeight)
 
 }
 
-CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int spawnid, std::map<int, int> vecZombi)
+CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int waveid, int spawnid, std::map<int, int> vecZombi)
 {
+	int priority = 0;
+	int ZombiType = randomByWeight(vecZombi);
+
+	if (!g_ZBSZombiTypeData.empty())
+	{
+		for (auto iter = g_ZBSZombiTypeData.begin(); iter != g_ZBSZombiTypeData.end(); iter++)
+		{
+			if (iter->id == ZombiType)
+			{
+				priority = iter->priority;
+				break;
+			}
+		}
+	}
 
 #ifndef __AUTO_RESIZE__
-	if (MonsterManager().EntityCount() >= MonsterManager().GetMaxNumOfEntity())
+	if (MonsterManager().EntityCount() >= MonsterManager().GetMaxNumOfEntity() && !priority)
 		return nullptr;
 #endif
 	CMonster* monster = GetClassPtr<CMonster>(nullptr);
@@ -757,7 +775,7 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int spawnid, std::map<int, int> 
 	edict_t* pent = monster->edict();
 
 	Vector origin, angles;
-	int ZombiType = randomByWeight(vecZombi);
+	
 
 	CZombieSpawn* sp = SelectZombieSpawnPoint();
 	if (sp)
@@ -778,16 +796,25 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int spawnid, std::map<int, int> 
 		{
 			sp = SelectZombieSpawnPoint(spawnid);
 
-			if (sp)
-			{
-				monster->pev->origin = sp->pev->origin;
-				monster->pev->angles = sp->pev->angles;
-			}
-			else
+			if (!iter->origin.IsZero())
 			{
 				monster->pev->origin = iter->origin;
 				monster->pev->angles = iter->angle;
-			}	
+			}
+			else
+			{
+				if (sp)
+				{
+					monster->pev->origin = sp->pev->origin;
+					monster->pev->angles = sp->pev->angles;
+				}
+				else
+				{
+					monster->pev->origin = sp->pev->origin;
+					monster->pev->angles = sp->pev->angles;
+				}
+			}
+
 			break;
 			//monster->m_iTeam = iter->team;
 		}
@@ -801,14 +828,16 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int spawnid, std::map<int, int> 
 			{
 				monster->m_pMonsterStrategy.reset(new CMonsterModStrategy_ZBS(monster, this));
 				monster->SetClass(iter->appearance.c_str());
+				monster->SetModel(iter->appearance.c_str());
 				pent->v.spawnflags |= SF_NORESPAWN;
 				DispatchSpawn(pent);
 
-				float damageAdd = 0;
+				//default setting
+				float damageAdd = (0.2f * m_iNumCTWins + 1);
 				float attackRangeAdd = 0;
-				float healthAdd = 0;
+				float healthAdd = m_iNumCTWins * 15;
 				float armorAdd = 0;
-				float speedAdd = 0;
+				float speedAdd = (m_iNumCTWins / 3) * 15;
 				int moneyAdd = 0;
 
 				for (auto roundData = g_ZBSRoundData.begin(); roundData != g_ZBSRoundData.end(); roundData++)
@@ -835,7 +864,9 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int spawnid, std::map<int, int> 
 				monster->m_flAttackDist = iter->attackRange + attackRangeAdd;
 				monster->m_flAttackRate = iter->attackInterval;
 				monster->m_iKillBonusMoney = iter->bonusMoney + moneyAdd;
-				monster->SetModel(iter->appearance.c_str());
+				
+				monster->m_iPriority = iter->priority;
+				monster->m_iWaveID = waveid;
 				return monster;
 				break;
 			}

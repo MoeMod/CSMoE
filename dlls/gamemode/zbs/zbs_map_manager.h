@@ -95,12 +95,40 @@ namespace sv {
 		int roundTimeBase;
 	};
 
+	struct BossData
+	{
+		int id;
+		int type;
+		float ratio;
+		duration_t cooltime;
+		duration_t aniTime;
+		std::string aniSeq;
+		duration_t damageDelay;
+		float damage;
+		float damageDegree;
+		float damageHeight;
+		float damageDist;
+		duration_t forceAttackTime;
+		float startDistMin;
+		float startDistMax;
+		float startHealthMin;
+		float startHealthMax;
+		float approachDist;
+		int startMsg;
+		float kickSide;
+		float kickUp;
+		float rushPower;
+
+		time_point_t m_flTimeSkillEnd;
+	};
+
 
 	void ZBS_LoadSpawnArea();
 	void ZBS_LoadWaveData();
 	void ZBS_LoadZombiTypeData();
 	void ZBS_LoadZBSRoundData();
 	void ZBS_LoadTriggerData();
+	void ZBS_LoadBossData();
 }
 
 #endif

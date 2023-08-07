@@ -508,6 +508,7 @@ void CWorld::Precache()
 	ZBS_LoadZombiTypeData();
 	ZBS_LoadZBSRoundData();
 	ZBS_LoadTriggerData();
+	ZBS_LoadBossData();
 
 	// UNDONE why is there so much Spawn code in the Precache function? I'll just keep it here
 
