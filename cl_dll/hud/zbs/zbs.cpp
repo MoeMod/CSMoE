@@ -26,16 +26,46 @@ GNU General Public License for more details.
 #include "zbs_roundclear.h"
 #include "zbs_message.h"
 #include "zbs_kill.h"
+#include "zbs_msg.h"
+#include "zbs_healthbar.h"
 
 #include "gamemode/zbs/zbs_const.h"
 
 namespace cl {
 
 class CHudZBS::impl_t
-	: public THudSubDispatcher<CHudZBSLevel, CHudZBSScoreBoard, CHudZBSKill, CHudZBSRoundClear> {};
+	: public THudSubDispatcher<CHudZBSLevel, CHudZBSScoreBoard, CHudZBSKill, CHudZBSRoundClear, CHudZBSMsg, CHudZBSHealthBar> {};
 
 DECLARE_MESSAGE(m_ZBS, ZBSTip)
 DECLARE_MESSAGE(m_ZBS, ZBSLevel)
+DECLARE_MESSAGE(m_ZBS, ZBSMsg)
+
+int CHudZBS::MsgFunc_ZBSMsg(const char* pszName, int iSize, void* pbuf)
+{
+	BufferReader buf(pszName, pbuf, iSize);
+	int iType = buf.ReadByte();
+	switch (iType)
+	{
+	case 0:
+	{
+		int iID = buf.ReadShort();
+
+		pimpl->get<CHudZBSMsg>().PushMsg(iID);
+		break;
+	}
+	case 1:
+	{
+		int iClass = buf.ReadByte();
+		float flPercent = buf.ReadCoord();
+
+		pimpl->get<CHudZBSHealthBar>().UpdateHealth(flPercent, iClass);
+		break;
+	}
+	}
+	
+
+	return 1;
+}
 
 int CHudZBS::MsgFunc_ZBSTip(const char *pszName, int iSize, void *pbuf)
 {
@@ -78,6 +108,7 @@ int CHudZBS::Init(void)
 
 	HOOK_MESSAGE(ZBSTip);
 	HOOK_MESSAGE(ZBSLevel);
+	HOOK_MESSAGE(ZBSMsg);
 
 	ZBS_LoadMessageData();
 

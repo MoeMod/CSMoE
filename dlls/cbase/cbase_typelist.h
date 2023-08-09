@@ -822,6 +822,7 @@ TL_ADD(CSfTurretNade)
 TL_ADD(CCKnifeDvhammer_Spike)
 TL_ADD(CLeapStrikeGunProj)
 TL_ADD(CZBSBig02Bomb)
+TL_ADD(CZBSBig03Tentacle)
 #endif
 
 TL_END(AllEntityTypeList)

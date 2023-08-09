@@ -14,6 +14,7 @@ public:
 
 	int MsgFunc_ZBSTip(const char *pszName, int iSize, void *pbuf);
 	int MsgFunc_ZBSLevel(const char *pszName, int iSize, void *pbuf);
+	int MsgFunc_ZBSMsg(const char* pszName, int iSize, void* pbuf);
 
 protected:
 	class impl_t;

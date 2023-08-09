@@ -114,7 +114,7 @@ namespace sv {
 		float startHealthMin;
 		float startHealthMax;
 		float approachDist;
-		int startMsg;
+		std::string startMsg;
 		float kickSide;
 		float kickUp;
 		float rushPower;
@@ -122,6 +122,19 @@ namespace sv {
 		time_point_t m_flTimeSkillEnd;
 	};
 
+	struct EventData
+	{
+		int round;
+		duration_t startTime;
+		std::string triggerName;
+	};
+
+	struct MapTriggerData
+	{
+		int id;
+		Vector absmin;
+		Vector absmax;
+	};
 
 	void ZBS_LoadSpawnArea();
 	void ZBS_LoadWaveData();
@@ -129,6 +142,8 @@ namespace sv {
 	void ZBS_LoadZBSRoundData();
 	void ZBS_LoadTriggerData();
 	void ZBS_LoadBossData();
+	void ZBS_LoadEventData();
+	void ZBS_LoadMapTrgData();
 }
 
 #endif

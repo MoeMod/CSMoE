@@ -7,28 +7,6 @@ extern std::vector<BossData> g_BossData;
 
 LINK_ENTITY_TO_CLASS(zbs_big02_bomb, CZBSBig02Bomb);
 
-std::random_device rd;
-std::mt19937 gen(rd());
-
-// 根据权重随机选择一个项
-template<typename T>
-const T& randomWeightedChoice(const std::vector<std::pair<T, int>>& items) {
-	std::vector<int> weights;
-	int totalWeight = 0;
-
-	for (const auto& item : items) {
-		totalWeight += item.second;
-		weights.push_back(totalWeight);
-	}
-
-	std::uniform_int_distribution<> distribution(1, totalWeight);
-	int randomNumber = distribution(gen);
-
-	auto it = std::lower_bound(weights.begin(), weights.end(), randomNumber);
-	int index = std::distance(weights.begin(), it);
-
-	return items[index].first;
-}
 
 void CZBSBig02Bomb::Spawn(void)
 {
@@ -42,7 +20,7 @@ void CZBSBig02Bomb::Spawn(void)
 	ResetSequenceInfo();
 
 	SET_MODEL(ENT(pev), "models/zbs_bossl_big02_bomb.mdl");
-	UTIL_SetSize(pev, { -2.0, -2.0, -2.0 }, { 2.0, 2.0, 2.0 });
+	UTIL_SetSize(pev, { -0.1, -0.1, -0.1 }, { 0.1, 0.1, 0.1 });
 
 	SetTouch(&CZBSBig02Bomb::BombTouch);
 }
@@ -119,6 +97,8 @@ void CBossSkill_Big02::OnThink()
 		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay;
 		break;
 	case sv::CBossSkill_Big02::ZBS_ATTACK1_DMG:
+		if (strstr(m_CurSkillData.aniSeq.c_str(), "knife"))
+			UTIL_TempModel({ 0, 0, 10 }, m_pMonster->pev->angles, g_vecZero, m_iKnifeIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pMonster, true, 16, 0, 256, 0x20000000);
 		m_pMonster->RadiusDamage(m_pMonster->pev->origin, m_CurSkillData.damage, m_CurSkillData.damageDegree, m_CurSkillData.damageDist, m_CurSkillData.damageHeight, DMG_SLASH, m_CurSkillData.kickSide, m_CurSkillData.kickUp, m_CurSkillData.rushPower, false);
 		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
 		m_iBossSkillStatus = ZBS_NONE;
@@ -130,6 +110,8 @@ void CBossSkill_Big02::OnThink()
 		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay + 0.16s;
 		break;
 	case sv::CBossSkill_Big02::ZBS_ATTACK2_DMG:
+		if (strstr(m_CurSkillData.aniSeq.c_str(), "knife"))
+			UTIL_TempModel({ 0, 0, 10 }, m_pMonster->pev->angles, g_vecZero, m_iKnifeIndex, 10, 1, 10, 0, 0, 255, kRenderTransAdd, m_pMonster, true, 16, 0, 256, 0x20000000);
 		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
 		m_pMonster->RadiusDamage(m_pMonster->pev->origin, m_CurSkillData.damage, m_CurSkillData.damageDegree, m_CurSkillData.damageDist, m_CurSkillData.damageHeight, DMG_SLASH, m_CurSkillData.kickSide, m_CurSkillData.kickUp, m_CurSkillData.rushPower, false);
 		m_iBossSkillStatus = ZBS_NONE;
@@ -158,14 +140,16 @@ void CBossSkill_Big02::OnThink()
 		Jump(m_CurSkillData, m_pMonster->m_hTargetEnt);
 		break;
 	case sv::CBossSkill_Big02::ZBS_ATTACK3_END:
+		m_pMonster->pev->movetype = MOVETYPE_NONE;
 		m_pMonster->RadiusDamage(m_pMonster->pev->origin, m_CurSkillData.damage, 360.0f, m_CurSkillData.damageDist, m_CurSkillData.damageHeight, DMG_SLASH, m_CurSkillData.kickSide, m_CurSkillData.kickUp, m_CurSkillData.rushPower, false);
+		m_pMonster->m_flStop = gpGlobals->time + 1s;
 		m_iBossSkillStatus = ZBS_NONE;
 		break;
 	case sv::CBossSkill_Big02::ZBS_ATTACK_BOMB:
 		m_pMonster->pev->movetype = MOVETYPE_NONE;
 		m_iBombSkillCount = 3;
 		m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, m_CurSkillData.aniTime, false);
-		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
+		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay;
 		m_iBossSkillStatus = ZBS_ATTACK_BOMB_ACTION;
 		break;
 	case sv::CBossSkill_Big02::ZBS_ATTACK_BOMB_ACTION:
@@ -180,29 +164,62 @@ void CBossSkill_Big02::OnThink()
 			m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay;
 
 		Vector vecSrc = m_pMonster->pev->origin;
-		Vector vecTarget = vecSrc;
-
-		for (int i = 0; i < 9; i++)
+		vecSrc.z += 40.0;
+	
+		for (int i = 0; i < 3; i++)
 		{
-			vecSrc.x += RANDOM_FLOAT(-5.0f, 5.0f);
-			vecSrc.y += RANDOM_FLOAT(-5.0f, 5.0f);
+			Vector vecVelocity;
 
-			vecTarget.x += RANDOM_FLOAT(-500.0f, 500.0f);
-			vecTarget.y += RANDOM_FLOAT(-500.0f, 500.0f);
+			vecVelocity.z = RANDOM_FLOAT(800.0f, 900.0f);
 
-			Vector vecVelocity = (vecTarget - vecSrc).Normalize();
+			//Upper right 
+			float flDispersion = 500.0;
+			vecVelocity[0] += flDispersion + RANDOM_FLOAT(100.0f, 200.0f);
+			vecVelocity[1] += flDispersion + RANDOM_FLOAT(100.0f, 200.0f);
 
-			vecVelocity *= 500;
-			vecVelocity.z += 500;
-
-			CZBSBig02Bomb* pEnt = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
-			if (pEnt)
+			vecSrc.x += RANDOM_FLOAT(-5, 5);
+			CZBSBig02Bomb* pEntUR = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
+			if (pEntUR)
 			{
-				pEnt->pev->velocity = vecVelocity;
-				pEnt->m_flDamage = m_CurSkillData.damage;
-				pEnt->m_flRadius = m_CurSkillData.damageDist;
+				pEntUR->pev->velocity = vecVelocity;
+				pEntUR->m_flDamage = m_CurSkillData.damage;
+				pEntUR->m_flRadius = m_CurSkillData.damageDist;
+			}
+
+			//Upper left
+			vecSrc.y += RANDOM_FLOAT(-5, 5);
+			vecVelocity[0] -= flDispersion * 2 - RANDOM_FLOAT(100.0f, 200.0f);
+			CZBSBig02Bomb* pEntUL = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
+			if (pEntUL)
+			{
+				pEntUL->pev->velocity = vecVelocity;
+				pEntUL->m_flDamage = m_CurSkillData.damage;
+				pEntUL->m_flRadius = m_CurSkillData.damageDist;
+			}
+
+			//Lower left
+			vecSrc.y += RANDOM_FLOAT(-5, 5);
+			vecVelocity[1] -= flDispersion * 2 - RANDOM_FLOAT(100.0f, 200.0f);
+			CZBSBig02Bomb* pEntLL = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
+			if (pEntLL)
+			{
+				pEntLL->pev->velocity = vecVelocity;
+				pEntLL->m_flDamage = m_CurSkillData.damage;
+				pEntLL->m_flRadius = m_CurSkillData.damageDist;
+			}
+
+			//Lower right
+			vecSrc.x += RANDOM_FLOAT(-5, 5);
+			vecVelocity[0] += flDispersion * 2 + RANDOM_FLOAT(100.0f, 200.0f);
+			CZBSBig02Bomb* pEntLR = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
+			if (pEntLR)
+			{
+				pEntLR->pev->velocity = vecVelocity;
+				pEntLR->m_flDamage = m_CurSkillData.damage;
+				pEntLR->m_flRadius = m_CurSkillData.damageDist;
 			}
 		}
+		
 		break;
 	}
 	case sv::CBossSkill_Big02::ZBS_ATTACK_HOLE:
@@ -219,19 +236,27 @@ void CBossSkill_Big02::OnThink()
 		if(m_flHoleSkillTime < gpGlobals->time)
 			m_iBossSkillStatus = ZBS_ATTACK_HOLE_END;
 		AttackHole(m_CurSkillData, true);
-		m_pMonster->m_flStop = gpGlobals->time;
+		m_pMonster->m_flStop = gpGlobals->time + 0.1s;
 		break;
 	case sv::CBossSkill_Big02::ZBS_ATTACK_HOLE_END:
+		if (strstr(m_CurSkillData.aniSeq.c_str(), "knife"))
+			UTIL_TempModel({ 0, 0, 10 }, m_pMonster->pev->angles, g_vecZero, m_iKnifeIndex, 10, 2, 10, 0, 0, 255, kRenderTransAdd, m_pMonster, true, 16, 0, 256, 0x20000000);
 		AttackHole(m_CurSkillData, false);
 		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
 		m_iBossSkillStatus = ZBS_NONE;
 		break;
 	case sv::CBossSkill_Big02::ZBS_APPEAR:
+		m_pMonster->pev->movetype = MOVETYPE_NONE;
 		m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, m_CurSkillData.aniTime, false);
 		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime;
 		m_iBossSkillStatus = ZBS_NONE;
 		break;
-	case sv::CBossSkill_Big02::ZBS_SCENE_KNIFE:
+	case sv::CBossSkill_Big02::ZBS_SCENE_KNIFE:	
+		MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
+		WRITE_SHORT(std::atoi(m_CurSkillData.startMsg.c_str()));
+		MESSAGE_END();
+
+		m_pMonster->pev->movetype = MOVETYPE_NONE;
 		m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, m_CurSkillData.aniTime, false);
 		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime;
 		m_iBossSkillStatus = ZBS_NONE;
@@ -246,10 +271,6 @@ void CBossSkill_Big02::OnActivate(CBaseEntity* target)
 	if (m_iBossSkillStatus != ZBS_NONE)
 		return;
 
-	if (!m_pMonster->m_hTargetEnt) return;
-	if (!m_pMonster->m_hTargetEnt->IsAlive()) return;
-	if (!m_pMonster->m_hTargetEnt->IsPlayer()) return;
-
 	std::vector<BossData> skill;
 	for (auto iter = g_BossData.begin(); iter != g_BossData.end(); iter++)
 	{
@@ -258,10 +279,27 @@ void CBossSkill_Big02::OnActivate(CBaseEntity* target)
 		if (flHealth < iter->startHealthMin || flHealth > iter->startHealthMax)
 			continue;
 
-		float dis = (m_pMonster->m_hTargetEnt->pev->origin - m_pMonster->pev->origin).Length();
-		if (dis < iter->startDistMin || dis > iter->startDistMax)
-			continue;
+		if (m_pMonster->m_hTargetEnt)
+		{
+			if (!m_pMonster->m_hTargetEnt->IsAlive())
+				continue;
 
+			if (!m_pMonster->m_hTargetEnt->IsPlayer())
+				continue;
+
+			if (iter->damageDegree)
+			{
+				float c = cos(90.0 * 0.5 * M_PI / 180.0);
+
+				if (!m_pMonster->AngularCheck(m_pMonster->m_hTargetEnt, m_pMonster, m_pMonster->m_hTargetEnt->pev->origin, iter->damageDegree, c))
+					continue;
+			}
+
+			float dis = (m_pMonster->m_hTargetEnt->pev->origin - m_pMonster->pev->origin).Length();
+			if (dis < iter->startDistMin || dis > iter->startDistMax)
+				continue;
+		}
+		
 		auto it = m_MapSkillTime.find(iter->type);
 		if (it != m_MapSkillTime.end() && it->second > gpGlobals->time)
 			continue;
@@ -279,7 +317,7 @@ void CBossSkill_Big02::OnActivate(CBaseEntity* target)
 		items.push_back(std::pair(*iter, iter->ratio));
 	}
 
-	BossData useskill = randomWeightedChoice(items);
+	BossData useskill = RandomHelper::getInstance().randomWeightedChoice(items);
 	if (useskill.id == 0)
 		return;
 
@@ -335,7 +373,7 @@ void CBossSkill_Big02::AttackHole(const BossData& sk, bool loop)
 
 	vecStart = m_pMonster->pev->origin + Vector(0.0, 0.0, 5.0);
 
-	float flRange = sk.damageDist;
+	float flRange = 200.0f + sk.damageDist;
 
 	if (!loop)
 		flRange = 200;
@@ -364,8 +402,8 @@ void CBossSkill_Big02::AttackHole(const BossData& sk, bool loop)
 
 		if (loop)
 		{
-			pEntity->pev->velocity.x += vecDir.x * 900;
-			pEntity->pev->velocity.y += vecDir.x * 900;
+			pEntity->pev->velocity.x = vecDir.x * 800;
+			pEntity->pev->velocity.y = vecDir.x * 800;
 		}
 		else
 		{
@@ -385,17 +423,30 @@ void CBossClass_Big02::OnSpawn()
 	m_pMonster->m_flAttackRate = 2.0s;
 	m_pMonster->m_flAttackDist = 72.0f;
 	m_pMonster->pev->maxspeed = 225.0f;
+	m_pMonster->m_turnTolerance = 400.0f;
+	m_pMonster->pev->nextthink = gpGlobals->time;
+	m_pMonster->m_flNextFullThink = gpGlobals->time;
+	m_pMonster->m_flStop = gpGlobals->time;
+	m_pMonster->m_flSkillCheck = gpGlobals->time;
 }
 
 void CBossClass_Big02::OnInit()
 {
-	PRECACHE_MODEL("models/ef_knife.mdl");
-
+	m_bAnimDeath = false;
 	PRECACHE_MODEL("models/monster/zbs_bossl_big02.mdl");
 	SET_MODEL(m_pMonster->edict(), "models/monster/zbs_bossl_big02.mdl");
 	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	m_pMonster->SetSkill(std::make_unique<CBossSkill_Big02>(m_pMonster));
+	m_pMonster->SetAble(JUMP, false);
+	
 }
 
+void CBossClass_Big02::OnKilled(entvars_t* pKiller, int iGib)
+{
+	m_pMonster->pev->nextthink = gpGlobals->time + 10s;
+	m_pMonster->pev->sequence = 20;
+	m_pMonster->pev->frame = 0;
+	m_pMonster->ResetSequenceInfo();
+}
 
 }

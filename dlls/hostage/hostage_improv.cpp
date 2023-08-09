@@ -29,7 +29,7 @@ inline void DrawAxes(const Vector &origin, int red, int green, int blue)
 	UTIL_DrawBeamPoints(origin + Vector(0, 0, size), origin - Vector(0, 0, size), 2, red, green, blue);
 }
 
-CHostageImprov::CHostageImprov(CBaseEntity *entity)
+CHostageImprov::CHostageImprov(CBaseEntity *entity) : m_turnTolerance(300.0f)
 {
 	m_hostage = static_cast<CHostage *>(entity);
 	OnReset();
@@ -238,8 +238,7 @@ bool CHostageImprov::FaceTowards(const Vector &target, float deltaT)
 
 	if (error || fabs(dot) >= maxTurnRate)
 	{
-		const float tolerance = 300.0f;
-		float moveRatio = dot * deltaT * tolerance + moveAngle;
+		float moveRatio = dot * deltaT * m_turnTolerance + moveAngle;
 
 		BotCOS(moveRatio);
 		BotSIN(moveRatio);

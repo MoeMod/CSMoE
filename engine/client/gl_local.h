@@ -332,10 +332,10 @@ byte *GL_ResampleTexture( const byte *source, int in_w, int in_h, int out_w, int
 int GL_CreateTexture( const char *name, int width, int height, const void *buffer, texFlags_t flags );
 void GL_ProcessTexture( int texnum, float gamma, int topColor, int bottomColor );
 void GL_TexFilter( gltexture_t *tex, qboolean update );
-void R_FreeImage( gltexture_t *image, bool ignoreLru = false );
+bool R_FreeImage( gltexture_t *image, bool ignoreLru = false );
 int GL_FindTexture( const char *name );
 void GL_FreeTexture( GLenum texnum );
-void GL_FreeTextureIgnoreLru( GLenum texnum );
+bool GL_FreeTextureIgnoreLru( GLenum texnum );
 void GL_FreeImage( const char *name );
 const char *GL_Target( GLenum target );
 void R_TextureList_f( void );

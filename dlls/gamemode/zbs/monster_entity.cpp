@@ -22,6 +22,7 @@
 #include "gamemode/mod_zbs.h"
 #include "monster_boss_big00.h"
 #include "monster_boss_big02.h"
+#include "monster_boss_big03.h"
 #include <future>
 #include <atomic>
 #include <algorithm>
@@ -50,6 +51,7 @@ const std::tuple<MonsterClass, unsigned int, std::shared_ptr<CBaseMonsterClass>(
 	{MONSTER_CLASS_DEIMOS2, 100, MakeMonsterClass<CMonsterClass_Deimos2>},
 	{BOSS_CLASS_BIG00, 0, MakeMonsterClass<CBossClass_Big00>},
 	{BOSS_CLASS_BIG02, 0, MakeMonsterClass<CBossClass_Big02>},
+	{BOSS_CLASS_BIG03, 0, MakeMonsterClass<CBossClass_Big03>},
 };
 
 constexpr auto NUM_MONSTERCLASSES = std::extent<decltype(g_MonsterClassList)>::value;
@@ -147,6 +149,10 @@ std::shared_ptr<CBaseMonsterClass> CMonsterModStrategy_Default::MonsterClassFact
 		{
 			iClass = BOSS_CLASS_BIG02;
 		}
+		else if (strstr(appearance, "bossL_big03"))
+		{
+			iClass = BOSS_CLASS_BIG03;
+		}
 	}
 
 	if (iClass == MONSTER_CLASS_RANDOM)
@@ -180,6 +186,11 @@ public:
 	CMonsterImprov(CBaseEntity *entity) : CHostageImprov(entity), 
 		m_bCalculatingPath(false)
 	{
+	}
+	CMonsterImprov(CBaseEntity* entity, float turnTolerance) : CHostageImprov(entity),
+		m_bCalculatingPath(false)
+	{
+		m_turnTolerance = turnTolerance;
 	}
 	~CMonsterImprov() {} // virtual
 
@@ -221,12 +232,14 @@ public:
 	}
 	bool CanJump() const override
 	{
-		return false;
-		CBasePlayer *player = NULL;
+		auto pMonster = dynamic_cast<CMonster*>(m_hostage);
+		if(!pMonster->HasAble(JUMP))
+			return false;
+
 		if (IsFollowing())
 		{
-			player = (CBasePlayer *)GetFollowLeader();
-			if ((m_hostage->Center() - player->Center()).Length() < 48.0)
+			CBasePlayer* player = (CBasePlayer *)GetFollowLeader();
+			if ((m_hostage->Center() - player->Center()).LengthSquared() < 48.0f * 48.0f)
 				return false;
 		}
 
@@ -799,6 +812,14 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 				SetAnimation(MONSTERANIM_FLINCH);
 			}
 		}
+		else
+		{
+			MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
+			WRITE_BYTE(1);
+			WRITE_BYTE(m_iClass);
+			WRITE_COORD((float)(pev->health / pev->max_health));
+			MESSAGE_END();
+		}
 
 		if (pAttacker != NULL)
 		{
@@ -870,14 +891,6 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 {
 	if (!IsAlive())
 		return;
-	// unsigned int cCount = 0;
-	// BOOL fDone = FALSE;
-
-	// clear the deceased's sound channels.(may have been firing or reloading when killed)
-	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/null.wav", VOL_NORM, ATTN_NORM);
-	m_IdealMonsterState = MONSTERSTATE_DEAD;
-	// Make sure this condition is fired too (TakeDamage breaks out before this happens on death)
-	SetConditions(bits_COND_LIGHT_DAMAGE);
 
 	// tell owner ( if any ) that we're dead.This is mostly for MonsterMaker functionality.
 	CBaseEntity *pOwner = CBaseEntity::Instance(pev->owner);
@@ -889,15 +902,8 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 	SetTouch(NULL);
 	BecomeDead();
 
-	//pev->enemy = ENT(pevAttacker);//why? (sjb)
-	m_IdealMonsterState = MONSTERSTATE_DEAD;
-
-	//SetDeathActivity();
-	SetAnimation(MONSTERANIM_DIE);
-
 	pev->nextthink = gpGlobals->time + 3s;
 	SetThink(&CMonster::Remove);
-
 	m_flTimeLastActive = invalid_time_point;
 
 	m_pMonsterStrategy->OnKilled(pevAttacker, iGib);
@@ -921,10 +927,12 @@ CMonster::CMonster() : CHostage(),
 	m_iKillBonusFrags(1), 
 	m_flTimeLastActive(0.0s), 
 	m_iClass(MONSTER_CLASS_ZOMBIE),
-	m_pMonsterStrategy(new CMonsterModStrategy_Default(this))
+	m_pMonsterStrategy(new CMonsterModStrategy_Default(this)),
+	m_turnTolerance(300.0f)
 {
 	m_pLifeCycleHolder = std::make_shared<CMonster *>(this);
 	MonsterManager().OnEntityAdd(m_pLifeCycleHolder);
+	m_able.set();
 }
 
 void CMonster::IdleThink()
@@ -935,7 +943,7 @@ void CMonster::IdleThink()
 
 	if (!m_improv)
 	{
-		m_improv = new CMonsterImprov(this);
+		m_improv = new CMonsterImprov(this, m_turnTolerance);
 	}
 
 	if (m_iHealthDecreaseCount && gpGlobals->time > m_flHealthDecreaseStartTime)
@@ -1045,6 +1053,7 @@ bool CMonster::CheckTarget()
 	if (m_hTargetEnt && !m_hTargetEnt->IsAlive())
 	{
 		m_flTargetChange = gpGlobals->time + 0.2s;
+		m_hTargetEnt = nullptr;
 		return false;
 	}
 	return false;
@@ -1722,7 +1731,7 @@ void CMonster::SetModel(const char* appearance)
 
 		if (strstr(appearance, "jun00"))
 		{
-			hullMin = { -32.0, -32.0, -36.0 };
+			hullMin = { -32.0, -32.0, 30.0 };
 			hullMax = { 32.0, 32.0, 100.0 };
 		}
 		else if (strstr(appearance, "jun01"))
@@ -1732,18 +1741,25 @@ void CMonster::SetModel(const char* appearance)
 		}
 		else if (strstr(appearance, "big00"))
 		{
-			hullMin = { -50.0, -50.0, -36.0 };
-			hullMax = { 50.0, 50.0, 200.0 };
+			hullMin = { -32.0, -32.0, 30.0 };
+			hullMax = { 32.0, 32.0, 150.0 };
 		}
 		else if (strstr(appearance, "big01"))
 		{
-			hullMin = { -32.0, -32.0, -36.0 };
+			hullMin = { -32.0, -32.0, 30.0 };
 			hullMax = { 32.0, 32.0, 150.0 };
 		}
 		else if (strstr(appearance, "big02"))
 		{
-			hullMin = { -50.0, -50.0, -36.0 };
-			hullMax = { 50.0, 50.0, 150.0 };
+			hullMin = { -32.0, -32.0, 30.0 };
+			hullMax = { 32.0, 32.0, 150.0 };
+		}
+		else if (strstr(appearance, "big03"))
+		{
+			hullMin = { -32.0, -32.0, 30.0 };
+			hullMax = { 32.0, 32.0, 150.0 };
+			//hullMin = { 16.0, 16.0, 10.0 };
+			//hullMax = { 3.0, 3.0, 3.0 };
 		}
 	}
 	else if (strstr(appearance, "dog"))
@@ -1792,6 +1808,10 @@ void CMonsterModStrategy_Default::OnTouch(CBaseEntity* other)
 
 void CMonsterModStrategy_Default::OnKilled(entvars_t* pKiller, int iGib)
 {
+	if (m_pClass) {
+		m_pClass->OnKilled(pKiller, iGib);
+	}
+
 	if (m_pSkill) {
 		m_pSkill->OnKilled(pKiller, iGib);
 	}
@@ -1826,6 +1846,11 @@ void CBaseMonsterClass::OnInit()
 {
 	SET_MODEL(m_pMonster->edict(), "models/player/zombi_origin/zombi_origin.mdl");
 	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
+}
+
+void CBaseMonsterClass::OnKilled(entvars_t* pKiller, int iGib)
+{
+	if(m_bAnimDeath) m_pMonster->SetAnimation(MONSTERANIM_DIE);
 }
 
 const Vector CBaseMonsterClass::GetCenterid() const

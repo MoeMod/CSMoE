@@ -21,6 +21,14 @@
 namespace sv {
 
 
+extern std::vector<SpawnData> g_ZBSSpawnData;
+extern std::vector<WaveData> g_ZBSWaveData;
+extern std::vector<ZombiTypeData> g_ZBSZombiTypeData;
+extern ZBSData g_ZBSData;
+extern std::vector<ZBSRoundData> g_ZBSRoundData;
+extern std::vector<TriggerData> g_ZBSTriggerData;
+extern std::vector<EventData> g_EventData;
+
 PlayerModStrategy_ZBS::PlayerModStrategy_ZBS(CBasePlayer *player, CMod_ZombieScenario *mp) : CPlayerModStrategy_Default(player), m_HumanLevel(player), m_pModZBS(mp)
 {
 	m_flWallTakeDamage = 0.0f;
@@ -67,11 +75,29 @@ void PlayerModStrategy_ZBS::ClientPutInServer()
 {
 	m_flSpawnTimeOffset = 0.0f;
 	m_flSpawnTime = invalid_time_point;
+
+	if (!g_ZBSWaveData.empty() && !g_ZBSRoundData.empty())
+	{
+		for (auto roundData = g_ZBSRoundData.begin(); roundData != g_ZBSRoundData.end(); roundData++)
+		{
+			if ((m_pModZBS->m_iNumCTWins + 1) == roundData->round)
+			{		
+				if (roundData->BGM == 6)
+					g_engfuncs.pfnClientCommand(m_pPlayer->edict(), "mp3 loop sound/Scenario_Rush.mp3\n");
+				else if (roundData->BGM == 5)
+					g_engfuncs.pfnClientCommand(m_pPlayer->edict(), "mp3 loop sound/Scenario_Normal.mp3\n");
+				else
+					g_engfuncs.pfnClientCommand(m_pPlayer->edict(), "mp3 loop sound/Scenario_Normal.mp3\n");
+			}
+		}
+	}
 }
 
 void PlayerModStrategy_ZBS::OnSpawn()
 {
-	m_pPlayer->pev->health += m_HumanLevel.GetHealthBonus();
+	//m_pPlayer->pev->health += m_HumanLevel.GetHealthBonus();
+	if(!m_pPlayer->IsBot())
+		m_pPlayer->pev->health += 800.0f;
 	m_pPlayer->SpawnProtection_Start(3.0s);
 }
 
@@ -134,15 +160,15 @@ void PlayerModStrategy_ZBS::UpdateStatusBar(CBaseEntity* pEntity, char* sbuf0, i
 	if (!FClassnameIs(pEntity->pev, "zbsbreak"))
 		return;
 
-	if (playerid.value != PLAYERID_OFF || m_pPlayer->IsObserver())
-		strcpy(sbuf0, "1 %c1 %i3");
-	else
-		strcpy(sbuf0, " ");
+		if (playerid.value != PLAYERID_OFF || m_pPlayer->IsObserver())
+			strcpy(sbuf0, "1 %c1 %i3");
+		else
+			strcpy(sbuf0, " ");
 
-	newSBarState[SBAR_ID_TARGETTYPE] = SBAR_TARGETTYPE_WALL;
-	newSBarState[SBAR_ID_TARGETHEALTH] = int(pEntity->pev->health);
+		newSBarState[SBAR_ID_TARGETTYPE] = SBAR_TARGETTYPE_WALL;
+		newSBarState[SBAR_ID_TARGETHEALTH] = int(pEntity->pev->health);
 
-	m_pPlayer->m_flStatusBarDisappearDelay = gpGlobals->time + 2s;
+		m_pPlayer->m_flStatusBarDisappearDelay = gpGlobals->time + 2s;
 }
 
 
@@ -169,12 +195,6 @@ protected:
 };
 
 
-extern std::vector<SpawnData> g_ZBSSpawnData;
-extern std::vector<WaveData> g_ZBSWaveData;
-extern std::vector<ZombiTypeData> g_ZBSZombiTypeData;
-extern ZBSData g_ZBSData;
-extern std::vector<ZBSRoundData> g_ZBSRoundData;
-extern std::vector<TriggerData> g_ZBSTriggerData;
 
 void CMod_ZombieScenario::InstallPlayerModStrategy(CBasePlayer *player)
 {
@@ -258,12 +278,47 @@ void CMod_ZombieScenario::RestartRound()
 	}
 
 	ClearZombieNPC();
+	CheckMapEvent();
 	CHalfLifeMultiplay::RestartRound();
 }
 
 void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
 {
 	CHalfLifeMultiplay::PlayerSpawn(pPlayer);
+}
+
+void CMod_ZombieScenario::CheckMapEvent()
+{
+	if (!g_EventData.empty())
+	{
+		for (auto evt = g_EventData.begin(); evt != g_EventData.end(); evt++)
+		{
+			if ((m_iNumCTWins + 1) == evt->round)
+			{
+				CBaseEntity* trg = nullptr;
+				while ((trg = UTIL_FindEntityByClassname(trg, "trigger_once")) != nullptr)
+				{
+					CTriggerOnce* pTrg = static_cast<CTriggerOnce*>(trg);
+					if (pTrg)
+					{
+						if (!FStringNull(pTrg->pev->targetname))
+						{
+							const char* targetname = STRING(pTrg->pev->targetname);
+
+							if (!strcmp(targetname, (evt->triggerName.substr(0, evt->triggerName.length() - 1)).c_str()))
+							{
+								pTrg->m_flDelay = evt->startTime;
+								pTrg->SUB_UseTargets(pTrg, USE_TOGGLE, 0);
+							}
+						}
+						
+					}
+				}
+			}
+		}
+
+		
+	}
 }
 
 void CMod_ZombieScenario::WaitingSound()
@@ -408,8 +463,12 @@ void CMod_ZombieScenario::Think()
 					if (iter->spawnPoint == 9999)
 					{
 						//todo hud msg
-						
-						UTIL_ClientPrintAll(HUD_PRINTCENTER, "#CSO_ZS_Warning_MSG_%s", iter->eventmessage.c_str());
+						MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
+						WRITE_BYTE(0);
+						WRITE_SHORT(std::atoi(iter->eventmessage.c_str())); 
+						MESSAGE_END();
+
+						//UTIL_ClientPrintAll(HUD_PRINTCENTER, "#CSO_ZS_Warning_MSG_%s", iter->eventmessage.c_str());
 					}
 					else if((*iter).wavestate == WAVE_OPEN)
 					{
@@ -499,6 +558,18 @@ void CMod_ZombieScenario::ZombieWin()
 	WRITE_BYTE(ZBS_TIP_ROUNDFAIL);
 	MESSAGE_END();
 
+	//avoid crash
+	CBaseEntity* npc = nullptr;
+	while ((npc = UTIL_FindEntityByClassname(npc, "monster_entity")) != nullptr)
+	{
+		npc->pev->nextthink = gpGlobals->time + 999s;
+
+		CMonster* pMonster = static_cast<CMonster*>(npc);
+
+		if (pMonster)
+			pMonster->SetAnimation(MONSTERANIM_IDLE);	
+	}
+
 	TerminateRound(5s, WINSTATUS_TERRORISTS);
 	++m_iNumTerroristWins;
 	UpdateTeamScores();
@@ -570,6 +641,7 @@ void CMod_ZombieScenario::RoundStart()
 
 				if (g_ZBSTriggerData.empty())
 				{
+					//gametype == 0
 					for (auto waveData = g_ZBSWaveData.begin(); waveData != g_ZBSWaveData.end(); waveData++)
 					{
 						if (std::find(roundData->waveTypes.begin(), roundData->waveTypes.end(), waveData->waveID) != roundData->waveTypes.end())
@@ -582,6 +654,25 @@ void CMod_ZombieScenario::RoundStart()
 				}
 				else
 				{	
+					//遍历该关卡的trigger
+					CBaseEntity* trg = nullptr;
+					while ((trg = UTIL_FindEntityByClassname(trg, "zbstrigger")) != nullptr)
+					{
+						CZBSTrigger* pTrg = static_cast<CZBSTrigger*>(trg);
+						if (pTrg)
+						{	
+							pTrg->m_bTriggerClosed = true;
+							//打开该关卡对应的trigger
+							for (auto trigger = g_ZBSTriggerData.begin(); trigger != g_ZBSTriggerData.end(); trigger++)
+							{
+								if (std::find(roundData->waveTypes.begin(), roundData->waveTypes.end(), trigger->id) != roundData->waveTypes.end())
+								{
+									if (trigger->map_triggerid == pTrg->m_iTriggerId)
+										pTrg->m_bTriggerClosed = false;
+								}
+							}
+						}
+					}	
 #if 0
 					//close all wave use map trigger
 					for (auto waveData = g_ZBSWaveData.begin(); waveData != g_ZBSWaveData.end(); waveData++)
@@ -951,6 +1042,8 @@ BOOL CMod_ZombieScenario::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity
 ModConfigData_t CMod_ZombieScenario::QueryModConfig(const char *key, ModConfigData_t defaultValue, CBaseEntity *invoker) {
     if(!strcmp(key, "MaxMoney"))
         return 32000;
+	if (!strcmp(key, "WeaponBoxLifeTime"))
+		return 30.0s;
     return IBaseMod::QueryModConfig(key, defaultValue, invoker);
 }
 

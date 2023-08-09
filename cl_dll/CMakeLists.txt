@@ -516,6 +516,8 @@ set (HUD_SRCS
 	./hud/zbs/zbs_kill.cpp
 	./hud/zbs/zbs_roundclear.cpp
 	./hud/zbs/zbs_message.cpp
+	./hud/zbs/zbs_msg.cpp
+	./hud/zbs/zbs_healthbar.cpp
 	./hud/retina.cpp
 	./hud/scenariostatus.cpp
 	./hud/zb2/zb2.cpp

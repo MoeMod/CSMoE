@@ -116,6 +116,7 @@ extern int gmsgHitMsg;
 extern int gmsgHeadIcon;
 extern int gmsgZBSTip;
 extern int gmsgZBSLevel;
+extern int gmsgZBSMsg;
 extern int gmsgBTEWeapon;
 extern int gmsgZB2Msg;
 extern int gmsgZB3Msg;

@@ -11,6 +11,7 @@ typedef struct lua_State lua_State;
 #define SIGNAL_RESCUE			(1<<2)
 #define SIGNAL_ESCAPE			(1<<3)
 #define SIGNAL_VIPSAFETY		(1<<4)
+#define SIGNAL_ROUNDCLEAR		(1<<5)
 
 #ifdef CLIENT_DLL
 namespace cl {

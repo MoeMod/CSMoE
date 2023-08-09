@@ -31,6 +31,8 @@ public:
 
 	void OnInit() override;
 	void OnSpawn() override;
+	void OnKilled(entvars_t* pKiller, int iGib) override;
+	//const Vector GetCenterid() const override;
 };
 
 class CBossSkill_Big02 : public CBaseMonsterSkill
@@ -60,6 +62,8 @@ public:
 	CBossSkill_Big02(CMonster* p) : CBaseMonsterSkill(p) , m_iBossSkillStatus(ZBS_NONE)
 	{ 
 		m_iHoleIndex = PRECACHE_MODEL("models/ef_hole.mdl");
+		m_iKnifeIndex = PRECACHE_MODEL("models/ef_knife.mdl");
+
 	}
 
 	void OnThink() override;
@@ -71,6 +75,7 @@ public:
 protected:
 	BossData m_CurSkillData;
 	time_point_t m_flHoleSkillTime;
+	int m_iKnifeIndex;
 	int m_iHoleIndex;
 	int m_iBombSkillCount;
 	BossSkillStatus m_iBossSkillStatus;

@@ -1,30 +1,6 @@
 
 #include "monster_boss_big00.h"
 
-std::random_device rd;
-std::mt19937 gen(rd());
-
-// 根据权重随机选择一个项
-template<typename T>
-const T& randomWeightedChoice(const std::vector<std::pair<T, int>>& items) {
-	std::vector<int> weights;
-	int totalWeight = 0;
-
-	for (const auto& item : items) {
-		totalWeight += item.second;
-		weights.push_back(totalWeight);
-	}
-
-	std::uniform_int_distribution<> distribution(1, totalWeight);
-	int randomNumber = distribution(gen);
-
-	auto it = std::lower_bound(weights.begin(), weights.end(), randomNumber);
-	int index = std::distance(weights.begin(), it);
-
-	return items[index].first;
-}
-
-
 namespace sv {
 
 extern std::vector<BossData> g_BossData;
@@ -101,6 +77,14 @@ void CBossSkill_Big00::OnActivate(CBaseEntity* target)
 		if (flHealth < iter->startHealthMin || flHealth > iter->startHealthMax)
 			continue;
 
+		if (iter->damageDegree)
+		{
+			float c = cos(90.0 * 0.5 * M_PI / 180.0);
+
+			if (!m_pMonster->AngularCheck(m_pMonster->m_hTargetEnt, m_pMonster, m_pMonster->m_hTargetEnt->pev->origin, iter->damageDegree, c))
+				continue;
+		}
+
 		float dis = (m_pMonster->m_hTargetEnt->pev->origin - m_pMonster->pev->origin).Length();
 		if (dis < iter->startDistMin || dis > iter->startDistMax)
 			continue;
@@ -122,7 +106,7 @@ void CBossSkill_Big00::OnActivate(CBaseEntity* target)
 		items.push_back(std::pair(*iter, iter->ratio));
 	}
 
-	BossData useskill = randomWeightedChoice(items);
+	BossData useskill = RandomHelper::getInstance().randomWeightedChoice(items);
 	if (useskill.id == 0)
 		return;
 
@@ -248,8 +232,7 @@ void CBossClass_Big00::OnInit()
 	SET_MODEL(m_pMonster->edict(), "models/monster/zbs_bossl_big00.mdl");
 	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	m_pMonster->SetSkill(std::make_unique<CBossSkill_Big00>(m_pMonster));
+	m_pMonster->SetAble(JUMP, false);
+	m_pMonster->m_turnTolerance = 400.0f;
 }
-
-
-
 }

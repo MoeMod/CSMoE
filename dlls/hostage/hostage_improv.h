@@ -203,7 +203,6 @@ public:
 	void UpdateVision();
 
 	void SetFollowRange(float maxPathLength, float giveUpRange, float stopRange) { m_followState.SetFollowRange(maxPathLength, giveUpRange, stopRange); }
-
 public:
 	CountdownTimer m_coughTimer;
 	CountdownTimer m_grenadeTimer;
@@ -278,6 +277,7 @@ protected:
 	EntityHandle<CBasePlayer> m_visiblePlayer[ MAX_CLIENTS ];
 	int m_visiblePlayerCount;
 	CountdownTimer m_visionTimer;
+	float m_turnTolerance;
 };
 
 class CheckWayFunctor

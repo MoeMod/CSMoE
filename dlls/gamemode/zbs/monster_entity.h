@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <mutex>
+#include <bitset>
 
 namespace sv {
 
@@ -29,7 +30,9 @@ enum MonsterClass
 	MONSTER_CLASS_DEIMOS2,
 	MONSTER_CLASS_PC,
 	BOSS_CLASS_BIG00,
+	BOSS_CLASS_BIG01,
 	BOSS_CLASS_BIG02,
+	BOSS_CLASS_BIG03,
 };
 
 enum MonsterAnim
@@ -52,8 +55,52 @@ enum MonsterSkillStatus : byte
 	SKILL_STATUS_FREEZING
 };
 
-class CMonster;
+enum MonsterAbleFlag {
+	WALK = 0,
+	RUN,
+	JUMP,
+	ATTACK,
+	MAX_ABLE
+};
 
+class RandomHelper {
+private:
+	std::random_device rd;
+	std::mt19937 gen;
+
+// 私有构造函数，防止外部创建实例
+RandomHelper() : gen(rd()) {}
+
+public:
+	// 全局访问点，返回唯一实例
+	static RandomHelper& getInstance() {
+		static RandomHelper instance;
+		return instance;
+	}
+
+	// 根据权重随机选择一个项
+	template<typename T>
+	const T& randomWeightedChoice(const std::vector<std::pair<T, int>>& items) {
+		std::vector<int> weights;
+		int totalWeight = 0;
+
+		for (const auto& item : items) {
+			totalWeight += item.second;
+			weights.push_back(totalWeight);
+		}
+
+		std::uniform_int_distribution<> distribution(1, totalWeight);
+		int randomNumber = distribution(gen);
+
+		auto it = std::lower_bound(weights.begin(), weights.end(), randomNumber);
+		int index = std::distance(weights.begin(), it);
+
+		return items[index].first;
+	}
+};
+
+
+class CMonster;
 struct BaseMonsterExtra
 {
 public:
@@ -139,16 +186,19 @@ inline IBaseMonsterClass::~IBaseMonsterClass() {}
 class CBaseMonsterClass : public IBaseMonsterClass
 {
 public:
-	explicit CBaseMonsterClass(CMonster* p) : IBaseMonsterClass(p) {}
+	explicit CBaseMonsterClass(CMonster* p) : IBaseMonsterClass(p), m_bAnimDeath(true) {}
 
 	void OnInit() override;
 	void OnSpawn() override {}
 	void OnThink() override {}
 	void OnTouch(CBaseEntity* other) override {}
-	void OnKilled(entvars_t* pKiller, int iGib) override  {}
+	void OnKilled(entvars_t* pKiller, int iGib) override;
 
 	const Vector GetCenterid() const override;
 	void DeathSound() const override;
+
+protected:
+	bool m_bAnimDeath;
 };
 
 class CMonsterModStrategy_Default : public IBaseMonsterStrategy
@@ -181,6 +231,21 @@ public:
 	std::shared_ptr<CBaseMonsterClass> MonsterClassFactory(MonsterClass iClass);
 	std::shared_ptr<CBaseMonsterClass> MonsterClassFactory(const char* appearance);
 };
+
+//class CBaseMonsterBossClass : public CBaseMonsterClass
+//{
+//public:
+//	explicit CBaseMonsterBossClass(CMonster* p) : CBaseMonsterClass(p) {}
+//
+//	void OnInit() override;
+//	void OnSpawn() override {}
+//	void OnThink() override {}
+//	void OnTouch(CBaseEntity* other) override {}
+//	void OnKilled(entvars_t* pKiller, int iGib) override;
+//
+//	const Vector GetCenterid() const override;
+//	void DeathSound() const override;
+//};
 
 class CMonster : public CHostage
 {
@@ -243,6 +308,9 @@ public:
 	int m_iCustomSequence;
 	int m_iWaveID;
 	int m_iPriority;
+	std::bitset<MAX_ABLE> m_able;
+	float m_turnTolerance;
+
 public:
 	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;
 	std::shared_ptr<CMonster *> m_pLifeCycleHolder; // auto release with RAII
@@ -254,6 +322,13 @@ public:
 	void SetEntAnim(int ianim, float framerate, duration_t animtime, bool resetframe);
 	bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector origin, float angle, float flMinimumCosine);
 	void RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool falloff = false);
+
+	inline void SetAble(MonsterAbleFlag behavior, bool value) {
+		m_able.set(static_cast<size_t>(behavior), value);
+	}
+	inline bool HasAble(MonsterAbleFlag behavior) {
+		return m_able.test(static_cast<size_t>(behavior));
+	}
 };
 
 class CMonsterClass_Normal : public CBaseMonsterClass

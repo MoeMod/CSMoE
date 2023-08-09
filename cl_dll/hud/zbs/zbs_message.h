@@ -1,8 +1,11 @@
+
 #ifndef ZBS_MAP_MANAGER_H
 #define ZBS_MAP_MANAGER_H
 #ifdef _WIN32
 #pragma once
 #endif
+
+#include <zbs/zbs_msg.h>
 
 namespace cl {
 
@@ -20,10 +23,25 @@ namespace cl {
 		float fadeOut;
 		int type;
 		int textType;
+
+		void operator=(CHudZBSMsg::ZbsMsgProperties_s& obj)
+		{
+			obj.pColor[0] = r;
+			obj.pColor[1] = g;
+			obj.pColor[2] = b;
+
+			obj.szImage = image;
+			obj.szSound = sound;
+			obj.szText = text;
+
+		};
+		friend CHudZBSMsg;
 	};
 
 
 	void ZBS_LoadMessageData();
+	extern std::map<int, MessageData> g_ZBSMessageData;
+	
 }
 
 #endif

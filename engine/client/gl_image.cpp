@@ -1860,16 +1860,16 @@ void GL_FreeTexture( GLenum texnum )
 GL_FreeTextureIgnoreLru
 ================
 */
-void GL_FreeTextureIgnoreLru(GLenum texnum)
+bool GL_FreeTextureIgnoreLru(GLenum texnum)
 {
 	// number 0 it's already freed
 	if( texnum <= 0 || !glw_state.initialized )
-		return;
+		return false;
 
 	ASSERT( texnum > 0 && texnum < R_TextureNum() );
 	if (texnum >= R_TextureNum())
-		return;
-	R_FreeImage( &r_textures[texnum], true);
+		return false;
+	return R_FreeImage( &r_textures[texnum], true);
 }
 
 /*
@@ -1877,7 +1877,7 @@ void GL_FreeTextureIgnoreLru(GLenum texnum)
 R_FreeImage
 ================
 */
-void R_FreeImage( gltexture_t *image, bool ignoreLru )
+bool R_FreeImage( gltexture_t *image, bool ignoreLru )
 {
 	uint		hash;
 	gltexture_t	*cur;
@@ -1889,19 +1889,19 @@ void R_FreeImage( gltexture_t *image, bool ignoreLru )
 	{
 		if( image->texnum != 0 )
 			MsgDev( D_ERROR, "trying to free unnamed texture with texnum %i\n", image->texnum );
-		return;
+		return false;
 	}
 
 	if (image->refCount && --image->refCount > 0)
 	{
-		return;
+		return false;
 	}
 
 	auto iter = r_texturesHashTable.find(image->name);
 	if (iter == r_texturesHashTable.end())
 	{
 		MsgDev(D_ERROR, "couldn't find %i %s\n", image->texnum, image->name);
-		return;
+		return false;
 	}
 
 	if (!ignoreLru) xe::TexLru_Free( image->texnum );
@@ -1921,6 +1921,7 @@ void R_FreeImage( gltexture_t *image, bool ignoreLru )
 
 	pglDeleteTextures( 1, &image->texnum );
 	*image = {};
+	return true;
 }
 
 /*

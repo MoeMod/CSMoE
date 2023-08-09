@@ -181,9 +181,11 @@ LINK_ENTITY_TO_CLASS(zbstrigger, CZBSTrigger);
 
 extern std::vector<TriggerData> g_ZBSTriggerData;
 extern std::vector<WaveData> g_ZBSWaveData;
+extern std::vector<ZBSRoundData> g_ZBSRoundData;
 
 void CZBSTrigger::Spawn()
 {
+	m_bTriggerClosed = true;
 	m_iRound = -1;
 	m_iCurentRound = g_pGameRules->m_iTotalRoundsPlayed;
 	InitTrigger();
@@ -194,6 +196,9 @@ void CZBSTrigger::Spawn()
 		ALERT(at_console, "Bad team number (%i) in func_buyzone\n", pev->team);
 		pev->team = UNASSIGNED;
 	}
+
+
+
 }
 
 void CZBSTrigger::TriggerThink()
@@ -203,6 +208,8 @@ void CZBSTrigger::TriggerThink()
 
 void CZBSTrigger::TriggerTouch(CBaseEntity* pOther)
 {
+	if (m_bTriggerClosed)
+		return;
 
 	if (!pOther->IsPlayer())
 		return;
@@ -221,25 +228,33 @@ void CZBSTrigger::TriggerTouch(CBaseEntity* pOther)
 					{
 						if (!strcmp(trigger->type.c_str(), "g"))
 						{
+							int iPlayerInTrigger = 0;
 							CBasePlayer* p = static_cast<CBasePlayer*>(pOther);
 							if (p)
 							{
-								if (std::find(m_iPlayerInTrigger.begin(), m_iPlayerInTrigger.end(), p->entindex()) == m_iPlayerInTrigger.end())
-									m_iPlayerInTrigger.push_back(p->entindex());
-							}
-							//todo clear round;
+								p->m_signals.Signal(SIGNAL_ROUNDCLEAR);
+								p->m_signals.GetState();
+
+								CBaseEntity* pPlayer = NULL;
+								while ((pPlayer = UTIL_FindEntityByClassname(pPlayer, "player")) != NULL)
+								{
+									CBasePlayer* player = GetClassPtr<CBasePlayer>(pPlayer->pev);
+
+									if (player->m_signals.GetState() & SIGNAL_ROUNDCLEAR)
+										iPlayerInTrigger++;
+								}
+							};
 
 							float ratio = trigger->destratio / 100.0;
 
 							int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;
 							g_pGameRules->InitializePlayerCounts(NumAliveTerrorist, NumAliveCT, NumDeadTerrorist, NumDeadCT);
 
-							if (float(m_iPlayerInTrigger.size()) / float(NumAliveCT) >= ratio)
+							if (float(iPlayerInTrigger) / float(NumAliveCT) >= ratio)
 							{
 								if (pModZBS)
 									pModZBS->HumanWin();
 
-								SetTouch(nullptr);
 								break;
 							}
 						}

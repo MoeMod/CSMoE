@@ -41,6 +41,7 @@ public: // CHalfLifeMultiplay
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void RestartRound() override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
+	void CheckMapEvent();
 	void Think() override;
 	void CheckWinConditions() override;
 	void CheckMapConditions() override;

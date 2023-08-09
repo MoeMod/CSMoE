@@ -113,6 +113,7 @@ DLL_GLOBAL int gmsgShowTimer = 0;
 
 DLL_GLOBAL int gmsgZBSTip = 0;
 DLL_GLOBAL int gmsgZBSLevel = 0;
+DLL_GLOBAL int gmsgZBSMsg = 0;
 DLL_GLOBAL int gmsgBTEWeapon = 0;
 DLL_GLOBAL int gmsgZB2Msg = 0;
 DLL_GLOBAL int gmsgZB3Msg = 0;
@@ -221,6 +222,7 @@ void LinkUserMessages()
 
 	gmsgZBSTip = REG_USER_MSG("ZBSTip", -1);
 	gmsgZBSLevel = REG_USER_MSG("ZBSLevel", -1);
+	gmsgZBSMsg = REG_USER_MSG("ZBSMsg", -1);
 	gmsgBTEWeapon = REG_USER_MSG("BTEWeapon", -1);
 	gmsgZB2Msg = REG_USER_MSG("ZB2Msg", -1);
 	gmsgZB3Msg = REG_USER_MSG("ZB3Msg", -1);

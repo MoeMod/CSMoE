@@ -44,10 +44,10 @@ public:
 	void KeyValue(KeyValueData* pkvd) override;
 
 public:
+	bool m_bTriggerClosed;
 	int m_iRound;
 	int m_iCurentRound;
 	int m_iTriggerId;
-	std::vector<int> m_iPlayerInTrigger;
 };
 
 

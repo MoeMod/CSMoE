@@ -18,6 +18,8 @@ ZBSData g_ZBSData;
 std::vector<ZBSRoundData> g_ZBSRoundData;
 std::vector<TriggerData> g_ZBSTriggerData;
 std::vector<BossData> g_BossData;
+std::vector<EventData> g_EventData;
+std::vector<MapTriggerData> g_MapTriggerData;
 
 void ZBS_LoadSpawnArea()
 {
@@ -552,7 +554,7 @@ void ZBS_LoadBossData()
 		sk.approachDist = atof(data.c_str()) * 39.37;
 
 		std::getline(ss, data, ',');
-		sk.startMsg = atoi(data.c_str());
+		sk.startMsg = data;
 
 		std::getline(ss, data, ',');
 		sk.kickSide = atof(data.c_str());
@@ -564,6 +566,114 @@ void ZBS_LoadBossData()
 		sk.rushPower = atof(data.c_str());
 
 		g_BossData.push_back(sk);
+	}
+}
+
+void ZBS_LoadEventData()
+{
+	g_EventData.clear();
+
+	static char filename[256];
+	Q_sprintf(filename, "maps\\zbs_evt_%s.csv", STRING(gpGlobals->mapname));
+
+	SteamFile file(filename);
+
+	if (!file.IsValid())
+		return;
+
+	auto readline = [](SteamFile& sf) {
+		std::string ret;
+		char ch = '\0';
+		while (sf.Read((void*)&ch, sizeof(char)))
+		{
+			if (ch == '\n')
+				return std::make_pair(true, ret);
+			ret.push_back(ch);
+		}
+		return std::make_pair(false, ret);
+	};
+
+	bool bFirstLine = true;
+	std::pair<bool, std::string> linedata;
+	while ((linedata = readline(file)).first)
+	{
+		if (bFirstLine) {
+			bFirstLine = false;
+			continue;
+		}
+		std::istringstream ss(linedata.second);
+		std::string data;
+
+		EventData evt;
+
+		std::getline(ss, data, ',');
+		evt.round = atoi(data.c_str());
+
+		std::getline(ss, data, ',');
+		evt.startTime = atof(data.c_str()) * 1s;
+
+		std::getline(ss, data, ',');
+		evt.triggerName = data;
+
+		g_EventData.push_back(evt);
+	}
+}
+
+void ZBS_LoadMapTrgData()
+{
+	g_MapTriggerData.clear();
+
+	static char filename[256];
+	Q_sprintf(filename, "maps\\zbs_map_trg_%s.csv", STRING(gpGlobals->mapname));
+
+	SteamFile file(filename);
+
+	if (!file.IsValid())
+		return;
+
+	auto readline = [](SteamFile& sf) {
+		std::string ret;
+		char ch = '\0';
+		while (sf.Read((void*)&ch, sizeof(char)))
+		{
+			if (ch == '\n')
+				return std::make_pair(true, ret);
+			ret.push_back(ch);
+		}
+		return std::make_pair(false, ret);
+	};
+
+	std::pair<bool, std::string> linedata;
+	while ((linedata = readline(file)).first)
+	{
+
+		std::istringstream ss(linedata.second);
+		std::string data;
+
+		MapTriggerData trg;
+
+		std::getline(ss, data, ',');
+		trg.id = atoi(data.c_str());
+
+		std::getline(ss, data, ',');
+		trg.absmin.x = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		trg.absmin.y = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		trg.absmin.z = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		trg.absmax.x = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		trg.absmax.y = atof(data.c_str());
+
+		std::getline(ss, data, ',');
+		trg.absmax.z = atof(data.c_str());
+
+		g_MapTriggerData.push_back(trg);
 	}
 }
 }
