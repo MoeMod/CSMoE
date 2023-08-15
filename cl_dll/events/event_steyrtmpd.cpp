@@ -123,29 +123,31 @@ void EV_FireSteyrTMPD(event_args_s *args)
 
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAlloc(ent->attachment[i], pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_PERSIST | FTENT_CLIENTCUSTOM | FTENT_FADEOUT | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.framerate = 1.0;
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_PERSIST | FTENT_CLIENTCUSTOM | FTENT_FADEOUT | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.framerate = 1.0;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOWMOVE;
+					pEnt->entity.curstate.aiment = ent->index;
+					pEnt->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
+					pEnt->entity.curstate.body = i + 1;
+					pEnt->frameMax = 30.0;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.03f, 0.04f);
+					pEnt->entity.baseline.renderamt = pEnt->entity.curstate.renderamt = gEngfuncs.pfnRandomFloat(150.0f, 200.0f);
+					pEnt->fadeSpeed = 2.0f;
+					pEnt->entity.curstate.iuser1 = i;
+					pEnt->die = gHUD.m_flTime + 0.3f;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					pEnt->callback = ResetMuzz;
+				}
 
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOWMOVE;
-				pEnt->entity.curstate.aiment = ent->index;
-				pEnt->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
-				pEnt->entity.curstate.body = i + 1;
-				pEnt->frameMax = 30.0;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.03f, 0.04f);
-				pEnt->entity.baseline.renderamt = pEnt->entity.curstate.renderamt = gEngfuncs.pfnRandomFloat(150.0f, 200.0f);
-				pEnt->fadeSpeed = 2.0f;
-				pEnt->entity.curstate.iuser1 = i;
-				pEnt->die = gHUD.m_flTime + 0.3f;
-				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
-				pEnt->callback = ResetMuzz;
+				
 			}
 		}
 		return;

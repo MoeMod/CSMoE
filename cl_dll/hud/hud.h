@@ -135,7 +135,7 @@ struct HUDLIST {
 #include "hud_centertips.h"
 #include "weapons_const.h"
 #include "weapons_moe_buy.h"
-
+#include "hud_zecounter.h"
 
 
 namespace cl {
@@ -1554,6 +1554,7 @@ public:
 	CHudMVP m_MVP;
 	CHudNewHud m_NewHud;
     CHudCenterTips m_CenterTips;
+	CHudZECounter m_ZECounter;
 	CHudDeathInfo m_DeathInfo;
 	CHudNewAlarm  m_NewAlarm;
 	CHudDrawFontText m_DrawFontText;

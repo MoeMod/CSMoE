@@ -97,6 +97,7 @@ namespace sv {
 
 	struct BossData
 	{
+		int raw;
 		int id;
 		int type;
 		float ratio;

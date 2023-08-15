@@ -125,19 +125,20 @@ void EV_FireBalrog7(event_args_s *args)
 		
 		pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(VecOrigin, pModel);
 
-		if (!pEnt)
-			return;
-
-		pEnt->entity.curstate.rendermode = kRenderTransAdd;
-		pEnt->entity.curstate.renderamt = 255;
-		pEnt->entity.curstate.scale = 0.5;
-		pEnt->die = gHUD.m_flTime + 0.6f;
-		pEnt->flags |= FTENT_CLIENTCUSTOM;
-		pEnt->callback = pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
-			ent->entity.curstate.scale += 0.007;
-			if (ent->die <= gHUD.m_flTime + 0.3)
-				ent->entity.curstate.renderamt -= 35;
-		};
+		if (pEnt)
+		{
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.scale = 0.5;
+			pEnt->die = gHUD.m_flTime + 0.6f;
+			pEnt->flags |= FTENT_CLIENTCUSTOM;
+			pEnt->callback = pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+				ent->entity.curstate.scale += 0.007;
+				if (ent->die <= gHUD.m_flTime + 0.3)
+					ent->entity.curstate.renderamt -= 35;
+			};
+		}
+		
 
 		int id;
 		gEngfuncs.CL_LoadModel("sprites/fexplo.spr", &id);

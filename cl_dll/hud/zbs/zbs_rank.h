@@ -40,39 +40,45 @@ namespace cl {
 		}ZbsRankProp_s;
 
 		std::vector<std::pair<int, ZbsRankProp_s>> m_vecRankData;
+		float m_flTotalDamage;
 
 		struct ArrangeData
 		{
-			bool operator()(const ZbsRankProp_s& Val1, const ZbsRankProp_s& Val2)
+			int iIndex;
+
+			void ParsingIndex(int index)
 			{
-				return Val1.flDamage > Val2.flDamage;
+				iIndex = index;
+			}
+			bool operator()(const std::pair<int, ZbsRankProp_s>& Val1, const std::pair<int, ZbsRankProp_s>& Val2)
+			{
+				return Val1.second.flDamage > Val2.second.flDamage;
+			}
+			bool operator()(const std::pair<int, ZbsRankProp_s> Val1)
+			{
+				return Val1.first == iIndex;
 			}
 		};
 
-
-		float m_flTotalDamage;
-
-		class ZbsRankDamage
+		struct ZbsRankDamage
 		{
-		public:
+
 			ZbsRankDamage()
 			{
 				m_flTotalDamage = 0;
 			}
-			void operator()(const ZbsRankProp_s& Val)
+			void operator()(const std::pair<int, ZbsRankProp_s>& Val)
 			{
-				m_flTotalDamage += Val.flDamage;
+				m_flTotalDamage += Val.second.flDamage;
 			}
 			float GetTotalDamage() const
 			{
 				return m_flTotalDamage;
 			}
-
-		private:
 			float m_flTotalDamage;
 		};
-
-
+	public:
+		void DrawIntentionally(bool bCycle, int i, int& iX, int& iY, int& iW, int& iH, std::vector<std::pair<int, ZbsRankProp_s>>::iterator pFirst, int bIsLoacl);
 	};
 
 

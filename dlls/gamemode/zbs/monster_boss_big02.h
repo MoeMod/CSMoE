@@ -20,8 +20,6 @@ namespace sv {
 
 		float m_flDamage;
 		float m_flRadius;
-
-
 	};
 
 class CBossClass_Big02 : public CBaseMonsterClass
@@ -32,54 +30,41 @@ public:
 	void OnInit() override;
 	void OnSpawn() override;
 	void OnKilled(entvars_t* pKiller, int iGib) override;
-	//const Vector GetCenterid() const override;
 };
 
 class CBossSkill_Big02 : public CBaseMonsterSkill
 {
-	enum BossSkillStatus : byte
-	{
-		ZBS_NONE,
-		ZBS_ATTACK1,
-		ZBS_ATTACK1_DMG,
-		ZBS_ATTACK2,
-		ZBS_ATTACK2_DMG,
-		ZBS_ATTACK3,
-		ZBS_ATTACK3_ACTION_JUMP,
-		ZBS_ATTACK3_ACTION_TRACE,
-		ZBS_ATTACK3_END,
-		ZBS_ATTACK_BOMB,
-		ZBS_ATTACK_BOMB_ACTION,
-		ZBS_ATTACK_BOMB_END,
-		ZBS_ATTACK_HOLE,
-		ZBS_ATTACK_HOLE_ACTION,
-		ZBS_ATTACK_HOLE_END,
-		ZBS_APPEAR,
-		ZBS_SCENE_KNIFE,
-	};
-
 public:
-	CBossSkill_Big02(CMonster* p) : CBaseMonsterSkill(p) , m_iBossSkillStatus(ZBS_NONE)
-	{ 
+	CBossSkill_Big02(CMonster* p) : CBaseMonsterSkill(p)
+	{
 		m_iHoleIndex = PRECACHE_MODEL("models/ef_hole.mdl");
 		m_iKnifeIndex = PRECACHE_MODEL("models/ef_knife.mdl");
-
+		m_ioc_enabled = true;
 	}
 
 	void OnThink() override;
 	void OnActivate(CBaseEntity* target) override;
-
-	void Jump(const BossData& sk, CBaseEntity* target);
-	void AttackHole(const BossData& sk, bool loop);
+	void ActivateSkill(CBaseEntity* target);
 
 protected:
 	BossData m_CurSkillData;
 	time_point_t m_flHoleSkillTime;
+	time_point_t m_flForceAttackTime;
 	int m_iKnifeIndex;
 	int m_iHoleIndex;
 	int m_iBombSkillCount;
-	BossSkillStatus m_iBossSkillStatus;
 	std::unordered_map<int, EngineClock::time_point> m_MapSkillTime;
+
+	boost::asio::awaitable<void> Task_ZBS_ATTACK1();
+	boost::asio::awaitable<void> Task_ZBS_ATTACK2();
+	boost::asio::awaitable<void> Task_ZBS_ATTACK3();
+	boost::asio::awaitable<void> Task_ZBS_ATTACK_HOLE();
+	boost::asio::awaitable<void> Task_ZBS_ATTACK_BOMB();
+	boost::asio::awaitable<void> Task_ZBS_APPEAR();
+	boost::asio::awaitable<void> Task_ZBS_SCENE_KNIFE();
+
+	void Jump(const BossData& sk, CBaseEntity* target);
+	void AttackHole(const BossData& sk, bool loop);
 };
 
 

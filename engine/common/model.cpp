@@ -28,6 +28,7 @@ GNU General Public License for more details.
 
 #ifndef XASH_DEDICATED
 #include "gl_texlru.h"
+#include <set>
 #endif
 
 #define MAX_SIDE_VERTS		512	// per one polygon
@@ -51,6 +52,9 @@ static wadlist_t	wadlist;
 model_t		*loadmodel;
 model_t		*worldmodel;
 
+#ifndef XASH_DEDICATED
+std::set<model_t*> persist_models;
+#endif
 // cvars
 
 
@@ -2378,11 +2382,13 @@ static void Mod_LoadEntities( const dlump_t *l )
 						break;
 					}
 
-					Q_strncpy( wadpath, path, (end - path) + 1 );
+					auto length = (end - path) + 1;
+					Q_strncpy(wadpath, path, length);
+					wadpath[length] = '\0';
 
-					FS_FileBase( wadpath, wadlist.wadnames[wadlist.count++] );
-					path += (end - path) + 1; // move pointer
-					if( wadlist.count >= 256 ) 
+					FS_FileBase(wadpath, wadlist.wadnames[wadlist.count++]);
+					path += length; // move pointer
+					if (wadlist.count >= 256)
 						break; // too many wads...
 				}
 			}
@@ -3248,7 +3254,12 @@ void Mod_LoadWorld( const char *name, uint *checksum, qboolean multiplayer )
 	Mod_FreeModel( &cm_models[0] );
 	Mem_EmptyPool( com_studiocache );
 	world.load_sequence++;	// now all models are invalid
-
+#ifndef XASH_DEDICATED
+	for (auto &model : persist_models)
+	{
+		model->needload++;
+	}
+#endif
 	// load the newmap
 	world.loading = true;
 	worldmodel = Mod_ForName( name, true );

@@ -201,6 +201,7 @@ RichText::RichText(Panel *parent, const char *panelName) : BaseClass(parent, pan
 	m_bResetFades = false;
 	m_bInteractive = true;
 	m_bUnusedScrollbarInvis = false;
+	m_bShouldDrawStart = false;
 }
 
 //-----------------------------------------------------------------------------

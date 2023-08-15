@@ -31,6 +31,7 @@ GNU General Public License for more details.
 #include "gl_studiolru.h"
 #include "gl_bindspr.h"
 #include <triangleapi.h>
+#include <set>
 extern triangleapi_t gTriApi;
 
 #ifdef XASH_RAGDOLL
@@ -1871,11 +1872,14 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 							}
 
 							auto pspriteframe = R_GetSpriteFrame(pModel, frame, 0.0);
-
 							int index = pspriteframe->gl_texturenum;
 
 							if (pspriteframe->gl_texturenum)
+							{
 								xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+								extern std::set<model_t*> persist_models;
+								persist_models.insert(pModel);
+							}
 
 							bBindSpr = true;
 							break;

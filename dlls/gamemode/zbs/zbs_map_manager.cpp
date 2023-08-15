@@ -234,8 +234,6 @@ void ZBS_LoadZombiTypeData()
 		zt.skill = atoi(data.c_str());
 
 		std::getline(ss, data, ',');
-		zt.skill = atoi(data.c_str());
-
 		std::string str = data;
 		std::istringstream is(str);
 		int i;
@@ -487,6 +485,7 @@ void ZBS_LoadBossData()
 		return std::make_pair(false, ret);
 	};
 
+	int raw = 1;
 	bool bFirstLine = true;
 	std::pair<bool, std::string> linedata;
 	while ((linedata = readline(file)).first)
@@ -499,6 +498,9 @@ void ZBS_LoadBossData()
 		std::string data;
 
 		BossData sk;
+
+		sk.raw = raw;
+		raw++;
 		//temp useless
 		std::getline(ss, data, ',');
 

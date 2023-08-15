@@ -50,6 +50,28 @@ public:
 	int m_iTriggerId;
 };
 
+class CZBSTriggerSpawn : public CBaseTrigger
+{
+public:
+	void Spawn() override;
+	void EXPORT TriggerTouch(CBaseEntity* pOther);
+	void KeyValue(KeyValueData* pkvd) override;
+
+public:
+	int m_iTriggerId;
+};
+
+class CZECounter : public CBaseTrigger
+{
+public:
+	void Spawn() override;
+	void KeyValue(KeyValueData* pkvd) override;
+	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value) override;
+public:
+	char m_szLabel[48];
+	int m_iCounter;
+	
+};
 
 }
 

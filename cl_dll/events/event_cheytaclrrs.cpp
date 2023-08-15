@@ -77,24 +77,25 @@ void PlayMuzzleFlash(cl_entity_t* ent, int iType, int iId)
 	if (pModel)
 	{
 		TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel);
-		if (!pTemp) 
-			return;
-	
-		pTemp->flags |= FTENT_SPRANIMATE;
-		pTemp->entity.curstate.rendermode = kRenderTransAdd;
-		pTemp->entity.curstate.renderamt = 255;
-		pTemp->entity.curstate.framerate = FrameRate;
-		pTemp->entity.curstate.renderfx = 0;
-		pTemp->die = gHUD.m_flTime + die;
-		pTemp->entity.curstate.frame = 0;
-		pTemp->entity.curstate.movetype = MOVETYPE_FOLLOW;
-		pTemp->entity.curstate.aiment = iId;
-		pTemp->frameMax = FrameCount;
-		pTemp->entity.curstate.body = 1;
-		pTemp->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
-		pTemp->entity.curstate.scale = Scale;
-		pTemp->flags |= FTENT_CLIENTCUSTOM;
-		pTemp->callback = ResetMuz;
+		if (pTemp)
+		{
+			pTemp->flags |= FTENT_SPRANIMATE;
+			pTemp->entity.curstate.rendermode = kRenderTransAdd;
+			pTemp->entity.curstate.renderamt = 255;
+			pTemp->entity.curstate.framerate = FrameRate;
+			pTemp->entity.curstate.renderfx = 0;
+			pTemp->die = gHUD.m_flTime + die;
+			pTemp->entity.curstate.frame = 0;
+			pTemp->entity.curstate.movetype = MOVETYPE_FOLLOW;
+			pTemp->entity.curstate.aiment = iId;
+			pTemp->frameMax = FrameCount;
+			pTemp->entity.curstate.body = 1;
+			pTemp->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
+			pTemp->entity.curstate.scale = Scale;
+			pTemp->flags |= FTENT_CLIENTCUSTOM;
+			pTemp->callback = ResetMuz;
+		}
+		
 	}
 	
 }

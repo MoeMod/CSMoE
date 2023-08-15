@@ -5,6 +5,7 @@
 #pragma once
 #endif
 
+#include "zbs_const.h"
 #include "hostage/hostage.h"
 #include <memory>
 #include <map>
@@ -12,28 +13,14 @@
 #include <mutex>
 #include <bitset>
 
+#include <boost/asio.hpp>
+#include <boost/asio/use_awaitable.hpp>
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/detached.hpp>
+
 namespace sv {
 
-enum MonsterClass
-{
-	MONSTER_CLASS_RANDOM,
-	MONSTER_CLASS_ZOMBIE,
-	MONSTER_CLASS_SPEED,
-	MONSTER_CLASS_HEAVY,
-	MONSTER_CLASS_THROWER,
-	MONSTER_CLASS_HEAL,
-	MONSTER_CLASS_ZOMBIEDOG,
-	MONSTER_CLASS_BOOMER,
-	MONSTER_CLASS_RESIDENT,
-	MONSTER_CLASS_DEIMOS,
-	MONSTER_CLASS_HELMET,
-	MONSTER_CLASS_DEIMOS2,
-	MONSTER_CLASS_PC,
-	BOSS_CLASS_BIG00,
-	BOSS_CLASS_BIG01,
-	BOSS_CLASS_BIG02,
-	BOSS_CLASS_BIG03,
-};
+
 
 enum MonsterAnim
 {
@@ -143,10 +130,11 @@ public:
 
 inline IBaseMonsterStrategy::~IBaseMonsterStrategy() {}
 
+
 class CBaseMonsterSkill : public IBaseMonsterSkill
 {
 public:
-	explicit CBaseMonsterSkill(CMonster* p) : IBaseMonsterSkill(p), m_iSkillStatus(SKILL_STATUS_READY) {}
+	explicit CBaseMonsterSkill(CMonster* p) : IBaseMonsterSkill(p), m_iSkillStatus(SKILL_STATUS_READY), m_ioc_enabled(false), m_timer(m_ioc), m_task_running(false) {}
 
 	void OnThink() override;
 	void OnTouch(CBaseEntity* other) override {}
@@ -159,10 +147,34 @@ protected:
 	virtual void OnSkillEnd() {}
 	virtual void OnSkillReady() {}
 
+	boost::asio::awaitable<void> async_wait_timer(const EngineClock::duration& timeout) {
+		m_timer.expires_after(timeout);
+		co_await m_timer.async_wait(boost::asio::use_awaitable);
+	}
+
+	template<class CompletionToken>
+	auto StartTask(boost::asio::awaitable<void> task, CompletionToken&& token)
+	{
+		return boost::asio::co_spawn(m_ioc, [cotask = std::move(task), this]() mutable->boost::asio::awaitable<void> {
+			m_task_running = true;
+			try {
+				co_await std::move(cotask);
+			}
+			catch (...) {
+			}
+			m_task_running = false;
+		}, std::forward<CompletionToken>(token));
+	}
+
 protected:
 	MonsterSkillStatus m_iSkillStatus;
 	EngineClock::time_point m_flTimeSkillEnd;
 	EngineClock::time_point m_flTimeSkillNext;
+
+	bool m_task_running;
+	bool m_ioc_enabled;
+	boost::asio::io_context m_ioc;
+	boost::asio::basic_waitable_timer<EngineClock> m_timer;
 };
 
 class IBaseMonsterClass : public BaseMonsterExtra
@@ -306,10 +318,18 @@ public:
 
 	time_point_t m_flCustomSequenceUntilTime;
 	int m_iCustomSequence;
+	Vector m_vecSpawnOrigin;
+	Vector m_vecSpawnAngle;
 	int m_iWaveID;
+	int m_iZombiId;
+	int m_iSkillId;
 	int m_iPriority;
+	int m_iClearPoint;
 	std::bitset<MAX_ABLE> m_able;
 	float m_turnTolerance;
+	char m_szWalkAnim[32];
+	char m_szIdleAnim[32];
+	char m_szRunAnim[32];
 
 public:
 	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;
@@ -320,9 +340,9 @@ public:
 	void SetModel(const char* appearance);
 	void SetSkill(std::unique_ptr<IBaseMonsterSkill> ptr);
 	void SetEntAnim(int ianim, float framerate, duration_t animtime, bool resetframe);
-	bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector origin, float angle, float flMinimumCosine);
+	bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector origin, float flAngle);
 	void RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool falloff = false);
-
+	
 	inline void SetAble(MonsterAbleFlag behavior, bool value) {
 		m_able.set(static_cast<size_t>(behavior), value);
 	}

@@ -254,27 +254,29 @@ void EV_FireHolySword(event_args_t *args)
 
 				g_HolySwordStackModel = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[0], pModel);
 
-				if (!g_HolySwordStackModel)
-					return;
+				if (g_HolySwordStackModel)
+				{
+					g_HolySwordStackModel->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					g_HolySwordStackModel->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+					g_HolySwordStackModel->entity.curstate.frame = 0.0f;
+					g_HolySwordStackModel->entity.curstate.framerate = 30.0f;
+					g_HolySwordStackModel->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_HolySwordStackModel->entity.curstate.aiment = clientindex;
+					g_HolySwordStackModel->entity.curstate.solid = SOLID_NOT;
+					g_HolySwordStackModel->entity.curstate.rendermode = kRenderTransAdd;
+					g_HolySwordStackModel->entity.curstate.renderfx = kRenderFxNone;
+					g_HolySwordStackModel->frameMax = 11.0;
+					g_HolySwordStackModel->entity.curstate.scale = 0.03f;
+					g_HolySwordStackModel->entity.curstate.renderamt = 255;
+					g_HolySwordStackModel->entity.curstate.body = 1;
+					g_HolySwordStackModel->die = gHUD.m_flTime + 999;
+					g_HolySwordStackModel->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
+					g_HolySwordStackModel->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-				g_HolySwordStackModel->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				g_HolySwordStackModel->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
-				g_HolySwordStackModel->entity.curstate.frame = 0.0f;
-				g_HolySwordStackModel->entity.curstate.framerate = 30.0f;
-				g_HolySwordStackModel->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				g_HolySwordStackModel->entity.curstate.aiment = clientindex;
-				g_HolySwordStackModel->entity.curstate.solid = SOLID_NOT;
-				g_HolySwordStackModel->entity.curstate.rendermode = kRenderTransAdd;
-				g_HolySwordStackModel->entity.curstate.renderfx = kRenderFxNone;
-				g_HolySwordStackModel->frameMax = 11.0;
-				g_HolySwordStackModel->entity.curstate.scale = 0.03f;
-				g_HolySwordStackModel->entity.curstate.renderamt = 255;
-				g_HolySwordStackModel->entity.curstate.body = 1;
-				g_HolySwordStackModel->die = gHUD.m_flTime + 999;
-				g_HolySwordStackModel->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
-				g_HolySwordStackModel->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					g_HolySwordStackModel->callback = ResetStackModel;
+				}
 
-				g_HolySwordStackModel->callback = ResetStackModel;
+				
 			}
 		}
 	}

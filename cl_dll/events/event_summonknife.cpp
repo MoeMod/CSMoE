@@ -94,34 +94,36 @@ void EV_FireSummonKnife(event_args_s *args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[6], pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					pEnt->entity.curstate.aiment = ent->index;
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.aiment = ent->index;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->frameMax = 33.0;
+					pEnt->entity.curstate.scale = 0.17f;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.body = 7;	//attachment + 1
+					pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 33.0;
-				pEnt->entity.curstate.scale = 0.17f;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.body = 7;	//attachment + 1
-				pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
-				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					pEnt->die = gHUD.m_flTime + 1.1;
 
-				pEnt->die = gHUD.m_flTime + 1.1;
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+						/*if (viewent->curstate.sequence != 0)
+							pEnt->die = gHUD.m_flTime;*/
+					};
+				}
 
-					/*if (viewent->curstate.sequence != 0)
-						pEnt->die = gHUD.m_flTime;*/
-				};
+				
 			}
 			break;
 		}
@@ -142,34 +144,36 @@ void EV_FireSummonKnife(event_args_s *args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[7], pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					pEnt->entity.curstate.aiment = ent->index;
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.aiment = ent->index;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->frameMax = 30.0;
+					pEnt->entity.curstate.scale = 0.029f;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.body = 8;	//attachment + 1
+					pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 30.0;
-				pEnt->entity.curstate.scale = 0.029f;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.body = 8;	//attachment + 1
-				pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
-				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					pEnt->die = gHUD.m_flTime + 1.0;
 
-				pEnt->die = gHUD.m_flTime + 1.0;
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+						/*if (viewent->curstate.sequence != 0)
+							pEnt->die = gHUD.m_flTime;*/
+					};
+				}
 
-					/*if (viewent->curstate.sequence != 0)
-						pEnt->die = gHUD.m_flTime;*/
-				};
+			
 			}
 			break;
 		}
@@ -192,34 +196,36 @@ void EV_FireSummonKnife(event_args_s *args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[iAttachment], pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					pEnt->entity.curstate.aiment = ent->index;
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.aiment = ent->index;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->frameMax = 33.0;
+					pEnt->entity.curstate.scale = 0.16f;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.body = iAttachment + 1;	//attachment + 1
+					pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 33.0;
-				pEnt->entity.curstate.scale = 0.16f;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.body = iAttachment + 1;	//attachment + 1
-				pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
-				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					pEnt->die = gHUD.m_flTime + 1.1;
 
-				pEnt->die = gHUD.m_flTime + 1.1;
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+						/*if (viewent->curstate.sequence != 0)
+							pEnt->die = gHUD.m_flTime;*/
+					};
+				}
 
-					/*if (viewent->curstate.sequence != 0)
-						pEnt->die = gHUD.m_flTime;*/
-				};
+				
 			}
 
 			if (!gHUD.cl_righthand->value)
@@ -239,34 +245,37 @@ void EV_FireSummonKnife(event_args_s *args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[iAttachment], pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.aiment = ent->index;
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					pEnt->entity.curstate.aiment = ent->index;
 
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 41.0;
-				pEnt->entity.curstate.scale = 0.2f;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.body = iAttachment + 1;	//attachment + 1
-				pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
-				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->frameMax = 41.0;
+					pEnt->entity.curstate.scale = 0.2f;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.body = iAttachment + 1;	//attachment + 1
+					pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-				pEnt->die = gHUD.m_flTime + 1.1;
+					pEnt->die = gHUD.m_flTime + 1.1;
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
-					/*if (viewent->curstate.sequence != 0)
-						pEnt->die = gHUD.m_flTime;*/
-				};
+						/*if (viewent->curstate.sequence != 0)
+							pEnt->die = gHUD.m_flTime;*/
+					};
+				}
+
+
 			}
 			break;
 		}
@@ -281,34 +290,36 @@ void EV_FireSummonKnife(event_args_s *args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[6], pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.aiment = ent->index;
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					pEnt->entity.curstate.aiment = ent->index;
 
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 15.0;
-				pEnt->entity.curstate.scale = 0.05f;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.body = 7;	//attachment + 1
-				pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
-				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->frameMax = 15.0;
+					pEnt->entity.curstate.scale = 0.05f;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.body = 7;	//attachment + 1
+					pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-				pEnt->die = gHUD.m_flTime + 9999.0;
+					pEnt->die = gHUD.m_flTime + 9999.0;
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
-					if (viewent->curstate.sequence != ANIM_CHARGING_LOOP)
-						pEnt->die = gHUD.m_flTime;
-				};
+						if (viewent->curstate.sequence != ANIM_CHARGING_LOOP)
+							pEnt->die = gHUD.m_flTime;
+					};
+				}
+
 			}
 			break;
 		}
@@ -325,34 +336,37 @@ void EV_FireSummonKnife(event_args_s *args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[4], pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.aiment = ent->index;
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					pEnt->entity.curstate.aiment = ent->index;
 
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 46.0;
-				pEnt->entity.curstate.scale = 0.1f;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.body = 5;	//attachment + 1
-				pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
-				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->frameMax = 46.0;
+					pEnt->entity.curstate.scale = 0.1f;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.body = 5;	//attachment + 1
+					pEnt->entity.curstate.weaponmodel = ent->curstate.weaponmodel;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-				pEnt->die = gHUD.m_flTime + 1.53;
+					pEnt->die = gHUD.m_flTime + 1.53;
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
-					/*if (viewent->curstate.sequence != 0)
-						pEnt->die = gHUD.m_flTime;*/
-				};
+						/*if (viewent->curstate.sequence != 0)
+							pEnt->die = gHUD.m_flTime;*/
+					};
+				}
+
+
 			}
 			break;
 		}

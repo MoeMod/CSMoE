@@ -547,7 +547,13 @@ void CFuncTrain::KeyValue(KeyValueData *pkvd)
 	if (FStrEq(pkvd->szKeyName, "sounds")) {
 		m_sounds = Q_atoi(pkvd->szValue);
 		pkvd->fHandled = TRUE;
-	} else
+	} 
+	else if (FStrEq(pkvd->szKeyName, "model_ex"))
+	{
+		/*PRECACHE_MODEL(pkvd->szKeyName);
+		SET_MODEL(ENT(pev), pkvd->szKeyName);*/
+	}
+	else
 		CBasePlatTrain::KeyValue(pkvd);
 }
 

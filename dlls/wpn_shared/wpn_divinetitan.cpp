@@ -1584,6 +1584,7 @@ namespace sv {
 			//m_iTarget[i]->TraceAttack(pAttackPlayer->pev, GetDamage_Instance() * flDamageAdjust, vecDirection, &tr, DMG_BULLET);
 			//ApplyMultiDamage(pAttackPlayer->pev, pAttackPlayer->pev);
 			
+			m_iTarget[i]->m_LastHitGroup = HITGROUP_CHEST;
 			m_iTarget[i]->TakeDamage(pev, pAttackPlayer->pev, GetDamage_Instance()* flDamageAdjust, DMG_BULLET);
 #endif
 		}
@@ -1779,6 +1780,7 @@ namespace sv {
 						}
 					}
 				}
+				pEntity->m_LastHitGroup = HITGROUP_CHEST;
 				pEntity->TakeDamage(pev, pAttackPlayer->pev, GetDamage_Instance() * flDamageAdjust, DMG_BULLET);
 				UTIL_BloodDrips(pEntity->pev->origin, vecDirection, 255, (int)GetDamage_Instance()* flDamageAdjust / (int)10.0);
 #endif
@@ -2043,14 +2045,12 @@ namespace sv {
 		{
 			Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
 
-			TraceResult tr;
-			UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
-			tr.iHitgroup = HITGROUP_CHEST; // ...
 
 			//ClearMultiDamage();
 			//pOther->TraceAttack(pAttackePlayer->pev, GetDamage_Missile(1), vecDirection, &tr, DMG_BULLET);
 			//ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
 
+			pOther->m_LastHitGroup = HITGROUP_CHEST;
 			pOther->TakeDamage(pev, pAttackePlayer->pev, GetDamage_Missile(1), DMG_BULLET);
 
 			if (pOther->IsPlayer())

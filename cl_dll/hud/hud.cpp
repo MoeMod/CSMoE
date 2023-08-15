@@ -214,6 +214,7 @@ void CHud :: Init( void )
 	m_MoeTouch.Init();
 	m_MVP.Init();
     m_CenterTips.Init();
+	m_ZECounter.Init();
 
 	// chat, death notice, status bars and other
 	m_SayText.Init();

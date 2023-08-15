@@ -449,6 +449,7 @@ void UTIL_EmitAmbientSound(edict_t *entity, const Vector &vecOrigin, const char 
 unsigned short FixedUnsigned16(float value, float scale);
 short FixedSigned16(float value, float scale);
 void UTIL_ScreenShake(const Vector &center, float amplitude, float frequency, float duration, float radius);
+void UTIL_ScreenShakeOne(CBaseEntity* pVictim, int amplitude = 4, int duration = 2, int frequency = 10);
 //NOXREF void UTIL_ScreenShakeAll(const Vector &center, float amplitude, float frequency, float duration);
 
 #ifdef SHAKE_H

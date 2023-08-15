@@ -215,14 +215,16 @@ void EV_FireWhipSword(event_args_t* args)
 				g_WhipSwordStabEffect->clientIndex = idx;
 				g_WhipSwordStabEffect->entity.curstate.iuser1 = id;
 				g_WhipSwordStabEffect->flags |= FTENT_PLYRATTACHMENT | FTENT_CLIENTCUSTOM;
+
+				g_WhipSwordStabEffect->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+				{
+					cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(g_WhipSwordStabEffect->entity.curstate.iuser1);
+					pEnt->entity.angles = pPlayer->angles;
+					pEnt->entity.angles.z = 0;
+				};
 			}
 
-			g_WhipSwordStabEffect->callback = [](tempent_s* pEnt, float frametime, float currenttime)
-			{
-				cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(g_WhipSwordStabEffect->entity.curstate.iuser1);
-				pEnt->entity.angles = pPlayer->angles;
-				pEnt->entity.angles.z = 0;
-			};
+			
 		}
 
 		break;
@@ -257,14 +259,16 @@ void EV_FireWhipSword(event_args_t* args)
 				g_WhipSwordSlashEffect->entity.curstate.rendermode = kRenderTransAdd;
 				g_WhipSwordSlashEffect->entity.curstate.iuser1 = id;
 				g_WhipSwordSlashEffect->flags |= FTENT_PLYRATTACHMENT | FTENT_CLIENTCUSTOM;
+
+				g_WhipSwordSlashEffect->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+				{
+					cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(g_WhipSwordSlashEffect->entity.curstate.iuser1);
+					pEnt->entity.angles = pPlayer->angles;
+					pEnt->entity.angles.z = 0;
+				};
 			}
 
-			g_WhipSwordSlashEffect->callback = [](tempent_s* pEnt, float frametime, float currenttime)
-			{
-				cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(g_WhipSwordSlashEffect->entity.curstate.iuser1);
-				pEnt->entity.angles = pPlayer->angles;
-				pEnt->entity.angles.z = 0;
-			};
+			
 		}
 
 		break;

@@ -252,25 +252,26 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.baseline.origin = vVelocity;
+					pEnt->entity.curstate.framerate = 2.0;
+					pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
+					pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
 
-				pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.baseline.origin = vVelocity;
-				pEnt->entity.curstate.framerate = 2.0;
-				pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
-				pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						float gravity = -frametime * 140.0;
+						pEnt->entity.baseline.origin[2] += gravity;
+					};
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					float gravity = -frametime * 140.0;
-					pEnt->entity.baseline.origin[2] += gravity;
-				};
-
-				pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
-					pEnt->entity.baseline.origin = Vector(0, 0, 0);
-				};
+					pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
+						pEnt->entity.baseline.origin = Vector(0, 0, 0);
+					};
+				}
+				
 			}
 		}
 
@@ -320,30 +321,30 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(vStartOrigin, pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.rendermode = kRenderNormal;
+					pEnt->entity.baseline.origin = vVelocity;
+					pEnt->entity.angles = angles;
+					pEnt->entity.curstate.framerate = 2.0;
+					pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
+					pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
+					/*gEngfuncs.Con_Printf("vVelocity is x= %f ,y= %f ,z=%f\n", vVelocity[0], vVelocity[1], vVelocity[2]);
+					gEngfuncs.Con_Printf("angles is x= %f ,y= %f ,z=%f\n", angles[0], angles[1], angles[2]);*/
 
-				pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.rendermode = kRenderNormal;
-				pEnt->entity.baseline.origin = vVelocity;
-				pEnt->entity.angles = angles;
-				pEnt->entity.curstate.framerate = 2.0;
-				pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
-				pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
-				/*gEngfuncs.Con_Printf("vVelocity is x= %f ,y= %f ,z=%f\n", vVelocity[0], vVelocity[1], vVelocity[2]);
-				gEngfuncs.Con_Printf("angles is x= %f ,y= %f ,z=%f\n", angles[0], angles[1], angles[2]);*/
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						float gravity = -frametime * 96.0;
+						pEnt->entity.baseline.origin[2] += gravity;
+						if (pEnt->entity.baseline.origin[1])
+							pEnt->entity.angles -= Vector(6.0, 6.0, 6.0);
+					};
+					pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
+						pEnt->entity.baseline.origin = Vector(0, 0, 0);
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					float gravity = -frametime * 96.0;
-					pEnt->entity.baseline.origin[2] += gravity;
-					if (pEnt->entity.baseline.origin[1])
-						pEnt->entity.angles -= Vector(6.0, 6.0, 6.0);
-				};
-				pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
-					pEnt->entity.baseline.origin = Vector(0, 0, 0);
-
-				};
+					};
+				}
 			}
 		}
 
@@ -371,25 +372,27 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.baseline.origin = vVelocity;
+					pEnt->entity.curstate.framerate = 2.0;
+					pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
+					pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
 
-				pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.baseline.origin = vVelocity;
-				pEnt->entity.curstate.framerate = 2.0;
-				pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
-				pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						float gravity = -frametime * 300.0;
+						pEnt->entity.baseline.origin[2] += gravity;
+					};
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					float gravity = -frametime * 300.0;
-					pEnt->entity.baseline.origin[2] += gravity;
-				};
+					pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
+						pEnt->entity.baseline.origin = Vector(0, 0, 0);
+					};
+				}
 
-				pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
-					pEnt->entity.baseline.origin = Vector(0, 0, 0);
-				};
+			
 			}
 		}
 
@@ -428,17 +431,19 @@ void EV_WpnEffects(event_args_s* args)
 			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_STATIC, SLASH_SOUND[args->iparam2], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-			if (!pEnt)
-				return;
+			if (pEnt)
+			{
+				pEnt->flags |= FTENT_SPRANIMATE;
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.framerate = 30.0;
 
-			pEnt->flags |= FTENT_SPRANIMATE;
-			pEnt->entity.curstate.frame = 0;
-			pEnt->entity.curstate.framerate = 30.0;
+				pEnt->entity.curstate.rendermode = kRenderTransAlpha;
+				pEnt->entity.curstate.scale = 0.5;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->die = gHUD.m_flTime + 0.7;
+			}
 
-			pEnt->entity.curstate.rendermode = kRenderTransAlpha;
-			pEnt->entity.curstate.scale = 0.5;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->die = gHUD.m_flTime + 0.7;
+			
 
 		}
 		break;
@@ -452,17 +457,18 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->entity.curstate.sequence = 1;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
+					pEnt->entity.curstate.framerate = 1.0;
+					pEnt->tentOffset = Vector(0, 0, -32);
+					pEnt->die = gHUD.m_flTime + 0.2;
+					pEnt->clientIndex = idx;
+					pEnt->flags |= FTENT_PLYRATTACHMENT;
+				}
 
-				pEnt->entity.curstate.sequence = 1;
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.animtime = gHUD.m_flTime;
-				pEnt->entity.curstate.framerate = 1.0;
-				pEnt->tentOffset = Vector(0, 0, -32);
-				pEnt->die = gHUD.m_flTime + 0.2;
-				pEnt->clientIndex = idx;
-				pEnt->flags |= FTENT_PLYRATTACHMENT;
 			}
 
 		}
@@ -474,18 +480,20 @@ void EV_WpnEffects(event_args_s* args)
 				//origin[2] += 32;
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
 
-				pEnt->flags |= FTENT_SPRANIMATE;
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.framerate = 30.0;
-				pEnt->tentOffset = Vector(0, 0, -32);
+					pEnt->flags |= FTENT_SPRANIMATE;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.framerate = 30.0;
+					pEnt->tentOffset = Vector(0, 0, -32);
 
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.scale = 1.0;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 0.67;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.scale = 1.0;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->die = gHUD.m_flTime + 0.67;
+				}
+
 
 			}
 		}
@@ -498,45 +506,49 @@ void EV_WpnEffects(event_args_s* args)
 				cl_entity_t* viewent = gEngfuncs.GetViewModel();
 				TEMPENTITY* pEntAttach1 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], pModel);
 
-				if (!pEntAttach1)
-					return;
+				if (pEntAttach1)
+				{
 
-				pEntAttach1->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEntAttach1->flags |= FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_SPRANIMATE;
-				pEntAttach1->entity.curstate.frame = 0;
-				pEntAttach1->entity.curstate.framerate = 30.0;
-				pEntAttach1->entity.curstate.rendermode = kRenderTransAdd;
-				pEntAttach1->entity.curstate.renderfx = kRenderFxNone;
-				pEntAttach1->entity.curstate.scale = 0.09;
-				pEntAttach1->entity.curstate.renderamt = 255;
-				pEntAttach1->die = gHUD.m_flTime + 0.5;
-				pEntAttach1->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					pEntAttach1->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEntAttach1->flags |= FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_SPRANIMATE;
+					pEntAttach1->entity.curstate.frame = 0;
+					pEntAttach1->entity.curstate.framerate = 30.0;
+					pEntAttach1->entity.curstate.rendermode = kRenderTransAdd;
+					pEntAttach1->entity.curstate.renderfx = kRenderFxNone;
+					pEntAttach1->entity.curstate.scale = 0.09;
+					pEntAttach1->entity.curstate.renderamt = 255;
+					pEntAttach1->die = gHUD.m_flTime + 0.5;
+					pEntAttach1->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-				pEntAttach1->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
-					pEnt->entity.origin = viewent->attachment[1];
-				};
+					pEntAttach1->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
+						pEnt->entity.origin = viewent->attachment[1];
+					};
+				}
+
 
 				TEMPENTITY* pEntAttach2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[2], pModel);
 
-				if (!pEntAttach2)
-					return;
+				if (pEntAttach2)
+				{
 
-				pEntAttach2->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEntAttach2->flags |= FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_SPRANIMATE;
-				pEntAttach2->entity.curstate.frame = 0;
-				pEntAttach2->entity.curstate.framerate = 30.0;
-				pEntAttach2->entity.curstate.rendermode = kRenderTransAdd;
-				pEntAttach2->entity.curstate.renderfx = kRenderFxNone;
-				pEntAttach2->entity.curstate.scale = 0.11;
-				pEntAttach2->entity.curstate.renderamt = 255;
-				pEntAttach2->die = gHUD.m_flTime + 0.5;
-				pEntAttach2->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
-			
-				pEntAttach2->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
-					pEnt->entity.origin = viewent->attachment[2];
-				};
+					pEntAttach2->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEntAttach2->flags |= FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_SPRANIMATE;
+					pEntAttach2->entity.curstate.frame = 0;
+					pEntAttach2->entity.curstate.framerate = 30.0;
+					pEntAttach2->entity.curstate.rendermode = kRenderTransAdd;
+					pEntAttach2->entity.curstate.renderfx = kRenderFxNone;
+					pEntAttach2->entity.curstate.scale = 0.11;
+					pEntAttach2->entity.curstate.renderamt = 255;
+					pEntAttach2->die = gHUD.m_flTime + 0.5;
+					pEntAttach2->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+
+					pEntAttach2->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
+						pEnt->entity.origin = viewent->attachment[2];
+					};
+				}
+
 			}
 
 			break;
@@ -559,53 +571,55 @@ void EV_WpnEffects(event_args_s* args)
 		{
 			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-			if (!pEnt)
-				return;
-
-			pEnt->entity.curstate.body = viewent->curstate.body;
-			pEnt->entity.curstate.frame = 0.0f;
-			pEnt->entity.curstate.framerate = 1.0f;
-			pEnt->entity.curstate.animtime = gHUD.m_flTime;
-			pEnt->entity.curstate.sequence = args->iparam2;
-			pEnt->tentOffset = Vector(0, 0, 0);
-			pEnt->bounceFactor = 3;	// ??
-			pEnt->fadeSpeed = 512;
-			pEnt->frameMax = 31;
-
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.baseline.angles = Vector(0, 0, 0);
-			pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
-
-			if (args->iparam2 != 3)
+			if (pEnt)
 			{
-				pEnt->die = gHUD.m_flTime + 1.0;
-				pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
-					pEnt->entity.origin = viewent->origin;
-					pEnt->entity.angles = viewent->angles;
-					if (currenttime > pEnt->entity.curstate.fuser1)
-						pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1) * 255.0f;
-				};
-			}
-			else
-			{
-				pEnt->die = gHUD.m_flTime + 1.5;
-				pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
-					pEnt->entity.origin = viewent->origin;
-					pEnt->entity.angles = viewent->angles;
-					if (currenttime > pEnt->entity.curstate.fuser1 + 1.0)
-						pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1 - 1.0) * 2.0f * 255.0f;
-				};
-			}
+				pEnt->entity.curstate.body = viewent->curstate.body;
+				pEnt->entity.curstate.frame = 0.0f;
+				pEnt->entity.curstate.framerate = 1.0f;
+				pEnt->entity.curstate.animtime = gHUD.m_flTime;
+				pEnt->entity.curstate.sequence = args->iparam2;
+				pEnt->tentOffset = Vector(0, 0, 0);
+				pEnt->bounceFactor = 3;	// ??
+				pEnt->fadeSpeed = 512;
+				pEnt->frameMax = 31;
+
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.baseline.angles = Vector(0, 0, 0);
+				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+
+				if (args->iparam2 != 3)
+				{
+					pEnt->die = gHUD.m_flTime + 1.0;
+					pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
+						pEnt->entity.origin = viewent->origin;
+						pEnt->entity.angles = viewent->angles;
+						if (currenttime > pEnt->entity.curstate.fuser1)
+							pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1) * 255.0f;
+					};
+				}
+				else
+				{
+					pEnt->die = gHUD.m_flTime + 1.5;
+					pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
+						pEnt->entity.origin = viewent->origin;
+						pEnt->entity.angles = viewent->angles;
+						if (currenttime > pEnt->entity.curstate.fuser1 + 1.0)
+							pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1 - 1.0) * 2.0f * 255.0f;
+					};
+				}
 
 
-			pEnt->clientIndex = idx;
-			pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-			pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_FADEOUT | FTENT_PERSIST;
+				pEnt->clientIndex = idx;
+				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+				pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_FADEOUT | FTENT_PERSIST;
+			}
+
+			
 		}
 
 		break;
@@ -667,18 +681,19 @@ void EV_WpnEffects(event_args_s* args)
 
 			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[0], pModel);
 
-			if (!pEnt)
-				return;
-
-			pEnt->flags |= FTENT_SPRANIMATE;
-			pEnt->entity.curstate.frame = 0;
-			pEnt->entity.curstate.framerate = 30.0;
-			pEnt->entity.curstate.movetype = MOVETYPE_NONE;
-			pEnt->entity.curstate.solid = SOLID_TRIGGER;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.scale = 0.5;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->die = gHUD.m_flTime + 0.5;
+			if (pEnt)
+			{
+				pEnt->flags |= FTENT_SPRANIMATE;
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.framerate = 30.0;
+				pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+				pEnt->entity.curstate.solid = SOLID_TRIGGER;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.scale = 0.5;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->die = gHUD.m_flTime + 0.5;
+			}
+			
 		}
 		
 		break;
@@ -699,32 +714,35 @@ void EV_WpnEffects(event_args_s* args)
 				cl_entity_t* viewent = gEngfuncs.GetViewModel();
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[i], pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_PERSIST | FTENT_CLIENTCUSTOM | FTENT_FADEOUT;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOWMOVE;
+					pEnt->entity.curstate.aiment = viewent->index;
+					pEnt->entity.curstate.body = i + 1;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.005f, 0.01f);
+					pEnt->entity.baseline.renderamt = pEnt->entity.curstate.renderamt = gEngfuncs.pfnRandomFloat(150.0f, 200.0f);
+					pEnt->fadeSpeed = 2.0f;
+					pEnt->die = gHUD.m_flTime + 0.3f;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						char pModelName[32];
+						int index = Com_RandomLong(0, 4);
+						sprintf(pModelName, "sprites/buffm249_fire0%i.spr", index + 1);
+						pEnt->entity.curstate.modelindex = gEngfuncs.pEventAPI->EV_FindModelIndex(pModelName);
+						pEnt->entity.curstate.frame += frametime * 2;
+						if (pEnt->entity.curstate.scale < 0.03f)
+							pEnt->entity.curstate.scale += frametime * 0.05f;
+					};
+				}
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_PERSIST | FTENT_CLIENTCUSTOM | FTENT_FADEOUT;
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOWMOVE;
-				pEnt->entity.curstate.aiment = viewent->index;
-				pEnt->entity.curstate.body = i + 1;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.005f, 0.01f);
-				pEnt->entity.baseline.renderamt = pEnt->entity.curstate.renderamt = gEngfuncs.pfnRandomFloat(150.0f, 200.0f);
-				pEnt->fadeSpeed = 2.0f;
-				pEnt->die = gHUD.m_flTime + 0.3f;
-				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					char pModelName[32];
-					int index = Com_RandomLong(0, 4);
-					sprintf(pModelName, "sprites/buffm249_fire0%i.spr", index + 1);
-					pEnt->entity.curstate.modelindex = gEngfuncs.pEventAPI->EV_FindModelIndex(pModelName);
-					pEnt->entity.curstate.frame += frametime * 2;
-					if(pEnt->entity.curstate.scale < 0.03f)
-						pEnt->entity.curstate.scale += frametime * 0.05f;
-				};
+
+				
 			}
 		}
 		break;
@@ -741,16 +759,18 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->die = gHUD.m_flTime + 1.5f;
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
+					pEnt->entity.curstate.framerate = 1.0f;
+					pEnt->entity.curstate.sequence = args->bparam2;
+					pEnt->clientIndex = args->iparam2;
+					pEnt->tentOffset = Vector(0, 0, -20);
+					pEnt->flags |= FTENT_PLYRATTACHMENT;
+				}
 
-				pEnt->die = gHUD.m_flTime + 1.5f;
-				pEnt->entity.curstate.animtime = gHUD.m_flTime;
-				pEnt->entity.curstate.framerate = 1.0f;
-				pEnt->entity.curstate.sequence = args->bparam2;
-				pEnt->clientIndex = args->iparam2;
-				pEnt->tentOffset = Vector(0, 0, -20);
-				pEnt->flags |= FTENT_PLYRATTACHMENT;
+				
 			}
 		}
 		else
@@ -763,30 +783,31 @@ void EV_WpnEffects(event_args_s* args)
 				{
 					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-					if (!pEnt)
-						return;
-								
-					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-					pEnt->flags |= FTENT_FADEOUT | FTENT_CLIENTCUSTOM;
-					pEnt->entity.curstate.solid = SOLID_NOT;
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.renderfx = kRenderFxNone;
-					pEnt->entity.curstate.renderamt = 255;
-					pEnt->entity.curstate.angles = args->angles;
-					pEnt->entity.curstate.movetype = MOVETYPE_NOCLIP;
-					pEnt->entity.curstate.animtime = gHUD.m_flTime;
-					pEnt->entity.curstate.framerate = 1.0f;
-					pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.5f;
+					if (pEnt)
+					{
+						pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+						pEnt->flags |= FTENT_FADEOUT | FTENT_CLIENTCUSTOM;
+						pEnt->entity.curstate.solid = SOLID_NOT;
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.renderfx = kRenderFxNone;
+						pEnt->entity.curstate.renderamt = 255;
+						pEnt->entity.curstate.angles = args->angles;
+						pEnt->entity.curstate.movetype = MOVETYPE_NOCLIP;
+						pEnt->entity.curstate.animtime = gHUD.m_flTime;
+						pEnt->entity.curstate.framerate = 1.0f;
+						pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.5f;
 
-					pEnt->entity.curstate.sequence = Com_RandomLong(0, 2);
-					pEnt->die = gHUD.m_flTime + 0.5f;
+						pEnt->entity.curstate.sequence = Com_RandomLong(0, 2);
+						pEnt->die = gHUD.m_flTime + 0.5f;
 
-					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-						if (gHUD.m_flTime - pEnt->entity.curstate.fuser1 < 1.0f)
-							pEnt->entity.curstate.renderamt = 255 * (1.0f - (gHUD.m_flTime - pEnt->entity.curstate.fuser1));
-						else
-							pEnt->die = gHUD.m_flTime;
-					};
+						pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+							if (gHUD.m_flTime - pEnt->entity.curstate.fuser1 < 1.0f)
+								pEnt->entity.curstate.renderamt = 255 * (1.0f - (gHUD.m_flTime - pEnt->entity.curstate.fuser1));
+							else
+								pEnt->die = gHUD.m_flTime;
+						};
+					}
+					
 				}
 			}
 			else
@@ -797,32 +818,34 @@ void EV_WpnEffects(event_args_s* args)
 				{
 					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-					if (!pEnt)
-						return;
+					if (pEnt)
+					{
 
-					Vector vecAngle, vecVelocity;
-					vecVelocity = args->angles;
-					VectorAngles(vecVelocity, vecAngle);
+						Vector vecAngle, vecVelocity;
+						vecVelocity = args->angles;
+						VectorAngles(vecVelocity, vecAngle);
 
-					pEnt->flags |= FTENT_CLIENTCUSTOM;
-					pEnt->entity.curstate.solid = SOLID_NOT;
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.renderfx = kRenderFxNone;
-					pEnt->entity.curstate.renderamt = 255;
-					pEnt->entity.baseline.origin = vecVelocity;
-					pEnt->entity.angles = vecAngle;
-					pEnt->entity.curstate.movetype = MOVETYPE_NOCLIP;
-					pEnt->entity.curstate.animtime = gHUD.m_flTime;
-					pEnt->entity.curstate.framerate = 1.0f;
+						pEnt->flags |= FTENT_CLIENTCUSTOM;
+						pEnt->entity.curstate.solid = SOLID_NOT;
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.renderfx = kRenderFxNone;
+						pEnt->entity.curstate.renderamt = 255;
+						pEnt->entity.baseline.origin = vecVelocity;
+						pEnt->entity.angles = vecAngle;
+						pEnt->entity.curstate.movetype = MOVETYPE_NOCLIP;
+						pEnt->entity.curstate.animtime = gHUD.m_flTime;
+						pEnt->entity.curstate.framerate = 1.0f;
 
-					pEnt->entity.curstate.vuser1 = origin;	//oldorigin
-					pEnt->entity.curstate.sequence = 0;
-					pEnt->die = gHUD.m_flTime + 1.0f;
+						pEnt->entity.curstate.vuser1 = origin;	//oldorigin
+						pEnt->entity.curstate.sequence = 0;
+						pEnt->die = gHUD.m_flTime + 1.0f;
 
-					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-						if ((pEnt->entity.origin - pEnt->entity.curstate.vuser1).Length2D() > 200)
-							pEnt->die = gHUD.m_flTime;					
-					};
+						pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+							if ((pEnt->entity.origin - pEnt->entity.curstate.vuser1).Length2D() > 200)
+								pEnt->die = gHUD.m_flTime;
+						};
+					}
+
 				}
 			}			
 		}
@@ -851,44 +874,46 @@ void EV_WpnEffects(event_args_s* args)
 
 			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[index], pModel);
 
-			if (!pEnt)
-				return;
+			if (pEnt)
+			{
 
-			pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-			pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
-			pEnt->entity.curstate.frame = 0.0f;
-			pEnt->entity.curstate.iuser1 = index;
-			pEnt->entity.curstate.framerate = 30.0f;
-			pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-			pEnt->entity.curstate.aiment = viewent->index;
-			pEnt->entity.curstate.solid = SOLID_NOT;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderfx = kRenderFxNone;
-			pEnt->frameMax = 30.0;
-			pEnt->entity.curstate.scale = 0.036f;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.curstate.body = index + 1;
-			pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
-			pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED|EFLAG_AFTER_VIEWMODEL;
+				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+				pEnt->entity.curstate.frame = 0.0f;
+				pEnt->entity.curstate.iuser1 = index;
+				pEnt->entity.curstate.framerate = 30.0f;
+				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				pEnt->entity.curstate.aiment = viewent->index;
+				pEnt->entity.curstate.solid = SOLID_NOT;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderfx = kRenderFxNone;
+				pEnt->frameMax = 30.0;
+				pEnt->entity.curstate.scale = 0.036f;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.curstate.body = index + 1;
+				pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
+				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-			if (!index)
-				pEnt->die = gHUD.m_flTime + 3.03;
-			else
-				pEnt->die = gHUD.m_flTime + 4.03;
-
-			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-				cl_entity_t* viewent = gEngfuncs.GetViewModel();
-				if (!pEnt->entity.curstate.iuser1)
-				{
-					if (viewent->curstate.sequence != 0)
-						pEnt->die = gHUD.m_flTime;
-				}
+				if (!index)
+					pEnt->die = gHUD.m_flTime + 3.03;
 				else
-				{
-					if (viewent->curstate.sequence != 7)
-						pEnt->die = gHUD.m_flTime;
-				}
-			};
+					pEnt->die = gHUD.m_flTime + 4.03;
+
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+					if (!pEnt->entity.curstate.iuser1)
+					{
+						if (viewent->curstate.sequence != 0)
+							pEnt->die = gHUD.m_flTime;
+					}
+					else
+					{
+						if (viewent->curstate.sequence != 7)
+							pEnt->die = gHUD.m_flTime;
+					}
+				};
+			}
+
 		}
 		break;
 	}
@@ -957,18 +982,21 @@ void EV_WpnEffects(event_args_s* args)
 		{
 			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(args->origin, pModel);
 
-			if (!pEnt)
-				return;
+			if (pEnt)
+			{
 
-			pEnt->entity.angles = viewent->angles;
-			pEnt->flags &= ~FTENT_GRAVITY;
-			pEnt->entity.curstate.sequence = 0;
-			pEnt->entity.curstate.frame = 0;
-			pEnt->entity.curstate.renderamt = 250;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.animtime = gHUD.m_flTime;
-			pEnt->entity.curstate.framerate = 1.0;
-			pEnt->die = gHUD.m_flTime + 0.5;
+				pEnt->entity.angles = viewent->angles;
+				pEnt->flags &= ~FTENT_GRAVITY;
+				pEnt->entity.curstate.sequence = 0;
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.renderamt = 250;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.animtime = gHUD.m_flTime;
+				pEnt->entity.curstate.framerate = 1.0;
+				pEnt->die = gHUD.m_flTime + 0.5;
+
+			}
+
 
 			
 		}
@@ -985,34 +1013,36 @@ void EV_WpnEffects(event_args_s* args)
 
 			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[0], pModel);
 
-			if (!pEnt)
-				return;
+			if (pEnt)
+			{
 
-			pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-			pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
-			pEnt->entity.curstate.frame = 0.0f;
-			pEnt->entity.curstate.framerate = 30.0f;
-			pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-			pEnt->entity.curstate.aiment = viewent->index;
+				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+				pEnt->entity.curstate.frame = 0.0f;
+				pEnt->entity.curstate.framerate = 30.0f;
+				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				pEnt->entity.curstate.aiment = viewent->index;
 
-			pEnt->entity.curstate.solid = SOLID_NOT;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderfx = kRenderFxNone;
-			pEnt->frameMax = 40.0;
-			pEnt->entity.curstate.scale = 0.075f;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.curstate.body =  1;
-			pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
-			pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+				pEnt->entity.curstate.solid = SOLID_NOT;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderfx = kRenderFxNone;
+				pEnt->frameMax = 40.0;
+				pEnt->entity.curstate.scale = 0.075f;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.curstate.body = 1;
+				pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
+				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
 
-			pEnt->die = gHUD.m_flTime + 22;
+				pEnt->die = gHUD.m_flTime + 22;
 
-			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-				cl_entity_t* viewent = gEngfuncs.GetViewModel();
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
-				if (viewent->curstate.sequence != 0)
-					pEnt->die = gHUD.m_flTime;
-			};
+					if (viewent->curstate.sequence != 0)
+						pEnt->die = gHUD.m_flTime;
+				};
+			}
+
 		}
 		break;
 	}
@@ -1031,19 +1061,21 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(args->origin, pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
 
-				pEnt->flags |= FTENT_SPRANIMATE;
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.framerate = 30.0;
-				pEnt->entity.curstate.movetype = MOVETYPE_NONE;
-				pEnt->entity.curstate.solid = SOLID_TRIGGER;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.scale = 0.6;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->frameMax = 31.0;
-				pEnt->die = gHUD.m_flTime + 1.0;
+					pEnt->flags |= FTENT_SPRANIMATE;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.framerate = 30.0;
+					pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+					pEnt->entity.curstate.solid = SOLID_TRIGGER;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.scale = 0.6;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->frameMax = 31.0;
+					pEnt->die = gHUD.m_flTime + 1.0;
+				}
+
 			}
 		}
 		else
@@ -1052,18 +1084,20 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(args->origin, pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags |= FTENT_SPRANIMATE;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.framerate = 30.0;
+					pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+					pEnt->entity.curstate.solid = SOLID_TRIGGER;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.scale = 0.6;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->die = gHUD.m_flTime + 0.83;
+				}
 
-				pEnt->flags |= FTENT_SPRANIMATE;
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.framerate = 30.0;
-				pEnt->entity.curstate.movetype = MOVETYPE_NONE;
-				pEnt->entity.curstate.solid = SOLID_TRIGGER;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.scale = 0.6;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 0.83;
+			
 			}
 
 			cl_entity_t* ent = gEngfuncs.GetEntityByIndex(idx);
@@ -1102,34 +1136,36 @@ void EV_WpnEffects(event_args_s* args)
 
 			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[3], pModel);
 
-			if (!pEnt)
-				return;
+			if (pEnt)
+			{
 
-			pEnt->flags |= FTENT_CLIENTCUSTOM;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.curstate.animtime = gHUD.m_flTime;
-			pEnt->entity.curstate.framerate = 1.0;
-			pEnt->entity.curstate.body = 4;
-			pEnt->entity.curstate.sequence = args->iparam2;
-			pEnt->die = gHUD.m_flTime + 0.8;
-			pEnt->entity.curstate.iuser1 = idx;
+				pEnt->flags |= FTENT_CLIENTCUSTOM;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.curstate.animtime = gHUD.m_flTime;
+				pEnt->entity.curstate.framerate = 1.0;
+				pEnt->entity.curstate.body = 4;
+				pEnt->entity.curstate.sequence = args->iparam2;
+				pEnt->die = gHUD.m_flTime + 0.8;
+				pEnt->entity.curstate.iuser1 = idx;
 
-			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-				cl_entity_t* ent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser1);
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* ent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser1);
 
-				if (!ent)
-				{
-					pEnt->die = gHUD.m_flTime;
-					return;
-				}
+					if (!ent)
+					{
+						pEnt->die = gHUD.m_flTime;
+						return;
+					}
 
-				if (pEnt->die >= gHUD.m_flTime)
-				{
-					if (pEnt->die <= gHUD.m_flTime + 0.3f)
-						pEnt->entity.curstate.renderamt = (int)(255.0f * (1.0 - (gHUD.m_flTime + 0.3f - pEnt->die) / 0.3f));
-				}
-			};
+					if (pEnt->die >= gHUD.m_flTime)
+					{
+						if (pEnt->die <= gHUD.m_flTime + 0.3f)
+							pEnt->entity.curstate.renderamt = (int)(255.0f * (1.0 - (gHUD.m_flTime + 0.3f - pEnt->die) / 0.3f));
+					}
+				};
+			}
+
 		}
 	break;
 	}
@@ -1151,87 +1187,93 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin + Vector(0, 0, 125), pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->frameMax = 33.0;
+					pEnt->entity.curstate.scale = 1.0f;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->die = gHUD.m_flTime + 1.1;
+					pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.6;
+					pEnt->entity.curstate.iuser1 = idx;
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_NONE;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 33.0;
-				pEnt->entity.curstate.scale = 1.0f;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 1.1;
-				pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.6;
-				pEnt->entity.curstate.iuser1 = idx;
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-
-					if (currenttime > pEnt->entity.curstate.fuser1)
-					{
-						pEnt->entity.curstate.fuser1 = currenttime + 9999.0;
-						int id = pEnt->entity.curstate.iuser1;
-						cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(id);
-						if (!pPlayer)
-							return;
-
-						model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_summoner_summon02.spr", false);
-
-						if (pModel)
+						if (currenttime > pEnt->entity.curstate.fuser1)
 						{
-							TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin + Vector(0, 0, 125), pModel);
-
-							if (!pEnt)
+							pEnt->entity.curstate.fuser1 = currenttime + 9999.0;
+							int id = pEnt->entity.curstate.iuser1;
+							cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(id);
+							if (!pPlayer)
 								return;
 
-							pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-							pEnt->flags |= FTENT_SPRANIMATE;
-							pEnt->entity.curstate.frame = 0.0f;
-							pEnt->entity.curstate.framerate = 30.0f;
-							pEnt->entity.curstate.movetype = MOVETYPE_NONE;
-							pEnt->entity.curstate.solid = SOLID_NOT;
-							pEnt->entity.curstate.rendermode = kRenderTransAdd;
-							pEnt->entity.curstate.renderfx = kRenderFxNone;
-							pEnt->frameMax = 46.0;
-							pEnt->entity.curstate.scale = 1.5f;
-							pEnt->entity.curstate.renderamt = 255;
-							pEnt->die = gHUD.m_flTime + 1.53;
+							model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_summoner_summon02.spr", false);
+
+							if (pModel)
+							{
+								TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin + Vector(0, 0, 125), pModel);
+
+								if (pEnt)
+								{
+									pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+									pEnt->flags |= FTENT_SPRANIMATE;
+									pEnt->entity.curstate.frame = 0.0f;
+									pEnt->entity.curstate.framerate = 30.0f;
+									pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+									pEnt->entity.curstate.solid = SOLID_NOT;
+									pEnt->entity.curstate.rendermode = kRenderTransAdd;
+									pEnt->entity.curstate.renderfx = kRenderFxNone;
+									pEnt->frameMax = 46.0;
+									pEnt->entity.curstate.scale = 1.5f;
+									pEnt->entity.curstate.renderamt = 255;
+									pEnt->die = gHUD.m_flTime + 1.53;
+								}
+
+
+							}
+
+							pModel = IEngineStudio.Mod_ForName("models/ef_summoner_summoning.mdl", false);
+
+							if (pModel)
+							{
+								TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin + Vector(0, 0, -25), pModel);
+
+								if (pEnt)
+								{
+
+									pEnt->entity.curstate.frame = 0;
+									pEnt->entity.curstate.sequence = 0;
+									pEnt->entity.curstate.framerate = 1.0f;
+									pEnt->entity.curstate.animtime = gHUD.m_flTime;
+									pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+									pEnt->entity.curstate.solid = SOLID_NOT;
+									pEnt->entity.curstate.rendermode = kRenderTransAdd;
+									pEnt->entity.curstate.renderfx = kRenderFxNone;
+									pEnt->entity.curstate.renderamt = 255;
+									pEnt->die = gHUD.m_flTime + 2.7;
+									pEnt->flags |= FTENT_CLIENTCUSTOM;
+									pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.3f;
+
+									pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+										if (gHUD.m_flTime - pEnt->entity.curstate.fuser1 < 2.0f)
+											pEnt->entity.curstate.renderamt = 255 * (2.0f - (gHUD.m_flTime - pEnt->entity.curstate.fuser1));
+										else
+											pEnt->die = gHUD.m_flTime;
+									};
+								}
+
+							}
 						}
+					};
+				}
 
-						pModel = IEngineStudio.Mod_ForName("models/ef_summoner_summoning.mdl", false);
-
-						if (pModel)
-						{
-							TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin + Vector(0, 0, -25), pModel);
-
-							if (!pEnt)
-								return;
-
-							pEnt->entity.curstate.frame = 0;
-							pEnt->entity.curstate.sequence = 0;
-							pEnt->entity.curstate.framerate = 1.0f;
-							pEnt->entity.curstate.animtime = gHUD.m_flTime;
-							pEnt->entity.curstate.movetype = MOVETYPE_NONE;
-							pEnt->entity.curstate.solid = SOLID_NOT;
-							pEnt->entity.curstate.rendermode = kRenderTransAdd;
-							pEnt->entity.curstate.renderfx = kRenderFxNone;
-							pEnt->entity.curstate.renderamt = 255;
-							pEnt->die = gHUD.m_flTime + 2.7;
-							pEnt->flags |= FTENT_CLIENTCUSTOM;
-							pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.3f;
-
-							pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-								if (gHUD.m_flTime - pEnt->entity.curstate.fuser1 < 2.0f)
-									pEnt->entity.curstate.renderamt = 255 * (2.0f - (gHUD.m_flTime - pEnt->entity.curstate.fuser1));
-								else
-									pEnt->die = gHUD.m_flTime;
-							};
-						}
-					}
-				};
+				
 			}
 			break;
 		}
@@ -1272,28 +1314,30 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin + Vector(0, 0, -25), pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
 
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.sequence = 0;
-				pEnt->entity.curstate.framerate = 1.0f;
-				pEnt->entity.curstate.animtime = gHUD.m_flTime;
-				pEnt->entity.curstate.movetype = MOVETYPE_NONE;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 2.7;
-				pEnt->flags |= FTENT_CLIENTCUSTOM;
-				pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.3f;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.sequence = 0;
+					pEnt->entity.curstate.framerate = 1.0f;
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
+					pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->die = gHUD.m_flTime + 2.7;
+					pEnt->flags |= FTENT_CLIENTCUSTOM;
+					pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.3f;
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					if (gHUD.m_flTime - pEnt->entity.curstate.fuser1 < 1.2f)
-						pEnt->entity.curstate.renderamt = 255 * (1.2f - (gHUD.m_flTime - pEnt->entity.curstate.fuser1));
-					else
-						pEnt->die = gHUD.m_flTime;
-				};
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						if (gHUD.m_flTime - pEnt->entity.curstate.fuser1 < 1.2f)
+							pEnt->entity.curstate.renderamt = 255 * (1.2f - (gHUD.m_flTime - pEnt->entity.curstate.fuser1));
+						else
+							pEnt->die = gHUD.m_flTime;
+					};
+				}
+
 			}
 			break;
 		}
@@ -1311,53 +1355,57 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin + Vector(0, 0, 135), pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->frameMax = 36.0;
+					pEnt->entity.curstate.scale = 1.0f;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->die = gHUD.m_flTime + 1.53;
+					pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.5;
+					pEnt->entity.curstate.vuser1 = pPlayer->origin + Vector(0, 0, 135);
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_NONE;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 36.0;
-				pEnt->entity.curstate.scale = 1.0f;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 1.53;
-				pEnt->entity.curstate.fuser1 = gHUD.m_flTime + 0.5;
-				pEnt->entity.curstate.vuser1 = pPlayer->origin + Vector(0, 0, 135);
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-
-					if (currenttime > pEnt->entity.curstate.fuser1)
-					{
-						pEnt->entity.curstate.fuser1 = currenttime + 9999.0;
-						model_s* pModel = pModel = IEngineStudio.Mod_ForName("sprites/ef_summoner_unsummon02.spr", false);
-
-						if (pModel)
+						if (currenttime > pEnt->entity.curstate.fuser1)
 						{
-							TEMPENTITY* ent = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pEnt->entity.curstate.vuser1, pModel);
+							pEnt->entity.curstate.fuser1 = currenttime + 9999.0;
+							model_s* pModel = pModel = IEngineStudio.Mod_ForName("sprites/ef_summoner_unsummon02.spr", false);
 
-							if (!ent)
-								return;
+							if (pModel)
+							{
+								TEMPENTITY* ent = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pEnt->entity.curstate.vuser1, pModel);
 
-							ent->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-							ent->flags |= FTENT_SPRANIMATE;
-							ent->entity.curstate.frame = 0.0f;
-							ent->entity.curstate.framerate = 30.0f;
-							ent->entity.curstate.movetype = MOVETYPE_NONE;
-							ent->entity.curstate.solid = SOLID_NOT;
-							ent->entity.curstate.rendermode = kRenderTransAdd;
-							ent->entity.curstate.renderfx = kRenderFxNone;
-							ent->frameMax = 36.0;
-							ent->entity.curstate.scale = 1.0f;
-							ent->entity.curstate.renderamt = 255;
-							ent->die = gHUD.m_flTime + 1.53;
+								if (ent)
+								{
+									ent->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+									ent->flags |= FTENT_SPRANIMATE;
+									ent->entity.curstate.frame = 0.0f;
+									ent->entity.curstate.framerate = 30.0f;
+									ent->entity.curstate.movetype = MOVETYPE_NONE;
+									ent->entity.curstate.solid = SOLID_NOT;
+									ent->entity.curstate.rendermode = kRenderTransAdd;
+									ent->entity.curstate.renderfx = kRenderFxNone;
+									ent->frameMax = 36.0;
+									ent->entity.curstate.scale = 1.0f;
+									ent->entity.curstate.renderamt = 255;
+									ent->die = gHUD.m_flTime + 1.53;
+								}
+
+							
+							}
 						}
-					}
-				};
+					};
+				}
+
+			
 			}
 			break;
 		}
@@ -1373,31 +1421,33 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[1], pModel);
 
-				if (!pEnt)
-					return;
+				if (pEnt)
+				{
 
-				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.aiment = idx;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.body = 1;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->frameMax = 29.0;
-				pEnt->entity.curstate.scale = 0.3f;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 13;
-				pEnt->entity.curstate.iuser1 = idx;
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.aiment = idx;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.body = 1;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->frameMax = 29.0;
+					pEnt->entity.curstate.scale = 0.3f;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->die = gHUD.m_flTime + 13;
+					pEnt->entity.curstate.iuser1 = idx;
 
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* ent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser1);
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* ent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser1);
 
-					if (!ent)
-						pEnt->die = gHUD.m_flTime;
-				};
+						if (!ent)
+							pEnt->die = gHUD.m_flTime;
+					};
+				}
+
 			}
 		}
 		default:
@@ -1458,73 +1508,75 @@ void EV_WpnEffects(event_args_s* args)
 					cl_entity_t* viewent = gEngfuncs.GetViewModel();
 					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[5], pModel);
 
-					if (!pEnt)
-						return;
-
-					if (viewent->curstate.sequence != 5 || viewent->curstate.sequence != 11)
-						viewent->curstate.skin = 0;
-
-					if (args->iparam2)
+					if (pEnt)
 					{
-						pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-						pEnt->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
-						pEnt->entity.curstate.frame = 0;
-						pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-						pEnt->entity.curstate.framerate = 30.0f;
-						pEnt->entity.curstate.aiment = viewent->index;
-						pEnt->entity.curstate.body = 6;
-						pEnt->frameMax = 31;
+						if (viewent->curstate.sequence != 5 || viewent->curstate.sequence != 11)
+							viewent->curstate.skin = 0;
 
-						pEnt->entity.curstate.solid = SOLID_NOT;
-						pEnt->entity.curstate.rendermode = kRenderTransAdd;
-						pEnt->entity.curstate.renderfx = kRenderFxNone;
-						pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
-						pEnt->entity.curstate.scale = args->bparam1 ? 0.04f : 0.03f;
+						if (args->iparam2)
+						{
+							pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+							pEnt->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+							pEnt->entity.curstate.frame = 0;
+							pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+							pEnt->entity.curstate.framerate = 30.0f;
+							pEnt->entity.curstate.aiment = viewent->index;
+							pEnt->entity.curstate.body = 6;
+							pEnt->frameMax = 31;
 
-						pEnt->die = gHUD.m_flTime + 1.0;
-						pEnt->entity.curstate.iuser1 = viewent->index;
-						pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
-					}
-					else
-					{
-						pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-						pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
-						pEnt->entity.curstate.frame = 0;
-						pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-						pEnt->entity.curstate.framerate = 30.0f;
-						pEnt->entity.curstate.aiment = viewent->index;
-						pEnt->entity.curstate.body = 6;
-						pEnt->frameMax = args->bparam1 ? 47 : 45;
+							pEnt->entity.curstate.solid = SOLID_NOT;
+							pEnt->entity.curstate.rendermode = kRenderTransAdd;
+							pEnt->entity.curstate.renderfx = kRenderFxNone;
+							pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
+							pEnt->entity.curstate.scale = args->bparam1 ? 0.04f : 0.03f;
 
-						pEnt->entity.curstate.solid = SOLID_NOT;
-						pEnt->entity.curstate.rendermode = kRenderTransAdd;
-						pEnt->entity.curstate.renderfx = kRenderFxNone;
-						pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
-						pEnt->entity.curstate.scale = args->bparam1 ? 0.04f : 0.03f;
-						pEnt->entity.curstate.iuser2 = args->bparam1;
+							pEnt->die = gHUD.m_flTime + 1.0;
+							pEnt->entity.curstate.iuser1 = viewent->index;
+							pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+						}
+						else
+						{
+							pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+							pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+							pEnt->entity.curstate.frame = 0;
+							pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+							pEnt->entity.curstate.framerate = 30.0f;
+							pEnt->entity.curstate.aiment = viewent->index;
+							pEnt->entity.curstate.body = 6;
+							pEnt->frameMax = args->bparam1 ? 47 : 45;
 
-						pEnt->die = gHUD.m_flTime + (args->bparam1 ? 1.77f : 1.7f);
-						pEnt->entity.curstate.iuser1 = viewent->index;
-						pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+							pEnt->entity.curstate.solid = SOLID_NOT;
+							pEnt->entity.curstate.rendermode = kRenderTransAdd;
+							pEnt->entity.curstate.renderfx = kRenderFxNone;
+							pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
+							pEnt->entity.curstate.scale = args->bparam1 ? 0.04f : 0.03f;
+							pEnt->entity.curstate.iuser2 = args->bparam1;
 
-						pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-							cl_entity_t* viewent = gEngfuncs.GetViewModel();
+							pEnt->die = gHUD.m_flTime + (args->bparam1 ? 1.77f : 1.7f);
+							pEnt->entity.curstate.iuser1 = viewent->index;
+							pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-							if (viewent)
-							{
-								if (pEnt->entity.curstate.iuser2)
+							pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+								cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+								if (viewent)
 								{
-									if (viewent->curstate.sequence == 7 || viewent->curstate.sequence < 5)
-										pEnt->die = gHUD.m_flTime;
+									if (pEnt->entity.curstate.iuser2)
+									{
+										if (viewent->curstate.sequence == 7 || viewent->curstate.sequence < 5)
+											pEnt->die = gHUD.m_flTime;
+									}
+									else
+									{
+										if (viewent->curstate.sequence == 1 || viewent->curstate.sequence > 6)
+											pEnt->die = gHUD.m_flTime;
+									}
 								}
-								else
-								{
-									if (viewent->curstate.sequence == 1 || viewent->curstate.sequence > 6)
-										pEnt->die = gHUD.m_flTime;
-								}
-							}
-						};
+							};
+						}
 					}
+
+					
 				}
 
 			}
@@ -1539,8 +1591,7 @@ void EV_WpnEffects(event_args_s* args)
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(args->origin + Vector(0, 0, -36), pModel);
 
 				if (!pEnt)
-					return;
-
+					break;
 				pEnt->entity.curstate.scale = 1.0;
 				pEnt->entity.curstate.frame = 0;
 				pEnt->entity.curstate.sequence = 0;
@@ -1593,7 +1644,7 @@ void EV_WpnEffects(event_args_s* args)
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], pModel);
 
 				if (!pEnt)
-					return;
+					break;
 			
 				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
 				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
@@ -1770,23 +1821,24 @@ void EV_WpnEffects(event_args_s* args)
 
 			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-			if (!pEnt)
-				return;
+			if (pEnt)
+			{
 
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.curstate.scale = 0.3;
-			pEnt->die = gHUD.m_flTime + 0.6f;
-			pEnt->flags |= FTENT_CLIENTCUSTOM;
-			pEnt->callback = pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
-				ent->entity.curstate.scale += 0.0013;
-				if (ent->die <= gHUD.m_flTime + 0.4)
-					ent->entity.curstate.renderamt -= 15;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.curstate.scale = 0.3;
+				pEnt->die = gHUD.m_flTime + 0.6f;
+				pEnt->flags |= FTENT_CLIENTCUSTOM;
+				pEnt->callback = pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+					ent->entity.curstate.scale += 0.0013;
+					if (ent->die <= gHUD.m_flTime + 0.4)
+						ent->entity.curstate.renderamt -= 15;
 
-				if (ent->entity.curstate.renderamt < 0)
-					ent->entity.curstate.renderamt = 0;
+					if (ent->entity.curstate.renderamt < 0)
+						ent->entity.curstate.renderamt = 0;
 
-			};
+				};
+			}
 
 			int id;
 			gEngfuncs.CL_LoadModel("sprites/fexplo.spr", &id);
@@ -1802,19 +1854,19 @@ void EV_WpnEffects(event_args_s* args)
 
 			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-			if (!pEnt)
-				return;
-
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.curstate.scale = 0.5;
-			pEnt->die = gHUD.m_flTime + 0.6f;
-			pEnt->flags |= FTENT_CLIENTCUSTOM;
-			pEnt->callback = pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
-				ent->entity.curstate.scale += 0.007;
-				if (ent->die <= gHUD.m_flTime + 0.3)
-					ent->entity.curstate.renderamt -= 35;
-			};
+			if (pEnt)
+			{
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.curstate.scale = 0.5;
+				pEnt->die = gHUD.m_flTime + 0.6f;
+				pEnt->flags |= FTENT_CLIENTCUSTOM;
+				pEnt->callback = pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+					ent->entity.curstate.scale += 0.007;
+					if (ent->die <= gHUD.m_flTime + 0.3)
+						ent->entity.curstate.renderamt -= 35;
+				};
+			}
 
 			int id;
 			gEngfuncs.CL_LoadModel("sprites/fexplo.spr", &id);
@@ -2037,61 +2089,61 @@ void EV_WpnEffects(event_args_s* args)
 					pEnt->entity.curstate.vuser1 = origin;
 					pEnt->entity.curstate.iuser1 = args->iparam2;
 					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATE;
+					pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
 
+						cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(ent->entity.curstate.iuser1);
+						if (pPlayer)
+						{
+							Vector vecDir = (ent->entity.curstate.vuser1 - pPlayer->curstate.origin).Normalize();
+							VectorAngles(vecDir, ent->entity.angles);
+							ent->entity.angles.x *= -1.0;
+						}
+
+						if (ent->entity.curstate.frame + 1 >= ent->frameMax)
+						{
+							if (!ent->entity.curstate.iuser2)
+							{
+								ent->entity.curstate.iuser2 = 1;
+
+								model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_mgknife_exp02.spr", false);
+
+								if (pModel)
+								{
+									TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->entity.curstate.vuser1, pModel);
+
+									if (!pEnt)
+										return;
+
+									pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+									pEnt->entity.curstate.animtime = gHUD.m_flTime;
+									pEnt->entity.curstate.frame = 0.0f;
+									pEnt->entity.curstate.framerate = 30.0f;
+									pEnt->entity.curstate.rendermode = kRenderTransAdd;
+									pEnt->frameMax = 35.0;
+									pEnt->entity.curstate.scale = 0.5f;
+									pEnt->entity.curstate.renderamt = 255;
+									pEnt->die = gHUD.m_flTime + 1.5;
+									pEnt->entity.curstate.vuser1 = ent->entity.curstate.vuser1;
+									pEnt->entity.curstate.iuser1 = ent->entity.curstate.iuser1;
+
+									pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+										cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser1);
+										if (pPlayer)
+										{
+											Vector vecDir = (pEnt->entity.curstate.vuser1 - pPlayer->curstate.origin).Normalize();
+											VectorAngles(vecDir, pEnt->entity.angles);
+											pEnt->entity.angles.x *= -1.0;
+										}
+									};
+								}
+							}
+
+						}
+					};
 					gEngfuncs.pEventAPI->EV_PlaySound(pEnt->entity.index, origin, CHAN_AUTO, "weapons/magicknife_magic_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 				}
-				pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
-
-					cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(ent->entity.curstate.iuser1);
-					if (pPlayer)
-					{
-						Vector vecDir = (ent->entity.curstate.vuser1 - pPlayer->curstate.origin).Normalize();
-						VectorAngles(vecDir, ent->entity.angles);
-						ent->entity.angles.x *= -1.0;
-					}
-
-					if (ent->entity.curstate.frame + 1 >= ent->frameMax)
-					{
-						if (!ent->entity.curstate.iuser2)
-						{
-							ent->entity.curstate.iuser2 = 1;
-
-							model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_mgknife_exp02.spr", false);
-
-							if (pModel)
-							{
-								TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->entity.curstate.vuser1, pModel);
-
-								if (!pEnt)
-									return;
-
-								pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-								pEnt->entity.curstate.animtime = gHUD.m_flTime;
-								pEnt->entity.curstate.frame = 0.0f;
-								pEnt->entity.curstate.framerate = 30.0f;
-								pEnt->entity.curstate.rendermode = kRenderTransAdd;
-								pEnt->frameMax = 35.0;
-								pEnt->entity.curstate.scale = 0.5f;
-								pEnt->entity.curstate.renderamt = 255;
-								pEnt->die = gHUD.m_flTime + 1.5;
-								pEnt->entity.curstate.vuser1 = ent->entity.curstate.vuser1;
-								pEnt->entity.curstate.iuser1 = ent->entity.curstate.iuser1;
-
-								pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-									cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser1);
-									if (pPlayer)
-									{
-										Vector vecDir = (pEnt->entity.curstate.vuser1 - pPlayer->curstate.origin).Normalize();
-										VectorAngles(vecDir, pEnt->entity.angles);
-										pEnt->entity.angles.x *= -1.0;
-									}
-								};
-							}
-						}
-						
-					}
-				};
+				
 			}
 		}
 		
@@ -2110,22 +2162,23 @@ void EV_WpnEffects(event_args_s* args)
 			{
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(args->origin + Vector(0, 0, -36), pModel);
 
-				if (!pEnt)
-					return;
-
-				pEnt->entity.curstate.scale = 1.0;
-				pEnt->entity.curstate.animtime = gHUD.m_flTime;
-				pEnt->entity.curstate.frame = 0.0f;
-				pEnt->entity.curstate.framerate = 30.0f;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->frameMax = 8.0;
-				pEnt->entity.curstate.movetype = MOVETYPE_NONE;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 0.4;
-				pEnt->flags |= FTENT_NONE | FTENT_SPRANIMATE;
+				if (pEnt)
+				{
+					pEnt->entity.curstate.scale = 1.0;
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
+					pEnt->entity.curstate.frame = 0.0f;
+					pEnt->entity.curstate.framerate = 30.0f;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->frameMax = 8.0;
+					pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderfx = kRenderFxNone;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->die = gHUD.m_flTime + 0.4;
+					pEnt->flags |= FTENT_NONE | FTENT_SPRANIMATE;
+				}
+			
 			}
 			break;
 		}

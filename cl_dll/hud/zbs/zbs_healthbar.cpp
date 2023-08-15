@@ -3,7 +3,7 @@
 
 #include "zbs.h"
 #include "zbs_healthbar.h"
-
+#include "gamemode//zbs/zbs_const.h"
 #include <algorithm>
 #include <functional>
 
@@ -82,16 +82,26 @@ namespace cl {
 
 			switch (m_iCurrentClassID)
 			{
-			case 13:case 14:
-				//BOSS_CLASS_BIG00 / 01
+			case MONSTER_CLASS_HELMET:
+				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_jun00");
+				break;
+			case MONSTER_CLASS_DEIMOS2:
+				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_jun01");
+				break;
+			case BOSS_CLASS_BIG00:
 				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left");
 				break;
-			case 15:
-				//BOSS_CLASS_BIG02
+			case BOSS_CLASS_BIG01:
+				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_big01");
+				break;
+			case BOSS_CLASS_BIG02:
 				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_oberon");
 				break;
-			case 16:
+			case BOSS_CLASS_BIG03:
 				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_dione");
+				break;
+			case BOSS_CLASS_BIG07:
+				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_fallentitan");
 				break;
 			default:
 				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left");

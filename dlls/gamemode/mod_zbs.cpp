@@ -28,6 +28,7 @@ extern ZBSData g_ZBSData;
 extern std::vector<ZBSRoundData> g_ZBSRoundData;
 extern std::vector<TriggerData> g_ZBSTriggerData;
 extern std::vector<EventData> g_EventData;
+extern std::vector<MapTriggerData> g_MapTriggerData;
 
 PlayerModStrategy_ZBS::PlayerModStrategy_ZBS(CBasePlayer *player, CMod_ZombieScenario *mp) : CPlayerModStrategy_Default(player), m_HumanLevel(player), m_pModZBS(mp)
 {
@@ -96,7 +97,7 @@ void PlayerModStrategy_ZBS::ClientPutInServer()
 void PlayerModStrategy_ZBS::OnSpawn()
 {
 	//m_pPlayer->pev->health += m_HumanLevel.GetHealthBonus();
-	if(!m_pPlayer->IsBot())
+	//if(!m_pPlayer->IsBot())
 		m_pPlayer->pev->health += 800.0f;
 	m_pPlayer->SpawnProtection_Start(3.0s);
 }
@@ -222,6 +223,8 @@ CMod_ZombieScenario::CMod_ZombieScenario()
 {
 	m_iRoundTimeSecs = m_iIntroRoundTime = 20s + 2s; // keep it from ReadMultiplayCvars
 	m_flIntervalAdd = 0s;
+	m_iClearPoint = 0;
+	m_iPlayerSpawn = 0;
 	PRECACHE_GENERIC("sound/Scenario_Ready.mp3");
 	PRECACHE_GENERIC("sound/Scenario_Normal.mp3");
 	PRECACHE_GENERIC("sound/Scenario_Rush.mp3");
@@ -254,6 +257,42 @@ void CMod_ZombieScenario::CheckMapConditions()
 
 	m_iRoundTimeSecs = m_iIntroRoundTime = 20s + 2s; // keep it from ReadMultiplayCvars
 
+	if (!g_MapTriggerData.empty())
+	{
+		bool bHasTrigger = false;
+		CBaseEntity* pEnt = nullptr;
+		while ((pEnt = UTIL_FindEntityByClassname(pEnt, "zbstrigger")) != nullptr)
+		{
+			bHasTrigger = true;
+			break;
+		}
+
+		if (!bHasTrigger)
+		{
+			for (auto trg = g_MapTriggerData.begin(); trg != g_MapTriggerData.end(); trg++)
+			{
+				Vector absMax, absMin, vecOrigin, min, max;
+				absMax = trg->absmax;
+				absMin = trg->absmin;
+				vecOrigin = (absMax + absMin) / 2;
+				min = absMin - vecOrigin;
+				max = absMax - vecOrigin;
+				CZBSTrigger* pTrg = static_cast<CZBSTrigger*>(CBaseEntity::Create("zbstrigger", vecOrigin, g_vecZero, NULL));
+				if (pTrg)
+				{
+					pTrg->m_iTriggerId = trg->id;
+					pTrg->pev->maxs = max;
+					pTrg->pev->mins = min;
+					pTrg->pev->model = MAKE_STRING("models/w_ak47.mdl");
+					pTrg->InitTrigger();
+					UTIL_SetSize(pTrg->pev, min, max);
+				}
+			}
+		}
+	}
+
+
+
 	return Base::CheckMapConditions();
 }
 
@@ -277,11 +316,16 @@ void CMod_ZombieScenario::RestartRound()
 		}
 	}
 
-	ClearZombieNPC();
-	CheckMapEvent();
+	ClearZombieNPC();	
+	ResetHud();
 	CHalfLifeMultiplay::RestartRound();
 }
-
+void CMod_ZombieScenario::ResetHud()
+{
+	MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
+	WRITE_BYTE(3);
+	MESSAGE_END();
+}
 void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
 {
 	CHalfLifeMultiplay::PlayerSpawn(pPlayer);
@@ -289,6 +333,7 @@ void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
 
 void CMod_ZombieScenario::CheckMapEvent()
 {
+	
 	if (!g_EventData.empty())
 	{
 		for (auto evt = g_EventData.begin(); evt != g_EventData.end(); evt++)
@@ -375,14 +420,18 @@ void CMod_ZombieScenario::Think()
 				if (iCountDown == 19)
 				{
 					WaitingSound();
-
+					CheckMapEvent();
 					if (!g_ZBSTriggerData.empty())
 					{
-						for (auto waveData = g_ZBSWaveData.begin(); waveData != g_ZBSWaveData.end(); waveData++)
+						if (!g_ZBSWaveData.empty())
 						{
-							(*waveData).wavestate = WAVE_END;
-							(*waveData).m_flNextWave = invalid_time_point;
-							(*waveData).m_flEndWave = invalid_time_point;
+							//close every wave before start
+							for (auto waveData = g_ZBSWaveData.begin(); waveData != g_ZBSWaveData.end(); waveData++)
+							{
+								(*waveData).wavestate = WAVE_END;
+								(*waveData).m_flNextWave = invalid_time_point;
+								(*waveData).m_flEndWave = invalid_time_point;
+							}
 						}
 					}
 				}
@@ -453,12 +502,6 @@ void CMod_ZombieScenario::Think()
 				if (iter->m_flNextWave != invalid_time_point && iter->m_flNextWave < gpGlobals->time)
 				{
 					(*iter).m_flNextWave = gpGlobals->time + iter->intervalTime + m_flIntervalAdd;
-					//for jun00 boss only spawn once
-
-					if (iter->intervalTime == 0s)
-					{
-						(*iter).m_flNextWave = gpGlobals->time + iter->endTime;
-					}
 					
 					if (iter->spawnPoint == 9999)
 					{
@@ -475,7 +518,7 @@ void CMod_ZombieScenario::Think()
 						MakeZombieNPC(iter->waveID, iter->spawnPoint, iter->vecZombi);
 					}
 
-					if (iter->startTime >= iter->endTime)
+					if (iter->intervalTime == 0s)
 					{
 						//once msg or spawn boss
 						(*iter).m_flNextWave = invalid_time_point;
@@ -484,7 +527,7 @@ void CMod_ZombieScenario::Think()
 					}
 				}
 
-				if (iter->startTime < iter->endTime && iter->m_flEndWave != invalid_time_point && iter->m_flEndWave < gpGlobals->time)
+				if (iter->intervalTime != 0s && iter->m_flEndWave != invalid_time_point && iter->m_flEndWave < gpGlobals->time)
 				{
 					(*iter).m_flEndWave = invalid_time_point;
 					(*iter).wavestate = WAVE_END;
@@ -506,6 +549,10 @@ void CMod_ZombieScenario::Think()
 	{
 		if (TimeRemaining() <= 0s && !m_bRoundTerminating)
 			HumanWin();
+	}
+	else if (!m_bRoundTerminating && m_iClearPoint >= 100)
+	{
+		HumanWin();
 	}
 	
 }
@@ -754,19 +801,18 @@ edict_t* CMod_ZombieScenario::GetPlayerSpawnSpot(CBasePlayer* pPlayer)
 
 	if (!g_ZBSSpawnData.empty() && !g_ZBSRoundData.empty())
 	{
-		int iPlayerSpawn = 0;
 		for (auto roundData = g_ZBSRoundData.begin(); roundData != g_ZBSRoundData.end(); roundData++)
 		{
-			if ((m_iNumCTWins + 1) == roundData->round)
+			if (m_iPlayerSpawn < 100 && (m_iNumCTWins + 1) == roundData->round)
 			{
-				iPlayerSpawn = roundData->PlayerSpawn;
+				m_iPlayerSpawn = roundData->PlayerSpawn;
 				break;
 			}
 		}
 
 		for (auto iter = g_ZBSSpawnData.begin(); iter != g_ZBSSpawnData.end(); iter++)
 		{
-			if (iPlayerSpawn != iter->spawnPoint)
+			if (m_iPlayerSpawn != iter->spawnPoint)
 				continue;
 
 			if (IsSpawnPointValid(pPlayer, iter->origin) && iter->team != 1)
@@ -911,6 +957,9 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int waveid, int spawnid, std::ma
 		}
 	}
 
+	monster->m_vecSpawnOrigin = monster->pev->origin;
+	monster->m_vecSpawnAngle = monster->pev->angles;
+
 	if (!g_ZBSZombiTypeData.empty())
 	{
 		for (auto iter = g_ZBSZombiTypeData.begin(); iter != g_ZBSZombiTypeData.end(); iter++)
@@ -918,6 +967,8 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int waveid, int spawnid, std::ma
 			if (iter->id == ZombiType)
 			{
 				monster->m_pMonsterStrategy.reset(new CMonsterModStrategy_ZBS(monster, this));
+				monster->m_iSkillId = iter->skill;
+				monster->m_iZombiId = iter->id;
 				monster->SetClass(iter->appearance.c_str());
 				monster->SetModel(iter->appearance.c_str());
 				pent->v.spawnflags |= SF_NORESPAWN;
@@ -944,20 +995,33 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int waveid, int spawnid, std::ma
 						break;
 					}
 				}
-
-				monster->pev->max_health = iter->health + healthAdd;
-				monster->pev->health = monster->pev->max_health;
-				monster->pev->armortype = ARMOR_TYPE_HELMET;
-				monster->pev->armorvalue = iter->armor + healthAdd;
-				monster->pev->maxspeed = iter->speed + speedAdd;
-
-				monster->m_flAttackDamage = iter->attackDamage + damageAdd;
-				monster->m_flAttackDist = iter->attackRange + attackRangeAdd;
-				monster->m_flAttackRate = iter->attackInterval;
-				monster->m_iKillBonusMoney = iter->bonusMoney + moneyAdd;
 				
+				monster->pev->armortype = ARMOR_TYPE_HELMET;
+							
+				if (monster->m_iClass <= MONSTER_CLASS_PC)
+				{
+					monster->m_flAttackDamage = iter->attackDamage + damageAdd;
+					monster->m_flAttackDist = iter->attackRange + attackRangeAdd;
+					monster->m_iKillBonusMoney = iter->bonusMoney + moneyAdd;
+					monster->pev->max_health = iter->health + healthAdd;
+					monster->pev->armorvalue = iter->armor + healthAdd;
+					monster->pev->maxspeed = iter->speed + speedAdd;
+				}
+				else
+				{
+					monster->m_flAttackDamage = iter->attackDamage;
+					monster->m_flAttackDist = iter->attackRange;
+					monster->m_iKillBonusMoney = iter->bonusMoney;
+					monster->pev->max_health = iter->health;			
+					monster->pev->armorvalue = iter->armor;
+					monster->pev->maxspeed = iter->speed;
+				}
+
+				monster->pev->health = monster->pev->max_health;
+				monster->m_flAttackRate = iter->attackInterval;
 				monster->m_iPriority = iter->priority;
 				monster->m_iWaveID = waveid;
+				monster->m_iClearPoint = iter->clearpoint;
 				return monster;
 				break;
 			}
@@ -1024,6 +1088,7 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 
 void CMod_ZombieScenario::ClearZombieNPC()
 {
+	m_iClearPoint = 0;
 	CBaseEntity *npc = nullptr;
 	while ((npc = UTIL_FindEntityByClassname(npc, "monster_entity")) != nullptr)
 	{

@@ -518,6 +518,7 @@ set (HUD_SRCS
 	./hud/zbs/zbs_message.cpp
 	./hud/zbs/zbs_msg.cpp
 	./hud/zbs/zbs_healthbar.cpp
+	./hud/zbs/zbs_rank.cpp
 	./hud/retina.cpp
 	./hud/scenariostatus.cpp
 	./hud/zb2/zb2.cpp
@@ -547,6 +548,7 @@ set (HUD_SRCS
 	./hud/newhud/NewFontManager.cpp
 	./hud/followitem.cpp
 	../dlls/player/player_model.cpp
+	./hud/hud_zecounter.cpp
 )
 
 set (STUDIORENDER_SRCS

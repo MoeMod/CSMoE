@@ -50,6 +50,7 @@ namespace xe {
     };
 
     std::unordered_map<const mstudiotexture_t *, TextureAttr> g_textureAttrMap;
+    std::unordered_map<const mstudiotexture_t *, int> g_textureReplaceMap;
 
     void TexLru_UpdateAttr(const mstudiotexture_t *ptexture)
     {
@@ -575,12 +576,22 @@ namespace xe {
         auto iter = g_textureAttrMap.find(ptexture);
         if (iter == g_textureAttrMap.end())
             return;
-        if (!GL_FreeTextureIgnoreLru(iter->second.index))
+
+        int orinalTextureID = iter->second.index;
+        auto iter2 = g_textureReplaceMap.find(ptexture);
+        if (iter2 != g_textureReplaceMap.end())
+            orinalTextureID = iter2->second;
+
+        if (!GL_FreeTextureIgnoreLru(orinalTextureID))
             return;
-        gltexture_t* tex = R_GetTexture(iter->second.index);
+
+        if(orinalTextureID != iter->second.index)
+            g_textureReplaceMap.erase(ptexture);
+
+        gltexture_t* tex = R_GetTexture(orinalTextureID);
         tex->texlru_extdata = nullptr;
-        if (textureCache.contains(iter->second.index))
-            textureCache.remove(iter->second.index);
+        if (textureCache.contains(orinalTextureID))
+            textureCache.remove(orinalTextureID);
         g_textureAttrMap.erase(iter);
     }
 
@@ -618,6 +629,10 @@ namespace xe {
 
     void TexLru_BindReplace(const mstudiotexture_t* ptexture, int texnum)
     {
+        auto iter = g_textureAttrMap.find(ptexture);
+        if (iter != g_textureAttrMap.end())
+            g_textureReplaceMap.emplace(ptexture, iter->second.index);
+
         // set size for external texture
         if (TexLru_Upload(texnum))
             TexLru_CreateAttr(ptexture, texnum);

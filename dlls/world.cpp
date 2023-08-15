@@ -503,6 +503,7 @@ void CWorld::Precache()
 	CSDM_LoadSpawnPoints();
 	MapMgr_LoadMapList();
 	MapMgr_LoadMapSafeArea();
+#ifdef XASH_DEDICATED
 	ZBS_LoadSpawnArea();
 	ZBS_LoadWaveData();
 	ZBS_LoadZombiTypeData();
@@ -510,7 +511,8 @@ void CWorld::Precache()
 	ZBS_LoadTriggerData();
 	ZBS_LoadBossData();
 	ZBS_LoadEventData();
-
+	ZBS_LoadMapTrgData();
+#endif
 	// UNDONE why is there so much Spawn code in the Precache function? I'll just keep it here
 
 	// LATER - do we want a sound ent in deathmatch? (sjb)

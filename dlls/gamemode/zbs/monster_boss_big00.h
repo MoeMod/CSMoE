@@ -18,6 +18,7 @@ public:
 
 	void OnInit() override;
 	void OnSpawn() override;
+	void OnKilled(entvars_t* pKiller, int iGib) override;
 };
 
 class CBossSkill_Big00 : public CBaseMonsterSkill

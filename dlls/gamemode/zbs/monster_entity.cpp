@@ -14,15 +14,16 @@
 #include "game.h"
 #include "bot_include.h" // nav
 
-#include "zbs_const.h"
 #include "monster_manager.h"
 #include "gamemode/mods.h"
 #include "gamemode/zb2/deimostail.h"
 #include "gamemode/zb2/zombietrap.h"
 #include "gamemode/mod_zbs.h"
 #include "monster_boss_big00.h"
+#include "monster_boss_big01.h"
 #include "monster_boss_big02.h"
 #include "monster_boss_big03.h"
+#include "monster_boss_big07.h"
 #include <future>
 #include <atomic>
 #include <algorithm>
@@ -50,8 +51,10 @@ const std::tuple<MonsterClass, unsigned int, std::shared_ptr<CBaseMonsterClass>(
 	{MONSTER_CLASS_HELMET, 100, MakeMonsterClass<CMonsterClass_Helmet>},
 	{MONSTER_CLASS_DEIMOS2, 100, MakeMonsterClass<CMonsterClass_Deimos2>},
 	{BOSS_CLASS_BIG00, 0, MakeMonsterClass<CBossClass_Big00>},
+	{BOSS_CLASS_BIG01, 0, MakeMonsterClass<CBossClass_Big01>},
 	{BOSS_CLASS_BIG02, 0, MakeMonsterClass<CBossClass_Big02>},
 	{BOSS_CLASS_BIG03, 0, MakeMonsterClass<CBossClass_Big03>},
+	{BOSS_CLASS_BIG07, 0, MakeMonsterClass<CBossClass_Big07>},
 };
 
 constexpr auto NUM_MONSTERCLASSES = std::extent<decltype(g_MonsterClassList)>::value;
@@ -117,10 +120,6 @@ std::shared_ptr<CBaseMonsterClass> CMonsterModStrategy_Default::MonsterClassFact
 		{
 			iClass = MONSTER_CLASS_DEIMOS;
 		}
-		else if (strstr(appearance, "deimos2_zombi"))
-		{
-			iClass = MONSTER_CLASS_DEIMOS2;
-		}
 		else if (strstr(appearance, "boomer_zombi"))
 		{
 			iClass = MONSTER_CLASS_BOOMER;
@@ -133,17 +132,24 @@ std::shared_ptr<CBaseMonsterClass> CMonsterModStrategy_Default::MonsterClassFact
 		{
 			iClass = MONSTER_CLASS_ZOMBIEDOG;
 		}
-		else if (strstr(appearance, "bossS_jun00"))
+		else if (strstr(appearance, "bossS_jun00") ||
+				strstr(appearance, "bossS_jun02"))
 		{
 			iClass = MONSTER_CLASS_HELMET;
 		}
-		else if (strstr(appearance, "bossS_jun01"))
+		else if (strstr(appearance, "bossS_jun01") ||
+				strstr(appearance, "bossS_jun03") ||
+				strstr(appearance, "deimos2_zombi"))
 		{
 			iClass = MONSTER_CLASS_DEIMOS2;
 		}
 		else if (strstr(appearance, "bossL_big00"))
 		{
 			iClass = BOSS_CLASS_BIG00;
+		}
+		else if (strstr(appearance, "bossL_big01"))
+		{
+			iClass = BOSS_CLASS_BIG01;
 		}
 		else if (strstr(appearance, "bossL_big02"))
 		{
@@ -152,6 +158,11 @@ std::shared_ptr<CBaseMonsterClass> CMonsterModStrategy_Default::MonsterClassFact
 		else if (strstr(appearance, "bossL_big03"))
 		{
 			iClass = BOSS_CLASS_BIG03;
+		}
+		else if (strstr(appearance, "bossL_big07") ||
+			strstr(appearance, "bossL_big07_friend"))
+		{
+			iClass = BOSS_CLASS_BIG07;
 		}
 	}
 
@@ -790,6 +801,16 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 	if (flActualDamage > pev->health)
 		flActualDamage = pev->health;
 
+	if (pAttacker)
+	{
+		if (m_iPriority > 1)
+		{
+			int count;
+			count = RANDOM_FLOAT(0, 1) * (300 - flActualDamage / 5.0) + flActualDamage / 5.0;
+			pAttacker->AddAccount(count);
+		}
+	}
+
 	pev->health -= flActualDamage;
 
 	if (m_improv != NULL)
@@ -812,13 +833,24 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 				SetAnimation(MONSTERANIM_FLINCH);
 			}
 		}
-		else
+		
+		if(m_iPriority > 1)
 		{
+			float flPer = (float)(pev->health / pev->max_health);
 			MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
 			WRITE_BYTE(1);
 			WRITE_BYTE(m_iClass);
-			WRITE_COORD((float)(pev->health / pev->max_health));
+			WRITE_SHORT((int)(flPer * 1000));
 			MESSAGE_END();
+
+			if (pAttacker)
+			{
+				MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
+				WRITE_BYTE(2);
+				WRITE_BYTE(pAttacker->entindex());
+				WRITE_SHORT((int)(flDamage));
+				MESSAGE_END();
+			}
 		}
 
 		if (pAttacker != NULL)
@@ -923,6 +955,9 @@ void CMonster::Remove()
 }
 
 CMonster::CMonster() : CHostage(), 
+	m_szIdleAnim("zbs_idle1"),
+	m_szWalkAnim("zbs_walk"),
+	m_szRunAnim("zbs_run"),
 	m_iKillBonusMoney(500), 
 	m_iKillBonusFrags(1), 
 	m_flTimeLastActive(0.0s), 
@@ -1053,7 +1088,7 @@ bool CMonster::CheckTarget()
 	if (m_hTargetEnt && !m_hTargetEnt->IsAlive())
 	{
 		m_flTargetChange = gpGlobals->time + 0.2s;
-		m_hTargetEnt = nullptr;
+		m_hTargetEnt = NULL;
 		return false;
 	}
 	return false;
@@ -1085,7 +1120,7 @@ bool CMonster::CheckAttack()
 {
 	if (m_flSkillCheck <= gpGlobals->time)
 	{
-		m_flSkillCheck = gpGlobals->time + 2.0s;
+		m_flSkillCheck = gpGlobals->time + 0.1s;
 		auto p = (CMonsterModStrategy_Default*)m_pMonsterStrategy.get();
 		if (p->m_pSkill && p->m_pSkill->GetStatus() == SKILL_STATUS_READY) {
 			p->m_pSkill->OnActivate(m_hTargetEnt);
@@ -1095,7 +1130,7 @@ bool CMonster::CheckAttack()
 	if (m_timeNextAttack > gpGlobals->time || m_flAttackDamage < 2.0f)
 		return false;
 
-	if (!m_hTargetEnt)
+	if(!m_hTargetEnt)
 		return false;
 
 	if (!m_hTargetEnt->IsAlive())
@@ -1393,11 +1428,11 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 			&& (m_Activity != ACT_RELOAD || m_fSequenceFinished))
 		{
 			if (speed < 15.0f)
-				Q_strcpy(szAnim, "zbs_idle1");
+				Q_strcpy(szAnim, m_szIdleAnim);
 			else if (speed < 135.0f)
-				Q_strcpy(szAnim, "zbs_walk");
+				Q_strcpy(szAnim, m_szWalkAnim);
 			else
-				Q_strcpy(szAnim, "zbs_run");
+				Q_strcpy(szAnim, m_szRunAnim);
 
 			animDesired = LookupSequence(szAnim);
 			if (animDesired == -1)
@@ -1642,8 +1677,10 @@ CBasePlayer *CMonster::GetClosestPlayer(bool bVisible) const
 	return close;
 }
 
-bool CMonster::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, float angle, float flMinimumCosine)
+bool CMonster::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, float flAngle)
 {
+	float flMinimumCosine = cos(flAngle * 0.5 * M_PI / 180.0);
+
 	UTIL_MakeVectors(pAttacker->pev->angles);
 
 	Vector vecForward = gpGlobals->v_forward;
@@ -1674,11 +1711,10 @@ void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float fl
 	
 	vecSrc.z += 1;
 
-	float c = cos(90.0 * 0.5 * M_PI / 180.0);
 
 	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
 	{
-		if (!AngularCheck(pEntity, this, vecSrc, angle, c))
+		if (!AngularCheck(pEntity, this, vecSrc, angle))
 			continue;
 
 		if (pEntity->pev->takedamage == DAMAGE_NO)
@@ -1729,37 +1765,50 @@ void CMonster::SetModel(const char* appearance)
 	{
 		Q_snprintf(szModelPath, sizeof(szModelPath), "models/monster/%s.mdl", appearance);
 
-		if (strstr(appearance, "jun00"))
+		if (strstr(appearance, "jun00") ||
+			strstr(appearance, "jun02"))
 		{
-			hullMin = { -32.0, -32.0, 30.0 };
-			hullMax = { 32.0, 32.0, 100.0 };
+			hullMin = { -50.0, -50.0, 30.0 };
+			hullMax = { 50.0, 50.0, 100.0 };
+
+			Q_snprintf(szModelPath, sizeof(szModelPath), "models/monster/zbs_bossS_jun00.mdl");
+
 		}
-		else if (strstr(appearance, "jun01"))
+		else if (strstr(appearance, "jun01") ||
+				strstr(appearance, "jun03"))
 		{
 			hullMin = VEC_HULL_MIN;
 			hullMax = VEC_HULL_MAX;
+
+			Q_snprintf(szModelPath, sizeof(szModelPath), "models/monster/zbs_bossS_jun01.mdl");
 		}
 		else if (strstr(appearance, "big00"))
 		{
-			hullMin = { -32.0, -32.0, 30.0 };
-			hullMax = { 32.0, 32.0, 150.0 };
+			hullMin = { -50.0, -50.0, 30.0 };
+			hullMax = { 50.0, 50.0, 130.0 };
 		}
 		else if (strstr(appearance, "big01"))
 		{
-			hullMin = { -32.0, -32.0, 30.0 };
-			hullMax = { 32.0, 32.0, 150.0 };
+			hullMin = { -50.0, -50.0, 30.0 };
+			hullMax = { 50.0, 50.0, 130.0 };
 		}
 		else if (strstr(appearance, "big02"))
 		{
-			hullMin = { -32.0, -32.0, 30.0 };
-			hullMax = { 32.0, 32.0, 150.0 };
+			hullMin = { -50.0, -50.0, 25.0 };
+			hullMax = { 50.0, 50.0, 125.0 };
 		}
 		else if (strstr(appearance, "big03"))
 		{
 			hullMin = { -32.0, -32.0, 30.0 };
 			hullMax = { 32.0, 32.0, 150.0 };
-			//hullMin = { 16.0, 16.0, 10.0 };
-			//hullMax = { 3.0, 3.0, 3.0 };
+		}
+		else if (strstr(appearance, "big07") ||
+			strstr(appearance, "big07_friend"))
+		{
+			hullMin = { -50.0, -50.0, 25.0 };
+			hullMax = { 50.0, 50.0, 125.0 };
+
+			Q_snprintf(szModelPath, sizeof(szModelPath), "models/monster/zbs_bossL_big07.mdl");
 		}
 	}
 	else if (strstr(appearance, "dog"))
@@ -1820,8 +1869,7 @@ void CMonsterModStrategy_Default::OnKilled(entvars_t* pKiller, int iGib)
 
 	if (pModZBS)
 	{
-		if (m_pMonster->m_iPriority > 1)
-			pModZBS->HumanWin();
+		pModZBS->m_iClearPoint += m_pMonster->m_iClearPoint;
 	}
 }
 
@@ -1865,6 +1913,11 @@ void CBaseMonsterClass::DeathSound() const
 
 void CBaseMonsterSkill::OnThink()
 {
+	if (m_ioc_enabled)
+	{
+		m_ioc.poll();
+	}
+
 	if (m_iSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeSkillEnd)
 	{
 		OnSkillEnd();
@@ -2461,6 +2514,8 @@ void CMonsterClass_Helmet::OnInit()
 	PRECACHE_MODEL("models/monster/zbs_bosss_jun00.mdl");
 	SET_MODEL(m_pMonster->edict(), "models/monster/zbs_bosss_jun00.mdl");
 	UTIL_SetSize(m_pMonster->pev, Vector(-32.0, -32.0, -36.0), Vector(32.0, 32.0, 100.0));
+	m_pMonster->SetAble(JUMP, false);
+	m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Heavy>(m_pMonster));
 }
 
 void CMonsterClass_Helmet::OnSpawn()
@@ -2478,54 +2533,17 @@ void CMonsterSkill_Deimos2::OnThink()
 		FireZombieSkill();
 	}
 
-	if (m_iSkillStatus == SKILL_STATUS_USING)
-	{
-		if (!(m_pMonster->pev->flags & FL_ONGROUND))
-			m_pMonster->pev->velocity = g_vecZero;
-
-		if ((m_pMonster->pev->origin - vecStartOrigin).Length2D() > 500)
-		{
-			m_pMonster->pev->velocity *= 0.1;
-			vecStartOrigin = m_pMonster->pev->origin;
-		}
-			
-	}
-
 	CBaseMonsterSkill::OnThink();
 }
 
 void CMonsterSkill_Deimos2::FireZombieSkill()
 {
-	Vector velocity;
-
-	vecStartOrigin = m_pMonster->pev->origin;
-	
-	if (!m_pMonster->m_hTargetEnt)
-	{
-		UTIL_MakeAimVectors(m_pMonster->pev->angles);
-
-		velocity = gpGlobals->v_forward;
-	}
-	else
-	{
-
-		Vector vecVelDelta = m_pMonster->m_hTargetEnt->pev->velocity - m_pMonster->pev->velocity;
-		Vector vecDisDelta = m_pMonster->m_hTargetEnt->pev->origin - m_pMonster->pev->origin;
-
-		float tc = vecDisDelta.Length() / vecVelDelta.Length();
-
-		Vector st = m_pMonster->m_hTargetEnt->pev->origin + m_pMonster->m_hTargetEnt->pev->velocity * tc;
-
-		Vector vecDir = (st - m_pMonster->pev->origin).Normalize();
-
-		//Vector vecDir = (m_pMonster->m_hTargetEnt->pev->origin - m_pMonster->pev->origin).Normalize();
-		velocity = vecDir;
-	}
-
-	velocity.x *= 1000.0f;
-	velocity.y *= 1000.0f;
-
-	m_pMonster->pev->velocity = velocity;
+	m_pMonster->pev->movetype = MOVETYPE_FLY;
+	g_engfuncs.pfnWalkMove(m_pMonster->edict(), m_pMonster->pev->angles.y, 10.0, WALKMOVE_NORMAL);
+	UTIL_MakeVectors(m_pMonster->pev->angles);
+	Vector vecVelocity = gpGlobals->v_forward;
+	vecVelocity *= 700.0;
+	m_pMonster->pev->velocity = vecVelocity;
 	m_flTimeTriggerZombieSkill = invalid_time_point;
 }
 
@@ -2536,18 +2554,9 @@ void CMonsterSkill_Deimos2::OnActivate(CBaseEntity* target)
 	if (!target->IsAlive()) return;
 	if (!target->IsPlayer()) return;
 
-	Vector vecDelta = target->pev->origin - m_pMonster->pev->origin;
-	if (vecDelta.IsLengthGreaterThan(1500.0f))
-		return;
-
 	const duration_t flSkillTime = 1.9s;
-
-	m_pMonster->m_iCustomSequence = m_pMonster->LookupSequence("zbs_skill_dash");
-	m_pMonster->pev->velocity = g_vecZero;
-	m_pMonster->pev->maxspeed = 1.0f;
-	m_pMonster->m_flCustomSequenceUntilTime = gpGlobals->time + 1.9s;
-
-	m_pMonster->SetAnimation(MONSTERANIM_IDLE);
+	m_pMonster->pev->movetype = MOVETYPE_NONE;
+	m_pMonster->SetEntAnim(m_pMonster->LookupSequence("zbs_skill_dash"), 1.0, 1.9s, true);
 
 	m_pMonster->m_flStop = gpGlobals->time + flSkillTime;
 
@@ -2558,9 +2567,9 @@ void CMonsterSkill_Deimos2::OnActivate(CBaseEntity* target)
 
 void CMonsterSkill_Deimos2::OnSkillEnd()
 {
+	m_pMonster->pev->movetype = MOVETYPE_STEP;
 	m_iSkillStatus = SKILL_STATUS_FREEZING;
-	m_pMonster->pev->maxspeed = 225.0f;
-	m_flTimeSkillNext = gpGlobals->time + 10s;
+	m_flTimeSkillNext = gpGlobals->time + 5s;
 }
 
 void CMonsterSkill_Deimos2::OnTouch(CBaseEntity* other)
@@ -2568,11 +2577,10 @@ void CMonsterSkill_Deimos2::OnTouch(CBaseEntity* other)
 	if (m_iSkillStatus != SKILL_STATUS_USING)
 		return;
 
-	m_pMonster->pev->velocity *= 0.3;
-
 	if (other->IsPlayer() || other->Classify() == CLASS_PLAYER_ALLY)
 	{
-		other->TakeDamage(m_pMonster->pev, m_pMonster->pev, GetDamage(), DMG_BULLET);
+		if(other->IsPlayer())
+			other->TakeDamage(m_pMonster->pev, m_pMonster->pev, GetDamage(), DMG_BULLET);
 
 		Vector2D vecKickRateDir = (other->pev->origin.Make2D() - m_pMonster->pev->origin.Make2D()).Normalize();
 
@@ -2585,7 +2593,7 @@ void CMonsterSkill_Deimos2::OnTouch(CBaseEntity* other)
 
 float CMonsterSkill_Deimos2::GetDamage()
 {
-	return 5.0;
+	return 225.0;
 }
 
 void CMonsterClass_Deimos2::OnSpawn()
@@ -2603,6 +2611,7 @@ void CMonsterClass_Deimos2::OnInit()
 	SET_MODEL(m_pMonster->edict(), "models/monster/zbs_bosss_jun01.mdl");
 	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Deimos2>(m_pMonster));
+	m_pMonster->m_turnTolerance = 400.0f;
 }
 
 void CMonsterClass_PC::OnInit()

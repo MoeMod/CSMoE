@@ -68,7 +68,7 @@ float r_turbsin[] =
 	#include "warpsin.h"
 };
 
-static qboolean CheckSkybox( const char *name )
+static int CheckSkybox( const char *name )
 {
 	const char	*skybox_ext[] = { "astc", "dds", "tga", "bmp" };
 	int		i, j, num_checked_sides;
@@ -84,11 +84,10 @@ static qboolean CheckSkybox( const char *name )
 			sidename = va( "%s%s.%s", name, r_skyBoxSuffix[j], skybox_ext[i] );
 			if( FS_FileExists( sidename, false ))
 				num_checked_sides++;
-
 		}
 
 		if( num_checked_sides == 6 )
-			return true; // image exists
+			return 1; // image exists
 
 		for( j = 0; j < 6; j++ )
 		{         
@@ -99,9 +98,9 @@ static qboolean CheckSkybox( const char *name )
 		}
 
 		if( num_checked_sides == 6 )
-			return true; // images exists
+			return 2; // images exists
 	}
-	return false;
+	return 0;
 }
 
 void DrawSkyPolygon( int nump, float *vecs )
@@ -431,31 +430,33 @@ void R_SetupSky( const char *skyboxname )
 		return; // clear old skybox
 	}
 
-    loadname[0] = '\0';
+	int loadtype = 0;
     if(GL_Support(GL_ASTC_EXT) > 0)
     {
         // try load ddc
-        if( !loadname[0] || !CheckSkybox( loadname ) )
-        {
-            Q_snprintf( loadname, sizeof( loadname ), "ddc/gfx/env/%s", skyboxname );
-            FS_StripExtension( loadname );
+        Q_snprintf( loadname, sizeof( loadname ), "ddc/gfx/env/%s", skyboxname );
+        FS_StripExtension( loadname );
 
-            if( loadname[Q_strlen( loadname ) - 1] == '_' )
-                loadname[Q_strlen( loadname ) - 1] = '\0';
-        }
+        if( loadname[Q_strlen( loadname ) - 1] == '_' )
+            loadname[Q_strlen( loadname ) - 1] = '\0';
+
+		loadtype = CheckSkybox(loadname);
     }
+
     // fallback to default
-    if( !loadname[0] || !CheckSkybox( loadname ) )
+    if( !loadtype)
     {
         Q_snprintf(loadname, sizeof(loadname), "gfx/env/%s", skyboxname);
         FS_StripExtension(loadname);
 
         if (loadname[Q_strlen(loadname) - 1] == '_')
             loadname[Q_strlen(loadname) - 1] = '\0';
+
+		loadtype = CheckSkybox(loadname);
     }
 
 	// to prevent infinite recursion if default skybox was missed
-	if( !CheckSkybox( loadname ) && Q_stricmp( loadname, "gfx/env/desert" ))
+	if( !loadtype && Q_stricmp(loadname, "gfx/env/desert"))
 	{
 		MsgDev( D_ERROR, "R_SetupSky: missed or incomplete skybox '%s'\n", skyboxname );
 		R_SetupSky( "desert" ); // force to default
@@ -465,31 +466,19 @@ void R_SetupSky( const char *skyboxname )
 	// release old skybox
 	R_UnloadSkybox();
 
-	for( i = 0; i < 6; i++ )
+	if (!loadtype)
 	{
-		Q_snprintf( sidename, sizeof( sidename ), "%s%s", loadname, r_skyBoxSuffix[i] );
-		tr.skyboxTextures[i] = GL_LoadTexture( sidename, NULL, 0, TF_CLAMP|TF_SKY, NULL );
-		GL_SetTextureType( tr.skyboxTextures[i], TEX_CUBEMAP );
-		if( !tr.skyboxTextures[i] ) break;
+		MsgDev(D_ERROR, "R_SetupSky: couldn't load skybox '%s'\n", skyboxname);
+		return;
 	}
 
-	if( i == 6 ) return; // loaded
-
-	// clear previous and try again
-	R_UnloadSkybox();
-
-	for( i = 0; i < 6; i++ )
+	const char* underscore = loadtype == 1 ? "" : "_";
+	for (i = 0; i < 6; i++)
 	{
-		Q_snprintf( sidename, sizeof( sidename ), "%s_%s", loadname, r_skyBoxSuffix[i] );
-		tr.skyboxTextures[i] = GL_LoadTexture( sidename, NULL, 0, TF_CLAMP|TF_SKY, NULL );
-		GL_SetTextureType( tr.skyboxTextures[i], TEX_CUBEMAP );
-		if( !tr.skyboxTextures[i] ) break;
+		Q_snprintf(sidename, sizeof(sidename), "%s%s%s", loadname, underscore, r_skyBoxSuffix[i]);
+		tr.skyboxTextures[i] = GL_LoadTexture(sidename, NULL, 0, TF_CLAMP | TF_SKY, NULL);
+		GL_SetTextureType(tr.skyboxTextures[i], TEX_CUBEMAP);
 	}
-	if( i == 6 ) return; // loaded
-
-	// completely couldn't load skybox (probably never happens)
-	MsgDev( D_ERROR, "R_SetupSky: couldn't load skybox '%s'\n", skyboxname );
-	R_UnloadSkybox();
 }
 
 /*

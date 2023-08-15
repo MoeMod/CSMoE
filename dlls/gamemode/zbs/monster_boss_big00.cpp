@@ -44,12 +44,12 @@ void CBossSkill_Big00::OnThink()
 	case sv::CBossSkill_Big00::DASH:
 		m_pMonster->pev->movetype = MOVETYPE_NONE;
 		m_iBossSkillStatus = DASH_ACTION;
-		m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, 2.2s, false);
+		m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, 2.14s, false);
 		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay;
 		break;
 	case sv::CBossSkill_Big00::DASH_ACTION:
 		Dash(m_CurSkillData, m_pMonster->m_hTargetEnt);
-		m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
+		m_pMonster->m_flStop = gpGlobals->time + 2.14s - m_CurSkillData.damageDelay;
 		m_iBossSkillStatus = DASH_END;
 		break;
 	case sv::CBossSkill_Big00::DASH_END:
@@ -72,6 +72,8 @@ void CBossSkill_Big00::OnActivate(CBaseEntity* target)
 	std::vector<BossData> skill;
 	for (auto iter = g_BossData.begin(); iter != g_BossData.end(); iter++)
 	{
+		if (iter->id != m_pMonster->m_iSkillId)
+			continue;
 		//根据血量筛选技能,血量区间的技能type必定唯一
 		float flHealth = (m_pMonster->pev->health / m_pMonster->pev->max_health) * 100;
 		if (flHealth < iter->startHealthMin || flHealth > iter->startHealthMax)
@@ -81,7 +83,7 @@ void CBossSkill_Big00::OnActivate(CBaseEntity* target)
 		{
 			float c = cos(90.0 * 0.5 * M_PI / 180.0);
 
-			if (!m_pMonster->AngularCheck(m_pMonster->m_hTargetEnt, m_pMonster, m_pMonster->m_hTargetEnt->pev->origin, iter->damageDegree, c))
+			if (!m_pMonster->AngularCheck(m_pMonster->m_hTargetEnt, m_pMonster, m_pMonster->m_hTargetEnt->pev->origin, iter->damageDegree))
 				continue;
 		}
 
@@ -228,11 +230,20 @@ void CBossClass_Big00::OnSpawn()
 
 void CBossClass_Big00::OnInit()
 {
+	m_bAnimDeath = false;
 	PRECACHE_MODEL("models/monster/zbs_bossl_big00.mdl");
 	SET_MODEL(m_pMonster->edict(), "models/monster/zbs_bossl_big00.mdl");
 	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	m_pMonster->SetSkill(std::make_unique<CBossSkill_Big00>(m_pMonster));
 	m_pMonster->SetAble(JUMP, false);
 	m_pMonster->m_turnTolerance = 400.0f;
+}
+
+void CBossClass_Big00::OnKilled(entvars_t* pKiller, int iGib)
+{
+	m_pMonster->pev->nextthink = gpGlobals->time + 5s;
+	m_pMonster->pev->sequence = 3;
+	m_pMonster->pev->frame = 0;
+	m_pMonster->ResetSequenceInfo();
 }
 }

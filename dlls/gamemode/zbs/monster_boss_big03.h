@@ -65,15 +65,14 @@ class CBossSkill_Big03 : public CBaseMonsterSkill
 public:
 	CBossSkill_Big03(CMonster* p) : CBaseMonsterSkill(p) , m_iBossSkillStatus(ZBS_NONE)
 	{ 
-
+		PRECACHE_MODEL("models/dione_tentacle.mdl");
+		PRECACHE_MODEL("models/ef_dione_tentacle.mdl");
 
 	}
 
 	void OnThink() override;
+	void OnTouch(CBaseEntity* other) override;
 	void OnActivate(CBaseEntity* target) override;
-
-	void Jump(const BossData& sk, CBaseEntity* target);
-	void AttackHole(const BossData& sk, bool loop);
 
 protected:
 	BossData m_CurSkillData;

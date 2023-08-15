@@ -28,44 +28,59 @@ GNU General Public License for more details.
 #include "zbs_kill.h"
 #include "zbs_msg.h"
 #include "zbs_healthbar.h"
+#include "zbs_rank.h"
 
 #include "gamemode/zbs/zbs_const.h"
 
 namespace cl {
+	class CHudZBS::impl_t
+		: public THudSubDispatcher<CHudZBSLevel, CHudZBSScoreBoard, CHudZBSKill, CHudZBSRoundClear, CHudZBSMsg, CHudZBSHealthBar, CHudZBSRank> {};
 
-class CHudZBS::impl_t
-	: public THudSubDispatcher<CHudZBSLevel, CHudZBSScoreBoard, CHudZBSKill, CHudZBSRoundClear, CHudZBSMsg, CHudZBSHealthBar> {};
+	DECLARE_MESSAGE(m_ZBS, ZBSTip)
+	DECLARE_MESSAGE(m_ZBS, ZBSLevel)
+	DECLARE_MESSAGE(m_ZBS, ZBSMsg)
 
-DECLARE_MESSAGE(m_ZBS, ZBSTip)
-DECLARE_MESSAGE(m_ZBS, ZBSLevel)
-DECLARE_MESSAGE(m_ZBS, ZBSMsg)
-
-int CHudZBS::MsgFunc_ZBSMsg(const char* pszName, int iSize, void* pbuf)
-{
-	BufferReader buf(pszName, pbuf, iSize);
-	int iType = buf.ReadByte();
-	switch (iType)
+	int CHudZBS::MsgFunc_ZBSMsg(const char* pszName, int iSize, void* pbuf)
 	{
-	case 0:
-	{
-		int iID = buf.ReadShort();
+		BufferReader buf(pszName, pbuf, iSize);
+		int iType = buf.ReadByte();
+		switch (iType)
+		{
+		case 0:
+		{
+			int iID = buf.ReadShort();
 
-		pimpl->get<CHudZBSMsg>().PushMsg(iID);
-		break;
-	}
-	case 1:
-	{
-		int iClass = buf.ReadByte();
-		float flPercent = buf.ReadCoord();
+			pimpl->get<CHudZBSMsg>().PushMsg(iID);
+			break;
+		}
+		case 1:
+		{
+			int iClass = buf.ReadByte();
+			int flPercent = buf.ReadShort();
 
-		pimpl->get<CHudZBSHealthBar>().UpdateHealth(flPercent, iClass);
-		break;
-	}
-	}
-	
+			pimpl->get<CHudZBSHealthBar>().UpdateHealth(flPercent / 1000.0f, iClass);
+			break;
+		}
+		case 2:
+		{
+			int iIndex = buf.ReadByte();
+			int flData = buf.ReadShort();
 
-	return 1;
-}
+			pimpl->get<CHudZBSRank>().PushRankData(iIndex, flData);
+			break;
+		}
+		case 3:
+		{
+			pimpl->get<CHudZBSHealthBar>().UpdateHealth(0.0, -1);
+			pimpl->get<CHudZBSRank>().PushRankData(-1, -1);
+
+			break;
+		}
+		}
+
+
+		return 1;
+	}
 
 int CHudZBS::MsgFunc_ZBSTip(const char *pszName, int iSize, void *pbuf)
 {

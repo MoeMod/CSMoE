@@ -103,27 +103,29 @@ void EV_Knife( struct event_args_s *args )
 
 			g_DeathKnightChargeEffect = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[0], pModel);
 
-			if (!g_DeathKnightChargeEffect)
-				return;
+			if (g_DeathKnightChargeEffect)
+			{
 
-			g_DeathKnightChargeEffect->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-			g_DeathKnightChargeEffect->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
-			g_DeathKnightChargeEffect->entity.curstate.frame = 0.0f;
-			g_DeathKnightChargeEffect->entity.curstate.framerate = 30.0f;
-			g_DeathKnightChargeEffect->entity.curstate.movetype = MOVETYPE_FOLLOW;
-			g_DeathKnightChargeEffect->entity.curstate.aiment = clientindex;
-			g_DeathKnightChargeEffect->entity.curstate.solid = SOLID_NOT;
-			g_DeathKnightChargeEffect->entity.curstate.rendermode = kRenderTransAdd;
-			g_DeathKnightChargeEffect->entity.curstate.renderfx = kRenderFxNone;
-			g_DeathKnightChargeEffect->frameMax = 30.0;
-			g_DeathKnightChargeEffect->entity.curstate.scale = 0.07f;
-			g_DeathKnightChargeEffect->entity.curstate.renderamt = 255;
-			g_DeathKnightChargeEffect->entity.curstate.body = 1;
-			g_DeathKnightChargeEffect->die = gHUD.m_flTime + 999;
-			g_DeathKnightChargeEffect->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
-			g_DeathKnightChargeEffect->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+				g_DeathKnightChargeEffect->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+				g_DeathKnightChargeEffect->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+				g_DeathKnightChargeEffect->entity.curstate.frame = 0.0f;
+				g_DeathKnightChargeEffect->entity.curstate.framerate = 30.0f;
+				g_DeathKnightChargeEffect->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				g_DeathKnightChargeEffect->entity.curstate.aiment = clientindex;
+				g_DeathKnightChargeEffect->entity.curstate.solid = SOLID_NOT;
+				g_DeathKnightChargeEffect->entity.curstate.rendermode = kRenderTransAdd;
+				g_DeathKnightChargeEffect->entity.curstate.renderfx = kRenderFxNone;
+				g_DeathKnightChargeEffect->frameMax = 30.0;
+				g_DeathKnightChargeEffect->entity.curstate.scale = 0.07f;
+				g_DeathKnightChargeEffect->entity.curstate.renderamt = 255;
+				g_DeathKnightChargeEffect->entity.curstate.body = 1;
+				g_DeathKnightChargeEffect->die = gHUD.m_flTime + 999;
+				g_DeathKnightChargeEffect->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
+				g_DeathKnightChargeEffect->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
-			g_DeathKnightChargeEffect->callback = ResetChargeModel;
+				g_DeathKnightChargeEffect->callback = ResetChargeModel;
+			}
+
 		}
 		return;
 	}

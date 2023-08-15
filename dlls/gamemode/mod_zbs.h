@@ -42,6 +42,7 @@ public: // CHalfLifeMultiplay
 	void RestartRound() override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	void CheckMapEvent();
+	void ResetHud();
 	void Think() override;
 	void CheckWinConditions() override;
 	void CheckMapConditions() override;
@@ -79,6 +80,8 @@ public:
 	EventDispatcher<void(CMonster *victim, CBaseEntity *attacker)> m_eventMonsterKilled;
 
 	duration_t m_flIntervalAdd;
+	int m_iClearPoint;
+	int m_iPlayerSpawn;
 };
 
 class PlayerModStrategy_ZBS : public CPlayerModStrategy_Default

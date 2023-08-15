@@ -191,36 +191,37 @@ void EV_FireWingGun(event_args_s *args)
 				int iAttachment = 1;
 				g_WingGunRing = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[iAttachment], pModel);
 
-				if (!g_WingGunRing)
-					return;
-
-				g_WingGunRing->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				g_WingGunRing->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
-				g_WingGunRing->entity.curstate.frame = 0.0f;
-				g_WingGunRing->entity.curstate.framerate = 30.0f;
-				g_WingGunRing->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				g_WingGunRing->entity.curstate.aiment = clientindex;
-				g_WingGunRing->entity.curstate.solid = SOLID_NOT;
-				g_WingGunRing->entity.curstate.rendermode = kRenderTransAdd;
-				g_WingGunRing->entity.curstate.renderfx = kRenderFxNone;
-				g_WingGunRing->frameMax = 30.0;
-				g_WingGunRing->entity.curstate.scale = 0.05f;
-				g_WingGunRing->entity.curstate.renderamt = 255;
-				g_WingGunRing->entity.curstate.body = iAttachment + 1;
-				g_WingGunRing->die = gHUD.m_flTime + 999;
-				g_WingGunRing->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
-				g_WingGunRing->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
-
-				g_WingGunRing->callback = [](tempent_s* pEnt, float frametime, float currenttime)
+				if (g_WingGunRing)
 				{
-					cl_entity_t* parent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.aiment);
-					if (pEnt->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
+					g_WingGunRing->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					g_WingGunRing->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+					g_WingGunRing->entity.curstate.frame = 0.0f;
+					g_WingGunRing->entity.curstate.framerate = 30.0f;
+					g_WingGunRing->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_WingGunRing->entity.curstate.aiment = clientindex;
+					g_WingGunRing->entity.curstate.solid = SOLID_NOT;
+					g_WingGunRing->entity.curstate.rendermode = kRenderTransAdd;
+					g_WingGunRing->entity.curstate.renderfx = kRenderFxNone;
+					g_WingGunRing->frameMax = 30.0;
+					g_WingGunRing->entity.curstate.scale = 0.05f;
+					g_WingGunRing->entity.curstate.renderamt = 255;
+					g_WingGunRing->entity.curstate.body = iAttachment + 1;
+					g_WingGunRing->die = gHUD.m_flTime + 999;
+					g_WingGunRing->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
+					g_WingGunRing->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+
+					g_WingGunRing->callback = [](tempent_s* pEnt, float frametime, float currenttime)
 					{
-						pEnt->entity.curstate.renderamt = 0;
-						pEnt->die = gHUD.m_flTime;
-						g_WingGunRing = nullptr;
-					}
-				};
+						cl_entity_t* parent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.aiment);
+						if (pEnt->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
+						{
+							pEnt->entity.curstate.renderamt = 0;
+							pEnt->die = gHUD.m_flTime;
+							g_WingGunRing = nullptr;
+						}
+					};
+				}
+
 			}		
 
 			pModel = IEngineStudio.Mod_ForName("sprites/ef_winggun_charging.spr", false);

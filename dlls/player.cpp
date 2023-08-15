@@ -946,8 +946,12 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			int iAtt = ENTINDEX(ENT(pevAttacker));
 			int iVic = ENTINDEX(edict());
 
-			iDeathInfo_Fire[iAtt][iVic][2] += m_lastDamageAmount;
-			iDeathInfo_Body[iAtt][iVic][2] += 1;
+			if (iAtt > 0 && iAtt <= 32)
+			{
+				iDeathInfo_Fire[iAtt][iVic][2] += m_lastDamageAmount;
+				iDeathInfo_Body[iAtt][iVic][2] += 1;
+			}
+			
 		}
 		
 		CBaseEntity* temp = GetClassPtr<CBaseEntity>(pevInflictor);

@@ -766,6 +766,15 @@ void UTIL_ScreenShake(const Vector &center, float amplitude, float frequency, fl
 	}
 }
 
+void UTIL_ScreenShakeOne(CBaseEntity* pVictim, int amplitude, int duration, int frequency)
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgShake, NULL, pVictim->edict());
+	WRITE_SHORT((1 << 12) * amplitude);
+	WRITE_SHORT((1 << 12) * duration);
+	WRITE_SHORT((1 << 12) * frequency);
+	MESSAGE_END();
+}
+
 NOXREF void UTIL_ScreenShakeAll(const Vector &center, float amplitude, float frequency, float duration)
 {
 	UTIL_ScreenShake(center, amplitude, frequency, duration, 0);
