@@ -42,6 +42,7 @@ public: // CHalfLifeMultiplay
 	void RestartRound() override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	void CheckMapEvent();
+	void SavePlayerSpawnPoint();
 	void ResetHud();
 	void Think() override;
 	void CheckWinConditions() override;
@@ -82,6 +83,7 @@ public:
 	duration_t m_flIntervalAdd;
 	int m_iClearPoint;
 	int m_iPlayerSpawn;
+	std::vector<Vector> m_vecPlayerSpawnOrigin;
 };
 
 class PlayerModStrategy_ZBS : public CPlayerModStrategy_Default
@@ -102,13 +104,14 @@ public:
 	void UpdateStatusBar(CBaseEntity* pEntity, char* sbuf0, int* newSBarState) override;
 
 	float m_flWallTakeDamage;
+	float m_flSpawnTimeOffset;
 protected:
 	EventListener m_listenerAdjustDamage;
 	EventListener m_listenerMonsterKilled;
 	PlayerExtraHumanLevel_ZBS m_HumanLevel;
 	time_point_t m_flSpawnTips;
 	time_point_t m_flSpawnTime;
-	float m_flSpawnTimeOffset;
+	
 
 	CMod_ZombieScenario* const m_pModZBS;
 };

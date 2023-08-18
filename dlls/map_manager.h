@@ -5,6 +5,7 @@
 #endif
 
 namespace sv {
+	std::string MapMgr_GetMapName(const char* szMapName);
 	int MapMgr_GetMapID(const char* szMapName);
 	char* MapMgr_GetMapBright(const char* szMapName);
 	char* MapMgr_GetMapSkybox(const char* szMapName);

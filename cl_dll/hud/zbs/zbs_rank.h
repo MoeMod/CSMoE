@@ -8,6 +8,7 @@
 
 namespace cl {
 
+	extern inline char* va(const char* format, ...);
 	class CHudZBSRank : public IBaseHudSub
 	{
 	public:

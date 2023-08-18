@@ -14,6 +14,8 @@
 
 namespace cl {
 
+	extern std::map<int, ZBSMessageData> g_ZBSMessageData;
+
 	CHudZBSMsg::CHudZBSMsg(void)
 	{
 		bInit = false;
@@ -68,8 +70,8 @@ namespace cl {
 			if (pFirst.szSound[0])
 			{
 
-				static char szAlarmSound[128];
-				sprintf(szAlarmSound, "spk sound/%s", pFirst.szSound);
+				static char szAlarmSound[64];
+				sprintf(szAlarmSound, "spk sound/%s", pFirst.szSound.c_str());
 				gEngfuncs.pfnClientCmd(szAlarmSound);
 			}
 		}

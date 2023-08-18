@@ -24,6 +24,7 @@
 #include "newmenus.h"
 #include "client/wdnmd.h"
 #include "wpn_shared/z4b_shovelex.h"
+#include "map_manager.h"
 #ifdef XASH_MYSQL
 #include "database/db_main.h"
 #endif
@@ -5735,6 +5736,10 @@ void CHalfLifeMultiplay::LoadRandomMaps()
 		if (IS_MAP_VALID(szMap))
 		{
 			m_vecVoteMaps.emplace_back(std::make_pair(szMap, 0));
+
+			//std::string mapName = MapMgr_GetMapName(szMap);;
+
+			//m_vecVoteMaps.emplace_back(std::make_pair(mapName.size() == 0 ? szMap : mapName.c_str(), 0));
 		}
 		else
 			ALERT(at_console, "Skipping %s from mapcycle, not a valid map\n", szMap);

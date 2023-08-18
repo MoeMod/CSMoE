@@ -960,10 +960,10 @@ boost::asio::awaitable<void> CBossSkill_Big07::TASK_ZBS_HOWLING()
 
 boost::asio::awaitable<void> CBossSkill_Big07::TASK_ZBS_APPEAR()
 {	
+	m_pMonster->m_flStop = gpGlobals->time + 2s;
 	m_pMonster->pev->movetype = MOVETYPE_NONE;
 	m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, 1.1s, false);
-	m_pMonster->m_flStop = gpGlobals->time + 2s;
-	
+
 	MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
 	WRITE_BYTE(0);
 	WRITE_SHORT(std::atoi(m_CurSkillData.startMsg.c_str()));
@@ -971,22 +971,54 @@ boost::asio::awaitable<void> CBossSkill_Big07::TASK_ZBS_APPEAR()
 
 	co_await async_wait_timer(1.1s);
 
+	Vector vecOrigin = g_vecZero, vecAngle = g_vecZero;
+	CBaseEntity* ent = nullptr;
+	while ((ent = UTIL_FindEntityByClassname(ent, "boss_action")) != nullptr)
+	{
+		CBossAction* pAct = static_cast<CBossAction*>(ent);
+		
+		if (!strcmp(STRING(gpGlobals->mapname), "zs_contact"))
+		{
+			if (pAct->m_iId == 101)
+			{
+				vecOrigin = pAct->pev->origin;
+				vecAngle = pAct->pev->angles;
+			}
+		}
+	}
+
 	m_pMonster->pev->movetype = MOVETYPE_STEP;
 	m_pMonster->m_flStop = gpGlobals->time + 8s;
 	m_flAppearTime = gpGlobals->time + 8s;
 	m_pMonster->SetEntAnim(m_pMonster->LookupSequence("scene_appear2"), 1.0, 8s, false);
-	g_engfuncs.pfnWalkMove(m_pMonster->edict(), m_pMonster->pev->angles.y, 100.0, WALKMOVE_NORMAL);
 	float flOriginZ = m_pMonster->pev->origin.z;
-	UTIL_MakeVectors(m_pMonster->m_vecSpawnAngle);
-	Vector vecForward = gpGlobals->v_forward;
-	m_pMonster->pev->velocity = vecForward * 500;
 
+	if (!vecOrigin.IsZero())
+	{
+		UTIL_MakeVectors(vecAngle);
+		m_pMonster->pev->angles = vecAngle;
+		UTIL_MoveToOrigin(m_pMonster->edict(), vecOrigin, (vecOrigin - m_pMonster->pev->origin).Length(), WALKMOVE_NORMAL);
+		m_pMonster->pev->velocity = gpGlobals->v_forward * 500;
+		co_await async_wait_timer(1.5s);
+	}
+		
+	if (!strcmp(STRING(gpGlobals->mapname), "zs_contact"))
+	{
+		while ((ent = UTIL_FindEntityInSphere(ent, m_pMonster->pev->origin, 100.0)) != nullptr)
+		{
+			CZBSBreak* pBreak = dynamic_cast<CZBSBreak*>(ent);
+			if (pBreak)
+			{
+				pBreak->BreakTouch(m_pMonster);
+			}	
+		}
+	}
 	
 	while (m_flAppearTime > gpGlobals->time && m_flAppearTime != invalid_time_point)
 	{
 		//TODO
 		if ((m_pMonster->pev->flags & FL_ONGROUND))
-		{	
+		{
 			if (flOriginZ - m_pMonster->pev->origin.z > 150.0)
 			{
 				m_pMonster->pev->movetype = MOVETYPE_NONE;
@@ -1001,14 +1033,18 @@ boost::asio::awaitable<void> CBossSkill_Big07::TASK_ZBS_APPEAR()
 				break;
 			}
 
-			m_pMonster->pev->velocity = vecForward * 500;
+			g_engfuncs.pfnWalkMove(m_pMonster->edict(), m_pMonster->pev->angles.y, 30.0, WALKMOVE_NORMAL);
+			UTIL_MakeVectors(m_pMonster->m_vecSpawnAngle);
+			Vector vecForward = gpGlobals->v_forward;
+			m_pMonster->pev->velocity = vecForward * 300;
+
 			co_await async_wait_timer(0.1s);
 
 		}
 		else
 		{
 			co_await async_wait_timer(0.1s);
-		}		
+		}
 	}
 
 	m_pMonster->pev->movetype = MOVETYPE_STEP;

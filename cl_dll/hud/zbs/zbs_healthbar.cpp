@@ -11,6 +11,7 @@
 namespace cl {
 	CHudZBSHealthBar::CHudZBSHealthBar(void)
 	{
+		m_flPercentage = 0.0;
 		m_pCurrentHealth = 0.0;
 		m_pMaxHealth = 0.0;
 	}
@@ -26,10 +27,11 @@ namespace cl {
 
 	void CHudZBSHealthBar::Reset(void)
 	{
+
 	}
 	int CHudZBSHealthBar::Draw(float time)
 	{
-		if (!m_flPercentage)
+		if (m_flPercentage <= 0.0)
 			return 1;
 		if (m_iCurrentClassID <= 0)
 			return 1;
@@ -100,8 +102,20 @@ namespace cl {
 			case BOSS_CLASS_BIG03:
 				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_dione");
 				break;
+			case BOSS_CLASS_BIG04:
+				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_dione");
+				break;
+			case BOSS_CLASS_BIG05:
+				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_revenant");
+				break;
+			case BOSS_CLASS_BIG06:
+				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_angra");
+				break;
 			case BOSS_CLASS_BIG07:
 				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_fallentitan");
+				break;
+			case BOSS_CLASS_BIG08:
+				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left_scorpion");
 				break;
 			default:
 				m_pTexture_BossHp[0] = R_LoadTextureUnique("resource/helperhud/bosshp_bg_left");

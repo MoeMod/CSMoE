@@ -46,7 +46,7 @@ Studio models are position independent, so the cache manager can move them.
 #define MAXSTUDIOPIVOTS		256	// pivot points
 #define MAXSTUDIOBLENDS		16	// max anim blends
 #define MAXSTUDIOCONTROLLERS		8	// max controllers per model
-#define MAXSTUDIOATTACHMENTS		16	// max attachments per model
+#define MAXSTUDIOATTACHMENTS		20	// max attachments per model
 
 // client-side model flags
 #define STUDIO_ROCKET		0x0001	// leave a trail

@@ -132,6 +132,16 @@ protected:
 	vgui2::Label *m_pUpgradeTitle;
 	vgui2::Label *m_pOppZombiUpgradeTitle;
 
+	vgui2::Label* m_pUpgradeMoneyTitle[3];
+	vgui2::Button* m_pUpgradeButton[3];
+
+	vgui2::ImagePanel* m_pUpgradeBackGround[3];
+
+	vgui2::Label* m_pUpgradeInfoTitle[3];
+	vgui2::Label* m_pUpgradeLevelTitle[3];
+
+	vgui2::Label* m_pCurrentMoney;
+
 	// DM
 	vgui2::ImagePanel *m_pSetSelBg;
 	vgui2::Label *m_pSetLabel;
@@ -178,6 +188,22 @@ private:
 public:
 	CCSBuySubMenu_DeathMatch(vgui2::Panel *parent, const char *name = "BuySubMenu") : CCSBuySubMenu(parent, name) {}
 	virtual void LoadControlSettings(const char *dialogResourceName, const char *pathID = NULL, KeyValues *pPreloadedKeyValues = NULL) override;
+};
+class CCSBuySubMenu_ZombieScenarioMod : public CCSBuySubMenu
+{
+private:
+	typedef CCSBuySubMenu BaseClass;
+
+public:
+	CCSBuySubMenu_ZombieScenarioMod(vgui2::Panel* parent, const char* name = "BuySubMenu");
+	virtual void LoadControlSettings(const char* dialogResourceName, const char* pathID = NULL, KeyValues* pPreloadedKeyValues = NULL) override;
+	virtual void PerformLayout() override;
+	virtual void SetupPage(size_t iPage) override;
+	virtual void OnSelectWeapon(const char* weapon) override;
+	virtual void OnSelectFavoriteWeapons(int iSet) override;
+	virtual void OnCommand(const char* command) override;
+
+	virtual void OnThink() override;
 };
 
 #endif

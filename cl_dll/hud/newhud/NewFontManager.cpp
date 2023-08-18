@@ -54,6 +54,8 @@ namespace cl {
 		m_pFont.emplace_back(PushBackFont("ChatDefault"));
 		m_pFont.emplace_back(PushBackFont("DefaultSmall"));
 
+		m_pFont.emplace_back(PushBackFont("CreditsTitle"));
+
 
 		return 1;
 

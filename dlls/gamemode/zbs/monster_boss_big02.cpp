@@ -1,4 +1,4 @@
-
+﻿
 #include "monster_boss_big02.h"
 
 namespace sv {
@@ -30,6 +30,58 @@ void CZBSBig02Bomb::Precache(void)
 	PRECACHE_MODEL("models/zbs_bossl_big02_bomb.mdl");
 }
 
+void CZBSBig02Bomb::ParabolicMotion(CBaseEntity* pStartEntity, Vector vecEndPos, float flOffSet,float flVel)
+{
+	if (!pStartEntity)
+		return;
+	if (!vecEndPos.Length())
+		return;
+
+	Vector vecStart;
+	vecStart = this->pev->origin;
+
+	float flGravity;
+	flGravity = this->pev->gravity;
+
+	Vector vecPlane[2];
+	for (int i = 0; i < 2; i++)
+	{
+		vecPlane[0][i] = vecStart[i];
+		vecPlane[1][i] = vecEndPos[i];
+	}
+
+	//通过重力计算加速度. 
+	float flAcceleration = flGravity ? flGravity * flVel : flVel;
+	//计算两点间水平距离
+	float flLeveldistance = (vecPlane[0] - vecPlane[1]).Length();
+
+	Vector vecVelocity;
+
+	//末位置的高度 - 初位置的高度 + 抛物线的最值  = Z轴相对高度
+	//如果Z轴相对高度 是正的,也就是开口向下?
+
+	float flRelativeHeight = vecEndPos.z - vecStart.z + flOffSet;
+	if (flRelativeHeight > 0.0)
+	{
+		//垂直方向自由落体		速度 Vy= √2*g*h
+		vecVelocity.y = sqrt(2.0 * flAcceleration * flRelativeHeight);
+		//水平方向匀速直线运动  速度 Vx=  S/ (Vy/a +√2*△h/ a )    V
+		//S = Vo * t + ½ a * t²		Vt = Vo + a * t
+		vecVelocity.x = flLeveldistance / (vecVelocity.y / flAcceleration + sqrt(2.0 * flOffSet / flAcceleration));
+
+	}
+	else
+		vecVelocity.x = flLeveldistance / sqrt(2.0 * (vecStart.z - vecEndPos.z) / flAcceleration);
+	//否则就没有Y轴速度,开口向上物体受重力作用 会砸地板上
+
+	Vector vecVelocity_End;
+	//向量的计算  把速度方向搞出来 
+	vecVelocity_End = vecPlane[1] - vecPlane[0];
+	vecVelocity_End /= (flLeveldistance / vecVelocity.x);
+
+	vecVelocity_End.z = vecVelocity.y;
+	this->pev->velocity = vecVelocity_End;
+}
 void CZBSBig02Bomb::BombTouch(CBaseEntity* pOther)
 {
 	if (!pOther)
@@ -102,7 +154,7 @@ void CBossSkill_Big02::ActivateSkill(CBaseEntity* target)
 	m_flTimeSkillNext = m_flForceAttackTime + 10.0s;
 	m_MapSkillTime[m_CurSkillData.type] = gpGlobals->time + m_CurSkillData.cooltime;
 
-	//ʹ�ü���
+	//使用技能
 	switch (m_CurSkillData.type)
 	{
 	case 3:
@@ -145,7 +197,7 @@ void CBossSkill_Big02::OnActivate(CBaseEntity* target)
 	{
 		if (iter->id != m_pMonster->m_iSkillId)
 			continue;
-		//����Ѫ��ɸѡ����,Ѫ������ļ���type�ض�Ψһ
+		//根据血量筛选技能,血量区间的技能type必定唯一
 		float flHealth = (m_pMonster->pev->health / m_pMonster->pev->max_health) * 100;
 		if (flHealth < iter->startHealthMin || flHealth > iter->startHealthMax)
 			continue;
@@ -182,7 +234,7 @@ void CBossSkill_Big02::OnActivate(CBaseEntity* target)
 	if (skill.empty())
 		return;
 
-	//����ratioѡ�����ͷ�
+	//根据ratio选技能释放
 	std::vector<std::pair<BossData, int>> items;
 	for (auto iter = skill.begin(); iter != skill.end(); iter++)
 	{
@@ -205,7 +257,7 @@ boost::asio::awaitable<void> CBossSkill_Big02::Task_ZBS_ATTACK1()
 	co_await async_wait_timer(m_CurSkillData.damageDelay);
 
 	if (strstr(m_CurSkillData.aniSeq.c_str(), "knife"))
-		UTIL_TempModel({ 0, 0, 10 }, m_pMonster->pev->angles, g_vecZero, m_iKnifeIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pMonster, true, 16, 0, 256, 0x20000000);
+		UTIL_TempModel({ 0, 0, 10 }, m_pMonster->pev->angles, g_vecZero, m_iKnifeIndex, 10, 0, 10, 0, 0, 255, kRenderTransAdd, m_pMonster, false, 0, 0, 256, 0x20000000);
 	m_pMonster->RadiusDamage(m_pMonster->pev->origin, m_CurSkillData.damage, m_CurSkillData.damageDegree, m_CurSkillData.damageDist, m_CurSkillData.damageHeight, DMG_SLASH, m_CurSkillData.kickSide, m_CurSkillData.kickUp, m_CurSkillData.rushPower, false);
 	m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
 	co_await async_wait_timer(m_CurSkillData.aniTime - m_CurSkillData.damageDelay);
@@ -223,7 +275,7 @@ boost::asio::awaitable<void> CBossSkill_Big02::Task_ZBS_ATTACK2()
 	co_await async_wait_timer(m_CurSkillData.damageDelay + 0.16s);
 
 	if (strstr(m_CurSkillData.aniSeq.c_str(), "knife"))
-		UTIL_TempModel({ 0, 0, 10 }, m_pMonster->pev->angles, g_vecZero, m_iKnifeIndex, 10, 1, 10, 0, 0, 255, kRenderTransAdd, m_pMonster, true, 16, 0, 256, 0x20000000);
+		UTIL_TempModel({ 0, 0, 10 }, m_pMonster->pev->angles, g_vecZero, m_iKnifeIndex, 10, 1, 10, 0, 0, 255, kRenderTransAdd, m_pMonster, false, 0, 0, 256, 0x20000000);
 	m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime - m_CurSkillData.damageDelay;
 	m_pMonster->RadiusDamage(m_pMonster->pev->origin, m_CurSkillData.damage, m_CurSkillData.damageDegree, m_CurSkillData.damageDist, m_CurSkillData.damageHeight, DMG_SLASH, m_CurSkillData.kickSide, m_CurSkillData.kickUp, m_CurSkillData.rushPower, false);
 	co_await async_wait_timer(m_CurSkillData.aniTime - m_CurSkillData.damageDelay);
@@ -264,7 +316,7 @@ boost::asio::awaitable<void> CBossSkill_Big02::Task_ZBS_ATTACK_HOLE()
 	m_pMonster->pev->movetype = MOVETYPE_NONE;
 	UTIL_TempModel({ 0, 0, -32 }, g_vecZero, g_vecZero, m_iHoleIndex, 54, 0, 10, 0, 0, 255, kRenderTransAdd, m_pMonster, false, 0, 0, 256, 0x20000000);
 	m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, m_CurSkillData.aniTime, false);
-	m_flHoleSkillTime = gpGlobals->time + m_CurSkillData.damageDelay;	//5s	5s���ȭ����˺�
+	m_flHoleSkillTime = gpGlobals->time + m_CurSkillData.damageDelay;	//5s	5s后挥拳打出伤害
 	m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay;
 	co_await async_wait_timer(0.1s);
 
@@ -293,65 +345,106 @@ boost::asio::awaitable<void> CBossSkill_Big02::Task_ZBS_ATTACK_BOMB()
 	m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.damageDelay;
 	co_await async_wait_timer(m_CurSkillData.damageDelay);
 
+	std::vector<CBaseEntity*> vecArrayList(10);
+	int iIndex = 0;
+
+	std::array<Vector, 5> vecPosition{ Vector{-685.4,-220.7,-3228.0},Vector{-199.6,-473.6,-3228.0},Vector{-1101.6,-598.6,-3228.0},Vector{-1100.1,477.2,-3228.0},Vector{-272.4,543.0,-3228.0} };
+
 	while (m_iBombSkillCount--)
 	{	
+		m_iBombSkillRemain = 10;
 		Vector vecSrc = m_pMonster->pev->origin;
 
-		for (int i = 0; i < 3; i++)
+		CBaseEntity* pEntity = NULL;
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, m_pMonster->pev->origin, 4096.0)) != NULL)
 		{
-			Vector vecVelocity;
+			if (pEntity->IsDormant())
+				continue;
 
-			vecVelocity.z = RANDOM_FLOAT(800.0f, 900.0f);
+			if (pEntity->pev == m_pMonster->pev)
+				continue;
 
-			//Upper right 
-			float flDispersion = 500.0;
-			vecVelocity[0] += flDispersion + RANDOM_FLOAT(100.0f, 200.0f);
-			vecVelocity[1] += flDispersion + RANDOM_FLOAT(100.0f, 200.0f);
+			if (!pEntity->IsPlayer())
+				continue;
 
-			vecSrc.x += RANDOM_FLOAT(-5, 5);
-			CZBSBig02Bomb* pEntUR = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
-			if (pEntUR)
+			if (!pEntity->IsAlive())
+				continue;
+
+			if (vecArrayList.capacity())
 			{
-				pEntUR->pev->velocity = vecVelocity;
-				pEntUR->m_flDamage = m_CurSkillData.damage;
-				pEntUR->m_flRadius = m_CurSkillData.damageDist;
-			}
+				struct ArrangeData pGet;
+				pGet.ParsingIndex(pEntity);
 
-			//Upper left
-			vecSrc.y += RANDOM_FLOAT(-5, 5);
-			vecVelocity[0] -= flDispersion * 2 - RANDOM_FLOAT(100.0f, 200.0f);
-			CZBSBig02Bomb* pEntUL = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
-			if (pEntUL)
-			{
-				pEntUL->pev->velocity = vecVelocity;
-				pEntUL->m_flDamage = m_CurSkillData.damage;
-				pEntUL->m_flRadius = m_CurSkillData.damageDist;
-			}
+				if (std::find_if(vecArrayList.begin(), vecArrayList.end(), pGet) != vecArrayList.end())
+					continue;
 
-			//Lower left
-			vecSrc.y += RANDOM_FLOAT(-5, 5);
-			vecVelocity[1] -= flDispersion * 2 - RANDOM_FLOAT(100.0f, 200.0f);
-			CZBSBig02Bomb* pEntLL = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
-			if (pEntLL)
-			{
-				pEntLL->pev->velocity = vecVelocity;
-				pEntLL->m_flDamage = m_CurSkillData.damage;
-				pEntLL->m_flRadius = m_CurSkillData.damageDist;
-			}
+				vecArrayList[iIndex] = pEntity;
+				iIndex++;
 
-			//Lower right
-			vecSrc.x += RANDOM_FLOAT(-5, 5);
-			vecVelocity[0] += flDispersion * 2 + RANDOM_FLOAT(100.0f, 200.0f);
-			CZBSBig02Bomb* pEntLR = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
-			if (pEntLR)
-			{
-				pEntLR->pev->velocity = vecVelocity;
-				pEntLR->m_flDamage = m_CurSkillData.damage;
-				pEntLR->m_flRadius = m_CurSkillData.damageDist;
+				if (iIndex >= 10)
+				{
+					iIndex = 0;
+					break;
+				}
 			}
 		}
 
-		//ը����3��
+		for (auto pEntityList : vecArrayList)
+		{
+			if (pEntityList && pEntityList->IsAlive())
+			{
+				Vector vecOrigin = pEntityList->pev->origin;
+				Vector vecNorm = (vecOrigin - vecSrc);
+				Vector vecEnd = g_vecZero;
+				if (vecNorm.Length())
+				{
+					vecEnd = vecOrigin + vecNorm.Normalize() * RANDOM_FLOAT(-1.6, 1.6) * 10.0;
+				}
+
+				CZBSBig02Bomb* pEnt = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
+				if (pEnt)
+				{
+					pEnt->pev->avelocity[1] = RANDOM_FLOAT(-500.0, 500.0);
+					pEnt->ParabolicMotion(m_pMonster, vecEnd, (vecEnd - vecSrc).Length());
+					
+					pEnt->m_flDamage = m_CurSkillData.damage;
+					pEnt->m_flRadius = m_CurSkillData.damageDist;
+				}
+				--m_iBombSkillRemain;
+
+				pEntityList = NULL;
+			}
+		}
+
+		if (m_iBombSkillRemain)
+		{
+			while (--m_iBombSkillRemain)
+			{
+				Vector vecBase = vecPosition[0];
+				Vector vecDir;
+				vecDir.x = RANDOM_FLOAT(-1.0, 1.0);
+				vecDir.y = RANDOM_FLOAT(-1.0, 1.0);
+
+				vecDir = vecDir.Normalize();
+
+				Vector vecScale;
+				vecScale = vecDir  * (RANDOM_FLOAT(0, 1) ? -1.0 * RANDOM_FLOAT(0, 1) ? 256 + (m_iBombSkillRemain * 20.0) : 256.0: RANDOM_FLOAT(0, 1) ? 256 + (m_iBombSkillRemain * 20.0) : 256.0);
+
+				Vector vecEnd = vecBase + vecScale;
+
+				CZBSBig02Bomb* pEnt = static_cast<CZBSBig02Bomb*>(CBaseEntity::Create("zbs_big02_bomb", vecSrc, g_vecZero, m_pMonster->edict()));
+				if (pEnt)
+				{
+					pEnt->pev->avelocity[1] = RANDOM_FLOAT(-500.0, 500.0);
+					pEnt->ParabolicMotion(m_pMonster, vecEnd, (vecEnd - vecSrc).Length() / (RANDOM_FLOAT(0.5, 2)));
+
+					pEnt->m_flDamage = m_CurSkillData.damage;
+					pEnt->m_flRadius = m_CurSkillData.damageDist;
+				}
+			}
+		}
+
+		//炸弹放3次
 		if (!m_iBombSkillCount)
 		{
 			m_pMonster->m_flStop = gpGlobals->time + 2s;

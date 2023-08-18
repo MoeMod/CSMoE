@@ -163,5 +163,9 @@ void CHudZBS::Shutdown(void)
 	delete pimpl;
 	pimpl = nullptr;
 }
+void CHudZBS::GetLevelInfo(int* iLevelHp, int* iLevelAtk, int* iLevelWall)
+{
+	pimpl->get<CHudZBSLevel>().PushInfoData(iLevelHp, iLevelAtk, iLevelWall);
+}
 
 }

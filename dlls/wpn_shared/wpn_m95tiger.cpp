@@ -555,7 +555,7 @@ float CM95Tiger::GetDamage() const
 		if (enhancedzombie.value)
 			flDamage = 3100;
 		else
-			flDamage = 1100;
+			flDamage = 2500;
 	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 6200.0f;

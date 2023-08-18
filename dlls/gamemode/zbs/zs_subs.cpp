@@ -499,4 +499,22 @@ void CZECounter::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 	MESSAGE_END();
 }
 
+
+LINK_ENTITY_TO_CLASS(boss_action, CBossAction);
+
+void CBossAction::Spawn()
+{
+	return CPointEntity::Spawn();
+}
+
+void CBossAction::KeyValue(KeyValueData* pkvd)
+{
+	if (FStrEq(pkvd->szKeyName, "id"))
+	{
+		m_iId = Q_atoi(pkvd->szValue);
+	}
+	else
+		CPointEntity::KeyValue(pkvd);
+}
+
 }

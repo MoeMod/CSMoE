@@ -40,8 +40,8 @@ namespace cl {
 
 	void CHudZBSRank::Reset(void)
 	{
-		m_vecRankData.clear();
-		m_flTotalDamage = 0.0;
+		//m_vecRankData.clear();
+		//m_flTotalDamage = 0.0;
 	}
 	int CHudZBSRank::Draw(float time)
 	{
@@ -155,6 +155,8 @@ namespace cl {
 		if (flData == -1)
 		{
 			Reset();
+			m_vecRankData.clear();
+			m_flTotalDamage = 0.0;
 			return;
 		}
 		if (iIndex < 1 || iIndex > 32)

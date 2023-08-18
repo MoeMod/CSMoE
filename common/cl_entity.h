@@ -95,7 +95,7 @@ struct cl_entity_s
 	vec3_t					angles;
 
 	// Attachment points
-	vec3_t					attachment[16];
+	vec3_t					attachment[20];
 
 	// Other entity local information
 	int						trivial_accept;

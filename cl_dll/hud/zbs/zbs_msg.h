@@ -64,7 +64,7 @@ namespace cl {
 			return x.iId == y;
 		}
 
-		friend struct MessageData;
+		friend struct ZBSMessageData;
 
 	};
 

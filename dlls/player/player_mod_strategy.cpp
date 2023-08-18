@@ -51,7 +51,10 @@ void CPlayerModStrategy_Default::CheckBuyZone()
 		while ((pSpot = UTIL_FindEntityByClassname(pSpot, pszSpawnClass)) != nullptr)
 		{
 			if ((pSpot->pev->origin - player->pev->origin).Length() < 200.0f)
+			{
 				player->m_signals.Signal(SIGNAL_BUY);
+				break;
+			}
 		}
 	}
 }

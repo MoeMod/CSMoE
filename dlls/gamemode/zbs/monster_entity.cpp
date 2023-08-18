@@ -23,6 +23,7 @@
 #include "monster_boss_big01.h"
 #include "monster_boss_big02.h"
 #include "monster_boss_big03.h"
+#include "monster_boss_big05.h"
 #include "monster_boss_big07.h"
 #include <future>
 #include <atomic>
@@ -55,6 +56,7 @@ const std::tuple<MonsterClass, unsigned int, std::shared_ptr<CBaseMonsterClass>(
 	{BOSS_CLASS_BIG02, 0, MakeMonsterClass<CBossClass_Big02>},
 	{BOSS_CLASS_BIG03, 0, MakeMonsterClass<CBossClass_Big03>},
 	{BOSS_CLASS_BIG07, 0, MakeMonsterClass<CBossClass_Big07>},
+	{BOSS_CLASS_BIG05, 0, MakeMonsterClass<CBossClass_Big05>},
 };
 
 constexpr auto NUM_MONSTERCLASSES = std::extent<decltype(g_MonsterClassList)>::value;
@@ -158,6 +160,10 @@ std::shared_ptr<CBaseMonsterClass> CMonsterModStrategy_Default::MonsterClassFact
 		else if (strstr(appearance, "bossL_big03"))
 		{
 			iClass = BOSS_CLASS_BIG03;
+		}
+		else if (strstr(appearance, "bossL_big05"))
+		{
+			iClass = BOSS_CLASS_BIG05;
 		}
 		else if (strstr(appearance, "bossL_big07") ||
 			strstr(appearance, "bossL_big07_friend"))
@@ -1694,7 +1700,7 @@ bool CMonster::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector
 	return true;
 }
 
-void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool bFalloff)
+void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool bFalloff, bool bDropWeapons)
 {
 	CBaseEntity* pEntity = NULL;
 	float flAdjustedDamage, falloff;
@@ -1733,12 +1739,24 @@ void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float fl
 
 		if (pEntity->IsPlayer())
 		{
-			Vector2D vecDir2D = (pEntity->pev->origin.Make2D() - this->pev->origin.Make2D()).Normalize();
+			CBasePlayer* player = GetClassPtr<CBasePlayer>(pEntity->pev);
 
-			pEntity->pev->velocity.x = vecDir2D.x * flRushPower;
-			pEntity->pev->velocity.y = vecDir2D.y * flRushPower;
-			//pEntity->pev->velocity.z += pEntity->pev->flags & FL_ONGROUND ? flKickSide : flKickUp;
+			if(player)
+			{
+				Vector2D vecDir2D = (pEntity->pev->origin.Make2D() - this->pev->origin.Make2D()).Normalize();
+
+				pEntity->pev->velocity.x = vecDir2D.x * flRushPower;
+				pEntity->pev->velocity.y = vecDir2D.y * flRushPower;
+				//pEntity->pev->velocity.z += pEntity->pev->flags & FL_ONGROUND ? flKickSide : flKickUp;
+
+				if (bDropWeapons)
+				{
+					player->ReactToDeimosTail();
+				}
+			}	
 		}
+
+		
 
 	}
 }
@@ -1801,6 +1819,11 @@ void CMonster::SetModel(const char* appearance)
 		{
 			hullMin = { -32.0, -32.0, 30.0 };
 			hullMax = { 32.0, 32.0, 150.0 };
+		}
+		else if (strstr(appearance, "big05"))
+		{
+			hullMin = { -50.0, -50.0, 25.0 };
+			hullMax = { 50.0, 50.0, 125.0 };
 		}
 		else if (strstr(appearance, "big07") ||
 			strstr(appearance, "big07_friend"))

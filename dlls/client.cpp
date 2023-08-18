@@ -3737,10 +3737,13 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 					player->AddAutoBuyData(CMD_ARGV_(i));
 				}
 
-				bool oldval = g_bClientPrintEnable;
-				g_bClientPrintEnable = false;
-				player->AutoBuy();
-				g_bClientPrintEnable = oldval;
+				if (player->m_signals.GetState() & SIGNAL_BUY)
+				{
+					bool oldval = g_bClientPrintEnable;
+					g_bClientPrintEnable = false;
+					player->AutoBuy();
+					g_bClientPrintEnable = oldval;
+				}
 			}
 			else if (FStrEq(pcmd, "cl_setrebuy"))
 			{
@@ -3748,10 +3751,13 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				{
 					player->InitRebuyData(CMD_ARGV_(1));
 
-					bool oldval = g_bClientPrintEnable;
-					g_bClientPrintEnable = false;
-					player->Rebuy();
-					g_bClientPrintEnable = oldval;
+					if (player->m_signals.GetState() & SIGNAL_BUY)
+					{
+						bool oldval = g_bClientPrintEnable;
+						g_bClientPrintEnable = false;
+						player->Rebuy();
+						g_bClientPrintEnable = oldval;
+					}
 				}
 			}
 			else if (FStrEq(pcmd, "cl_autobuy"))

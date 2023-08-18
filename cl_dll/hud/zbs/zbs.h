@@ -16,6 +16,9 @@ public:
 	int MsgFunc_ZBSLevel(const char *pszName, int iSize, void *pbuf);
 	int MsgFunc_ZBSMsg(const char* pszName, int iSize, void* pbuf);
 
+	void GetLevelInfo(int* iLevelHp, int* iLevelAtk, int* iLevelWall);
+
+	int m_iHideHud;
 protected:
 	class impl_t;
 	impl_t *pimpl;

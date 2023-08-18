@@ -781,17 +781,17 @@ namespace sv {
 
 	float CChainSr::GetDamage() const
 	{
-		float flDamage = 150.0f;
+		float flDamage = 120.0f;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 		{
 			if (enhancedzombie.value)
-				flDamage = 3100;
+				flDamage = 4400;
 			else
-				flDamage = 1100;
+				flDamage = 2200;
 		}
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage = 6200.0f;
+			flDamage = 15600.0f;
 #endif
 		return flDamage;
 	}

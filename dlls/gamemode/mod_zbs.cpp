@@ -92,13 +92,26 @@ void PlayerModStrategy_ZBS::ClientPutInServer()
 			}
 		}
 	}
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBSMsg, NULL, m_pPlayer->edict());
+	WRITE_BYTE(1);
+	WRITE_BYTE(-1);
+	WRITE_SHORT(0);
+	MESSAGE_END();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBSMsg, NULL, m_pPlayer->edict());
+	WRITE_BYTE(2);
+	WRITE_BYTE(-1);
+	WRITE_SHORT(0);
+	MESSAGE_END();
 }
 
 void PlayerModStrategy_ZBS::OnSpawn()
 {
 	//m_pPlayer->pev->health += m_HumanLevel.GetHealthBonus();
 	//if(!m_pPlayer->IsBot())
-		m_pPlayer->pev->health += 800.0f;
+	m_pPlayer->pev->max_health += 800.0f;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health;
 	m_pPlayer->SpawnProtection_Start(3.0s);
 }
 
@@ -129,7 +142,7 @@ void PlayerModStrategy_ZBS::OnInitHUD()
 void PlayerModStrategy_ZBS::OnKilled(entvars_t* pKiller, entvars_t* pInflictor)
 {
 	m_flSpawnTime = gpGlobals->time + m_flSpawnTimeOffset * 1s + 5s;
-	m_flSpawnTimeOffset = min(m_flSpawnTimeOffset + 5.0f, 60.0f);
+	m_flSpawnTimeOffset = min(m_flSpawnTimeOffset + 5.0f, 30.0f);
 }
 
 void PlayerModStrategy_ZBS::OnThink()
@@ -298,21 +311,22 @@ void CMod_ZombieScenario::CheckMapConditions()
 
 void CMod_ZombieScenario::RestartRound()
 {
-	if (m_bCompleteReset)
+	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
 	{
-		for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+		CBaseEntity* entity = UTIL_PlayerByIndex(iIndex);
+
+		if (!entity)
+			continue;
+
+		CBasePlayer* player = static_cast<CBasePlayer*>(entity);
+		auto strategy = dynamic_cast<PlayerModStrategy_ZBS*>(player->m_pModStrategy.get());
+		if (strategy)
 		{
-			CBaseEntity* entity = UTIL_PlayerByIndex(iIndex);
-
-			if (!entity)
-				continue;
-
-			CBasePlayer* player = static_cast<CBasePlayer*>(entity);
-			auto strategy = dynamic_cast<PlayerModStrategy_ZBS*>(player->m_pModStrategy.get());
-			if (strategy)
+			if (m_bCompleteReset)
 			{
 				strategy->ClientPutInServer();
 			}
+			strategy->m_flSpawnTimeOffset = 0.0f;
 		}
 	}
 
@@ -329,6 +343,30 @@ void CMod_ZombieScenario::ResetHud()
 void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
 {
 	CHalfLifeMultiplay::PlayerSpawn(pPlayer);
+}
+
+void CMod_ZombieScenario::SavePlayerSpawnPoint()
+{
+	if (!g_ZBSSpawnData.empty() && !g_ZBSRoundData.empty())
+	{
+		m_vecPlayerSpawnOrigin.clear();
+		for (auto roundData = g_ZBSRoundData.begin(); roundData != g_ZBSRoundData.end(); roundData++)
+		{
+			if (m_iPlayerSpawn < 100 && (m_iNumCTWins + 1) == roundData->round)
+			{
+				m_iPlayerSpawn = roundData->PlayerSpawn;
+				break;
+			}
+		}
+
+		for (auto iter = g_ZBSSpawnData.begin(); iter != g_ZBSSpawnData.end(); iter++)
+		{
+			if (m_iPlayerSpawn != iter->spawnPoint)
+				continue;
+
+			m_vecPlayerSpawnOrigin.push_back(iter->origin);
+		}
+	}
 }
 
 void CMod_ZombieScenario::CheckMapEvent()
@@ -419,8 +457,8 @@ void CMod_ZombieScenario::Think()
 
 				if (iCountDown == 19)
 				{
+					SavePlayerSpawnPoint();
 					WaitingSound();
-					CheckMapEvent();
 					if (!g_ZBSTriggerData.empty())
 					{
 						if (!g_ZBSWaveData.empty())
@@ -439,7 +477,8 @@ void CMod_ZombieScenario::Think()
 		}
 		else
 		{
-			RoundStart();
+			if (TimeRemaining() < 0s)
+				RoundStart();
 		}
 
 		CheckFreezePeriodExpired();
@@ -585,6 +624,12 @@ void CMod_ZombieScenario::HumanWin()
 	WRITE_BYTE(ZBS_TIP_ROUNDCLEAR);
 	MESSAGE_END();
 
+	MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
+	WRITE_BYTE(1);
+	WRITE_BYTE(-1);
+	WRITE_SHORT(0);
+	MESSAGE_END();
+
 	TerminateRound(5s, WINSTATUS_CTS);
 
 	++m_iNumCTWins;
@@ -594,6 +639,11 @@ void CMod_ZombieScenario::HumanWin()
 	if (m_iMaxRoundsWon && m_iNumCTWins >= m_iMaxRoundsWon)
 	{
 		UTIL_ClientPrintAll(HUD_PRINTCENTER, "#CSO_CongAllRoundClear");
+
+		if (CheckCanStartVoteMaps())
+		{
+			SERVER_COMMAND("start_votemap\n");
+		}
 	}
 }
 
@@ -659,6 +709,8 @@ duration_t CMod_ZombieScenario::TimeRemaining()
 
 void CMod_ZombieScenario::RoundStart()
 {
+	CheckMapEvent();
+
 	if (g_ZBSData.gametype == MODE_DEF && g_ZBSData.roundTime)
 	{
 		m_iRoundTime = g_ZBSData.roundTime * 1s;
@@ -669,6 +721,10 @@ void CMod_ZombieScenario::RoundStart()
 	}
 
 	m_flNextSpawnNPC = gpGlobals->time;
+
+	MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
+	WRITE_BYTE(3);
+	MESSAGE_END();
 
 
 	if (!g_ZBSWaveData.empty() && !g_ZBSRoundData.empty())
@@ -816,7 +872,7 @@ edict_t* CMod_ZombieScenario::GetPlayerSpawnSpot(CBasePlayer* pPlayer)
 				continue;
 
 			if (IsSpawnPointValid(pPlayer, iter->origin) && iter->team != 1)
-			{
+			{		
 				pPlayer->pev->origin = iter->origin;
 				pPlayer->pev->angles = iter->angle;
 				pPlayer->pev->velocity = g_vecZero;

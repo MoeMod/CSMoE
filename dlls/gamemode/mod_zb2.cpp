@@ -561,6 +561,8 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	m_pPlayer->m_flLockGravity = 0.0;
 	sp->InitHUD();
 	sp->ResetMaxSpeed();
+	m_pPlayer->m_iTeam = TERRORIST;
+	m_pPlayer->pev->team = TERRORIST;
 
 	m_iZombieInfections = 0;
 	UpdatePlayerEvolutionHUD();
@@ -586,6 +588,8 @@ void CPlayerModStrategy_ZB2::BecomeHuman()
 
 	sp->InitHUD();
 	sp->ResetMaxSpeed();
+	m_pPlayer->m_iTeam = CT;
+	m_pPlayer->pev->team = CT;
 }
 
 void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker)

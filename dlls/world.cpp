@@ -503,6 +503,8 @@ void CWorld::Precache()
 	CSDM_LoadSpawnPoints();
 	MapMgr_LoadMapList();
 	MapMgr_LoadMapSafeArea();
+//#ifdef XASH_DEDICATED || _DEBUG
+
 #ifdef XASH_DEDICATED
 	ZBS_LoadSpawnArea();
 	ZBS_LoadWaveData();

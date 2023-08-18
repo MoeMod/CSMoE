@@ -18,6 +18,12 @@ public:
 		m_iLevel_ATK = att;
 		m_iLevel_Wall = wall;
 	}
+	int PushInfoData(int* i, int* j, int* k)
+	{
+		*i = m_iLevel_HP;
+		*j = m_iLevel_ATK;
+		*k = m_iLevel_Wall;
+	};
 
 protected:
 	UniqueTexture m_pTexture_ZBSBoard_BG;

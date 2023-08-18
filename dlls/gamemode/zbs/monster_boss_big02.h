@@ -16,6 +16,7 @@ namespace sv {
 		void Spawn(void);
 		void Precache(void);
 
+		void ParabolicMotion(CBaseEntity* pStartEntity, Vector vecEndPos, float flOffSet, float flVel = 600.0);
 		void EXPORT BombTouch(CBaseEntity* pOther);
 
 		float m_flDamage;
@@ -42,6 +43,20 @@ public:
 		m_ioc_enabled = true;
 	}
 
+	struct ArrangeData
+	{
+		CBaseEntity* pEnt;
+
+		void ParsingIndex(CBaseEntity* p)
+		{
+			pEnt = p;
+		}
+		bool operator()(const CBaseEntity* Val1)
+		{
+			return Val1 == pEnt;
+		}
+	};
+
 	void OnThink() override;
 	void OnActivate(CBaseEntity* target) override;
 	void ActivateSkill(CBaseEntity* target);
@@ -53,6 +68,7 @@ protected:
 	int m_iKnifeIndex;
 	int m_iHoleIndex;
 	int m_iBombSkillCount;
+	int m_iBombSkillRemain;
 	std::unordered_map<int, EngineClock::time_point> m_MapSkillTime;
 
 	boost::asio::awaitable<void> Task_ZBS_ATTACK1();

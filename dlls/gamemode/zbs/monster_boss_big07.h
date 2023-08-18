@@ -8,6 +8,7 @@
 #include "zbs_map_manager.h"
 #include "monster_entity.h"
 #include "gamemode/mod_zbs.h"
+#include "zs_subs.h"
 
 namespace sv {
 

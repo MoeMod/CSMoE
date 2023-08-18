@@ -143,7 +143,6 @@ public:
 	void OnKilled(entvars_t* pKiller, int iGib) override {}
 	MonsterSkillStatus GetStatus() const override { return m_iSkillStatus; }
 
-protected:
 	virtual void OnSkillEnd() {}
 	virtual void OnSkillReady() {}
 
@@ -164,6 +163,16 @@ protected:
 			}
 			m_task_running = false;
 		}, std::forward<CompletionToken>(token));
+	}
+
+	void StopTask()
+	{
+		if (m_task_running)
+		{
+			m_ioc.stop();
+			m_task_running = false;	
+		}
+			
 	}
 
 protected:
@@ -341,7 +350,7 @@ public:
 	void SetSkill(std::unique_ptr<IBaseMonsterSkill> ptr);
 	void SetEntAnim(int ianim, float framerate, duration_t animtime, bool resetframe);
 	bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector origin, float flAngle);
-	void RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool falloff = false);
+	void RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool falloff = false, bool dropweapons = false);
 	
 	inline void SetAble(MonsterAbleFlag behavior, bool value) {
 		m_able.set(static_cast<size_t>(behavior), value);

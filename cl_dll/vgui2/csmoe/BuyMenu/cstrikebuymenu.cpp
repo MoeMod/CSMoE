@@ -181,6 +181,8 @@ void CCSBaseBuyMenu::UpdateGameMode()
 		m_pMainMenu = new CCSBuySubMenu_ZombieMod(this);
 	else if ((cl::gHUD.m_iModRunning == MOD_ZB4) || (cl::gHUD.m_iModRunning == MOD_TDM) || (cl::gHUD.m_iModRunning == MOD_DM))
 		m_pMainMenu = new CCSBuySubMenu_ZombieMod(this); // new CCSBuySubMenu_DeathMatch(this);
+	else if ((cl::gHUD.m_iModRunning == MOD_ZBS))
+		m_pMainMenu = new CCSBuySubMenu_ZombieScenarioMod(this);
 	else
 		m_pMainMenu = new CCSBuySubMenu_DefaultMode(this);
 

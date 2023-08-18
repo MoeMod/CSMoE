@@ -98,12 +98,12 @@ namespace cl {
 
         char txt[6];
         sprintf(txt, "%d", iRemain);
-        iTextLen = gHUD.m_DrawFontText.GetFontTextWide("Default", 20, gHUD.m_DeathInfo.UTF8ToUnicode(txt));
+        iTextLen = gHUD.m_DrawFontText.GetFontTextWide("CreditsTitle", -1, gHUD.m_DeathInfo.UTF8ToUnicode(txt));
 
         iStart = iX;
         iStart = iX + (m_pBG->w() - iTextLen) / 2;
 
-        gHUD.m_DrawFontText.DrawFontText("Default", 20, iStart, iY, r, g, b, 255, gHUD.m_DeathInfo.UTF8ToUnicode(txt));
+        gHUD.m_DrawFontText.DrawFontText("CreditsTitle", -1, iStart, iY, r, g, b, 255, gHUD.m_DeathInfo.UTF8ToUnicode(txt));
         return 1;
     }
 

@@ -73,6 +73,20 @@ public:
 	
 };
 
+
+class CBossAction : public CPointEntity
+{
+public:
+	void Spawn() override;
+	void KeyValue(KeyValueData* pkvd) override;
+
+public:
+	int m_iId;
+	// pev->origin, pev_angles
+};
+
+
+
 }
 
 #endif

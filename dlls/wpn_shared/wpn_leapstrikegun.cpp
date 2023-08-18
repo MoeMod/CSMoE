@@ -378,6 +378,9 @@ namespace sv {
             m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
             m_iWeaponState = 4;
 
+            m_pPlayer->m_iBuff |= BUFF_AVOID_INFECT;
+            m_pPlayer->m_tAvoidInfectBuffTime = gpGlobals->time + GetAvoidInfectTime();
+
             m_pPlayer->pev->velocity = g_vecZero;
             m_pPlayer->pev->velocity.z -= 600;
 
@@ -580,8 +583,6 @@ namespace sv {
             m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
             if (m_iWeaponState == 4)
             {
-                m_pPlayer->m_iBuff |= BUFF_AVOID_INFECT;
-                m_pPlayer->m_tAvoidInfectBuffTime = gpGlobals->time + GetAvoidInfectTime();
                 DropAttack();      
             }
 

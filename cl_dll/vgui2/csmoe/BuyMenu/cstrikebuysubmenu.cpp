@@ -15,6 +15,8 @@
 #include "cso_controls/ButtonGlow.h"
 #include "cso_controls/DarkTextEntry.h"
 
+#include "zbs/zbs_rank.h"
+
 #include <nlohmann/json.hpp>
 
 #include <string>
@@ -858,4 +860,315 @@ void CCSBuySubMenu_ZombieMod::SetupItems(MoEWeaponBuyType type)
 		}
 		m_pSlotButtons[9]->SetCommand("VGUI_BuyMenu_Show");
 	}
+}
+
+CCSBuySubMenu_ZombieScenarioMod::CCSBuySubMenu_ZombieScenarioMod(vgui2::Panel* parent, const char* name) : CCSBuySubMenu(parent, name)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_pUpgradeMoneyTitle[i] = new Label(this, va("UpgradeMoneyTitle%d", i), "");
+		m_pUpgradeButton[i] = new Button(this, va("UpgradeButton%d", i), "");
+
+		m_pUpgradeBackGround[i] = new ImagePanel(this, va("UpgradeBackGround%d", i));
+
+		m_pUpgradeInfoTitle[i] = new Label(this, va("UpgradeInfoTitle%d", i), "");
+		m_pUpgradeLevelTitle[i] = new Label(this, va("UpgradeLevelTitle%d", i), "");
+
+	}
+	m_pCurrentMoney = new Label(this, "CurrentMoney", "");
+}
+void CCSBuySubMenu_ZombieScenarioMod::LoadControlSettings(const char* dialogResourceName, const char* pathID, KeyValues* pPreloadedKeyValues)
+{
+	BaseClass::LoadControlSettings(dialogResourceName, pathID, pPreloadedKeyValues);
+	BaseClass::LoadControlSettings("Resource/UI/cso_buysubmenu_ver2.res", "GAME");
+
+	m_pUpgradeTitle->SetVisible(true);
+	m_pUpgradeTitle->SetText("#CSO_UpGrade");
+
+	m_pUpgradeTitle->SetFont(scheme()->GetIScheme(m_pUpgradeTitle->GetScheme())->GetFont("Title", IsProportional()));
+	m_pUpgradeTitle->SizeToContents();
+
+	m_pOppZombiUpgradeTitle->SetVisible(false);
+
+	// hide dm set
+	m_pSetSelBg->SetVisible(false);
+	m_pSetLabel->SetVisible(false);
+	m_pPrevSetBtn->SetVisible(false);
+	m_pNextSetBtn->SetVisible(false);
+	m_pEditDescLabel_DM->SetVisible(false);
+	m_pEditDescBg->SetVisible(false);
+	m_pEquipSample->SetVisible(false);
+
+	// Lower Right Corner
+	m_pBasketClear->SetVisible(false);
+	m_pBasketBuy->SetVisible(false);
+	m_pQuitButton->SetVisible(false);
+
+	m_pFavDirectBuy->SetVisible(false);
+	m_pFavDirectBuy->SetSelected(true);
+
+	for (vgui2::Button* pPanel : m_pFavSaveButtons)
+	{
+		pPanel->SetVisible(false);
+	}
+	// hide set
+	for (vgui2::ImagePanel* pPanel : { primaryBG, secondaryBG, knifeBG, grenadeBG, equipBG })
+	{
+		pPanel->SetVisible(false);
+	}
+
+	for (vgui2::ImagePanel* pPanel : { pwpnBG, swpnBG, hgrenBG, newknifeBG })
+	{
+		pPanel->SetVisible(false);
+	}
+	for (vgui2::ImagePanel* pPanel : { sgrenBG, fgrenBG, fgren2BG, dfBG, nvBG, kevBG })
+	{
+		pPanel->SetVisible(false);
+	}
+
+	m_pShowCTWeapon->SetVisible(false);
+	m_pShowTERWeapon->SetVisible(false);
+
+	moneyText->SetVisible(false);
+	moneyBack->SetVisible(false);
+	freezetime->SetVisible(false);
+	account->SetVisible(false);
+	buytime->SetVisible(false);
+	account_num->SetVisible(false);
+	buytime_num->SetVisible(false);
+
+	// Right Fav List Hide
+	for (int i = 0; i < 5; i++)
+	{
+		m_pFavButtons[i]->SetVisible(false);
+		m_pFavSaveButtons[i]->SetVisible(false);
+	}
+	m_pFavDirectBuy->SetVisible(false);
+	FindControl<Label>("fav_edit_desc")->SetVisible(false);
+
+	m_pUpgradeInfoTitle[0]->SetText("#CSO_HealthLevel");
+	m_pUpgradeInfoTitle[1]->SetText("#CSO_AttackPowerLevel");
+	m_pUpgradeInfoTitle[2]->SetText("#CSO_WallLevel");
+
+	m_pUpgradeMoneyTitle[0]->SetText("$3000");
+	m_pUpgradeMoneyTitle[1]->SetText("$3000");
+	m_pUpgradeMoneyTitle[2]->SetText("$5000");
+
+	m_pUpgradeButton[0]->SetText("#CSO_ZBS_UpgradeHP");
+	m_pUpgradeButton[1]->SetText("#CSO_ZBS_UpgradeDmg");
+	m_pUpgradeButton[2]->SetText("#CSO_ZBS_UpgradeWall");
+
+
+}
+void CCSBuySubMenu_ZombieScenarioMod::OnThink()
+{
+	BaseClass::OnThink();
+
+	int iMoneyGlobal = gHUD.m_Money.m_iMoneyCount;
+
+
+	m_pCurrentMoney->SetText((va("Current Money \t\t $ %d", iMoneyGlobal)));
+
+	for (int i = 0; i < 3; i++)
+	{
+		int iLevel_Hp, iLevel_Atk, iLevel_Wall;
+		cl::gHUD.m_ZBS.GetLevelInfo(&iLevel_Hp, &iLevel_Atk, &iLevel_Wall);
+
+
+		if (!i)
+		{
+			m_pUpgradeLevelTitle[i]->SetText(va("%d(Level %d)", (int)((gHUD.m_Health.m_iMaxHealth < gHUD.m_Health.m_iHealth) ? gHUD.m_Health.m_iHealth : gHUD.m_Health.m_iMaxHealth), iLevel_Hp));
+			m_pUpgradeLevelTitle[i]->SizeToContents();
+		}
+		else if (i == 1)
+		{
+			m_pUpgradeLevelTitle[i]->SetText(va("%d%%(Level %d)", (int)(iLevel_Atk >= 40 ? 500 : (iLevel_Atk * 10 + 90)), iLevel_Atk));
+			m_pUpgradeLevelTitle[i]->SizeToContents();
+		}
+		else if (i == 2)
+		{
+			m_pUpgradeLevelTitle[i]->SetText(va("Level %d", (int)iLevel_Wall));
+			m_pUpgradeLevelTitle[i]->SizeToContents();
+		}
+
+		wchar_t szMoneyReq[8];
+		m_pUpgradeMoneyTitle[i]->GetText(szMoneyReq, sizeof szMoneyReq - 1);
+
+		if (szMoneyReq)
+		{
+			char szMoney[8];
+			wcstombs(szMoney, szMoneyReq, sizeof szMoneyReq - 1);
+
+			if (szMoney && szMoney[0] == '$')
+			{
+				char* pMoney = szMoney;
+
+				pMoney++;
+
+				int iMoney = std::atoi(pMoney);
+				if (iMoney)
+				{
+					if (iMoneyGlobal >= iMoney)
+					{
+						m_pUpgradeButton[i]->SetEnabled(true);
+						m_pUpgradeButton[i]->SetCommand(va("ZBS_LEVELUP%d", i));
+					}
+					else
+					{
+						m_pUpgradeButton[i]->SetEnabled(false);
+						m_pUpgradeButton[i]->SetCommand("");
+					}
+				}
+			}
+		}
+	}
+}
+void CCSBuySubMenu_ZombieScenarioMod::OnCommand(const char* command)
+{
+	if (!strncmp(command, "ZBS_LEVELUP", 11))
+	{
+		int iType;
+		if (command[11] != '\0')
+			sscanf(command + 11, "%d", &iType);
+
+		if (!iType)
+		{
+			gEngfuncs.pfnClientCmd("zbs_hp_up");
+			return;
+		}
+		else if (iType == 1)
+		{
+			gEngfuncs.pfnClientCmd("zbs_atk_up");
+			return;
+		}
+
+		return;
+	}
+
+	BaseClass::OnCommand(command);
+}
+void CCSBuySubMenu_ZombieScenarioMod::PerformLayout()
+{
+	BaseClass::PerformLayout();
+	for (int i = 0; i < 10; ++i)
+	{
+		m_pSlotButtons[i]->SetPos(
+			vgui2::scheme()->GetProportionalScaledValue(16),
+			vgui2::scheme()->GetProportionalScaledValue(50 + i * 25)
+		);
+	}
+
+
+	int iW, iH;
+	GetSize(iW, iH);
+
+	int iX, iY;
+	GetPos(iX, iY);
+
+	iX += iW;
+	iY += vgui2::scheme()->GetProportionalScaledValue(50);
+
+	m_pUpgradeTitle->SetPos(iX, iY);
+
+	iY += vgui2::scheme()->GetProportionalScaledValue(15);
+
+	//Offset
+	iX -= vgui2::scheme()->GetProportionalScaledValue(180);
+	iX -= vgui2::scheme()->GetProportionalScaledValue(20);
+
+	m_pCurrentMoney->SetPos(iX + vgui2::scheme()->GetProportionalScaledValue(10), iY + vgui2::scheme()->GetProportionalScaledValue(65 * 3 + 35 + 10 + 20));
+	m_pCurrentMoney->SetFont(scheme()->GetIScheme(m_pCurrentMoney->GetScheme())->GetFont("Title", IsProportional()));
+	m_pCurrentMoney->SizeToContents();
+	m_pCurrentMoney->SetVisible(true);
+
+	for (int i = 0; i < 3; i++)
+	{
+		int iY_BackGround = iY + vgui2::scheme()->GetProportionalScaledValue(65 * i);
+		m_pUpgradeBackGround[i]->SetImage(vgui2::scheme()->GetImage("resource/control/blankslot_mywpn", false));
+		m_pUpgradeBackGround[i]->SetShouldScaleImage(true);
+		m_pUpgradeBackGround[i]->SetSize(vgui2::scheme()->GetProportionalScaledValue(180), vgui2::scheme()->GetProportionalScaledValue(60));
+		m_pUpgradeBackGround[i]->SetPos(iX, iY_BackGround);
+
+		m_pUpgradeBackGround[i]->SetVisible(true);
+
+		int iY_InfoTitle = iY + vgui2::scheme()->GetProportionalScaledValue(10 + 65 * i);
+
+		m_pUpgradeInfoTitle[i]->SetPos(iX + vgui2::scheme()->GetProportionalScaledValue(10), iY_InfoTitle);
+		m_pUpgradeInfoTitle[i]->SetFont(scheme()->GetIScheme(m_pUpgradeInfoTitle[i]->GetScheme())->GetFont("Title", IsProportional()));
+		m_pUpgradeInfoTitle[i]->SizeToContents();
+		m_pUpgradeInfoTitle[i]->SetVisible(true);
+
+		iX += vgui2::scheme()->GetProportionalScaledValue(100);
+
+		iY += vgui2::scheme()->GetProportionalScaledValue(20);
+		m_pUpgradeMoneyTitle[i]->SetPos(iX + vgui2::scheme()->GetProportionalScaledValue(20), iY_InfoTitle);
+		m_pUpgradeMoneyTitle[i]->SetFont(scheme()->GetIScheme(m_pUpgradeMoneyTitle[i]->GetScheme())->GetFont("DamageDisplay", IsProportional()));
+		m_pUpgradeMoneyTitle[i]->SizeToContents();
+		m_pUpgradeMoneyTitle[i]->SetFgColor(Color{ 255,255,255,225 });
+		m_pUpgradeMoneyTitle[i]->SetVisible(true);
+		iY -= vgui2::scheme()->GetProportionalScaledValue(20);
+
+		int iY_Button = iY + vgui2::scheme()->GetProportionalScaledValue(65 * i + 35);
+		m_pUpgradeButton[i]->SizeToContents();
+		m_pUpgradeButton[i]->SetPos(iX + vgui2::scheme()->GetProportionalScaledValue(20), iY_Button);
+		m_pUpgradeButton[i]->SetSize(vgui2::scheme()->GetProportionalScaledValue(60), vgui2::scheme()->GetProportionalScaledValue(20));
+		m_pUpgradeButton[i]->SetVisible(true);
+		m_pUpgradeButton[i]->MoveToFront();
+
+		iX -= vgui2::scheme()->GetProportionalScaledValue(100);
+
+
+		int iY_LevelTitle = iY + vgui2::scheme()->GetProportionalScaledValue(10 + 65 * i + 35);
+
+		m_pUpgradeLevelTitle[i]->SetPos(iX + vgui2::scheme()->GetProportionalScaledValue(10), iY_LevelTitle);
+		m_pUpgradeLevelTitle[i]->SetFont(scheme()->GetIScheme(m_pUpgradeLevelTitle[i]->GetScheme())->GetFont("Title", IsProportional()));
+
+
+		int iLevel_Hp, iLevel_Atk, iLevel_Wall;
+		cl::gHUD.m_ZBS.GetLevelInfo(&iLevel_Hp, &iLevel_Atk, &iLevel_Wall);
+
+
+		if (!i)
+		{
+			m_pUpgradeLevelTitle[i]->SetText(va("%d(Level %d)", (int)cl::gHUD.m_Health.m_iMaxHealth, iLevel_Hp));
+			m_pUpgradeLevelTitle[i]->SizeToContents();
+		}
+		else if (i == 1)
+		{
+			m_pUpgradeLevelTitle[i]->SetText(va("%d%%(Level %d)", (int)(iLevel_Atk >= 40 ? 500 : (iLevel_Atk * 10 + 90)), iLevel_Atk));
+			m_pUpgradeLevelTitle[i]->SizeToContents();
+		}
+		else if (i == 2)
+		{
+			m_pUpgradeLevelTitle[i]->SetText(va("Level %d", (int)iLevel_Wall));
+			m_pUpgradeLevelTitle[i]->SizeToContents();
+		}
+
+		int r, g, b;
+		DrawUtils::UnpackRGB(r, g, b, 0x00FFC0CB);
+		m_pUpgradeLevelTitle[i]->SetFgColor(Color{ r,g,b,255 });
+
+		m_pUpgradeLevelTitle[i]->SetVisible(true);
+		m_pUpgradeLevelTitle[i]->SetEnabled(true);
+	}
+}
+void CCSBuySubMenu_ZombieScenarioMod::SetupPage(size_t iPage)
+{
+	BaseClass::SetupPage(iPage);
+
+	m_pSlotButtons[9]->SetText("#CSO_EndWpnBuy");
+	m_pSlotButtons[9]->SetCommand("vguicancel");
+	m_pSlotButtons[9]->SetHotkey('0');
+}
+void CCSBuySubMenu_ZombieScenarioMod::OnSelectWeapon(const char* weapon)
+{
+	char szBuffer[64];
+
+	sprintf(szBuffer, "moe_buy %s", weapon);
+	gEngfuncs.pfnClientCmd(szBuffer);
+	OnCommand("vguicancel");
+}
+void CCSBuySubMenu_ZombieScenarioMod::OnSelectFavoriteWeapons(int iSet)
+{
+	return;
 }

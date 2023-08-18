@@ -375,8 +375,8 @@ void CM3DragonEX::M3DragonEXShootCannon()
 
 	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.875s;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.875s;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.475s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.475s;
 
 	if (m_iClip)
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.5s;
@@ -404,8 +404,8 @@ void CM3DragonEX::SecondaryAttack_SignExplode()
 
 	SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] > 0  ? M3DRAGONEX_CHARGE_ATTACKB : M3DRAGONEX_CHARGE_ATTACK, UseDecrement() != FALSE);
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.875s;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.875s;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.475s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.475s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
 	EMIT_SOUND(ENT(pev), CHAN_ITEM, "weapons/m3dragonex_charge_attack.wav", VOL_NORM, ATTN_NORM);

@@ -1149,6 +1149,10 @@ void CCSBot::SilencerCheck()
 
 void CCSBot::OnTouchingWeapon(CWeaponBox *box)
 {
+	// fix auto hunt feature
+	if (!IsBot())
+		return;
+
 	CBasePlayerItem *droppedGun = dynamic_cast<CBasePlayerItem *>(box->m_rgpPlayerItems[ PRIMARY_WEAPON_SLOT ]);
 
 	// right now we only care about primary weapons on the ground

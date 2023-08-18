@@ -134,6 +134,14 @@ struct MapSafeSectorData
 typedef std::unordered_map<unsigned int, MapSafeSectorData> MapSafeSector;
 std::unordered_map<int, MapSafeSector> g_MapSafeArea;
 
+std::string MapMgr_GetMapName(const char* szMapName)
+{
+	if (g_MapData.find(std::string(szMapName)) == g_MapData.end())
+		return "";
+
+	return g_MapData[std::string(szMapName)].map_name;
+}
+
 int MapMgr_GetMapID(const char *szMapName)
 {
 	if (g_MapData.find(std::string(szMapName)) == g_MapData.end())

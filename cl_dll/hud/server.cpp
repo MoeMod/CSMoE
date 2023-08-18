@@ -708,6 +708,18 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		break;
 	}
+	case 43:
+	{
+		//revenant flame
+		arg1 = reader.ReadShort();
+		
+		for (int i = 2; i < 20; i++)
+		{
+			gEngfuncs.pEfxAPI->R_AttachTentToModel(arg1, i, 990, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame.spr"), 30.0, 240, kRenderTransAdd, 0.4, 17, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP, 0);
+		}
+
+		break;
+	}
 	case 45:
 	{	
 		std::string text = reader.ReadString();

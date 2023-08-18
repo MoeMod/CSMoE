@@ -387,7 +387,7 @@ extern "C" EXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfac
 
 	Q_memcpy(pFunctionTable, &gFunctionTable, sizeof(DLL_FUNCTIONS));
 
-	stringsHashTable.SetSize(2048);
+	stringsHashTable.SetSize(4096);
 
 	for (int i = 0; i < stringsHashTable.Count(); i++)
 		stringsHashTable[i].next = NULL;

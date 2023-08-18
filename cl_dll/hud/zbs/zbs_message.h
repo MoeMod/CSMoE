@@ -9,7 +9,7 @@
 
 namespace cl {
 
-	struct MessageData
+	struct ZBSMessageData
 	{
 		int id;
 		std::string text;
@@ -40,7 +40,6 @@ namespace cl {
 
 
 	void ZBS_LoadMessageData();
-	extern std::map<int, MessageData> g_ZBSMessageData;
 	
 }
 

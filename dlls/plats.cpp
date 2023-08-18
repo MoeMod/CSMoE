@@ -550,8 +550,21 @@ void CFuncTrain::KeyValue(KeyValueData *pkvd)
 	} 
 	else if (FStrEq(pkvd->szKeyName, "model_ex"))
 	{
-		/*PRECACHE_MODEL(pkvd->szKeyName);
-		SET_MODEL(ENT(pev), pkvd->szKeyName);*/
+		m_strModelEx = ALLOC_STRING(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "rendermode"))
+	{
+		pev->rendermode = Q_atoi(pkvd->szValue);
+	}
+	else if (FStrEq(pkvd->szKeyName, "angles"))
+	{
+		Vector tmp;
+		UTIL_StringToVector(tmp.data(), pkvd->szValue);
+
+		if (tmp != g_vecZero) {
+			pev->angles = tmp;
+		}
 	}
 	else
 		CBasePlatTrain::KeyValue(pkvd);
@@ -755,7 +768,17 @@ void CFuncTrain::Spawn()
 	else
 		pev->solid = SOLID_BSP;
 
-	SET_MODEL(ENT(pev), STRING(pev->model));
+	if (FStringNull(m_strModelEx))
+		SET_MODEL(ENT(pev), STRING(pev->model));
+	else
+	{
+		SET_MODEL(ENT(pev), STRING(m_strModelEx));
+
+		pev->solid = SOLID_NOT;
+		pev->mins = g_vecZero;
+		pev->maxs = g_vecZero;
+	}
+
 	UTIL_SetSize(pev, pev->mins, pev->maxs);
 	UTIL_SetOrigin(pev, pev->origin);
 
@@ -786,6 +809,9 @@ void CFuncTrain::Restart()
 
 void CFuncTrain::Precache()
 {
+	if (m_strModelEx)
+		PRECACHE_MODEL((char*)STRING(m_strModelEx));
+
 	CBasePlatTrain::Precache();
 }
 

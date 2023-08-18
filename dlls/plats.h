@@ -147,6 +147,7 @@ public:
 	entvars_t *m_pevCurrentTarget;
 	int m_sounds;
 	BOOL m_activated;
+	string_t m_strModelEx = iStringNull;
 };
 
 class CFuncTrainControls: public CBaseEntity
