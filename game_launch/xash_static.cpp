@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 #endif
 #ifdef DEBUG
 	std::vector<const char*> av{ "-game", "csmoe", "-console", "-developer" };
-#elif
+#else
 	std::vector<const char*> av{ "-game", "csmoe" };
 #endif // DEBUG
 

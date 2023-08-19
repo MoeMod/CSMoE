@@ -15,7 +15,7 @@
 #include "cbase/cbase_hash.h"
 
 #include "bot_include.h"
-
+#include "wpn_shared/wpn_m79.h"
 #ifndef CLIENT_DLL
 #include "player/player_mod_strategy.h"
 #endif
@@ -360,6 +360,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 	{
 		switch (type)
 		{
+		case EXPTYPE_JANUS1ROCKET:
 		case EXPTYPE_M79ROCKET:
 		case EXPTYPE_AT4ROCKET:
 		case EXPTYPE_FIRECRACKERROCKET:
@@ -591,6 +592,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 
 	switch (type)
 	{
+	case EXPTYPE_JANUS1ROCKET:
 	case EXPTYPE_M79ROCKET:
 	case EXPTYPE_AT4ROCKET:
 	case EXPTYPE_FIRECRACKERROCKET:
@@ -598,6 +600,16 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 	case EXPTYPE_OICWROCKET:
 	case EXPTYPE_HK121ROCKET:
 		m_bHit = RadiusDamage(pev, pevOwner, flDamage, CLASS_NONE, bitsDamageType, iRadius);
+
+		if (m_bHit && type == EXPTYPE_JANUS1ROCKET)
+		{
+			CJanus1Rocket* pRocket = dynamic_cast<CJanus1Rocket*> (this);
+
+			if (pRocket)
+			{
+				pRocket->m_pWeapon->pev->iuser1++;
+			}
+		}
 
 		break;
 	case EXPTYPE_FIREBOMB:
@@ -655,6 +667,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 
 	switch (type)
 	{
+	case EXPTYPE_JANUS1ROCKET:
 	case EXPTYPE_M79ROCKET:
 	case EXPTYPE_AT4ROCKET:
 	case EXPTYPE_FIRECRACKERROCKET:

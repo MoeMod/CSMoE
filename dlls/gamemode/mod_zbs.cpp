@@ -60,7 +60,37 @@ PlayerModStrategy_ZBS::PlayerModStrategy_ZBS(CBasePlayer *player, CMod_ZombieSce
 
 int PlayerModStrategy_ZBS::ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) 
 { 
-	return 600;
+	int ret = 600;
+
+	if (!strcmp(szAmmoClassName, "bowarrow"))
+		ret = 60;
+	if (!strcmp(szAmmoClassName, "pianogun_energycell"))
+		ret = 360;
+	else if (!strcmp(szAmmoClassName, "crossbowex21"))
+		ret = 500;
+	else if (!strcmp(szAmmoClassName, "lockongun"))
+		ret = 500;
+	else if (!strcmp(szAmmoClassName, "CannonAmmo"))
+		ret = 20;
+	else if (!strcmp(szAmmoClassName, "laserfist"))
+		ret = 1500;
+	else if (!strcmp(szAmmoClassName, "CannonEXAmmo"))
+		ret = 30;
+	else if (!strcmp(szAmmoClassName, "guillotineAmmo"))
+		ret = 10;
+	else if (!strcmp(szAmmoClassName, "guillotineexAmmo"))
+		ret = 50;
+	else if (!strcmp(szAmmoClassName, "408CheyTac"))
+		ret = 30;
+	else if (!strcmp(szAmmoClassName, "SpearAmmo"))
+		ret = 30;
+	else if (!strcmp(szAmmoClassName, "RailBeam"))
+		ret = 35;
+	else if (!strcmp(szAmmoClassName, "40mmGrenade"))
+		ret = 6;
+
+
+	return ret;
 }
 
 bool PlayerModStrategy_ZBS::CanPlayerBuy(bool display)
@@ -566,7 +596,7 @@ void CMod_ZombieScenario::Think()
 					}
 				}
 
-				if (iter->intervalTime != 0s && iter->m_flEndWave != invalid_time_point && iter->m_flEndWave < gpGlobals->time)
+				if (iter->endTime != 0s && iter->m_flEndWave != invalid_time_point && iter->m_flEndWave < gpGlobals->time)
 				{
 					(*iter).m_flEndWave = invalid_time_point;
 					(*iter).wavestate = WAVE_END;

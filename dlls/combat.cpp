@@ -1431,9 +1431,6 @@ bool RadiusDamage4(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 		if (!bInWater && pEntity->pev->waterlevel == 3)
 			continue;
 
-		if (!pEntity->IsPlayer())
-			break;
-
 		vecSpot = pEntity->BodyTarget(vecSrc);
 		UTIL_TraceLine(vecSrc, vecSpot, dont_ignore_monsters, ENT(pevInflictor), &tr);
 
@@ -1475,11 +1472,15 @@ bool RadiusDamage4(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 
 			pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
 
+			if (pEntity != CBaseEntity::Instance(pevAttacker))
+			{
+				if (pEntity->m_iTeam != pevAttacker->team)
+					bHit = true;
+			}
+
 			if (pEntity->pev->health > 0.0)
 				continue;
-
-			if (pEntity != CBaseEntity::Instance(pevAttacker))
-				bHit = true;
+		
 		}
 	}
 

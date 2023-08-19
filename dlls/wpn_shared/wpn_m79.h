@@ -123,4 +123,34 @@ public:
 
 };
 
+class CJanus1Rocket : public CGrenade
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+
+public:
+	void EXPORT FollowThink(void);
+	void EXPORT IgniteThink(void);
+	void EXPORT RocketTouch(CBaseEntity* pOther);
+
+public:
+	int GetWeaponsId(void)
+	{
+		return WEAPON_JANUS11;
+	}
+
+	int m_iType;
+
+	CJANUS1* m_pWeapon;
+
+private:
+	float GetRadius();
+	float GetDamage();
+
+
+	int m_iTrail;
+};
+
+
 }

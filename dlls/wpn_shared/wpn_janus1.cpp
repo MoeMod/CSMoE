@@ -32,37 +32,7 @@ namespace sv {
 #endif
 
 #ifndef CLIENT_DLL
-	class CJanus1Rocket : public CGrenade
-	{
-	public:
-		void Spawn(void);
-		void Precache(void);
-
-	public:
-		void EXPORT FollowThink(void);
-		void EXPORT IgniteThink(void);
-		void EXPORT RocketTouch(CBaseEntity* pOther);
-
-	public:
-		void Explode(CBaseEntity* pOther);
-
-	public:
-		int GetWeaponsId(void)
-		{
-			return WEAPON_JANUS11;
-		}
-
-		int m_iType;
-
-	private:
-		float GetRadius();
-		float GetDamage();
-
-		
-		int m_iTrail;
-	};
-
-
+	
 	LINK_ENTITY_TO_CLASS(janus1_rocket, CJanus1Rocket)
 
 	void CJanus1Rocket::Spawn(void)
@@ -135,7 +105,7 @@ namespace sv {
 		WRITE_SHORT(this->entindex());
 		MESSAGE_END();
 
-		ExplodeTouch3(pOther, GetRadius(), EXPTYPE_M79ROCKET, false);
+		ExplodeTouch3(pOther, GetRadius(), m_iType ? EXPTYPE_M79ROCKET : EXPTYPE_JANUS1ROCKET, false);
 	}
 
 	float CJanus1Rocket::GetRadius()
@@ -231,7 +201,7 @@ void CJANUS1::Spawn(void)
 	m_iId = WEAPON_JANUS1;
 	SET_MODEL(ENT(pev), "models/w_janus1.mdl");
 
-	m_iShotsRequired = 2;
+	m_iShotsRequired = 5;
 	m_iDefaultAmmo = 5;
 	FallInit();
 }
@@ -337,6 +307,7 @@ void CJANUS1::Janus1Fire(bool bSignal)
 
 	if (pRocket)
 	{
+		pRocket->m_pWeapon = this;
 		pRocket->m_iType = bSignal ? 1 : 0;
 		pRocket->pev->velocity = vecVelocity;
 		pRocket->pev->owner = m_pPlayer->edict();
@@ -364,11 +335,9 @@ void CJANUS1::Janus1Fire(bool bSignal)
 
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM79, 0, g_vecZero, g_vecZero, 0.0, 0.0, m_iWeaponState, int(m_pPlayer->pev->punchangle.y * 100), m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0, bSignal);
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + (bSignal ? 0.5s : 2.8s);
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + (bSignal ? 0.33s : 2.8s);
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.8s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
-
-	pev->iuser1++;
 
 #ifndef CLIENT_DLL
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -389,8 +358,8 @@ void CJANUS1::SecondaryAttack(void)
 		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 255;
 		m_iWeaponState = WPNSTATE_JANUS1_USING;
 		SendWeaponAnim(JANUS1_CHANGE1, UseDecrement() != FALSE);
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 
 		m_flNextReset = gpGlobals->time + 8.0s;
 	}
@@ -398,6 +367,17 @@ void CJANUS1::SecondaryAttack(void)
 
 void CJANUS1::ItemPostFrame(void)
 {
+	if (!m_iWeaponState)
+	{
+		if (pev->iuser1 >= m_iShotsRequired)
+		{
+			m_iWeaponState = WPNSTATE_JANUS1_SIGNAL;
+			m_flNextReset = gpGlobals->time + 9.0s;
+
+			EMIT_SOUND_DYN(edict(), CHAN_ITEM, "weapons/change1_ready.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
+		}
+	}
+
 	if (m_flNextReset != invalid_time_point && m_flNextReset < gpGlobals->time)
 	{
 		if (m_iWeaponState == WPNSTATE_JANUS1_SIGNAL)
@@ -409,8 +389,8 @@ void CJANUS1::ItemPostFrame(void)
 		{
 			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
 			SendWeaponAnim(JANUS1_CHANGE2, UseDecrement() != FALSE);
-			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
 			m_flNextReset = invalid_time_point;
 		}
 		pev->iuser1 = 0;
@@ -426,17 +406,6 @@ void CJANUS1::WeaponIdle(void)
 
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
-
-	if (!m_iWeaponState)
-	{
-		if (pev->iuser1 >= m_iShotsRequired)
-		{
-			m_iWeaponState = WPNSTATE_JANUS1_SIGNAL;
-			m_flNextReset = gpGlobals->time + 9.0s;
-
-			EMIT_SOUND_DYN(edict(), CHAN_ITEM, "weapons/change1_ready.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
-		}
-	}
 
 	int iAnim;
 	if (m_iWeaponState == WPNSTATE_JANUS1_USING)
