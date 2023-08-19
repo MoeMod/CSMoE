@@ -27,6 +27,10 @@ namespace cl {
 		float m_flPercentage;
 
 		int m_iCurrentClassID;
+		int m_iLastClassID;
+
+	public:
+		bool m_bShow;
 	};
 
 

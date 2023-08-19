@@ -5973,9 +5973,9 @@ void CHalfLifeMultiplay::VoteMapThink()
 	case 2: {
 		if (votemap_type.value <= 0.0f) {
 			std::sort(m_vecVoteMaps.begin(),
-				m_vecVoteMaps.begin() + min(m_vecVoteMaps.size(), MAX_CUSTOM_VOTE_MAPS) - 1,
+				m_vecVoteMaps.begin() + min(m_vecVoteMaps.size(), MAX_CUSTOM_VOTE_MAPS),
 				[](std::pair<std::string, int> a, std::pair<std::string, int> b) {
-					return b.second < a.second;
+					return b.second > a.second;
 				});
 			char szText[128];
 			if (!Q_strcmp(gamemode.string, "zbs"))

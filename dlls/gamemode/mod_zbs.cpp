@@ -69,6 +69,10 @@ bool PlayerModStrategy_ZBS::CanPlayerBuy(bool display)
 	if (m_pPlayer->pev->deadflag != DEAD_NO)
 		return false;
 
+	// is the player in a buy zone?
+	if (!(m_pPlayer->m_signals.GetState() & SIGNAL_BUY))
+		return false;
+
 	return true;
 }
 
@@ -94,15 +98,7 @@ void PlayerModStrategy_ZBS::ClientPutInServer()
 	}
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBSMsg, NULL, m_pPlayer->edict());
-	WRITE_BYTE(1);
-	WRITE_BYTE(-1);
-	WRITE_SHORT(0);
-	MESSAGE_END();
-
-	MESSAGE_BEGIN(MSG_ONE, gmsgZBSMsg, NULL, m_pPlayer->edict());
-	WRITE_BYTE(2);
-	WRITE_BYTE(-1);
-	WRITE_SHORT(0);
+	WRITE_BYTE(4);
 	MESSAGE_END();
 }
 
@@ -252,6 +248,10 @@ void CMod_ZombieScenario::UpdateGameMode(CBasePlayer *pPlayer)
 	WRITE_BYTE(0); // Reserved. (weapon restriction? )
 	WRITE_BYTE(maxrounds.value); // MaxRound (mp_roundlimit)
 	WRITE_BYTE(0); // Reserved. (MaxTime?)
+	MESSAGE_END();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBSMsg, NULL, pPlayer->edict());
+	WRITE_BYTE(4);
 	MESSAGE_END();
 }
 

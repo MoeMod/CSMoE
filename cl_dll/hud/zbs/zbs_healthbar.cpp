@@ -14,6 +14,8 @@ namespace cl {
 		m_flPercentage = 0.0;
 		m_pCurrentHealth = 0.0;
 		m_pMaxHealth = 0.0;
+
+		m_bShow = false;
 	}
 
 	int CHudZBSHealthBar::VidInit(void)
@@ -27,13 +29,16 @@ namespace cl {
 
 	void CHudZBSHealthBar::Reset(void)
 	{
-
+		m_bShow = false;
 	}
 	int CHudZBSHealthBar::Draw(float time)
 	{
 		if (m_flPercentage <= 0.0)
 			return 1;
 		if (m_iCurrentClassID <= 0)
+			return 1;
+
+		if (!m_bShow)
 			return 1;
 
 		const int iWidthLeftBar = m_pTexture_BossHp[0]->w();

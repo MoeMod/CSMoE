@@ -28,6 +28,7 @@ CClassMenu::CClassMenu(IViewport* pViewPort) : Frame(NULL, PANEL_CLASS), m_pView
 
 	SetTitleBarVisible(false);
 	SetProportional(true);
+	SetChainKeysToParent(true);
 
 	m_pPanel = new EditablePanel(this, "ClassInfo");
 
@@ -109,7 +110,7 @@ void CClassMenu::ShowPanel(bool bShow)
 		SetMouseInputEnabled(false);
 	}
 
-	m_pViewPort->ShowBackGround(bShow);
+	//m_pViewPort->ShowBackGround(bShow);
 }
 
 void CClassMenu::SetData(KeyValues *data)

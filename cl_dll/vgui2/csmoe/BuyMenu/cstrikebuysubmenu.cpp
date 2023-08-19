@@ -15,8 +15,6 @@
 #include "cso_controls/ButtonGlow.h"
 #include "cso_controls/DarkTextEntry.h"
 
-#include "zbs/zbs_rank.h"
-
 #include <nlohmann/json.hpp>
 
 #include <string>
@@ -862,21 +860,7 @@ void CCSBuySubMenu_ZombieMod::SetupItems(MoEWeaponBuyType type)
 	}
 }
 
-CCSBuySubMenu_ZombieScenarioMod::CCSBuySubMenu_ZombieScenarioMod(vgui2::Panel* parent, const char* name) : CCSBuySubMenu(parent, name)
-{
-	for (int i = 0; i < 3; i++)
-	{
-		m_pUpgradeMoneyTitle[i] = new Label(this, va("UpgradeMoneyTitle%d", i), "");
-		m_pUpgradeButton[i] = new Button(this, va("UpgradeButton%d", i), "");
 
-		m_pUpgradeBackGround[i] = new ImagePanel(this, va("UpgradeBackGround%d", i));
-
-		m_pUpgradeInfoTitle[i] = new Label(this, va("UpgradeInfoTitle%d", i), "");
-		m_pUpgradeLevelTitle[i] = new Label(this, va("UpgradeLevelTitle%d", i), "");
-
-	}
-	m_pCurrentMoney = new Label(this, "CurrentMoney", "");
-}
 void CCSBuySubMenu_ZombieScenarioMod::LoadControlSettings(const char* dialogResourceName, const char* pathID, KeyValues* pPreloadedKeyValues)
 {
 	BaseClass::LoadControlSettings(dialogResourceName, pathID, pPreloadedKeyValues);
@@ -937,6 +921,22 @@ void CCSBuySubMenu_ZombieScenarioMod::LoadControlSettings(const char* dialogReso
 	account_num->SetVisible(false);
 	buytime_num->SetVisible(false);
 
+	for (int i = 0; i < 3; i++)
+	{
+		char szVa[64]; sprintf(szVa, "UpgradeMoneyTitle%d", i);
+		m_pUpgradeMoneyTitle[i] = new Label(this, szVa, "");
+		sprintf(szVa, "UpgradeButton%d", i);
+		m_pUpgradeButton[i] = new Button(this, szVa, "");
+		sprintf(szVa, "UpgradeBackGround%d", i);
+		m_pUpgradeBackGround[i] = new ImagePanel(this, szVa);
+		sprintf(szVa, "UpgradeInfoTitle%d", i);
+		m_pUpgradeInfoTitle[i] = new Label(this, szVa, "");
+		sprintf(szVa, "UpgradeLevelTitle%d", i);
+		m_pUpgradeLevelTitle[i] = new Label(this, szVa, "");
+
+	}
+	m_pCurrentMoney = new Label(this, "CurrentMoney", "");
+
 	// Right Fav List Hide
 	for (int i = 0; i < 5; i++)
 	{
@@ -944,6 +944,7 @@ void CCSBuySubMenu_ZombieScenarioMod::LoadControlSettings(const char* dialogReso
 		m_pFavSaveButtons[i]->SetVisible(false);
 	}
 	m_pFavDirectBuy->SetVisible(false);
+
 	FindControl<Label>("fav_edit_desc")->SetVisible(false);
 
 	m_pUpgradeInfoTitle[0]->SetText("#CSO_HealthLevel");
@@ -964,30 +965,36 @@ void CCSBuySubMenu_ZombieScenarioMod::OnThink()
 {
 	BaseClass::OnThink();
 
+
 	int iMoneyGlobal = gHUD.m_Money.m_iMoneyCount;
 
+	char szVa[64];
+	sprintf(szVa, "Current Money \t\t $ %d", iMoneyGlobal);
+	m_pCurrentMoney->SetText(szVa);
 
-	m_pCurrentMoney->SetText((va("Current Money \t\t $ %d", iMoneyGlobal)));
+	int iLevel_Hp, iLevel_Atk, iLevel_Wall;
+	cl::gHUD.m_ZBS.GetLevelInfo(&iLevel_Hp, &iLevel_Atk, &iLevel_Wall);
 
 	for (int i = 0; i < 3; i++)
 	{
-		int iLevel_Hp, iLevel_Atk, iLevel_Wall;
-		cl::gHUD.m_ZBS.GetLevelInfo(&iLevel_Hp, &iLevel_Atk, &iLevel_Wall);
 
-
+		char szVa[32];
 		if (!i)
 		{
-			m_pUpgradeLevelTitle[i]->SetText(va("%d(Level %d)", (int)((gHUD.m_Health.m_iMaxHealth < gHUD.m_Health.m_iHealth) ? gHUD.m_Health.m_iHealth : gHUD.m_Health.m_iMaxHealth), iLevel_Hp));
+			sprintf(szVa, "%d(Level %d)", (int)((gHUD.m_Health.m_iMaxHealth < gHUD.m_Health.m_iHealth) ? gHUD.m_Health.m_iHealth : gHUD.m_Health.m_iMaxHealth), iLevel_Hp);
+			m_pUpgradeLevelTitle[i]->SetText(szVa);
 			m_pUpgradeLevelTitle[i]->SizeToContents();
 		}
 		else if (i == 1)
 		{
-			m_pUpgradeLevelTitle[i]->SetText(va("%d%%(Level %d)", (int)(iLevel_Atk >= 40 ? 500 : (iLevel_Atk * 10 + 90)), iLevel_Atk));
+			sprintf(szVa, "%d%%(Level %d)", (int)(iLevel_Atk >= 40 ? 500 : (iLevel_Atk * 10 + 90)), iLevel_Atk);
+			m_pUpgradeLevelTitle[i]->SetText(szVa);
 			m_pUpgradeLevelTitle[i]->SizeToContents();
 		}
 		else if (i == 2)
 		{
-			m_pUpgradeLevelTitle[i]->SetText(va("Level %d", (int)iLevel_Wall));
+			sprintf(szVa, "Level %d", (int)iLevel_Wall);
+			m_pUpgradeLevelTitle[i]->SetText(szVa);
 			m_pUpgradeLevelTitle[i]->SizeToContents();
 		}
 
@@ -1001,8 +1008,7 @@ void CCSBuySubMenu_ZombieScenarioMod::OnThink()
 
 			if (szMoney && szMoney[0] == '$')
 			{
-				char* pMoney = szMoney;
-
+				const char* pMoney = szMoney;
 				pMoney++;
 
 				int iMoney = std::atoi(pMoney);
@@ -1010,8 +1016,10 @@ void CCSBuySubMenu_ZombieScenarioMod::OnThink()
 				{
 					if (iMoneyGlobal >= iMoney)
 					{
+						char szVa[32];
+						sprintf(szVa, "ZBS_LEVELUP%d", i);
 						m_pUpgradeButton[i]->SetEnabled(true);
-						m_pUpgradeButton[i]->SetCommand(va("ZBS_LEVELUP%d", i));
+						m_pUpgradeButton[i]->SetCommand(szVa);
 					}
 					else
 					{
@@ -1050,6 +1058,7 @@ void CCSBuySubMenu_ZombieScenarioMod::OnCommand(const char* command)
 void CCSBuySubMenu_ZombieScenarioMod::PerformLayout()
 {
 	BaseClass::PerformLayout();
+
 	for (int i = 0; i < 10; ++i)
 	{
 		m_pSlotButtons[i]->SetPos(
@@ -1057,7 +1066,6 @@ void CCSBuySubMenu_ZombieScenarioMod::PerformLayout()
 			vgui2::scheme()->GetProportionalScaledValue(50 + i * 25)
 		);
 	}
-
 
 	int iW, iH;
 	GetSize(iW, iH);
@@ -1130,17 +1138,17 @@ void CCSBuySubMenu_ZombieScenarioMod::PerformLayout()
 
 		if (!i)
 		{
-			m_pUpgradeLevelTitle[i]->SetText(va("%d(Level %d)", (int)cl::gHUD.m_Health.m_iMaxHealth, iLevel_Hp));
+			//m_pUpgradeLevelTitle[i]->SetText(va("%d(Level %d)", (int)cl::gHUD.m_Health.m_iMaxHealth, iLevel_Hp));
 			m_pUpgradeLevelTitle[i]->SizeToContents();
 		}
 		else if (i == 1)
 		{
-			m_pUpgradeLevelTitle[i]->SetText(va("%d%%(Level %d)", (int)(iLevel_Atk >= 40 ? 500 : (iLevel_Atk * 10 + 90)), iLevel_Atk));
+			//m_pUpgradeLevelTitle[i]->SetText(va("%d%%(Level %d)", (int)(iLevel_Atk >= 40 ? 500 : (iLevel_Atk * 10 + 90)), iLevel_Atk));
 			m_pUpgradeLevelTitle[i]->SizeToContents();
 		}
 		else if (i == 2)
 		{
-			m_pUpgradeLevelTitle[i]->SetText(va("Level %d", (int)iLevel_Wall));
+			//m_pUpgradeLevelTitle[i]->SetText(va("Level %d", (int)iLevel_Wall));
 			m_pUpgradeLevelTitle[i]->SizeToContents();
 		}
 

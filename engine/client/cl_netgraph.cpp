@@ -630,7 +630,7 @@ void SCR_DrawNetGraph( void )
 	int	ping_count;
 	int	w, x, y;
 
-	if( !host.developer || !net_graph->value )
+	if( /*!host.developer ||*/ !net_graph->value )
 		return;
 
 	if( net_scale->value <= 0 )

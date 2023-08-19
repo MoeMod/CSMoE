@@ -59,6 +59,7 @@ namespace cl {
 			int flPercent = buf.ReadShort();
 
 			pimpl->get<CHudZBSHealthBar>().UpdateHealth(flPercent / 1000.0f, iClass);
+			pimpl->get<CHudZBSHealthBar>().m_bShow = true;
 			break;
 		}
 		case 2:
@@ -66,16 +67,28 @@ namespace cl {
 			int iIndex = buf.ReadByte();
 			int flData = buf.ReadShort();
 
-			pimpl->get<CHudZBSRank>().PushRankData(iIndex, flData);
+			pimpl->get<CHudZBSRank>().PushRankData(iIndex, (float)flData);
+			pimpl->get<CHudZBSRank>().m_bShow = true;
 			break;
 		}
+		//Clear
 		case 3:
 		{
+			pimpl->get<CHudZBSRank>().m_bShow = false;
+			pimpl->get<CHudZBSHealthBar>().m_bShow = false;
+
 			pimpl->get<CHudZBSHealthBar>().UpdateHealth(0.0, -1);
 			pimpl->get<CHudZBSRank>().PushRankData(-1, -1);
 
 			break;
 		}
+		//Hide
+		case 4:
+		{
+			pimpl->get<CHudZBSRank>().m_bShow = false;
+			pimpl->get<CHudZBSHealthBar>().m_bShow = false;
+		}
+		default:break;
 		}
 
 

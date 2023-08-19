@@ -288,7 +288,7 @@ Con_ToggleConsole_f
 */
 void Con_ToggleConsole_f( void )
 {
-	if( !host.developer ) return;	// disabled
+	// if( !host.developer ) return;	// disabled
 
 	if( UI_CreditsActive( )) return; // disabled by final credits
 #ifndef XASH_VGUI2

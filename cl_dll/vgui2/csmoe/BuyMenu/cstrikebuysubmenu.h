@@ -195,7 +195,7 @@ private:
 	typedef CCSBuySubMenu BaseClass;
 
 public:
-	CCSBuySubMenu_ZombieScenarioMod(vgui2::Panel* parent, const char* name = "BuySubMenu");
+	CCSBuySubMenu_ZombieScenarioMod(vgui2::Panel* parent, const char* name = "BuySubMenu") : CCSBuySubMenu(parent, name) {}
 	virtual void LoadControlSettings(const char* dialogResourceName, const char* pathID = NULL, KeyValues* pPreloadedKeyValues = NULL) override;
 	virtual void PerformLayout() override;
 	virtual void SetupPage(size_t iPage) override;

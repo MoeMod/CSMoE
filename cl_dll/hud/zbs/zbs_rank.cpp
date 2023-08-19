@@ -10,30 +10,18 @@
 
 namespace cl {
 
-	inline char* va(const char* format, ...)
-	{
-		va_list		argptr;
-		static char	string[256][1024], * s;
-		static int	stringindex = 0;
-
-		s = string[stringindex];
-		stringindex = (stringindex + 1) & 255;
-		va_start(argptr, format);
-		Q_vsnprintf(s, sizeof(string[0]), format, argptr);
-		va_end(argptr);
-
-		return s;
-	}
-
 	CHudZBSRank::CHudZBSRank(void)
 	{
 		m_flTotalDamage = 0.0;
+		m_bShow = false;
 	}
 
 	int CHudZBSRank::VidInit(void)
 	{
 		m_pTexture_DamageBg = R_LoadTextureShared("resource/helperhud/damagebg");
 		m_pTexture_DamageText = R_LoadTextureShared("resource/helperhud/damagetext");
+
+		m_vecRankData.reserve(32);
 
 		return 1;
 	}
@@ -42,10 +30,15 @@ namespace cl {
 	{
 		//m_vecRankData.clear();
 		//m_flTotalDamage = 0.0;
+
+		m_bShow = false;
 	}
 	int CHudZBSRank::Draw(float time)
 	{
 		if (m_vecRankData.empty())
+			return 1;
+
+		if (!m_bShow)
 			return 1;
 
 		int pLocal = gEngfuncs.GetLocalPlayer()->index;
@@ -122,22 +115,26 @@ namespace cl {
 		int iTextHeight = gHUD.m_DrawFontText.GetFontTextHeight("Default", 20);
 
 		//Draw types
-		iTextLen = gHUD.m_DrawFontText.GetFontTextWide("Default", 16, UTF8ToUnicode(va("%d", i + 1)));
-		gHUD.m_DrawFontText.DrawFontText("Default", 16, iX + iTextLen, iY + iTextHeight / 2, 255, 255, 255, 255, UTF8ToUnicode(va("%d", i + 1)));
+		char szVa[32];
+		sprintf(szVa, "%d", i + 1);
+
+		iTextLen = gHUD.m_DrawFontText.GetFontTextWide("Default", 16, UTF8ToUnicode(szVa));
+		gHUD.m_DrawFontText.DrawFontText("Default", 16, iX + iTextLen, iY + iTextHeight / 2, 255, 255, 255, 255, UTF8ToUnicode(szVa));
 
 		//Draw Names
 		iTextHeight = gHUD.m_DrawFontText.GetFontTextHeight("ChatDefault", -1);
 		gHUD.m_DrawFontText.DrawFontText("ChatDefault", -1, iX + iOffset, iY + iTextHeight / 2, 255, 255, 255, 255, UTF8ToUnicode(szName.c_str()));
 
 		float flPercent = (flDamage / m_flTotalDamage) * 100.0f;
-		std::string szRecord = (std::string)va("%.1f K(%d%%)", flDamage / 1000.0f, (int)flPercent);
+		sprintf(szVa, "%.1f K(%d%%)", flDamage / 1000.0f, (int)flPercent);
+		std::string szRecord = (std::string)szVa;
 
 		iY += iTextHeight;
 
 		iTextLen = gHUD.m_DrawFontText.GetFontTextWide("ChatDefault", -1, UTF8ToUnicode(szRecord.c_str()));
 
 		//Draw Damages
-		float flSubPercent = (i == 0) ? 1.0 : (flDamage / flSaveTopDamage);
+		float flSubPercent = (i == 0) ? 1.0 : max(0.0, (flDamage / flSaveTopDamage));
 		gEngfuncs.pfnFillRGBABlend(iX + iOffset, iY + iTextHeight / 2, (iW - iOffset) * flSubPercent, iTextHeight, !bIsLoacl ? 146 : 99, !bIsLoacl ? 75 : 116, !bIsLoacl ? 81 : 146, 200);
 
 		iX -= iTextLen;
@@ -152,13 +149,16 @@ namespace cl {
 	}
 	void CHudZBSRank::PushRankData(int iIndex, float flData)
 	{
-		if (flData == -1)
+		if (flData == -1.0)
 		{
 			Reset();
 			m_vecRankData.clear();
 			m_flTotalDamage = 0.0;
 			return;
 		}
+		else if (flData != -1.0 && flData <= 0.0)
+			return;
+
 		if (iIndex < 1 || iIndex > 32)
 			return;
 

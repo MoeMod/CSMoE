@@ -187,6 +187,9 @@ CCSClassMenu::CCSClassMenu(IViewport* pViewPort) : CClassMenu(pViewPort)
 	m_pSkillInfoText_Desc[1]->SetVisible(false);
 	//cso_classmenu_ver2
 	LoadControlSettings("Resource/UI/cso_classmenu_ver2.res", "GAME");
+
+	m_pPrevBtn->SetHotkey('-');
+	m_pNextBtn->SetHotkey('=');
 }
 CCSClassMenu::~CCSClassMenu(void)
 {
@@ -276,6 +279,7 @@ void CCSClassMenu::SetTeam(TeamName team)
 	m_pSkillInfoImage[1]->SetVisible(false);
 
 	m_iCurrentPage = 0;
+	SetupTeamPage(team, 0);
 
 }
 void CCSClassMenu::SetupTeamPage(TeamName team, size_t iPage)
@@ -291,7 +295,7 @@ void CCSClassMenu::SetupTeamPage(TeamName team, size_t iPage)
 	{
 		info = Class_CT;
 		num = sizeof(Class_CT) / sizeof(Class_CT[0]);
-		
+
 		col = COL_CT;
 	}
 	else if (team == TERRORIST)
@@ -301,7 +305,7 @@ void CCSClassMenu::SetupTeamPage(TeamName team, size_t iPage)
 		col = COL_TR;
 	}
 
-	int totalpages = ((num + 1) - 1) / 9 ;
+	int totalpages = ((num + 1) - 1) / 9;
 	if ((num / 9) % 9 != 0)
 		totalpages++;
 
@@ -309,7 +313,7 @@ void CCSClassMenu::SetupTeamPage(TeamName team, size_t iPage)
 	else if (iPage >= totalpages)
 		iPage = totalpages - 1;
 
-	m_pTitleLabel->SetText( "选择角色");
+	m_pTitleLabel->SetText("选择角色");
 	m_pTitleLabel->SizeToContents();
 
 	if (team == CT)
@@ -342,7 +346,7 @@ void CCSClassMenu::SetupTeamPage(TeamName team, size_t iPage)
 
 			// ClassImage Show
 			char szBuffer[64];
-			if(!strcmp(SzIsClassic ,"classic"))
+			if (!strcmp(SzIsClassic, "classic"))
 				sprintf(szBuffer, "#CSO_Item_Name_%s", SzGfxName);
 			else
 				sprintf(szBuffer, "#CSO_%s", SzGfxName);
@@ -352,7 +356,7 @@ void CCSClassMenu::SetupTeamPage(TeamName team, size_t iPage)
 
 			if (SzCheckValidVguiString != nullptr)
 			{
-				
+
 				m_pSlotButtons[i]->SetText(SzCheckValidVguiString);
 			}
 			else
@@ -689,7 +693,7 @@ void CCSClassMenu::UpdateGameMode()
 {
 	//LoadControlSettings("Resource/UI/cso_classmenu_ver2.res", "GAME");
 	InvalidateLayout();
-    SetupControlSettings();
+	SetupControlSettings();
 
 	m_pShowCT->SetVisible(false);
 	m_pShowTER->SetVisible(false);
@@ -733,14 +737,14 @@ void CCSClassMenu::UpdateClass(int i)
 
 	if (!CheckShowType())
 	{
-	
+
 
 		if (i > 9)
 			return;
 		//ClassImage Show
 		char szBuffer[64];
 		sprintf(szBuffer, "gfx/vgui/%s", info[iElement].model.c_str());
-		m_pClassImage->SetImage((i == 9) ? (m_iCurrentTeamPage == CT? "gfx/vgui/ct_random" : "gfx/vgui/t_random"):szBuffer);
+		m_pClassImage->SetImage((i == 9) ? (m_iCurrentTeamPage == CT ? "gfx/vgui/ct_random" : "gfx/vgui/t_random") : szBuffer);
 
 		//ClassDesc Show
 		std::string szClassDesc; szClassDesc = info[iElement].model;

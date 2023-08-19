@@ -80,6 +80,7 @@ namespace cl {
 		};
 	public:
 		void DrawIntentionally(bool bCycle, int i, int& iX, int& iY, int& iW, int& iH, std::vector<std::pair<int, ZbsRankProp_s>>::iterator pFirst, int bIsLoacl);
+		bool m_bShow;
 	};
 
 

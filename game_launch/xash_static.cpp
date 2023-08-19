@@ -35,7 +35,12 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdLine, int n
 int main(int argc, char **argv)
 {
 #endif
+#ifdef DEBUG
 	std::vector<const char*> av{ "-game", "csmoe", "-console", "-developer" };
+#elif
+	std::vector<const char*> av{ "-game", "csmoe" };
+#endif // DEBUG
+
 	std::copy_n(argv, argc, std::back_inserter(av));
 	
 	Host_Main(av.size(), av.data(), "csmoe", 0, NULL);

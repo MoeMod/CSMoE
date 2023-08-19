@@ -44,6 +44,7 @@ CTeamMenu::CTeamMenu(IViewport* pViewPort) : Frame(NULL, PANEL_TEAM), m_pViewPor
 
 	SetTitleBarVisible(false);
 	SetProportional(true);
+	SetChainKeysToParent(true);
 
 	m_pPanel = new EditablePanel(this, "ClassInfo");
 	m_pMapInfo = new RichText(this, "MapInfo");
@@ -119,7 +120,7 @@ void CTeamMenu::ShowPanel(bool bShow)
 		SetMouseInputEnabled(false);
 	}
 
-	m_pViewPort->ShowBackGround(bShow);
+	//m_pViewPort->ShowBackGround(bShow);
 }
 
 void CTeamMenu::Update(void)

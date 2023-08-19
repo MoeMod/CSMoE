@@ -594,8 +594,8 @@ void CL_ParseServerData( sizebuf_t *msg )
 	Q_strncpy( gamefolder, BF_ReadString( msg ), MAX_STRING );
 	host.features = (uint)BF_ReadLong( msg );
 
-	if( cl.maxclients > 1 && host.developer < 1 )
-		host.developer++;
+	/*if( cl.maxclients > 1 && host.developer < 1 )
+		host.developer++;*/
 
 	// set the background state
 	if( cls.demoplayback && ( cls.demonum != -1 ))

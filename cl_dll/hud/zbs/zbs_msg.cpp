@@ -77,7 +77,7 @@ namespace cl {
 		}
 
 		int iX = floor(ScreenWidth * 0.5f);
-		int iY = ScreenHeight * 0.3f;
+		int iY = ScreenHeight * 0.4f;
 		int iA = 255;
 
 		if (m_MsgDisplay.m_flDisplayTime <= gHUD.m_flTime)
@@ -104,7 +104,7 @@ namespace cl {
 			}
 		}
 
-		if (time - m_MsgDisplay.m_flFadeTime < 0.5f)
+		else if (time - m_MsgDisplay.m_flFadeTime < 0.5f)
 		{
 			iA = 255 * (time - m_MsgDisplay.m_flFadeTime) / 0.5f;
 		}
@@ -151,8 +151,8 @@ namespace cl {
 
 				if (!pFirst.szImage.empty())
 				{
-					iW = m_pTexture_Warning->w();
-					iH = m_pTexture_Warning->h();
+					iW = m_pTexture_Warning->w() * 0.75f;
+					iH = m_pTexture_Warning->h() * 0.75f;
 					iY -= iH;
 					m_pTexture_Warning->Draw2DQuadScaled(iX - iW / 2, iY, iX + iW / 2, iY + iH, 0, 0, 1, 1, 255, 255, 255, iA);
 				}
