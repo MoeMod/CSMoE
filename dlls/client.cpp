@@ -476,8 +476,8 @@ void CheckStartMoney()
 {
 	int money = (int) startmoney.value;
 
-	if (money > 16000)
-		CVAR_SET_FLOAT("mp_startmoney", 16000);
+	if (money > 32000)
+		CVAR_SET_FLOAT("mp_startmoney", 32000);
 	else if (money < 800)
 		CVAR_SET_FLOAT("mp_startmoney", 800);
 }

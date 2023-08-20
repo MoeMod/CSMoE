@@ -5974,8 +5974,8 @@ void CHalfLifeMultiplay::VoteMapThink()
 		if (votemap_type.value <= 0.0f) {
 			std::sort(m_vecVoteMaps.begin(),
 				m_vecVoteMaps.begin() + min(m_vecVoteMaps.size(), MAX_CUSTOM_VOTE_MAPS),
-				[](std::pair<std::string, int> a, std::pair<std::string, int> b) {
-					return b.second > a.second;
+				[](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
+					return a.second > b.second;
 				});
 			char szText[128];
 			if (!Q_strcmp(gamemode.string, "zbs"))
@@ -6074,9 +6074,9 @@ void CHalfLifeMultiplay::VoteMapThink()
 	}
 	case 6: {
 		std::sort(m_vecVoteMaps.begin(),
-			m_vecVoteMaps.begin() + min(m_vecVoteMaps.size(), MAX_CUSTOM_VOTE_MAPS) - 1,
-			[](std::pair<std::string, int> a, std::pair<std::string, int> b) {
-				return b.second < a.second;
+			m_vecVoteMaps.begin() + min(m_vecVoteMaps.size(), MAX_CUSTOM_VOTE_MAPS),
+			[](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
+				return a.second > b.second;
 			});
 		char szText[128];
 		sprintf(szText, "投票结束！回合结束后将更换为：^2%s", m_vecVoteMaps.front().first.c_str());

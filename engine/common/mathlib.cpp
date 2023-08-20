@@ -406,12 +406,12 @@ qboolean XASH_VECTORCALL BoundsAndSphereIntersect( const vec3_t mins, const vec3
 		return false;
 	
 	VectorSubtract(origin, radius3, temp);
-	VectorAdd(temp, maxs, temp);
-	// temp = origin - radius + maxs
+	VectorSubtract(temp, maxs, temp);
+	// temp = origin - radius - maxs
 	if( temp[0] > 0 || temp[1] > 0 || temp[2] > 0 )
-		return true;
+		return false;
 	
-	return false;
+	return true;
 }
 
 /*
