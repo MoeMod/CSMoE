@@ -26,7 +26,7 @@ namespace sv {
 		void CSfTurret::Spawn(void)
 	{
 		Precache();
-		m_iId = WEAPON_SFTURRET;
+		m_iId = WEAPON_HEGRENADE;
 		SET_MODEL(ENT(pev), "models/w_sfturret.mdl");
 
 		m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE * 3;
@@ -56,14 +56,14 @@ namespace sv {
 	int CSfTurret::GetItemInfo(ItemInfo* p)
 	{
 		p->pszName = STRING(pev->classname);
-		p->pszAmmo1 = "SfTurret";
+		p->pszAmmo1 = "HEGrenade";
 		p->iMaxAmmo1 = MAX_AMMO_HEGRENADE * 3;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = WEAPON_NOCLIP;
 		p->iSlot = 3;
 		p->iPosition = 1;
-		p->iId = m_iId = WEAPON_SFTURRET;
+		p->iId = m_iId = WEAPON_HEGRENADE;
 		p->iWeight = HEGRENADE_WEIGHT;
 		p->iFlags = ITEM_FLAG_LIMITINWORLD | ITEM_FLAG_EXHAUSTIBLE;
 
@@ -256,6 +256,7 @@ namespace sv {
 		SET_MODEL(ENT(pev), "models/w_sfturret.mdl");
 		UTIL_SetOrigin(pev, pev->origin);
 
+		m_iGrenadeID = GRENADE_SFTURRET;
 		pev->angles = g_vecZero;
 		pev->gravity = 2.5;
 		pev->solid = SOLID_BBOX;
@@ -276,6 +277,8 @@ namespace sv {
 
 		SetThink(&CSfTurretNade::TurretThink);
 		SetTouch(&CSfTurretNade::TurretTouch);
+
+		m_flSpawnTime = gpGlobals->time;
 	}
 
 	void CSfTurretNade::Init(CBasePlayer* pOwner, CSfTurret* pWeapon)
@@ -283,6 +286,41 @@ namespace sv {
 		m_pOwner = pOwner;
 		m_pWeapon = pWeapon;
 		m_iTeam = m_pOwner->m_iTeam;
+
+		std::vector < std::pair<int, time_point_t >> vecEnt;
+		CBaseEntity* pEntity = NULL;
+		while ((pEntity = UTIL_FindEntityByClassname(pEntity, "turret_sfturret")) != NULL)
+		{
+			CGrenade* grenade = dynamic_ent_cast<CGrenade*>(pEntity);
+			if (grenade == nullptr)
+				continue;
+
+			if (grenade->m_iGrenadeID != GRENADE_SFTURRET)
+				continue;
+
+			CSfTurretNade* pGrenade = dynamic_ent_cast<CSfTurretNade*>(grenade);
+			if (pGrenade == nullptr)
+				continue;
+
+			if (pGrenade->m_pOwner != this->m_pOwner)
+				continue;
+
+			vecEnt.emplace_back(pGrenade->entindex(), pGrenade->m_flSpawnTime);
+		}
+
+		if (!vecEnt.empty() && vecEnt.size() > 3)
+		{
+			std::sort(vecEnt.begin(), vecEnt.end(), [](const std::pair<int, time_point_t>& a, const std::pair<int, time_point_t>& b) {return a.second < b.second; });
+
+			CSfTurretNade* pGrenade = (CSfTurretNade*)Instance(INDEXENT(vecEnt.at(0).first));
+			if (pGrenade)
+			{
+				pGrenade->pev->effects |= EF_NODRAW;
+				pGrenade->pev->flags |= FL_KILLME;
+				pGrenade->SetThink(&CBaseEntity::SUB_Remove);
+				pGrenade->SetTouch(NULL);
+			}
+		}
 	}
 	void CSfTurretNade::Precache(void)
 	{
@@ -576,7 +614,7 @@ namespace sv {
 						continue;
 
 					if (IsDamage)
-						player->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NEVERGIB);
+						player->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NEVERGIB | DMG_NOMORALE);
 
 					vecTemp.push_back(player);
 				}
@@ -595,7 +633,7 @@ namespace sv {
 						continue;
 
 					if (IsDamage)
-						pEntity->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NEVERGIB);
+						pEntity->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NEVERGIB | DMG_NOMORALE);
 					vecTemp.push_back(pEntity);
 				}
 			}

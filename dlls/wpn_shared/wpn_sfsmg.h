@@ -73,6 +73,7 @@ public:
 	void SecondaryAttack() override;
 	void Reload() override;
 	void WeaponIdle() override;
+	void Holster(int skiplocal) override;
 #ifndef CLIENT_DLL
 	void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace) override;
 #endif

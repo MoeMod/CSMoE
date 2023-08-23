@@ -241,7 +241,6 @@ int CHudProgressBar::Init()
 	HOOK_MESSAGE( BarTime2 );
 	HOOK_MESSAGE( BotProgress );
 	m_iFlags = 0;
-	m_szLocalizedHeader = NULL;
 	m_szHeader[0] = '\0';
 	m_fStartTime = m_fPercent = 0.0f;
 
@@ -251,6 +250,9 @@ int CHudProgressBar::Init()
 
 int CHudProgressBar::VidInit()
 {
+	m_iFlags = 0;
+	m_szHeader[0] = '\0';
+	m_fStartTime = m_fPercent = 0.0f;
 	return 1;
 }
 
@@ -264,11 +266,11 @@ int CHudProgressBar::Draw( float flTime )
 		return 1;
 	}
 
-	if( m_szLocalizedHeader && m_szLocalizedHeader[0] )
+	if( m_szHeader && m_szHeader[0] )
 	{
 		int r, g, b;
 		DrawUtils::UnpackRGB( r, g, b, RGB_YELLOWISH );
-		DrawUtils::DrawHudString( ScreenWidth / 4, ScreenHeight / 2, ScreenWidth, (char*)m_szLocalizedHeader, r, g, b );
+		DrawUtils::DrawHudString( ScreenWidth / 4, ScreenHeight / 2, ScreenWidth, m_szHeader, r, g, b );
 
 		DrawUtils::DrawRectangle( ScreenWidth/ 4, ScreenHeight / 2 + gHUD.GetCharHeight(), ScreenWidth/2, ScreenHeight/30 );
 		FillRGBA( ScreenWidth/4+2, ScreenHeight/2 + gHUD.GetCharHeight() + 2, m_fPercent * (ScreenWidth/2-4), ScreenHeight/30-4, 255, 140, 0, 255 );
@@ -343,14 +345,12 @@ int CHudProgressBar::MsgFunc_BotProgress(const char *pszName, int iSize, void *p
         {
             vgui2::localize()->ConvertUnicodeToANSI(vgui2::localize()->Find(m_szHeader), m_szHeader, sizeof(m_szHeader));
         }
-            m_szLocalizedHeader = m_szHeader;
 		break;
 	case REMOVE_BOTPROGRESS:
 	default:
 		m_fPercent = 0.0f;
 		m_szHeader[0] = '\0';
 		m_iFlags = 0;
-		m_szLocalizedHeader = NULL;
 		break;
 	}
 

@@ -19,6 +19,7 @@ void CSpringCooler::Run()
 	;
 }
 
+
 LINK_ENTITY_TO_CLASS(revenant_groggy, CRevenantGroggy);
 
 void CRevenantGroggy::Spawn()
@@ -48,49 +49,48 @@ void CRevenantGroggy::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYP
 
 		if (pBoss)
 		{
-			//How to call CBossSkill_Big05 ??? TODO
-			/*auto p = (CMonsterModStrategy_Default*)pBoss->m_pMonsterStrategy.get();
-			if (p)
+			CMonsterModStrategy_Default* strategy = dynamic_cast<CMonsterModStrategy_Default*>(pBoss->m_pMonsterStrategy.get());
+
+			if (strategy)
 			{
-				p->m_pSkill == std::make_unique<CBossSkill_Big05>(pBoss);
-
-				CBossSkill_Big05* pSkill = (CBossSkill_Big05*)(p->m_pSkill);
-			}
-
-			pBoss->m_pMonsterStrategy.get()
-
-			if (pSkill)
-			{
-				if (!pSkill->m_iSpringCoolerIndex)
-					return;
-
-				if (pButton)
+				CBossSkill_Big05* pSkill = dynamic_cast<CBossSkill_Big05*>(strategy->m_pSkill.get());
+				if (pSkill)
 				{
-					sprintf(szString, "boss_button%d", pSkill->m_iSpringCoolerIndex);
-					if (strcmp(STRING(pButton->pev->targetname), szString))
+					if (!pSkill->m_iSpringCoolerIndex)
 						return;
 
-					if (!pSkill->m_bSpringCoolerUsed)
+					if (pButton)
 					{
-						pSkill->m_bSpringCoolerUsed = true;
-						pSkill->SetSpringCooler(true);
+						sprintf(szString, "boss_button%d", pSkill->m_iSpringCoolerIndex);
+						if (strcmp(STRING(pButton->pev->targetname), szString))
+							return;
 
-						MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
-						WRITE_BYTE(0);
-						WRITE_SHORT(360);
-						MESSAGE_END();
+						if (!pSkill->m_bSpringCoolerUsed)
+						{
+							pSkill->m_bSpringCoolerUsed = true;
+							pSkill->SetSpringCooler(true);
 
-						pSkill->StopTask();
-						pSkill->StartTask(pSkill->TASK_ZBS_GROGGY(), boost::asio::detached);
+							MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
+							WRITE_BYTE(0);
+							WRITE_SHORT(357);
+							MESSAGE_END();
 
-						MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
-						WRITE_BYTE(TE_KILLENTITYATTACHMENTS);
-						WRITE_SHORT(pBoss->entindex());
-						MESSAGE_END();
+							pSkill->StopTask();
+							pSkill->StartTask(pSkill->TASK_ZBS_GROGGY(), boost::asio::detached);
+
+							MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
+							WRITE_BYTE(TE_KILLENTITYATTACHMENTS);
+							WRITE_SHORT(pBoss->entindex());
+							MESSAGE_END();
+						}
 					}
 				}
-			}*/
-		}	
+			}
+			//How to call CBossSkill_Big05 ??? TODO
+			//CBossSkill_Big05* pSkill = dynamic_cast<CBossSkill_Big05*>(p->m_pSkill);
+
+			
+		}
 	}
 
 
@@ -697,6 +697,11 @@ boost::asio::awaitable<void> CBossSkill_Big05::TASK_ZBS_ATTACK5()
 
 	co_await async_wait_timer(1.3s);
 
+	MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_KILLENTITYATTACHMENTS);
+	WRITE_SHORT(m_pMonster->entindex());
+	MESSAGE_END();
+
 	m_pMonster->pev->movetype = MOVETYPE_STEP;
 	m_iSkillStatus = SKILL_STATUS_FREEZING;
 	m_flTimeSkillNext = gpGlobals->time + 0.1s;
@@ -820,7 +825,7 @@ boost::asio::awaitable<void> CBossSkill_Big05::TASK_ZBS_BURNNING1()
 
 	m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, m_CurSkillData.aniTime, false);
 	m_pMonster->m_flStop = gpGlobals->time + m_CurSkillData.aniTime;
-
+	m_pMonster->m_flDamageRate *= 0.5;
 	MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
 	WRITE_BYTE(0);
 	WRITE_SHORT(std::atoi(m_CurSkillData.startMsg.c_str()));
@@ -858,23 +863,27 @@ boost::asio::awaitable<void> CBossSkill_Big05::TASK_ZBS_BURNNING2()
 
 	SetSpringCooler(false);
 
-	co_await async_wait_timer(6s);
+	co_await async_wait_timer(4.5s);
+
+	MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL);
+	WRITE_BYTE(43);
+	WRITE_SHORT(m_pMonster->entindex());
+	MESSAGE_END();
+
+	float flHealth = m_pMonster->pev->health / m_pMonster->pev->max_health;
+	co_await async_wait_timer(flHealth < 0.5 ? 1.5s : 4.5s);
 
 	if (m_bSpringCoolerUsed)
 		m_bHellFireActivated = false;
 	else
-	{
+	{	
 		m_bHellFireActivated = true;
 		SetSpringCooler(true);
+		m_iSpringCoolerIndex = 0;
 
 		MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
 		WRITE_BYTE(0);
 		WRITE_SHORT(360);
-		MESSAGE_END();
-
-		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL);
-		WRITE_BYTE(43);
-		WRITE_SHORT(m_pMonster->entindex());
 		MESSAGE_END();
 	}
 
@@ -890,7 +899,8 @@ boost::asio::awaitable<void> CBossSkill_Big05::TASK_ZBS_BURNNING2()
 void CBossSkill_Big05::SetSpringCooler(bool reset)
 {
 	CBaseEntity* ent = nullptr;
-	if (!strcmp(STRING(gpGlobals->mapname), "zs_decoy"))
+	if (!strcmp(STRING(gpGlobals->mapname), "zs_decoy") ||
+		!strcmp(STRING(gpGlobals->mapname), "zs_envymaskre"))
 	{
 		if(!reset)
 			m_iSpringCoolerIndex = RANDOM_LONG(1, 4);
@@ -903,11 +913,13 @@ void CBossSkill_Big05::SetSpringCooler(bool reset)
 			{
 				if (!reset)
 				{
+					ent->pev->effects |= EF_FULLBRIGHT;
 					ent->pev->rendermode = kRenderTransAlpha;
 					ent->pev->renderamt = 50;
 				}
 				else
 				{
+					ent->pev->effects &= ~EF_FULLBRIGHT;
 					ent->pev->rendermode = kRenderNormal;
 					ent->pev->renderamt = 255;
 				}
@@ -951,18 +963,34 @@ boost::asio::awaitable<void> CBossSkill_Big05::TASK_ZBS_APPEAR()
 	m_pMonster->pev->takedamage = DAMAGE_NO;
 	Vector vecOrigin = g_vecZero, vecAngle = g_vecZero;
 	CBaseEntity* ent = nullptr;
-	while ((ent = UTIL_FindEntityByClassname(ent, "zombiespawn")) != nullptr)
+	if (!strcmp(STRING(gpGlobals->mapname), "zs_decoy"))
 	{
-		CZombieSpawn* pAct = static_cast<CZombieSpawn*>(ent);
-		
-		if (!strcmp(STRING(gpGlobals->mapname), "zs_decoy"))
+		while ((ent = UTIL_FindEntityByClassname(ent, "zombiespawn")) != nullptr)
 		{
+			CZombieSpawn* pAct = static_cast<CZombieSpawn*>(ent);
 			if (pAct->m_iId == 1000)
 			{
 				vecOrigin = pAct->pev->origin;
 				vecAngle = pAct->pev->angles;
 				m_pMonster->m_flTargetChange = gpGlobals->time + 10s;
 				m_pMonster->m_improv->MoveTo(vecOrigin);
+				break;
+			}
+		}
+	}
+	else if (!strcmp(STRING(gpGlobals->mapname), "zs_envymaskre"))
+	{
+		while ((ent = UTIL_FindEntityByClassname(ent, "boss_action")) != nullptr)
+		{
+			CBossAction* pAct = static_cast<CBossAction*>(ent);
+
+			if (pAct->m_iId == 3000)
+			{
+				vecOrigin = pAct->pev->origin;
+				vecAngle = pAct->pev->angles;
+				m_pMonster->m_flTargetChange = gpGlobals->time + 10s;
+				m_pMonster->m_improv->MoveTo(vecOrigin);
+				break;
 			}
 		}
 	}
@@ -976,7 +1004,7 @@ boost::asio::awaitable<void> CBossSkill_Big05::TASK_ZBS_APPEAR()
 	{
 		m_pMonster->SetEntAnim(m_pMonster->LookupSequence(m_CurSkillData.aniSeq.c_str()), 1.0, m_CurSkillData.aniTime, false);
 		
-		while ((m_pMonster->pev->origin - vecOrigin).Length2D() >= 20)
+		while ((m_pMonster->pev->origin - vecOrigin).Length2D() >= 30)
 		{
 			m_pMonster->m_improv->MoveTo(vecOrigin);
 			m_pMonster->m_flTargetChange = gpGlobals->time + 0.1s;
@@ -1126,11 +1154,17 @@ void CBossClass_Big05::OnKilled(entvars_t* pKiller, int iGib)
 {
 	EMIT_SOUND(m_pMonster->edict(), CHAN_BODY, "zombi/revenant/revenant_zbs_death.wav", VOL_NORM, ATTN_NORM);
 
+	MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
+	WRITE_BYTE(0);
+	WRITE_SHORT(358);
+	MESSAGE_END();
+
 	m_pMonster->pev->nextthink = gpGlobals->time + 15s;
 	m_pMonster->pev->sequence = 16;
 	m_pMonster->pev->frame = 0;
 	m_pMonster->ResetSequenceInfo();
 }
+
 
 }
 

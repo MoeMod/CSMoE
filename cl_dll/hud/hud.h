@@ -1017,7 +1017,6 @@ private:
 	float m_fPercent;
 	float m_fStartTime;
 	char m_szHeader[256];
-	const char *m_szLocalizedHeader;
 };
 
 //

@@ -123,6 +123,9 @@ int DrawUtils::DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *
 	// iterate throug the string in reverse
 	for ( signed int i = bytes / sizeof(uchar32); i > 0; i-- )
 	{
+		if (!wstr[i - 1])
+			continue;
+
 		if ( i > 1 )
 		{
 			if(wstr[i - 1] == L'\\' )

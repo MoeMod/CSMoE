@@ -70,6 +70,7 @@ namespace sv {
 		if (ENT(pOther->pev) == pev->owner)
 			return;
 
+		pev->velocity = g_vecZero;
 		m_flSlowdownTime = gpGlobals->time + 5.0s;
 
 		pev->solid = SOLID_NOT;

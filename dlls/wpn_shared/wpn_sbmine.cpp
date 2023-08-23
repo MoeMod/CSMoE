@@ -911,7 +911,7 @@ namespace sv {
 							flDamage /= 2;
 					}
 
-					player->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NEVERGIB);
+					player->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NEVERGIB | DMG_NOMORALE);
 				}
 				else
 				{
@@ -933,7 +933,7 @@ namespace sv {
 							flDamage /= 2;
 					}
 
-					pEntity->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NEVERGIB);
+					pEntity->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NEVERGIB | DMG_NOMORALE);
 				}
 			}
 		}

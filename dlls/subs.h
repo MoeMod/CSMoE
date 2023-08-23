@@ -47,6 +47,14 @@ public:
 	virtual BOOL IsTriggered(CBaseEntity *pEntity);
 };
 
+class CPlayerSpawn : public CPointEntity
+{
+public:
+	void KeyValue(KeyValueData* pkvd) override;
+
+	int m_iId;
+};
+
 void FireTargets(const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 void SetMovedir(entvars_t *pev);
 NOXREF BOOL FEntIsVisible(entvars_t *pev, entvars_t *pevTarget);

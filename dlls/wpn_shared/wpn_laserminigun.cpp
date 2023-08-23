@@ -247,7 +247,7 @@ namespace sv {
 				if (pEntity->Classify() == CLASS_NONE)
 					continue;
 
-				if (!friendlyfire.value && pEntity->m_iTeam == m_iTeam)
+				if (!friendlyfire.value && (g_pGameRules->PlayerRelationship(m_pOwner, pEntity) == GR_TEAMMATE))
 					continue;
 
 				if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
@@ -763,6 +763,8 @@ namespace sv {
 					//blue
 #ifndef CLIENT_DLL
 					m_pChargeAmmo = CLasermingunChargeAmmo::Create(0, ENT(m_pPlayer->pev));
+					if (m_pChargeAmmo)
+						m_pChargeAmmo->m_pOwner = m_pPlayer;
 #endif
 					m_iChargeState = 2;
 					m_flTimeCheckCharge = gpGlobals->time + 3.0s;

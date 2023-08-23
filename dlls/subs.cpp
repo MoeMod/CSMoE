@@ -69,7 +69,6 @@ class CVIPStart : public CDMStart {};
 class CLandMark : public CPointEntity {};
 class CHostageRescuePoint : public CPointEntity {};
 class CBombTargetPoint : public CPointEntity {};
-class CPlayerSpawn : public CPointEntity {};
 LINK_ENTITY_TO_CLASS(info_player_deathmatch, CDMStart);
 LINK_ENTITY_TO_CLASS(info_player_start, CPlayerStart);
 LINK_ENTITY_TO_CLASS(info_vip_start, CVIPStart);
@@ -77,6 +76,16 @@ LINK_ENTITY_TO_CLASS(playerspawn, CPlayerSpawn);
 LINK_ENTITY_TO_CLASS(info_landmark, CLandMark);
 LINK_ENTITY_TO_CLASS(info_hostage_rescue, CHostageRescuePoint);
 LINK_ENTITY_TO_CLASS(info_bomb_target, CBombTargetPoint);
+
+void CPlayerSpawn::KeyValue(KeyValueData* pkvd)
+{
+	if (FStrEq(pkvd->szKeyName, "id"))
+	{
+		m_iId = Q_atoi(pkvd->szValue);
+	}
+	else
+		CPointEntity::KeyValue(pkvd);
+}
 
 void CBaseDMStart::KeyValue(KeyValueData *pkvd)
 {

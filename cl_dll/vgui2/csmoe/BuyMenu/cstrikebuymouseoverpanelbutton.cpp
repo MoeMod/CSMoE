@@ -42,6 +42,7 @@ CSBuyMouseOverPanelButton::CSBuyMouseOverPanelButton(vgui2::Panel *parent, const
 	m_pWeaponImage->SetShouldCenterImage(true);
 	m_pWeaponImage->SetMouseInputEnabled(false);
 	m_pWeaponImage->SetKeyBoardInputEnabled(false);
+	m_pWeaponImage->DisableMouseInputForThisPanel(true);
 
 	m_pLockedImage = new vgui2::ImagePanel(this, "LevelLock");
 	m_pLockedImageBg = new vgui2::ImagePanel(this, "LevelLock_Bg");

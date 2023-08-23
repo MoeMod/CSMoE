@@ -158,7 +158,7 @@ namespace sv {
 				
 			else
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= (gpGlobals->time - m_flTimeholster) / 0.20s;
+				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= (gpGlobals->time - m_flTimeholster) / 0.10s;
 			}
 		}
 		else
@@ -881,7 +881,8 @@ namespace sv {
 								if (vecDelta.Length() > 360)
 									continue;
 
-								player->TakeDamage(pev, pAttackPlayer->pev, GetDamage_SummonerAttack(1), DMG_BULLET | DMG_NEVERGIB);
+								player->m_LastHitGroup = HITGROUP_CHEST;
+								player->TakeDamage(pev, pAttackPlayer->pev, GetDamage_SummonerAttack(1), DMG_BULLET | DMG_NEVERGIB | DMG_NOMORALE);
 							}
 							else
 							{
@@ -897,7 +898,8 @@ namespace sv {
 								if (vecDelta.Length() > 360)
 									continue;
 
-								pEntity->TakeDamage(pev, pAttackPlayer->pev, GetDamage_SummonerAttack(1), DMG_BULLET | DMG_NEVERGIB);
+								pEntity->m_LastHitGroup = HITGROUP_CHEST;
+								pEntity->TakeDamage(pev, pAttackPlayer->pev, GetDamage_SummonerAttack(1), DMG_BULLET | DMG_NEVERGIB | DMG_NOMORALE);
 							}
 						}
 					}
@@ -968,7 +970,8 @@ namespace sv {
 								if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
 									continue;
 
-								player->TakeDamage(this->pev, pAttackPlayer->pev, GetDamage_SummonerAttack(0), DMG_BULLET | DMG_NEVERGIB);
+								pEntity->m_LastHitGroup = HITGROUP_CHEST;
+								player->TakeDamage(this->pev, pAttackPlayer->pev, GetDamage_SummonerAttack(0), DMG_BULLET | DMG_NEVERGIB | DMG_NOMORALE);
 
 								if (player->m_bIsZombie && ~(player->m_iBuff) & BUFF_IGNORE_KNOCKBACK)
 								{
@@ -991,7 +994,8 @@ namespace sv {
 								if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
 									continue;
 
-								pEntity->TakeDamage(this->pev, pAttackPlayer->pev, GetDamage_SummonerAttack(0), DMG_BULLET | DMG_NEVERGIB);
+								pEntity->m_LastHitGroup = HITGROUP_CHEST;
+								pEntity->TakeDamage(this->pev, pAttackPlayer->pev, GetDamage_SummonerAttack(0), DMG_BULLET | DMG_NEVERGIB | DMG_NOMORALE);
 							}
 						}
 					}
@@ -1124,7 +1128,7 @@ namespace sv {
 	{
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
-			return IsAttraction ? 500.0f : 50000.0f;
+			return IsAttraction ? 500.0f : 45000.0f;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 			return IsAttraction ? 450.0f : 31600.0f;
 #endif
@@ -1781,7 +1785,7 @@ namespace sv {
 					}
 				}
 				pEntity->m_LastHitGroup = HITGROUP_CHEST;
-				pEntity->TakeDamage(pev, pAttackPlayer->pev, GetDamage_Instance() * flDamageAdjust, DMG_BULLET);
+				pEntity->TakeDamage(pev, pAttackPlayer->pev, GetDamage_Instance() * flDamageAdjust, DMG_BULLET | DMG_NOMORALE);
 				UTIL_BloodDrips(pEntity->pev->origin, vecDirection, 255, (int)GetDamage_Instance()* flDamageAdjust / (int)10.0);
 #endif
 				++v8;
@@ -1820,7 +1824,7 @@ namespace sv {
 					{
 						this->m_pWeapon->m_flTimeholster = invalid_time_point;
 
-						m_flTimeNextCharge = gpGlobals->time + 0.20s;
+						m_flTimeNextCharge = gpGlobals->time + 0.10s;
 
 						this->m_pWeapon->ChangeClip(1,false);
 						this->m_pWeapon->m_iSaveShoots++;
@@ -2051,7 +2055,7 @@ namespace sv {
 			//ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
 
 			pOther->m_LastHitGroup = HITGROUP_CHEST;
-			pOther->TakeDamage(pev, pAttackePlayer->pev, GetDamage_Missile(1), DMG_BULLET);
+			pOther->TakeDamage(pev, pAttackePlayer->pev, GetDamage_Missile(1), DMG_BULLET | DMG_NOMORALE);
 
 			if (pOther->IsPlayer())
 			{
@@ -2079,7 +2083,7 @@ namespace sv {
 		const Vector vecSrc = pev->origin;
 		entvars_t* const pevAttacker = VARS(pev->owner);
 		entvars_t* const pevInflictor = this->pev;
-		int bitsDamageType = DMG_BULLET;
+		int bitsDamageType = DMG_BULLET | DMG_NOMORALE;
 
 		TraceResult tr;
 		const float falloff = flRadius ? flDamage / flRadius : 1;
@@ -2117,6 +2121,7 @@ namespace sv {
 
 					if (tr.flFraction == 1.0f)
 					{
+						pEntity->m_LastHitGroup = HITGROUP_CHEST;
 						pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
 					}
 					else
@@ -2182,11 +2187,11 @@ namespace sv {
 	{
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
-			return IsTouch ? 2500.0f : 3000.0f;
+			return IsTouch ? 3050.0f : 2000.0f;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return IsTouch ? 2000.0f : 500.0f;
+			return IsTouch ? 1050.0f : 500.0f;
 #endif
-		return IsTouch ? 25.0f : 50.0f;
+		return IsTouch ? 50.0f : 20.0f;
 	}
 	float CDivineTitanBase::GetRange_Missile() const
 	{
@@ -2197,9 +2202,9 @@ namespace sv {
 	{
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
-			return 500.0f;
+			return 400.0f;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return 300.0f;
+			return 180.0f;
 #endif
 		return 10.0f;
 	}

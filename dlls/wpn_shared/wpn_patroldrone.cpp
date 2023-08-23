@@ -677,7 +677,7 @@ void CPatrolDroneGrenade::Explode()
 			continue;
 
 		pEntity->m_LastHitGroup = HITGROUP_CHEST;
-		pEntity->TakeDamage(pev, m_pOwner->pev, GetExpDamage(), DMG_GENERIC | DMG_BULLET | DMG_NEVERGIB);
+		pEntity->TakeDamage(pev, m_pOwner->pev, GetExpDamage(), DMG_GENERIC | DMG_BULLET | DMG_NEVERGIB | DMG_NOMORALE);
 
 		Vector vecDirection = (pEntity->pev->origin - m_pOwner->pev->origin).Normalize();
 		UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 3500.0, 0);
@@ -730,7 +730,7 @@ void CPatrolDroneGrenade::Attack()
 	ClearMultiDamage();
 
 	tr.iHitgroup = HITGROUP_CHEST;
-	m_pTarget->TraceAttack(m_pOwner->pev, GetDirctDamage(), (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_NEVERGIB | DMG_BULLET);
+	m_pTarget->TraceAttack(m_pOwner->pev, GetDirctDamage(), (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_NEVERGIB | DMG_BULLET | DMG_NOMORALE);
 
 	ApplyMultiDamage(pev, m_pOwner->pev);
 

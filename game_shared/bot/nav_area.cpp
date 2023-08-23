@@ -4907,6 +4907,23 @@ Place CNavAreaGrid::GetPlace(const Vector *pos) const
 	return UNDEFINED_PLACE;
 }
 
+bool CNavAreaGrid::IsSpawnPointValid(Vector origin)
+{
+	CBaseEntity* ent = NULL;
+
+	while ((ent = UTIL_FindEntityInSphere(ent, origin, 64)) != NULL)
+	{
+		//avoid spawn on supplybox
+		if (!strcmp(STRING(ent->pev->classname), "supplybox"))
+			return false;
+
+		if (!strcmp(STRING(ent->pev->classname), "supersupplybox"))
+			return false;
+	}
+
+	return true;
+}
+
 CNavArea* CNavAreaGrid::GetRandomSpawnableArea(void)
 {
 	if (!m_grid)
@@ -4936,6 +4953,10 @@ CNavArea* CNavAreaGrid::GetRandomSpawnableArea(void)
 			return NULL;
 
 		Vector vecSrc = area->m_center + Vector(0, 0, HalfHumanHeight);
+
+		if (!IsSpawnPointValid(vecSrc))
+			return NULL;
+
 		TraceResult tr;
 
 		UTIL_TraceHull(vecSrc, vecSrc, dont_ignore_monsters, human_hull, NULL, &tr);

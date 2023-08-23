@@ -206,6 +206,7 @@ void CHud :: Init( void )
 	m_Battery.Init();
 	m_StatusIcons.Init();
 	m_Radar.Init();
+	m_StatusBar.Init();
 	m_ZBS.Init();
 	m_ZB2.Init();
 	m_ZB3.Init();
@@ -222,7 +223,7 @@ void CHud :: Init( void )
 	m_Geiger.Init();
 	m_Flash.Init();
 	m_Message.Init();
-	m_StatusBar.Init();
+	
 	m_SpecialCrossHair.Init();
 	m_ShowWin.Init();
 	m_HeadIcon.Init();

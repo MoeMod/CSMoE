@@ -7730,8 +7730,16 @@ void CBasePlayer::ItemPostFrame()
 
 		if (pWeapon)
 		{
-			if (pWeapon->m_iId == WEAPON_LEAPSTRIKEGUN && pWeapon != m_pActiveItem)
-				((CLeapStrikeGun*)pWeapon)->FlyThink();
+			if (pWeapon->m_iId == WEAPON_LEAPSTRIKEGUN)
+			{
+				if(pWeapon != m_pActiveItem)
+					((CLeapStrikeGun*)pWeapon)->FlyThink();
+			}
+			else
+			{
+				pev->flags &= ~FL_IMMUNE_LAVA;
+				m_iBuff &= ~BUFF_LEAPSTRIKEGUN;
+			}
 		}
 		else
 		{

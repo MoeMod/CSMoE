@@ -407,6 +407,29 @@ int CHudSniperScope::Draw(float flTime)
 	CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
 	if (pActiveBTEWeapon)
 	{
+		if (pActiveBTEWeapon->m_iId == WEAPON_KNIFE)
+		{
+			if (pActiveBTEWeapon->m_iKnifeID == KNIFE_DRAGONSWORD)
+				return 1;
+		}
+
+		if (pActiveBTEWeapon->m_iId == WEAPON_HEGRENADE)
+		{
+			if (pActiveBTEWeapon->m_iGrenadeID == GRENADE_BUNKERBUSTER)
+			{
+				if (gHUD.m_iFOV > 89)
+					return 1;
+
+				DrawBunkerBusterScope(flTime);
+				return 0;
+			}
+			if (pActiveBTEWeapon->m_iGrenadeID == GRENADE_PATROLDRONE)
+			{
+				DrawPatrolDroneScope(flTime);
+				return 1;
+			}
+		}
+
 		if (pActiveBTEWeapon->m_iId == WEAPON_SKULL5 || 
 			pActiveBTEWeapon->m_iId == WEAPON_SKULL6 || 
 			pActiveBTEWeapon->m_iId == WEAPON_CROSSBOW || 

@@ -661,6 +661,8 @@ public:
 	static TYPEDESCRIPTION m_SaveData[7];
 	time_point_t m_flHolsterTime;
 	time_point_t m_flBunkerBusterCoolDown;
+	int m_iKnifeID;
+	int m_iGrenadeID;
 };
 
 }
@@ -922,7 +924,7 @@ public:
 	void MaterialSound(void);
 
 	void HitDamage(CBaseEntity* pOther);
-	void AddPlayerToCrowd(CBasePlayer* pPlayer);
+	void AddPlayerToCrowd(CBaseMonster* pPlayer);
 
 public:
 	void Explode(duration_t flTimeRemove, bool bDetonate);

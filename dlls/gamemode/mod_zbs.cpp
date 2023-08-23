@@ -14,12 +14,11 @@
 #include "player/csdm_randomspawn.h"
 #include "zbs/monster_manager.h"
 #include "zbs/zbs_map_manager.h"
-
+#include "subs.h"
 
 #include <algorithm>
 
 namespace sv {
-
 
 extern std::vector<SpawnData> g_ZBSSpawnData;
 extern std::vector<WaveData> g_ZBSWaveData;
@@ -127,6 +126,7 @@ void PlayerModStrategy_ZBS::ClientPutInServer()
 		}
 	}
 
+	//Just Hide But donot clear.
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBSMsg, NULL, m_pPlayer->edict());
 	WRITE_BYTE(4);
 	MESSAGE_END();
@@ -138,7 +138,7 @@ void PlayerModStrategy_ZBS::OnSpawn()
 	//if(!m_pPlayer->IsBot())
 	m_pPlayer->pev->max_health += 800.0f;
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health;
-	m_pPlayer->SpawnProtection_Start(3.0s);
+	m_pPlayer->SpawnProtection_Start(10.0s);
 }
 
 bool PlayerModStrategy_ZBS::ClientCommand(const char *pcmd)
@@ -169,6 +169,33 @@ void PlayerModStrategy_ZBS::OnKilled(entvars_t* pKiller, entvars_t* pInflictor)
 {
 	m_flSpawnTime = gpGlobals->time + m_flSpawnTimeOffset * 1s + 5s;
 	m_flSpawnTimeOffset = min(m_flSpawnTimeOffset + 5.0f, 30.0f);
+}
+
+void PlayerModStrategy_ZBS::GiveDefaultItems()
+{
+	m_pPlayer->RemoveAllItems(FALSE);
+	m_pPlayer->m_bHasPrimary = false;
+
+	switch (m_pPlayer->m_iTeam)
+	{
+	case CT:
+		m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("weapon_usp");
+		m_pPlayer->GiveNamedItem("weapon_k1a");
+		m_pPlayer->GiveAmmo(MAX_AMMO_45ACP, "45acp", MAX_AMMO_45ACP);
+		m_pPlayer->GiveAmmo(MAX_AMMO_556NATO, "556Nato", MAX_AMMO_556NATO);
+		break;
+	case TERRORIST:
+		m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("weapon_k1a");
+		m_pPlayer->GiveNamedItem("weapon_glock18");
+		m_pPlayer->GiveAmmo(MAX_AMMO_9MM, "9mm", MAX_AMMO_9MM);
+		m_pPlayer->GiveAmmo(MAX_AMMO_556NATO, "556Nato", MAX_AMMO_556NATO);
+
+		break;
+	default:
+		break;
+	}
 }
 
 void PlayerModStrategy_ZBS::OnThink()
@@ -334,8 +361,6 @@ void CMod_ZombieScenario::CheckMapConditions()
 		}
 	}
 
-
-
 	return Base::CheckMapConditions();
 }
 
@@ -360,6 +385,18 @@ void CMod_ZombieScenario::RestartRound()
 		}
 	}
 
+	if (!g_ZBSRoundData.empty())
+	{
+		for (auto roundData = g_ZBSRoundData.begin(); roundData != g_ZBSRoundData.end(); roundData++)
+		{
+			if ((m_iNumCTWins + 1) == roundData->round)
+			{
+				m_iPlayerSpawn = roundData->PlayerSpawn;
+				break;
+			}
+		}
+	}
+
 	ClearZombieNPC();	
 	ResetHud();
 	CHalfLifeMultiplay::RestartRound();
@@ -367,7 +404,7 @@ void CMod_ZombieScenario::RestartRound()
 void CMod_ZombieScenario::ResetHud()
 {
 	MESSAGE_BEGIN(MSG_ALL, gmsgZBSMsg);
-	WRITE_BYTE(3);
+	WRITE_BYTE(4);
 	MESSAGE_END();
 }
 void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
@@ -858,6 +895,9 @@ BOOL CMod_ZombieScenario::IsSpawnPointValid(CBaseEntity* pPlayer, Vector origin)
 		// if ent is a client, don't spawn on 'em
 		if (ent->IsPlayer() && ent != pPlayer)
 			return FALSE;
+
+		if (ent->Classify() == CLASS_PLAYER_ALLY)
+			return FALSE;
 	}
 
 	return TRUE;
@@ -911,6 +951,39 @@ edict_t* CMod_ZombieScenario::GetPlayerSpawnSpot(CBasePlayer* pPlayer)
 				pPlayer->pev->fixangle = 1;
 				break;
 			}
+		}
+	}
+	else if (!g_ZBSRoundData.empty())
+	{
+		for (auto roundData = g_ZBSRoundData.begin(); roundData != g_ZBSRoundData.end(); roundData++)
+		{
+			if (m_iPlayerSpawn < 100 && (m_iNumCTWins + 1) == roundData->round)
+			{
+				m_iPlayerSpawn = roundData->PlayerSpawn;
+				break;
+			}
+
+			while(pPlayer->SelectSpawnSpot("playerspawn", pEntity))
+			{
+				CPlayerSpawn* sp = static_cast<CPlayerSpawn*>(pEntity);
+
+				if (sp)
+				{
+					if (m_iPlayerSpawn != sp->m_iId)
+						continue;
+
+					pPlayer->pev->origin = sp->pev->origin + Vector(0, 0, 1);
+					pPlayer->pev->v_angle = g_vecZero;
+					pPlayer->pev->velocity = g_vecZero;
+					pPlayer->pev->angles = sp->pev->angles;
+					pPlayer->pev->punchangle = g_vecZero;
+					pPlayer->pev->fixangle = TRUE;
+
+					pentSpawnSpot = sp->edict();
+					break;
+				}
+			}
+
 		}
 	}
 	return pentSpawnSpot;
@@ -1000,11 +1073,14 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int waveid, int spawnid, std::ma
 	Vector origin, angles;
 	
 
-	CZombieSpawn* sp = SelectZombieSpawnPoint();
+	CZombieSpawn* sp = SelectZombieSpawnPoint(spawnid);
 	if (sp)
 	{
 		origin = sp->pev->origin;
 		angles = sp->pev->angles;
+
+		monster->pev->origin = origin;
+		monster->pev->angles = angles;
 	}
 	else
 	{
@@ -1013,33 +1089,37 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int waveid, int spawnid, std::ma
 		monster->pev->v_angle = backup_v_angle;
 	}
 
-	for (auto iter = g_ZBSSpawnData.begin(); iter != g_ZBSSpawnData.end(); iter++)
-	{
-		if (iter->spawnPoint == spawnid && iter->team == 1)
-		{
-			sp = SelectZombieSpawnPoint(spawnid);
 
-			if (!iter->origin.IsZero())
+	if (!g_ZBSSpawnData.empty())
+	{
+		for (auto iter = g_ZBSSpawnData.begin(); iter != g_ZBSSpawnData.end(); iter++)
+		{
+			if (iter->spawnPoint == spawnid && iter->team == 1)
 			{
-				monster->pev->origin = iter->origin;
-				monster->pev->angles = iter->angle;
-			}
-			else
-			{
-				if (sp)
+				sp = SelectZombieSpawnPoint(spawnid);
+
+				if (!iter->origin.IsZero())
 				{
-					monster->pev->origin = sp->pev->origin;
-					monster->pev->angles = sp->pev->angles;
+					monster->pev->origin = iter->origin;
+					monster->pev->angles = iter->angle;
 				}
 				else
 				{
-					monster->pev->origin = sp->pev->origin;
-					monster->pev->angles = sp->pev->angles;
+					if (sp)
+					{
+						monster->pev->origin = sp->pev->origin;
+						monster->pev->angles = sp->pev->angles;
+					}
+					else
+					{
+						monster->pev->origin = sp->pev->origin;
+						monster->pev->angles = sp->pev->angles;
+					}
 				}
-			}
 
-			break;
-			//monster->m_iTeam = iter->team;
+				break;
+				//monster->m_iTeam = iter->team;
+			}
 		}
 	}
 
@@ -1057,6 +1137,7 @@ CBaseEntity* CMod_ZombieScenario::MakeZombieNPC(int waveid, int spawnid, std::ma
 				monster->m_iZombiId = iter->id;
 				monster->SetClass(iter->appearance.c_str());
 				monster->SetModel(iter->appearance.c_str());
+				monster->SetSkill(iter->skill);
 				pent->v.spawnflags |= SF_NORESPAWN;
 				DispatchSpawn(pent);
 

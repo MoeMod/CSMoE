@@ -354,6 +354,14 @@ void CY23S1SFSMG::FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResu
 }
 #endif
 
+void CY23S1SFSMG::Holster(int skiplocal)
+{
+#ifndef CLIENT_DLL
+	if (m_pEffect)
+		m_pEffect->RemoveEnt();
+#endif
+	return CBasePlayerWeapon::Holster(skiplocal);
+}
 
 void CY23S1SFSMG::WeaponIdle(void)
 {

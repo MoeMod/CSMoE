@@ -66,6 +66,8 @@ void CBTEClientWeapons::PrepEntity(CBasePlayer *pWeaponOwner)
 		if (pWeaponOwner)
 		{
 			((CBasePlayerWeapon *)pEntity)->m_pPlayer = pWeaponOwner;
+			((CBasePlayerWeapon*)pEntity)->m_iKnifeID = pWeaponOwner->m_iKnifeID;
+			((CBasePlayerWeapon*)pEntity)->m_iGrenadeID = pWeaponOwner->m_iGrenadeID;
 		}
 	}
 	LuaPrepPredictionWeaponEntity(pWeaponOwner);
@@ -83,6 +85,10 @@ void CBTEClientWeapons::ActiveWeapon(const char *name)
 		memset(&info, 0, sizeof(ItemInfo));
 		m_pActiveWeapon->GetItemInfo(&info);
 		g_pWpns[info.iId] = m_pActiveWeapon;
+
+		m_pActiveWeapon->m_iKnifeID = m_pActiveWeapon->m_pPlayer->m_iKnifeID;
+		m_pActiveWeapon->m_iGrenadeID = m_pActiveWeapon->m_pPlayer->m_iGrenadeID;
+
 	}
 	else if (auto iter = WeaponEntityFindList().find({ name }); iter != WeaponEntityFindList().end())
 	{
@@ -92,6 +98,9 @@ void CBTEClientWeapons::ActiveWeapon(const char *name)
 		memset(&info, 0, sizeof(ItemInfo));
 		m_pActiveWeapon->GetItemInfo(&info);
 		g_pWpns[info.iId] = m_pActiveWeapon;
+
+		m_pActiveWeapon->m_iKnifeID = m_pActiveWeapon->m_pPlayer->m_iKnifeID;
+		m_pActiveWeapon->m_iGrenadeID = m_pActiveWeapon->m_pPlayer->m_iGrenadeID;
 	}
 	else
 	{

@@ -3,6 +3,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#include "gamemode/zbs/monster_entity.h"
 #include "wpn_shared/wpn_speargun.h"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
@@ -52,7 +53,7 @@ namespace sv {
 		return pSpear;	
 	}
 
-	void CSpear::AddPlayerToCrowd(CBasePlayer* pPlayer)
+	void CSpear::AddPlayerToCrowd(CBaseMonster* pPlayer)
 	{
 		if (pPlayer->m_hSpearAttached != this)
 		{
@@ -143,11 +144,11 @@ namespace sv {
 
 				float flRatio;
 
-				/*
-				if (IsZSMonster(pHitEntity))
+				
+				if (pHitEntity->pev->flags & FL_MONSTER)
 					flRatio = 1.28;
 				else
-				*/
+				
 				flRatio = 1.0;
 
 				pHitEntity->TakeDamage(pev, pevOwner, m_flHitDamage * flRatio, DMG_BULLET);
@@ -295,7 +296,7 @@ namespace sv {
 
 		if (m_hLockingEntity == entityPushing)
 		{
-			if (entityBehind->IsPlayer() && m_iTeam != entityBehind->m_iTeam)
+			if ((entityBehind->IsPlayer() || entityBehind->Classify() == CLASS_PLAYER_ALLY) && g_pGameRules->PlayerRelationship(m_pOwner, entityPushing) != GR_TEAMMATE)
 			{
 				Vector vecDir = CalcCrowdForceDir(entityPushing, entityBehind);
 
@@ -304,11 +305,7 @@ namespace sv {
 					entityBehind->pev->velocity = vecDir * m_flCrowdForce;
 					entityBehind->pev->velocity.z = m_flCrowdBoostVel;
 
-					/*
-					if (entityBehind->Classify() == CLASS_ZBS_MONSTER)
-						entityBehind->m_flNextSpearPush = gpGlobals->time + 0.45;
-					*/
-
+					
 					bool bFound = false;
 
 					for (int i = 0; i < m_iNumCrowdMonsters; i++)
@@ -351,6 +348,14 @@ namespace sv {
 
 					if (entityBehind->IsPlayer())
 						AddPlayerToCrowd((CBasePlayer*)entityBehind);
+					else
+						AddPlayerToCrowd((CMonster*)entityBehind);
+
+					if (entityBehind->Classify() == CLASS_PLAYER_ALLY)
+					{
+						((CMonster*)entityBehind)->m_flNextSpearPush = gpGlobals->time + 0.45s;
+					}
+
 				}
 			}
 			else if (entityBehind->IsBSPModel() && UTIL_PointContents(entityBehind->pev->origin) != CONTENTS_WATER)
@@ -391,6 +396,28 @@ namespace sv {
 					}
 				}
 			}	
+		}
+		else if (entityPushing->Classify() == CLASS_PLAYER_ALLY && entityBehind->Classify() == CLASS_PLAYER_ALLY && SPEAR_PLAYER_PUSH_INTERVAL != 0s)
+		{
+			CMonster* pPlayer = static_cast<CMonster*>(entityBehind);
+
+			if ((pPlayer->m_hSpearAttached != nullptr || pPlayer->m_hSpearAttached == this))
+			{
+				AddPlayerToCrowd(pPlayer);
+
+				if (pPlayer->m_flNextSpearPush > gpGlobals->time && gpGlobals->time > pPlayer->m_flNextSpearPush)
+				{
+					Vector vecDir = CalcCrowdForceDir(entityPushing, entityBehind);
+					vecDir.z = 0;
+
+					if (vecDir.x || vecDir.y || vecDir.z)
+					{
+						entityBehind->pev->velocity = vecDir * entityPushing->pev->velocity.Length() * 1.01;
+
+						((CMonster*)entityBehind)->m_flNextSpearPush = gpGlobals->time + SPEAR_PLAYER_PUSH_INTERVAL;
+					}
+				}
+			}
 		}
 	}
 
@@ -569,7 +596,7 @@ namespace sv {
 			return;
 		}
 
-		if (!pOther->IsPlayer())	// !CanAddKickRate(pOther)
+		if (!pOther->IsPlayer() && pOther->Classify() != CLASS_PLAYER_ALLY)	// !CanAddKickRate(pOther)
 		{
 			HitDamage(pOther);
 
@@ -578,7 +605,21 @@ namespace sv {
 			return;
 		}
 
-		if (pOther->IsPlayer() && pOther->m_iTeam == m_iTeam)
+		CMonster* pMonster = dynamic_cast<CMonster*>(pOther);
+		if (pMonster)
+		{
+			if (pMonster->m_iClass >= BOSS_CLASS_BIG00)
+			{
+				HitDamage(pOther);
+
+				pev->origin -= m_vecDirection * 5.0;
+				Explode(0.0s, true);
+				return;
+			}
+		}
+
+	
+		if (pOther->IsPlayer() && g_pGameRules->PlayerRelationship(m_pOwner, pOther) == GR_TEAMMATE)
 		{
 			pev->origin += m_vecDirection * 0.5 * 39.37;
 
@@ -641,6 +682,60 @@ namespace sv {
 
 				return;
 			}
+		}
+
+		if (pOther->IsAlive() && pOther->Classify() == CLASS_PLAYER_ALLY)
+		{
+			if (pMonster)
+			{
+				if (pOther->pev->takedamage != DAMAGE_NO)
+				{
+					pev->solid = SOLID_NOT;
+
+					if (pMonster->m_hSpearAttached.Get() == NULL)
+					{
+						m_hLockingEntity = pOther;
+						pMonster->m_hSpearAttached = this;
+
+						SetTouch(NULL);
+
+						m_flTimeStopPushing = gpGlobals->time + m_flPushDuration;
+
+						pev->effects |= EF_NODRAW;
+						pev->velocity = g_vecZero;
+
+						if (gpGlobals->time + 0.8s <= m_flTimeExplode)
+							m_flTimeExplode = gpGlobals->time + 0.8s;
+
+						if (m_flTimeExplode - gpGlobals->time + 0.5s > UTIL_WeaponTimeBase())
+						{
+							int life = (m_flTimeExplode - gpGlobals->time + 0.5s) / 1s;
+							Vector vecOffset = pev->origin - pOther->pev->origin;
+
+							MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
+							WRITE_BYTE(TE_FOLLOWINGARROW);
+							WRITE_SHORT(pOther->entindex());
+							WRITE_SHORT(m_iArrowModel);
+							WRITE_COORD(vecOffset.x);
+							WRITE_COORD(vecOffset.y);
+							WRITE_COORD(vecOffset.z);
+							WRITE_COORD(pev->angles.x - pOther->pev->angles.x);
+							WRITE_COORD(pev->angles.y - pOther->pev->angles.y);
+							WRITE_COORD(pev->angles.z - pOther->pev->angles.z);
+							WRITE_BYTE(life);
+							MESSAGE_END();
+						}
+
+						return;
+					}
+
+					pev->origin -= m_vecDirection * 5.0;
+					Explode(0.0s, true);
+
+					return;
+				}
+			}
+			
 		}
 	}
 }

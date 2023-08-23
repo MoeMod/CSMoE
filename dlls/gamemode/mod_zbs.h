@@ -102,6 +102,7 @@ public:
 	void OnKilled(entvars_t* pKiller, entvars_t* pInflictor) override;
 	void OnThink() override;
 	void UpdateStatusBar(CBaseEntity* pEntity, char* sbuf0, int* newSBarState) override;
+	void GiveDefaultItems() override;
 
 	float m_flWallTakeDamage;
 	float m_flSpawnTimeOffset;

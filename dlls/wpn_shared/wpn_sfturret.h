@@ -68,6 +68,7 @@ namespace sv {
 		time_point_t m_flNextAnim;
 		time_point_t m_flDelayExplosion;
 		time_point_t m_flReadyExplosion;
+		time_point_t m_flSpawnTime;
 
 	};
 

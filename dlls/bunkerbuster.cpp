@@ -225,7 +225,7 @@ namespace sv {
 							continue;
 					}
 
-					pEntity->TakeDamage(pev, VARS(pev->owner), GetDamageFire(), DMG_NEVERGIB | DMG_BURN | DMG_NOMORALE | DMG_EXPLOSION);
+					pEntity->TakeDamage(pev, VARS(pev->owner), GetDamageFire(), DMG_NEVERGIB | DMG_BURN | DMG_NOMORALE | DMG_EXPLOSION | DMG_NOMORALE);
 				}
 			}
 		}
@@ -395,7 +395,7 @@ namespace sv {
 
 			}
 
-			pEntity->TakeDamage(pev, VARS(pev->owner), GetDamageMissile(), DMG_NEVERGIB | DMG_EXPLOSION);
+			pEntity->TakeDamage(pev, VARS(pev->owner), GetDamageMissile(), DMG_NEVERGIB | DMG_EXPLOSION | DMG_NOMORALE);
 		}
 
 

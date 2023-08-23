@@ -243,6 +243,9 @@ namespace sv {
 
     void CLeapStrikeGun::Holster(int skiplocal)
     {
+        if (m_iWeaponState == 2 && !(m_pPlayer->m_iBuff & BUFF_LEAPSTRIKEGUN))
+            m_iWeaponState = 0;
+
         m_flTimeNextCharge = gpGlobals->time;
 #ifndef CLIENT_DLL
         MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
@@ -401,8 +404,10 @@ namespace sv {
 
             UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
-            Vector vecForward = gpGlobals->v_forward * 260;
-            vecForward.z += 800;
+            Vector vecForward = gpGlobals->v_forward * 700;
+            if (vecForward.z < 0)
+                vecForward.z = 0;
+            vecForward.z += 200;
             m_pPlayer->pev->velocity = vecForward;
             RadiusAttack1();
 
@@ -637,18 +642,22 @@ namespace sv {
                 if (m_flTimeNextCharge <= gpGlobals->time)
                 {
                     m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
-                    if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 90)
-                    {
 
+                    //anim time = 1s
+
+                    if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == (100 - int(1.0s / GetChargeTime())))
+                    {
                         SendWeaponAnim2(PART_CHANGE_START);
 
-                        m_flTimeWeaponIdle2 = UTIL_WeaponTimeBase() + 1.0s;
-                        
-                       
+                        m_flTimeWeaponIdle2 = UTIL_WeaponTimeBase() + 1.5s;
+                    }
+
+                    if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 100)
+                    {        
                         m_iWeaponState = 1;
                         m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 100;
                     }
-                       
+
 
                     m_flTimeNextCharge = gpGlobals->time + GetChargeTime();
                 }

@@ -28,9 +28,6 @@ namespace cl {
 
 	void CHudZBSRank::Reset(void)
 	{
-		//m_vecRankData.clear();
-		//m_flTotalDamage = 0.0;
-
 		m_bShow = false;
 	}
 	int CHudZBSRank::Draw(float time)
@@ -74,7 +71,11 @@ namespace cl {
 			iY -= iH;
 			DrawIntentionally(true, i, iX, iY, iW, iH, pFirst, pLocal);
 			iY += iH;
-			++pFirst;
+
+			if ((pFirst + 1) <= m_vecRankData.end())
+				++pFirst;
+			else
+				break;
 		}
 
 		if (m_vecRankData.size() > 3)
@@ -164,21 +165,27 @@ namespace cl {
 
 		if (m_vecRankData.empty())
 		{
-			const char* szName = g_PlayerInfoList[iIndex].name;
+			if (g_PlayerInfoList)
+			{
+				if (g_PlayerInfoList[iIndex].name && g_PlayerInfoList[iIndex].name[0])
+				{
+					const char* szName = g_PlayerInfoList[iIndex].name;
 
-			ZbsRankProp_s pTemp{};
-			pTemp.iIndex = iIndex;
-			pTemp.flDamage = flData;
-			pTemp.szName.append(szName);
+					ZbsRankProp_s pTemp{};
+					pTemp.iIndex = iIndex;
+					pTemp.flDamage = flData;
+					pTemp.szName.append(szName);
 
-			m_vecRankData.emplace_back(std::make_pair(iIndex, pTemp));
+					m_vecRankData.emplace_back(std::make_pair(iIndex, pTemp));
 
-			sort(m_vecRankData.begin(), m_vecRankData.end(), ArrangeData());
+					sort(m_vecRankData.begin(), m_vecRankData.end(), ArrangeData());
 
-			struct ZbsRankDamage pDamageParser = for_each(m_vecRankData.begin(), m_vecRankData.end(), ZbsRankDamage());
-			m_flTotalDamage = pDamageParser.GetTotalDamage();
+					struct ZbsRankDamage pDamageParser = for_each(m_vecRankData.begin(), m_vecRankData.end(), ZbsRankDamage());
+					m_flTotalDamage = pDamageParser.GetTotalDamage();
 
-			return;
+					return;
+				}
+			}
 		}
 		struct ArrangeData pGet;
 		pGet.ParsingIndex(iIndex);
@@ -191,25 +198,36 @@ namespace cl {
 			auto& SetMessageData = Dataiter;
 			auto GetMessageData = *Dataiter;
 
+			if (g_PlayerInfoList)
+			{
+				if (g_PlayerInfoList[iIndex].name && g_PlayerInfoList[iIndex].name[0])
+				{
+					const char* szName = g_PlayerInfoList[iIndex].name;
+					std::string szNameString; szNameString.assign(szName);
 
-			const char* szName = g_PlayerInfoList[iIndex].name;
-			std::string szNameString; szNameString.assign(szName);
+					if (GetMessageData.second.szName != szNameString)
+						SetMessageData->second.szName.assign(szName);
 
-			if (GetMessageData.second.szName != szNameString)
-				SetMessageData->second.szName.assign(szName);
-
-			SetMessageData->second.flDamage += flData;
+					SetMessageData->second.flDamage += flData;
+				}
+			}
 		}
 		else
 		{
-			const char* szName = g_PlayerInfoList[iIndex].name;
+			if (g_PlayerInfoList)
+			{
+				if (g_PlayerInfoList[iIndex].name && g_PlayerInfoList[iIndex].name[0])
+				{
+					const char* szName = g_PlayerInfoList[iIndex].name;
 
-			ZbsRankProp_s pTemp{};
-			pTemp.iIndex = iIndex;
-			pTemp.flDamage = flData;
-			pTemp.szName.append(szName);
+					ZbsRankProp_s pTemp{};
+					pTemp.iIndex = iIndex;
+					pTemp.flDamage = flData;
+					pTemp.szName.append(szName);
 
-			m_vecRankData.emplace_back(std::make_pair(iIndex, pTemp));
+					m_vecRankData.emplace_back(std::make_pair(iIndex, pTemp));
+				}
+			}	
 		}
 		sort(m_vecRankData.begin(), m_vecRankData.end(), ArrangeData());
 

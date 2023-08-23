@@ -193,6 +193,20 @@ void CSpearGun::PrimaryAttack(void)
 			pSpear->m_flCrowdForce = 500;
 			pSpear->m_flCrowdBoostVel = 125;
 		}
+
+		if (g_pModRunning->DamageTrack() == DT_ZBS)
+		{
+			pSpear->m_flPushDuration = 0.4s;
+			pSpear->m_flHitDamage = 4200;
+			pSpear->m_flExplodeDamage = 1200;
+			pSpear->m_flOwnerDamageModifier = 0.05;
+			pSpear->m_flCrowdDamage = 65;
+			pSpear->m_flExplodeForce = 350;
+			pSpear->m_flPushForce = 850;
+			pSpear->m_flPushBoostVel = 70;
+			pSpear->m_flCrowdForce = 800;
+			pSpear->m_flCrowdBoostVel = 150;
+		}
 	}
 #endif
 

@@ -509,6 +509,7 @@ public:
 	CNavArea *GetNavAreaByID(unsigned int id) const;
 	CNavArea *GetNearestNavArea(const Vector *pos, bool anyZ = false) const;
 	CNavArea* GetRandomSpawnableArea(void);
+	bool IsSpawnPointValid(Vector origin);
 	Place GetPlace(const Vector *pos) const;						// return radio chatter place for given coordinate
 
 private:

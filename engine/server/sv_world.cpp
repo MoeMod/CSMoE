@@ -653,6 +653,9 @@ void SV_LinkEdict( edict_t *ent, qboolean touch_triggers )
 		}
 	}
 
+	/*if (ent->v.solid == SOLID_NOT & ent->v.skin >= -1 && !strcmp(STRING(ent->v.targetname), "playerclip"))
+		return;*/
+
 	// ignore non-solid bodies
 	if( ent->v.solid == SOLID_NOT && ent->v.skin >= CONTENTS_EMPTY )
 		return;
