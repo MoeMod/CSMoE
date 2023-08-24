@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "port.h"
 
 #include <memory>
+#include <functional>
 
 #include "backends.h"
 #include "defaults.h"
@@ -670,6 +671,9 @@ void Image_PaletteHueReplace( byte *palSrc, int newHue, int start, int end );
 void Image_SetForceFlags( uint flags );	// set image force flags on loading
 size_t Image_DXTGetLinearSize( int type, int width, int height, int depth );
 void Image_SetMDLPointer(const byte *p);
+using image_load_func = std::function<void(image_ref, uint* pal, int)>;
+void FS_LoadImageAsync(const char* filename, const image_load_func& callback, const byte* buffer = nullptr, const size_t size = 0, uint* d_currentpal = nullptr, int rendermode = 0, const byte* mdlpointer = nullptr);
+void Image_GetGlobalPalette(uint*& buffer, int& rendermode);
 
 /*
 ========================================================================

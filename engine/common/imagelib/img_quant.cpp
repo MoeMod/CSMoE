@@ -441,7 +441,7 @@ image_ref Image_Quantize( image_ref pic )
 	if( pic->type == PF_INDEXED_24 || pic->type ==  PF_INDEXED_32 )
 		return pic;
 
-	Image_CopyParms( pic );
+	Image_CopyParms( image, pic );
 	image.size = image.width * image.height;
 	image.bpp = PFDesc[pic->type].bpp;
 	image.ptr = 0;

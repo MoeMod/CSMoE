@@ -43,26 +43,8 @@ typedef enum
 	IL_HINT_HL,
 } image_hint_t;
 
-typedef struct loadformat_s
-{
-	const char *formatstring;
-	const char *ext;
-	qboolean (*loadfunc)( const char *name, const byte *buffer, size_t filesize );
-	image_hint_t hint;
-} loadpixformat_t;
-
-typedef struct saveformat_s
-{
-	const char *formatstring;
-	const char *ext;
-	qboolean (*savefunc)( const char *name, image_ref pix );
-} savepixformat_t;
-
 typedef struct imglib_s
 {
-	const loadpixformat_t	*loadformats;
-	const savepixformat_t	*saveformats;
-
 	// current 2d image state
 	word			width;
 	word			height;
@@ -87,6 +69,7 @@ typedef struct imglib_s
 	uint			*d_currentpal;	// installed version of internal palette
 	int			d_rendermode;	// palette rendermode
 	byte			*palette;		// palette pointer
+	uint		d_8to24table[256];
 
 	// global parms
 	rgba_t			fogParams;	// some water textures has info about underwater fog
@@ -96,6 +79,21 @@ typedef struct imglib_s
 	int			cmd_flags;	// global imglib flags
 	int			force_flags;	// override cmd_flags
 } imglib_t;
+
+typedef struct loadformat_s
+{
+	const char *formatstring;
+	const char *ext;
+	qboolean (*loadfunc)( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+	image_hint_t hint;
+} loadpixformat_t;
+
+typedef struct saveformat_s
+{
+	const char *formatstring;
+	const char *ext;
+	qboolean (*savefunc)( const char *name, image_ref pix );
+} savepixformat_t;
 
 /*
 ========================================================================
@@ -269,43 +267,45 @@ enum
 };
 
 extern imglib_t image;
+extern const loadpixformat_t* image_loadformats;
+extern const savepixformat_t* image_saveformats;
 
 void Image_RoundDimensions( int *scaled_width, int *scaled_height );
 byte *Image_ResampleInternal( const void *indata, int in_w, int in_h, int out_w, int out_h, int intype, qboolean *done );
 byte *Image_FlipInternal( const byte *in, word *srcwidth, word *srcheight, int type, int flags );
 void Image_PaletteHueReplace( byte *palSrc, int newHue, int start, int end );
 rgbdata_t *Image_Load(const char *filename, const byte *buffer, size_t buffsize );
-qboolean Image_Copy8bitRGBA( const byte *in, byte *out, int pixels );
-qboolean Image_AddIndexedImageToPack( const byte *in, int width, int height );
+qboolean Image_Copy8bitRGBA( imglib_t& image, const byte *in, byte *out, int pixels );
+qboolean Image_AddIndexedImageToPack( imglib_t& image, const byte *in, int width, int height );
 qboolean Image_AddRGBAImageToPack( uint imageSize, const void* data );
 void Image_Save( const char *filename, rgbdata_t *pix );
 void Image_ConvertPalTo24bit( rgbdata_t *pic );
-void Image_GetPaletteLMP( const byte *pal, int rendermode );
-void Image_GetPaletteBMP( const byte *pal );
+void Image_GetPaletteLMP( imglib_t& image, const byte *pal, int rendermode );
+void Image_GetPaletteBMP( imglib_t& image, const byte *pal );
 int Image_ComparePalette( const byte *pal );
 void Image_FreeImage( rgbdata_t *pack );
 void Image_CopyPalette24bit( void );
-void Image_CopyPalette32bit( void );
+void Image_CopyPalette32bit( imglib_t& image );
 void Image_SetPixelFormat( void );
-void Image_GetPaletteQ1( void );
-void Image_GetPaletteHL( void );
+void Image_GetPaletteQ1( imglib_t& image );
+void Image_GetPaletteHL( imglib_t& image );
 
 //
 // formats load
 //
-qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize );
-qboolean Image_LoadMDL( const char *name, const byte *buffer, size_t filesize );
-qboolean Image_LoadSPR( const char *name, const byte *buffer, size_t filesize );
-qboolean Image_LoadTGA( const char *name, const byte *buffer, size_t filesize );
-qboolean Image_LoadBMP( const char *name, const byte *buffer, size_t filesize );
-qboolean Image_LoadFNT( const char *name, const byte *buffer, size_t filesize );
-qboolean Image_LoadDDS( const char *name, const byte *buffer, size_t filesize );
-qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize );
-qboolean Image_LoadPAL( const char *name, const byte *buffer, size_t filesize );
-qboolean Image_LoadMDL_BMP( const char *name, const byte *buffer, size_t filesize, const byte* ptexture );
+qboolean Image_LoadMIP( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadMDL( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadSPR( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadTGA( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadBMP( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadFNT( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadDDS( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadLMP( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadPAL( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadMDL_BMP( imglib_t& image, const char *name, const byte *buffer, size_t filesize, const byte* ptexture );
 
 #ifdef XASH_ASTC
-qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadASTC( imglib_t& image, const char *name, const byte *buffer, size_t filesize );
 #endif
 
 //
@@ -325,12 +325,12 @@ image_ref Image_Quantize( image_ref pic );
 //
 // img_utils.c
 //
-void Image_Reset( void );
-image_ref ImagePack( void );
-byte *Image_Copy( size_t size );
-void Image_CopyParms( image_ref src );
-qboolean Image_ValidSize( const char *name );
-qboolean Image_LumpValidSize( const char *name );
-qboolean Image_CheckFlag( int bit );
+void Image_Reset( imglib_t& image );
+image_ref ImagePack( imglib_t& image );
+byte *Image_Copy( imglib_t& image, size_t size );
+void Image_CopyParms( imglib_t& image, image_ref src );
+qboolean Image_ValidSize( imglib_t& image, const char *name );
+qboolean Image_LumpValidSize( imglib_t& image, const char *name );
+qboolean Image_CheckFlag( imglib_t& image, int bit );
 
 #endif//IMAGELIB_H

@@ -33,7 +33,7 @@ typedef struct tagRGBQUAD {
 Image_LoadMDL_BMP
 =============
 */
-qboolean Image_LoadMDL_BMP(const char* name, const byte* buffer, size_t filesize, const byte* ptexture)
+qboolean Image_LoadMDL_BMP(imglib_t& image, const char* name, const byte* buffer, size_t filesize, const byte* ptexture)
 {
 	const mstudiotexture_t* pin;
 	int		flags;
@@ -100,7 +100,7 @@ qboolean Image_LoadMDL_BMP(const char* name, const byte* buffer, size_t filesize
 	image.width = columns = bhdr.width;
 	image.height = rows = abs(bhdr.height);
 
-	if (!Image_ValidSize(name))
+	if (!Image_ValidSize(image, name))
 		return false;
 
 	// special hack for loading qfont
@@ -154,7 +154,7 @@ qboolean Image_LoadMDL_BMP(const char* name, const byte* buffer, size_t filesize
 		image.flags |= IMAGE_HAS_ALPHA;
 	}
 
-	if (Image_CheckFlag(IL_KEEP_8BIT) && bhdr.bitsPerPixel == 8)
+	if (Image_CheckFlag(image, IL_KEEP_8BIT) && bhdr.bitsPerPixel == 8)
 	{
 		pixbuf = image.palette = (byte*)Mem_Alloc(host.imagepool, 1024);
 		image.flags |= IMAGE_HAS_COLOR;
@@ -264,7 +264,7 @@ qboolean Image_LoadMDL_BMP(const char* name, const byte* buffer, size_t filesize
 				blue = palette[palIndex][0];
 				alpha = palette[palIndex][3];
 
-				if (Image_CheckFlag(IL_KEEP_8BIT))
+				if (Image_CheckFlag(image, IL_KEEP_8BIT))
 				{
 					*pixbuf++ = palIndex;
 				}
@@ -309,13 +309,13 @@ qboolean Image_LoadMDL_BMP(const char* name, const byte* buffer, size_t filesize
 				Mem_Free(image.rgba);
 				return false;
 			}
-			if (!Image_CheckFlag(IL_KEEP_8BIT) && (red != green || green != blue))
+			if (!Image_CheckFlag(image, IL_KEEP_8BIT) && (red != green || green != blue))
 				image.flags |= IMAGE_HAS_COLOR;
 		}
 		buf_p += padSize;	// actual only for 4-bit bmps
 	}
 
-	if (image.palette) Image_GetPaletteBMP(image.palette);
+	if (image.palette) Image_GetPaletteBMP(image, image.palette);
 
 	return true;
 }
@@ -325,7 +325,7 @@ qboolean Image_LoadMDL_BMP(const char* name, const byte* buffer, size_t filesize
 Image_LoadBMP
 =============
 */
-qboolean Image_LoadBMP( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadBMP( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	byte	*buf_p, *pixbuf, magic[2];
 	byte	palette[256][4];
@@ -386,7 +386,7 @@ qboolean Image_LoadBMP( const char *name, const byte *buffer, size_t filesize )
 	image.width = columns = bhdr.width;
 	image.height = rows = abs( bhdr.height );
 
-	if( !Image_ValidSize( name ))
+	if( !Image_ValidSize( image, name ))
 		return false;
 
 	// special hack for loading qfont
@@ -431,7 +431,7 @@ qboolean Image_LoadBMP( const char *name, const byte *buffer, size_t filesize )
 		}
 	}
 
-	if( Image_CheckFlag( IL_KEEP_8BIT ) && bhdr.bitsPerPixel == 8 )
+	if( Image_CheckFlag( image, IL_KEEP_8BIT ) && bhdr.bitsPerPixel == 8 )
 	{
 		pixbuf = image.palette = (byte*)Mem_Alloc( host.imagepool, 1024 );
 		image.flags |= IMAGE_HAS_COLOR;
@@ -541,7 +541,7 @@ qboolean Image_LoadBMP( const char *name, const byte *buffer, size_t filesize )
 				blue = palette[palIndex][0];
 				alpha = palette[palIndex][3];
 
-				if( Image_CheckFlag( IL_KEEP_8BIT ))
+				if( Image_CheckFlag( image, IL_KEEP_8BIT ))
 				{
 					*pixbuf++ = palIndex;
 				}
@@ -586,13 +586,13 @@ qboolean Image_LoadBMP( const char *name, const byte *buffer, size_t filesize )
 				Mem_Free( image.rgba );
 				return false;
 			}
-			if( !Image_CheckFlag( IL_KEEP_8BIT ) && ( red != green || green != blue ))
+			if( !Image_CheckFlag( image, IL_KEEP_8BIT ) && ( red != green || green != blue ))
 				image.flags |= IMAGE_HAS_COLOR;
 		}
 		buf_p += padSize;	// actual only for 4-bit bmps
 	}
 
-	if( image.palette ) Image_GetPaletteBMP( image.palette );
+	if( image.palette ) Image_GetPaletteBMP( image, image.palette );
 
 	return true;
 }
@@ -611,7 +611,7 @@ qboolean Image_SaveBMP( const char *name, image_ref pix )
 	int		pixel_size;
 	int		i, x, y;
 
-	if( FS_FileExists( name, false ) && !Image_CheckFlag( IL_ALLOW_OVERWRITE ) && !host.write_to_clipboard )
+	if( FS_FileExists( name, false ) && !Image_CheckFlag( image, IL_ALLOW_OVERWRITE ) && !host.write_to_clipboard )
 		return false; // already existed
 
 	// bogus parameter check

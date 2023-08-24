@@ -27,7 +27,7 @@ static byte mutable_pal[768];
 Image_LoadPAL
 ============
 */
-qboolean Image_LoadPAL( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadPAL( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	int	rendermode = LUMP_NORMAL; 
 
@@ -54,8 +54,8 @@ qboolean Image_LoadPAL( const char *name, const byte *buffer, size_t filesize )
 
 	// NOTE: image.d_currentpal not cleared with Image_Reset()
 	// and stay valid any time before new call of Image_SetPalette
-	Image_GetPaletteLMP( buffer, rendermode );
-	Image_CopyPalette32bit();
+	Image_GetPaletteLMP( image, buffer, rendermode );
+	Image_CopyPalette32bit(image);
 
 	image.rgba = NULL;	// only palette, not real image
 	image.size = 1024;	// expanded palette
@@ -69,7 +69,7 @@ qboolean Image_LoadPAL( const char *name, const byte *buffer, size_t filesize )
 Image_LoadFNT
 ============
 */
-qboolean Image_LoadFNT( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadFNT( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	qfont_t		font;
 	const byte	*pal, *fin;
@@ -112,7 +112,7 @@ qboolean Image_LoadFNT( const char *name, const byte *buffer, size_t filesize )
 		image.height = font.height;
 	}
 
-	if( !Image_LumpValidSize( name ))
+	if( !Image_LumpValidSize( image, name ))
 		return false;
 
 	fin = buffer + sizeof( font ) - 4;
@@ -122,7 +122,7 @@ qboolean Image_LoadFNT( const char *name, const byte *buffer, size_t filesize )
 	if( numcolors == 768 || numcolors == 256 )
 	{
 		// g-cont. make sure that is didn't hit anything
-		Image_GetPaletteLMP( pal, LUMP_QFONT );
+		Image_GetPaletteLMP( image, pal, LUMP_QFONT );
 		image.flags |= IMAGE_HAS_ALPHA; // fonts always have transparency
 	}
 	else 
@@ -134,7 +134,7 @@ qboolean Image_LoadFNT( const char *name, const byte *buffer, size_t filesize )
 
 	image.type = PF_INDEXED_32;	// 32-bit palette
 
-	return Image_AddIndexedImageToPack( fin, image.width, image.height );
+	return Image_AddIndexedImageToPack( image, fin, image.width, image.height );
 }
 /*
 ======================
@@ -154,7 +154,7 @@ void Image_SetMDLPointer(const byte *p)
 Image_LoadMDL
 ============
 */
-qboolean Image_LoadMDL( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadMDL( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	const byte		*fin;
 	size_t		pixels;
@@ -172,7 +172,7 @@ qboolean Image_LoadMDL( const char *name, const byte *buffer, size_t filesize )
 	ASSERT(fin);
 	g_mdltexdata = NULL;
 
-	if( !Image_ValidSize( name )) return false;
+	if( !Image_ValidSize( image, name )) return false;
 
 	if( image.hint == IL_HINT_HL )
 	{
@@ -187,10 +187,10 @@ qboolean Image_LoadMDL( const char *name, const byte *buffer, size_t filesize )
 			// make transparent color is black, blue color looks ugly
 			pal[255*3+0] = pal[255*3+1] = pal[255*3+2] = 0;
 
-			Image_GetPaletteLMP( pal, LUMP_TRANSPARENT );
+			Image_GetPaletteLMP( image, pal, LUMP_TRANSPARENT );
 			image.flags |= IMAGE_HAS_ALPHA;
 		}
-		else Image_GetPaletteLMP( fin + pixels, LUMP_NORMAL );
+		else Image_GetPaletteLMP( image, fin + pixels, LUMP_NORMAL );
 	}
 	else
 	{
@@ -201,7 +201,7 @@ qboolean Image_LoadMDL( const char *name, const byte *buffer, size_t filesize )
 
 	image.type = PF_INDEXED_32;	// 32-bit palete
 
-	return Image_AddIndexedImageToPack( fin, image.width, image.height );
+	return Image_AddIndexedImageToPack( image, fin, image.width, image.height );
 }
 
 /*
@@ -209,7 +209,7 @@ qboolean Image_LoadMDL( const char *name, const byte *buffer, size_t filesize )
 Image_LoadSPR
 ============
 */
-qboolean Image_LoadSPR( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadSPR( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	dspriteframe_t	pin;	// identical for q1\hl sprites
 
@@ -223,7 +223,7 @@ qboolean Image_LoadSPR( const char *name, const byte *buffer, size_t filesize )
 	}
 	else if( image.hint == IL_HINT_Q1 )
 	{
-		Image_GetPaletteQ1();
+		Image_GetPaletteQ1(image);
 	}
 	else
 	{
@@ -242,7 +242,7 @@ qboolean Image_LoadSPR( const char *name, const byte *buffer, size_t filesize )
 	}
 
 	// sorry, can't validate palette rendermode
-	if( !Image_LumpValidSize( name )) return false;
+	if( !Image_LumpValidSize( image, name )) return false;
 	image.type = PF_INDEXED_32;	// 32-bit palete
 
 	// detect alpha-channel by palette type
@@ -258,7 +258,7 @@ qboolean Image_LoadSPR( const char *name, const byte *buffer, size_t filesize )
 	if( image.d_rendermode == LUMP_TRANSPARENT )
 		image.d_currentpal[255] = 0;
 
-	return Image_AddIndexedImageToPack( (byte *)(buffer + sizeof(dspriteframe_t)), image.width, image.height );
+	return Image_AddIndexedImageToPack( image, (byte *)(buffer + sizeof(dspriteframe_t)), image.width, image.height );
 }
 
 /*
@@ -266,7 +266,7 @@ qboolean Image_LoadSPR( const char *name, const byte *buffer, size_t filesize )
 Image_LoadLMP
 ============
 */
-qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadLMP( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	lmp_t	lmp;
 	const byte	*fin, *pal;
@@ -281,7 +281,7 @@ qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize )
 
 	// greatest hack from valve software (particle palette)
 	if( Q_stristr( name, "palette.lmp" ))
-		return Image_LoadPAL( name, buffer, filesize );
+		return Image_LoadPAL( image, name, buffer, filesize );
 
 	// greatest hack from id software
 	if( image.hint != IL_HINT_HL && Q_stristr( name, "conchars" ))
@@ -310,7 +310,7 @@ qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize )
 		return false;
 	}
 
-	if( !Image_ValidSize( name ))
+	if( !Image_ValidSize( image, name ))
 		return false;         
 
 	if( image.hint != IL_HINT_Q1 && filesize > (int)sizeof(lmp) + pixels )
@@ -333,10 +333,10 @@ qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize )
 	}
 
 	if( fin[0] == 255 ) image.flags |= IMAGE_HAS_ALPHA;
-	Image_GetPaletteLMP( pal, rendermode );
+	Image_GetPaletteLMP( image, pal, rendermode );
 	image.type = PF_INDEXED_32; // 32-bit palete
 
-	return Image_AddIndexedImageToPack( fin, image.width, image.height );
+	return Image_AddIndexedImageToPack( image, fin, image.width, image.height );
 }
 
 /*
@@ -344,7 +344,7 @@ qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize )
 Image_LoadMIP
 =============
 */
-qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadMIP( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	mip_t	mip;
 	qboolean	hl_texture;
@@ -367,7 +367,7 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 	image.width = LittleLong(mip.width);
 	image.height = LittleLong(mip.height);
 
-	if( !Image_ValidSize( name ))
+	if( !Image_ValidSize( image, name ))
 		return false;
 
 	//Q_memcpy( ofs, mip.offsets, sizeof( ofs ));
@@ -442,7 +442,7 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 			rendermode = LUMP_NORMAL;
 		}
 
-		Image_GetPaletteLMP( pal, rendermode );
+		Image_GetPaletteLMP( image, pal, rendermode );
 		image.d_currentpal[255] &= 0xFFFFFF;
 	}
 	else if( image.hint != IL_HINT_HL && filesize >= (int)sizeof(mip) + ((pixels * 85)>>6))
@@ -470,7 +470,7 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 			}
 		}
 
-		Image_GetPaletteQ1();
+		Image_GetPaletteQ1(image);
 	}
 	else
 	{
@@ -509,5 +509,5 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 	}
  
 	image.type = PF_INDEXED_32;	// 32-bit palete
-	return Image_AddIndexedImageToPack( fin, image.width, image.height );
+	return Image_AddIndexedImageToPack( image, fin, image.width, image.height );
 }

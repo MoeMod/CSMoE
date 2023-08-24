@@ -224,4 +224,10 @@ namespace xe {
             studiovbocache.evict();
         }
     }
+
+    void StudioLru_RemoveCachedData(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags)
+    {
+        studiolru_key_t key{ studiohdr, submodel, mesh, flags };
+        studiovbocache.remove(key);
+    }
 }

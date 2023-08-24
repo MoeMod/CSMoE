@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include "gl_texlru.h"
 #include <variant>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "util/lru_cache.h"
 
@@ -51,6 +52,7 @@ namespace xe {
 
     std::unordered_map<const mstudiotexture_t *, TextureAttr> g_textureAttrMap;
     std::unordered_map<const mstudiotexture_t *, int> g_textureReplaceMap;
+    std::unordered_set<int> g_texureUploaded;
 
     void TexLru_UpdateAttr(const mstudiotexture_t *ptexture)
     {
@@ -113,12 +115,10 @@ namespace xe {
         return TexLru_UpdateAttr(ptexture);
     }
 
-    int TexLru_LoadTextureExternal(const char *name, int flags, imgfilter_t *filter)
+    bool TexLru_LoadTexture(const char *name, int flags, imgfilter_t *filter, gltexture_t *&out_tex, int& texnum)
     {
-        uint		picFlags = 0;
-
         if( !name || !name[0] || !glw_state.initialized )
-            return 0;
+            return false;
 
         // see if already loaded
         int i = GL_FindTexture(name);
@@ -130,8 +130,12 @@ namespace xe {
             if (tex->name[0] != '*')
                 tex->refCount++;
 
-            return i;
+            out_tex = tex;
+            texnum = i;
+            return false;
         }
+
+        uint picFlags = 0;
 
         if( flags & TF_NOFLIP_TGA )
             picFlags |= IL_DONTFLIP_TGA;
@@ -139,6 +143,7 @@ namespace xe {
         if( flags & TF_KEEP_8BIT )
             picFlags |= IL_KEEP_8BIT;
 
+        // TOFIX: save in lrudata
         // set some image flags
         Image_SetForceFlags( picFlags );
 
@@ -160,118 +165,49 @@ namespace xe {
             tex->texnum = i;//tr.skyboxbasenum++;
         else tex->texnum = i; // texnum is used for fast acess into r_textures array too
 
-        // add to lru
-        tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_external_s{ name } });
-
         // NOTE: always return texnum as index in array or engine will stop work !!!
-        return i;
+        out_tex = tex;
+        texnum = i;
+        return true;
+    }
+
+    int TexLru_LoadTextureExternal(const char *name, int flags, imgfilter_t *filter)
+    {
+        gltexture_t* tex;
+        int texnum;
+        if(!TexLru_LoadTexture(name, flags, filter, tex, texnum))
+            return texnum;
+
+        // add to lru
+        tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ texnum, filter, texlru_src_external_s{ name } });
+
+        return texnum;
     }
 
     int TexLru_LoadTextureInternal(const char *name, const char *model_name, const studiohdr_t *phdr, const mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter)
     {
-        uint		picFlags = 0;
-
-        if( !name || !name[0] || !glw_state.initialized )
-            return 0;
-
-        // see if already loaded
-        int i = GL_FindTexture(name);
-        if(i > 0)
-        {
-            // prolonge registration
-            gltexture_t	*tex = R_GetTexture(i);
-            tex->cacheframe = world.load_sequence;
-            if (tex->name[0] != '*')
-                tex->refCount++;
-
-            return i;
-        }
-
-        if( flags & TF_NOFLIP_TGA )
-            picFlags |= IL_DONTFLIP_TGA;
-
-        if( flags & TF_KEEP_8BIT )
-            picFlags |= IL_KEEP_8BIT;
-
-        // set some image flags
-        Image_SetForceFlags( picFlags );
-
-        // HACKHACK: get rid of black vertical line on a 'BlackMesa map'
-        if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
-            flags |= TF_NEAREST;
-
-        i = GL_AllocateTextureSlot(name);
-        gltexture_t	*tex = R_GetTexture(i);
-        Q_strncpy( tex->name, name, sizeof( tex->name ));
-        tex->flags = (texFlags_t)flags;
-
-        // init reference exclude brush model's texture
-        if (tex->name[0] != '*')
-            tex->refCount = 1;
-
-        if( flags & TF_SKYSIDE )
-            tex->texnum = i;//tr.skyboxbasenum++;
-        else tex->texnum = i; // texnum is used for fast acess into r_textures array too
+        gltexture_t* tex;
+        int texnum;
+        if(!TexLru_LoadTexture(name, flags, filter, tex, texnum))
+            return texnum;
 
         // add to lru
-        tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_internal_s{ name, model_name, phdr, ptexture, size } });
+        tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ texnum, filter, texlru_src_internal_s{ name, model_name, phdr, ptexture, size } });
 
-        // NOTE: always return texnum as index in array or engine will stop work !!!
-        return i;
+        return texnum;
     }
 
     int TexLru_LoadTextureSPR(const char *name, const dsprite_t *psprite, const byte *buf, const dspriteframe_t *frame, int flags, imgfilter_t *filter)
     {
-        uint		picFlags = 0;
-
-        if( !name || !name[0] || !glw_state.initialized )
-            return 0;
-
-        // see if already loaded
-        int i = GL_FindTexture(name);
-        if(i > 0)
-        {
-            // prolonge registration
-            gltexture_t	*tex = R_GetTexture(i);
-            tex->cacheframe = world.load_sequence;
-            if (tex->name[0] != '*')
-                tex->refCount++;
-
-            return i;
-        }
-
-        if( flags & TF_NOFLIP_TGA )
-            picFlags |= IL_DONTFLIP_TGA;
-
-        if( flags & TF_KEEP_8BIT )
-            picFlags |= IL_KEEP_8BIT;
-
-        // set some image flags
-        Image_SetForceFlags( picFlags );
-
-        // HACKHACK: get rid of black vertical line on a 'BlackMesa map'
-        if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
-            flags |= TF_NEAREST;
-
-        i = GL_AllocateTextureSlot(name);
-
-        auto tex = R_GetTexture(i);
-        Q_strncpy( tex->name, name, sizeof( tex->name ));
-        tex->flags = (texFlags_t)flags;
-
-        // init reference exclude brush model's texture
-        if (tex->name[0] != '*')
-            tex->refCount = 1;
-
-        if( flags & TF_SKYSIDE )
-            tex->texnum = i;//tr.skyboxbasenum++;
-        else tex->texnum = i; // texnum is used for fast acess into r_textures array too
+        gltexture_t* tex;
+        int texnum;
+        if(!TexLru_LoadTexture(name, flags, filter, tex, texnum))
+            return texnum;
 
         // add to lru
-        tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_spr_s{ name, psprite, frame } });
+        tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ texnum, filter, texlru_src_spr_s{ name, psprite, frame } });
 
-        // NOTE: always return texnum as index in array or engine will stop work !!!
-        return i;
+        return texnum;
     }
 
     int TexLru_LoadTextureSkybox(const char *name, int flags, imgfilter_t *filter)
@@ -380,29 +316,52 @@ namespace xe {
 
     void SPR_InstallPal(const dsprite_t *psprite)
     {
-        image_ref pal;
-
         auto buffer = (const byte *)psprite + sizeof(dsprite_t) + sizeof(short);
-
         // install palette
         switch (psprite->texFormat) {
             case SPR_ADDITIVE:
-                pal = FS_LoadImage("#normal.pal", buffer, 768);
+                FS_LoadImage("#normal.pal", buffer, 768);
                 break;
             case SPR_INDEXALPHA:
-                pal = FS_LoadImage("#decal.pal", buffer, 768);
+                FS_LoadImage("#decal.pal", buffer, 768);
                 break;
             case SPR_ALPHTEST:
-                pal = FS_LoadImage("#transparent.pal", buffer, 768);
+                FS_LoadImage("#transparent.pal", buffer, 768);
                 break;
             case SPR_NORMAL:
             default:
-                pal = FS_LoadImage("#normal.pal", buffer, 768);
+                FS_LoadImage("#normal.pal", buffer, 768);
                 break;
         }
+    }
 
-        buffer += 768; //读下一个数据块
-        pal = nullptr; // palette installed, no reason to keep this data
+    void SPR_InstallPalAsync(const dsprite_t *psprite, const std::function<void(uint* pal, int)>& callback)
+    {
+        auto LoadedCallback = [psprite, callback](image_ref pic, uint* pal, int rendermode) {
+            if( !pic )
+                return;
+            if(!psprite)
+                return;
+            callback(pal, rendermode);
+        };
+
+        auto buffer = (const byte*)psprite + sizeof(dsprite_t) + sizeof(short);
+        // install palette
+        switch (psprite->texFormat) {
+            case SPR_ADDITIVE:
+                FS_LoadImageAsync("#normal.pal", LoadedCallback, buffer, 768);
+                break;
+            case SPR_INDEXALPHA:
+                FS_LoadImageAsync("#decal.pal", LoadedCallback, buffer, 768);
+                break;
+            case SPR_ALPHTEST:
+                FS_LoadImageAsync("#transparent.pal", LoadedCallback, buffer, 768);
+                break;
+            case SPR_NORMAL:
+            default:
+                FS_LoadImageAsync("#normal.pal", LoadedCallback, buffer, 768);
+                break;
+        }
     }
 
     struct TexLru_Uploader{
@@ -414,7 +373,7 @@ namespace xe {
             auto pic = FS_LoadImage( src.path.c_str(), nullptr, 0 );
             if( !pic )
             {
-                MsgDev(D_ERROR, "TexLru : fail to load load external texture %s\n", src.path.c_str());
+                MsgDev(D_ERROR, "TexLru : fail to load external texture %s\n", src.path.c_str());
                 return {}; // couldn't loading image
             }
 
@@ -463,7 +422,7 @@ namespace xe {
             auto pic = FS_LoadImage( src.path.c_str(), (const byte*)src.texture, src.texture->width * src.texture->height );
             if( !pic )
             {
-                MsgDev(D_ERROR, "TexLru : fail to load load sprite texture %s\n", src.path.c_str());
+                MsgDev(D_ERROR, "TexLru : fail to load sprite texture %s\n", src.path.c_str());
                 return {}; // couldn't loading image
             }
 
@@ -560,8 +519,125 @@ namespace xe {
         textureCache.set_capacity(r_texlru->integer);
 
         auto &lrudata = *tex->texlru_extdata;
-        auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter }, lrudata.src);
-        textureCache.insert((GLuint)texnum, std::move(deleter));
+        
+        #if 1
+        if (std::holds_alternative<texlru_src_external_s>(lrudata.src)) {
+            auto src = std::get<texlru_src_external_s>(lrudata.src);
+            FS_LoadImageAsync(src.path.c_str(), [texnum, src, tex](image_ref pic, uint* pal, int rendermode) {
+                if( !pic )
+                {
+                    MsgDev(D_ERROR, "TexLru : fail to load external texture %s\n", src.path.c_str());
+                    return; // couldn't loading image
+                }
+
+                if(!tex->name[0])
+                {
+                    MsgDev(D_ERROR, "TexLru : fail to load external texture %s(%d) already released\n", src.path.c_str(), texnum);
+                    return;
+                }
+
+                int flags = tex->flags;
+                // force upload texture as RGB or RGBA (detail textures requires this)
+                if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
+
+                GL_UploadTexture( pic, tex, false, tex->texlru_extdata->filter);
+                GL_TexFilter( tex, false ); // update texture filter, wrap etc
+
+                if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
+                    pic = nullptr; // release source texture
+
+                g_texureUploaded.insert(texnum);
+                MsgDev(D_INFO, "TexLru : load external texture %s\n", src.path.c_str());
+            } );
+            textureCache.insert((GLuint)texnum, std::move(std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture }));
+        }
+        else if(std::holds_alternative<texlru_src_internal_s>(lrudata.src)) {
+            auto src = std::get<texlru_src_internal_s>(lrudata.src);
+            const studiohdr_t *phdr = src.phdr;
+            FS_LoadImageAsync(src.texture_name.c_str(), [texnum, src, tex](image_ref pic, uint* pal, int rendermode) {
+                if( !pic )
+                {
+                    MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
+                    return; // couldn't loading image
+                }
+
+                int flags = tex->flags;
+                // force upload texture as RGB or RGBA (detail textures requires this)
+                if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
+
+                GL_UploadTexture( pic, tex, false, tex->texlru_extdata->filter);
+                GL_TexFilter( tex, false ); // update texture filter, wrap etc
+
+                if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
+                    pic = nullptr; // release source texture
+
+                g_texureUploaded.insert(texnum);
+                MsgDev(D_INFO, "TexLru : load internal texture %s from %s\n", src.texture->name, src.model_name.c_str());
+            }, (const byte *)src.texture, src.size, nullptr, 0, (const byte *)phdr + src.texture->index);
+            textureCache.insert((GLuint)texnum, std::move(std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture }));
+        }
+        else if(std::holds_alternative<texlru_src_spr_s>(lrudata.src)) {
+            auto src = std::get<texlru_src_spr_s>(lrudata.src);
+            
+            //SPR_InstallPal(src.psprite);
+            //uint* pal;
+            //int rendermode;
+            //Image_GetGlobalPalette(pal, rendermode);
+
+            //FS_LoadImageAsync(src.path.c_str(), [src, tex](image_ref pic, uint* pal, int rendermode) {
+            //    if (!pic)
+            //    {
+            //        MsgDev(D_ERROR, "TexLru : fail to load sprite texture %s\n", src.path.c_str());
+            //        return; // couldn't loading image
+            //    }
+
+            //    int flags = tex->flags;
+            //    // force upload texture as RGB or RGBA (detail textures requires this)
+            //    if (flags & TF_FORCE_COLOR) pic->flags |= IMAGE_HAS_COLOR;
+
+            //    GL_UploadTexture(pic, tex, false, tex->texlru_extdata->filter);
+            //    GL_TexFilter(tex, false); // update texture filter, wrap etc
+
+            //    if (!(flags & (TF_KEEP_8BIT | TF_KEEP_RGBDATA)))
+            //        pic = nullptr; // release source texture
+
+            //    // set spr type
+            //    tex->texType = TEX_SPRITE;
+
+            //    MsgDev(D_INFO, "TexLru : load SPR texture %s\n", src.path.c_str());
+            //}, (const byte*)src.texture, src.texture->width * src.texture->height, pal, rendermode);
+            SPR_InstallPalAsync(src.psprite, [src, tex](uint* pal, int rendermode) {
+                FS_LoadImageAsync(src.path.c_str(), [src, tex](image_ref pic, uint* pal, int rendermode) {
+                    if (!pic)
+                    {
+                        MsgDev(D_ERROR, "TexLru : fail to load sprite texture %s\n", src.path.c_str());
+                        return; // couldn't loading image
+                    }
+
+                    int flags = tex->flags;
+                    // force upload texture as RGB or RGBA (detail textures requires this)
+                    if (flags & TF_FORCE_COLOR) pic->flags |= IMAGE_HAS_COLOR;
+
+                    GL_UploadTexture(pic, tex, false, tex->texlru_extdata->filter);
+                    GL_TexFilter(tex, false); // update texture filter, wrap etc
+
+                    if (!(flags & (TF_KEEP_8BIT | TF_KEEP_RGBDATA)))
+                        pic = nullptr; // release source texture
+
+                    // set spr type
+                    tex->texType = TEX_SPRITE;
+
+                    MsgDev(D_INFO, "TexLru : load SPR texture %s\n", src.path.c_str());
+                }, (const byte*)src.texture, src.texture->width * src.texture->height, pal, rendermode);
+            });
+            textureCache.insert((GLuint)texnum, std::move(std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture }));
+        }
+        else 
+        #endif
+        {
+            auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter }, lrudata.src);
+            textureCache.insert((GLuint)texnum, std::move(deleter));
+        }
         return true;
     }
 
@@ -572,7 +648,6 @@ namespace xe {
 
     void TexLru_FreeTexture(const mstudiotexture_t *ptexture)
     {
-        // TODO : prevent crash ?
         auto iter = g_textureAttrMap.find(ptexture);
         if (iter == g_textureAttrMap.end())
             return;
@@ -644,5 +719,11 @@ namespace xe {
         for(int i = 0; i < psprite->numframes; ++i)
             TexLru_Upload(psprite->frames[i].frameptr->gl_texturenum);
         return GL_Bind(XASH_TEXTURE0, pspriteframe->gl_texturenum);
+    }
+
+    // for remove studio lru
+    bool TexLru_IsTextureUploaded(int texnum)
+    {
+        return g_texureUploaded.erase(texnum) != 0;
     }
 }

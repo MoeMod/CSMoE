@@ -15,8 +15,17 @@ GNU General Public License for more details.
 
 #include "imagelib.h"
 
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+#include <queue>
+#include <string>
+#include <functional>
+
 // global image variables
 imglib_t	image;
+const loadpixformat_t* image_loadformats;
+const savepixformat_t* image_saveformats;
 
 typedef struct suffix_s
 {
@@ -101,7 +110,7 @@ const bpc_desc_t PFDesc[] =
 {PF_ASTC_12x12,	"ASTC 12x12",0x93BD, 4, true },
 };
 
-void Image_Reset( void )
+void Image_Reset( imglib_t& image )
 {
 	// reset global variables
 	image.width = image.height = image.depth = 0;
@@ -124,6 +133,257 @@ void Image_Reset( void )
 	image.size = 0;
 }
 
+#ifndef XASH_DEDICATED
+struct AsyncStruct
+{
+public:
+    AsyncStruct
+    ( const char* fn, const image_load_func& f, const byte*& b, const size_t bz, uint* pal, int rendermode, const byte* mdl) : filename(fn), callback(f), buffer(b), size(bz), mdlpointer(mdl), loadSuccess(false) {
+		Image_Reset(image);
+		switch (host.type)
+		{
+		case HOST_NORMAL:
+		case HOST_DEDICATED:
+			image.cmd_flags = IL_USE_LERPING | IL_ALLOW_OVERWRITE;
+			break;
+		default:
+			break;
+		}
+		image.tempbuffer = NULL;
+
+		// only for sprite
+		if(pal) {
+			Q_memcpy(image.d_8to24table, pal, sizeof(uint) * 256);
+			image.d_currentpal = image.d_8to24table;
+			image.d_rendermode = rendermode;
+		}
+	}
+
+	std::string filename;
+	image_load_func callback;
+	imglib_t image;
+	image_ref image_data;
+	const byte* buffer;
+	size_t size;
+	//uint* d_8to24table;
+	const byte* mdlpointer;
+	bool loadSuccess;
+};
+
+std::thread* _loadingThread = nullptr;
+std::deque<AsyncStruct*> _asyncStructQueue;
+std::deque<AsyncStruct*> _requestQueue;
+std::deque<AsyncStruct*> _responseQueue;
+std::mutex _requestMutex;
+std::mutex _responseMutex;
+std::condition_variable _sleepCondition;
+bool _needQuit;
+int _asyncRefCount;
+
+void FS_LoadImageThread()
+{
+	AsyncStruct* asyncStruct = nullptr;
+	while (!_needQuit)
+	{
+		std::unique_lock<std::mutex> ul(_requestMutex);
+		// pop an AsyncStruct from request queue
+		if (_requestQueue.empty())
+		{
+			asyncStruct = nullptr;
+		}
+		else
+		{
+			asyncStruct = _requestQueue.front();
+			_requestQueue.pop_front();
+		}
+
+		if (nullptr == asyncStruct) {
+			if (_needQuit) {
+				break;
+			}
+			_sleepCondition.wait(ul);
+			continue;
+		}
+		ul.unlock();
+
+		// load image
+		const char* filename = asyncStruct->filename.c_str();
+		const char* ext = FS_FileExtension(filename);
+		string		path, loadname, sidename;
+		qboolean		anyformat = true;
+		qboolean		gamedironly = true;
+		int		i;
+		fs_offset_t	filesize = 0;
+		const loadpixformat_t* format;
+		const cubepack_t* cmap;
+		const byte* f;
+
+		Q_strncpy(loadname, filename, sizeof(loadname));
+		if (Q_stricmp(ext, ""))
+		{
+			// we needs to compare file extension with list of supported formats
+			// and be sure what is real extension, not a filename with dot
+			for (format = image_loadformats; format && format->formatstring; format++)
+			{
+				if (!Q_stricmp(format->ext, ext))
+				{
+					FS_StripExtension(loadname);
+					anyformat = false;
+					break;
+				}
+			}
+		}
+
+		// HACKHACK: skip any checks, load file from buffer
+		if (filename[0] == '#' && asyncStruct->buffer && asyncStruct->size) goto load_internal_thread;
+
+	search_fs_thread:
+		// now try all the formats in the selected list
+		for (format = image_loadformats; format && format->formatstring; format++)
+		{
+			if (anyformat || !Q_stricmp(ext, format->ext))
+			{
+				Q_sprintf(path, format->formatstring, loadname, "", format->ext);
+				asyncStruct->image.hint = format->hint;
+				f = FS_MapFile(path, &filesize, gamedironly);
+				if (f && filesize > 0)
+				{
+					if (format->loadfunc(asyncStruct->image, path, f, (size_t)filesize))
+					{
+						FS_MapFree(f, filesize); // release buffer
+						asyncStruct->image_data = ImagePack(asyncStruct->image); // loaded
+						asyncStruct->loadSuccess = true;
+						break;
+					}
+					else FS_MapFree(f, filesize); // release buffer
+				}
+			}
+		}
+
+		if (gamedironly && !asyncStruct->loadSuccess)
+		{
+			gamedironly = false;
+			goto search_fs_thread;
+		}
+
+	load_internal_thread:
+		for (format = image_loadformats; format && format->formatstring; format++)
+		{
+			if (anyformat || !Q_stricmp(ext, format->ext))
+			{
+				asyncStruct->image.hint = format->hint;
+				if (asyncStruct->buffer && asyncStruct->size > 0)
+				{
+					if(asyncStruct->mdlpointer) Image_SetMDLPointer(asyncStruct->mdlpointer);
+					if (format->loadfunc(asyncStruct->image, loadname, asyncStruct->buffer, asyncStruct->size))
+					{
+						asyncStruct->image_data = ImagePack(asyncStruct->image); // loaded
+						asyncStruct->loadSuccess = true;
+						break;
+					}
+				}
+			}
+		}
+
+		// push the asyncStruct to response queue
+		_responseMutex.lock();
+		_responseQueue.push_back(asyncStruct);
+		_responseMutex.unlock();
+	}
+}
+
+extern bool cl_load_image_async_run;
+void FS_LoadImageAsync(const char* filename, const image_load_func& callback, const byte* buffer, const size_t size, uint* d_currentpal, int rendermode, const byte* mdlpointer)
+{
+    // lazy init
+    if (_loadingThread == nullptr)
+    {
+        // create a new thread to load images
+        _needQuit = false;
+        _loadingThread = new (std::nothrow) std::thread(&FS_LoadImageThread);
+    }
+
+    if (0 == _asyncRefCount)
+    {
+		cl_load_image_async_run = true;
+    }
+
+    ++_asyncRefCount;
+
+    // generate async struct
+    AsyncStruct *data = new (std::nothrow) AsyncStruct(filename, callback, buffer, size, d_currentpal, rendermode, mdlpointer);
+    
+    // add async struct into queue
+    _asyncStructQueue.push_back(data);
+    std::unique_lock<std::mutex> ul(_requestMutex);
+    _requestQueue.push_back(data);
+    _sleepCondition.notify_one();
+}
+
+void FS_LoadImageAsyncCallBack()
+{
+    AsyncStruct *asyncStruct = nullptr;
+    while (true)
+    {
+        // pop an AsyncStruct from response queue
+        _responseMutex.lock();
+        if (_responseQueue.empty())
+        {
+            asyncStruct = nullptr;
+        }
+        else
+        {
+            asyncStruct = _responseQueue.front();
+            _responseQueue.pop_front();
+
+            // the asyncStruct's sequence order in _asyncStructQueue must equal to the order in _responseQueue
+            ASSERT(asyncStruct == _asyncStructQueue.front());
+            _asyncStructQueue.pop_front();
+        }
+        _responseMutex.unlock();
+
+        if (nullptr == asyncStruct) {
+            break;
+        }
+
+		if (!asyncStruct->loadSuccess)
+		{
+			MsgDev( D_ERROR, "FS_LoadImageAsync: couldn't load \"%s\"\n", asyncStruct->filename.c_str() );
+		}
+
+        // call callback function
+        if (asyncStruct->callback)
+        {
+            (asyncStruct->callback)(asyncStruct->image_data, asyncStruct->image.d_currentpal, asyncStruct->image.d_rendermode);
+        }
+
+        // release the asyncStruct
+        delete asyncStruct;
+        --_asyncRefCount;
+    }
+
+    if (0 == _asyncRefCount)
+    {
+		cl_load_image_async_run = false;
+    }
+}
+
+void FS_LoadImage_waitForQuit()
+{
+    // notify sub thread to quick
+    std::unique_lock<std::mutex> ul(_requestMutex);
+    _needQuit = true;
+    _sleepCondition.notify_one();
+    ul.unlock();
+    if (_loadingThread) _loadingThread->join();
+}
+#endif
+void Image_GetGlobalPalette(uint*& buffer, int& rendermode)
+{
+	buffer = image.d_currentpal;
+	rendermode = image.d_rendermode;
+}
+
 void FS_FreeImageInternal( rgbdata_t *pack );
 
 image_ref Image_NewTemp()
@@ -132,7 +392,7 @@ image_ref Image_NewTemp()
 	return pack;
 }
 
-image_ref ImagePack( void )
+image_ref ImagePack( imglib_t& image )
 {
 	image_ref pack = Image_NewTemp();
 
@@ -186,7 +446,7 @@ FS_AddSideToPack
 
 ================
 */
-qboolean FS_AddSideToPack( const char *name, int adjust_flags )
+qboolean FS_AddSideToPack( imglib_t& image, const char *name, int adjust_flags )
 {
 	byte	*out, *flipped;
 	qboolean	resampled = false;
@@ -209,12 +469,12 @@ qboolean FS_AddSideToPack( const char *name, int adjust_flags )
 	// flip image if needed
 	flipped = Image_FlipInternal( image.rgba, &image.width, &image.height, image.source_type, adjust_flags );
 	if( !flipped ) return false; // try to reasmple dxt?
-	if( flipped != image.rgba ) image.rgba = Image_Copy( image.size );
+	if( flipped != image.rgba ) image.rgba = Image_Copy( image, image.size );
 
 	// resampling image if needed
 	out = Image_ResampleInternal((uint *)image.rgba, image.width, image.height, image.source_width, image.source_height, image.source_type, &resampled );
 	if( !out ) return false; // try to reasmple dxt?
-	if( resampled ) image.rgba = Image_Copy( image.size );
+	if( resampled ) image.rgba = Image_Copy( image, image.size );
 
 	image.cubemap = (byte*)Mem_Realloc( host.imagepool, image.cubemap, image.ptr + image.size );
     Mem_VirtualCopy( image.cubemap + image.ptr, image.rgba, image.size ); // add new side
@@ -245,14 +505,14 @@ image_ref FS_LoadImage( const char *filename, const byte *buffer, size_t size )
 	const cubepack_t	*cmap;
 	const byte		*f;
 
-	Image_Reset(); // clear old image
+	Image_Reset( image ); // clear old image
 	Q_strncpy( loadname, filename, sizeof( loadname ));
 
 	if( Q_stricmp( ext, "" ))
 	{
 		// we needs to compare file extension with list of supported formats
 		// and be sure what is real extension, not a filename with dot
-		for( format = image.loadformats; format && format->formatstring; format++ )
+		for( format = image_loadformats; format && format->formatstring; format++ )
 		{
 			if( !Q_stricmp( format->ext, ext ))
 			{
@@ -272,7 +532,7 @@ image_ref FS_LoadImage( const char *filename, const byte *buffer, size_t size )
 search_fs:
 
 	// now try all the formats in the selected list
-	for( format = image.loadformats; format && format->formatstring; format++)
+	for( format = image_loadformats; format && format->formatstring; format++)
 	{
 		if( anyformat || !Q_stricmp( ext, format->ext ))
 		{
@@ -281,10 +541,10 @@ search_fs:
 			f = FS_MapFile( path, &filesize, gamedironly );
 			if( f && filesize > 0 )
 			{
-				if( format->loadfunc( path, f, (size_t)filesize ))
+				if( format->loadfunc( image, path, f, (size_t)filesize ))
 				{
 					FS_MapFree( f, filesize ); // release buffer
-					return ImagePack(); // loaded
+					return ImagePack(image); // loaded
 				}
 				else FS_MapFree( f, filesize ); // release buffer
 			}
@@ -304,7 +564,7 @@ search_fs:
 		{
 			// for support mixed cubemaps e.g. sky_ft.bmp, sky_rt.tga
 			// NOTE: all loaders must keep sides in one format for all
-			for( format = image.loadformats; format && format->formatstring; format++ )
+			for( format = image_loadformats; format && format->formatstring; format++ )
 			{
 				if( anyformat || !Q_stricmp( ext, format->ext ))
 				{
@@ -315,10 +575,10 @@ search_fs:
 					if( f && filesize > 0 )
 					{
 						// this name will be used only for tell user about problems 
-						if( format->loadfunc( path, f, (size_t)filesize ))
+						if( format->loadfunc( image, path, f, (size_t)filesize ))
 						{         
 							Q_snprintf( sidename, sizeof( sidename ), "%s%s.%s", loadname, cmap->type[i].suf, format->ext );
-							if( FS_AddSideToPack( sidename, cmap->type[i].flags )) // process flags to flip some sides
+							if( FS_AddSideToPack( image, sidename, cmap->type[i].flags )) // process flags to flip some sides
 							{
 								FS_MapFree( f, filesize );
 								break; // loaded
@@ -349,24 +609,24 @@ search_fs:
 			// unexpected errors ?
 			if( image.cubemap )
 				Mem_Free( image.cubemap );
-			Image_Reset();
+			Image_Reset( image );
 		}
 		else break;
 	}
 
 	if( image.cubemap )
-		return ImagePack(); // all done
+		return ImagePack(image); // all done
 
 load_internal:
-	for( format = image.loadformats; format && format->formatstring; format++ )
+	for( format = image_loadformats; format && format->formatstring; format++ )
 	{
 		if( anyformat || !Q_stricmp( ext, format->ext ))
 		{
 			image.hint = format->hint;
 			if( buffer && size > 0  )
 			{
-				if( format->loadfunc( loadname, buffer, size ))
-					return ImagePack(); // loaded
+				if( format->loadfunc( image, loadname, buffer, size ))
+					return ImagePack(image); // loaded
 			}
 		}
 	}
@@ -379,10 +639,10 @@ load_internal_ext:
 		f = FS_MapFile(path, &filesize, gamedironly);
 		if (f && filesize > 0)
 		{
-			if (Image_LoadMDL_BMP(path, f, (size_t)filesize, buffer))
+			if (Image_LoadMDL_BMP(image, path, f, (size_t)filesize, buffer))
 			{
 				FS_MapFree(f, filesize); // release buffer
-				return ImagePack(); // loaded
+				return ImagePack(image); // loaded
 			}
 			else FS_MapFree(f, filesize); // release buffer
 		}
@@ -394,7 +654,7 @@ load_internal_ext:
 		goto load_internal_ext;
 	}
 
-	if( !image.loadformats || image.loadformats->ext == NULL )
+	if( !image_loadformats || image_loadformats->ext == NULL )
 		MsgDev( D_NOTE, "FS_LoadImage: imagelib offline\n" );
 	else if( filename[0] != '#' )
 		MsgDev( D_WARN, "FS_LoadImage: couldn't load \"%s\"\n", loadname );
@@ -404,7 +664,7 @@ load_internal_ext:
 
 	return nullptr;
 }
-
+void Image_GetGlobalPalette(const byte*& buffer, const int& rendermode);
 /*
 ================
 Image_Save
@@ -451,7 +711,7 @@ qboolean FS_SaveImage( const char *filename, image_ref pix )
 		picBuffer = pix->buffer;
 
 		// save all sides seperately
-		for( format = image.saveformats; format && format->formatstring; format++ )
+		for( format = image_saveformats; format && format->formatstring; format++ )
 		{
 			if( !Q_stricmp( ext, format->ext ))
 			{
@@ -475,7 +735,7 @@ qboolean FS_SaveImage( const char *filename, image_ref pix )
 	}
 	else
 	{
-		for( format = image.saveformats; format && format->formatstring; format++ )
+		for( format = image_saveformats; format && format->formatstring; format++ )
 		{
 			if( !Q_stricmp( ext, format->ext ))
 			{

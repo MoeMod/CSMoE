@@ -34,4 +34,5 @@ namespace xe {
     void StudioLru_Submit(int startArrayElems, int numArrayElems, int startArrayVerts, int numArrayVerts);
     void StudioLru_DrawMesh();
     void StudioLru_Shrink();
+    void StudioLru_RemoveCachedData(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags);
 }

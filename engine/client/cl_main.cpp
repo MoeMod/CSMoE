@@ -2370,6 +2370,9 @@ Host_ClientFrame
 
 ==================
 */
+extern void FS_LoadImageAsyncCallBack();
+bool cl_load_image_async_run = false;
+
 void Host_ClientFrame( void )
 {
 	// if client is not active, skip render functions
@@ -2421,6 +2424,8 @@ void Host_ClientFrame( void )
 
 	// update the screen
 	SCR_UpdateScreen ();
+
+	if (cl_load_image_async_run) FS_LoadImageAsyncCallBack();
 
 	if( cls.initialized )
 	{
@@ -2546,6 +2551,8 @@ void CL_Shutdown( void )
 	FS_Delete( "demoheader.tmp" ); // remove tmp file
 	SCR_FreeCinematic (); // release AVI's *after* client.dll because custom renderer may use them
 	S_Shutdown ();
+	extern void FS_LoadImage_waitForQuit();
+	void FS_LoadImage_waitForQuit();
 	R_Shutdown ();
 }
 #endif // XASH_DEDICATED

@@ -77,6 +77,9 @@ public:
     void remove(const key_type &key)
     {
         auto i = m_map.find(key);
+        if (i == m_map.end())
+            return;
+
         auto i2 = i->second.second;
         m_list.erase(i2);
         m_map.erase(i);

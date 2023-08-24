@@ -17,6 +17,7 @@ GNU General Public License for more details.
 #include "mathlib.h"
 #include "mod_local.h"
 #include "gl_export.h"
+#include <mutex>
 
 convar_t *gl_round_down;
 
@@ -25,7 +26,7 @@ convar_t *gl_round_down;
 
 uint d_8toQ1table[256];
 uint d_8toHLtable[256];
-uint d_8to24table[256];
+// uint d_8to24table[256];
 
 qboolean q1palette_init = false;
 qboolean hlpalette_init = false;
@@ -180,12 +181,12 @@ void Image_Init( void )
 	case HOST_NORMAL:
     case HOST_DEDICATED:
 		image.cmd_flags = IL_USE_LERPING|IL_ALLOW_OVERWRITE;		
-		image.loadformats = load_game;
-		image.saveformats = save_game;
+		image_loadformats = load_game;
+		image_saveformats = save_game;
 		break;
 	default:	// all other instances not using imagelib or will be reinstalling later
-		image.loadformats = load_null;
-		image.saveformats = save_null;
+		image_loadformats = load_null;
+		image_saveformats = save_null;
 		break;
 	}
 
@@ -197,7 +198,7 @@ void Image_Shutdown( void )
 	Mem_FreePool( &host.imagepool );
 }
 
-byte *Image_Copy( size_t size )
+byte *Image_Copy( imglib_t& image, size_t size )
 {
 	byte	*out;
 
@@ -212,7 +213,7 @@ byte *Image_Copy( size_t size )
 Image_CheckFlag
 =================
 */
-qboolean Image_CheckFlag( int bit )
+qboolean Image_CheckFlag( imglib_t& image, int bit )
 {
 	if( image.force_flags & bit )
 		return true;
@@ -255,7 +256,7 @@ void Image_RoundDimensions( int *width, int *height )
 	*height = NearestPOW( *height, gl_round_down->integer );
 }
 
-qboolean Image_ValidSize( const char *name )
+qboolean Image_ValidSize( imglib_t& image, const char *name )
 {
 	if( image.width > IMAGE_MAXWIDTH || image.height > IMAGE_MAXHEIGHT || image.width <= 0 || image.height <= 0 )
 	{
@@ -265,7 +266,7 @@ qboolean Image_ValidSize( const char *name )
 	return true;
 }
 
-qboolean Image_LumpValidSize( const char *name )
+qboolean Image_LumpValidSize( imglib_t& image, const char *name )
 {
 	if( image.width > LUMP_MAXWIDTH || image.height > LUMP_MAXHEIGHT || image.width <= 0 || image.height <= 0 )
 	{
@@ -291,7 +292,7 @@ int Image_ComparePalette( const byte *pal )
 	return PAL_CUSTOM;		
 }
 
-void Image_SetPalette( const byte *pal, uint *d_table )
+void Image_SetPalette( imglib_t& image, const byte *pal, uint *d_table )
 {
 	int	i;
 	byte	rgba[4];
@@ -352,62 +353,62 @@ void Image_SetPalette( const byte *pal, uint *d_table )
 	}
 }
 
-void Image_GetPaletteQ1( void )
+void Image_GetPaletteQ1( imglib_t& image )
 {
 	image.d_rendermode = LUMP_NORMAL;
 
 	if( !q1palette_init )
 	{
-		Image_SetPalette( palette_q1, d_8toQ1table );
+		Image_SetPalette( image, palette_q1, d_8toQ1table );
 		d_8toQ1table[255] = 0; // 255 is transparent
 		q1palette_init = true;
 	}
 	image.d_currentpal = d_8toQ1table;
 }
 
-void Image_GetPaletteHL( void )
+void Image_GetPaletteHL( imglib_t& image )
 {
 	image.d_rendermode = LUMP_NORMAL;
 
 	if( !hlpalette_init )
 	{
-		Image_SetPalette( palette_hl, d_8toHLtable );
+		Image_SetPalette( image, palette_hl, d_8toHLtable );
 		d_8toHLtable[255] = 0; // 255 is transparent
 		hlpalette_init = true;
 	}
 	image.d_currentpal = d_8toHLtable;
 }
 
-void Image_GetPaletteBMP( const byte *pal )
+void Image_GetPaletteBMP( imglib_t& image, const byte *pal )
 {
 	image.d_rendermode = LUMP_EXTENDED;
 
 	if( pal )
 	{
-		Image_SetPalette( pal, d_8to24table );
-		image.d_currentpal = d_8to24table;
+		Image_SetPalette( image, pal, image.d_8to24table );
+		image.d_currentpal = image.d_8to24table;
 	}
 }
 
-void Image_GetPaletteLMP( const byte *pal, int rendermode )
+void Image_GetPaletteLMP( imglib_t& image, const byte *pal, int rendermode )
 {
 	image.d_rendermode = rendermode;
 
 	if( pal )
 	{
-		Image_SetPalette( pal, d_8to24table );
+		Image_SetPalette( image, pal, image.d_8to24table );
 		if( rendermode != LUMP_DECAL )
-			d_8to24table[255] &= 0xFFFFFF;
-		image.d_currentpal = d_8to24table;
+			image.d_8to24table[255] &= 0xFFFFFF;
+		image.d_currentpal = image.d_8to24table;
 	}
 	else if( rendermode == LUMP_QFONT )
 	{
 		// quake1 base palette and font palette have some diferences
-		Image_SetPalette( palette_q1, d_8to24table );
-		d_8to24table[0] = 0;
-		image.d_currentpal = d_8to24table;
+		Image_SetPalette( image, palette_q1, image.d_8to24table );
+		image.d_8to24table[0] = 0;
+		image.d_currentpal = image.d_8to24table;
 	}
-	else Image_GetPaletteHL(); // default half-life palette
+	else Image_GetPaletteHL(image); // default half-life palette
 }
 
 void Image_ConvertPalTo24bit( image_ref pic )
@@ -443,7 +444,7 @@ void Image_ConvertPalTo24bit( image_ref pic )
 	pic->type = PF_INDEXED_24;
 }
 
-void Image_CopyPalette32bit( void )
+void Image_CopyPalette32bit( imglib_t& image )
 {
 	if( image.palette ) return; // already created ?
 	image.palette = (byte*)Mem_Alloc( host.imagepool, 1024 );
@@ -524,9 +525,9 @@ void Image_PaletteHueReplace( byte *palSrc, int newHue, int start, int end )
 	}
 }
 
-void Image_CopyParms( image_ref src )
+void Image_CopyParms( imglib_t& image, image_ref src )
 {
-	Image_Reset();
+	Image_Reset( image );
 
 	image.width = src->width;
 	image.height = src->height;
@@ -545,7 +546,7 @@ Image_Copy8bitRGBA
 NOTE: must call Image_GetPaletteXXX before used
 ============
 */
-qboolean Image_Copy8bitRGBA( const byte *in, byte *out, int pixels )
+qboolean Image_Copy8bitRGBA( imglib_t& image, const byte *in, byte *out, int pixels )
 {
 	int	*iout = (int *)out;
 	byte	*fin = (byte *)in;
@@ -1034,7 +1035,7 @@ Image_Resample
 */
 byte *Image_ResampleInternal( const void *indata, int inwidth, int inheight, int outwidth, int outheight, int type, qboolean *resampled )
 {
-	qboolean	quality = Image_CheckFlag( IL_USE_LERPING );
+	qboolean	quality = Image_CheckFlag( image, IL_USE_LERPING );
 
 	// nothing to resample ?
 	if( inwidth == outwidth && inheight == outheight )
@@ -1250,12 +1251,12 @@ byte *Image_CreateLumaInternal( byte *fin, int width, int height, int type, int 
 	return image.tempbuffer;
 }
 
-qboolean Image_AddIndexedImageToPack( const byte *in, int width, int height )
+qboolean Image_AddIndexedImageToPack( imglib_t& image, const byte *in, int width, int height )
 {
 	int	mipsize = width * height;
 	qboolean	expand_to_rgba = true;
 
-	if( Image_CheckFlag( IL_KEEP_8BIT ))
+	if( Image_CheckFlag( image, IL_KEEP_8BIT ))
 		expand_to_rgba = false;
 	else if( !Host_IsDedicated() && ( image.flags & ( IMAGE_HAS_LUMA|IMAGE_QUAKESKY )))
 		expand_to_rgba = false;
@@ -1263,12 +1264,12 @@ qboolean Image_AddIndexedImageToPack( const byte *in, int width, int height )
 	image.size = mipsize;
 
 	if( expand_to_rgba ) image.size *= 4;
-	else Image_CopyPalette32bit(); 
+	else Image_CopyPalette32bit(image); 
 
 	// reallocate image buffer
 	image.rgba = (byte*)Mem_Alloc( host.imagepool, image.size );
 	if( !expand_to_rgba ) Mem_VirtualCopy( image.rgba, in, image.size );
-	else if( !Image_Copy8bitRGBA( in, image.rgba, mipsize ))
+	else if( !Image_Copy8bitRGBA( image, in, image.rgba, mipsize ))
 		return false; // probably pallette not installed
 
 	return true;
@@ -1299,14 +1300,14 @@ qboolean Image_Decompress( const byte *data )
 		if( image.flags & IMAGE_HAS_ALPHA )
 		{
 			if( image.flags & IMAGE_COLORINDEX )
-				Image_GetPaletteLMP( image.palette, LUMP_DECAL ); 
-			else Image_GetPaletteLMP( image.palette, LUMP_TRANSPARENT ); 
+				Image_GetPaletteLMP(image, image.palette, LUMP_DECAL );
+			else Image_GetPaletteLMP(image, image.palette, LUMP_TRANSPARENT );
 		}
-		else Image_GetPaletteLMP( image.palette, LUMP_NORMAL );
+		else Image_GetPaletteLMP(image, image.palette, LUMP_NORMAL );
 		// intentional falltrough
 	case PF_INDEXED_32:
 		if( !image.d_currentpal ) image.d_currentpal = (uint *)image.palette;
-		if( !Image_Copy8bitRGBA( fin, fout, image.width * image.height ))
+		if( !Image_Copy8bitRGBA( image, fin, fout, image.width * image.height ))
 			return false;
 		break;
 	case PF_BGR_24:
@@ -1355,7 +1356,7 @@ image_ref Image_DecompressInternal( image_ref pic )
 	if( pic->type == PF_RGBA_32 )
 		return pic;
 
-	Image_CopyParms( pic );
+	Image_CopyParms( image, pic );
 	image.size = image.ptr = 0;
 
 	Image_Decompress( pic->buffer );
@@ -1634,7 +1635,7 @@ qboolean Image_Process( image_ref *pix, int width, int height, float gamma, uint
 			pic->width = w, pic->height = h;
 			pic->size = w * h * PFDesc[pic->type].bpp;
 			Mem_Free( pic->buffer );		// free original image buffer
-			pic->buffer = Image_Copy( pic->size );	// unzone buffer (don't touch image.tempbuffer)
+			pic->buffer = Image_Copy( image, pic->size );	// unzone buffer (don't touch image.tempbuffer)
 		}
 		else
 		{

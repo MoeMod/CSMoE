@@ -128,7 +128,7 @@ static void free_image(astcenc_image * img)
 Image_LoadTGA
 =============
 */
-qboolean Image_LoadASTC_SW( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadASTC_SW( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	if(filesize <= sizeof(astc_header))
 	{
@@ -212,7 +212,7 @@ qboolean Image_LoadASTC_SW( const char *name, const byte *buffer, size_t filesiz
 	return true;
 }
 
-qboolean Image_LoadASTC_HW( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadASTC_HW( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
     if(filesize <= sizeof(astc_header))
     {
@@ -285,14 +285,14 @@ qboolean Image_LoadASTC_HW( const char *name, const byte *buffer, size_t filesiz
     return true;
 }
 
-qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadASTC( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 #ifndef XASH_DEDICATED
     if(GL_Support(GL_ASTC_EXT) > 0)
-        return Image_LoadASTC_HW(name, buffer, filesize);
+        return Image_LoadASTC_HW(image, name, buffer, filesize);
     else
 #endif
-        return Image_LoadASTC_SW(name, buffer, filesize);
+        return Image_LoadASTC_SW(image, name, buffer, filesize);
 }
 
 static const unsigned int save_block_x = 8;
@@ -388,7 +388,7 @@ std::vector<byte> Image_SaveASTC_Worker(astcenc_context* context, byte *rgba, in
 
 qboolean Image_SaveASTC( const char *name, image_ref pix )
 {
-    if( FS_FileExists( name, false ) && !Image_CheckFlag( IL_ALLOW_OVERWRITE ) && !host.write_to_clipboard )
+    if( FS_FileExists( name, false ) && !Image_CheckFlag( image, IL_ALLOW_OVERWRITE ) && !host.write_to_clipboard )
         return false; // already existed
 
     // bogus parameter check

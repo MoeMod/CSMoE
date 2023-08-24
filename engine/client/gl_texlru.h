@@ -47,4 +47,5 @@ namespace xe {
     void TexLru_Free( int texnum );
 	void TexLru_Shrink();
 	void TexLru_Clear();
+    bool TexLru_IsTextureUploaded(int texnum);
 }

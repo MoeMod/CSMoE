@@ -238,7 +238,7 @@ void Image_DXTAdjustVolume( dds_t *hdr )
 Image_LoadDDS
 =============
 */
-qboolean Image_LoadDDS( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadDDS( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	dds_t	header;
 	byte	*fin;
@@ -273,12 +273,12 @@ qboolean Image_LoadDDS( const char *name, const byte *buffer, size_t filesize )
 		image.depth = header.dwDepth;
 	else image.depth = 1;
 
-	if( !Image_ValidSize( name )) return false;
+	if( !Image_ValidSize( image, name )) return false;
 
 	Image_DXTGetPixelFormat( &header ); // and image type too :)
 	Image_DXTAdjustVolume( &header );
 
-	if( !Image_CheckFlag( IL_DDS_HARDWARE ) && ( image.type == PF_DXT1 || image.type == PF_DXT3 || image.type == PF_DXT5 ))
+	if( !Image_CheckFlag( image, IL_DDS_HARDWARE ) && ( image.type == PF_DXT1 || image.type == PF_DXT3 || image.type == PF_DXT5 ))
 		return false; // silently rejected
 
 	if( image.type == PF_UNKNOWN ) 

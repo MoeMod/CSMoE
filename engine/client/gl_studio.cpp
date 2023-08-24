@@ -1635,58 +1635,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
-#if 0
-		int flags;
-		if (ptexture->flags & STUDIO_NF_NORMALMAP)
-			flags |= (TF_NORMALMAP);
 
-		bool bBindTex = false;
-
-		if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_L.bmp") ||
-			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_highq_hand__long_512.bmp"))
-		{
-			int texnum = xe::TexLru_LoadTextureExternal("gfx/tattoo/tttiger22_MaleLong.tga", flags, NULL);
-			if (texnum)
-			{
-				xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
-				bBindTex = true;
-			}
-
-		}
-		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_O.bmp") ||
-			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "hand.bmp") ||
-			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "252246hand.bmp") ||
-			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "256252hand.bmp") ||
-			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "256256hand.bmp"))
-		{
-			//512 Textrue need CHANGE TO 256
-			int texnum = xe::TexLru_LoadTextureExternal("gfx/tattoo/tttiger22_MaleOrg.tga", flags, NULL);
-			if (texnum)
-			{
-				xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
-				bBindTex = true;
-			}
-		}
-		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_S.bmp") ||
-			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_highq_hand_512.bmp"))
-		{
-			int texnum = xe::TexLru_LoadTextureExternal("gfx/tattoo/tttiger22_MaleShort.tga", flags, NULL);
-			if (texnum)
-			{
-				xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
-				bBindTex = true;
-			}
-		}
-		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "F_L.bmp") ||
-			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_girl_hand_long.bmp"))
-		{
-
-		}
-		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_girl_hand.bmp"))
-		{
-
-		}
-#endif
 		const auto& attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
 		if(xe::TexLru_Upload(attr.index))
 			xe::TexLru_UpdateAttr(&ptexture[pskinref[pmesh->skinref]]);
@@ -1814,9 +1763,6 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
-
-			
-
 			bool bBindSpr = false;
 
 			for (auto iter = g_vecBindSprList.begin(); iter != g_vecBindSprList.end(); iter++)
@@ -1884,163 +1830,12 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 							bBindSpr = true;
 							break;
 						}
-
-
-
 					}
 
 					if (bBindSpr)
-						break;
-
-
-
-					//
-					//model_t* pModel = Mod_ForName(iter->sprname, FALSE);
-
-					//float frame = 0.0;
-					//float framerate = iter->sprFPS;
-					//int startFrame = iter->sequence.startFrame ? iter->sequence.startFrame : 0;
-					//int maxframe = pModel->numframes - 1;
-
-					//int endFrame = iter->sequence.endFrame ? iter->sequence.endFrame : maxframe;
-
-					//bool isSyncFrame = iter->sequence.isSyncFrame;
-					//if (isSyncFrame)
-					//{
-					//	mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
-
-					//	frame = R_StudioEstimateFrame(RI.currententity, pseqdesc) / pseqdesc->numframes * maxframe;
-
-					//	if (iter->sequence.isLoop)
-					//	{
-					//		frame = startFrame;
-					//	}
-					//}
-					//else
-					//{
-					//	//double dt = (cl.time - cl.oldtime);
-					//	//frame += dt * framerate;
-
-					//	frame = framerate * (cl.time - RI.currententity->curstate.animtime) + startFrame;
-
-					//	if (frame > maxframe)
-					//	{
-					//		if (iter->sequence.isLoop)
-					//		{
-					//			frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
-					//			//frame = frame - (int)frame;
-					//			//frame = startFrame;
-					//		}
-					//		else
-					//			frame = maxframe;
-					//	}
-					//}
-
-					//auto pspriteframe = R_GetSpriteFrame(pModel, frame, 0.0);
-
-					//int index = pspriteframe->gl_texturenum;
-
-					//if (pspriteframe->gl_texturenum)
-					//	xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
-
-					//bBindSpr = true;
-					//break;
-									
+						break;			
 				}
-
 			}
-			
-
-
-			//if (!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_leapstrikegun_v_effect01.bmp"))
-			//{
-
-			//	model_t* pLeapStrikeGunSprA = Mod_ForName("sprites/leapstrikegun_v_ef.spr", FALSE);
-			//	//bugs
-			//	static int frame = 0;
-			//	float framerate = 4.0;
-			//	int startFrame = 0;
-			//	int endFrame = 0;
-
-			//	int maxframe = pLeapStrikeGunSprA->numframes;
-
-			//	if (endFrame)
-			//		maxframe = endFrame;
-
-			//	if (!startFrame)
-			//		startFrame = frame;
-
-			//	bool isSyncFrame = false;
-			//	if (isSyncFrame)
-			//	{
-			//		mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
-
-			//		frame = R_StudioEstimateFrame(RI.currententity, pseqdesc);
-			//	}
-			//	else
-			//	{
-			//		frame += (cl.time - (int)cl.time) * framerate;
-
-			//		if (frame > maxframe)
-			//			frame = fmod(frame, maxframe);
-			//	}
-
-			//	auto pspriteframe = R_GetSpriteFrame(pLeapStrikeGunSprA, frame, 0.0);
-
-			//	int index = pspriteframe->gl_texturenum;
-
-			//	if (pspriteframe->gl_texturenum)
-			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
-
-			//	special = true;
-
-			//	/*pTemp->entity.curstate.frame += frametime * pTemp->entity.curstate.framerate;
-			//	if (pTemp->entity.curstate.frame >= pTemp->frameMax)
-			//	{
-			//		pTemp->entity.curstate.frame = pTemp->entity.curstate.frame - (int)(pTemp->entity.curstate.frame);
-			//	}*/
-			//}
-			//if (!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_leapstrikegun_flying.bmp"))
-			//{
-			//	model_t* pLeapStrikeGunSprA = Mod_ForName("sprites/ef_leapstrikegun_fly.spr", FALSE);
-			//	//bugs
-			//	static int frame = 0;
-			//	float framerate = 30.0;
-			//	int startFrame = 0;
-			//	int endFrame = 0;
-
-			//	int maxframe = pLeapStrikeGunSprA->numframes;
-
-			//	if (endFrame)
-			//		maxframe = endFrame;
-
-			//	if (!startFrame)
-			//		startFrame = frame;
-
-			//	bool isSyncFrame = false;
-			//	if (isSyncFrame)
-			//	{
-			//		mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
-
-			//		frame = R_StudioEstimateFrame(RI.currententity, pseqdesc);
-			//	}
-			//	else
-			//	{
-			//		frame += (cl.time - (int)cl.time) * framerate;
-
-			//		if (frame > maxframe)
-			//			frame = fmod(frame, maxframe);
-			//	}
-
-			//	auto pspriteframe = R_GetSpriteFrame(pLeapStrikeGunSprA, frame, 0.0);
-
-			//	int index = pspriteframe->gl_texturenum;
-
-			//	if (pspriteframe->gl_texturenum)
-			//		xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
-
-			//	special = true;
-			//}
 			
 			if(!bBindSpr)
 				xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
@@ -2118,11 +1913,15 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		}
 #endif
 #ifdef XASH_SHADER_VBO
-        xe::StudioLru_BindVBO(m_pStudioHeader, m_pSubModel, j, !(g_nForceFaceFlags & STUDIO_NF_CHROME));
-        if(!xe::StudioLru_HasCachedData())
-        {
+		if(xe::TexLru_IsTextureUploaded(attr.index))
+		{
+			xe::StudioLru_RemoveCachedData(m_pStudioHeader, m_pSubModel, j, !(g_nForceFaceFlags& STUDIO_NF_CHROME));
+		}
+		xe::StudioLru_BindVBO(m_pStudioHeader, m_pSubModel, j, !(g_nForceFaceFlags& STUDIO_NF_CHROME));
+		if (!xe::StudioLru_HasCachedData())
+		{
 			R_StudioDrawMesh(ptricmds, s, t, alpha, scale);
-        }
+		}
 		xe::StudioLru_DrawMesh();
 		xe::StudioLru_UnbindVBO();
 #else
@@ -3305,6 +3104,40 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
         // CSO Texture Load
         if (name[0] == '#' || name[0] == '@')
         {
+			if (Q_stristr(ptexture->name, "#M_L.bmp") ||
+				Q_stristr(ptexture->name, "cso_highq_hand__long_512.bmp"))
+			{
+				sprintf(texname, "gfx/tattoo/tttiger22_MaleLong.tga");
+				if (FS_FileExists(texname, false))
+				{
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+					break;
+				}
+			}
+			else if (Q_stristr(ptexture->name, "#M_O.bmp") ||
+				!Q_stricmp(ptexture->name, "hand.bmp") ||
+				Q_stristr(ptexture->name, "252246hand.bmp") ||
+				Q_stristr(ptexture->name, "256252hand.bmp") ||
+				Q_stristr(ptexture->name, "256256hand.bmp"))
+			{
+				sprintf(texname, "gfx/tattoo/tttiger22_MaleOrg.tga");
+				if (FS_FileExists(texname, false))
+				{
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+					break;
+				}
+			}
+			else if (Q_stristr(ptexture->name, "#M_S.bmp") ||
+				Q_stristr(ptexture->name, "cso_highq_hand_512.bmp"))
+			{
+				sprintf(texname, "gfx/tattoo/tttiger22_MaleShort.tga");
+				if (FS_FileExists(texname, false))
+				{
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+					break;
+				}
+			}
+			
 			if (mod->suffix[0])
 			{
 				sprintf(texname, "models/texture/%s%s.bmp", mod->suffix, name);
