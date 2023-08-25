@@ -3002,10 +3002,13 @@ void CGrenade::FireBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t
 
 			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
 
-			pPlayer->m_pBuffAttacker = pevAttacker;
-			pPlayer->m_iHealthDecreaseCount = 5;
-			pPlayer->m_flHealthDecreaseAmount = pPlayer->pev->max_health * flBurnAmount;
-			pPlayer->m_flHealthDecreaseInterval = 1.0s;
+			if (pPlayer->pev->team != pevAttack->team)
+			{
+				pPlayer->m_pBuffAttacker = pevAttacker;
+				pPlayer->m_iHealthDecreaseCount = 5;
+				pPlayer->m_flHealthDecreaseAmount = pPlayer->pev->max_health * flBurnAmount;
+				pPlayer->m_flHealthDecreaseInterval = 1.0s;
+			}
 
 			for (int id = 1; id <= gpGlobals->maxClients; id++)
 			{

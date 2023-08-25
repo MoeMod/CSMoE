@@ -3104,6 +3104,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
         // CSO Texture Load
         if (name[0] == '#' || name[0] == '@')
         {
+		#if 0
 			if (Q_stristr(ptexture->name, "#M_L.bmp") ||
 				Q_stristr(ptexture->name, "cso_highq_hand__long_512.bmp"))
 			{
@@ -3137,6 +3138,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 					break;
 				}
 			}
+		#endif
 			
 			if (mod->suffix[0])
 			{

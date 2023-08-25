@@ -129,7 +129,7 @@ namespace cl::event::y22s2sfpistol {
 		int sModelMuzzleflash;
 		gEngfuncs.CL_LoadModel("sprites/ef_starchasersr_star.spr", &sModelMuzzleflash);
 
-		TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.5, sModelMuzzleflash, 0, 60, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.25, 15, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP);
+		TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.5, sModelMuzzleflash, 0, 60, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.25, 15, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP, 0, 0);
 		if (pEnt)
 		{
 			pEnt->entity.curstate.rendercolor.r = 255;

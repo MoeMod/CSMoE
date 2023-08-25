@@ -2537,7 +2537,7 @@ void UTIL_BroadcastStuffText(const char* fmt, ...)
 }
 
 
-void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vector& vecVelocity, int iModelIndex, int life, int sequence, int framerate, bool fadeOut, int fadeSpeed, int brightness, int rendermode, CBaseEntity* pEntity, bool fadeIn, int fadeInSpeed, int scale, int frameMax, int flags, bool excludeSource)
+void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vector& vecVelocity, int iModelIndex, int life, int sequence, int framerate, bool fadeOut, int fadeSpeed, int brightness, int rendermode, CBaseEntity* pEntity, bool fadeIn, int fadeInSpeed, int scale, int frameMax, int flags, bool excludeSource, int skin, int body)
 {	
 	if(excludeSource)
 		MESSAGE_BEGIN(MSG_EXCLUDESOURCE, SVC_TEMPENTITY, g_vecZero, pEntity->edict());
@@ -2574,6 +2574,8 @@ void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vect
 	WRITE_BYTE(scale);
 	WRITE_SHORT(frameMax);
 	WRITE_LONG(flags);
+	//WRITE_BYTE(skin);
+	//WRITE_BYTE(body);
 	MESSAGE_END();
 }
 

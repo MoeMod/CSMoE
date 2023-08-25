@@ -306,3 +306,4 @@ HOOK_EVENT(ozwpnset1, FireOzWpnSet1);
 HOOK_EVENT(ignitemg, FireIgniteMG);
 HOOK_EVENT(m3dragonex, FireM3DragonEX);
 HOOK_EVENT(leapstrikegun, FireLeapStrikeGun);
+HOOK_EVENT(transformgunadv, FireTransformGunADV);

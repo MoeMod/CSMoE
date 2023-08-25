@@ -55,6 +55,17 @@ struct client_anim_state_t
 	latchedvars_t lv;
 };
 
+struct ExtraViewModel
+{
+	struct model_s* s_pModel;
+	float m_flTimeStart;
+	float m_flTimeEnd;
+	int m_iSequence;
+	int rendermode;
+	int renderamt;
+	int skin;
+};
+
 class CGameStudioModelRenderer : public CStudioModelRenderer
 {
 public:
@@ -71,7 +82,7 @@ public:
 	virtual void CalculateYawBlend(entity_state_t *pplayer);
 	virtual void CalculatePitchBlend(entity_state_t *pplayer);
 	void SetFixInterpolant(bool value);
-
+	void R_AddExtraViewModel(const ExtraViewModel& item);
 private:
 	void SavePlayerState(entity_state_t *pplayer);
 	void SetupClientAnimation(entity_state_t *pplayer);
@@ -84,6 +95,8 @@ private:
 };
 
 extern CGameStudioModelRenderer g_StudioRenderer;
+
+
 
 }
 

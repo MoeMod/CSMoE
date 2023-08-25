@@ -254,33 +254,7 @@ namespace sv {
 
 		if (m_flCreateSharkTime < gpGlobals->time)
 		{
-			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-			WRITE_BYTE(TE_TEMPMODEL);
-			WRITE_COORD(pev->origin.x);
-			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z);
-			WRITE_COORD(0);
-			WRITE_COORD(0);
-			WRITE_COORD(0);
-			WRITE_COORD(0);
-			WRITE_COORD(0);
-			WRITE_COORD(0);
-			WRITE_SHORT(m_iSharkEffect);
-			WRITE_BYTE(20);	//life
-			WRITE_SHORT(0);
-			WRITE_BYTE(10);
-			WRITE_BYTE(false);
-			WRITE_BYTE(255);
-			WRITE_BYTE(kRenderNormal);
-			WRITE_SHORT(-1);
-			WRITE_BYTE(0);
-			WRITE_BYTE(false);
-			WRITE_BYTE(0);
-			WRITE_BYTE(0);
-			WRITE_SHORT(61);
-			WRITE_LONG(0);
-			MESSAGE_END();
-
+			UTIL_TempModel(pev->origin, g_vecZero, g_vecZero, m_iSharkEffect, 20, 0, 10, false, 0, 255, kRenderNormal, NULL, false, 0, 0, 255, 0);
 
 			for (int i = 0; i < 4; i++)
 			{

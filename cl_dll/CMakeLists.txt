@@ -472,6 +472,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m3dragonex.cpp
 	../dlls/wpn_shared/knife_dvhammer.cpp
 	../dlls/wpn_shared/wpn_leapstrikegun.cpp
+	../dlls/wpn_shared/wpn_transformgunadv.cpp
 	)
 
 set (HUD_SRCS

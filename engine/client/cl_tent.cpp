@@ -2364,7 +2364,7 @@ CL_TempCustomModel
 CutomModel
 ==============
 */
-TEMPENTITY* GAME_EXPORT CL_TempCustomModel(const vec3_t pos, const vec3_t angles, const vec3_t velocity, float life, int modelIndex, int sequence, float framerate, bool fadeOut, int brightness, int rendermode, int entity, float fadeSpeed, bool fadeIn, float fadeInSpeed, float scale, int frameMax, int flags)
+TEMPENTITY* GAME_EXPORT CL_TempCustomModel(const vec3_t pos, const vec3_t angles, const vec3_t velocity, float life, int modelIndex, int sequence, float framerate, bool fadeOut, int brightness, int rendermode, int entity, float fadeSpeed, bool fadeIn, float fadeInSpeed, float scale, int frameMax, int flags, int skin, int body)
 {
 	//for (int i = 0; i < 2; i++)
 	//{
@@ -2387,6 +2387,8 @@ TEMPENTITY* GAME_EXPORT CL_TempCustomModel(const vec3_t pos, const vec3_t angles
 	else
 		pTemp->frameMax = frameCount;
 
+	pTemp->entity.curstate.body = body;
+	pTemp->entity.curstate.skin = skin;
 	pTemp->entity.curstate.rendermode = rendermode;
 	pTemp->entity.curstate.renderamt = brightness * 2;
 	pTemp->entity.curstate.sequence = sequence;
@@ -2934,6 +2936,8 @@ void R_TempModel(sizebuf_t* msg)
 	float scale;
 	int frameMax;
 	int flags;
+	int skin;
+	int body;
 
 	pos.x = BF_ReadCoord(msg);
 	pos.y = BF_ReadCoord(msg);
@@ -2961,6 +2965,8 @@ void R_TempModel(sizebuf_t* msg)
 	scale = BF_ReadByte(msg) * 0.1;
 	frameMax = BF_ReadShort(msg);
 	flags = BF_ReadLong(msg);
+	skin = BF_ReadByte(msg);
+	body = BF_ReadByte(msg);
 
 	if (framerate > 25.0)
 		framerate = 30.0;
@@ -2968,7 +2974,7 @@ void R_TempModel(sizebuf_t* msg)
 	if (life > 25.0)
 		life = 999.0;
 
-	CL_TempCustomModel(pos, angles, velocity, life, modelIndex, sequence, framerate, fadeOut, brightness, rendermode, entity, fadeSpeed, fadeIn, fadeInSpeed, scale, frameMax, flags);
+	CL_TempCustomModel(pos, angles, velocity, life, modelIndex, sequence, framerate, fadeOut, brightness, rendermode, entity, fadeSpeed, fadeIn, fadeInSpeed, scale, frameMax, flags, skin, body);
 }
 
 TEMPENTITY* R_TempSprite2(vec3_t pos, vec3_t dir, float scale, int modelIndex, int rendermode, int renderfx, float brightness, float life, int flags, float framerate)

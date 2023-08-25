@@ -840,32 +840,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 			m_pPlayer->pev->armorvalue = 9000;
 
-			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-			WRITE_BYTE(TE_TEMPMODEL);
-			WRITE_COORD(m_pPlayer->pev->origin.x);
-			WRITE_COORD(m_pPlayer->pev->origin.y);
-			WRITE_COORD(m_pPlayer->pev->origin.z);
-			WRITE_COORD(g_vecZero.x);
-			WRITE_COORD(g_vecZero.y);
-			WRITE_COORD(g_vecZero.z);
-			WRITE_COORD(g_vecZero.x);
-			WRITE_COORD(g_vecZero.y);
-			WRITE_COORD(g_vecZero.z);
-			WRITE_SHORT(m_iZB5EvolutionEffect);
-			WRITE_BYTE(10);	//life
-			WRITE_SHORT(0);
-			WRITE_BYTE(1);
-			WRITE_BYTE(false);
-			WRITE_BYTE(255);
-			WRITE_BYTE(kRenderNormal);
-			WRITE_SHORT(-1);
-			WRITE_BYTE(0);
-			WRITE_BYTE(false);
-			WRITE_BYTE(0);
-			WRITE_BYTE(0);
-			WRITE_SHORT(31);
-			WRITE_LONG(0);
-			MESSAGE_END();
+			UTIL_TempModel(m_pPlayer->pev->origin, g_vecZero, g_vecZero, m_iZB5EvolutionEffect, 10, 0, 10, false, 0, 255, kRenderNormal, NULL, false, 0, 0, 255, 0);
 
 			auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(m_pPlayer->m_pModStrategy.get());
 			if (strategy)

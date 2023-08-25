@@ -4324,32 +4324,7 @@ namespace sv {
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/deathknight_skill_guard_start.wav", VOL_NORM, ATTN_NORM);
 
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_TEMPMODEL);
-		WRITE_COORD(g_vecZero.x);
-		WRITE_COORD(g_vecZero.y);
-		WRITE_COORD(g_vecZero.z);
-		WRITE_COORD(g_vecZero.x);
-		WRITE_COORD(g_vecZero.y);
-		WRITE_COORD(g_vecZero.z);
-		WRITE_COORD(g_vecZero.x);
-		WRITE_COORD(g_vecZero.y);
-		WRITE_COORD(g_vecZero.z);
-		WRITE_SHORT(m_iDeathKnightEffectShield);
-		WRITE_BYTE(50);	//life
-		WRITE_SHORT(0);	//seq
-		WRITE_BYTE(1);	//framerate
-		WRITE_BYTE(false);
-		WRITE_BYTE(255);
-		WRITE_BYTE(kRenderNormal);
-		WRITE_SHORT(m_pPlayer->entindex());
-		WRITE_BYTE(0);
-		WRITE_BYTE(false);
-		WRITE_BYTE(0);
-		WRITE_BYTE(0);
-		WRITE_SHORT(2);
-		WRITE_LONG(0);
-		MESSAGE_END();
+		UTIL_TempModel(g_vecZero, g_vecZero, g_vecZero, m_iDeathKnightEffectShield, 50, 0, 10, false, 0, 255, kRenderNormal, m_pPlayer, false, 0, 0, 255, 0);
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);

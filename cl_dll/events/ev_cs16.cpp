@@ -1098,7 +1098,7 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 
 						int sModelIndexParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_buffng7_spark_a.spr");
 
-						gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.2, sModelIndexParticle, 0, 20, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.2, 3, FTENT_SPRANIMATE);
+						gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.2, sModelIndexParticle, 0, 20, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.2, 3, FTENT_SPRANIMATE, 0, 0);
 						break;
 					}
 					case BULLET_PLAYER_BUFFNG7_BUCKSHOT:
@@ -1116,14 +1116,14 @@ void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, cons
 
 						int sModelIndexParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_buffng7_spark_b.spr");
 
-						gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.2, sModelIndexParticle, 0, 20, false, 180, kRenderTransAdd, 0, 0, false, 0, 0.2, 3, FTENT_SPRANIMATE);
+						gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.2, sModelIndexParticle, 0, 20, false, 180, kRenderTransAdd, 0, 0, false, 0, 0.2, 3, FTENT_SPRANIMATE, 0, 0);
 						break;
 					}
 					case BULLET_PLAYER_CROSSBOWEX21:
 					{
 						int sModelIndexParticle = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_crossbowex_hit_1.spr");
 
-						gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.2, sModelIndexParticle, 0, 30, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.08, 13, FTENT_SPRANIMATE);
+						gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.2, sModelIndexParticle, 0, 30, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.08, 13, FTENT_SPRANIMATE, 0, 0);
 						break;
 					}
 					case BULLET_PLAYER_VOIDPISTOL:
@@ -1341,7 +1341,7 @@ void CreateCorpse(Vector *p_vOrigin, Vector *p_vAngles, const char *pModel, floa
 	//													modelIdx,
 	//													0 );
 
-	TEMPENTITY* model = gEngfuncs.pEfxAPI->R_TempCustomModel(*p_vOrigin, *p_vAngles, null, gEngfuncs.pfnGetCvarFloat("cl_corpsestay"), modelIdx, 0, 1.0, false, 255, kRenderNormal, 0, 0, false, 0, 1.0, 256,  FTENT_GRAVITY | FTENT_CLIENTCUSTOM);
+	TEMPENTITY* model = gEngfuncs.pEfxAPI->R_TempCustomModel(*p_vOrigin, *p_vAngles, null, gEngfuncs.pfnGetCvarFloat("cl_corpsestay"), modelIdx, 0, 1.0, false, 255, kRenderNormal, 0, 0, false, 0, 1.0, 256,  FTENT_GRAVITY | FTENT_CLIENTCUSTOM, 0, 0);
 
 	if(model)
 	{

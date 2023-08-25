@@ -428,6 +428,7 @@ TL_ADD(CSfTurret)
 TL_ADD(CM3DragonEX)
 TL_ADD(CKnifeDVHammer)
 TL_ADD(CLeapStrikeGun)
+TL_ADD(CTransformGunADV)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)

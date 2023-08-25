@@ -260,7 +260,7 @@ void EV_FireMalorian3516(event_args_s *args)
 
 		//gEngfuncs.pEfxAPI->R_AttachTentToModel(ent->index, 3, 1.0, iMuzzModelIndex, framerate, brightness, kRenderTransAdd, scale, 30, FTENT_SPRANIMATE, EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL);
 
-		gEngfuncs.pEfxAPI->R_TempCustomModel(ent->attachment[3], { 0, 0, 0 }, { 0, 0, 0 }, 1.0, iMuzzModelIndex, 0, framerate, false, brightness, kRenderTransAdd, 0, 0, false, 0, scale, 30, FTENT_SPRANIMATE);
+		gEngfuncs.pEfxAPI->R_TempCustomModel(ent->attachment[3], { 0, 0, 0 }, { 0, 0, 0 }, 1.0, iMuzzModelIndex, 0, framerate, false, brightness, kRenderTransAdd, 0, 0, false, 0, scale, 30, FTENT_SPRANIMATE, 0, 0);
 
 		framerate = Com_RandomLong(30, 35);
 		scale = Com_RandomFloat(0.05, 0.1);
@@ -268,7 +268,7 @@ void EV_FireMalorian3516(event_args_s *args)
 
 		//gEngfuncs.pEfxAPI->R_AttachTentToModel(ent->index, 4, 1.0, iMuzzModelIndex, framerate, brightness, kRenderTransAdd, scale, 30, FTENT_SPRANIMATE, EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL);
 
-		gEngfuncs.pEfxAPI->R_TempCustomModel(ent->attachment[4], {0, 0, 0}, {0, 0, 0}, 1.0, iMuzzModelIndex, 0, framerate, false, brightness, kRenderTransAdd, 0, 0, false, 0, scale, 30, FTENT_SPRANIMATE);
+		gEngfuncs.pEfxAPI->R_TempCustomModel(ent->attachment[4], {0, 0, 0}, {0, 0, 0}, 1.0, iMuzzModelIndex, 0, framerate, false, brightness, kRenderTransAdd, 0, 0, false, 0, scale, 30, FTENT_SPRANIMATE, 0, 0);
 		
 		if(args->bparam2)
 			PLAY_EVENT_SOUND("weapons/malorian_arms_3516/malorian-1.wav");

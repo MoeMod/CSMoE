@@ -53,6 +53,8 @@ namespace cl {
 
 CGameStudioModelRenderer g_StudioRenderer;
 
+std::vector<ExtraViewModel> m_vecExtraViewModels;
+
 int g_rseq;
 int g_gaitseq;
 vec3_t g_clorg;
@@ -155,6 +157,11 @@ int g_iDvhammerState = 0;
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {
 	m_bLocal = false;
+}
+
+void CGameStudioModelRenderer::R_AddExtraViewModel(const ExtraViewModel& item)
+{
+	m_vecExtraViewModels.push_back(item);
 }
 
 mstudioanim_t *CGameStudioModelRenderer::LookupAnimation(mstudioseqdesc_t *pseqdesc, int index)
@@ -1370,6 +1377,35 @@ int R_StudioDrawModel(int flags)
 			g_StudioRenderer.SetFixInterpolant(false);
 
 			return iReturn;
+		}
+
+		if (m_vecExtraViewModels.size())
+		{
+			static cl_entity_t saveent;
+			saveent = *curent;
+
+			for (auto iter = m_vecExtraViewModels.begin(); iter != m_vecExtraViewModels.end();/**/)
+			{
+				curent->model = iter->s_pModel;
+				curent->curstate.skin = iter->skin;
+				curent->curstate.animtime = iter->m_flTimeStart;
+				curent->curstate.framerate = 1.0;
+				curent->curstate.sequence = iter->m_iSequence;
+				curent->curstate.rendermode = iter->rendermode;
+				curent->curstate.renderamt = iter->renderamt;
+
+				g_StudioRenderer.StudioDrawModel(flags);
+
+				if (gHUD.m_flTime >= iter->m_flTimeEnd)
+				{
+					iter = m_vecExtraViewModels.erase(iter);
+				}
+				else
+				{
+					++iter;
+				}
+			}
+			*curent = saveent;
 		}
 	}
 

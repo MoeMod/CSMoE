@@ -183,7 +183,7 @@ void EV_FireY23S1SFSMG(struct event_args_s* args)
 
 	int sModelMuzzleflash = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/muzzleflash289.spr");
 
-	TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.3, sModelMuzzleflash, 0, 30, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.08, 11, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP);
+	TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempCustomModel(tr.endpos, { 0, 0, 0 }, { 0, 0, 0 }, 0.3, sModelMuzzleflash, 0, 30, false, 225, kRenderTransAdd, 0, 0, false, 0, 0.08, 11, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP, 0, 0);
 
 	if (g_flY23S1SFSMGBeamTime[idx] >= gHUD.m_flTime)
 	{
