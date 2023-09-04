@@ -2525,9 +2525,9 @@ int R_StudioDrawModel(int flags)
 	return iReturn;
 }
 
-int R_StudioGetPlayerClassID(model_t* mod, const studiohdr_t* phdr, const mstudiotexture_t* ptexture)
+int R_StudioGetPlayerClassID(int playerid)
 {
-	return PlayerClassManager().Client_ModelToApperance(mod->name);
+	return PlayerClassManager().GetPlayerClass(playerid).ClassID;
 }
 
 // The simple drawing interface we'll pass back to the engine

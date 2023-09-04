@@ -30,6 +30,8 @@ GNU General Public License for more details.
 #include "gl_studioshader.h"
 #include "gl_studiolru.h"
 #include "gl_bindspr.h"
+#include "../dlls/player/player_const.h"
+#include <map>
 #include <triangleapi.h>
 #include <set>
 extern triangleapi_t gTriApi;
@@ -51,6 +53,28 @@ static const char* studioshadervariant_define[MAX_STUDIOSHADERVARIANTS] = {
 	"#define CSO_ENV\n#define CSO_FINAL_WHITE\n"
 };
 #endif
+
+enum HandType
+{
+	MALE_LONG,
+	MALE_ORIGINAL,
+	MALE_SHORT,
+	FEMALE_LONG,
+	FEMALE_SHORT,
+	NUM_HAND_TYPES
+};
+
+const char* szHandTypes[NUM_HAND_TYPES] = { "malelong", "maleorg", "maleshort", "femalelong", "femaleshort" };
+
+std::map<ModelName, const char*> g_HandTextureName = 
+{
+	{ MODEL_BUFFCLASSLYCAN, "buffclasslycan" },
+	{ MODEL_BUFFCLASSHUNTER, "buffclasshunter" },
+	{ MODEL_BUFFCLASSA, "buffclassa" },
+	{ MODEL_BUFFCLASSB, "buffclassb" },
+	{ MODEL_BUFFCLASSFERNADO, "buffclassfernando" },
+	{ MODEL_BUFFCLASSBLAIR, "buffclassblair" },
+};
 
 static vec3_t hullcolor[8] = 
 {
@@ -1446,7 +1470,6 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 
     const byte *pvertbone = ((const byte *)m_pStudioHeader + m_pSubModel->vertinfoindex);
 
-
 #ifdef XASH_SHADER
     //studio_vertex_attrib_item_t *vboattrs = (studio_vertex_attrib_item_t *)pglMapBufferARB( GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
     //auto arrayelems = (unsigned short *)pglMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB );
@@ -1635,6 +1658,162 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		pmesh = g_sortedMeshes[j].mesh;
 		ptricmds = (short *)((byte *)m_pStudioHeader + pmesh->triindex);
+		
+		//handtexture system start
+		int id;
+
+		if (CL_GetLocalPlayer()->curstate.iuser1 == OBS_IN_EYE)
+		{
+			id = CL_GetLocalPlayer()->curstate.iuser2;
+		}
+		else
+		{
+			id = CL_GetLocalPlayer()->index;
+		}
+
+		ModelName ClassID = ModelName(pStudioDraw->StudioGetPlayerClassID(id));
+
+		bool bBindTex = false;
+		int texnum = 0;
+		int flags = 0;
+		if (ptexture->flags & STUDIO_NF_NORMALMAP)
+			flags |= (TF_NORMALMAP);
+
+		if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_L.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_highq_hand__long_512.bmp"))
+		{
+			if (g_HandTextureName.count(ClassID))
+			{
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_HandTextureName[ClassID], szHandTypes[MALE_LONG]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+			else
+			{
+				const char* pszFileName = va("models/texture/%s", ptexture[pskinref[pmesh->skinref]].name);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+		}
+		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_O.bmp") ||
+			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "hand.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "252246hand.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "256252hand.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "256256hand.bmp"))
+		{
+			if (g_HandTextureName.count(ClassID))
+			{
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_HandTextureName[ClassID], szHandTypes[MALE_ORIGINAL]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+			else
+			{
+				const char* pszFileName = va("models/texture/%s", ptexture[pskinref[pmesh->skinref]].name);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+		}
+		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_S.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_highq_hand_512.bmp"))
+		{
+			if (g_HandTextureName.count(ClassID))
+			{
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_HandTextureName[ClassID], szHandTypes[MALE_SHORT]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+			else
+			{
+				const char* pszFileName = va("models/texture/%s", ptexture[pskinref[pmesh->skinref]].name);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+		}
+		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#F_L.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_girl_hand_long.bmp"))
+		{
+			if (g_HandTextureName.count(ClassID))
+			{
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_HandTextureName[ClassID], szHandTypes[FEMALE_LONG]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+			else
+			{
+				const char* pszFileName = va("models/texture/%s", ptexture[pskinref[pmesh->skinref]].name);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+		}
+		else if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#F_S.bmp") ||
+			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_girl_hand.bmp"))
+		{
+			if (g_HandTextureName.count(ClassID))
+			{
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_HandTextureName[ClassID], szHandTypes[FEMALE_SHORT]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+			else
+			{
+				const char* pszFileName = va("models/texture/%s", ptexture[pskinref[pmesh->skinref]].name);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+
+		}
+		//handtexture system end
 
 		const auto& attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
 		if(xe::TexLru_Upload(attr.index))
@@ -1837,8 +2016,11 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 				}
 			}
 			
-			if(!bBindSpr)
-				xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);
+			if (bBindTex)
+				xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], texnum);
+
+			if(!bBindSpr && !bBindTex)
+				xe::TexLru_Bind(&ptexture[pskinref[pmesh->skinref]]);	
 		}
 
 		if (RI.currententity->curstate.renderfx == kRenderFxWallHack) {
@@ -3102,13 +3284,13 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 
     do {
         // CSO Texture Load
-        if (name[0] == '#' || name[0] == '@')
+        if (name[0] == '#' || name[0] == '@' || name[0] == '$')
         {
 		#if 0
 			if (Q_stristr(ptexture->name, "#M_L.bmp") ||
 				Q_stristr(ptexture->name, "cso_highq_hand__long_512.bmp"))
 			{
-				sprintf(texname, "gfx/tattoo/tttiger22_MaleLong.tga");
+				sprintf(texname, "gfx/tattoo/buffclass21s3ct_malelong.tga");
 				if (FS_FileExists(texname, false))
 				{
 					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
@@ -3121,7 +3303,7 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 				Q_stristr(ptexture->name, "256252hand.bmp") ||
 				Q_stristr(ptexture->name, "256256hand.bmp"))
 			{
-				sprintf(texname, "gfx/tattoo/tttiger22_MaleOrg.tga");
+				sprintf(texname, "gfx/tattoo/buffclass21s3ct_maleorg.tga");
 				if (FS_FileExists(texname, false))
 				{
 					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
@@ -3131,13 +3313,33 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 			else if (Q_stristr(ptexture->name, "#M_S.bmp") ||
 				Q_stristr(ptexture->name, "cso_highq_hand_512.bmp"))
 			{
-				sprintf(texname, "gfx/tattoo/tttiger22_MaleShort.tga");
+				sprintf(texname, "gfx/tattoo/buffclass21s3ct_maleshort.tga");
 				if (FS_FileExists(texname, false))
 				{
 					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 					break;
 				}
 			}
+			else if (Q_stristr(ptexture->name, "#F_L.bmp") ||
+				Q_stristr(ptexture->name, "cso_girl_hand_long.bmp"))
+			{
+				sprintf(texname, "gfx/tattoo/buffclasslycan_femalelong.tga");
+				if (FS_FileExists(texname, false))
+				{
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+					break;
+				}
+			}
+			else if (Q_stristr(ptexture->name, "#F_S.bmp") || 
+				Q_stristr(ptexture->name, "cso_girl_hand.bmp"))
+			{
+				sprintf(texname, "gfx/tattoo/buffclasslycan_femaleshort.tga");
+				if (FS_FileExists(texname, false))
+				{
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+					break;
+				}
+			}	
 		#endif
 			
 			if (mod->suffix[0])
@@ -3170,6 +3372,13 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 			}
 
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
+			if (FS_FileExists(texname, false))
+			{
+				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+				break;
+			}
+
+			Q_snprintf(texname, sizeof(texname), "models/%s.tga", name);
 			if (FS_FileExists(texname, false))
 			{
 				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);

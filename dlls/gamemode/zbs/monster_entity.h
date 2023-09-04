@@ -352,7 +352,7 @@ public:
 	void SetSkill(int iType);
 	void SetEntAnim(int ianim, float framerate, duration_t animtime, bool resetframe);
 	bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector origin, float flAngle);
-	void RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool falloff = false, bool dropweapons = false);
+	void RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool falloff = false, bool dropweapons = false, bool doshock = false);
 
 	inline void SetAble(MonsterAbleFlag behavior, bool value) {
 		m_able.set(static_cast<size_t>(behavior), value);

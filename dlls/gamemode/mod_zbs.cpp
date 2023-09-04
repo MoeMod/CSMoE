@@ -134,10 +134,8 @@ void PlayerModStrategy_ZBS::ClientPutInServer()
 
 void PlayerModStrategy_ZBS::OnSpawn()
 {
-	//m_pPlayer->pev->health += m_HumanLevel.GetHealthBonus();
-	//if(!m_pPlayer->IsBot())
-	m_pPlayer->pev->max_health += 800.0f;
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health;
+	m_pPlayer->pev->health += m_HumanLevel.GetHealthBonus();
+	m_pPlayer->pev->max_health = m_pPlayer->pev->health;
 	m_pPlayer->SpawnProtection_Start(10.0s);
 }
 
@@ -180,17 +178,15 @@ void PlayerModStrategy_ZBS::GiveDefaultItems()
 	{
 	case CT:
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("weapon_usp");
-		m_pPlayer->GiveNamedItem("weapon_k1a");
+		m_pPlayer->GiveNamedItem("weapon_k3");
 		m_pPlayer->GiveAmmo(MAX_AMMO_45ACP, "45acp", MAX_AMMO_45ACP);
-		m_pPlayer->GiveAmmo(MAX_AMMO_556NATO, "556Nato", MAX_AMMO_556NATO);
+		m_pPlayer->GiveAmmo(MAX_AMMO_556NATOBOX, "556NatoBox", MAX_AMMO_556NATOBOX);
 		break;
 	case TERRORIST:
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("weapon_k1a");
-		m_pPlayer->GiveNamedItem("weapon_glock18");
+		m_pPlayer->GiveNamedItem("weapon_k3");
 		m_pPlayer->GiveAmmo(MAX_AMMO_9MM, "9mm", MAX_AMMO_9MM);
-		m_pPlayer->GiveAmmo(MAX_AMMO_556NATO, "556Nato", MAX_AMMO_556NATO);
+		m_pPlayer->GiveAmmo(MAX_AMMO_556NATOBOX, "556NatoBox", MAX_AMMO_556NATOBOX);
 
 		break;
 	default:

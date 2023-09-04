@@ -108,10 +108,15 @@ namespace xe {
             attr.width = gltex->width;
             attr.height = gltex->height;
         }
-
+#if 1
+        auto [iter, succ] = g_textureAttrMap.emplace(ptexture, attr);
+        if (!succ)
+            (*iter).second = attr;
+#else
         auto [iter, succ] = g_textureAttrMap.emplace(ptexture, TextureAttr{  ptexture->flags, ptexture->width, ptexture->height, gl_texturenum });
         if (!succ)
          (*iter).second = TextureAttr{ ptexture->flags, ptexture->width, ptexture->height, gl_texturenum };
+#endif
         return TexLru_UpdateAttr(ptexture);
     }
 
@@ -520,7 +525,7 @@ namespace xe {
 
         auto &lrudata = *tex->texlru_extdata;
         
-        #if 1
+        #if 0
         if (std::holds_alternative<texlru_src_external_s>(lrudata.src)) {
             auto src = std::get<texlru_src_external_s>(lrudata.src);
             FS_LoadImageAsync(src.path.c_str(), [texnum, src, tex](image_ref pic, uint* pal, int rendermode) {

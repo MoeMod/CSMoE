@@ -1726,6 +1726,11 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 				appearance.model_id = MODEL_BUFFCLASSBLAIR;
 				break;
 			}
+			case 16:
+			{
+				appearance.model_id = MODEL_JPNGIRL01ORG;
+				break;
+			}
 			default:
 			{
 				appearance.model_id = MODEL_YURI;
@@ -1853,7 +1858,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 	player->m_iModelName = appearance.model_id;
 
 #if PLAYER_CLASS_SYSTEM
-	player->m_bIsFemale = PlayerClassManager().PlayerClass_IsFemale(slot);
+	player->m_bIsFemale = PlayerClassManager().PlayerClass_IsFemale(appearance.model_id);
 #else
 	player->m_bIsFemale = PlayerModel_IsFemale(slot, player->m_iModelTeam);
 #endif
@@ -1862,7 +1867,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 	char path[128];
 	
 #if PLAYER_CLASS_SYSTEM
-	PlayerClassManager().Client_ApperanceToModel(path, slot);
+	PlayerClassManager().Client_ApperanceToModel(path, appearance.model_id);
 #else
 	Client_ApperanceToModel(path, slot, player->m_iModelTeam);
 #endif

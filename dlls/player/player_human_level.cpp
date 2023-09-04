@@ -10,7 +10,7 @@ namespace sv {
 
 PlayerExtraHumanLevel_ZBS::PlayerExtraHumanLevel_ZBS(CBasePlayer *player) : BasePlayerExtra(player)
 {
-	m_iHealth = 1;
+	m_iHealth = 15;
 	m_iAttack = 1;
 }
 

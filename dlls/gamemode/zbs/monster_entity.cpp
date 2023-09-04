@@ -1142,7 +1142,7 @@ bool CMonster::CheckAttack()
 	if (m_timeNextAttack > gpGlobals->time || m_flAttackDamage < 2.0f)
 		return false;
 
-	if(!m_hTargetEnt)
+	if(m_hTargetEnt == nullptr)
 		return false;
 
 	if (!m_hTargetEnt->IsAlive())
@@ -1706,7 +1706,7 @@ bool CMonster::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector
 	return true;
 }
 
-void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool bFalloff, bool bDropWeapons)
+void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float flRadius, float flHeight, int bitsDamageType, float flKickSide, float flKickUp, float flRushPower, bool bFalloff, bool bDropWeapons, bool doshock)
 {
 	CBaseEntity* pEntity = NULL;
 	float flAdjustedDamage, falloff;
@@ -1759,7 +1759,13 @@ void CMonster::RadiusDamage(Vector vecSrc, float flDamage, float angle, float fl
 				{
 					player->ReactToDeimosTail();
 				}
-			}	
+
+				if (doshock)
+				{
+					UTIL_ScreenShakeOne(player, 10, 3, 10);
+				}
+					
+			}
 		}
 
 		
@@ -1823,8 +1829,8 @@ void CMonster::SetModel(const char* appearance)
 		}
 		else if (strstr(appearance, "big03"))
 		{
-			hullMin = { -32.0, -32.0, 30.0 };
-			hullMax = { 32.0, 32.0, 150.0 };
+			hullMin = { -50.0, -50.0, 25.0 };
+			hullMax = { 50.0, 50.0, 125.0 };
 		}
 		else if (strstr(appearance, "big05"))
 		{

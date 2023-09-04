@@ -303,8 +303,31 @@ void DLLEXPORT HUD_StudioEvent( const struct mstudioevent_s *event, const struct
 		break;
 	// Client side sound
 	case 5004:
-		gEngfuncs.pfnPlaySoundByNameAtLocation( (char *)event->options, 1.0, entity->attachment[0] );
+	{
+		if (entity->attachment[0].IsNaN() || entity->attachment[0].IsZero())
+			gEngfuncs.pfnPlaySoundByNameAtLocation((char*)event->options, 1.0, entity->origin);
+		else
+			gEngfuncs.pfnPlaySoundByNameAtLocation((char*)event->options, 1.0, entity->attachment[0]);
 		break;
+	}
+	
+	case 5008:
+	{
+		if (!strcmp((char*)event->options, "1") || !strcmp((char*)event->options, "2") || !strcmp((char*)event->options, "3"))
+		{
+			gEngfuncs.pfnPlaySoundByNameAtLocation("zombi/boss_footstep_2.wav", 1.0, entity->origin);
+			break;
+		}
+		else if (!strcmp((char*)event->options, ""))
+		{
+			gEngfuncs.pfnPlaySoundByNameAtLocation("zombi/boss_footstep_1.wav", 1.0, entity->origin);
+			break;
+		}
+
+		gEngfuncs.pfnPlaySoundByNameAtLocation((char*)event->options, 1.0, entity->origin);
+		break;
+	}
+		
 	default:
 		break;
 	}

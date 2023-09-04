@@ -920,7 +920,60 @@ LINK_ENTITY_TO_CLASS(trigger_once, CTriggerOnce);
 void CTriggerOnce::Spawn()
 {
 	m_flWait = -1s;
+
 	CTriggerMultiple::Spawn();
+
+	if (!strcmp(STRING(pev->targetname), "playerclip"))
+	{
+		SetTouch(&CTriggerOnce::OnTouch);
+	
+		if (pev->angles == g_vecZero)
+		{
+			pev->angles.y = 360;
+		}
+
+		if (pev->speed == 0)
+		{
+			pev->speed = 200;
+		}
+	}
+}
+
+void CTriggerOnce::OnTouch(CBaseEntity* pOther)
+{
+	if (!pOther->IsPlayer())
+		return;
+
+	entvars_t* pevToucher = pOther->pev;
+
+	// UNDONE: Is there a better way than health to detect things that have physics? (clients/monsters)
+	switch (pevToucher->movetype)
+	{
+	case MOVETYPE_NONE:
+	case MOVETYPE_PUSH:
+	case MOVETYPE_NOCLIP:
+	case MOVETYPE_FOLLOW:
+		return;
+	}
+
+	if (pevToucher->solid != SOLID_NOT && pevToucher->solid != SOLID_BSP)
+	{
+		// Push field, transfer to base velocity
+		Vector vecPush;
+		if(pevToucher->velocity.Length() <= 200)
+			vecPush = (pev->speed * -pevToucher->velocity);
+		else
+			vecPush = (2.0 * -pevToucher->velocity);
+
+		if (pevToucher->flags & FL_BASEVELOCITY)
+		{
+			vecPush = vecPush + pevToucher->basevelocity;
+		}
+
+		pevToucher->basevelocity = vecPush;
+		pevToucher->flags |= FL_BASEVELOCITY;
+		
+	}
 }
 
 void CBaseTrigger::MultiTouch(CBaseEntity *pOther)

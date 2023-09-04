@@ -48,6 +48,7 @@ const ClassInfo Class_TE[] = {
 	{"buffclassb"},
 	{"buffclasshunter"},
 	{"buffclassblair"},
+	{"jpngirl01org"},
 };
 
 const ClassInfo Class_CT[] = {

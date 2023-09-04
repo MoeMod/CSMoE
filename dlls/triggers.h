@@ -302,6 +302,7 @@ class CTriggerOnce : public CTriggerMultiple
 {
 public:
 	virtual void Spawn();
+	virtual void OnTouch(CBaseEntity* pOther);
 };
 
 // QUAKED trigger_counter (.5 .5 .5) ? nomessage

@@ -121,7 +121,7 @@ static CPlayerClassManager::ClassData gPlayerClass[] =
 	{ MODEL_PIRATEGIRL, "pirategirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_707, "707", CT, false, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_RB, "rb", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
-	{ MODEL_SOZO, "sozo", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SOZO, "sozo", CT, false, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_JPNGIRL01, "jpngirl01", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_MAGUI, "magui", CT, false, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_RITSUKA, "ritsuka", TERRORIST, true ,SHOW_SPEED | SHOW_DAMAGE},
@@ -142,6 +142,7 @@ static CPlayerClassManager::ClassData gPlayerClass[] =
 	{ MODEL_BUFFCLASSLYCAN, "buffclasslycan", CT, true, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_BUFFCLASSBLAIR, "buffclassblair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_BUFFCLASSFERNADO, "buffclassfernando", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_JPNGIRL01ORG, "jpngirl01org", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE}
 };
 
 constexpr auto NUM_CLASS = std::extent<decltype(gPlayerClass)>::value;

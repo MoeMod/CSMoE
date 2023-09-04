@@ -1129,6 +1129,9 @@ void CBossClass_Big05::OnInit()
 	m_bAnimDeath = false;
 	PRECACHE_MODEL("models/monster/zbs_bossl_big05.mdl");
 	PRECACHE_MODEL("sprites/flame.spr");
+	PRECACHE_MODEL("sprites/burn5.spr");
+	PRECACHE_MODEL("sprites/burn6.spr");
+	PRECACHE_MODEL("sprites/burn7.spr");
 
 	PRECACHE_SOUND("zombi/revenant/revenant_scene_appear.wav");
 	PRECACHE_SOUND("zombi/revenant/revenant_zbs_death.wav");

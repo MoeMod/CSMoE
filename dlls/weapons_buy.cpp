@@ -457,7 +457,7 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "z4b_shovelex",	KNIFE_SHOVELEX },
 	{ "knife_tyrantmace",	KNIFE_TYRANTMACE },
 	{ "knife_dvhammer",	KNIFE_DVHAMMER },
-	
+	{ "knife_hzknife",	KNIFE_HZKNIFE },
 };
 
 // must same as classname
