@@ -5758,6 +5758,11 @@ void CBasePlayer::SetNewPlayerModel(const char *modelName)
 	else
 		UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	m_modelIndexPlayer = pev->modelindex;
+
+	if (m_iModelName == MODEL_ALICEBLUE)
+		pev->skin = 1;
+	else
+		pev->skin = 0;
 }
 
 // UpdatePlayerSound - updates the position of the player's

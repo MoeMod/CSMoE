@@ -54,29 +54,32 @@ ModelName PlayerModel_GetRandomSkin();
 const char* PlayerModel_GetApperance(int iApperance, TeamName iTeam);
 bool PlayerModel_IsFemale(int iApperance, TeamName iTeam);
 
+struct ClassData
+{
+	int ClassID;
+	const char* model_name;
+	TeamName team;
+	bool isFemale;
+	int m_iBitsShowState;
+	int HandTexid[6];
+};
+
 class CPlayerClassManager
 {
 public:
-	struct ClassData
-	{
-		int ClassID;
-		const char* model_name;
-		TeamName team;
-		bool isFemale;
-		int m_iBitsShowState;
-		int HandTexid[6];
-	};
+	
 	void PlayerModel_Precache();
-	const char* PlayerClass_GetModelName(int iApperance);
-	bool PlayerClass_IsFemale(int iApperance);
-	void Client_ApperanceToModel(char* buffer, int iApperance);
-	int Client_ModelToApperance(const char* modelname);
+	const char* PlayerClass_GetModelName(ModelName iApperance);
+	bool PlayerClass_IsFemale(ModelName iApperance);
+	void Client_ApperanceToModel(char* buffer, ModelName iApperance);
+	ModelName Client_ModelToApperance(const char* modelname);
 	int PlayerClass_GetNumClass();
 	int PlayerClass_GetNumCT();
 	int PlayerClass_GetNumTR();
 	ModelName PlayerClass_GetRandomClass();
 
 	void SetPlayerClass(int index, char* name);
+	void SetPlayerClass(int index, ModelName name);
 
 	inline ClassData& GetPlayerClass(int idx)
 	{

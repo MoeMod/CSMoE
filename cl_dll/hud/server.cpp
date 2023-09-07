@@ -728,6 +728,15 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		m_ZECounter.SetCounter(arg1);
 		break;
 	}
+	case 46:	
+	{
+		// changeTatto
+		arg1 = reader.ReadByte();
+
+		gEngfuncs.PlayerInfo_SetValueForKey("tattoo", std::to_string(arg1).c_str());
+
+		break;
+	}
 	case 79:	// stop sound
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadShort();

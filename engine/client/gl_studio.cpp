@@ -24,6 +24,7 @@ GNU General Public License for more details.
 #include "pm_local.h"
 #include "gl_local.h"
 #include "cl_tent.h"
+#include "cl_game.cpp"
 #include "gl_texlru.h"
 #include "gl_shader.h"
 #include "gl_cubemap.h"
@@ -74,6 +75,16 @@ std::map<ModelName, const char*> g_HandTextureName =
 	{ MODEL_BUFFCLASSB, "buffclassb" },
 	{ MODEL_BUFFCLASSFERNADO, "buffclassfernando" },
 	{ MODEL_BUFFCLASSBLAIR, "buffclassblair" },
+	{ MODEL_ALICEBLUE, "ma_blue" },
+	{ MODEL_ALICERED, "ma_red" },
+};
+
+std::map<HandTattooName, const char*> g_TattoTextureName =
+{
+	{ TATTOO_CHAOS, "chaos" },
+	{ TATTOO_DRAGON, "dragon" },
+	{ TATTOO_TIGER, "tiger" },
+
 };
 
 static vec3_t hullcolor[8] = 
@@ -1661,15 +1672,19 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		
 		//handtexture system start
 		int id;
+		int type = TATTOO_NONE;
 
 		if (CL_GetLocalPlayer()->curstate.iuser1 == OBS_IN_EYE)
 		{
 			id = CL_GetLocalPlayer()->curstate.iuser2;
+			type = atoi(gEngfuncs.PlayerInfo_ValueForKey(id, "tattoo"));
 		}
 		else
 		{
 			id = CL_GetLocalPlayer()->index;
+			type = atoi(gEngfuncs.LocalPlayerInfo_ValueForKey("tattoo"));
 		}
+
 
 		ModelName ClassID = ModelName(pStudioDraw->StudioGetPlayerClassID(id));
 
@@ -1689,7 +1704,17 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
 				if (texnum)
 				{
-					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+			else if(type != TATTOO_NONE)
+			{
+
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_TattoTextureName[HandTattooName(type)], szHandTypes[MALE_LONG]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
 					bBindTex = true;
 				}
 			}
@@ -1722,6 +1747,17 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 					bBindTex = true;
 				}
 			}
+			else if (type != TATTOO_NONE)
+			{
+
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_TattoTextureName[HandTattooName(type)], szHandTypes[MALE_ORIGINAL]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					bBindTex = true;
+				}
+			}
 			else
 			{
 				const char* pszFileName = va("models/texture/%s", ptexture[pskinref[pmesh->skinref]].name);
@@ -1745,6 +1781,17 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 				if (texnum)
 				{
 					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+			else if (type != TATTOO_NONE)
+			{
+
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_TattoTextureName[HandTattooName(type)], szHandTypes[MALE_SHORT]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
 					bBindTex = true;
 				}
 			}
@@ -1774,6 +1821,17 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 					bBindTex = true;
 				}
 			}
+			else if (type != TATTOO_NONE)
+			{
+
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_TattoTextureName[HandTattooName(type)], szHandTypes[FEMALE_LONG]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					bBindTex = true;
+				}
+			}
 			else
 			{
 				const char* pszFileName = va("models/texture/%s", ptexture[pskinref[pmesh->skinref]].name);
@@ -1797,6 +1855,17 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 				if (texnum)
 				{
 					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+			else if (type != TATTOO_NONE)
+			{
+
+				const char* pszFileName = va("gfx/tattoo/%s_%s.tga", g_TattoTextureName[HandTattooName(type)], szHandTypes[FEMALE_SHORT]);
+
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
 					bBindTex = true;
 				}
 			}

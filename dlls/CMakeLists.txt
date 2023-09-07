@@ -274,6 +274,7 @@ set(HLDLL_SRCS
 	./gamemode/zbs/monster_boss_big05.cpp
 	./gamemode/zbs/monster_boss_big07.cpp
 	./gamemode/zbs/monster_boss_big08.cpp
+	./client/moe_fun.cpp
 
 	)
 

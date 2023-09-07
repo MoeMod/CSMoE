@@ -49,11 +49,16 @@ void CZombieHook::Precache(void)
 {
 	m_iWitchBatModelIndex = PRECACHE_MODEL("models/monster/bat_witch.mdl");
 	m_iBatEffectModelIndex = PRECACHE_MODEL("sprites/ef_bat.spr");
+
+	PRECACHE_SOUND("zombi/zombi_banshee_pulling_fire.wav");
+	PRECACHE_SOUND("zombi/zombi_banshee_pulling_fail.wav");
+	PRECACHE_SOUND("zombi/human_female_surprise.wav");
+	PRECACHE_SOUND("zombi/human_male_surprise.wav");
 }
 
 void EXPORT CZombieHook::Kill(void)
 {
-	EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "zombi/Zombi_Banshee_Pulling_Fire.wav", 0.0, 0.0, 1 << 5, PITCH_NORM);
+	EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "zombi/zombi_banshee_pulling_fire.wav", 0.0, 0.0, 1 << 5, PITCH_NORM);
 
 	CBasePlayer* pPlayer = (CBasePlayer*)UTIL_PlayerByIndex(m_nOwnerIndex);
 
@@ -161,7 +166,7 @@ void EXPORT CZombieHook::TailTouch(CBaseEntity* pOther)
 {
 	if (!pOther || !pOther->IsPlayer() || !pOther->IsAlive())
 	{
-		EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "zombi/Zombi_Banshee_Pulling_Fail.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "zombi/zombi_banshee_pulling_fail.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 		Kill();
 		return;
@@ -174,7 +179,7 @@ void EXPORT CZombieHook::TailTouch(CBaseEntity* pOther)
 
 	if (pPlayer)
 	{
-		EMIT_SOUND_DYN(pPlayer->edict(), CHAN_ITEM, "zombi/Human_Female_Surprise.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(pPlayer->edict(), CHAN_ITEM, pPlayer->m_bIsFemale ? "zombi/human_female_surprise.wav" : "zombi/human_male_surprise.wav" , VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgShake, NULL, pPlayer->pev);
 		WRITE_SHORT(0xA000);
@@ -197,7 +202,7 @@ void EXPORT CZombieHook::TailTouch(CBaseEntity* pOther)
 	}
 	else
 	{
-		EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "zombi/Zombi_Banshee_Pulling_Fail.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "zombi/zombi_banshee_pulling_fail.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 		Kill();
 	}

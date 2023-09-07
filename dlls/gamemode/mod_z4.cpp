@@ -945,7 +945,7 @@ namespace sv {
 					if(strategy->adrenaline->m_bIsUsingDash)
 					{
 						m_pPlayer->ResetMaxSpeed();
-						CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/human_breath_male\n");
+						CLIENT_COMMAND(m_pPlayer->edict(), m_pPlayer->m_bIsFemale ? "spk human_breath_female.wav\n" : "spk zombi/human_breath_male.wav\n");
 					}
 				}
 			}

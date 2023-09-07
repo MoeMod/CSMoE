@@ -109,14 +109,64 @@ CPlayerClassManager& PlayerClassManager()
 	return x;
 }
 
-static CPlayerClassManager::ClassData gPlayerClass[] =
+static std::map<ModelName, ClassData> gPlayerClass =
 {
-	{ MODEL_UNASSIGNED, NULL, UNASSIGNED },
-	{ MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_UNASSIGNED, { MODEL_UNASSIGNED, NULL, UNASSIGNED } },
+	{ MODEL_YURI, { MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SAF, { MODEL_SAF, "saf", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_PIRATEBOY, { MODEL_PIRATEBOY, "pirateboy", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_CHOIJIYOON, { MODEL_CHOIJIYOON, "choijiyoon", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_MARINEBOY, { MODEL_MARINEBOY, "marineboy", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_FERNANDO, { MODEL_FERNANDO, "fernando", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_PIRATEGIRL, { MODEL_PIRATEGIRL, "pirategirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_707, { MODEL_707, "707", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_RB, { MODEL_RB, "rb", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SOZO, { MODEL_SOZO, "sozo", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_JPNGIRL01, { MODEL_JPNGIRL01, "jpngirl01", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_MAGUI, { MODEL_MAGUI, "magui", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_RITSUKA, { MODEL_RITSUKA, "ritsuka", TERRORIST, true ,SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_NATASHA, { MODEL_NATASHA, "natasha", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_TERROR, { MODEL_TERROR, "terror", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_URBAN, { MODEL_URBAN, "urban", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_LEET, { MODEL_LEET, "leet", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_GSG9, { MODEL_GSG9, "gsg9", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_ARCTIC, { MODEL_ARCTIC, "arctic", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SAS, { MODEL_SAS, "sas", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_GUERILLA, { MODEL_GUERILLA, "guerilla", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_GIGN, { MODEL_GIGN, "gign", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_MILITIA, { MODEL_MILITIA, "militia", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SPETSNAZ, { MODEL_SPETSNAZ, "spetsnaz", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_BUFFCLASSB, { MODEL_BUFFCLASSB, "buffclassb", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_BUFFCLASSA, { MODEL_BUFFCLASSA, "buffclassa", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_BUFFCLASSHUNTER, { MODEL_BUFFCLASSHUNTER, "buffclasshunter", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_BUFFCLASSLYCAN, { MODEL_BUFFCLASSLYCAN, "buffclasslycan", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_BUFFCLASSBLAIR, { MODEL_BUFFCLASSBLAIR, "buffclassblair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_BUFFCLASSFERNADO, { MODEL_BUFFCLASSFERNADO, "buffclassfernando", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_JPNGIRL01ORG, { MODEL_JPNGIRL01ORG, "jpngirl01org", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SOI, { MODEL_SOI, "soi", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_IDOLGIRL, { MODEL_IDOLGIRL, "idolgirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_MARINEGIRL, { MODEL_MARINEGIRL, "marinegirl", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_BLAIR, { MODEL_BLAIR, "blair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_JENNIFER, { MODEL_JENNIFER, "jennifer", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_ALICEBLUE, { MODEL_ALICEBLUE, "ma_aliceblue", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_ALICERED, { MODEL_ALICERED, "ma_alicered", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_JIA, { MODEL_JIA, "jra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SDEFENCE, { MODEL_SDEFENCE, "sdefence", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SCJIA, { MODEL_SCJIA, "scjra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SCVIP, { MODEL_SCVIP, "scvip", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SCYURI, { MODEL_SCYURI, "scyuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_SCCJY, { MODEL_SCCJY, "sccjy", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_YURI2, { MODEL_YURI2, "yuri2", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_ALICE2, { MODEL_ALICE2, "alice2", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_ETA, { MODEL_ETA, "eta", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_IRA, { MODEL_IRA, "ira", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+
+	/*{ MODEL_UNASSIGNED, { MODEL_UNASSIGNED, NULL, UNASSIGNED } },
+	{ MODEL_YURI, { MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE} },
 	{ MODEL_SAF, "saf", CT, false, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_PIRATEBOY, "pirateboy", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_CHOIJIYOON, "choijiyoon", CT, true, SHOW_SPEED | SHOW_DAMAGE},
-	{ MODEL_MARINEBOY, "marineboy", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_MARINEBOY, "marineboy", CT, false, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_FERNANDO, "fernando", CT, false, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_PIRATEGIRL, "pirategirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_707, "707", CT, false, SHOW_SPEED | SHOW_DAMAGE},
@@ -142,49 +192,66 @@ static CPlayerClassManager::ClassData gPlayerClass[] =
 	{ MODEL_BUFFCLASSLYCAN, "buffclasslycan", CT, true, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_BUFFCLASSBLAIR, "buffclassblair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
 	{ MODEL_BUFFCLASSFERNADO, "buffclassfernando", CT, false, SHOW_SPEED | SHOW_DAMAGE},
-	{ MODEL_JPNGIRL01ORG, "jpngirl01org", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE}
+	{ MODEL_JPNGIRL01ORG, "jpngirl01org", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SOI, "soi", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_IDOLGIRL, "idolgirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_MARINEGIRL, "marinegirl", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_BLAIR, "blair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_JENNIFER, "jennifer", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_ALICEBLUE, "ma_alice", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_ALICERED, "ma_alice", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_JIA, "jra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SDEFENCE, "sdefence", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SCJIA, "scjra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SCVIP, "scvip", CT, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SCYURI, "scyuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_SCCJY, "sccjy", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_YURI2, "yuri2", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_ALICE2, "alice2", CT, true, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_ETA, "eta", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},
+	{ MODEL_IRA, "ira", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE},*/
 };
-
-constexpr auto NUM_CLASS = std::extent<decltype(gPlayerClass)>::value;
+int NUM_CLASS = gPlayerClass.size();
 
 void CPlayerClassManager::PlayerModel_Precache()
 {
+	
 	char path[128];
 	for (int i = 1; i < NUM_CLASS; i++)
 	{
-		Client_ApperanceToModel(path, i);
+		Client_ApperanceToModel(path, ModelName(i));
 		PRECACHE_MODEL(path);
 	}
 }
 
-const char* CPlayerClassManager::PlayerClass_GetModelName(int iApperance)
+const char* CPlayerClassManager::PlayerClass_GetModelName(ModelName iApperance)
 {
 	if (iApperance >= NUM_CLASS || iApperance < 1) {
-		iApperance = 1;
+		iApperance = MODEL_YURI;
 	}
 
 	return gPlayerClass[iApperance].model_name;
 }
 
-bool CPlayerClassManager::PlayerClass_IsFemale(int iApperance)
+bool CPlayerClassManager::PlayerClass_IsFemale(ModelName iApperance)
 {
 	if (iApperance >= NUM_CLASS || iApperance < 1) {
-		iApperance = 1;
+		iApperance = MODEL_YURI;
 	}
 
 	return gPlayerClass[iApperance].isFemale;
 }
 
-void CPlayerClassManager::Client_ApperanceToModel(char* buffer, int iApperance)
+void CPlayerClassManager::Client_ApperanceToModel(char* buffer, ModelName iApperance)
 {
 	auto model = gPlayerClass[iApperance].model_name;
 	Q_sprintf(buffer, "models/player/%s/%s.mdl", model, model);
 }
 
-int CPlayerClassManager::Client_ModelToApperance(const char* modelname)
+ModelName CPlayerClassManager::Client_ModelToApperance(const char* modelname)
 {
 	if (!strstr(modelname, "models/player/"))
-		return 0;	//cannot find
+		return MODEL_UNASSIGNED;	//cannot find
 	//return back modelname
 	char name[64];
 	strcpy(name, modelname + 14);
@@ -193,11 +260,11 @@ int CPlayerClassManager::Client_ModelToApperance(const char* modelname)
 
 	for (int i = 1; i < NUM_CLASS; i++)
 	{
-		if (!stricmp(name, gPlayerClass[i].model_name))
-			return i;
+		if (!stricmp(name, gPlayerClass[ModelName(i)].model_name))
+			return ModelName(i);
 	}
 
-	return 0;	//cannot find
+	return MODEL_UNASSIGNED;	//cannot find
 }
 
 ModelName CPlayerClassManager::PlayerClass_GetRandomClass()
@@ -215,7 +282,7 @@ int CPlayerClassManager::PlayerClass_GetNumCT()
 	int iCount = 0;
 	for (int i = 1; i < NUM_CLASS; i++)
 	{
-		if (gPlayerClass[i].team == CT)
+		if (gPlayerClass[ModelName(i)].team == CT)
 			iCount++;
 	}
 	return iCount;
@@ -226,7 +293,7 @@ int CPlayerClassManager::PlayerClass_GetNumTR()
 	int iCount = 0;
 	for (int i = 1; i < NUM_CLASS; i++)
 	{
-		if (gPlayerClass[i].team == TERRORIST)
+		if (gPlayerClass[ModelName(i)].team == TERRORIST)
 			iCount++;
 	}
 	return iCount;
@@ -237,12 +304,23 @@ void CPlayerClassManager::SetPlayerClass(int index, char* name)
 	if (index > 33 || index < 0)
 		return;
 
-	int ClassID = Client_ModelToApperance(name);
+	ModelName ClassID = Client_ModelToApperance(name);
 	
 	if (!ClassID)
 		m_PlayerClass[index] = &m_NullClass;
 
 	m_PlayerClass[index] = &gPlayerClass[ClassID];
+}
+
+void CPlayerClassManager::SetPlayerClass(int index, ModelName name)
+{
+	if (index > 33 || index < 0)
+		return;
+
+	if (!name)
+		m_PlayerClass[index] = &m_NullClass;
+
+	m_PlayerClass[index] = &gPlayerClass[name];
 }
 
 

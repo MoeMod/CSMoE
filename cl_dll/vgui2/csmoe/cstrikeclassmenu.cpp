@@ -35,20 +35,29 @@ const ClassInfo Class_TE[] = {
 	//介绍图片, 按钮, 介绍
 	{"yuri"},
 	{"pirateboy"},
-	{"marineboy"},
+	{"blair"},
 	{"pirategirl"},
 	{"rb"},
 	{"jpngirl01"},
 	{"ritsuka"},
-	{"terror","classic"},
-	{"leet","classic"},
-	{"arctic","classic"},
-	{"guerilla","classic"},
-	{"militia","classic"},
+	{"terror"},
+	{"leet"},
+	{"arctic"},
+	{"guerilla"},
+	{"militia",},
 	{"buffclassb"},
 	{"buffclasshunter"},
 	{"buffclassblair"},
 	{"jpngirl01org"},
+	{"idolgirl"},
+	{"jennifer"},
+	{"ma_alicered"},
+	{"jra"},
+	{"scjra"},
+	{"scyuri"},
+	{"yuri2"},
+	{"eta"},
+	{"ira"},
 };
 
 const ClassInfo Class_CT[] = {
@@ -60,15 +69,22 @@ const ClassInfo Class_CT[] = {
 	{"sozo"},
 	{"magui"},
 	{"natasha"},
-	{"urban","classic"},
-	{"gsg9","classic"},
-	{"sas","classic"},
-	{"gign","classic"},
-	{"spetsnaz","classic"},
+	{"urban"},
+	{"gsg9"},
+	{"sas"},
+	{"gign"},
+	{"spetsnaz"},
 	{"buffclassa"},
 	{"buffclasslycan"},
 	{"buffclassfernando"},
-
+	{"soi"},
+	{"marinegirl"},
+	{"marineboy"},
+	{"ma_aliceblue"},
+	{"sdefence"},
+	{"scvip"},
+	{"sccjy"},
+	{"alice2"},
 };
 
 const ClassInfo Class_Zb[] = {
@@ -339,7 +355,6 @@ void CCSClassMenu::SetupTeamPage(TeamName team, size_t iPage)
 		else
 		{
 			const char* SzGfxName = info[iElement].model.c_str();
-			const char* SzIsClassic = info[iElement].name.c_str();
 
 			char buffer[64];
 			sprintf(buffer, "VGUI_ClassMenu_Select %d", iElement + 1);
@@ -347,10 +362,9 @@ void CCSClassMenu::SetupTeamPage(TeamName team, size_t iPage)
 
 			// ClassImage Show
 			char szBuffer[64];
-			if (!strcmp(SzIsClassic, "classic"))
-				sprintf(szBuffer, "#CSO_Item_Name_%s", SzGfxName);
-			else
-				sprintf(szBuffer, "#CSO_%s", SzGfxName);
+			
+			sprintf(szBuffer, "#CSO_Item_Name_%s", SzGfxName);
+
 
 			auto SzCheckValidVguiString = vgui2::localize()->Find(szBuffer);
 			char* szBuffer2;
@@ -726,7 +740,7 @@ void CCSClassMenu::UpdateClass(int i)
 
 
 	int iElement = m_iCurrentPage * 9 + i;
-	if (iElement > 23)iElement = 0;
+	//if (iElement > 23)iElement = 0;
 
 	const char* SzCheck = info[iElement].model.c_str();
 	bool bEnabled = (SzCheck[0] && SzCheck) ? true : false;
@@ -750,24 +764,12 @@ void CCSClassMenu::UpdateClass(int i)
 		//ClassDesc Show
 		std::string szClassDesc; szClassDesc = info[iElement].model;
 		szClassDesc[0] = std::toupper(info[iElement].model[0]);
-		sprintf(szBuffer, "#Cstrike_%s_Label", szClassDesc.c_str());
-
-		auto SzCheckValidVguiString = vgui2::localize()->Find((char*)szBuffer);
-		char* szBuffer2;
-
-		if (SzCheckValidVguiString != nullptr)
-		{
-			szBuffer2 = new char[std::char_traits<wchar_t>::length(vgui2::localize()->Find((char*)szBuffer)) + 1];
-			sprintf(szBuffer2, "%s", szBuffer);
-		}
+		sprintf(szBuffer, "#CSO_Item_Desc_%s", szClassDesc.c_str());
 
 		m_pClassDesc->SetVisible(true);
 		m_pClassDesc->SetTextColorState(Label::CS_BRIGHT);
-		m_pClassDesc->SetText((i == 9) ? "随机选择人物" : (SzCheckValidVguiString != nullptr ? szBuffer2 : szBuffer));
+		m_pClassDesc->SetText(i == 9 ? "随机选择人物" : szBuffer);
 		m_pClassDesc->SizeToContents();
-
-		if (SzCheckValidVguiString != nullptr && szBuffer2)
-			delete[] szBuffer2;
 	}
 	else
 	{

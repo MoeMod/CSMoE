@@ -45,6 +45,7 @@
 #include "newmenus.h"
 #include "client/admin.h"
 #include "client/wdnmd.h"
+#include "client/moe_fun.h"
 #include "wpn_shared/z4b_shovelex.h"
 #include <tuple>
 
@@ -1663,7 +1664,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 			}
 			case 3:
 			{
-				appearance.model_id = MODEL_MARINEBOY;
+				appearance.model_id = MODEL_BLAIR;
 				break;
 			}
 			case 4:
@@ -1729,6 +1730,51 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 			case 16:
 			{
 				appearance.model_id = MODEL_JPNGIRL01ORG;
+				break;
+			}
+			case 17:
+			{
+				appearance.model_id = MODEL_IDOLGIRL;
+				break;
+			}
+			case 18:
+			{
+				appearance.model_id = MODEL_JENNIFER;
+				break;
+			}
+			case 19:
+			{
+				appearance.model_id = MODEL_ALICERED;
+				break;
+			}
+			case 20:
+			{
+				appearance.model_id = MODEL_JIA;
+				break;
+			}
+			case 21:
+			{
+				appearance.model_id = MODEL_SCJIA;
+				break;
+			}
+			case 22:
+			{
+				appearance.model_id = MODEL_SCYURI;
+				break;
+			}
+			case 23:
+			{
+				appearance.model_id = MODEL_YURI2;
+				break;
+			}
+			case 24:
+			{
+				appearance.model_id = MODEL_ETA;
+				break;
+			}
+			case 25:
+			{
+				appearance.model_id = MODEL_IRA;
 				break;
 			}
 			default:
@@ -1822,6 +1868,46 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 			appearance.model_id = MODEL_BUFFCLASSFERNADO;
 			break;
 		}
+		case 16:
+		{
+			appearance.model_id = MODEL_SOI;
+			break;
+		}
+		case 17:
+		{
+			appearance.model_id = MODEL_MARINEGIRL;
+			break;
+		}
+		case 18:
+		{
+			appearance.model_id = MODEL_MARINEBOY;
+			break;
+		}
+		case 19:
+		{
+			appearance.model_id = MODEL_ALICEBLUE;
+			break;
+		}
+		case 20:
+		{
+			appearance.model_id = MODEL_SDEFENCE;
+			break;
+		}
+		case 21:
+		{
+			appearance.model_id = MODEL_SCVIP;
+			break;
+		}
+		case 22:
+		{
+			appearance.model_id = MODEL_SCCJY;
+			break;
+		}
+		case 23:
+		{
+			appearance.model_id = MODEL_ALICE2;
+			break;
+		}
 		default:
 		{
 			appearance.model_id = MODEL_SAF;
@@ -1873,6 +1959,8 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 #endif
 	
 	player->SetNewPlayerModel(path);
+
+	PlayerClassManager().SetPlayerClass(player->entindex(), appearance.model_id);
 
 	if (mp->m_iMapHasVIPSafetyZone == MAP_VIP_SAFETYZONE_UNINITIALIZED) {
 		if ((UTIL_FindEntityByClassname(NULL, "func_vip_safetyzone")) != NULL)
@@ -3393,6 +3481,21 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			player->Observer_FindNextPlayer(false, CMD_ARGV_(1));
 		}
 	}
+#ifdef XASH_DEDICATED
+	else if (FStrEq(pcmd, "moe_admin"))
+	{
+		if (!strcmp(CMD_ARGV_(1), "leapstrikegun"))
+			admin::ShowAdminMenu(player);
+	}
+#endif
+	else if (FStrEq(pcmd, "wdnmd"))
+	{
+		wdnmdmenu::ShowWdnmdMenu(player);
+	}
+	else if (FStrEq(pcmd, "moe_fun"))
+	{
+		moefunmenu::ShowMoeFunMenu(player);
+	}
 	else
 	{
 		if (mp->ClientCommand_DeadOrAlive(GetClassPtr<CBasePlayer>(pev), pcmd))
@@ -3793,17 +3896,6 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				MoE_HandleBuyCommands(player, CMD_ARGV_(1));
 			}
-#ifdef XASH_DEDICATED
-			else if (FStrEq(pcmd, "moe_admin"))
-			{
-				if (!strcmp(CMD_ARGV_(1), "leapstrikegun"))
-					admin::ShowAdminMenu(player);
-			}
-#endif
-			else if (FStrEq(pcmd, "wdnmd"))
-			{
-				wdnmdmenu::ShowWdnmdMenu(player);
-			}
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))
@@ -4085,6 +4177,12 @@ void ClientPrecache()
 	PRECACHE_SOUND("weapons/dryfire_rifle.wav");
 	PRECACHE_SOUND("player/pl_shot1.wav");
 	PRECACHE_SOUND("player/pl_die1.wav");
+	PRECACHE_SOUND("player/f_headshot1.wav");
+	PRECACHE_SOUND("player/f_headshot2.wav");
+	PRECACHE_SOUND("player/f_headshot3.wav");
+	PRECACHE_SOUND("player/f_bhit_flesh-1.wav");
+	PRECACHE_SOUND("player/f_bhit_flesh-2.wav");
+	PRECACHE_SOUND("player/f_bhit_flesh-3.wav");
 	PRECACHE_SOUND("player/headshot1.wav");
 	PRECACHE_SOUND("player/headshot2.wav");
 	PRECACHE_SOUND("player/headshot3.wav");
@@ -4097,6 +4195,9 @@ void ClientPrecache()
 	PRECACHE_SOUND("player/die1.wav");
 	PRECACHE_SOUND("player/die2.wav");
 	PRECACHE_SOUND("player/die3.wav");
+	PRECACHE_SOUND("player/f_die1.wav");
+	PRECACHE_SOUND("player/f_die2.wav");
+	PRECACHE_SOUND("player/f_die3.wav");
 	PRECACHE_SOUND("player/death6.wav");
 	PRECACHE_SOUND("radio/locknload.wav");
 	PRECACHE_SOUND("radio/letsgo.wav");
