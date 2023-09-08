@@ -116,6 +116,7 @@ LINK_ENTITY_TO_CLASS(knife_mastercombat, CKnifeMasterCombat)
 
 void CKnifeMasterCombat::Spawn()
 {
+	m_iKnifeID = KNIFE_MASTERCOMBAT;
 	pev->classname = MAKE_STRING("knife_mastercombat");
 	m_iId = WEAPON_KNIFE;
 	Precache();

@@ -24,6 +24,7 @@ LINK_ENTITY_TO_CLASS(weapon_waterbomb, CWaterBomb)
 
 void CWaterBomb::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_WATERBOMB;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_waterbomb.mdl");

@@ -105,17 +105,25 @@ namespace sv {
 			if (m_pWeapon)
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
-				if (pWeapon->m_iId == WEAPON_CLAYMORE)
-				{
-					//pWeapon->RetireWeapon();
 
-					CClayMore* pLinkWeapon = dynamic_cast<CClayMore*>(pWeapon);
-					if (pLinkWeapon)
+
+				if (m_pOwner->m_iGrenadeID == GRENADE_CLAYMORE)
+				{
+					while (pWeapon)
 					{
-						pLinkWeapon->m_bAlreadySetUp = false;
-						pLinkWeapon->Holster(false);
-						pLinkWeapon->RetireWeapon();
+						if (pWeapon->m_iId == WEAPON_HEGRENADE)
+						{
+							CClayMore* pLinkWeapon = dynamic_cast<CClayMore*>(pWeapon);
+							if (pLinkWeapon)
+							{
+								pLinkWeapon->SetFirePost();
+								pLinkWeapon->m_bAlreadySetUp = false;
+							}
+						}
+
+						pWeapon = (CBasePlayerWeapon*)pWeapon->m_pNext;
 					}
+
 				}
 			}
 		}
@@ -443,15 +451,7 @@ namespace sv {
 			return;
 		}
 
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
-
-		if (!pWeapon)
-		{
-			Remove();
-			return;
-		}
-
-		if (pWeapon->m_iId != GetWeaponsId())
+		if (m_pOwner->m_iGrenadeID != GRENADE_CLAYMORE)
 		{
 			Remove();
 			return;
@@ -541,16 +541,25 @@ namespace sv {
 		if (m_pWeapon)
 		{
 			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
-			if (pWeapon->m_iId == WEAPON_CLAYMORE)
+			if (m_pOwner->m_iGrenadeID == GRENADE_CLAYMORE)
 			{
-				CClayMore* pLinkWeapon = dynamic_cast<CClayMore*>(pWeapon);
-				if (pLinkWeapon)
+				while (pWeapon)
 				{
-					pLinkWeapon->m_bAlreadySetUp = false;
-					pLinkWeapon->Holster(false);
-					pLinkWeapon->RetireWeapon();
+					if (pWeapon->m_iId == WEAPON_HEGRENADE)
+					{
+						CClayMore* pLinkWeapon = dynamic_cast<CClayMore*>(pWeapon);
+						if (pLinkWeapon)
+						{
+							pLinkWeapon->SetFirePost();
+							pLinkWeapon->m_bAlreadySetUp = false;
+						}
+					}
+
+					pWeapon = (CBasePlayerWeapon*)pWeapon->m_pNext;
 				}
+				
 			}
+			
 		}
 
 		MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY, pev->origin);

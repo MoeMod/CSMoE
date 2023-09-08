@@ -670,6 +670,7 @@ namespace sv {
 
 	void CKnifeLance::Spawn()
 	{
+		m_iKnifeID = KNIFE_LANCE;
 		pev->classname = MAKE_STRING("knife_lance");
 		m_iId = WEAPON_KNIFE;
 		Precache();

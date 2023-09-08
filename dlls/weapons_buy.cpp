@@ -1519,22 +1519,15 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 		case GRENADE_SLOT:
 			{		
 					bool bGrenadeChanged = pPlayer->m_iGrenadeID != iter->iID;
-					bool bWasActiveItem = pPlayer->m_pActiveItem && 
-						(pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE || 
-						pPlayer->m_pActiveItem->m_iId == WEAPON_PATROLDRONE || 
-						pPlayer->m_pActiveItem->m_iId == WEAPON_DIVINETITAN || 
-						pPlayer->m_pActiveItem->m_iId == WEAPON_BUNKERBUSTER ||
-						pPlayer->m_pActiveItem->m_iId == WEAPON_SBMINE ||
-						pPlayer->m_pActiveItem->m_iId == WEAPON_CLAYMORE ||
-						pPlayer->m_pActiveItem->m_iId == WEAPON_SFTURRET);
+					bool bWasActiveItem = pPlayer->m_pActiveItem && pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE;
 
-					if (iter->iID == WEAPON_PATROLDRONE)
+					if (!bGrenadeChanged)
 					{
-						CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+						CBasePlayerWeapon* pGrenade = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[GRENADE_SLOT];	
 						//buy patroldrone ammo
 						while (pGrenade)
 						{
-							if (pGrenade->m_iId == WEAPON_PATROLDRONE)
+							if (pPlayer->m_iGrenadeID == GRENADE_PATROLDRONE && pGrenade->m_iGrenadeID == GRENADE_PATROLDRONE)
 							{
 								//add clip
 								if (pPlayer->m_iAccount < 500) {
@@ -1590,13 +1583,7 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 
 						while (pGrenade)
 						{
-							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
-								pGrenade->m_iId == WEAPON_PATROLDRONE ||
-								pGrenade->m_iId == WEAPON_DIVINETITAN ||
-								pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
-								pGrenade->m_iId == WEAPON_SBMINE ||
-								pGrenade->m_iId == WEAPON_CLAYMORE ||
-								pGrenade->m_iId == WEAPON_SFTURRET)
+							if (pGrenade->m_iId == WEAPON_HEGRENADE)
 							{
 								pGrenade->Kill();
 
@@ -1625,13 +1612,7 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 
 						while (pGrenade)
 						{
-							if (pGrenade->m_iId == WEAPON_HEGRENADE ||
-								pGrenade->m_iId == WEAPON_PATROLDRONE ||
-								pGrenade->m_iId == WEAPON_DIVINETITAN ||
-								pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
-								pGrenade->m_iId == WEAPON_SBMINE ||
-								pGrenade->m_iId == WEAPON_CLAYMORE ||
-								pGrenade->m_iId == WEAPON_SFTURRET)
+							if (pGrenade->m_iId == WEAPON_HEGRENADE)
 							{
 								pPlayer->m_pActiveItem = pGrenade;
 

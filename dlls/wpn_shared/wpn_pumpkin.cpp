@@ -24,6 +24,7 @@ LINK_ENTITY_TO_CLASS(weapon_pumpkin, CPumpkin)
 
 void CPumpkin::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_PUMPKIN;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_pumpkin.mdl");

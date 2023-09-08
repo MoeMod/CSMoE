@@ -24,6 +24,7 @@ LINK_ENTITY_TO_CLASS(z4b_mechanicherogun, CMechanicHeroGun)
 
 void CMechanicHeroGun::Spawn(void)
 {
+	m_iGrenadeID = WEAPON_MECHANICHEROGUN;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_mechanicherogun.mdl");

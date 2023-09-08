@@ -124,6 +124,7 @@ LINK_ENTITY_TO_CLASS(knife_nataknifed, CKnifeNataKnifeD)
 
 void CKnifeNataKnifeD::Spawn()
 {
+	m_iKnifeID = KNIFE_NATAKNIFED;
 	pev->classname = MAKE_STRING("knife_nataknifed");
 	m_iId = WEAPON_KNIFE;
 	Precache();

@@ -228,6 +228,7 @@ bool CKnifeThanatos9::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker,
 
 void CKnifeThanatos9::Spawn()
 {
+	m_iKnifeID = KNIFE_THANATOS9;
 	pev->classname = MAKE_STRING("knife_thanatos9");
 	m_iId = WEAPON_KNIFE;
 	Precache();

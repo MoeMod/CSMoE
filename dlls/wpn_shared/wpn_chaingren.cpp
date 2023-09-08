@@ -221,6 +221,7 @@ LINK_ENTITY_TO_CLASS(weapon_chaingren, CChainGrenade)
 
 void CChainGrenade::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_CHAINGRENADE;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_chaingren.mdl");

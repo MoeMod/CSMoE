@@ -18,8 +18,9 @@ namespace sv {
 
 		void CClayMore::Spawn(void)
 	{
+		m_iGrenadeID = GRENADE_CLAYMORE;
 		Precache();
-		m_iId = WEAPON_CLAYMORE;
+		m_iId = WEAPON_HEGRENADE;
 		SET_MODEL(ENT(pev), "models/w_claymore.mdl");
 
 		pev->classname = MAKE_STRING("weapon_claymore");
@@ -59,7 +60,7 @@ namespace sv {
 		p->iMaxClip = WEAPON_NOCLIP;
 		p->iSlot = 3;
 		p->iPosition = 1;
-		p->iId = m_iId = WEAPON_CLAYMORE;
+		p->iId = m_iId = WEAPON_HEGRENADE;
 		p->iWeight = HEGRENADE_WEIGHT;
 		p->iFlags = 0;
 
@@ -290,12 +291,8 @@ namespace sv {
 				}
 #endif
 
-				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-					--m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
-
-				m_bAlreadySetUp = false;
-				Holster(false);
-				RetireWeapon();
+				SetFirePost();
+				m_bAlreadySetUp = false;			
 				m_bIsManual = false;
 			}
 		}
@@ -304,6 +301,19 @@ namespace sv {
 		return CBasePlayerWeapon::ItemPostFrame();
 	}
 
+	void CClayMore::SetFirePost()
+	{
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+
+		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+		{
+			SendWeaponAnim(CLAYMORE_DRAW, UseDecrement() != FALSE);
+			m_flReleaseThrow = invalid_time_point;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
+		}
+		else
+			RetireWeapon();
+	}
 
 	void CClayMore::WeaponIdle(void)
 	{

@@ -124,6 +124,7 @@ namespace sv {
 
 	void CKnifeCrowbarCraft::Spawn()
 	{
+		m_iKnifeID = KNIFE_CROWBARCRAFT;
 		pev->classname = MAKE_STRING("knife_crowbarcraft");
 		m_iId = WEAPON_KNIFE;
 		Precache();

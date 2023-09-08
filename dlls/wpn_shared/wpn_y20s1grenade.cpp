@@ -24,6 +24,7 @@ LINK_ENTITY_TO_CLASS(weapon_y20s1grenade, CY20S1Grenade)
 
 void CY20S1Grenade::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_Y20S1GRENADE;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_y20s1grenade.mdl");

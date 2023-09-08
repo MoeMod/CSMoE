@@ -182,6 +182,7 @@ LINK_ENTITY_TO_CLASS(z4b_holyfist, CKnifeHolyFist)
 
 void CKnifeHolyFist::Spawn()
 {
+	m_iKnifeID = KNIFE_HOLYFIST;
 	pev->classname = MAKE_STRING("z4b_holyfist");
 	m_iId = WEAPON_KNIFE;
 	Precache();

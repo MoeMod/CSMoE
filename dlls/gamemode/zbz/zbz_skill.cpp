@@ -267,6 +267,14 @@ namespace sv {
 			if (m_pPlayer->m_iBuff & BUFF_LASTHERO)
 				return;
 
+			if (m_pPlayer->m_iGrenadeID == GRENADE_BUNKERBUSTER ||
+				m_pPlayer->m_iGrenadeID == GRENADE_PATROLDRONE ||
+				m_pPlayer->m_iGrenadeID == GRENADE_DIVINETITAN ||
+				m_pPlayer->m_iGrenadeID == GRENADE_SBMINE ||
+				m_pPlayer->m_iGrenadeID == GRENADE_CLAYMORE ||
+				m_pPlayer->m_iGrenadeID == GRENADE_SFTURRET)
+				return;
+
 			if (m_flNextThink > gpGlobals->time)
 				return;
 
@@ -284,18 +292,8 @@ namespace sv {
 
 			while (pWeapon != NULL)
 			{
-				if (pWeapon->m_iId == WEAPON_DIVINETITAN || 
-					pWeapon->m_iId == WEAPON_PATROLDRONE ||
-					pWeapon->m_iId == WEAPON_BUNKERBUSTER ||
-					pWeapon->m_iId == WEAPON_CLAYMORE ||
-					pWeapon->m_iId == WEAPON_SBMINE ||
-					pWeapon->m_iId == WEAPON_SFTURRET)
-					return;
-
 				if (amount && pWeapon && pWeapon->m_iId != WEAPON_HEGRENADE)
-				{
 					return;
-				}
 
 				pWeapon = pWeapon->m_pNext;
 			}

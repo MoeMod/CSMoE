@@ -1703,7 +1703,28 @@ void CBasePlayer::PackDeadPlayerItems()
 				}
 				// drop a grenade after death
 				else if (pPlayerItem->iItemSlot() == GRENADE_SLOT && g_bIsCzeroGame && !this->m_bIsZombie)
+				{
+					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pPlayerItem;
+
+					if (!pWeapon)
+					{
+						pPlayerItem = pPlayerItem->m_pNext;
+						continue;
+					}
+
+					if (pWeapon->m_iGrenadeID == GRENADE_DIVINETITAN ||
+						pWeapon->m_iGrenadeID == GRENADE_PATROLDRONE ||
+						pWeapon->m_iGrenadeID == GRENADE_SBMINE ||
+						pWeapon->m_iGrenadeID == GRENADE_CLAYMORE ||
+						pWeapon->m_iGrenadeID == GRENADE_BUNKERBUSTER ||
+						pWeapon->m_iGrenadeID == GRENADE_SFTURRET)
+					{
+						pPlayerItem = pPlayerItem->m_pNext;
+						continue;
+					}
+						
 					packPlayerItem(this, pPlayerItem, true);
+				}			
 
 				pPlayerItem = pPlayerItem->m_pNext;
 			}

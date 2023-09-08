@@ -157,6 +157,7 @@ LINK_ENTITY_TO_CLASS(knife_ironfan, CKnifeIronFan)
 
 void CKnifeIronFan::Spawn()
 {
+	m_iKnifeID = KNIFE_IRONFAN;
 	pev->classname = MAKE_STRING("knife_ironfan");
 	m_iId = WEAPON_KNIFE;
 	Precache();

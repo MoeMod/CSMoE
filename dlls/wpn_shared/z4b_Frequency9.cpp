@@ -106,6 +106,7 @@ public:
 
 	void Spawn() override
 	{
+		m_iKnifeID = KNIFE_Z4B_FREQUENCY9;
 		pev->classname = MAKE_STRING("z4b_Frequency9");
 		m_iId = WEAPON_KNIFE;
 		Precache();

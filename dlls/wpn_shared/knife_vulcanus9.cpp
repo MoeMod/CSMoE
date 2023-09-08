@@ -202,6 +202,7 @@ int CKnifeVulcanus9::GetItemInfo(ItemInfo* p)
 
 void CKnifeVulcanus9::Spawn()
 {
+	m_iKnifeID = KNIFE_VULCANUS9;
 	pev->classname = MAKE_STRING("knife_vulcanus9");
 	m_iId = WEAPON_KNIFE;
 	Precache();

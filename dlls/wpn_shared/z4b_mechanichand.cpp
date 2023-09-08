@@ -164,6 +164,7 @@ int CKnifeMechanicHand::GetItemInfo(ItemInfo* p)
 
 void CKnifeMechanicHand::Spawn()
 {
+	m_iKnifeID = KNIFE_MECHANICHAND;
 	pev->classname = MAKE_STRING("z4b_mechanichand");
 	m_iId = WEAPON_KNIFE;
 	Precache();

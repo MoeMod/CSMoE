@@ -1471,7 +1471,8 @@ int CHudAmmo::Draw(float flTime)
 				}
 				else
 				{
-					if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+					
+					if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))
 					{
 						x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
 						x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
@@ -1481,7 +1482,7 @@ int CHudAmmo::Draw(float flTime)
 		}
 
 		// Draw the ammo Icon
-		if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+		if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))
 		{
 			int iOffset = (m_pWeapon->rcAmmo.bottom - m_pWeapon->rcAmmo.top) / 8;
 			SPR_Set(m_pWeapon->hAmmo, r, g, b);
@@ -2179,7 +2180,7 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 				}
 				else
 				{
-					if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+					if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))
 					{
 						iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
 						DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
@@ -2189,7 +2190,7 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 		}
 
 		// Draw the ammo Icon
-		if (m_pWeapon->iId != WEAPON_PATROLDRONE)
+		if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))
 		{
 			iY = ScreenHeight - 15 - gHUD.m_NEWHUD_iFontHeight;
 			iX = ScreenWidth - 5;
@@ -2741,7 +2742,7 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 				}
 
 				// Draw the ammo Icon
-				if (pWeapon->iId != WEAPON_PATROLDRONE)
+				if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))
 				{
 					auto pRcAmmo = pWeapon->rcAmmo;
 					auto pHAmmo = pWeapon->hAmmo;

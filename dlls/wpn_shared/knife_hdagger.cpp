@@ -111,6 +111,7 @@ LINK_ENTITY_TO_CLASS(knife_hdagger, CKnifeHDagger)
 
 void CKnifeHDagger::Spawn()
 {
+	m_iKnifeID = KNIFE_HDAGGER;
 	pev->classname = MAKE_STRING("knife_hdagger");
 	m_iId = WEAPON_KNIFE;
 	Precache();

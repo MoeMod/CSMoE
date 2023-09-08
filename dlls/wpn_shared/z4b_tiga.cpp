@@ -169,6 +169,7 @@ LINK_ENTITY_TO_CLASS(z4b_tiga, CKnifeTIGA)
 
 void CKnifeTIGA::Spawn()
 {
+	m_iKnifeID = KNIFE_TIGA;
 	pev->classname = MAKE_STRING("z4b_tiga");
 	m_iId = WEAPON_KNIFE;
 	Precache();

@@ -24,6 +24,7 @@ LINK_ENTITY_TO_CLASS(weapon_heartbomb, CHeartBomb)
 
 void CHeartBomb::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_HEARTBOMB;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_heartbomb.mdl");

@@ -580,6 +580,7 @@ namespace sv {
 
 	void CKnifeDgaxe::Spawn()
 	{
+		m_iKnifeID = KNIFE_DGAXE;
 		pev->classname = MAKE_STRING("knife_dgaxe");
 		m_iId = WEAPON_KNIFE;
 		Precache();

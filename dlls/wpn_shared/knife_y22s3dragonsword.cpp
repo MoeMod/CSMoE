@@ -151,6 +151,7 @@ namespace sv {
 
 	void CKnifeY22S3DragonSword::Spawn()
 	{
+		m_iKnifeID = KNIFE_Y22S3DRAGONSWORD;
 		pev->classname = MAKE_STRING("knife_y22s3dragonsword");
 		m_iId = WEAPON_KNIFE;
 		m_flSpeedBuffTime = invalid_time_point;

@@ -24,6 +24,7 @@ LINK_ENTITY_TO_CLASS(weapon_cartfrag, CCartfrag)
 
 void CCartfrag::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_CARTFRAG;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_cartfrag.mdl");

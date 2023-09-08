@@ -37,6 +37,7 @@ namespace sv {
 		virtual void SecondaryAttack();
 		virtual void ItemPostFrame();
 		virtual void WeaponIdle();
+		void SetFirePost();
 		virtual BOOL UseDecrement()
 		{
 #ifdef CLIENT_WEAPONS

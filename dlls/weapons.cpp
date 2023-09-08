@@ -1865,18 +1865,14 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					int playerGrenades = pPlayer->m_rgAmmo[pGrenade->m_iPrimaryAmmoType];
 					int maxGrenades = 0;
 					const char *grenadeName = NULL;
+					int iGrenadeId = GRENADE_HEGRENADE;
 
 					switch (pGrenade->m_iId)
 					{
-					case WEAPON_DIVINETITAN:
-					case WEAPON_PATROLDRONE:
-					case WEAPON_BUNKERBUSTER:
-					case WEAPON_SBMINE:
-					case WEAPON_CLAYMORE:
-					case WEAPON_SFTURRET:
 					case WEAPON_HEGRENADE:
-						grenadeName = "weapon_hegrenade";
+						grenadeName = STRING(pItem->pev->classname);
 						maxGrenades = 1;
+						iGrenadeId = AliasToGrenadeType(STRING(pItem->pev->classname));;
 						break;
 					case WEAPON_SMOKEGRENADE:
 						grenadeName = "weapon_smokegrenade";
@@ -1893,6 +1889,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					if (playerGrenades < maxGrenades && grenadeName != NULL)
 					{
 						bEmitSound = true;
+						pPlayer->m_iGrenadeID = iGrenadeId;
 						pPlayer->GiveNamedItem(grenadeName);
 
 						// unlink this weapon from the box

@@ -26,8 +26,9 @@ LINK_ENTITY_TO_CLASS(weapon_patroldrone, CPatrolDrone)
 
 void CPatrolDrone::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_PATROLDRONE;
 	Precache();
-	m_iId = WEAPON_PATROLDRONE;
+	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_patroldrone.mdl");
 
 	m_iDefaultAmmo = PATROLDRONE_MAX_CLIP;
@@ -62,7 +63,7 @@ int CPatrolDrone::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = WEAPON_NOCLIP;
 	p->iSlot = 3;
 	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_PATROLDRONE;
+	p->iId = m_iId = WEAPON_HEGRENADE;
 	p->iWeight = HEGRENADE_WEIGHT;
 	p->iFlags = 0;
 
@@ -464,17 +465,7 @@ void CPatrolDroneGrenade::OnThink()
 		return;
 	}
 
-	CBasePlayerItem* pWeapon = m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
-
-	while (pWeapon)
-	{
-		if (pWeapon->m_iId == WEAPON_PATROLDRONE)
-			break;
-
-		pWeapon = pWeapon->m_pNext;
-	}
-
-	if (!pWeapon)
+	if(m_pOwner->m_iGrenadeID != GRENADE_PATROLDRONE)
 	{
 		UTIL_Remove(pBeam);
 		UTIL_Remove(this);

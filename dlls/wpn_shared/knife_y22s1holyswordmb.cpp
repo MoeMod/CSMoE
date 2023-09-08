@@ -440,6 +440,7 @@ namespace sv {
 
 	void CKnifeY22S1HolySwordMB::Spawn()
 	{
+		m_iKnifeID = KNIFE_Y22S1HOLYSWORDMB;
 		pev->classname = MAKE_STRING("knife_y22s1holyswordmb");
 		m_iId = WEAPON_KNIFE;
 		Precache();

@@ -24,6 +24,7 @@ LINK_ENTITY_TO_CLASS(weapon_holybomb, CHolyBomb)
 
 void CHolyBomb::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_HOLYBOMB;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_holybomb.mdl");

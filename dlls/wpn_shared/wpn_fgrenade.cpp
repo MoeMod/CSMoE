@@ -24,6 +24,7 @@ LINK_ENTITY_TO_CLASS(weapon_fgrenade, CFGrenade)
 
 void CFGrenade::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_FIREBOMB;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_fgrenade.mdl");

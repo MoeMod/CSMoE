@@ -139,6 +139,7 @@ LINK_ENTITY_TO_CLASS(z4b_dualkukri, CKnifeDualKukri)
 
 void CKnifeDualKukri::Spawn()
 {
+	m_iKnifeID = KNIFE_DUALKUKRI;
 	pev->classname = MAKE_STRING("z4b_dualkukri");
 	m_iId = WEAPON_KNIFE;
 	Precache();

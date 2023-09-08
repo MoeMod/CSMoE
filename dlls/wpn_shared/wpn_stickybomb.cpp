@@ -653,6 +653,7 @@ LINK_ENTITY_TO_CLASS(weapon_stickybomb, CStickyBomb)
 
 void CStickyBomb::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_STICKYBOMB;
 	Precache();
 	m_iId = WEAPON_HEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_stickybomb.mdl");

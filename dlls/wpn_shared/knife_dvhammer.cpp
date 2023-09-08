@@ -617,6 +617,7 @@ namespace sv {
 
 	void CKnifeDVHammer::Spawn()
 	{
+		m_iKnifeID = KNIFE_DVHAMMER;
 		pev->classname = MAKE_STRING("knife_dvhammer");
 		m_iId = WEAPON_KNIFE;
 		Precache();

@@ -131,6 +131,7 @@ namespace sv {
 		virtual void ItemPostFrame();
 #endif
 		virtual void WeaponIdle();
+		void SetFirePost();
 		virtual BOOL UseDecrement()
 		{
 #ifdef CLIENT_WEAPONS

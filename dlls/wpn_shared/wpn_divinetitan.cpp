@@ -31,8 +31,9 @@ namespace sv {
 
 	void CDivineTitan::Spawn(void)
 	{
+		m_iGrenadeID = GRENADE_DIVINETITAN;
 		Precache();
-		m_iId = WEAPON_DIVINETITAN;
+		m_iId = WEAPON_HEGRENADE;
 		SET_MODEL(ENT(pev), "models/w_divinetitan.mdl");
 
 		pev->classname = MAKE_STRING("weapon_divinetitan");
@@ -88,7 +89,7 @@ namespace sv {
 		p->iMaxClip = WEAPON_NOCLIP;
 		p->iSlot = 3;
 		p->iPosition = 1;
-		p->iId = m_iId = WEAPON_DIVINETITAN;
+		p->iId = m_iId = WEAPON_HEGRENADE;
 		p->iWeight = HEGRENADE_WEIGHT;
 		p->iFlags = 0;
 
@@ -1802,9 +1803,16 @@ namespace sv {
 			{
 				CBasePlayerItem* pWeapon = pAttack->m_rgpPlayerItems[GRENADE_SLOT];
 
+				if (pAttack->m_iGrenadeID != GRENADE_DIVINETITAN)
+				{
+					pAttack->m_flPlayerBuffData = 0;
+					UTIL_Remove(this);
+					return;
+				}
+
 				while (pWeapon)
 				{
-					if (pWeapon->m_iId == WEAPON_DIVINETITAN)
+					if (pWeapon->m_iId == WEAPON_HEGRENADE)
 						break;
 
 					pWeapon = pWeapon->m_pNext;

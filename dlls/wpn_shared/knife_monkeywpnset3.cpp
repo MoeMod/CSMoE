@@ -127,6 +127,7 @@ namespace sv {
 
 	void CKnifeMonkeyWpnSet3::Spawn()
 	{
+		m_iKnifeID = KNIFE_MONKEYWPNSET3;
 		pev->classname = MAKE_STRING("knife_monkeywpnset3");
 		m_iId = WEAPON_KNIFE;
 		Precache();

@@ -176,6 +176,7 @@ LINK_ENTITY_TO_CLASS(z4b_dualslayer, CKnifeDualSlayer)
 
 void CKnifeDualSlayer::Spawn()
 {
+	m_iKnifeID = KNIFE_DUALSLAYER;
 	pev->classname = MAKE_STRING("z4b_dualslayer");
 	m_iId = WEAPON_KNIFE;
 	Precache();

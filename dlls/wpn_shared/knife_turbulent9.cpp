@@ -153,6 +153,7 @@ LINK_ENTITY_TO_CLASS(knife_turbulent9, CKnifeTurbulent9)
 
 void CKnifeTurbulent9::Spawn()
 {
+	m_iKnifeID = KNIFE_TURBULENT9;
 	pev->classname = MAKE_STRING("knife_turbulent9");
 	m_iId = WEAPON_KNIFE;
 	Precache();

@@ -297,6 +297,7 @@ bool CKnifeStormgiant::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker
 
 void CKnifeStormgiant::Spawn()
 {
+	m_iKnifeID = KNIFE_STORMGIANT;
 	pev->classname = MAKE_STRING("knife_stormgiant");
 	m_iId = WEAPON_KNIFE;
 	Precache();

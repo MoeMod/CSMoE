@@ -175,13 +175,7 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 
 				while (pGrenade)
 				{
-					if (pGrenade->m_iId == WEAPON_HEGRENADE ||
-						pGrenade->m_iId == WEAPON_PATROLDRONE ||
-						pGrenade->m_iId == WEAPON_DIVINETITAN ||
-						pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
-						pGrenade->m_iId == WEAPON_CLAYMORE ||
-						pGrenade->m_iId == WEAPON_SBMINE ||
-						pGrenade->m_iId == WEAPON_SFTURRET)
+					if (pGrenade->m_iId == WEAPON_HEGRENADE)
 					{
 						pGrenade->Kill();
 
@@ -303,13 +297,7 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 
 				while (pGrenade)
 				{
-					if (pGrenade->m_iId == WEAPON_HEGRENADE ||
-						pGrenade->m_iId == WEAPON_PATROLDRONE ||
-						pGrenade->m_iId == WEAPON_DIVINETITAN ||
-						pGrenade->m_iId == WEAPON_BUNKERBUSTER ||
-						pGrenade->m_iId == WEAPON_CLAYMORE ||
-						pGrenade->m_iId == WEAPON_SBMINE ||
-						pGrenade->m_iId == WEAPON_SFTURRET)
+					if (pGrenade->m_iId == WEAPON_HEGRENADE)
 					{
 						pGrenade->Kill();
 

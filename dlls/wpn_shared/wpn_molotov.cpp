@@ -187,6 +187,7 @@ LINK_ENTITY_TO_CLASS(weapon_molotov, CMolotov)
 
 void CMolotov::Spawn(void)
 {
+	m_iGrenadeID = GRENADE_MOLOTOV;
 	pev->classname = MAKE_STRING("weapon_molotov");
 
 	Precache();

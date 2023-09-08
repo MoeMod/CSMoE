@@ -24,8 +24,9 @@ namespace sv {
 
 		void CSbMine::Spawn(void)
 	{
+		m_iGrenadeID = GRENADE_SBMINE;
 		Precache();
-		m_iId = WEAPON_SBMINE;
+		m_iId = WEAPON_HEGRENADE;
 		SET_MODEL(ENT(pev), "models/w_sbmine.mdl");
 
 		m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE * 2;
@@ -57,7 +58,7 @@ namespace sv {
 		p->iMaxClip = WEAPON_NOCLIP;
 		p->iSlot = 3;
 		p->iPosition = 1;
-		p->iId = m_iId = WEAPON_SBMINE;
+		p->iId = m_iId = WEAPON_HEGRENADE;
 		p->iWeight = HEGRENADE_WEIGHT;
 		p->iFlags = ITEM_FLAG_LIMITINWORLD | ITEM_FLAG_EXHAUSTIBLE;
 
@@ -156,9 +157,6 @@ namespace sv {
 		if (m_pMine)
 		{
 			m_pMine->SetIsManualExp(true);
-			Holster(false);
-			RetireWeapon();
-
 			SetThink(nullptr);
 		}
 #endif
@@ -246,11 +244,9 @@ namespace sv {
 
 			m_flStartThrow = invalid_time_point;
 
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 			m_pDeployRemoteControl = true;
 
-			if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-				m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
+			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
 
 			return;
 		}
@@ -275,6 +271,15 @@ namespace sv {
 			SendWeaponAnim(m_pDeployRemoteControl ? SBMINE_IDLE_TRIGGER : SBMINE_IDLE, UseDecrement() != FALSE);
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RandomDuration<float>(10s, 15s);
 		}
+	}
+
+	void CSbMine::SetFirePost()
+	{
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+
+		m_flStartThrow = invalid_time_point;
+		m_flReleaseThrow = gpGlobals->time;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 	}
 	BOOL CSbMine::CanDeploy(void)
 	{
@@ -374,15 +379,7 @@ namespace sv {
 			return;
 		}
 
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
-
-		if (!pWeapon)
-		{
-			SUB_Remove();
-			return;
-		}
-
-		if (pWeapon->m_iId != GetWeaponsId())
+		if (m_pOwner->m_iGrenadeID != GRENADE_SBMINE)
 		{
 			SUB_Remove();
 			return;
@@ -542,17 +539,9 @@ namespace sv {
 			return;
 		}
 
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
-
-		if (!pWeapon)
+		if (m_pOwner->m_iGrenadeID != GRENADE_SBMINE)
 		{
-			Remove();
-			return;
-		}
-
-		if (pWeapon->m_iId != GetWeaponsId())
-		{
-			Remove();
+			SUB_Remove();
 			return;
 		}
 
@@ -793,16 +782,23 @@ namespace sv {
 			if (m_pWeapon)
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pOwner->m_rgpPlayerItems[GRENADE_SLOT];
-				if (pWeapon->m_iId == WEAPON_SBMINE)
-				{
 
-					CSbMine* pLinkWeapon = dynamic_cast<CSbMine*>(pWeapon);
-					if (pLinkWeapon)
+				if (m_pOwner->m_iGrenadeID == GRENADE_SBMINE)
+				{
+					while (pWeapon)
 					{
-						pLinkWeapon->m_pDeployRemoteControl = false;
-						pLinkWeapon->SetTimeOut(5.0s);
-						pLinkWeapon->Holster(false);
-						pLinkWeapon->RetireWeapon();
+						if (pWeapon->m_iId == WEAPON_HEGRENADE)
+						{
+							CSbMine* pLinkWeapon = dynamic_cast<CSbMine*>(pWeapon);
+							if (pLinkWeapon)
+							{
+								pLinkWeapon->m_pDeployRemoteControl = false;
+								pLinkWeapon->SetTimeOut(5.0s);
+								pLinkWeapon->SetFirePost();
+							}
+						}
+
+						pWeapon = (CBasePlayerWeapon*)pWeapon->m_pNext;
 					}
 				}
 			}

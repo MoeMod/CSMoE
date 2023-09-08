@@ -25,6 +25,7 @@ namespace sv {
 
 		void CSfTurret::Spawn(void)
 	{
+		m_iGrenadeID = GRENADE_SFTURRET;
 		Precache();
 		m_iId = WEAPON_HEGRENADE;
 		SET_MODEL(ENT(pev), "models/w_sfturret.mdl");
@@ -397,6 +398,12 @@ namespace sv {
 		}
 
 		if (m_pOwner->m_bIsZombie || !m_pOwner->IsAlive())
+		{
+			Remove();
+			return;
+		}
+
+		if (m_pOwner->m_iGrenadeID != GRENADE_SFTURRET)
 		{
 			Remove();
 			return;

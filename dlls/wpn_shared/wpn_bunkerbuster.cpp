@@ -20,8 +20,9 @@ namespace sv {
 
 		void CBunkerBuster::Spawn(void)
 	{
+		m_iGrenadeID = GRENADE_BUNKERBUSTER;
 		Precache();
-		m_iId = WEAPON_BUNKERBUSTER;
+		m_iId = WEAPON_HEGRENADE;
 		SET_MODEL(ENT(pev), "models/w_bunkerbuster.mdl");
 
 		pev->classname = MAKE_STRING("weapon_bunkerbuster");
@@ -55,7 +56,7 @@ namespace sv {
 		p->iMaxClip = WEAPON_NOCLIP;
 		p->iSlot = 3;
 		p->iPosition = 1;
-		p->iId = m_iId = WEAPON_BUNKERBUSTER;
+		p->iId = m_iId = WEAPON_HEGRENADE;
 		p->iWeight = HEGRENADE_WEIGHT;
 		p->iFlags = 0;
 
@@ -600,17 +601,24 @@ namespace sv {
 		{
 			if (m_bFastRemove)
 			{
-				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pOwnerPlayer->m_rgpPlayerItems[GRENADE_SLOT];
-
-				if (pWeapon->m_iId == WEAPON_BUNKERBUSTER)
+				if (pOwnerPlayer->m_iGrenadeID == GRENADE_BUNKERBUSTER)
 				{
-					if (pWeapon)
+					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pOwnerPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+
+					while (pWeapon)
 					{
-						if (!m_pWeapon->m_bStartedAiming)
+						if (pWeapon->m_iId == WEAPON_HEGRENADE)
 						{
-							UTIL_Remove(this);
-							return;
+							if (pWeapon)
+							{
+								if (!m_pWeapon->m_bStartedAiming)
+								{
+									UTIL_Remove(this);
+									return;
+								}
+							}
 						}
+						pWeapon = (CBasePlayerWeapon*)pWeapon->m_pNext;
 					}
 				}
 				else
@@ -618,7 +626,6 @@ namespace sv {
 					UTIL_Remove(this);
 					return;
 				}
-
 			}
 		}
 	}

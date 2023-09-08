@@ -419,6 +419,7 @@ LINK_ENTITY_TO_CLASS(knife_whipsword, CKnifeWhipSword)
 
 void CKnifeWhipSword::Spawn()
 {
+	m_iKnifeID = KNIFE_WHIPSWORD;
 	pev->classname = MAKE_STRING("knife_whipsword");
 	m_iId = WEAPON_KNIFE;
 	m_CrossHairState = m_CrossHairStateStored = WHIPSWORD_AIM_OFF;

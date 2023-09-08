@@ -165,6 +165,7 @@ int CKnifeHeartStimulater::GetItemInfo(ItemInfo* p)
 
 void CKnifeHeartStimulater::Spawn()
 {
+	m_iKnifeID = KNIFE_HEARTSTIMULATER;
 	pev->classname = MAKE_STRING("z4b_heartstimulater");
 	m_iId = WEAPON_KNIFE;
 	Precache();

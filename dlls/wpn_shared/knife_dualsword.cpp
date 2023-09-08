@@ -223,6 +223,7 @@ LINK_ENTITY_TO_CLASS(knife_dualsword, CKnifeDualsword)
 
 void CKnifeDualsword::Spawn()
 {
+	m_iKnifeID = KNIFE_DUALSWORD;
 	pev->classname = MAKE_STRING("knife_dualsword");
 	m_iId = WEAPON_KNIFE;
 	m_iAttackRecord = 0;

@@ -160,7 +160,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 
 	{ WEAPON_FGLAUNCHER, "weapon_fglauncher",        "礼花发射器",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 
-	{ WEAPON_BUNKERBUSTER, "weapon_bunkerbuster",      "天降正义LTD",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_BUNKERBUSTER, "weapon_bunkerbuster",      "天降正义LTD",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_Z4B_M4A1RAZER, "z4b_m4a1razer",      "雷蛇M4A1",    4250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 
 		{ WEAPON_Z4B_AK47X, "z4b_ak47x",      "黑武士AK47",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
@@ -202,7 +202,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_BUFFAUG, "weapon_buffaug",         "【无双】AUG",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	{ WEAPON_BLOODHUNTER, "weapon_bloodhunter",	 "【血契】D.Eagle",			  1800,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL },
 	{ WEAPON_LOCKONGUN, "weapon_lockongun",      "【暮光】F2000",    5500, PRIMARY_WEAPON_SLOT, UNASSIGNED,  BUY_RIFLE },
-		{ WEAPON_PATROLDRONE, "weapon_patroldrone",      "【幽浮】控制核心",    3000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+		{ GRENADE_PATROLDRONE, "weapon_patroldrone",      "【幽浮】控制核心",    3000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SPMG, "weapon_spmg",        "炙热蒸汽",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG },
 
 { WEAPON_FLAMETHROWER, "weapon_airburster",        "风魔啸天破",                  5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
@@ -260,7 +260,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_KRONOS12, "weapon_kronos12",        "粉碎者X-12",                 3500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN },
 	{ WEAPON_CROSSBOWEX21, "weapon_crossbowex21",      "【歼星】十字弩",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
-	{ WEAPON_DIVINETITAN, "weapon_divinetitan",      "圣翼皓印",    0, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_DIVINETITAN, "weapon_divinetitan",      "圣翼皓印",    0, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_SGDRILLEX, "weapon_sgdrillex",         "【电光】狂龙钻", 2000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ WEAPON_Z4B_AQUARIUSPLASMAGUN, "z4b_aquariusplasmagun",      "破晓黎明 - 水瓶座",    0, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE },
 	//{ WEAPON_FGLAUNCHER, "weapon_fglauncher",         "礼花发射器", 2000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },

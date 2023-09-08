@@ -118,6 +118,7 @@ BOOL CKnifeShovelEX::Deploy()
 
 void CKnifeShovelEX::Spawn()
 {
+	m_iKnifeID = KNIFE_SHOVELEX;
 	pev->classname = MAKE_STRING("z4b_shovelex");
 	m_iId = WEAPON_KNIFE;
 	Precache();

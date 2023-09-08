@@ -115,6 +115,7 @@ LINK_ENTITY_TO_CLASS(z4b_facelessvoid, CKnifeFacelessVoid)
 
 void CKnifeFacelessVoid::Spawn()
 {
+	m_iKnifeID = KNIFE_Z4B_FACELESSVOID;
 	pev->classname = MAKE_STRING("z4b_facelessvoid");
 	m_iId = WEAPON_KNIFE;
 	Precache();
