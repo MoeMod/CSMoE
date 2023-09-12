@@ -334,57 +334,57 @@ void CPlayerClassManager::PlayerModel_Precache()
 		Client_ApperanceToModel(path, ModelName(i));
 		PRECACHE_MODEL(path);
 
-		std::string szSound;
+		//std::string szSound;
 
-		if (gPlayerClass[ModelName(i)].radio_json_name)
-		{
-			int iSize = sizeof(m_szRadioType) / sizeof(m_szRadioType[0]);
+		//if (gPlayerClass[ModelName(i)].radio_json_name)
+		//{
+		//	int iSize = sizeof(m_szRadioType) / sizeof(m_szRadioType[0]);
 
 
-			for (int type = 0; type < iSize; type++)
-			{
-				int size = g_Radio[m_szRadioType[type]].size();
-				//g_Radio[m_szRadioType[type]] = "MRAD_AFFIRM"
+		//	for (int type = 0; type < iSize; type++)
+		//	{
+		//		int size = g_Radio[m_szRadioType[type]].size();
+		//		//g_Radio[m_szRadioType[type]] = "MRAD_AFFIRM"
 
-				if (g_Radio[m_szRadioType[type]].contains(gPlayerClass[ModelName(i)].radio_json_name))
-				{
-					if (g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).is_array())
-					{
-						for (int m = 0; m < g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).size(); m++)
-						{
-							szSound = g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name)[m].get<std::string>();
-							if (strstr(gPlayerClass[ModelName(i)].radio_json_name, "buffdefault"))
-							{
-								std::string new_value = gPlayerClass[ModelName(i)].model_name;
-								szSound = UTIL_ReplaceString(szSound, "$buffclassname", new_value);
+		//		if (g_Radio[m_szRadioType[type]].contains(gPlayerClass[ModelName(i)].radio_json_name))
+		//		{
+		//			if (g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).is_array())
+		//			{
+		//				for (int m = 0; m < g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).size(); m++)
+		//				{
+		//					szSound = g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name)[m].get<std::string>();
+		//					if (strstr(gPlayerClass[ModelName(i)].radio_json_name, "buffdefault"))
+		//					{
+		//						std::string new_value = gPlayerClass[ModelName(i)].model_name;
+		//						szSound = UTIL_ReplaceString(szSound, "$buffclassname", new_value);
 
-								if (!gPlayerClass[ModelName(i)].isFemale)
-								{
-									if (strstr(szSound.c_str(), "f_hit_flesh"))
-										continue;
-								}
-								else
-								{
-									if (strstr(szSound.c_str(), "/hit_flesh"))
-										continue;
-								}
-							}
-							PRECACHE_SOUND(szSound.c_str());
-						}
-					}
-					else
-					{
-						szSound = g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).get<std::string>();
-						if (strstr(gPlayerClass[ModelName(i)].radio_json_name, "buffdefault"))
-						{
-							std::string new_value = gPlayerClass[ModelName(i)].model_name;
-							szSound = UTIL_ReplaceString(szSound, "$buffclassname", new_value);
-						}
-						PRECACHE_SOUND(szSound.c_str());
-					}
-				}			
-			}
-		}
+		//						if (!gPlayerClass[ModelName(i)].isFemale)
+		//						{
+		//							if (strstr(szSound.c_str(), "f_hit_flesh"))
+		//								continue;
+		//						}
+		//						else
+		//						{
+		//							if (strstr(szSound.c_str(), "/hit_flesh"))
+		//								continue;
+		//						}
+		//					}
+		//					PRECACHE_SOUND(szSound.c_str());
+		//				}
+		//			}
+		//			else
+		//			{
+		//				szSound = g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).get<std::string>();
+		//				if (strstr(gPlayerClass[ModelName(i)].radio_json_name, "buffdefault"))
+		//				{
+		//					std::string new_value = gPlayerClass[ModelName(i)].model_name;
+		//					szSound = UTIL_ReplaceString(szSound, "$buffclassname", new_value);
+		//				}
+		//				PRECACHE_SOUND(szSound.c_str());
+		//			}
+		//		}			
+		//	}
+		//}
 	}
 #endif
 }
