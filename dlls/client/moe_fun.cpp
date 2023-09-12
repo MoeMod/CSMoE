@@ -7,6 +7,7 @@
 #include "util/u_range.hpp"
 #include "player/player_const.h"
 #include "moe_fun.h"
+#include "wdnmd.h"
 #include "immenu.h"
 
 namespace sv {
@@ -159,6 +160,9 @@ namespace sv {
 
             if (context.item("suicide", "自杀"))
                 ShowKillConfirmMenu(playerid);
+
+            if (context.item("wdnmd", "wdnmd语音菜单"))
+                wdnmdmenu::ShowWdnmdMenu(playerid);
 
             if (context.item("tattomenu", "纹身管理"))
                 ShowTattoMenu(playerid);

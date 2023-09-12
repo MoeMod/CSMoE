@@ -1807,6 +1807,31 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 				appearance.model_id = MODEL_BUFFCLASS22S4TR;
 				break;
 			}
+			case 32:
+			{
+				appearance.model_id = MODEL_BUFFCLASS19S3TR;
+				break;
+			}
+			case 33:
+			{
+				appearance.model_id = MODEL_BUFFCLASS22S1TR;
+				break;
+			}
+			case 34:
+			{
+				appearance.model_id = MODEL_BUFFCLASS22S2TR;
+				break;
+			}
+			case 35:
+			{
+				appearance.model_id = MODEL_BUFFCLASS23S1TR;
+				break;
+			}
+			case 36:
+			{
+				appearance.model_id = MODEL_BUFFCLASS23S2TR;
+				break;
+			}
 			default:
 			{
 				appearance.model_id = MODEL_YURI;
@@ -1976,6 +2001,31 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 		case 31:
 		{
 			appearance.model_id = MODEL_BUFFCLASS22S4CT;
+			break;
+		}
+		case 32:
+		{
+			appearance.model_id = MODEL_BUFFCLASS19S3CT;
+			break;
+		}
+		case 33:
+		{
+			appearance.model_id = MODEL_BUFFCLASS22S1CT;
+			break;
+		}
+		case 34:
+		{
+			appearance.model_id = MODEL_BUFFCLASS22S2CT;
+			break;
+		}
+		case 35:
+		{
+			appearance.model_id = MODEL_BUFFCLASS23S1CT;
+			break;
+		}
+		case 36:
+		{
+			appearance.model_id = MODEL_BUFFCLASS23S2CT;
 			break;
 		}
 		default:

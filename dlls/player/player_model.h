@@ -4,8 +4,9 @@
 #pragma once
 #endif
 
+#ifndef CLIENT_DLL
 #include <nlohmann/json.hpp>
-
+#endif
 #ifdef CLIENT_DLL
 namespace cl {
 #else

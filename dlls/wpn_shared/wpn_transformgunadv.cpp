@@ -873,6 +873,7 @@ namespace sv {
         {
             if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] > 0)
             {
+                m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
                 m_iMode = SpecialAttackMode_1;
                 m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 99s;
                 //m_flNextPrimaryAttack = m_flNextSecondaryAttack = duration_t::max(); // 0x7F7FFFFF;

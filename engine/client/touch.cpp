@@ -916,7 +916,7 @@ void Touch_Init( void )
 	Touch_AddDefaultButton("slot7", "touch_default/key_7.tga", "slot7", 0.620000, 0.272617, 0.680000, 0.389452, color, 2, 1, 0);
 	Touch_AddDefaultButton("lastinv", "touch/gfx/left.tga", "lastinv", 0.740000, 0.233671, 0.800000, 0.350507, color, 2, 1, 0);
 	Touch_AddDefaultButton("console", "touch/gfx/cmdmenu.tga", "toggleconsole", 0.240000, 0.000000, 0.320000, 0.116836, color, 2, 1, 0);
-	Touch_AddDefaultButton("qzradio", "touch/gfx/qzradio.tga", "wdnmd", 0.100000, 0.600000, 0.20000, 0.70000, color, 2, 1, 0);
+	Touch_AddDefaultButton("moefun", "touch/gfx/moefun.tga", "moe_fun", 0.100000, 0.600000, 0.20000, 0.70000, color, 2, 1, 0);
 	
 	Cmd_AddCommand( "touch_addbutton", Touch_AddButton_f, "add native touch button" );
 	Cmd_AddCommand( "touch_removebutton", IN_TouchRemoveButton_f, "remove native touch button" );

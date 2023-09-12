@@ -64,6 +64,12 @@ const ClassInfo Class_TE[] = {
 	{"mercenarytr"},
 	{"y20s1leechang"},
 	{"buffclass22s4tr"},
+	{"buffclass19s3tr"},
+	{"buffclass22s1tr"},
+	{"buffclass22s2tr"},
+	{"buffclass23s1tr"},
+	{"buffclass23s2tr"},
+
 };
 
 const ClassInfo Class_CT[] = {
@@ -99,6 +105,11 @@ const ClassInfo Class_CT[] = {
 	{"mercenaryct"},
 	{"y20s1yeongsin"},
 	{"buffclass22s4ct"},
+	{"buffclass19s3ct"},
+	{"buffclass22s1ct"},
+	{"buffclass22s2ct"},
+	{"buffclass23s1ct"},
+	{"buffclass23s2ct"},
 };
 
 const ClassInfo Class_Zb[] = {

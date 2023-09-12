@@ -2746,7 +2746,7 @@ PlayerInfo_ValueForKey
 
 =============
 */
-static const char *GAME_EXPORT PlayerInfo_ValueForKey( int playerNum, const char *key )
+const char *GAME_EXPORT PlayerInfo_ValueForKey( int playerNum, const char *key )
 {
 	// find the player
 	if(( playerNum > cl.maxclients ) || ( playerNum < 1 ))
@@ -2764,7 +2764,7 @@ PlayerInfo_SetValueForKey
 
 =============
 */
-static void GAME_EXPORT PlayerInfo_SetValueForKey( const char *key, const char *value )
+void GAME_EXPORT PlayerInfo_SetValueForKey( const char *key, const char *value )
 {
 	cvar_t	*var;
 
@@ -2963,7 +2963,7 @@ LocalPlayerInfo_ValueForKey
 
 =============
 */
-static const char *GAME_EXPORT LocalPlayerInfo_ValueForKey( const char* key )
+const char *GAME_EXPORT LocalPlayerInfo_ValueForKey( const char* key )
 {
 	return Info_ValueForKey( Cvar_Userinfo(), key );
 }

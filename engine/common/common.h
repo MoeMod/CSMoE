@@ -1055,6 +1055,8 @@ void HTTP_Run( void );
 void HTTP_ClearCustomServers( void );
 void HTTP_Clear_f( void );
 void CL_ProcessFile( qboolean successfully_received, const char *filename );
+const char* PlayerInfo_ValueForKey(int playerNum, const char* key);
+const char* LocalPlayerInfo_ValueForKey(const char* key);
 
 typedef struct autocomplete_list_s
 {
