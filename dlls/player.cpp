@@ -283,21 +283,6 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 		else
 			strcat(radiomsg, "_ZB");
 	}
-	else if (m_bIsFemale)
-	{
-		switch (m_iModelName)
-		{
-		case MODEL_JPNGIRL01:
-			strcat(radiomsg, "_CW");
-			break;
-			strcat(radiomsg, "_W_JIN");
-			break;
-
-		default:
-			strcat(radiomsg, "_W");
-			break;
-		}
-	}
 
 
 	CBaseEntity *pEntity = NULL;

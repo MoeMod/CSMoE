@@ -1777,6 +1777,36 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 				appearance.model_id = MODEL_IRA;
 				break;
 			}
+			case 26:
+			{
+				appearance.model_id = MODEL_SPADE;
+				break;
+			}
+			case 27:
+			{
+				appearance.model_id = MODEL_JENNIFER2;
+				break;
+			}
+			case 28:
+			{
+				appearance.model_id = MODEL_PIRATEGIRL2;
+				break;
+			}
+			case 29:
+			{
+				appearance.model_id = MODEL_MERCENARYTR;
+				break;
+			}
+			case 30:
+			{
+				appearance.model_id = MODEL_Y20S1LEECHANG;
+				break;
+			}
+			case 31:
+			{
+				appearance.model_id = MODEL_BUFFCLASS22S4TR;
+				break;
+			}
 			default:
 			{
 				appearance.model_id = MODEL_YURI;
@@ -1906,6 +1936,46 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 		case 23:
 		{
 			appearance.model_id = MODEL_ALICE2;
+			break;
+		}
+		case 24:
+		{
+			appearance.model_id = MODEL_CHNGIRL01;
+			break;
+		}
+		case 25:
+		{
+			appearance.model_id = MODEL_HUNTER;
+			break;
+		}
+		case 26:
+		{
+			appearance.model_id = MODEL_CRISS;
+			break;
+		}
+		case 27:
+		{
+			appearance.model_id = MODEL_NATASHA2;
+			break;
+		}
+		case 28:
+		{
+			appearance.model_id = MODEL_CHOIJIYOON2;
+			break;
+		}
+		case 29:
+		{
+			appearance.model_id = MODEL_MERCENARYCT;
+			break;
+		}
+		case 30:
+		{
+			appearance.model_id = MODEL_Y20S1YEONGSIN;
+			break;
+		}
+		case 31:
+		{
+			appearance.model_id = MODEL_BUFFCLASS22S4CT;
 			break;
 		}
 		default:

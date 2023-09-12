@@ -108,8 +108,11 @@ void DLLEXPORT HUD_ProcessPlayerState( struct entity_state_s *dst, const struct 
 	if (src->modelindex != dst->modelindex)
 	{
 		model_t* pmodel = IEngineStudio.GetModelByIndex(src->modelindex);
-
-		PlayerClassManager().SetPlayerClass(src->number, pmodel->name);
+		if (pmodel)
+		{
+			PlayerClassManager().SetPlayerClass(src->number, pmodel->name);
+		}
+			
 	}
 
 	// Copy in network data

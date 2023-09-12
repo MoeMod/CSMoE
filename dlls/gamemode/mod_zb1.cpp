@@ -222,7 +222,7 @@ void CMod_Zombi::HumanWin()
 	WRITE_BYTE(5);
 	MESSAGE_END();*/
 
-	EndRoundMessage("Human Win", ROUND_CTS_WIN);
+	EndRoundMessage("#CSO_HumanWin", ROUND_CTS_WIN);
 	TerminateRound(5s, WINSTATUS_CTS);
 	RoundEndScore(WINSTATUS_CTS);
 
@@ -243,7 +243,7 @@ void CMod_Zombi::ZombieWin()
 	WRITE_BYTE(5);
 	MESSAGE_END();*/
 
-	EndRoundMessage("Zombie Win", ROUND_TERRORISTS_WIN);
+	EndRoundMessage("#CSO_ZombiWin", ROUND_TERRORISTS_WIN);
 	TerminateRound(5s, WINSTATUS_TERRORISTS);
 	RoundEndScore(WINSTATUS_TERRORISTS);
 

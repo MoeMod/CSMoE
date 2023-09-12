@@ -1041,7 +1041,7 @@ namespace sv {
 		WRITE_BYTE(5);
 		MESSAGE_END();*/
 
-		EndRoundMessage("人类胜利", ROUND_CTS_WIN);
+		EndRoundMessage("#CSO_HumanWin", ROUND_CTS_WIN);
 		TerminateRound(5s, WINSTATUS_CTS);
 		RoundEndScore(WINSTATUS_CTS);
 
@@ -1059,7 +1059,7 @@ namespace sv {
 		WRITE_BYTE(5);
 		MESSAGE_END();*/
 
-		EndRoundMessage("僵尸胜利", ROUND_TERRORISTS_WIN);
+		EndRoundMessage("#CSO_ZombiWin", ROUND_TERRORISTS_WIN);
 		TerminateRound(5s, WINSTATUS_TERRORISTS);
 		RoundEndScore(WINSTATUS_TERRORISTS);
 

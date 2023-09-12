@@ -637,6 +637,8 @@ bool CPlayerModStrategy_ZBZ::UpgradeSkill()
 		ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
 		CLIENT_COMMAND(m_pPlayer->edict(), "spk player/zombiez_mutation.wav\n");
 
+		UTIL_SendAudio(m_pPlayer, "%!GAIN_MUTAION", PITCH_NORM);
+
 		MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
 		WRITE_BYTE(ZBZ_MESSAGE_SKILL_ADD);
 		WRITE_BYTE(data.first);

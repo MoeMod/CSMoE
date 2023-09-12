@@ -546,6 +546,8 @@ int UTIL_GetLineTarget(Vector vecSrc, Vector vecDirShooting, Vector vecRight, Ve
 Vector UTIL_GetSpeedVector(Vector vecSrc, Vector vecEnd, float flSpeed);
 bool UTIL_IsWallBetweenEntity(CBaseEntity* pEntity, CBaseEntity* pAttackPlayer);
 void UTIL_BreakModel(const Vector& pos, const Vector& size, const Vector& velocity, int random_velocity, int modelindex, int flags, int count, float life);
+std::string UTIL_ReplaceString(const std::string& original, const std::string& old_value, const std::string& new_value);
+void UTIL_SendAudio(CBaseEntity* pEntity, const char* msg_id, short pitch, bool msgAll = false);
 }
 #else
 namespace cl {
@@ -569,7 +571,6 @@ void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTER
 void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,
                     edict_t *pentIgnore, TraceResult *ptr);
 CBaseEntity *UTIL_PlayerByIndex(int playerIndex);
-
 }
 #endif
 

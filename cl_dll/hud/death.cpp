@@ -70,6 +70,9 @@ static float KILLICON_DISPLAY_TIME = 0.75f;
 
 DeathNoticeItem rgDeathNoticeList[ MAX_DEATHNOTICES + 1 ];
 
+static std::map<std::string, BOOL> s_KnifeNamesMap;
+static std::map<std::string, BOOL> s_GrenadeNamesMap;
+
 int CHudDeathNotice :: Init( void )
 {
 	gHUD.AddHudElem( this );
@@ -141,6 +144,91 @@ int CHudDeathNotice :: VidInit( void )
 
 	NewAlarm().VidInit();
 	HudDeathInfo().VidInit();
+
+	s_KnifeNamesMap["d_knife"] = TRUE;
+	s_KnifeNamesMap["d_dgaxe"] = TRUE;
+	s_KnifeNamesMap["d_knifedragon"] = TRUE;
+	s_KnifeNamesMap["d_dragonsword"] = TRUE;
+	s_KnifeNamesMap["d_dualsword"] = TRUE;
+	s_KnifeNamesMap["d_z4b_facelessvoid"] = TRUE;
+	s_KnifeNamesMap["d_z4b_frequency9"] = TRUE;
+	s_KnifeNamesMap["d_katana"] = TRUE;
+	s_KnifeNamesMap["d_lance"] = TRUE;
+	s_KnifeNamesMap["d_z4b_lc_sword"] = TRUE;
+	s_KnifeNamesMap["d_z4b_nataknifedx"] = TRUE;
+	s_KnifeNamesMap["d_z4b_oppovivo"] = TRUE;
+	s_KnifeNamesMap["d_skullaxe"] = TRUE;
+	s_KnifeNamesMap["d_z4b_stormgiantx"] = TRUE;
+	s_KnifeNamesMap["d_z4b_strongknifex"] = TRUE;
+	s_KnifeNamesMap["d_stormgiant"] = TRUE;
+	s_KnifeNamesMap["d_natakinfe"] = TRUE;
+	s_KnifeNamesMap["d_natakinfed"] = TRUE;
+	s_KnifeNamesMap["d_thanatos9"] = TRUE;
+	s_KnifeNamesMap["d_skullt9"] = TRUE;
+	s_KnifeNamesMap["d_runeblade"] = TRUE;
+	s_KnifeNamesMap["d_janus9"] = TRUE;
+	s_KnifeNamesMap["d_summonknife"] = TRUE;
+	s_KnifeNamesMap["d_balrog9"] = TRUE;
+	s_KnifeNamesMap["d_holysword"] = TRUE;
+	s_KnifeNamesMap["d_y22s1holyswordmb"] = TRUE;
+	s_KnifeNamesMap["d_magicknife"] = TRUE;
+	s_KnifeNamesMap["d_whipsword"] = TRUE;
+	s_KnifeNamesMap["d_z4b_dualkukri"] = TRUE;
+	s_KnifeNamesMap["d_z4b_dualslayer"] = TRUE;
+	s_KnifeNamesMap["d_jknife"] = TRUE;
+	s_KnifeNamesMap["d_combat"] = TRUE;
+	s_KnifeNamesMap["d_mastercombat"] = TRUE;
+	s_KnifeNamesMap["d_hdagger"] = TRUE;
+	s_KnifeNamesMap["d_axe"] = TRUE;
+	s_KnifeNamesMap["d_hammer"] = TRUE;
+	s_KnifeNamesMap["d_z4b_holyfist"] = TRUE;
+	s_KnifeNamesMap["d_z4b_dualstinger"] = TRUE;
+	s_KnifeNamesMap["d_z4b_heartstimulater"] = TRUE;
+	s_KnifeNamesMap["d_y22s2sfsword"] = TRUE;
+	s_KnifeNamesMap["d_armtorch"] = TRUE;
+	s_KnifeNamesMap["d_z4b_tiga"] = TRUE;
+	s_KnifeNamesMap["d_y22s3dragonsword"] = TRUE;
+	s_KnifeNamesMap["d_monkeywpnset3"] = TRUE;
+	s_KnifeNamesMap["d_ozwpnset3"] = TRUE;
+	s_KnifeNamesMap["d_tomahawk"] = TRUE;
+	s_KnifeNamesMap["d_crowbarcraft"] = TRUE;
+	s_KnifeNamesMap["d_dragontail"] = TRUE;
+	s_KnifeNamesMap["d_katanad"] = TRUE;
+	s_KnifeNamesMap["d_vulcanus9"] = TRUE;
+	s_KnifeNamesMap["d_sfsword"] = TRUE;
+	s_KnifeNamesMap["d_spknife"] = TRUE;
+	s_KnifeNamesMap["d_crow9"] = TRUE;
+	s_KnifeNamesMap["d_turbulent9"] = TRUE;
+	s_KnifeNamesMap["d_ironfan"] = TRUE;
+	s_KnifeNamesMap["d_swordbombard"] = TRUE;
+	s_KnifeNamesMap["d_z4b_mechanichand"] = TRUE;
+	s_KnifeNamesMap["d_z4b_shovelex"] = TRUE;
+	s_KnifeNamesMap["d_tyrantmace"] = TRUE;
+	s_KnifeNamesMap["d_dvhammer"] = TRUE;
+	s_KnifeNamesMap["d_hzknife"] = TRUE;
+
+	s_GrenadeNamesMap["d_grenade"] = TRUE;
+	s_GrenadeNamesMap["d_m24grenade"] = TRUE;
+	s_GrenadeNamesMap["d_fgrenade2"] = TRUE;
+	s_GrenadeNamesMap["d_firebomb"] = TRUE;
+	s_GrenadeNamesMap["d_eventbomb"] = TRUE;
+	s_GrenadeNamesMap["d_mooncake"] = TRUE;
+	s_GrenadeNamesMap["d_pumpkin"] = TRUE;
+	s_GrenadeNamesMap["d_cartfrag"] = TRUE;
+	s_GrenadeNamesMap["d_holybomb"] = TRUE;
+	s_GrenadeNamesMap["d_sfgrenade"] = TRUE;
+	s_GrenadeNamesMap["d_chaingren"] = TRUE;
+	s_GrenadeNamesMap["d_sbmine"] = TRUE;
+	s_GrenadeNamesMap["d_claymore"] = TRUE;
+	s_GrenadeNamesMap["d_stickybomb"] = TRUE;
+	s_GrenadeNamesMap["d_holybomb_ex"] = TRUE;
+	s_GrenadeNamesMap["d_y20s1grenade"] = TRUE;
+	s_GrenadeNamesMap["d_waterbomb"] = TRUE;
+	s_GrenadeNamesMap["d_chinaeventbomb"] = TRUE;
+	s_GrenadeNamesMap["d_sfturret"] = TRUE;
+	//s_GrenadeNamesMap["d_bunkerbuster"] = TRUE;
+	s_GrenadeNamesMap["d_patroldrone"] = TRUE;
+	//s_GrenadeNamesMap["d_divinetitan"] = TRUE;
 
 	return 1;
 }
@@ -497,9 +585,13 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 				m_showIcon = true;
 				m_iconIndex = 1;
 				m_killIconTime = gHUD.m_flTime + KILLICON_DISPLAY_TIME;
+
+				char* szSound = nullptr;
+				szSound = const_cast<char*>("%!MRAD_HEADSHOT");
+				gHUD.m_Radio.RadioEX(killer, szSound, PITCH_NORM);
 			}
 
-			if (!strcmp(killedwith, "d_grenade"))
+			if (s_GrenadeNamesMap.find(killedwith) != s_GrenadeNamesMap.end())
 			{
 				if (!multiKills)
 					if (gHUD.m_alarmstyle->value != 0)
@@ -514,7 +606,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 			}
 		}
 
-		if (!strcmp(killedwith, "d_knife") && !g_PlayerExtraInfo[killer].zombie)
+		if (s_KnifeNamesMap.find(killedwith) != s_KnifeNamesMap.end() && !g_PlayerExtraInfo[killer].zombie)
 		{
 			if (killer == idx)
 			{
@@ -528,6 +620,10 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 				m_showIcon = true;
 				m_iconIndex = 2;
 				m_killIconTime = gHUD.m_flTime + KILLICON_DISPLAY_TIME;
+
+				char* szSound =nullptr;
+				szSound = const_cast<char*>("%!MRAD_KNIFEKILL");
+				gHUD.m_Radio.RadioEX(killer, szSound, PITCH_NORM);
 			}
 
 			if (victim == idx)

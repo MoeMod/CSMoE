@@ -4,12 +4,13 @@
 #pragma once
 #endif
 
+#include <nlohmann/json.hpp>
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
 #endif
-
 
 #define	SHOW_DAMAGE (1 << 0)
 #define	SHOW_SPEED (1 << 1)
@@ -61,13 +62,13 @@ struct ClassData
 	TeamName team;
 	bool isFemale;
 	int m_iBitsShowState;
-	int HandTexid[6];
+	const char* radio_json_name;
 };
 
 class CPlayerClassManager
 {
 public:
-	
+	void InitRadio();
 	void PlayerModel_Precache();
 	const char* PlayerClass_GetModelName(ModelName iApperance);
 	bool PlayerClass_IsFemale(ModelName iApperance);
@@ -94,6 +95,8 @@ public:
 	ClassData* m_PlayerClass[33];
 	ClassData m_NullClass;
 };
+
+
 
 CPlayerClassManager &PlayerClassManager();
 

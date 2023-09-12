@@ -77,6 +77,11 @@ std::map<ModelName, const char*> g_HandTextureName =
 	{ MODEL_BUFFCLASSBLAIR, "buffclassblair" },
 	{ MODEL_ALICEBLUE, "ma_blue" },
 	{ MODEL_ALICERED, "ma_red" },
+	{ MODEL_Y20S1LEECHANG, "y20s1leechangtr" },
+	{ MODEL_Y20S1YEONGSIN, "y20s1yeongsinct" },
+	{ MODEL_BUFFCLASS22S4TR, "buffclass22s4tr" },
+	{ MODEL_BUFFCLASS22S4CT, "buffclass22s4ct" },
+	{ MODEL_YURI, "yuri" },
 };
 
 std::map<HandTattooName, const char*> g_TattoTextureName =
@@ -84,7 +89,22 @@ std::map<HandTattooName, const char*> g_TattoTextureName =
 	{ TATTOO_CHAOS, "chaos" },
 	{ TATTOO_DRAGON, "dragon" },
 	{ TATTOO_TIGER, "tiger" },
-
+	{ TATTOO_BAMBOU, "ttbambou" },
+	{ TATTOO_CSOWC, "ttcsowc" },
+	{ TATTOO_TTCUSTOM, "ttcustom" },
+	{ TATTOO_DIONE, "ttdione" },
+	{ TATTOO_GLUTTONY, "ttgluttony" },
+	{ TATTOO_MADMECHANIC, "ttmadmechanic" },
+	{ TATTOO_PHOBOS, "ttphobos" },
+	{ TATTOO_POISONFIRE, "ttpoisonfire" },
+	{ TATTOO_RUSTYSCORPION, "ttrustyscorpion" },
+	{ TATTOO_SNAKE, "ttsnake" },
+	{ TATTOO_SNOW, "ttsnow" },
+	{ TATTOO_ZAVISTNEID, "ttzavistneid" },
+	{ TATTOO_LETTERCHN1, "ttletterchn1" },
+	{ TATTOO_LETTERCHN2, "ttletterchn2" },
+	{ TATTOO_LETTERCHN3, "ttletterchn3" },
+	{ TATTOO_TIGER22, "tttiger22" },
 };
 
 static vec3_t hullcolor[8] = 

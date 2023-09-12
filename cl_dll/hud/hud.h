@@ -31,6 +31,7 @@
 #include "csprite.h"
 #include "cvardef.h" // cvar_t
 #include <set>
+#include <nlohmann/json.hpp>
 
 enum GameMode_e : byte; // #include "gamemode/mods_const.h"
 
@@ -947,6 +948,10 @@ class CHudRadio: public CHudBase
 {
 public:
 	int Init( void );
+	int VidInit(void);
+	void InitRadio(void);
+	void RadioEX(int SenderID, char* sentence, int pitch);
+
 	void Voice(int entindex, bool bTalking );
 	// play a sentence from a radio
 	// [byte] unknown (always 1)
@@ -955,6 +960,9 @@ public:
 	CHudMsgFunc(SendAudio);
 	CHudMsgFunc(ReloadSound);
 	CHudMsgFunc(BotVoice);
+
+	std::string replace_string(const std::string& original, const std::string& old_value, const std::string& new_value);
+	nlohmann::json g_Radio;
 };
 
 //

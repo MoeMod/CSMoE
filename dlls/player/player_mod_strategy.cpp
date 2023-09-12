@@ -24,12 +24,14 @@ GNU General Public License for more details.
 #include "gamemode/mods.h"
 #include "weapons_moe_buy.h"
 #include "csdm_randomspawn.h"
-
+#include "player/player_model.h"
 #include <vector>
 #include <algorithm>
 
 
 namespace sv {
+
+extern	nlohmann::json g_Radio;
 
 void CPlayerModStrategy_Default::CheckBuyZone()
 {
@@ -129,6 +131,9 @@ bool CPlayerModStrategy_Default::CanPlayerBuy(bool display)
 void CPlayerModStrategy_Default::Pain(int m_LastHitGroup, bool HasArmour)
 {
 	auto temp = RANDOM_LONG(0, 2);
+	std::map<int, std::string> szSound;
+
+	int id = m_pPlayer->entindex();
 
 	if (m_LastHitGroup == HITGROUP_HEAD)
 	{
@@ -138,22 +143,72 @@ void CPlayerModStrategy_Default::Pain(int m_LastHitGroup, bool HasArmour)
 			return;
 		}
 
-		if (m_pPlayer->m_bIsFemale)
+		if (PlayerClassManager().GetPlayerClass(id).radio_json_name)
 		{
-			switch (temp)
+			if (g_Radio["VOICE_HURT_HEAD"].contains(PlayerClassManager().GetPlayerClass(id).radio_json_name))
 			{
-			case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_headshot1.wav", VOL_NORM, ATTN_NORM); break;
-			case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_headshot2.wav", VOL_NORM, ATTN_NORM); break;
-			default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_headshot3.wav", VOL_NORM, ATTN_NORM); break;
+				if (g_Radio["VOICE_HURT_HEAD"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name).is_array())
+				{
+					for (int i = 0; i < g_Radio["VOICE_HURT_HEAD"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name).size(); i++)
+					{
+						szSound.insert(std::make_pair(i, g_Radio["VOICE_HURT_HEAD"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name)[i].get<std::string>()));
+						if (strstr(PlayerClassManager().GetPlayerClass(id).radio_json_name, "buffdefault"))
+						{
+							std::string new_value = PlayerClassManager().GetPlayerClass(id).model_name;
+							std::string sound = UTIL_ReplaceString(szSound[i], "$buffclassname", new_value);
+							szSound[i] = sound;
+						}
+					}
+				}
+				else
+				{
+					szSound.insert(std::make_pair(0, g_Radio["VOICE_HURT_HEAD"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name).get<std::string>()));
+					if (strstr(PlayerClassManager().GetPlayerClass(id).radio_json_name, "buffdefault"))
+					{
+						std::string new_value = PlayerClassManager().GetPlayerClass(id).model_name;
+						std::string sound = UTIL_ReplaceString(szSound[0], "$buffclassname", new_value);
+						szSound[0] = sound;
+					}
+				}
+			}
+
+
+			int size = szSound.size();
+			if (size < 2)
+				temp = 0;
+			else
+				temp = RANDOM_LONG(0, size - 1);
+
+			if (szSound.empty())
+			{
+				goto DEFAULT_PAIN_HEAD;
+			}
+			else
+			{
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, (szSound[temp]).c_str(), VOL_NORM, ATTN_NORM);
 			}
 		}
 		else
 		{
-			switch (temp)
+DEFAULT_PAIN_HEAD:
+			if (m_pPlayer->m_bIsFemale)
 			{
-			case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot1.wav", VOL_NORM, ATTN_NORM); break;
-			case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot2.wav", VOL_NORM, ATTN_NORM); break;
-			default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot3.wav", VOL_NORM, ATTN_NORM); break;
+				switch (temp)
+				{
+				case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_headshot1.wav", VOL_NORM, ATTN_NORM); break;
+				case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_headshot2.wav", VOL_NORM, ATTN_NORM); break;
+				default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_headshot3.wav", VOL_NORM, ATTN_NORM); break;
+				}
+
+			}
+			else
+			{
+				switch (temp)
+				{
+				case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot1.wav", VOL_NORM, ATTN_NORM); break;
+				case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot2.wav", VOL_NORM, ATTN_NORM); break;
+				default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot3.wav", VOL_NORM, ATTN_NORM); break;
+				}
 			}
 		}
 	}
@@ -168,22 +223,83 @@ void CPlayerModStrategy_Default::Pain(int m_LastHitGroup, bool HasArmour)
 			}
 		}
 
-		if (m_pPlayer->m_bIsFemale)
+
+		if (PlayerClassManager().GetPlayerClass(id).radio_json_name)
 		{
-			switch (temp)
+			if (g_Radio["VOICE_HURT_FLESH"].contains(PlayerClassManager().GetPlayerClass(id).radio_json_name))
 			{
-			case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_bhit_flesh-1.wav", VOL_NORM, ATTN_NORM); break;
-			case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_bhit_flesh-2.wav", VOL_NORM, ATTN_NORM); break;
-			default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_bhit_flesh-3.wav", VOL_NORM, ATTN_NORM); break;
+				if (g_Radio["VOICE_HURT_FLESH"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name).is_array())
+				{
+					for (int i = 0; i < g_Radio["VOICE_HURT_FLESH"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name).size(); i++)
+					{
+						szSound.insert(std::make_pair(i, g_Radio["VOICE_HURT_FLESH"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name)[i].get<std::string>()));
+						if (strstr(PlayerClassManager().GetPlayerClass(id).radio_json_name, "buffdefault"))
+						{
+							std::string new_value = PlayerClassManager().GetPlayerClass(id).model_name;
+							std::string sound = UTIL_ReplaceString(szSound[i], "$buffclassname", new_value);
+							szSound[i] = sound;
+						}
+					}
+				}
+				else
+				{
+					szSound.insert(std::make_pair(0, g_Radio["VOICE_HURT_FLESH"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name).get<std::string>()));
+					if (strstr(PlayerClassManager().GetPlayerClass(id).radio_json_name, "buffdefault"))
+					{
+						std::string new_value = PlayerClassManager().GetPlayerClass(id).model_name;
+						std::string sound = UTIL_ReplaceString(szSound[0], "$buffclassname", new_value);
+						szSound[0] = sound;
+					}
+				}
+			}
+
+
+			int size = szSound.size();
+			if (size < 2)
+				temp = 0;
+			else
+			{
+				if (strstr(PlayerClassManager().GetPlayerClass(id).radio_json_name, "buffdefault"))
+				{
+					if (PlayerClassManager().GetPlayerClass(id).isFemale)
+						temp = RANDOM_LONG(3, size - 1);
+					else
+						temp = RANDOM_LONG(0, 2);
+				}
+				else
+					temp = RANDOM_LONG(0, size - 1);
+			}
+				
+
+			if (szSound.empty())
+			{
+				goto DEFAULT_PAIN_FLESH;
+			}
+			else
+			{
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, (szSound[temp]).c_str(), VOL_NORM, ATTN_NORM);
 			}
 		}
 		else
 		{
-			switch (temp)
+DEFAULT_PAIN_FLESH:
+			if (m_pPlayer->m_bIsFemale)
 			{
-			case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-1.wav", VOL_NORM, ATTN_NORM); break;
-			case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-2.wav", VOL_NORM, ATTN_NORM); break;
-			default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-3.wav", VOL_NORM, ATTN_NORM); break;
+				switch (temp)
+				{
+				case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_bhit_flesh-1.wav", VOL_NORM, ATTN_NORM); break;
+				case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_bhit_flesh-2.wav", VOL_NORM, ATTN_NORM); break;
+				default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_bhit_flesh-3.wav", VOL_NORM, ATTN_NORM); break;
+				}
+			}
+			else
+			{
+				switch (temp)
+				{
+				case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-1.wav", VOL_NORM, ATTN_NORM); break;
+				case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-2.wav", VOL_NORM, ATTN_NORM); break;
+				default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-3.wav", VOL_NORM, ATTN_NORM); break;
+				}
 			}
 		}
 	}
@@ -202,24 +318,78 @@ void CPlayerModStrategy_Default::DeathSound()
 	else
 	{
 		// temporarily using pain sounds for death sounds
-		if (m_pPlayer->m_bIsFemale)
+		
+		std::map<int, std::string> szSound;
+
+		int id = m_pPlayer->entindex();
+
+		if (PlayerClassManager().GetPlayerClass(id).radio_json_name)
 		{
-			switch (RANDOM_LONG(1, 3))
+			if (g_Radio["VOICE_DEATH"].contains(PlayerClassManager().GetPlayerClass(id).radio_json_name))
 			{
-			case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_die1.wav", VOL_NORM, ATTN_NORM); break;
-			case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_die2.wav", VOL_NORM, ATTN_NORM); break;
-			case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_die3.wav", VOL_NORM, ATTN_NORM); break;
+				if (g_Radio["VOICE_DEATH"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name).is_array())
+				{
+					for (int i = 0; i < g_Radio["VOICE_DEATH"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name).size(); i++)
+					{
+						szSound.insert(std::make_pair(i, g_Radio["VOICE_DEATH"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name)[i].get<std::string>()));
+						if (strstr(PlayerClassManager().GetPlayerClass(id).radio_json_name, "buffdefault"))
+						{
+							std::string new_value = PlayerClassManager().GetPlayerClass(id).model_name;
+							std::string sound = UTIL_ReplaceString(szSound[i], "$buffclassname", new_value);
+							szSound[i] = sound;
+						}
+					}
+				}
+				else
+				{
+					szSound.insert(std::make_pair(0, g_Radio["VOICE_DEATH"].at(PlayerClassManager().GetPlayerClass(id).radio_json_name).get<std::string>()));
+					if (strstr(PlayerClassManager().GetPlayerClass(id).radio_json_name, "buffdefault"))
+					{
+						std::string new_value = PlayerClassManager().GetPlayerClass(id).model_name;
+						std::string sound = UTIL_ReplaceString(szSound[0], "$buffclassname", new_value);
+						szSound[0] = sound;
+					}
+				}
+			}
+
+			int temp;
+			int size = szSound.size();
+			if (size < 2)
+				temp = 0;
+			else
+				temp = RANDOM_LONG(0, size - 1);
+
+			if (szSound.empty())
+			{
+				goto DEFAULT_DEATH_SOUND;
+			}
+			else
+			{
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, (szSound[temp]).c_str(), VOL_NORM, ATTN_NORM);
 			}
 		}
 		else
 		{
-			switch (RANDOM_LONG(1, 4))
+DEFAULT_DEATH_SOUND:
+			if (m_pPlayer->m_bIsFemale)
 			{
-			case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die1.wav", VOL_NORM, ATTN_NORM); break;
-			case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die2.wav", VOL_NORM, ATTN_NORM); break;
-			case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
-			case 4: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
-			default:break;
+				switch (RANDOM_LONG(1, 3))
+				{
+				case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_die1.wav", VOL_NORM, ATTN_NORM); break;
+				case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_die2.wav", VOL_NORM, ATTN_NORM); break;
+				case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_die3.wav", VOL_NORM, ATTN_NORM); break;
+				}
+			}
+			else
+			{
+				switch (RANDOM_LONG(1, 4))
+				{
+				case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die1.wav", VOL_NORM, ATTN_NORM); break;
+				case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die2.wav", VOL_NORM, ATTN_NORM); break;
+				case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
+				case 4: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
+				default:break;
+				}
 			}
 		}
 	}

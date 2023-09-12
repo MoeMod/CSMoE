@@ -5,6 +5,11 @@
 #include "gamerules.h"
 #include "player_model.h"
 
+#include <iostream>
+#include <fstream>
+
+#include "FileSystem.h"
+#include "fs_int.h"
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -112,54 +117,68 @@ CPlayerClassManager& PlayerClassManager()
 static std::map<ModelName, ClassData> gPlayerClass =
 {
 	{ MODEL_UNASSIGNED, { MODEL_UNASSIGNED, NULL, UNASSIGNED } },
-	{ MODEL_YURI, { MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SAF, { MODEL_SAF, "saf", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_PIRATEBOY, { MODEL_PIRATEBOY, "pirateboy", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_CHOIJIYOON, { MODEL_CHOIJIYOON, "choijiyoon", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_MARINEBOY, { MODEL_MARINEBOY, "marineboy", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_FERNANDO, { MODEL_FERNANDO, "fernando", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_PIRATEGIRL, { MODEL_PIRATEGIRL, "pirategirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_707, { MODEL_707, "707", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_RB, { MODEL_RB, "rb", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SOZO, { MODEL_SOZO, "sozo", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_JPNGIRL01, { MODEL_JPNGIRL01, "jpngirl01", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_MAGUI, { MODEL_MAGUI, "magui", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_RITSUKA, { MODEL_RITSUKA, "ritsuka", TERRORIST, true ,SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_NATASHA, { MODEL_NATASHA, "natasha", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_TERROR, { MODEL_TERROR, "terror", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_URBAN, { MODEL_URBAN, "urban", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_LEET, { MODEL_LEET, "leet", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_GSG9, { MODEL_GSG9, "gsg9", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_ARCTIC, { MODEL_ARCTIC, "arctic", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SAS, { MODEL_SAS, "sas", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_GUERILLA, { MODEL_GUERILLA, "guerilla", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_GIGN, { MODEL_GIGN, "gign", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_MILITIA, { MODEL_MILITIA, "militia", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SPETSNAZ, { MODEL_SPETSNAZ, "spetsnaz", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_BUFFCLASSB, { MODEL_BUFFCLASSB, "buffclassb", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_BUFFCLASSA, { MODEL_BUFFCLASSA, "buffclassa", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_BUFFCLASSHUNTER, { MODEL_BUFFCLASSHUNTER, "buffclasshunter", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_BUFFCLASSLYCAN, { MODEL_BUFFCLASSLYCAN, "buffclasslycan", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_BUFFCLASSBLAIR, { MODEL_BUFFCLASSBLAIR, "buffclassblair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_BUFFCLASSFERNADO, { MODEL_BUFFCLASSFERNADO, "buffclassfernando", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_JPNGIRL01ORG, { MODEL_JPNGIRL01ORG, "jpngirl01org", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SOI, { MODEL_SOI, "soi", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_IDOLGIRL, { MODEL_IDOLGIRL, "idolgirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_MARINEGIRL, { MODEL_MARINEGIRL, "marinegirl", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_BLAIR, { MODEL_BLAIR, "blair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_JENNIFER, { MODEL_JENNIFER, "jennifer", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_ALICEBLUE, { MODEL_ALICEBLUE, "ma_aliceblue", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_ALICERED, { MODEL_ALICERED, "ma_alicered", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_JIA, { MODEL_JIA, "jra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SDEFENCE, { MODEL_SDEFENCE, "sdefence", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SCJIA, { MODEL_SCJIA, "scjra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SCVIP, { MODEL_SCVIP, "scvip", CT, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SCYURI, { MODEL_SCYURI, "scyuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_SCCJY, { MODEL_SCCJY, "sccjy", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_YURI2, { MODEL_YURI2, "yuri2", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_ALICE2, { MODEL_ALICE2, "alice2", CT, true, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_ETA, { MODEL_ETA, "eta", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
-	{ MODEL_IRA, { MODEL_IRA, "ira", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE } },
+	{ MODEL_YURI, { MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_SAF, { MODEL_SAF, "saf", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_PIRATEBOY, { MODEL_PIRATEBOY, "pirateboy", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_CHOIJIYOON, { MODEL_CHOIJIYOON, "choijiyoon", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_MARINEBOY, { MODEL_MARINEBOY, "marineboy", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_FERNANDO, { MODEL_FERNANDO, "fernando", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_PIRATEGIRL, { MODEL_PIRATEGIRL, "pirategirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_707, { MODEL_707, "707", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_RB, { MODEL_RB, "rb", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_SOZO, { MODEL_SOZO, "sozo", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_JPNGIRL01, { MODEL_JPNGIRL01, "jpngirl01", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "chn_woman"} },
+	{ MODEL_MAGUI, { MODEL_MAGUI, "magui", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_RITSUKA, { MODEL_RITSUKA, "ritsuka", TERRORIST, true ,SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_NATASHA, { MODEL_NATASHA, "natasha", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_TERROR, { MODEL_TERROR, "terror", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_URBAN, { MODEL_URBAN, "urban", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_LEET, { MODEL_LEET, "leet", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_GSG9, { MODEL_GSG9, "gsg9", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_ARCTIC, { MODEL_ARCTIC, "arctic", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_SAS, { MODEL_SAS, "sas", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_GUERILLA, { MODEL_GUERILLA, "guerilla", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_GIGN, { MODEL_GIGN, "gign", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_MILITIA, { MODEL_MILITIA, "militia", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_SPETSNAZ, { MODEL_SPETSNAZ, "spetsnaz", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_BUFFCLASSB, { MODEL_BUFFCLASSB, "buffclassb", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_BUFFCLASSA, { MODEL_BUFFCLASSA, "buffclassa", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_BUFFCLASSHUNTER, { MODEL_BUFFCLASSHUNTER, "buffclasshunter", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_BUFFCLASSLYCAN, { MODEL_BUFFCLASSLYCAN, "buffclasslycan", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_BUFFCLASSBLAIR, { MODEL_BUFFCLASSBLAIR, "buffclassblair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_BUFFCLASSFERNADO, { MODEL_BUFFCLASSFERNADO, "buffclassfernando", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_JPNGIRL01ORG, { MODEL_JPNGIRL01ORG, "jpngirl01org", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_SOI, { MODEL_SOI, "soi", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_IDOLGIRL, { MODEL_IDOLGIRL, "idolgirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_MARINEGIRL, { MODEL_MARINEGIRL, "marinegirl", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_BLAIR, { MODEL_BLAIR, "blair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_JENNIFER, { MODEL_JENNIFER, "jennifer", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_ALICEBLUE, { MODEL_ALICEBLUE, "ma_aliceblue", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_ALICERED, { MODEL_ALICERED, "ma_alicered", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_JIA, { MODEL_JIA, "jra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_SDEFENCE, { MODEL_SDEFENCE, "sdefence", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_SCJIA, { MODEL_SCJIA, "scjra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_SCVIP, { MODEL_SCVIP, "scvip", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_SCYURI, { MODEL_SCYURI, "scyuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_SCCJY, { MODEL_SCCJY, "sccjy", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_YURI2, { MODEL_YURI2, "yuri2", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_ALICE2, { MODEL_ALICE2, "alice2", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_ETA, { MODEL_ETA, "eta", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_IRA, { MODEL_IRA, "ira", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_CHNGIRL01, { MODEL_CHNGIRL01, "chngirl01", CT, true, SHOW_SPEED | SHOW_DAMAGE, "chn_woman" } },
+	{ MODEL_HUNTER, { MODEL_HUNTER, "hunter", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_SPADE, { MODEL_SPADE, "spade", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_CRISS, { MODEL_CRISS, "criss", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_NATASHA2, { MODEL_NATASHA2, "natasha2", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_CHOIJIYOON2, { MODEL_CHOIJIYOON2, "choijiyoon2", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_JENNIFER2, { MODEL_JENNIFER2, "jennifer2", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_PIRATEGIRL2, { MODEL_PIRATEGIRL2, "pirategirl2", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_MERCENARYCT, { MODEL_MERCENARYCT, "mercenaryct", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_MERCENARYTR, { MODEL_MERCENARYTR, "mercenarytr", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_Y20S1YEONGSIN, { MODEL_Y20S1YEONGSIN, "y20s1yeongsin", CT, false, SHOW_SPEED | SHOW_DAMAGE, "yeongsin"}},
+	{ MODEL_Y20S1LEECHANG, { MODEL_Y20S1LEECHANG, "y20s1leechang", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "leechang" } },
+	{ MODEL_BUFFCLASS22S4CT, { MODEL_BUFFCLASS22S4CT, "buffclass22s4ct", CT, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault" },},
+	{ MODEL_BUFFCLASS22S4TR, { MODEL_BUFFCLASS22S4TR, "buffclass22s4tr", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault"}},
 
 	/*{ MODEL_UNASSIGNED, { MODEL_UNASSIGNED, NULL, UNASSIGNED } },
 	{ MODEL_YURI, { MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE} },
@@ -213,15 +232,151 @@ static std::map<ModelName, ClassData> gPlayerClass =
 };
 int NUM_CLASS = gPlayerClass.size();
 
+extern fs_api_t gFileSystemAPI;
+
+#ifndef CLIENT_DLL
+nlohmann::json g_Radio;
+#endif
+
+static const char* m_szRadioType[] =
+{
+	"MRAD_AFFIRM",
+	"MRAD_BACKUP",
+	"MRAD_BLOW" ,
+	"MRAD_BOMBDEF",
+	"MRAD_BOMBPL",
+	"MRAD_CIRCLEBACK",
+	"MRAD_CLEAR",
+	"MRAD_COVERME" ,
+	"MRAD_CTWIN" ,
+	"MRAD_ELIM",
+	"MRAD_ENEMYDOWN" ,
+	"MRAD_ENEMYSPOT" ,
+	"MRAD_ESCAPED" ,
+	"MRAD_FALLBACK" ,
+	"MRAD_FIREINHOLE" ,
+	"MRAD_FOLLOWCOM" ,
+	"MRAD_FOLLOWME" ,
+	"MRAD_GETINPOS" ,
+	"MRAD_GETOUT" ,
+	"MRAD_GO" ,
+	"MRAD_GOGOGO" ,
+	"MRAD_HITASSIST" ,
+	"MRAD_HOSDOWN" ,
+	"MRAD_IMHIT" ,
+	"MRAD_INPOS" ,
+	"MRAD_JOKE1" ,
+	"MRAD_JOKE2" ,
+	"MRAD_LETSGO" ,
+	"MRAD_LOCKNLOAD" ,
+	"MRAD_MATEDOWN" ,
+	"MRAD_MEETME" ,
+	"MRAD_MOVEOUT" ,
+	"MRAD_NEGATIVE" ,
+	"MRAD_POINT" ,
+	"MRAD_POSITION" ,
+	"MRAD_REGROUP" ,
+	"MRAD_REPORTIN" ,
+	"MRAD_REPRTINGIN" ,
+	"MRAD_RESCUED" ,
+	"MRAD_ROGER" ,
+	"MRAD_ROUNDDRAW" ,
+	"MRAD_STICKTOG" ,
+	"MRAD_STORMFRONT" ,
+	"MRAD_TAKEPOINT" ,
+	"MRAD_TERWIN" ,
+	"MRAD_VIP" ,
+	"MRAD_ASITE" ,
+	"MRAD_BSITE" ,
+	"MRAD_NICESHOT" ,
+	"MRAD_THANK" ,
+	"MRAD_WANTHELP" ,
+	"MRAD_WIN",
+	"MRAD_LOSE",
+	"VOICE_HURT_HEAD",
+	"VOICE_HURT_FLESH" ,
+	"VOICE_DEATH"
+};
+
+void CPlayerClassManager::InitRadio()
+{
+#ifndef CLIENT_DLL
+	fs_offset_t length;
+
+	auto data = gFileSystemAPI.FS_MapFile("sound/sentences.json", &length, true);
+	if (data)
+	{
+		g_Radio = nlohmann::json::parse(std::string_view((const char*)data, length));
+		gFileSystemAPI.FS_MapFree(data, length);
+	}
+#endif
+}
+
+
 void CPlayerClassManager::PlayerModel_Precache()
 {
-	
+#ifndef CLIENT_DLL
+	InitRadio();
+
 	char path[128];
 	for (int i = 1; i < NUM_CLASS; i++)
 	{
 		Client_ApperanceToModel(path, ModelName(i));
 		PRECACHE_MODEL(path);
+
+		std::string szSound;
+
+		if (gPlayerClass[ModelName(i)].radio_json_name)
+		{
+			int iSize = sizeof(m_szRadioType) / sizeof(m_szRadioType[0]);
+
+
+			for (int type = 0; type < iSize; type++)
+			{
+				int size = g_Radio[m_szRadioType[type]].size();
+				//g_Radio[m_szRadioType[type]] = "MRAD_AFFIRM"
+
+				if (g_Radio[m_szRadioType[type]].contains(gPlayerClass[ModelName(i)].radio_json_name))
+				{
+					if (g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).is_array())
+					{
+						for (int m = 0; m < g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).size(); m++)
+						{
+							szSound = g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name)[m].get<std::string>();
+							if (strstr(gPlayerClass[ModelName(i)].radio_json_name, "buffdefault"))
+							{
+								std::string new_value = gPlayerClass[ModelName(i)].model_name;
+								szSound = UTIL_ReplaceString(szSound, "$buffclassname", new_value);
+
+								if (!gPlayerClass[ModelName(i)].isFemale)
+								{
+									if (strstr(szSound.c_str(), "f_hit_flesh"))
+										continue;
+								}
+								else
+								{
+									if (strstr(szSound.c_str(), "/hit_flesh"))
+										continue;
+								}
+							}
+							PRECACHE_SOUND(szSound.c_str());
+						}
+					}
+					else
+					{
+						szSound = g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).get<std::string>();
+						if (strstr(gPlayerClass[ModelName(i)].radio_json_name, "buffdefault"))
+						{
+							std::string new_value = gPlayerClass[ModelName(i)].model_name;
+							szSound = UTIL_ReplaceString(szSound, "$buffclassname", new_value);
+						}
+						PRECACHE_SOUND(szSound.c_str());
+					}
+				}			
+			}
+		}
 	}
+#endif
 }
 
 const char* CPlayerClassManager::PlayerClass_GetModelName(ModelName iApperance)

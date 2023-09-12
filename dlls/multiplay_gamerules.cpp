@@ -602,6 +602,8 @@ void EndRoundMessage(const char* sentence, int event)
 #endif
 	UTIL_ClientPrintAll(HUD_PRINTCENTER, sentence);
 
+	int iWinTeam = 0;
+
 	switch (event)
 	{
 	case ROUND_TARGET_BOMB:
@@ -610,6 +612,7 @@ void EndRoundMessage(const char* sentence, int event)
 	case ROUND_TERRORISTS_WIN:
 	case ROUND_HOSTAGE_NOT_RESCUED:
 	case ROUND_VIP_NOT_ESCAPED:
+		iWinTeam = TERRORIST;
 		team = GetTeam(TERRORIST);
 		// tell bots the terrorists won the round
 		if (TheBots != NULL)
@@ -625,6 +628,7 @@ void EndRoundMessage(const char* sentence, int event)
 	case ROUND_ALL_HOSTAGES_RESCUED:
 	case ROUND_TARGET_SAVED:
 	case ROUND_TERRORISTS_NOT_ESCAPED:
+		iWinTeam = CT;
 		team = GetTeam(CT);
 		// tell bots the CTs won the round
 		if (TheBots != NULL)
@@ -640,6 +644,24 @@ void EndRoundMessage(const char* sentence, int event)
 			TheBots->OnEvent(EVENT_ROUND_DRAW);
 		}
 		break;
+	}
+
+	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	{
+		CBaseEntity* entity = UTIL_PlayerByIndex(iIndex);
+
+		if (!entity)
+			continue;
+
+		if (!entity->IsAlive())
+			continue;
+
+		if (entity->pev->team == iWinTeam)
+		{
+			UTIL_SendAudio(entity, "%!MRAD_WIN", PITCH_NORM);
+		}
+		else
+			UTIL_SendAudio(entity, "%!MRAD_LOSE", PITCH_NORM);
 	}
 
 	if (mp != NULL)

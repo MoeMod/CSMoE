@@ -18,6 +18,22 @@ namespace sv {
         { TATTOO_CHAOS, "火花纹身" },
         { TATTOO_DRAGON, "青龙纹身" },
         { TATTOO_TIGER, "猛虎纹身" },
+        { TATTOO_BAMBOU, "翠竹纹身" },
+        { TATTOO_CSOWC, "CSOWC 纪念纹身" },
+        { TATTOO_TTCUSTOM, "蚩尤纹身" },
+        { TATTOO_DIONE, "狄欧斯纹身" },
+        { TATTOO_GLUTTONY, "狂暴饕餮纹身" },
+        { TATTOO_MADMECHANIC, "破面重甲纹身" },
+        { TATTOO_PHOBOS, "异形斗兽纹身" },
+        { TATTOO_POISONFIRE, "鬼火纹身" },
+        { TATTOO_RUSTYSCORPION, "铁甲巨蝎纹身" },
+        { TATTOO_SNAKE, "巨蛇纹身" },
+        { TATTOO_SNOW, "冰晶纹身" },
+        { TATTOO_ZAVISTNEID, "恸哭双子纹身" },
+        { TATTOO_LETTERCHN1, "纹身设计师活动获奖作品1(文字纹身)" },
+        { TATTOO_LETTERCHN2, "纹身设计师活动获奖作品2(文字纹身)" },
+        { TATTOO_LETTERCHN3, "纹身设计师活动获奖作品3(文字纹身)" },
+        { TATTOO_TIGER22, "黑虎纹身" },
     };
 
     void PrintToChat(CBasePlayer* target, const std::string& what)

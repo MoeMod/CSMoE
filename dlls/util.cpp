@@ -2574,8 +2574,8 @@ void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vect
 	WRITE_BYTE(scale);
 	WRITE_SHORT(frameMax);
 	WRITE_LONG(flags);
-	//WRITE_BYTE(skin);
-	//WRITE_BYTE(body);
+	WRITE_BYTE(skin);
+	WRITE_BYTE(body);
 	MESSAGE_END();
 }
 
@@ -2972,6 +2972,33 @@ void UTIL_BreakModel(const Vector& pos, const Vector& size, const Vector& veloci
 	WRITE_BYTE(count);
 	WRITE_BYTE(int(life * 10));
 	WRITE_BYTE(flags);
+	MESSAGE_END();
+}
+
+std::string UTIL_ReplaceString(const std::string& original, const std::string& old_value, const std::string& new_value)
+{
+	std::string result = original;
+	size_t pos = 0;
+
+	while ((pos = result.find(old_value, pos)) != std::string::npos) {
+		result.replace(pos, old_value.length(), new_value);
+		pos += new_value.length();
+	}
+
+	return result;
+}
+
+void UTIL_SendAudio(CBaseEntity * pEntity, const char* msg_id, short pitch, bool msgAll)
+{
+	char radiomsg[256];
+	strcpy(radiomsg, msg_id);
+	if(msgAll)
+		MESSAGE_BEGIN(MSG_ALL, gmsgSendAudio);
+	else
+		MESSAGE_BEGIN(MSG_ONE, gmsgSendAudio, NULL, pEntity->pev);
+	WRITE_BYTE(ENTINDEX(pEntity->edict()));
+	WRITE_STRING(radiomsg);
+	WRITE_SHORT(pitch);
 	MESSAGE_END();
 }
 

@@ -31,11 +31,17 @@ version.
 #include "cl_util.h"
 
 #include "parsemsg.h"
-
+#include "player/player_model.h"
 #include "r_efx.h"
 #include "event_api.h"
 #include "com_model.h"
 #include <string.h>
+
+#include <iostream>
+#include <fstream>
+
+#include "FileSystem.h"
+
 
 namespace cl {
 
@@ -53,6 +59,12 @@ int CHudRadio::Init( )
 	return 1;
 }
 
+int CHudRadio::VidInit()
+{
+	InitRadio();
+	return 1;
+}
+
 
 void Broadcast( const char *msg, int pitch )
 {
@@ -64,6 +76,140 @@ void Broadcast( const char *msg, int pitch )
 		gEngfuncs.pfnPlaySoundVoiceByName(const_cast<char *>(msg), 1.0f, pitch );
 }
 
+
+void CHudRadio::InitRadio()
+{
+	fs_offset_t length;
+
+	auto data = gFileSystemAPI.FS_MapFile("sound/sentences.json", &length, true);
+	if (data)
+	{
+		g_Radio = nlohmann::json::parse(std::string_view((const char*)data, length));
+		gFileSystemAPI.FS_MapFree(data, length);
+	}
+}
+
+std::string CHudRadio::replace_string(const std::string& original, const std::string& old_value, const std::string& new_value) {
+	std::string result = original;
+	size_t pos = 0;
+
+	while ((pos = result.find(old_value, pos)) != std::string::npos) {
+		result.replace(pos, old_value.length(), new_value);
+		pos += new_value.length();
+	}
+
+	return result;
+}
+
+void CHudRadio::RadioEX(int SenderID, char* sentence, int pitch)
+{
+	std::map<int, std::string> szRadio;
+
+	if (sentence[0] == '%' && sentence[1] == '!')
+	{
+		std::string szSentence = sentence;
+		szSentence = szSentence.substr(2);
+		std::transform(szSentence.begin(), szSentence.end(), szSentence.begin(), ::toupper);
+		if (strstr(sentence, "MRAD_"))
+		{
+			if (SenderID == 0)
+			{
+				SenderID = gEngfuncs.GetLocalPlayer()->index;
+			}
+
+			if (!PlayerClassManager().GetPlayerClass(SenderID).radio_json_name)
+			{
+				if (PlayerClassManager().GetPlayerClass(SenderID).isFemale)
+				{
+					if (g_Radio[szSentence].contains("woman"))
+						szRadio.insert(std::make_pair(0, g_Radio[szSentence].at("woman").get<std::string>()));
+				}				
+				else
+				{
+					if (g_Radio[szSentence].contains("man"))
+						szRadio.insert(std::make_pair(0, g_Radio[szSentence].at("man").get<std::string>()));
+				}
+					
+			}
+			else
+			{
+				if (g_Radio[szSentence].contains(PlayerClassManager().GetPlayerClass(SenderID).radio_json_name))
+				{
+					if (g_Radio[szSentence].at(PlayerClassManager().GetPlayerClass(SenderID).radio_json_name).is_array())
+					{
+						for (int i = 0; i < g_Radio[szSentence].at(PlayerClassManager().GetPlayerClass(SenderID).radio_json_name).size(); i++)
+						{
+							szRadio.insert(std::make_pair(i, g_Radio[szSentence].at(PlayerClassManager().GetPlayerClass(SenderID).radio_json_name)[i].get<std::string>()));
+							if (strstr(PlayerClassManager().GetPlayerClass(SenderID).radio_json_name, "buffdefault"))
+							{
+								std::string new_value = PlayerClassManager().GetPlayerClass(SenderID).model_name;
+								std::string szSound = replace_string(szRadio[i], "$buffclassname", new_value);
+								szRadio[i] = szSound;
+							}
+						}
+					}
+					else
+					{
+						szRadio.insert(std::make_pair(0, g_Radio[szSentence].at(PlayerClassManager().GetPlayerClass(SenderID).radio_json_name).get<std::string>()));
+						if (strstr(PlayerClassManager().GetPlayerClass(SenderID).radio_json_name, "buffdefault"))
+						{
+							std::string new_value = PlayerClassManager().GetPlayerClass(SenderID).model_name;
+							std::string szSound = replace_string(szRadio[0], "$buffclassname", new_value);
+							szRadio[0] = szSound;
+						}
+					}				
+				}
+				else
+				{
+					if (PlayerClassManager().GetPlayerClass(SenderID).isFemale)
+					{
+						if (g_Radio[szSentence].contains("woman"))
+							szRadio.insert(std::make_pair(0, g_Radio[szSentence].at("woman").get<std::string>()));
+					}
+					else
+					{
+						if (g_Radio[szSentence].contains("man"))
+							szRadio.insert(std::make_pair(0, g_Radio[szSentence].at("man").get<std::string>()));
+					}
+				}
+			
+			}
+		}
+
+		if (strstr(sentence, "MRAD_WIN") ||
+			strstr(sentence, "MRAD_LOSE"))
+		{
+			if (szRadio.empty())
+				return;
+		}
+
+		int temp, size;
+		size = szRadio.size();
+		if (size < 2)
+			temp = 0;
+		else
+			temp = Com_RandomLong(0, size - 1);
+
+		if (szRadio.empty())
+			Broadcast(sentence, pitch);
+		else
+		{
+			std::string szSound = szRadio[temp];
+			
+			cl_entity_t* pEntity = gEngfuncs.GetEntityByIndex(SenderID);
+			if(pEntity)
+			{
+				gEngfuncs.pEventAPI->EV_StopSound(SenderID, CHAN_AUTO, szSound.c_str());
+				gEngfuncs.pEventAPI->EV_PlaySound(SenderID, pEntity->origin, CHAN_AUTO, szSound.c_str(), 1.0, ATTN_NORM, 0, PITCH_NORM);
+			}
+			//gEngfuncs.pfnPlaySoundVoiceByName(szSound.c_str(), 1.0f, pitch);
+		}
+			
+	}
+	else
+		Broadcast(sentence, pitch);
+}
+
 int CHudRadio::MsgFunc_SendAudio( const char *pszName, int iSize, void *pbuf )
 {
 	BufferReader reader( pszName, pbuf, iSize );
@@ -72,7 +218,10 @@ int CHudRadio::MsgFunc_SendAudio( const char *pszName, int iSize, void *pbuf )
 	char *sentence = reader.ReadString( );
 	int pitch = reader.ReadShort( );
 
-	Broadcast( sentence, pitch );
+	if(g_PlayerExtraInfo[SenderID].zombie)
+		Broadcast( sentence, pitch );
+	else
+		RadioEX(SenderID, sentence, pitch);
 
 	if( SenderID <= MAX_PLAYERS )
 	{

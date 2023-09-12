@@ -58,6 +58,12 @@ const ClassInfo Class_TE[] = {
 	{"yuri2"},
 	{"eta"},
 	{"ira"},
+	{"spade"},
+	{"jennifer2"},
+	{"pirategirl2"},
+	{"mercenarytr"},
+	{"y20s1leechang"},
+	{"buffclass22s4tr"},
 };
 
 const ClassInfo Class_CT[] = {
@@ -85,6 +91,14 @@ const ClassInfo Class_CT[] = {
 	{"scvip"},
 	{"sccjy"},
 	{"alice2"},
+	{"chngirl01"},
+	{"hunter"},
+	{"criss"},	
+	{"natasha2"},
+	{"choijiyoon2"},
+	{"mercenaryct"},
+	{"y20s1yeongsin"},
+	{"buffclass22s4ct"},
 };
 
 const ClassInfo Class_Zb[] = {

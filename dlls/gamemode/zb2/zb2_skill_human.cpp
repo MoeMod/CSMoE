@@ -80,6 +80,8 @@ public:
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);
 
+		UTIL_SendAudio(m_pPlayer, "%!SPRINT_START", PITCH_NORM);
+
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 		WRITE_BYTE(ZOMBIE_SKILL_SPRINT);
@@ -127,7 +129,8 @@ protected:
 		m_flTimeZombieSkillEffect = gpGlobals->time + 1.0s;
 
 		if (m_bDebuffStatus)
-			CLIENT_COMMAND(m_pPlayer->edict(), m_pPlayer->m_bIsFemale ? "spk human_breath_female.wav\n" : "spk zombi/human_breath_male.wav\n");
+			UTIL_SendAudio(m_pPlayer, "%!SPRINT_END", PITCH_NORM);
+			//CLIENT_COMMAND(m_pPlayer->edict(), m_pPlayer->m_bIsFemale ? "spk human_breath_female.wav\n" : "spk zombi/human_breath_male.wav\n");
 		else
 			CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/speedup_heartbeat.wav\n");
 	}
@@ -159,7 +162,7 @@ public:
 		m_flTimeZombieSkillEnd = gpGlobals->time + 4.5s;
 
 		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-		if (pWeapon != NULL && !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw"))
+		if (pWeapon != NULL && (pWeapon->m_iId == WEAPON_BUFFM4 || pWeapon->m_iId == WEAPON_Z4B_M4A1MW))
 		{
 			m_flTimeZombieSkillEnd = gpGlobals->time + 5.5s;
 		}
@@ -168,6 +171,8 @@ public:
         m_flTimeZombieSkillNext = cooldown_time != zero_duration ? gpGlobals->time + cooldown_time : invalid_time_point;
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);
+
+		UTIL_SendAudio(m_pPlayer, "%!DEADLYSHOT", PITCH_NORM);
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
