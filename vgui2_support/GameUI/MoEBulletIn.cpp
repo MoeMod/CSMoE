@@ -153,7 +153,7 @@ const wchar_t* szFixedBulletinCN[] =
 	L"杰拉德临死前（萌殇小白白）\n",
 	L"共创人员: [Co-Creators]",
 	L"过气的维吉尔 & 血小板 & 橘子  & Rentro",
-	L"ZackMount    & 小文喵 & Titan & Mat\n",
+	L"ZackMount    & Titan & Mat\n",
 	L"版权所有: [Contributors]",
 	L"CSMoE Team\nBTE Team\nXash3D FWGS\n",
 	L"官方组织: [Official Orgs]",

@@ -40,12 +40,12 @@ GNU General Public License for more details.
 }
 
 namespace sv {
-	constexpr int MAX_LEVELS = 40;
-	constexpr int HURT_PER_XP = 10; // 满足累计承受伤害后获得经验值
-	constexpr int HURT_AMOUNT = 1000; // 满足累计承受伤害值
-	constexpr int DAMAGE_PER_XP = 10; // 满足累计造成伤害后获得经验值
-	constexpr int DAMAGE_AMOUNT = 500; // 满足累计造成伤害值
-	constexpr float EXP_SCALE = 0.5f; // 每回合每升一级所减少经验获取百分比
+	constexpr int MAX_LEVELS = 60;
+	constexpr int HURT_PER_XP = 30; // 满足累计承受伤害后获得经验值
+	constexpr int HURT_AMOUNT = 3000; // 满足累计承受伤害值
+	constexpr int DAMAGE_PER_XP = 100; // 满足累计造成伤害后获得经验值
+	constexpr int DAMAGE_AMOUNT = 5000; // 满足累计造成伤害值
+	constexpr float EXP_SCALE = 0.33f; // 每回合每升一级所减少经验获取百分比
 	constexpr duration_t ROUND_PERIOD_ADD = 60s; // 每回合时间超过多少秒后下一回合才会给予技能点
 	constexpr duration_t UPGRADE_SKILL_DELAY = 1s;
 

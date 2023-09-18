@@ -80,9 +80,9 @@ void ImGui_LCSM_OnGUI(void)
 		return;
 
 	ImGuiUtils::CenterNextWindow(ImGuiCond_Always);
-	ImGui::OpenPopup(xorstr("柑橘 CSMoE LCSM 公告").crypt_get());
-	if (ImGui::BeginPopupModal(xorstr("柑橘 CSMoE LCSM 公告").crypt_get(), &lcsm_enabled, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text(xorstr("柑橘 CSMoE v22 Counter-Strike Mobile-oriented Edition (原名 CSBTE-Mobile)").crypt_get());
+	ImGui::OpenPopup(xorstr("CSMoE LCSM 公告").crypt_get());
+	if (ImGui::BeginPopupModal(xorstr("CSMoE LCSM 公告").crypt_get(), &lcsm_enabled, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::Text(xorstr("CSMoE v22 Counter-Strike Mobile-oriented Edition (原名 CSBTE-Mobile)").crypt_get());
 		ImGui::Text(xorstr("版权所有：BTE Team|CSMoE Team|百度csoldjb吧|死神CS社区|Faith Zone|幻夜CS社区|柑橘CitruS").crypt_get());
 		ImColor warning_color(1.0f, 0.2f, 0.2f, 1.0f);
 		ImGui::TextColored(warning_color, xorstr("1.EC精英社所谓“CS破茧”“CS神器时代”“CS创新纪元”均为盗版游戏，我们强烈谴责盗版游戏的行为").crypt_get());
@@ -97,9 +97,9 @@ void ImGui_LCSM_OnGUI(void)
 		ImGui::BeginGroup();
 		ImColor tipssss_color(0.3f, 0.6f, 0.2f, 1.0f);
 		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------").crypt_get());
-		ImGui::TextColored(tipssss_color, xorstr("柑橘 CSMoE 现已开设免费公益的官方联机服供大家体验").crypt_get());
-		ImGui::TextColored(tipssss_color, xorstr("您可以加群706711420和爱好者们交流（右边扫码进群）").crypt_get());
-		ImGui::TextColored(tipssss_color, xorstr("或者直接点击下方按钮进服击剑~~~").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("CSMoE只支持联机，如单机出现任何问题请不要反馈").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("CSMoE官方群706711420，也可通过扫码进入").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("游戏更新相关可点击左下角公告查看").crypt_get());
 		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------").crypt_get());
 		ImGui::EndGroup();
 
