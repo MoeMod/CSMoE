@@ -27,6 +27,7 @@
 #include "cbase.h"
 #include "weapons.h"
 #include "cs_wpn/bte_weapons.h"
+#include "gamemode/zb2/zb2_const.h"
 
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
@@ -50,6 +51,8 @@ namespace cl {
 
 	extern int g_iLeapStrikeGunAnim;
 	extern float g_iLeapStrikeGunAnimTime;
+
+	extern int g_iZombieClassSkin[33][MAX_ZOMBIE_CLASS];
 enum
 {
 	HUMAN_SKILL_KNIFE2X,
@@ -735,6 +738,32 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 
 		gEngfuncs.PlayerInfo_SetValueForKey("tattoo", std::to_string(arg1).c_str());
 
+		break;
+	}
+	case 47:
+	{
+		// changeZombieSkin
+		arg1 = reader.ReadByte();	//PlayerID
+		arg2 = reader.ReadByte();	//ZombieType
+		int arg3 = reader.ReadByte();	//ZomieSkin
+
+		g_iZombieClassSkin[arg1][arg2] = arg3;
+
+		break;
+	}
+	case 48:
+	{
+		//banZombie
+		gHUD.m_setBanZombie.clear();
+		int length = reader.ReadByte();
+		for (int i = 0; i < length; i++)
+		{
+			int id = reader.ReadByte();
+			gHUD.m_setBanZombie.insert(id);
+
+			gHUD.m_ZB2.SetSelectorIconBan(id - 1);
+			gHUD.m_ZB2.SetSelectorIconLevel(id - 1, 0);
+		}
 		break;
 	}
 	case 79:	// stop sound

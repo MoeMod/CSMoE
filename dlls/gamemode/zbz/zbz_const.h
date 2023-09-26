@@ -6,6 +6,8 @@
 #pragma once
 #endif
 
+#include "gamemode/zb2/zb2_const.h"
+
 enum ZombieZSkillType : byte
 {
 	TYPE_GENERAL,
@@ -118,32 +120,34 @@ struct KeeperInfo
 	int level;
 };
 
-const KeeperInfo KeeperClassInfo[] = {
-
-	{"defaultzb", "#CSO_ZombieType_defaultz",0},
-	{"lightzb", "#CSO_ZombieType_lightzb",6},
-	{"heavyzb", "#CSO_ZombieType_heavyzb",21},
-	{"pczb", "#CSO_ZombieType_pczb",10},
-	{"doctorzb", "#CSO_ZombieType_doctorzb",13},
-	{"deimoszb", "#CSO_ZombieType_deimoszb",31},
-	{"deimos2zb", "#CSO_ZombieType_deimos2zb",19},
-	{"deimos2zb", "#CSO_ZombieType_deimos2zb",21},
-	{"teleportzb", "#CSO_ZombieType_teleportzb",41},
-	{"boosterzb", "#CSO_ZombieType_boosterzb",30},
-	{"chinazb", "#CSO_ZombieType_chinazb",14},
-	{"passzb", "#CSO_ZombieType_passzb",25},
-	{"flyingzb", "#CSO_ZombieType_flyingzb",36},
-	{"revivalzb", "#CSO_ZombieType_revivalzb",41},
-	{"undertakerzb", "#CSO_ZombieType_undertakerzb",12},
-	{"residentzb", "#CSO_ZombieType_residentzb",23},
-	{"witchzb", "#CSO_ZombieType_witchzb",28},
-	{"akshazb", "#CSO_ZombieType_akshazb",16},
-	{"boomerzb", "#CSO_ZombieType_boomerzb",8},
-	{"nemesiszb", "#CSO_ZombieType_nemesiszb",41},
-	{"spiderzb", "#CSO_ZombieType_spiderzb",41},
-	{"deathknightzb", "#CSO_ZombieType_deathknightzb",41},
-	{"sirenzb", "#CSO_ZombieType_sirenzb",10},
+const std::map<ZombieClassType, KeeperInfo> KeeperClassInfo =
+{
+	{ ZOMBIE_CLASS_TANK,  { "defaultzb", "#CSO_ZombieType_defaultz",0 } },
+	{ ZOMBIE_CLASS_SPEED,{ "lightzb", "#CSO_ZombieType_lightzb",3 } },
+	{ ZOMBIE_CLASS_HEAVY, { "heavyzb", "#CSO_ZombieType_heavyzb",9 } },
+	{ ZOMBIE_CLASS_PC, { "pczb", "#CSO_ZombieType_pczb", 6 } },
+	{ ZOMBIE_CLASS_HEAL, { "doctorzb", "#CSO_ZombieType_doctorzb",6 } },
+	{ ZOMBIE_CLASS_DEIMOS, { "deimoszb", "#CSO_ZombieType_deimoszb",12 } },
+	{ ZOMBIE_CLASS_DEIMOS2, { "deimos2zb", "#CSO_ZombieType_deimos2zb",15 } },
+	{ ZOMBIE_CLASS_ZBS_DEIMOS2, { "deimos2zb", "#CSO_ZombieType_deimos2zb", 17 } },
+	{ ZOMBIE_CLASS_TELEPORT, { "teleportzb", "#CSO_ZombieType_teleportzb",41 } },
+	{ ZOMBIE_CLASS_BOOSTER, { "boosterzb", "#CSO_ZombieType_boosterzb",17 } },
+	{ ZOMBIE_CLASS_CHINA, { "chinazb", "#CSO_ZombieType_chinazb",8 } },
+	{ ZOMBIE_CLASS_PASS, { "passzb", "#CSO_ZombieType_passzb",11 } },
+	{ ZOMBIE_CLASS_FLYING, { "flyingzb", "#CSO_ZombieType_flyingzb", 21 } },
+	{ ZOMBIE_CLASS_REVIVAL, { "revivalzb", "#CSO_ZombieType_revivalzb",41 } },
+	{ ZOMBIE_CLASS_STAMPER, { "undertakerzb", "#CSO_ZombieType_undertakerzb",12 } },
+	{ ZOMBIE_CLASS_RESIDENT, { "residentzb", "#CSO_ZombieType_residentzb",16 } },
+	{ ZOMBIE_CLASS_WITCH, { "witchzb", "#CSO_ZombieType_witchzb",12 } },
+	{ ZOMBIE_CLASS_AKSHA, { "akshazb", "#CSO_ZombieType_akshazb",12 } },
+	{ ZOMBIE_CLASS_BOOMER, { "boomerzb", "#CSO_ZombieType_boomerzb",8 } },
+	{ ZOMBIE_CLASS_NEMESIS, { "nemesiszb", "#CSO_ZombieType_nemesiszb",41 } },
+	{ ZOMBIE_CLASS_SPIDER, { "spiderzb", "#CSO_ZombieType_spiderzb",41 } },
+	{ ZOMBIE_CLASS_DEATHKNIGHT, { "deathknightzb", "#CSO_ZombieType_deathknightzb",41 } },
+	{ ZOMBIE_CLASS_MEATWALL, { "meatwallzb", "#CSO_ZombieType_meatwallzb",41 } },
+	{ ZOMBIE_CLASS_SIREN, { "sirenzb", "#CSO_ZombieType_sirenzb",10 } },
 };
+
 
 
 #endif

@@ -16,6 +16,7 @@
 #include <vgui/KeyCode.h>
 #include <FileSystem.h>
 
+#include "gamemode/zb2/zb2_const.h"
 
 using namespace vgui2;
 
@@ -268,7 +269,7 @@ void CZb2ZombieKeeper::OnSetFocus()
 
 void CZb2ZombieKeeper::SetupPage(size_t iPage)
 {
-	int totalpages = ((23 + 1) - 1) / 10 + 1;
+	int totalpages = ((ZOMBIE_CLASS_MEATWALL + 1) - 1) / 10 + 1;
 	if (iPage <= 0) iPage = 0;
 	else if (iPage >= totalpages)
 		iPage = totalpages - 1;
@@ -292,8 +293,8 @@ void CZb2ZombieKeeper::SetupPage(size_t iPage)
 
 	for (int i = 0; i < 10; ++i)
 	{
-		int iElement = m_iCurrentPage * 10 + i;
-		if (iElement >= 23)
+		int iElement = m_iCurrentPage * 10 + i + 1;
+		if (iElement >= ZOMBIE_CLASS_Z4NORMAL + 1)
 		{
 			m_ZombieKeeperSlot[i].m_BtnImagePanel->SetVisible(false);
 			m_ZombieKeeperSlot[i].m_BtnImagePanel->GetTooltip()->SetText("");
@@ -306,33 +307,48 @@ void CZb2ZombieKeeper::SetupPage(size_t iPage)
 			ReSetLockSlot(i);
 			ReSetBanSlot(i);
 
-			const char* SzDesc = KeeperClassInfo[iElement].desc.c_str();
-			const int SzLevel = KeeperClassInfo[iElement].level;
-
-			char buffer[64];
-			sprintf(buffer, "VGUI_BTE_Zb_Select_Zombie%d", iElement);
-
-
-			m_ZombieKeeperSlot[i].m_BtnImagePanel->GetTooltip()->SetText(SzDesc);
-			m_ZombieKeeperSlot[i].m_BtnImagePanel->SetImage((std::string("resource/zombi/zombietype_") + KeeperClassInfo[iElement].name).c_str());
-			m_ZombieKeeperSlot[i].m_BtnImagePanel->SetVisible(true);
-			m_ZombieKeeperSlot[i].m_BtnImagePanel->SetEnabled(true);
-			m_ZombieKeeperSlot[i].m_BtnImagePanel->SetCommand(buffer);
-
-			if (SzLevel > 40)
+			//random zombie
+			if (iElement == ZOMBIE_CLASS_Z4NORMAL)
 			{
-				SetBanSlot(i);
+				char buffer[64];
+				sprintf(buffer, "VGUI_BTE_Zb_Select_Zombie%d", iElement - 1);	//mp side + 1
+
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->GetTooltip()->SetText("Random Zombie");
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->SetImage("resource/hud/zombie/zombietype_random");
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->SetVisible(true);
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->SetEnabled(true);
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->SetCommand(buffer);
 			}
 			else
 			{
-				if ((cl::gHUD.IsZombieMod() && (cl::gHUD.m_iModRunning == MOD_ZBZ)))
+				const char* SzDesc = KeeperClassInfo.at(ZombieClassType(iElement)).desc.c_str();
+				const int SzLevel = KeeperClassInfo.at(ZombieClassType(iElement)).level;
+
+				char buffer[64];
+				sprintf(buffer, "VGUI_BTE_Zb_Select_Zombie%d", iElement - 1);
+
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->GetTooltip()->SetText(SzDesc);
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->SetImage((std::string("resource/zombi/zombietype_") + KeeperClassInfo.at(ZombieClassType(iElement)).name).c_str());
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->SetVisible(true);
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->SetEnabled(true);
+				m_ZombieKeeperSlot[i].m_BtnImagePanel->SetCommand(buffer);
+
+				if (SzLevel > 40 || cl::gHUD.m_setBanZombie.count(iElement))
 				{
-					if (SzLevel > cl::gHUD.m_iZlevel)
+					SetBanSlot(i);
+				}
+				else
+				{
+					if ((cl::gHUD.IsZombieMod() && (cl::gHUD.m_iModRunning == MOD_ZBZ)))
 					{
-						SetLockSlot(i, SzLevel);
+						if (SzLevel > cl::gHUD.m_iZlevel)
+						{
+							SetLockSlot(i, SzLevel);
+						}
 					}
 				}
 			}
+			
 		}
 	}
 }

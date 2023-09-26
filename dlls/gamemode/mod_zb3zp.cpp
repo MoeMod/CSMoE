@@ -100,29 +100,29 @@ void CMod_ZB3ZP::HumanInfectionByZombie(CBasePlayer* player, CBasePlayer* attack
 {
 	CMod_ZombieMod2::HumanInfectionByZombie(player, attacker);
 
-	if(!strcmp(player->m_ZombieClass, "alien_boss"))
+	if (player->m_iZombieClass ==ZOMBIE_CLASS_ALIEN_BOSS)
 		player->pev->health = player->pev->max_health = 2300.0f;
-	else if(!strcmp(player->m_ZombieClass, "source"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_SOURCE)
 		player->pev->health = player->pev->max_health = 2500.0f;
-	else if (!strcmp(player->m_ZombieClass, "licker"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_LICKER)
 		player->pev->health = player->pev->max_health = 2000.0f;
-	else if (!strcmp(player->m_ZombieClass, "alien_infected"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_ALIEN_INFECTED)
 		player->pev->health = player->pev->max_health = 1800.0f;
-	else if (!strcmp(player->m_ZombieClass, "ap"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_AP)
 		player->pev->health = player->pev->max_health = 3000.0f;
-	else if (!strcmp(player->m_ZombieClass, "hostex"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_HOSTEX)
 		player->pev->health = player->pev->max_health = 2500.0f;
-	else if (!strcmp(player->m_ZombieClass, "humanzombie"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_HUMANZOMBIE)
 		player->pev->health = player->pev->max_health = 1800.0f;
-	else if (!strcmp(player->m_ZombieClass, "nohead"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_NOHEAD)
 		player->pev->health = player->pev->max_health = 1800.0f;
-	else if (!strcmp(player->m_ZombieClass, "pyrammid"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_PYRAMMID)
 		player->pev->health = player->pev->max_health = 2300.0f;
-	else if (!strcmp(player->m_ZombieClass, "zptank"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_TANK)
 		player->pev->health = player->pev->max_health = 2000.0f;
-	else if (!strcmp(player->m_ZombieClass, "tf"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_TF)
 		player->pev->health = player->pev->max_health = 3000.0f;
-	else if (!strcmp(player->m_ZombieClass, "siren"))
+	else if (player->m_iZombieClass == ZOMBIE_CLASS_SIREN)
 		player->pev->health = player->pev->max_health = 2000.0f;
 }
 
@@ -182,77 +182,65 @@ bool CPlayerModStrategy_ZB3ZP::CanPlayerBuy(bool display)
 	return !m_pPlayer->m_bIsZombie;
 }
 
-std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3ZP::ZombieClassFactory(ZombieLevel lv, const char* name)
+std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3ZP::ZombieClassFactory( ZombieLevel lv, ZombieClassType iZombieClass)
 {
 	auto player = m_pPlayer;
 
-	if (!strcmp(name, "random"))
+	if (iZombieClass == ZOMBIE_CLASS_HUMAN)
 	{
 		switch (RANDOM_LONG(0, 1))
 		{
 		case 0:
-		{
-			player->m_ZombieClass = "source";
+		{		
 			return std::make_shared<CZombieClass_Source>(m_pPlayer, lv);
 		}
 		case 1:
 		{
-			player->m_ZombieClass = "licker";
 			return std::make_shared<CZombieClass_Licker>(m_pPlayer, lv);
 		}
 		case 2:
 		{
-			player->m_ZombieClass = "alien_boss";
 			return std::make_shared<CZombieClass_Alien_Boss>(m_pPlayer, lv);
 		}
 		case 3:
 		{
-			player->m_ZombieClass = "alien_infected";
 			return std::make_shared<CZombieClass_Alien_Infected>(m_pPlayer, lv);
 		}
 		case 4:
 		{
-			player->m_ZombieClass = "ap";
 			return std::make_shared<CZombieClass_AP>(m_pPlayer, lv);
 		}
 		case 5:
 		{
-			player->m_ZombieClass = "hostex";
 			return std::make_shared<CZombieClass_HostEx>(m_pPlayer, lv);
 		}
 		case 6:
 		{
-			player->m_ZombieClass = "humanzombie";
 			return std::make_shared<CZombieClass_Human>(m_pPlayer, lv);
 		}
 		case 7:
 		{
-			player->m_ZombieClass = "nohead";
 			return std::make_shared<CZombieClass_Nohead>(m_pPlayer, lv);
 		}
 		case 8:
 		{
-			player->m_ZombieClass = "pyrammid";
 			return std::make_shared<CZombieClass_Pyrammid>(m_pPlayer, lv);
 		}
 		case 9:
 		{
-			player->m_ZombieClass = "zptank";
 			return std::make_shared<CZombieClass_Tank>(m_pPlayer, lv);
 		}
 		case 10:
 		{
-			player->m_ZombieClass = "tf";
 			return std::make_shared<CZombieClass_TF>(m_pPlayer, lv);
 		}
 		case 11:
 		{
-			player->m_ZombieClass = "siren";
 			return std::make_shared<CZombieClass_Siren>(m_pPlayer, lv);
 		}
 		}
 	}
-	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, name);
+	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, iZombieClass);
 }
 
 void CPlayerModStrategy_ZB3ZP::CmdStart(struct usercmd_s* cmd, unsigned int random_seed)
@@ -280,7 +268,7 @@ void CPlayerModStrategy_ZB3ZP::CmdStart(struct usercmd_s* cmd, unsigned int rand
 			}
 
 			m_flNextTimeChangeZombie = gpGlobals->time + 10.0s;
-			m_pPlayer->m_ZombieClass = "random";
+			m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
 			CPlayerModStrategy_ZB3::BecomeZombie(m_pPlayer->m_iZombieLevel);

@@ -25,6 +25,45 @@ GNU General Public License for more details.
 
 namespace sv {
 
+std::map<ZombieSkin, const char*> g_ZombieSkinModelName =
+{
+	{ SKIN_CHNNORMAL ,"chnzombinormal" },
+	{ SKIN_CHNSPEED ,"chnzombispeed" },
+	{ SKIN_CHNPC ,"chnzombipc" },
+	{ SKIN_COSSPEED1 ,"cosspeed1" },
+	{ SKIN_SANTASKINLIGHT ,"santaskinlight" },
+	{ SKIN_SANTASKINHEAVY ,"santaskinheavy" },
+	{ SKIN_CHEFSKINHEAVY, "chefskinheavy" },
+	{ SKIN_NURSESKINRESI, "nurseskinresi" },
+	{ SKIN_TWSKINHEAVY, "twskinheavy" },
+	{ SKIN_DEVILSKINLIGHT, "devilskinlight" },
+	{ SKIN_STONEDEIMOS2, "stonedeimos2" },
+	{ SKIN_MUMMYSTAMPER, "mummystamper" },
+	{ SKIN_STUDENTLIGHT, "studentlight" },
+	{ SKIN_STONEBOOMER, "stoneboomer" },
+	{ SKIN_Y19S2BLOTERSKIN, "y19s2bloterskin" },
+	{ SKIN_Y19S2LIGHTSKIN, "y19s2lightskin" },
+	{ SKIN_Y19S4PSYCHO, "y19s4psycho" },
+	{ SKIN_Y19S4RUSTYWING, "y19s4rustywing" },
+	{ SKIN_Y20S1DOCTORSKIN, "y20s1doctorskin" },
+	{ SKIN_Y20S1WITCHSKIN, "y20s1witchskin" },
+	{ SKIN_Y20S2RESISKIN, "y20s2resiskin" },
+	{ SKIN_Y20S2BOOTSKIN, "y20s2bootskin" },
+	{ SKIN_Y20S3SPEEDSKIN, "y20s3speedskin" },
+	{ SKIN_Y20S3STAMPERSKIN, "y20s3stamperskin" },
+	{ SKIN_Y21S1AKSHA, "y21s1aksha" },
+	{ SKIN_Y21S1FLYINGZOMBIE, "y21s1flyingzombie" },
+	{ SKIN_Y21S2DEIMOSSKIN, "y21s2deimosskin" },
+	{ SKIN_Y21S2WITCHSKIN, "y21s2witchskin" },
+	{ SKIN_Y21S3DEIMOS2SKIN, "y21s3deimos2skin" },
+	{ SKIN_Y21S3BOOSTERZOMBISKIN, "y21s3boosterzombiskin" },
+	{ SKIN_Y21S4BLOTERSKIN, "y21s4bloterskin" },
+	{ SKIN_Y21S4BOOMERSKIN, "y21s4boomerskin" },
+	{ SKIN_Y23S1NORMAL, "y23s1normal" },
+	{ SKIN_Y23S2WITCHSKIN, "y23s2witchskin" },
+	{ SKIN_Y23S3NORMAL, "y23s3normal" },
+};
+
 CHuman_ZB1::CHuman_ZB1(CBasePlayer *player) : BasePlayerExtra(player)
 {
 	m_pPlayer->m_bIsZombie = false;
@@ -333,6 +372,38 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/zombie_tf1/zombie_tf1.mdl");
 	PRECACHE_MODEL("models/player/zombie_tf2/zombie_tf2.mdl");
 
+
+	for (auto it : g_ZombieSkinModelName) {
+		const char* szModel = it.second;
+		char szModelPath[128];
+		Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s_host/%s_host.mdl", szModel, szModel);
+		PRECACHE_MODEL(szModelPath);
+		Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s_origin/%s_origin.mdl", szModel, szModel);
+		PRECACHE_MODEL(szModelPath);
+		Q_snprintf(szModelPath, sizeof(szModelPath), "models/v_knife_%s.mdl", szModel, szModel);
+		PRECACHE_MODEL(szModelPath);
+		Q_snprintf(szModelPath, sizeof(szModelPath), "models/v_zombibomb_%s.mdl", szModel, szModel);
+		PRECACHE_MODEL(szModelPath);
+		Q_snprintf(szModelPath, sizeof(szModelPath), "models/@frogvari_v_zombibomb_%s.mdl", szModel, szModel);
+		PRECACHE_MODEL(szModelPath);
+
+		if (it.first == SKIN_STONEDEIMOS2 ||
+			it.first == SKIN_STONEBOOMER ||
+			it.first == SKIN_Y19S4RUSTYWING ||
+			it.first == SKIN_Y20S2BOOTSKIN ||
+			it.first == SKIN_Y21S2DEIMOSSKIN ||
+			it.first == SKIN_Y21S3DEIMOS2SKIN ||
+			it.first == SKIN_Y21S3BOOSTERZOMBISKIN
+			)
+		{
+			Q_snprintf(szModelPath, sizeof(szModelPath), "models/v_knife_%s_host.mdl", szModel, szModel);
+			PRECACHE_MODEL(szModelPath);
+			Q_snprintf(szModelPath, sizeof(szModelPath), "models/v_zombibomb_%s_host.mdl", szModel, szModel);
+			PRECACHE_MODEL(szModelPath);
+			Q_snprintf(szModelPath, sizeof(szModelPath), "models/@frogvari_v_zombibomb_%s_host.mdl", szModel, szModel);
+			PRECACHE_MODEL(szModelPath);
+		}
+	}
 }
 
 }

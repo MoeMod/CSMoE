@@ -37,7 +37,7 @@ namespace sv {
 
 			explicit zclass_z4humpback(CBasePlayer *player) : m_pPlayer(player)
 			{
-				m_pPlayer->m_ZombieClass = "z4humpback";
+				m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_Z4HUMPBACK;
 
 				SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", Model);
 

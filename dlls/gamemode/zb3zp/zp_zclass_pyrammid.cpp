@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_Pyrammid::CZombieClass_Pyrammid(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "pyrammid";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_PYRAMMID;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
 
 	Evolution(iEvolutionLevel);

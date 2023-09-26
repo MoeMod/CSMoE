@@ -32,7 +32,7 @@ namespace sv {
 
 	CZombieClass_ZBS_Deimos2::CZombieClass_ZBS_Deimos2(CBasePlayer* player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "zbs_deimos2";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_ZBS_DEIMOS2;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieDash>(m_pPlayer);
 	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieStrengthRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);

@@ -136,7 +136,7 @@ class CPlayerModStrategy_ZB3F2P : public CPlayerModStrategy_ZB3
 public:
 	using CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3;
 	void GiveDefaultItems() override;
-	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, const char *name) override;
+	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, ZombieClassType iZombieClass = ZOMBIE_CLASS_HUMAN) override;
 };
 
 }

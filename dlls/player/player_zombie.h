@@ -20,9 +20,11 @@ GNU General Public License for more details.
 #endif
 
 #include "gamemode/zb1/zb1_const.h"
-
+#include "gamemode/zb2/zb2_const.h"
 namespace sv {
 void PlayerZombie_Precache();
+
+extern std::map<ZombieSkin, const char*> g_ZombieSkinModelName;
 }
 
 #endif

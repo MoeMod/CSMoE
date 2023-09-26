@@ -64,7 +64,7 @@ void EXPORT CZombieRushBox::BoxThink()
 		return;
 	}
 
-	if (stricmp(pOwner->m_ZombieClass, "meatwall"))
+	if (pOwner->m_iZombieClass != ZOMBIE_CLASS_MEATWALL)
 	{
 		SetThink(NULL);
 		UTIL_Remove(this);;

@@ -163,13 +163,11 @@ namespace sv {
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 105;
 		m_pPlayer->ResetMaxSpeed();
 
-		if (m_pPlayer->m_ZombieClass != NULL)
-		{
-			if (!stricmp(m_pPlayer->m_ZombieClass, "flying"))
+
+			if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_FLYING)
 				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/flyzombie_pressure.wav", VOL_NORM, ATTN_NORM);
 			else
 				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pressure.wav", VOL_NORM, ATTN_NORM);
-		}
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
@@ -184,24 +182,21 @@ namespace sv {
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
 		{
 			m_pPlayer->pev->maxspeed = 415;
-			if (m_pPlayer->m_ZombieClass != NULL)
+			if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_FLYING)
 			{
-				if (!stricmp(m_pPlayer->m_ZombieClass, "flying"))
-				{
-					m_pPlayer->pev->maxspeed = 395;
-					m_pPlayer->pev->gravity = 0.55;
-				}
-				if (!stricmp(m_pPlayer->m_ZombieClass, "pass"))
-				{
-					m_pPlayer->pev->maxspeed = 350;
-					m_pPlayer->pev->gravity = 0.6;
-				}
-				if (!stricmp(m_pPlayer->m_ZombieClass, "tank"))
-				{
-					m_pPlayer->pev->maxspeed = 415;
-					m_pPlayer->pev->gravity = 0.7;
-				}
+				m_pPlayer->pev->maxspeed = 395;
+				m_pPlayer->pev->gravity = 0.55;
 			}
+			if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_PASS)
+			{
+				m_pPlayer->pev->maxspeed = 350;
+				m_pPlayer->pev->gravity = 0.6;
+			}
+			if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_TANK)
+			{
+				m_pPlayer->pev->maxspeed = 415;
+				m_pPlayer->pev->gravity = 0.7;
+			}		
 		}
 	}
 
@@ -221,9 +216,9 @@ namespace sv {
 	{
 		m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
 
-		if (m_pPlayer->m_ZombieClass != NULL)
+		if (m_pPlayer->m_iZombieClass != NULL)
 		{
-			if (stricmp(m_pPlayer->m_ZombieClass, "flying"))
+			if (m_pPlayer->m_iZombieClass != ZOMBIE_CLASS_FLYING)
 			{
 				if (RANDOM_LONG(0, 1))
 					EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pre_idle_1.wav", VOL_NORM, ATTN_NORM);
@@ -245,15 +240,12 @@ namespace sv {
 
 	float CZombieSkill_ZombieCrazy::GetDamageRatio() const
 	{
-		if (m_pPlayer->m_ZombieClass != NULL)
-		{
-			if (!stricmp(m_pPlayer->m_ZombieClass, "flying"))
-				return 2.0;
-			if (!stricmp(m_pPlayer->m_ZombieClass, "pass"))
-				return 0.9;
-			if (!stricmp(m_pPlayer->m_ZombieClass, "tank"))
-				return 1.5;
-		}
+		if (m_pPlayer->m_iZombieClass != ZOMBIE_CLASS_FLYING)
+			return 2.0;
+		if (m_pPlayer->m_iZombieClass != ZOMBIE_CLASS_PASS)
+			return 0.9;
+		if (m_pPlayer->m_iZombieClass != ZOMBIE_CLASS_TANK)
+			return 1.5;
 
 		return 1.0f;
 	}
@@ -655,17 +647,18 @@ namespace sv {
 
 				if (flOldHealth < player->pev->health)
 				{
-					if (player->m_ZombieClass != NULL)
-					{
-						if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "flying") || !stricmp(m_pPlayer->m_ZombieClass, "resident") || !stricmp(m_pPlayer->m_ZombieClass, "witch") || !stricmp(m_pPlayer->m_ZombieClass, "spider") || !stricmp(m_pPlayer->m_ZombieClass, "siren"))
+						if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SPEED ||
+							m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_BOOSTER ||
+							m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_FLYING ||
+							m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_RESIDENT ||
+							m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_WITCH ||
+							m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SPIDER ||
+							m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SIREN)
 							EMIT_SOUND_DYN(ENT(player->pev), CHAN_AUTO, "zombi/zombi_heal_female.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
-						else if (!stricmp(m_pPlayer->m_ZombieClass, "teleport"))
+						else if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_TELEPORT)
 							EMIT_SOUND_DYN(ENT(player->pev), CHAN_AUTO, "zombi/zombi_heal_teleport.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);						
 						else
 							EMIT_SOUND_DYN(ENT(player->pev), CHAN_AUTO, "zombi/zombi_heal.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
-					}
-					else
-						EMIT_SOUND_DYN(ENT(player->pev), CHAN_AUTO, "zombi/zombi_heal.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
 				}
 				else
 				{
@@ -2888,24 +2881,24 @@ namespace sv {
 	{
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
 		{
-			if (m_pPlayer->m_ZombieClass != NULL)
+			if (m_pPlayer->m_iZombieClass != NULL)
 			{
-				if (!stricmp(m_pPlayer->m_ZombieClass, "speed"))
+				if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SPEED)
 				{
 					if(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
 						m_pPlayer->pev->gravity = 0.5;
 					else
 						m_pPlayer->pev->gravity = 0.55;
 				}
-				if (!stricmp(m_pPlayer->m_ZombieClass, "booster"))
+				if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_BOOSTER)
 				{
 					m_pPlayer->pev->gravity = 0.55;
 				}
-				if (!stricmp(m_pPlayer->m_ZombieClass, "witch"))
+				if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_WITCH)
 				{
 					m_pPlayer->pev->gravity = 0.6;
 				}
-				if (!stricmp(m_pPlayer->m_ZombieClass, "alien_infected"))
+				if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_ALIEN_INFECTED)
 				{
 					m_pPlayer->pev->gravity = 0.5;
 				}
@@ -3625,6 +3618,7 @@ namespace sv {
 			{
 				if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId == WEAPON_KNIFE)
 				{
+					FireZombieSkill();
 					m_SkillStatus = DEFENSE_START;
 					m_iZombieSkillStatus = SKILL_STATUS_USING;
 					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;

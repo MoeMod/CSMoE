@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_MeatWall::CZombieClass_MeatWall(CBasePlayer* player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "meatwall";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_MEATWALL;
 	m_pPlayer->m_iBuff |= BUFF_IGNORE_KNOCKBACK;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieDogShoot>(m_pPlayer);
 	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieRush>(m_pPlayer);

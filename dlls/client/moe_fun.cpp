@@ -6,6 +6,7 @@
 #include "player/player_mod_strategy.h"
 #include "util/u_range.hpp"
 #include "player/player_const.h"
+#include "gamemode/zb2//zb2_const.h"
 #include "moe_fun.h"
 #include "wdnmd.h"
 #include "immenu.h"
@@ -35,6 +36,52 @@ namespace sv {
         { TATTOO_LETTERCHN2, "纹身设计师活动获奖作品2(文字纹身)" },
         { TATTOO_LETTERCHN3, "纹身设计师活动获奖作品3(文字纹身)" },
         { TATTOO_TIGER22, "黑虎纹身" },
+    };
+
+    struct ZombieSkinMenu
+    {
+        ZombieClassType ClassType;
+        const char* SkinName;
+    };
+
+    std::map<ZombieSkin, ZombieSkinMenu> g_ZombieSkinName =
+    {
+        { SKIN_CHNNORMAL, { ZOMBIE_CLASS_TANK ,"国服(普通僵尸装饰)" } },
+        { SKIN_CHNSPEED, { ZOMBIE_CLASS_SPEED ,"国服(暗影芭比装饰)" } },
+        { SKIN_CHNPC, { ZOMBIE_CLASS_PC ,"国服(迷雾鬼影装饰)" } },
+        { SKIN_COSSPEED1, { ZOMBIE_CLASS_SPEED , "血腥玛丽(暗影芭比装饰)" } },
+        { SKIN_SANTASKINLIGHT, { ZOMBIE_CLASS_SPEED ,"圣诞派对(暗影芭比装饰)" } },
+        { SKIN_SANTASKINHEAVY, { ZOMBIE_CLASS_HEAVY ,"圣诞派对(憎恶屠夫装饰)"} },
+        { SKIN_CHEFSKINHEAVY, { ZOMBIE_CLASS_HEAVY ,"特级厨师(憎恶屠夫装饰)"} },
+        { SKIN_NURSESKINRESI, { ZOMBIE_CLASS_RESIDENT ,"死亡天使(痛苦女王装饰)"} },
+        { SKIN_TWSKINHEAVY, { ZOMBIE_CLASS_HEAVY ,"电音三太子(憎恶屠夫装饰)"} },
+        { SKIN_DEVILSKINLIGHT, { ZOMBIE_CLASS_SPEED ,"黑夜魔女(暗影芭比装饰)" } },
+        { SKIN_STONEDEIMOS2, { ZOMBIE_CLASS_DEIMOS2 ,"晶石魔像(恶魔猎手装饰)" } },
+        { SKIN_MUMMYSTAMPER, { ZOMBIE_CLASS_STAMPER ,"木乃伊(送葬者装饰)" } },
+        { SKIN_STUDENTLIGHT, { ZOMBIE_CLASS_SPEED ,"黑暗萝莉(暗影芭比装饰)" } },
+        { SKIN_STONEBOOMER, { ZOMBIE_CLASS_BOOMER ,"晶石巨像(腐化暴君装饰)" } },
+        { SKIN_Y19S2BLOTERSKIN, { ZOMBIE_CLASS_PASS ,"稻草人(爆弹狂魔装饰)" } },
+        { SKIN_Y19S2LIGHTSKIN, { ZOMBIE_CLASS_SPEED ,"西部牛仔(暗影芭比装饰)" } },
+        { SKIN_Y19S4PSYCHO, { ZOMBIE_CLASS_PC ,"海盗船长(迷雾鬼影装饰)" } },
+        { SKIN_Y19S4RUSTYWING, { ZOMBIE_CLASS_FLYING ,"堕落天使(断翼恶灵装饰)" } },
+        { SKIN_Y20S1DOCTORSKIN, { ZOMBIE_CLASS_HEAL ,"祸乱朝堂(巫蛊术尸装饰)" } },
+        { SKIN_Y20S1WITCHSKIN, { ZOMBIE_CLASS_WITCH ,"村野民妇(嗜血女妖装饰)" } },
+        { SKIN_Y20S2RESISKIN, { ZOMBIE_CLASS_RESIDENT ,"南方女巫(痛苦女王装饰)" } },
+        { SKIN_Y20S2BOOTSKIN, { ZOMBIE_CLASS_BOOSTER ,"西方女巫(追猎傀儡装饰)" } },
+        { SKIN_Y20S3SPEEDSKIN, { ZOMBIE_CLASS_SPEED ,"人工智能(暗影芭比装饰)" } },
+        { SKIN_Y20S3STAMPERSKIN, { ZOMBIE_CLASS_STAMPER ,"街头派对(送葬者装饰)" } },
+        { SKIN_Y21S1AKSHA, { ZOMBIE_CLASS_AKSHA ,"冰霜巨魔(赤炎恶鬼装饰)" } },
+        { SKIN_Y21S1FLYINGZOMBIE, { ZOMBIE_CLASS_FLYING ,"冰雪妖姬(断翼恶灵装饰)" } },
+        { SKIN_Y21S2DEIMOSSKIN, { ZOMBIE_CLASS_DEIMOS ,"半兽人(恶魔之子装饰)" } },
+        { SKIN_Y21S2WITCHSKIN, { ZOMBIE_CLASS_WITCH ,"黑暗精灵(嗜血女妖装饰)" } },
+        { SKIN_Y21S3DEIMOS2SKIN, { ZOMBIE_CLASS_DEIMOS2 ,"拘束装甲(恶魔猎手装饰)" } },
+        { SKIN_Y21S3BOOSTERZOMBISKIN, { ZOMBIE_CLASS_BOOSTER ,"自动人偶(追猎傀儡装饰)" } },
+        { SKIN_Y21S4BLOTERSKIN, { ZOMBIE_CLASS_PASS ,"双脊龙(爆弹狂魔装饰)" } },
+        { SKIN_Y21S4BOOMERSKIN, { ZOMBIE_CLASS_BOOMER ,"盾甲龙(腐化禁卫装饰)" } },
+        { SKIN_Y23S1NORMAL, { ZOMBIE_CLASS_TANK ,"机械殖装(普通僵尸装饰)" } },
+        { SKIN_Y23S2WITCHSKIN, { ZOMBIE_CLASS_WITCH ,"红心王后(嗜血女妖装饰)" } },
+        { SKIN_Y23S3NORMAL, { ZOMBIE_CLASS_TANK ,"埃及(普通僵尸装饰)" } },
+        
     };
 
     void PrintToChat(CBasePlayer* target, const std::string& what)
@@ -148,7 +195,43 @@ namespace sv {
             context.end(adminid);
             });
     }
- 
+
+    void ShowZombieSkinMenu(CBasePlayer* adminid)
+    {
+        ImMenu(adminid, [](auto context, CBasePlayer* adminid) {
+            context.begin("僵尸皮肤管理");
+
+            g_ZombieSkinName.size();
+
+            for (auto it = g_ZombieSkinName.begin(); it != g_ZombieSkinName.end(); it++) {
+
+                char szMenuSkinName[64];
+
+                if (adminid->m_iZombieClassSkin[it->second.ClassType] == it->first)
+                    Q_snprintf(szMenuSkinName, sizeof(szMenuSkinName), "%s[使用中]", it->second.SkinName);
+                else
+                    Q_snprintf(szMenuSkinName, sizeof(szMenuSkinName), "%s", it->second.SkinName);
+
+                if (context.item(it->second.SkinName, szMenuSkinName))
+                {
+                    if (adminid->m_iZombieClassSkin[it->second.ClassType] == it->first)
+                    {
+                        adminid->m_iZombieClassSkin[it->second.ClassType] = 0;
+
+                        PrintToChat(adminid, "已清除皮肤");
+                    }
+                    else
+                    {
+                        adminid->m_iZombieClassSkin[it->second.ClassType] = it->first;
+
+                        PrintToChat(adminid, "已应用皮肤");
+                    }
+                }
+            }
+
+            context.end(adminid);
+            });
+    }
     void ShowMoeFunMenu(CBasePlayer *playerid)
     {
         ImMenu(playerid, [](auto context, CBasePlayer * playerid){         
@@ -166,6 +249,9 @@ namespace sv {
 
             if (context.item("tattomenu", "纹身管理"))
                 ShowTattoMenu(playerid);
+
+            if (context.item("tattomenu", "僵尸皮肤管理"))
+                ShowZombieSkinMenu(playerid);
 
             context.end(playerid);
         });

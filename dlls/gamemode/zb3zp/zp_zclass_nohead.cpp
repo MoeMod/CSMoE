@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_Nohead::CZombieClass_Nohead(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "nohead";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_NOHEAD;
 
 	Evolution(iEvolutionLevel);
 

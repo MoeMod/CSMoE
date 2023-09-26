@@ -993,7 +993,7 @@ public:
 			{
 				CBasePlayer* player = (CBasePlayer*)pEntity;
 
-				if (player->m_bIsZombie && player->m_ZombieClass)
+				if (player->m_bIsZombie)
 				{
 					CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(pEntity);
 					if (player && player->m_bIsZombie)

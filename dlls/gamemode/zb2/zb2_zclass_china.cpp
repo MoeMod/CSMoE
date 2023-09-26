@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_China::CZombieClass_China(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "china";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_CHINA;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieStiffen>(m_pPlayer);
 	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieStrengthRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);

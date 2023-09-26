@@ -47,6 +47,9 @@ void CZombieHook::Spawn(void)
 
 void CZombieHook::Precache(void)
 {
+	PRECACHE_MODEL("models/y20s1witch_flower.mdl");
+	PRECACHE_MODEL("models/y21s2witch_fire.mdl");
+	PRECACHE_MODEL("models/ef_y23s2witchskin.mdl");
 	m_iWitchBatModelIndex = PRECACHE_MODEL("models/monster/bat_witch.mdl");
 	m_iBatEffectModelIndex = PRECACHE_MODEL("sprites/ef_bat.spr");
 
@@ -221,6 +224,21 @@ void CZombieHook::Init(void)
 
 	if (!pPlayer)
 		return;
+
+	if (pPlayer->m_iZombieClassSkin[ZOMBIE_CLASS_WITCH] == SKIN_Y20S1WITCHSKIN)
+		SET_MODEL(ENT(pev), "models/y20s1witch_flower.mdl");
+	else if (pPlayer->m_iZombieClassSkin[ZOMBIE_CLASS_WITCH] == SKIN_Y21S2WITCHSKIN)
+		SET_MODEL(ENT(pev), "models/y21s2witch_fire.mdl");
+	else if (pPlayer->m_iZombieClassSkin[ZOMBIE_CLASS_WITCH] == SKIN_Y23S2WITCHSKIN)
+		SET_MODEL(ENT(pev), "models/ef_y23s2witchskin.mdl");
+	else
+		SET_MODEL(ENT(pev), "models/monster/bat_witch.mdl");
+
+	pev->sequence = 0;
+
+	ResetSequenceInfo();
+
+	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
 	pPlayer->ResetMaxSpeed();
 	pPlayer->SendFOV(120);

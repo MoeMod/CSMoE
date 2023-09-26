@@ -1209,7 +1209,7 @@ namespace sv {
 		// Human should respawn as a zombie
 		if (!m_pPlayer->m_bIsZombie)
 		{
-			m_pPlayer->m_ZombieClass = "random";
+			m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 			m_pPlayer->m_bHeadshotKilled = false;
 			m_pPlayer->m_LastHitGroup = HITGROUP_GENERIC; // fix headshot cannot respawn (Bad Solution)
 			m_pPlayer->m_bIsZombie = true;

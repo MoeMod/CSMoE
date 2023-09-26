@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_Tank::CZombieClass_Tank(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "zptank";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_TANK;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 

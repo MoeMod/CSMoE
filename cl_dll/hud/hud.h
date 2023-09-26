@@ -1606,6 +1606,7 @@ public:
 	std::set<int> m_setBanWeapon;
 	std::set<int> m_setBanKnife;
 	std::set<int> m_setBanGrenade;
+	std::set<int> m_setBanZombie;
 
 	int m_iZlevel;
 	float m_flZombieSelectTime;

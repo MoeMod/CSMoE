@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_Teleport::CZombieClass_Teleport(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "teleport";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_TELEPORT;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieTeleport>(m_pPlayer);
 	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieHpBuff>(m_pPlayer);
 	Evolution(iEvolutionLevel);

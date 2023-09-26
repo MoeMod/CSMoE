@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_AP::CZombieClass_AP(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "ap";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_AP;
 
 	Evolution(iEvolutionLevel);
 

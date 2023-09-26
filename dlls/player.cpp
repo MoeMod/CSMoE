@@ -271,12 +271,14 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 
 	if (m_bIsZombie)
 	{
-		if (!stricmp(m_ZombieClass, "speed") ||
-			!stricmp(m_ZombieClass, "booster") ||
-			!stricmp(m_ZombieClass, "teleport") ||
-			!stricmp(m_ZombieClass, "flying") ||
-			!stricmp(m_ZombieClass, "spider") ||
-			!stricmp(m_ZombieClass, "siren"))
+		if (m_iZombieClass == ZOMBIE_CLASS_SPEED ||
+			m_iZombieClass == ZOMBIE_CLASS_BOOSTER ||
+			m_iZombieClass == ZOMBIE_CLASS_FLYING ||
+			m_iZombieClass == ZOMBIE_CLASS_RESIDENT ||
+			m_iZombieClass == ZOMBIE_CLASS_WITCH ||
+			m_iZombieClass == ZOMBIE_CLASS_SPIDER ||
+			m_iZombieClass == ZOMBIE_CLASS_SIREN ||
+			m_iZombieClass == ZOMBIE_CLASS_TELEPORT)
 		{
 			strcat(radiomsg, "_ZW");
 		}
@@ -986,9 +988,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				MESSAGE_END();
 			}
 			
-			if (m_bIsZombie && m_ZombieClass)
+			if (m_bIsZombie)
 			{
-				if (!stricmp(m_ZombieClass, "revival") && ~m_iBuff & BUFF_IGNORE_KNOCKBACK)
+				if (m_iZombieClass == ZOMBIE_CLASS_REVIVAL && ~m_iBuff & BUFF_IGNORE_KNOCKBACK)
 				{
 					m_iBuff |= BUFF_IGNORE_KNOCKBACK;
 					return flDamage;
@@ -1520,9 +1522,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		return flDamage;
 	}
 
-	if (m_bIsZombie && m_ZombieClass && flDamage > pev->health)
+	if (m_bIsZombie && flDamage > pev->health)
 	{
-		if (!stricmp(m_ZombieClass, "revival") && ~m_iBuff & BUFF_IGNORE_KNOCKBACK)
+		if (m_iZombieClass == ZOMBIE_CLASS_REVIVAL && ~m_iBuff & BUFF_IGNORE_KNOCKBACK)
 		{
 			m_iBuff |= BUFF_IGNORE_KNOCKBACK;
 			return flDamage;
@@ -2152,7 +2154,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 		}
 	}
 
-	if (m_bIsZombie && m_ZombieClass && (!stricmp(m_ZombieClass, "boomer")))
+	if (m_bIsZombie && m_iZombieClass == ZOMBIE_CLASS_BOOMER)
 	{
 		EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "zombi/boomer_death.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
@@ -2601,7 +2603,7 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 	if (m_bIsZombie)
 	{
 		speedLimit = 160.0;
-		if (!stricmp(this->m_ZombieClass, "meatwall"))
+		if (m_iZombieClass == ZOMBIE_CLASS_MEATWALL)
 		{
 			speedLimit = 300.0;
 			bMeatWallZombie = true;
@@ -4760,7 +4762,7 @@ void CBasePlayer::PlayerDeathThink()
 		if (gpGlobals->time > m_fDeadTime + 3.0s && !(m_afPhysicsFlags & PFLAG_OBSERVER))
 		{
 			// Send message to everybody to spawn a corpse.
-			if (!(m_bIsZombie && m_ZombieClass && (!stricmp(m_ZombieClass, "boomer"))))
+			if (!(m_bIsZombie && m_iZombieClass == ZOMBIE_CLASS_BOOMER))
 				SpawnClientSideCorpse();
 
 			// go to dead camera.
@@ -5189,7 +5191,7 @@ void CBasePlayer::Jump()
 		}
 	}
 
-	if (m_bIsZombie && !stricmp(this->m_ZombieClass, "china"))
+	if (m_bIsZombie && m_iZombieClass == ZOMBIE_CLASS_CHINA)
 		EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "zombi/zombi_chinese_jump.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 

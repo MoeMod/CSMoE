@@ -227,25 +227,26 @@ int CHudZB2_Skill::VidInit(void)
 				if (i == 0 || i > ((int)ZOMBIE_CLASS_MEATWALL + 1))
 					continue;
 
-				if (i == ((int)ZOMBIE_CLASS_MEATWALL + 1))
+				if (i == ZOMBIE_CLASS_MEATWALL + 1)
 				{
 					//PreInit SharedTexture
 					m_pTexture_RandomZbClass = R_LoadTextureShared("resource\\hud\\zombie\\zombietype_random");
 					gHUD.m_ZB2.SetSelectorIcon(i - 1, "resource\\hud\\zombie\\zombietype_random");
 					gHUD.m_ZB2.SetSelectorIconLevel(i - 1, 0);
 				}
-				else if (i == ((int)ZOMBIE_CLASS_MEATWALL))
-				{
-					//ZOMBIE_CLASS_SIREN
-					gHUD.m_ZB2.SetSelectorIcon(i - 1, Config::ZOMBIE_CLASS_HUD_ICON_NEW[ZOMBIE_CLASS_SIREN]);
-					gHUD.m_ZB2.SetSelectorIconLevel(i - 1, 0);
-				}
 				else
 				{
 					gHUD.m_ZB2.SetSelectorIcon(i - 1, Config::ZOMBIE_CLASS_HUD_ICON_NEW[i]);
-					gHUD.m_ZB2.SetSelectorIconLevel(i - 1, KeeperClassInfo[i - 1].level);
+					gHUD.m_ZB2.SetSelectorIconLevel(i - 1, KeeperClassInfo.at(ZombieClassType(i)).level);
 
-					if (i == ((int)ZOMBIE_CLASS_TELEPORT) || i == ((int)ZOMBIE_CLASS_REVIVAL) || i == ((int)ZOMBIE_CLASS_NEMESIS) || i == ((int)ZOMBIE_CLASS_SPIDER) || i == ((int)ZOMBIE_CLASS_DEATHKNIGHT))
+					//TODO mp_ban_zombie
+
+					if (i == ZOMBIE_CLASS_TELEPORT || 
+						i == ZOMBIE_CLASS_REVIVAL ||
+						i == ZOMBIE_CLASS_NEMESIS ||
+						i == ZOMBIE_CLASS_SPIDER || 
+						i == ZOMBIE_CLASS_DEATHKNIGHT ||
+						i == ZOMBIE_CLASS_MEATWALL)
 					{
 						gHUD.m_ZB2.SetSelectorIconBan(i - 1);
 						gHUD.m_ZB2.SetSelectorIconLevel(i - 1, 0);

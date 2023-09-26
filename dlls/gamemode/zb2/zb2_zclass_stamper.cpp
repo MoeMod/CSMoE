@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_Stamper::CZombieClass_Stamper(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "stamper";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_STAMPER;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePile>(m_pPlayer);
 	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieArmorRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);
@@ -45,11 +45,32 @@ void CZombieClass_Stamper::Evolution(ZombieLevel iEvolutionLevel)
 {
 	CBaseZombieClass_ZB2::Evolution(iEvolutionLevel);
 
-	const char* szModel = iEvolutionLevel ? "stamper_zombi_origin" : "stamper_zombi_host";
-	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
+	ZombieSkin skin = ZombieSkin(m_pPlayer->m_iZombieClassSkin[m_pPlayer->m_iZombieClass]);
 
-	static char szModelPath[64];
-	Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
+	char szModelPath[128];
+
+	if (g_ZombieSkinModelName.count(skin))
+	{
+		char szModel[32];
+		if (iEvolutionLevel)
+		{
+			Q_snprintf(szModel, sizeof(szModel), "%s_origin", g_ZombieSkinModelName[skin]);
+		}
+		else
+		{
+			Q_snprintf(szModel, sizeof(szModel), "%s_host", g_ZombieSkinModelName[skin]);
+		}
+
+		SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
+		Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
+	}
+	else
+	{
+		const char* szModel = iEvolutionLevel ? "stamper_zombi_origin" : "stamper_zombi_host";
+		SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
+		Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
+	}
+
 	m_pPlayer->SetNewPlayerModel(szModelPath);
 }
 
@@ -148,21 +169,50 @@ void CZombieClass_Stamper::DeathSound_Zombie()
 
 void CZombieClass_Stamper::OnWeaponDeploy(CBasePlayerItem *item)
 {
+	ZombieSkin skin = ZombieSkin(m_pPlayer->m_iZombieClassSkin[m_pPlayer->m_iZombieClass]);
+
 	switch(item->m_iId)
 	{
 		case WEAPON_KNIFE:
 		{
-			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_knife_zombiundertaker.mdl");
+			if (g_ZombieSkinModelName.count(skin))
+			{
+				const char* szModel = g_ZombieSkinModelName[skin];
+				char szModelPath[128];
+				Q_snprintf(szModelPath, sizeof(szModelPath), "models/v_knife_%s.mdl", szModel, szModel);
+
+				m_pPlayer->pev->viewmodel = MAKE_STRING(szModelPath);
+			}
+			else
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_knife_zombiundertaker.mdl");
 			break;
 		}
 		case WEAPON_HEGRENADE:
 		{
-			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb_undertaker.mdl");
+			if (g_ZombieSkinModelName.count(skin))
+			{
+				const char* szModel = g_ZombieSkinModelName[skin];
+				char szModelPath[128];
+				Q_snprintf(szModelPath, sizeof(szModelPath), "models/v_zombibomb_%s.mdl", szModel, szModel);
+
+				m_pPlayer->pev->viewmodel = MAKE_STRING(szModelPath);
+			}
+			else
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb_undertaker.mdl");
 			break;
 		}
 		case WEAPON_SMOKEGRENADE:
 		{
-			m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb_undertaker.mdl");
+			if (g_ZombieSkinModelName.count(skin))
+			{
+				const char* szModel = g_ZombieSkinModelName[skin];
+				char szModelPath[128];
+				Q_snprintf(szModelPath, sizeof(szModelPath), "models/@frogvari_v_zombibomb_%s.mdl", szModel, szModel);
+
+				m_pPlayer->pev->viewmodel = MAKE_STRING(szModelPath);
+			}
+			else
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb_undertaker.mdl");
 			break;
 		}
 		default:

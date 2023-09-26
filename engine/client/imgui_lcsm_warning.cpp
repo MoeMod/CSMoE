@@ -99,7 +99,7 @@ void ImGui_LCSM_OnGUI(void)
 		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------").crypt_get());
 		ImGui::TextColored(tipssss_color, xorstr("CSMoE只支持联机，如单机出现任何问题请不要反馈").crypt_get());
 		ImGui::TextColored(tipssss_color, xorstr("CSMoE官方群706711420，也可通过扫码进入").crypt_get());
-		ImGui::TextColored(tipssss_color, xorstr("游戏更新相关可点击左下角公告查看").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("更多内容请点击左下角公告查看").crypt_get());
 		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------").crypt_get());
 		ImGui::EndGroup();
 

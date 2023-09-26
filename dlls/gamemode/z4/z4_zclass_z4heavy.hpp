@@ -36,7 +36,7 @@ namespace sv {
 
 			explicit zclass_z4heavy(CBasePlayer *player) : m_pPlayer(player)
 			{
-				m_pPlayer->m_ZombieClass = "z4heavy";
+				m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_Z4HEAVY;
 
 				SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", Model);
 

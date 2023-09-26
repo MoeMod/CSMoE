@@ -309,7 +309,7 @@ namespace ui {
 			return;
 		ImGui::SetNextWindowSizeConstraints(ImGuiUtils::GetScaledSize({480, 320}), ImGui::GetIO().DisplaySize);
 		ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
-		if (ImGui::Begin("柑橘 CSMoE 服务器列表", &s_server_open))
+		if (ImGui::Begin("CSMoE 服务器列表", &s_server_open))
 		{
 			s_server_ioc.poll();
 

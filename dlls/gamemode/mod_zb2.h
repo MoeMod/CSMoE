@@ -44,7 +44,6 @@ public:
 	void PlayerThink(CBasePlayer *pPlayer) override;
 	BOOL ClientCommand(CBasePlayer *pPlayer, const char *pcmd) override;
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)  override;
-
 public: // IBaseMod
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 	float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
@@ -81,15 +80,13 @@ public:
 	void Pain(int m_LastHitGroup, bool HasArmour) override;
 	BOOL DeployWeapon(CBasePlayerItem *item) override;
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
-
-	const char* ZombieNameByClass(ZombieClassType i);
 protected:
 	virtual bool CanUseZombieSkill();
 	virtual void Zombie_HealthRecoveryThink();
 	virtual void UpdatePlayerEvolutionHUD();
 	virtual void CheckEvolution();
 	virtual void Evolution(ZombieLevel iEvolutionLevel);
-	virtual std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, const char *name = nullptr);
+	virtual std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, ZombieClassType iZombieClass = ZOMBIE_CLASS_HUMAN);
 
 protected:
 	void BecomeZombie(ZombieLevel iEvolutionLevel) override;

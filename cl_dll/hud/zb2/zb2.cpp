@@ -177,7 +177,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		float flHoldTime = buf.ReadCoord();
 		int iIsPc = buf.ReadByte();
 
-		cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + 6.0;
+		cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + flHoldTime;
 		if (iIsPc)
 		{
 			SetSelectorDrawTime(gHUD.m_flTime, flHoldTime);
@@ -407,7 +407,7 @@ int CHudZB2::Draw(float time)
 				{
 					m_iIcon[index]->Draw2DQuadScaled(iX, iY, (iX + m_iIcon[index]->w()), (iY + m_iIcon[index]->h()));
 				}
-				if (m_iLevel[index] > gHUD.m_iZlevel)
+				if (m_iLevel[index] > gHUD.m_iZlevel && gHUD.m_iModRunning == MOD_ZBZ)
 				{
 					if (m_iLockedImageBg)
 						m_iLockedImageBg->Draw2DQuadScaled(iX, iY, (iX + m_iIcon[index]->w()), (iY + m_iIcon[index]->h()));
@@ -760,7 +760,7 @@ bool CHudZB2::Selector(int item)
 			if (!m_bDraw[iNum] || m_bBanned[iNum])
 				return false;
 
-			if (m_iLevel[iNum] > gHUD.m_iZlevel)
+			if (m_iLevel[iNum] > gHUD.m_iZlevel && gHUD.m_iModRunning == MOD_ZBZ)
 				return false;
 
 			sprintf(ch, "BTE_Zb_Select_Zombie%d\n", iNum);

@@ -38,6 +38,7 @@
 #include "pm_materials.h"
 #include "player/hintmessage.h"
 #include "weapons.h"
+#include "gamemode/zb2/zb2_const.h"
 
 constexpr auto MIN_BUY_TIME =			15;	// the minimum threshold values for cvar mp_buytime 15 sec's
 
@@ -804,7 +805,8 @@ public:
 	float m_flSaveArmorAmount;
 
 	int m_iHealthDamageType;
-	const char* m_ZombieClass;
+	int m_iZombieClass;
+	int m_iZombieClassSkin[MAX_ZOMBIE_CLASS];
 	time_point_t m_flCustomSequenceUntilTime;
 	int m_iCustomSequence;
 	char m_szCustomSequence[32];

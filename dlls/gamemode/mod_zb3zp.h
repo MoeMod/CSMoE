@@ -44,7 +44,7 @@ public:
 	using CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3;
 	bool CanPlayerBuy(bool display) override;
 	void GiveDefaultItems() override;
-	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, const char* name) override;
+	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, ZombieClassType iZombieClass = ZOMBIE_CLASS_HUMAN) override;
 	void CmdStart(struct usercmd_s* cmd, unsigned int random_seed) override;
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet);

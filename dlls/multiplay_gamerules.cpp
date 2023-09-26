@@ -374,6 +374,32 @@ void SV_RemoveBanGrenade()
 	MESSAGE_END();
 }
 
+
+void SV_BanZombie()
+{
+	int n = CMD_ARGC();
+	if (n <= 1) return;
+	CHalfLifeMultiplay* mp = g_pGameRules;
+	std::vector<int> vecTemp;
+	mp->m_setBanZombie.clear();
+	for (int i = 1; i < n; ++i)
+	{
+		int iZombieClass = Q_atoi(CMD_ARGV(i));
+		mp->m_setBanZombie.insert(iZombieClass);
+		vecTemp.push_back(iZombieClass);
+	}
+
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgMPToCL);
+	WRITE_BYTE(48);
+	WRITE_BYTE(vecTemp.size());
+	for (auto& x : vecTemp)
+	{
+		WRITE_BYTE(x);
+	}
+	MESSAGE_END();
+}
+
+
 void CHalfLifeMultiplay::SetCareerMatchLimit(int minWins, int winDifference)
 {
 	if (!IsCareer())
@@ -898,6 +924,8 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 		ADD_SERVER_COMMAND("mp_remove_ban_knife", SV_RemoveBanKnife);
 		ADD_SERVER_COMMAND("mp_add_ban_grenade", SV_AddBanGrenade);
 		ADD_SERVER_COMMAND("mp_remove_ban_grenade", SV_RemoveBanGrenade);
+		ADD_SERVER_COMMAND("mp_ban_zombie", SV_BanZombie);
+
 		installedCommands = true;
 	}
 

@@ -33,7 +33,7 @@ namespace sv {
 
 			explicit zclass_z4light(CBasePlayer *player) : m_pPlayer(player)
 			{
-				m_pPlayer->m_ZombieClass = "z4light";
+				m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_Z4SPEED;
 
 				SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", Model);
 

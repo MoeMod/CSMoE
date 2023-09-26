@@ -62,6 +62,7 @@ class CPlayerModStrategy_ZBZ : public CPlayerModStrategy_ZB3
 public:
 	CPlayerModStrategy_ZBZ(CBasePlayer *player, CMod_ZombieZ *mp);
 
+	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, ZombieClassType iZombieClass = ZOMBIE_CLASS_HUMAN) override;
 	bool ClientCommand(const char* pcmd) override;
 	void OnSpawn() override;
 	void Evolution(ZombieLevel iEvolutionLevel) override;

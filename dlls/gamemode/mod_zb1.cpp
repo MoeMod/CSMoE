@@ -519,7 +519,7 @@ void CMod_Zombi::PickZombieOrigin()
 	// pick them
 	for (size_t i = 0; i < iNumZombies; ++i)
 	{
-		players[i]->m_ZombieClass = "random";
+		players[i]->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 		players[i]->pev->sequence = 0;
 		players[i]->m_iCustomSequence = -1;
 		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
@@ -535,7 +535,7 @@ void CMod_Zombi::PickZombieOrigin()
 
 void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
-	player->m_ZombieClass = "random";
+	player->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 	player->pev->sequence = 0;
 	player->m_tLockBuffTime = invalid_time_point;
 	player->m_flLockSpeed = 0.0;

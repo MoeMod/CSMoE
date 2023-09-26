@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_Spider::CZombieClass_Spider(CBasePlayer* player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "spider";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_SPIDER;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieWebShooter>(m_pPlayer);
 	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieWebBomb>(m_pPlayer);
 	Evolution(iEvolutionLevel);

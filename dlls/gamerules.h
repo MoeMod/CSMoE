@@ -569,6 +569,7 @@ public:
 	std::set<int> m_setBanWeapon;
 	std::set<int> m_setBanKnife;
 	std::set<int> m_setBanGrenade;
+	std::set<int> m_setBanZombie;
 
 protected:
 	time_point_t m_flIntermissionEndTime;

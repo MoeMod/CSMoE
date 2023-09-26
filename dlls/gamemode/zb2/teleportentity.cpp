@@ -50,7 +50,7 @@ void CTeleportEntity::Kill(void)
 void EXPORT CTeleportEntity::OnThink()
 {
 	CBasePlayer* owner = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pev->owner));
-	if (!owner->IsAlive() || (owner->m_ZombieClass && stricmp(owner->m_ZombieClass, "teleport")) || !owner->m_bIsZombie)
+	if (!owner->IsAlive() || owner->m_iZombieClass != ZOMBIE_CLASS_TELEPORT || !owner->m_bIsZombie)
 	{
 		Kill();
 		return;

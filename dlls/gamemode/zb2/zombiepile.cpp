@@ -113,7 +113,13 @@ void CZombiePile::Spawn(void)
 
 	SetTouch(NULL);
 	SetThink(&CZombiePile::OnGround);
-	SET_MODEL(ENT(pev), "models/zombipile.mdl");
+
+	if (m_hOwner->m_iZombieClassSkin[ZOMBIE_CLASS_STAMPER] == SKIN_MUMMYSTAMPER)
+		SET_MODEL(ENT(pev), "models/zombipile_mummystamper.mdl");
+	else if (m_hOwner->m_iZombieClassSkin[ZOMBIE_CLASS_STAMPER] == SKIN_Y20S3STAMPERSKIN)
+		SET_MODEL(ENT(pev), "models/zombipile_y20s3stamperskin.mdl");
+	else
+		SET_MODEL(ENT(pev), "models/zombipile.mdl");
 
 	pev->deadflag = DEAD_NO;
 	pev->takedamage = DAMAGE_YES;
@@ -148,6 +154,8 @@ void CZombiePile::Precache(void)
 	PRECACHE_SOUND("zombi/Zombi_Wood_Broken.wav");
 	PRECACHE_SOUND("zombi/zombi_stamper_iron_maiden_explosion.wav");
 	PRECACHE_MODEL("models/zombipile.mdl");
+	PRECACHE_MODEL("models/zombipile_mummystamper.mdl");
+	PRECACHE_MODEL("models/zombipile_y20s3stamperskin.mdl");
 	m_idShard = PRECACHE_MODEL("models/gibs_woodplank.mdl");
 	m_idShockWave = PRECACHE_MODEL("sprites/ef_shockwave.spr");
 }

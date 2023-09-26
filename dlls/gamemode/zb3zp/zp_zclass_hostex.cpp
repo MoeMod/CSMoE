@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_HostEx::CZombieClass_HostEx(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "hostex";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_HOSTEX;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieStiffen>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 

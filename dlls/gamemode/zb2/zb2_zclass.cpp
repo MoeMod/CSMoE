@@ -59,37 +59,38 @@ std::shared_ptr<CBaseZombieClass_ZB2> MakeZombieClass(CBasePlayer *player, Zombi
 	return std::make_shared<T>(player, lv);
 }
 #ifdef XASH_DEDICATED
-const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
-		{"tank", 100, MakeZombieClass<CZombieClass_Default>},
-		{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
-		{"heavy", 100, MakeZombieClass<CZombieClass_Heavy> },
-		{"pc", 100, MakeZombieClass<CZombieClass_Pc> },
-		{"heal", 100, MakeZombieClass<CZombieClass_Heal> },
-		{"deimos", 100, MakeZombieClass<CZombieClass_Deimos> },
-		{"deimos2", 100, MakeZombieClass<CZombieClass_Deimos2> },
-		{"zbs_deimos2", 100, MakeZombieClass<CZombieClass_ZBS_Deimos2> },
-		{"teleport", 100, MakeZombieClass<CZombieClass_Teleport> },
-		{"booster", 100, MakeZombieClass<CZombieClass_Booster> },
-		{"china", 100, MakeZombieClass<CZombieClass_China> },
-		{"pass", 100, MakeZombieClass<CZombieClass_Pass> },
-		{"flying", 100, MakeZombieClass<CZombieClass_Flying> },
-		{"revival", 50, MakeZombieClass<CZombieClass_Revival> },
-		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
-		{"resident", 100, MakeZombieClass<CZombieClass_Resident> },
-		{"witch", 100, MakeZombieClass<CZombieClass_Witch> },
-		{"aksha", 100, MakeZombieClass<CZombieClass_Aksha> },
-		{"boomer", 100, MakeZombieClass<CZombieClass_Boomer> },
-		{"nemesis", 25, MakeZombieClass<CZombieClass_Nemesis>},
-		{"spider", 25, MakeZombieClass<CZombieClass_Spider>},
-		{"deathknight", 25, MakeZombieClass<CZombieClass_DeathKnight>},
-		{"siren", 50, MakeZombieClass<CZombieClass_Siren>},
-		{"meatwall", 25, MakeZombieClass<CZombieClass_MeatWall>},
+
+const std::tuple<int, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
+	{ ZOMBIE_CLASS_TANK, 100, MakeZombieClass<CZombieClass_Default>},
+	{ ZOMBIE_CLASS_SPEED, 100, MakeZombieClass<CZombieClass_Speed> },
+	{ ZOMBIE_CLASS_HEAVY, 100, MakeZombieClass<CZombieClass_Heavy> },
+	{ ZOMBIE_CLASS_PC, 100, MakeZombieClass<CZombieClass_Pc> },
+	{ ZOMBIE_CLASS_HEAL, 100, MakeZombieClass<CZombieClass_Heal> },
+	{ ZOMBIE_CLASS_DEIMOS, 100, MakeZombieClass<CZombieClass_Deimos> },
+	{ ZOMBIE_CLASS_DEIMOS2, 100, MakeZombieClass<CZombieClass_Deimos2> },
+	{ ZOMBIE_CLASS_ZBS_DEIMOS2, 100, MakeZombieClass<CZombieClass_ZBS_Deimos2> },
+	{ ZOMBIE_CLASS_TELEPORT, 100, MakeZombieClass<CZombieClass_Teleport> },
+	{ ZOMBIE_CLASS_BOOSTER, 100, MakeZombieClass<CZombieClass_Booster> },
+	{ ZOMBIE_CLASS_CHINA, 100, MakeZombieClass<CZombieClass_China> },
+	{ ZOMBIE_CLASS_PASS, 100, MakeZombieClass<CZombieClass_Pass> },
+	{ ZOMBIE_CLASS_FLYING, 100, MakeZombieClass<CZombieClass_Flying> },
+	{ ZOMBIE_CLASS_REVIVAL, 50, MakeZombieClass<CZombieClass_Revival> },
+	{ ZOMBIE_CLASS_STAMPER, 100, MakeZombieClass<CZombieClass_Stamper> },
+	{ ZOMBIE_CLASS_RESIDENT, 100, MakeZombieClass<CZombieClass_Resident> },
+	{ ZOMBIE_CLASS_WITCH, 100, MakeZombieClass<CZombieClass_Witch> },
+	{ ZOMBIE_CLASS_AKSHA, 100, MakeZombieClass<CZombieClass_Aksha> },
+	{ ZOMBIE_CLASS_BOOMER, 100, MakeZombieClass<CZombieClass_Boomer> },
+	{ ZOMBIE_CLASS_NEMESIS, 25, MakeZombieClass<CZombieClass_Nemesis>},
+	{ ZOMBIE_CLASS_SPIDER, 25, MakeZombieClass<CZombieClass_Spider>},
+	{ ZOMBIE_CLASS_DEATHKNIGHT, 25, MakeZombieClass<CZombieClass_DeathKnight>},
+	{ ZOMBIE_CLASS_MEATWALL, 25, MakeZombieClass<CZombieClass_MeatWall>},
 };
 
 #else
-const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
-	{"tank", 100, MakeZombieClass<CZombieClass_Default>},
-	{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
+
+const std::tuple<int, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
+	{ ZOMBIE_CLASS_TANK, 100, MakeZombieClass<CZombieClass_Default>},
+	{ ZOMBIE_CLASS_SPEED, 100, MakeZombieClass<CZombieClass_Speed> },
 };
 #endif
 
@@ -101,32 +102,27 @@ constexpr std::array<unsigned int, NUM_ZCLASSES> MakeZClassWeightList(std::index
 }
 auto ZCLASSES_WEIGHT = MakeZClassWeightList(std::make_index_sequence<NUM_ZCLASSES>{});
 
-const char* CPlayerModStrategy_ZB2::ZombieNameByClass(ZombieClassType i)
-{
-	return std::get<0>(g_FindList[i]);
-}
-std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB2::ZombieClassFactory(ZombieLevel lv, const char *name)
+std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB2::ZombieClassFactory(ZombieLevel lv, ZombieClassType iZombieClass)
 {
 	auto player = m_pPlayer;
-	if(name == nullptr)
-		return std::get<2>(g_FindList[0])(player, lv);
 
-	if(!stricmp(name, "random"))
+	for (auto&& pr : g_FindList)
 	{
-		std::random_device rd;
-		std::mt19937 gen(rd());
-		const std::size_t N = std::discrete_distribution<>(ZCLASSES_WEIGHT.begin(), ZCLASSES_WEIGHT.end())(gen);
-		player->m_ZombieClass = std::get<0>(g_FindList[N]);
-		return std::get<2>(g_FindList[N])(player, lv);
-	}
-
-	for(auto &&pr : g_FindList)
-	{
-		if(!stricmp(name, std::get<0>(pr)))
+		if (iZombieClass == std::get<0>(pr))
 			return std::get<2>(pr)(player, lv);
 	}
 
-	return std::get<2>(g_FindList[0])(player, lv);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::size_t N;
+	while (N = std::discrete_distribution<>(ZCLASSES_WEIGHT.begin(), ZCLASSES_WEIGHT.end())(gen))
+	{
+		if (!g_pGameRules->m_setBanZombie.count(std::get<0>(g_FindList[N])))
+			break;	
+	}
+
+	player->m_iZombieClass = std::get<0>(g_FindList[N]);
+	return std::get<2>(g_FindList[N])(player, lv);
 }
 
 void CBaseZombieClass_ZB2::Evolution(ZombieLevel iEvolutionLevel)
@@ -241,14 +237,14 @@ float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
 	if(GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING || GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING)
 		return 0;
 
-	if (m_pPlayer->m_ZombieClass)
+	if (m_pPlayer->m_iZombieClass)
 	{
-		if (!stricmp(m_pPlayer->m_ZombieClass, "revival") || 
-			!stricmp(m_pPlayer->m_ZombieClass, "teleport") || 
-			!stricmp(m_pPlayer->m_ZombieClass, "spider") || 
-			!stricmp(m_pPlayer->m_ZombieClass, "deathknight") ||
-			!stricmp(m_pPlayer->m_ZombieClass, "nemesis") ||
-			!stricmp(m_pPlayer->m_ZombieClass, "meatwall"))
+		if(m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_REVIVAL ||
+			m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_TELEPORT ||
+			m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SPIDER || 
+			m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_DEATHKNIGHT ||
+			m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_MEATWALL ||
+			m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_NEMESIS)
 			return 1000;
 	}
 		

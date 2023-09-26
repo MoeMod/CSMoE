@@ -201,7 +201,7 @@ void CPlayerModStrategy_ZB3::OnKilled(entvars_t * pKiller, entvars_t * pInflicto
 	// Human should respawn as a zombie
 	if (!m_pPlayer->m_bIsZombie)
 	{
-		m_pPlayer->m_ZombieClass = "random";
+		m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 		m_pPlayer->m_bHeadshotKilled = false;
 		m_pPlayer->m_LastHitGroup = HITGROUP_GENERIC; // fix headshot cannot respawn (Bad Solution)
 		m_pPlayer->m_bIsZombie = true;
@@ -428,7 +428,7 @@ void CPlayerModStrategy_ZB3::CmdStart(struct usercmd_s* cmd, unsigned int random
 		auto iNumZombies = m_pModZB3->ZombieOriginNum();
 		auto iNumPlayers = m_pModZB3->m_iNumTerrorist + m_pModZB3->m_iNumCT;
 
-		m_pPlayer->m_ZombieClass = "random";
+		m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 		m_pPlayer->pev->sequence = 0;
 		m_pPlayer->m_iCustomSequence = -1;
 		m_pModZB3->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
@@ -549,7 +549,7 @@ void CMod_ZombieHero::MakeZombieOrigin()
 	// pick them
 	for (size_t i = 0; i < players.size(); ++i)
 	{
-		players[i]->m_ZombieClass = "random";
+		players[i]->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 		players[i]->pev->sequence = 0;
 		players[i]->m_iCustomSequence = -1;
 		if (enhancedzombie.value)
@@ -950,9 +950,9 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 	return CPlayerModStrategy_ZB3::GiveDefaultItems();
 }
 
-std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3F2P::ZombieClassFactory(ZombieLevel lv, const char *name)
+std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3F2P::ZombieClassFactory(ZombieLevel lv, ZombieClassType iZombieClass)
 {
-	if(!strcmp(name, "random"))
+	if(iZombieClass == ZOMBIE_CLASS_HUMAN)
 	{
 		if(!RANDOM_LONG(0, 3))
 		{
@@ -965,7 +965,7 @@ std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3F2P::ZombieClassFact
 			return std::make_shared<CZombieClass_Speed>(m_pPlayer, lv);
 		}
 	}
-	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, name);
+	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, iZombieClass);
 }
 }
 

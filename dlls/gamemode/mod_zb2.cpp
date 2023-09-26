@@ -263,7 +263,7 @@ void CMod_ZombieMod2::PickZombieOrigin()
 	// pick them
 	for (size_t i = 0; i < iNumZombies; ++i)
 	{
-		players[i]->m_ZombieClass = "random";
+		players[i]->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 		players[i]->pev->sequence = 0;
 		players[i]->m_iCustomSequence = -1;
 		players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
@@ -284,7 +284,7 @@ void CMod_ZombieMod2::PickZombieOrigin()
 
 void CMod_ZombieMod2::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
-	player->m_ZombieClass = "random";
+	player->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 	player->pev->sequence = 0;
 	player->m_tLockBuffTime = invalid_time_point;
 	player->m_flLockSpeed = 0.0;
@@ -356,7 +356,7 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 		WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
-		WRITE_COORD(20.0);
+		WRITE_COORD(8.0);
 		MESSAGE_END();
 	}
 
@@ -371,42 +371,15 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 			//(将字符串里的字母和下划线去掉)仅保留数字.
 			sscanf(pcmd, "%*[A-Za-z_]%31[0-9]", pCmdString);
 			//将（string）“数字”转为（int） 数字
-			iCmd = std::stoi(pCmdString);
+			iCmd = std::stoi(pCmdString) + 1;
 
-			int iZombieType = 0;
 
-			//如果选择的是随机  iZombieType = -1 ，否则 iZombieType = 人物序号（参见zb2_const.h）
-			if (iCmd <= ((int)ZOMBIE_CLASS_BOOMER))
-			{
-				iZombieType = (iCmd == int((ZOMBIE_CLASS_BOOMER))) ? -1 : iCmd;
-			}
-			//如果是随机选择
-			if (iZombieType == -1)
-			{
-				m_pPlayer->m_ZombieClass = "random";
-				auto RandomZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, m_pPlayer->m_ZombieClass);
-
-				m_pCharacter_ZB2 = RandomZombie;
-				m_pCharacter = RandomZombie;
-				RandomZombie->InitHUD();
-			}
-			//如果不是随机，根据用户选定的 ZombieClassType 找到对应的僵尸名
-			else
-			{
-				m_pPlayer->m_ZombieClass = ZombieNameByClass((ZombieClassType)iZombieType);
-				auto AbsZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, m_pPlayer->m_ZombieClass);
-
-				if (!AbsZombie)
-				{
-					m_pPlayer->m_ZombieClass = ZombieNameByClass(ZOMBIE_CLASS_TANK);
-					AbsZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, m_pPlayer->m_ZombieClass);
-				}
-					
-				m_pCharacter_ZB2 = AbsZombie;
-				m_pCharacter = AbsZombie;
-				AbsZombie->InitHUD();
-			}
-
+			auto AbsZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, ZombieClassType(iCmd));
+			
+			m_pCharacter_ZB2 = AbsZombie;
+			m_pCharacter = AbsZombie;
+			AbsZombie->InitHUD();
+			
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
 
@@ -505,17 +478,20 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 			m_pPlayer->pev->health = std::min(m_pPlayer->pev->max_health, m_pPlayer->pev->health + flRecoverValue);
 
 			// effects
-			if (m_pPlayer->m_ZombieClass)
-			{
-				if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "flying") || !stricmp(m_pPlayer->m_ZombieClass, "resident") || !stricmp(m_pPlayer->m_ZombieClass, "witch") || !stricmp(m_pPlayer->m_ZombieClass, "spider") || !stricmp(m_pPlayer->m_ZombieClass, "siren"))
-					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_female.wav\n");
-				else if (!stricmp(m_pPlayer->m_ZombieClass, "teleport"))
-					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_teleport.wav\n");
-				else if (!stricmp(m_pPlayer->m_ZombieClass, "revival"))
-					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_revival.wav\n");
-				else
-					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal.wav\n");
-			}
+			if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SPEED ||
+				m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_BOOSTER ||
+				m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_FLYING ||
+				m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_RESIDENT ||
+				m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_WITCH ||
+				m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SPIDER ||
+				m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SIREN)
+				CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_female.wav\n");
+			else if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_TELEPORT)
+				CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_teleport.wav\n");
+			else if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_REVIVAL)
+				CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_revival.wav\n");
+			else
+				CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal.wav\n");
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
 			WRITE_BYTE(ZB2_MESSAGE_HEALTH_RECOVERY);
@@ -526,7 +502,7 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 
 void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	auto sp = ZombieClassFactory(iEvolutionLevel, m_pPlayer->m_ZombieClass);
+	auto sp = ZombieClassFactory(iEvolutionLevel, (ZombieClassType)m_pPlayer->m_iZombieClass);
 	m_pCharacter_ZB2 = sp;
 	m_pCharacter = sp;
 	m_pPlayer->pev->flags &= ~FL_IMMUNE_LAVA;
@@ -568,7 +544,7 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
-	WRITE_COORD(20.0);
+	WRITE_COORD(8.0);
 	WRITE_BYTE((!m_pPlayer->IsUsingPC()) ? 0 : 1);
 	MESSAGE_END();
 
@@ -639,13 +615,12 @@ void CPlayerModStrategy_ZB2::Event_AdjustHumanHitgroup(CBasePlayer * attacker, H
 
 void CPlayerModStrategy_ZB2::Pain(int m_LastHitGroup, bool HasArmour)
 {
-	if (m_pPlayer->m_ZombieClass)
-	{
-		if(!stricmp(m_pPlayer->m_ZombieClass, "revival") && (m_pPlayer->m_iBuff) & BUFF_IGNORE_KNOCKBACK)
-			return CPlayerModStrategy_ZB1::Pain(m_LastHitGroup, HasArmour);
-		else
-			m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0s;
-	}
+
+	if(m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_REVIVAL && (m_pPlayer->m_iBuff) & BUFF_IGNORE_KNOCKBACK)
+		return CPlayerModStrategy_ZB1::Pain(m_LastHitGroup, HasArmour);
+	else
+		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0s;
+	
 	return CPlayerModStrategy_ZB1::Pain(m_LastHitGroup, HasArmour);
 }
 
@@ -717,13 +692,18 @@ void CPlayerModStrategy_ZB2::Evolution(ZombieLevel iEvolutionLevel)
 		m_pPlayer->m_flZombieArmor = m_pPlayer->pev->armorvalue;
 	}
 
-	if (m_pPlayer->m_ZombieClass)
-	{
-		if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "teleport") || !stricmp(m_pPlayer->m_ZombieClass, "flying") || !stricmp(m_pPlayer->m_ZombieClass, "spider") || !stricmp(m_pPlayer->m_ZombieClass, "siren"))
+	
+	if (m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SPEED ||
+		m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_BOOSTER ||
+		m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_FLYING ||
+		m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_RESIDENT ||
+		m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_WITCH ||
+		m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SPIDER ||
+		m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_SIREN ||
+		m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_TELEPORT)
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution_female.wav", VOL_NORM, ATTN_NORM);
 		else
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);
-	}
 }
 
 BOOL CPlayerModStrategy_ZB2::DeployWeapon(CBasePlayerItem *item)
@@ -747,12 +727,12 @@ int CPlayerModStrategy_ZB2::AddToFullPack_Post(struct entity_state_s* state, int
 
 void CPlayerModStrategy_ZB2::OnTouch(CBaseEntity* other)
 {
-	if (m_pPlayer->m_bIsZombie && m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "meatwall") && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
+	if (m_pPlayer->m_bIsZombie &&  m_pPlayer->m_iZombieClass ==ZOMBIE_CLASS_MEATWALL && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
 	{
 		m_pPlayer->m_iBuff |= BUFF_RUSHENTITY;
 	}
 
-	if (m_pPlayer->m_bIsZombie && m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "boomer") && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
+	if (m_pPlayer->m_bIsZombie && m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_BOOMER && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
 	{
 		if (!other->IsPlayer())
 			return;

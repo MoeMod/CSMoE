@@ -33,7 +33,7 @@ namespace sv {
 
 CZombieClass_Licker::CZombieClass_Licker(CBasePlayer* player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pPlayer->m_ZombieClass = "licker";
+	m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_LICKER;
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieHide>(m_pPlayer);
 
 	Evolution(iEvolutionLevel);

@@ -39,6 +39,7 @@
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
 #include "pm_defs.h"
+#include "gamemode/zb2/zb2_const.h"
 
 #define ANIM_WALK_SEQUENCE 3
 #define ANIM_JUMP_SEQUENCE 6
@@ -153,6 +154,8 @@ int g_iStickyBombSkinG = 0;
 int g_iStickyBombSkinW = 0;
 
 int g_iDvhammerState = 0;
+
+int g_iZombieClassSkin[33][MAX_ZOMBIE_CLASS];
 
 CGameStudioModelRenderer::CGameStudioModelRenderer(void)
 {

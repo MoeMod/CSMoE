@@ -9,7 +9,8 @@ public:
 
 public:
 	void EXPORT OnTouch(CBaseEntity* pOther);
-	void EXPORT Onthink();
+	void EXPORT IgniteThink();
+	void EXPORT FollowThink();
 
 public:
 	void Explosion();
@@ -17,11 +18,14 @@ public:
 	void RadiusDamage();
 
 public:
-	int m_iSmokeTrail;
-	int m_iFireBallDestroy;
-	int m_iFireBallExplosion;
+	int m_iSmokeTrail[2];
+	int m_iFireBallDestroy[2];
+	int m_iFireBallExplosion[2];
 
 private:
+	int m_iSkin;
+	float m_flMaxFrames;
+	CBasePlayer* m_pOwner;
 	duration_t GetAliveTime() const { return 4s; }
 	float GetRange() const { return 180.0f; }
 	float GetDamage() const { return 800.0f; }

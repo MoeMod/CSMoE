@@ -731,7 +731,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 	m_pPlayer->m_bHasPrimary = false;
 
 	m_pPlayer->GiveNamedItem("weapon_zombibomb");
-	if (m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "deathknight"))
+	if (m_pPlayer->m_iZombieClass && m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_DEATHKNIGHT)
 	{
 		m_pPlayer->GiveNamedItem("knife_zombi_z5");
 	}

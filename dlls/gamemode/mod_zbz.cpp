@@ -40,12 +40,12 @@ GNU General Public License for more details.
 }
 
 namespace sv {
-	constexpr int MAX_LEVELS = 60;
+	constexpr int MAX_LEVELS = 40;
 	constexpr int HURT_PER_XP = 30; // 满足累计承受伤害后获得经验值
-	constexpr int HURT_AMOUNT = 3000; // 满足累计承受伤害值
-	constexpr int DAMAGE_PER_XP = 100; // 满足累计造成伤害后获得经验值
-	constexpr int DAMAGE_AMOUNT = 5000; // 满足累计造成伤害值
-	constexpr float EXP_SCALE = 0.33f; // 每回合每升一级所减少经验获取百分比
+	constexpr int HURT_AMOUNT = 400; // 满足累计承受伤害值
+	constexpr int DAMAGE_PER_XP = 10; // 满足累计造成伤害后获得经验值
+	constexpr int DAMAGE_AMOUNT = 500; // 满足累计造成伤害值
+	constexpr float EXP_SCALE = 0.25f; // 每回合每升一级所减少经验获取百分比
 	constexpr duration_t ROUND_PERIOD_ADD = 60s; // 每回合时间超过多少秒后下一回合才会给予技能点
 	constexpr duration_t UPGRADE_SKILL_DELAY = 1s;
 
@@ -238,9 +238,9 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 		m_pPlayer->m_iTeam = TERRORIST;
 		const char* pszArg1 = CMD_ARGV_(1);
 		if (pszArg1)
-			m_pPlayer->m_ZombieClass = pszArg1;
+			m_pPlayer->m_iZombieClass = pszArg1;
 		else
-			m_pPlayer->m_ZombieClass = "random";
+			m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_HUMAN
 
 		m_pPlayer->pev->sequence = 0;
 		m_pModZBZ->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
@@ -343,13 +343,50 @@ void CPlayerModStrategy_ZBZ::BecomeHuman()
 	SKILL_FUNCTION(m_vecSkill, OnBecomeHuman);
 }
 
+std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZBZ::ZombieClassFactory(ZombieLevel lv, ZombieClassType iZombieClass)
+{
+	if (m_pPlayer->IsBot())
+		return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, iZombieClass);
+
+	if (iZombieClass > ZOMBIE_CLASS_MEATWALL || iZombieClass < ZOMBIE_CLASS_TANK)
+	{
+		if (!RANDOM_LONG(0, 9))
+		{
+			switch (RANDOM_LONG(0,5))
+			{
+			case 0: iZombieClass = ZOMBIE_CLASS_TELEPORT; break;
+			case 1: iZombieClass = ZOMBIE_CLASS_REVIVAL; break;
+			case 2: iZombieClass = ZOMBIE_CLASS_SPIDER; break;
+			case 3: iZombieClass = ZOMBIE_CLASS_DEATHKNIGHT; break;
+			case 4: iZombieClass = ZOMBIE_CLASS_MEATWALL; break;
+			case 5: iZombieClass = ZOMBIE_CLASS_NEMESIS; break;
+			}
+
+			return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, iZombieClass);
+		}
+		else
+		{
+			while(iZombieClass = ZombieClassType(RANDOM_LONG(ZOMBIE_CLASS_TANK, ZOMBIE_CLASS_BOOMER)))
+			{
+				if (m_iLevel >= KeeperClassInfo.at(iZombieClass).level)
+					break;
+
+				if (!g_pGameRules->m_setBanZombie.count(iZombieClass))
+					break;
+			}
+		}
+	}
+	
+	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, iZombieClass);
+}
+
 void CPlayerModStrategy_ZBZ::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
 	CPlayerModStrategy_ZB3::BecomeZombie(iEvolutionLevel);
 	// this is a bad solution....
-	/*if (!CheckSkill(Skill_HeroicPresence) && m_pPlayer->m_ZombieClass == "revival")
+	/*if (!CheckSkill(Skill_HeroicPresence) && m_pPlayer->m_iZombieClass == "revival")
 	{
-		m_pPlayer->m_ZombieClass = "random";
+		m_pPlayer->m_iZombieClass = "random";
 		m_pModZBZ->MakeZombie(m_pPlayer, m_pPlayer->m_iZombieLevel);
 	}*/
 
@@ -741,7 +778,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			auto iNumZombies = m_pModZBZ->ZombieOriginNum();
 			auto iNumPlayers = m_pModZBZ->m_iNumTerrorist + m_pModZBZ->m_iNumCT;
 
-			m_pPlayer->m_ZombieClass = "random";
+			m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
 			m_pModZBZ->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
@@ -809,7 +846,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 				return;
 			}
 
-			if (m_pPlayer && m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "nemesis"))
+			if (m_pPlayer && m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_NEMESIS)
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 				if (pWeapon)
@@ -823,10 +860,10 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
 			switch (RANDOM_LONG(0, 3))
 			{
-			case 0: m_pPlayer->m_ZombieClass = "nemesis"; break;
-			case 1: m_pPlayer->m_ZombieClass = "spider"; break;
-			case 2: m_pPlayer->m_ZombieClass = "deathknight"; break;
-			case 3: m_pPlayer->m_ZombieClass = "meatwall"; break;
+			case 0: m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_NEMESIS; break;
+			case 1: m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_SPIDER; break;
+			case 2: m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_DEATHKNIGHT; break;
+			case 3: m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_MEATWALL; break;
 			}		
 			
 			m_pPlayer->pev->sequence = 0;
@@ -860,7 +897,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 				return;
 			}
 
-			if (m_pPlayer && m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "nemesis"))
+			if (m_pPlayer && m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_NEMESIS)
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 				if (pWeapon)
@@ -880,7 +917,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			}
 
 			m_flNextTimeChangeZombie = gpGlobals->time + 5.0s;
-			m_pPlayer->m_ZombieClass = "random";
+			m_pPlayer->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
 			CPlayerModStrategy_ZB3::BecomeZombie(m_pPlayer->m_iZombieLevel);
@@ -1047,7 +1084,7 @@ void CMod_ZombieZ::RestartRound()
 
 void CMod_ZombieZ::HumanInfectionByZombie(CBasePlayer* player, CBasePlayer* attacker)
 {
-	player->m_ZombieClass = "random";
+	player->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 	player->pev->sequence = 0;
 	player->m_tLockBuffTime = invalid_time_point;
 	player->m_flLockSpeed = 0.0;
@@ -1111,7 +1148,7 @@ void CMod_ZombieZ::MakeZombieOrigin()
 	// pick them
 	for (size_t i = 0; i < players.size(); ++i)
 	{
-		players[i]->m_ZombieClass = "random";
+		players[i]->m_iZombieClass = ZOMBIE_CLASS_HUMAN;
 		players[i]->pev->sequence = 0;
 		players[i]->m_iCustomSequence = -1;
 		if (enhancedzombie.value)
