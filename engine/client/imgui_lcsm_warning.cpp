@@ -98,7 +98,7 @@ void ImGui_LCSM_OnGUI(void)
 		ImColor tipssss_color(0.3f, 0.6f, 0.2f, 1.0f);
 		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------").crypt_get());
 		ImGui::TextColored(tipssss_color, xorstr("CSMoE只支持联机，如单机出现任何问题请不要反馈").crypt_get());
-		ImGui::TextColored(tipssss_color, xorstr("CSMoE官方群706711420，也可通过扫码进入").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("CSMoE官方群932329867，也可通过扫码进入").crypt_get());
 		ImGui::TextColored(tipssss_color, xorstr("更多内容请点击左下角公告查看").crypt_get());
 		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------").crypt_get());
 		ImGui::EndGroup();
@@ -144,7 +144,7 @@ void ImGui_LCSM_OnGUI(void)
 			qrcode::QRCode s_qrcode;
 			std::vector<uint8_t> s_qrCodeBytes;
 			s_qrCodeBytes.resize(qrcode::getBufferSize(9));
-			qrcode::initText(&s_qrcode, s_qrCodeBytes.data(), 9, qrcode::ECC_LOW, xorstr("https://qm.qq.com/cgi-bin/qm/qr?k=m-wI8acAT7XurfGiy_2JZy9DBupc1tXe&authKey=ZgiTHa6sHJjpkKqMLE8XQH31pHL1gFGF4mOi3xH5zW6D169YuTGbKJqcRI0B7cVX").crypt_get());
+			qrcode::initText(&s_qrcode, s_qrCodeBytes.data(), 9, qrcode::ECC_LOW, xorstr("https://qm.qq.com/cgi-bin/qm/qr?k=PpTT3VKOkaOOy8FCKHtz_BbHXnlQ86fw&jump_from=webapi&qr=1").crypt_get());
 
 			auto	r_image = Image_NewTemp();
 			char	texName[32];

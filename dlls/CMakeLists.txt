@@ -275,6 +275,7 @@ set(HLDLL_SRCS
 	./gamemode/zbs/monster_boss_big07.cpp
 	./gamemode/zbs/monster_boss_big08.cpp
 	./client/moe_fun.cpp
+	./dgaxelubu.cpp
 
 	)
 
@@ -684,6 +685,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_leapstrikegun.cpp
 	../dlls/wpn_shared/wpn_transformgunadv.cpp
 	../dlls/wpn_shared/knife_hzknife.cpp
+	../dlls/wpn_shared/wpn_y23s3buffm249.cpp
+	../dlls/wpn_shared/wpn_ignitebomb.cpp
+	../dlls/wpn_shared/knife_dgaxeex.cpp
 	)
 
 set(PM_SRCS

@@ -288,6 +288,13 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pLeapStrikeGunViewModel = IEngineStudio.Mod_ForName("models/v_leapstrikegun.mdl", FALSE);
 	CStudioModelRenderer::s_pLeapStrikeGunPartModel = IEngineStudio.Mod_ForName("models/v_leapstrikegun_parts.mdl", FALSE);
 
+	CStudioModelRenderer::s_pY23S3BUFFM249ViewModel = IEngineStudio.Mod_ForName("models/v_y23s3buffm249.mdl", FALSE);
+	CStudioModelRenderer::s_pY23S3BUFFM249FireModel = IEngineStudio.Mod_ForName("sprites/ef_y23s3buffm249_fire.spr", FALSE);
+
+	CStudioModelRenderer::s_pDgaxeEXViewModel = IEngineStudio.Mod_ForName("models/v_dgaxeex.mdl", FALSE);
+	CStudioModelRenderer::s_pDgaxeEXMuzzLModel = IEngineStudio.Mod_ForName("sprites/muzzleflash333.spr", FALSE);
+	CStudioModelRenderer::s_pDgaxeEXMuzzRModel = IEngineStudio.Mod_ForName("sprites/muzzleflash334.spr", FALSE);
+
 	//VGui_Startup();
 
 	return 1;

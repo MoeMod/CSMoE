@@ -24,8 +24,11 @@
 #include "draw_util.h"
 #include "legacy/hud_scoreboard_legacy.h"
 #include "player/player_model.h"
+#include "gamemode/zb2/zb2_const.h"
 
 namespace cl {
+
+extern int g_iPlayerZombieClass;
 
 DECLARE_MESSAGE(m_NewHud, NewHudMsg)
 
@@ -210,6 +213,26 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 		m_iCharacter = R_LoadTextureUnique(tmp.c_str());
 	}
 
+	if (g_PlayerExtraInfo[idx].zombie)
+	{
+		if (m_iLastZombieClass != g_iPlayerZombieClass)
+		{
+			m_iLastZombieClass = g_iPlayerZombieClass;
+			if (m_iCharacter)
+				m_iCharacter = nullptr;
+
+			std::string tmp;
+			if (Q_stristr(g_PlayerInfoList[idx].model, "_host"))
+				tmp = "resource/hud/portrait/hud_" + g_szZombiePortrait.at(ZombieClassType(g_iPlayerZombieClass)) + "_host";
+			else if (Q_stristr(g_PlayerInfoList[idx].model, "_origin"))
+				tmp = "resource/hud/portrait/hud_" + g_szZombiePortrait.at(ZombieClassType(g_iPlayerZombieClass)) + "_origin";
+			else
+				tmp = "resource/hud/portrait/hud_" + g_szZombiePortrait.at(ZombieClassType(g_iPlayerZombieClass));
+
+			m_iCharacter = R_LoadTextureUnique(tmp.c_str());
+		}
+	}
+
 	if (m_iCharacter) {
 		iW = m_iCharacter->w();
 		iH = m_iCharacter->h();
@@ -247,6 +270,27 @@ int CHudNewHud::DrawApexHudCharacterBG(float flTime)
 		std::string tmp = "resource/hud/portrait/hud_" + m_szLastModel;
 		m_iCharacter = R_LoadTextureUnique(tmp.c_str());
 	}
+
+	if (g_PlayerExtraInfo[iIndex].zombie)
+	{
+		if (m_iLastZombieClass != g_iPlayerZombieClass)
+		{
+			m_iLastZombieClass = g_iPlayerZombieClass;
+			if (m_iCharacter)
+				m_iCharacter = nullptr;
+
+			std::string tmp;
+			if (Q_stristr(g_PlayerInfoList[iIndex].model, "_host"))
+				tmp = "resource/hud/portrait/hud_" + g_szZombiePortrait.at(ZombieClassType(g_iPlayerZombieClass)) + "_host";
+			else if (Q_stristr(g_PlayerInfoList[iIndex].model, "_origin"))
+				tmp = "resource/hud/portrait/hud_" + g_szZombiePortrait.at(ZombieClassType(g_iPlayerZombieClass)) + "_origin";
+			else
+				tmp = "resource/hud/portrait/hud_" + g_szZombiePortrait.at(ZombieClassType(g_iPlayerZombieClass));
+
+			m_iCharacter = R_LoadTextureUnique(tmp.c_str());
+		}
+	}
+
 	if (m_iCharacter)
 	{
 		int iW = m_iCharacter->w() * 0.6f;

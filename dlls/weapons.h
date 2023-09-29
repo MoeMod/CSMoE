@@ -230,7 +230,8 @@ public:
 		EXPTYPE_HK121ROCKET,
 		EXPTYPE_CHINAEVENTBOMB,
 		EXPTYPE_Y20S1GRENADE,
-		EXPTYPE_JANUS1ROCKET
+		EXPTYPE_JANUS1ROCKET,
+		EXPTYPE_IGNITEBOMB,
 	};
 
 	void Spawn() override;
@@ -319,6 +320,7 @@ public:
 	void FireBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
 	void ChinaEventBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius);
 	void WaterBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius);
+	void IgniteBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius);
 	void EXPORT SFGrenadeExplodeThink(void);
 	void EXPORT SFGrenadeTouch(CBaseEntity* pOther);
 
@@ -1571,6 +1573,44 @@ private:
 	time_point_t m_flIgniteTime;
 };
 
+class CKnifeDGAXE_LuBu : public CBaseAnimating
+{
+public:
+	CKnifeDGAXE_LuBu()
+	{
+		m_iType = 0;
+		m_iSkill = 0;
+	};
+	void Spawn(void);
+	void Precache(void);
+
+	float GetArmorRatioModifier() { return ::sv::GetArmorRatioModifier(WEAPON_KNIFE); }
+	int GetWeaponsId(void) { return WEAPON_KNIFE; }
+
+public:
+	void EXPORT LuBuThink(void);
+
+	static CKnifeDGAXE_LuBu* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, CBasePlayer* pOwner, int iTeam, int iSkill);
+	void RadiusDamage();
+	void FadeOut();
+
+private:
+	float GetDamage();
+	float GetRadius();
+
+	int m_iType;
+	int m_iSkill;
+	CBasePlayer* m_pOwner;
+	int m_iExplo[2];
+	int m_iSmoke;
+	int m_iShockWaveIndex;
+
+	time_point_t m_flDamageTime;
+	time_point_t m_flLoopTime;
+
+
+};
+
 #if 0
 class CGuillotineexAmmo : public CBaseAnimating
 {
@@ -1675,6 +1715,7 @@ extern short g_sModelIndexEventBombExp;
 extern short g_sModelIndexEventBombExp2;
 extern short g_sModelIndexMoonCakeExp;
 extern short g_sModelIndexHolyWater;
+extern short g_sModelIndexIgniteBomb;
 
 extern short g_sModelIndexBoomerEffect;
 extern short g_sModelIndexBoomerSprite;

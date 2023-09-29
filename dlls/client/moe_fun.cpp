@@ -80,7 +80,7 @@ namespace sv {
         { SKIN_Y21S4BOOMERSKIN, { ZOMBIE_CLASS_BOOMER ,"盾甲龙(腐化禁卫装饰)" } },
         { SKIN_Y23S1NORMAL, { ZOMBIE_CLASS_TANK ,"机械殖装(普通僵尸装饰)" } },
         { SKIN_Y23S2WITCHSKIN, { ZOMBIE_CLASS_WITCH ,"红心王后(嗜血女妖装饰)" } },
-        { SKIN_Y23S3NORMAL, { ZOMBIE_CLASS_TANK ,"埃及(普通僵尸装饰)" } },
+        { SKIN_Y23S3NORMAL, { ZOMBIE_CLASS_TANK ,"沙漠守卫(普通僵尸装饰)" } },
         
     };
 

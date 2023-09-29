@@ -33,6 +33,8 @@ namespace sv {
 
 LINK_ENTITY_TO_CLASS(weapon_ignitemg, CIgniteMG)
 
+#define	IGNITEMG_MAX_CLIP2	25
+
 void CIgniteMG::Spawn(void)
 {
 	pev->classname = MAKE_STRING("weapon_ignitemg");
@@ -66,7 +68,7 @@ void CIgniteMG::Precache(void)
 	PRECACHE_MODEL("sprites/muzzleflash322.spr");
 	PRECACHE_MODEL("sprites/muzzleflash323.spr");
 
-	m_iBeamIndex = PRECACHE_MODEL("sprites/ef_gungnir_lightline1ex.spr");
+	m_iBeamIndex = PRECACHE_MODEL("sprites/ef_gungnir_xbeamex.spr");
 
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
@@ -79,7 +81,7 @@ int CIgniteMG::GetItemInfo(ItemInfo *p)
 	p->pszAmmo1 = "556NatoBox";
 	p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
 	p->pszAmmo2 = "ignitemg_b";
-	p->iMaxAmmo2 = 25;
+	p->iMaxAmmo2 = IGNITEMG_MAX_CLIP2;
 	p->iMaxClip = 150;
 	p->iSlot = 0;
 	p->iPosition = 4;
@@ -103,11 +105,16 @@ int CIgniteMG::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 
 BOOL CIgniteMG::Deploy(void)
 {
-	ResetChargeTimer();
-	ChargeAmmo();
+	CreateEffect();
+
 	m_flNextReload = invalid_time_point;
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
+
+	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += (gpGlobals->time - m_flTimeNextCharge) / GetChargeTime();
+	m_flTimeNextCharge = gpGlobals->time + GetChargeTime();
+	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= IGNITEMG_MAX_CLIP2)
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = IGNITEMG_MAX_CLIP2;
 
 	m_flAttackLoop = invalid_time_point;
 
@@ -206,7 +213,20 @@ void CIgniteMG::Reload(void)
 void CIgniteMG::Holster(int skiplocal)
 {
 	m_flNextPrimaryAttack = 0s;
-	ResetChargeTimer();
+	ClearEffect();
+	DestroyEffect();
+
+#ifndef CLIENT_DLL
+	MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+	WRITE_BYTE(79);
+	WRITE_SHORT(m_pPlayer->entindex());
+	WRITE_SHORT(CHAN_WEAPON);
+	WRITE_STRING("weapons/ignitemg_shoot2_loop.wav");
+	MESSAGE_END();
+#endif
+
+	m_flTimeNextCharge = gpGlobals->time;
+
 	return CBasePlayerWeapon::Holster(skiplocal);
 }
 
@@ -217,19 +237,17 @@ void CIgniteMG::ResetChargeTimer(void)
 
 void CIgniteMG::ChargeAmmo()
 {
-	if (m_flTimeNextCharge != invalid_time_point && m_flTimeNextCharge <= gpGlobals->time)
+	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < IGNITEMG_MAX_CLIP2)
 	{
-		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += int((gpGlobals->time - m_flTimeNextCharge) / 1.0s + 1.0);
+		if (m_flTimeNextCharge <= gpGlobals->time)
+		{
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
 
-		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 25)
-			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 25;
-
-
-		m_flTimeNextCharge = gpGlobals->time + 1.0s;
-
-		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 25)
-			m_flTimeNextCharge = invalid_time_point;
+			m_flTimeNextCharge = gpGlobals->time + GetChargeTime();
+		}
 	}
+	else
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = IGNITEMG_MAX_CLIP2;
 }
 
 void CIgniteMG::CreateEffect()
@@ -237,11 +255,11 @@ void CIgniteMG::CreateEffect()
 #ifndef CLIENT_DLL
 	for (size_t i = 0; i < 3; ++i)
 	{
-		CBeam* pBeam = CBeam::BeamCreate("sprites/ef_gungnir_lightline1ex.spr", 30);
-		pBeam->SetColor(0, 100, 255);
-		pBeam->SetScrollRate(30);
+		CBeam* pBeam = CBeam::BeamCreate("sprites/ef_gungnir_xbeamex.spr", 30);
+		pBeam->SetColor(255, 255, 255);
+		pBeam->SetScrollRate(8);
 		pBeam->SetBrightness(0);
-		pBeam->SetNoise(30);
+		pBeam->SetNoise(10);
 		pev->effects |= EF_NODRAW;
 
 		m_pBeamList[i] = pBeam;
@@ -360,76 +378,25 @@ void CIgniteMG::SecondaryAttack_InstantDamage()
 
 		if (v8 < 3)
 		{
-
 			CBeam* pBeam = m_pBeamList[v8];
 			if (pBeam)
 			{
 				pBeam->SetType(BEAM_ENTS);
 				pBeam->SetStartEntity(ENTINDEX(m_pPlayer->edict()));
 				pBeam->SetEndEntity(ENTINDEX(pEntity->edict()));
-				pBeam->SetStartAttachment(2);
+				pBeam->SetStartAttachment(0);
 				pBeam->SetEndAttachment(0);
 				pBeam->RelinkBeam();
 				pBeam->SetBrightness(230);
 				pBeam->pev->effects &= ~EF_NODRAW;
 			}
 
-			UTIL_TempModel(Vector(0, 0, 0), g_vecZero, g_vecZero, m_iHitIndex, 30, 0, 255, 0, 0, 210, kRenderTransAdd, pEntity, false, 0, 6, 16, 0);
+			UTIL_TempModel(Vector(0, 0, 0), g_vecZero, g_vecZero, m_iHitIndex, 30, 0, 255, 0, 0, 210, kRenderTransAdd, pEntity, false, 0, 2, 16, 0);
 
 			++v8;
 		}
 	}
 #endif
-}
-
-void CIgniteMG::CreateBeamEffect()
-{
-	pev->nextthink = gpGlobals->time + 0.1s;
-
-	int iStoredAmmo = m_iWeaponState;
-
-	if (m_iWeaponState)
-	{
-		if (!m_fInReload)
-		{
-			ClearEffect();
-			pev->nextthink = gpGlobals->time;
-			SetThink(nullptr);
-			return;
-		}
-		else
-		{
-			/*
-			if (m_flTimeNextCharge2 < gpGlobals->time)
-			{
-				m_flTimeNextCharge2 = gpGlobals->time + 0.5s;
-				m_iWeaponState--;
-				SetChargeSkin();
-			}
-
-			PrimaryAttack_FindTargets();
-			PrimaryAttack_InstantDamage();*/
-		}
-	}
-
-	if (!m_iWeaponState)
-	{
-		//remove beam
-		pev->nextthink = gpGlobals->time;
-		if (iStoredAmmo != m_iWeaponState)
-		{
-			int flags = 0;
-#ifdef CLIENT_WEAPONS
-			flags = FEV_NOTHOST;
-#else
-			flags = 0;
-#endif
-
-			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, 0, TRUE);
-		}
-		ClearEffect();
-		SetThink(nullptr);
-	}
 }
 
 void CIgniteMG::ItemPostFrame(void)
@@ -471,8 +438,16 @@ void CIgniteMG::SecondaryAttack()
 
 		if (m_flAttackLoop != invalid_time_point)
 		{
+#ifndef CLIENT_DLL
+			MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+			WRITE_BYTE(79);
+			WRITE_SHORT(m_pPlayer->entindex());
+			WRITE_SHORT(CHAN_WEAPON);
+			WRITE_STRING("weapons/ignitemg_shoot2_loop.wav");
+			MESSAGE_END();
+#endif
 			SendWeaponAnim(ANIM_SHOOT2_END, UseDecrement() != FALSE);
-
+			ClearEffect();
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
 			m_flAttackLoop = invalid_time_point;
 		}
@@ -507,6 +482,8 @@ void CIgniteMG::SecondaryAttack()
 
 	Attack();
 
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100.0), int(m_pPlayer->pev->punchangle.y * 100.0), FALSE, TRUE);
+
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
@@ -518,7 +495,8 @@ void CIgniteMG::SecondaryAttack()
 
 void CIgniteMG::Attack()
 {
-
+	SecondaryAttack_FindTargets();
+	SecondaryAttack_InstantDamage();
 }
 
 void CIgniteMG::WeaponIdle(void)
@@ -532,8 +510,16 @@ void CIgniteMG::WeaponIdle(void)
 	
 	if (m_flAttackLoop != invalid_time_point)
 	{
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
+		WRITE_BYTE(79);
+		WRITE_SHORT(m_pPlayer->entindex());
+		WRITE_SHORT(CHAN_WEAPON);
+		WRITE_STRING("weapons/ignitemg_shoot2_loop.wav");
+		MESSAGE_END();
+#endif
 		SendWeaponAnim(ANIM_SHOOT2_END, UseDecrement() != FALSE);
-
+		ClearEffect();
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
 		m_flAttackLoop = invalid_time_point;
 	}
@@ -560,12 +546,12 @@ float CIgniteMG::GetDamage() const
 
 float CIgniteMG::GetDamageB() const
 {
-	float flDamage = 36.0f;
+	float flDamage = 10.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 180.0f;
+		flDamage = 600.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 400.0f;
+		flDamage = 750.0f;
 #endif
 	return flDamage;
 }
@@ -578,6 +564,18 @@ KnockbackData CIgniteMG::GetKnockBackData()
 float CIgniteMG::GetMaxSpeed(void)
 {
 	return 210;
+}
+
+duration_t CIgniteMG::GetChargeTime()
+{
+	duration_t flTime = 1.0s;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flTime = 1.0s;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flTime = 1.0s;
+#endif
+	return flTime;
 }
 
 }

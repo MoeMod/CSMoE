@@ -75,6 +75,7 @@ short g_sModelIndexEventBombExp;
 short g_sModelIndexEventBombExp2;
 short g_sModelIndexMoonCakeExp;
 short g_sModelIndexHolyWater;
+short g_sModelIndexIgniteBomb;
 
 short g_sModelIndexBoomerEffect;
 short g_sModelIndexBoomerSprite;

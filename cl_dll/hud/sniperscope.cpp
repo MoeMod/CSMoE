@@ -217,6 +217,13 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iChainSrAimDeco[2], "sprites/chainsr_aim_deco03.tga");
 	R_InitTexture(m_iChainSrAimDeco[3], "sprites/chainsr_aim_deco04.tga");
 
+	R_InitTexture(m_iDgaxe_Aim_Off, "sprites/dgaxe_aim_off.tga");
+	R_InitTexture(m_iDgaxeEX_Aim_On, "sprites/dgaxeex_aim_on.tga");
+	R_InitTexture(m_iDgaxeEX_Aim_On_2, "sprites/dgaxeex_aim_on_2.tga");
+
+	R_InitTexture(m_iDgaxe_Aim_On, "sprites/dgaxe_aim_on.tga");
+	R_InitTexture(m_iDgaxe_Aim_On_2, "sprites/dgaxe_aim_on_2.tga");
+
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
@@ -409,8 +416,13 @@ int CHudSniperScope::Draw(float flTime)
 	{
 		if (pActiveBTEWeapon->m_iId == WEAPON_KNIFE)
 		{
-			if (pActiveBTEWeapon->m_iKnifeID == KNIFE_DRAGONSWORD)
+			if (pActiveBTEWeapon->m_iKnifeID == KNIFE_DGAXEEX ||
+				pActiveBTEWeapon->m_iKnifeID == KNIFE_DGAXE)
+			{
+				DrawDgaxeCrossHair(flTime, pActiveBTEWeapon->m_iKnifeID == KNIFE_DGAXE ? 0 : 1);
 				return 1;
+			}
+				
 		}
 
 		if (pActiveBTEWeapon->m_iId == WEAPON_HEGRENADE)
@@ -1603,6 +1615,61 @@ void CHudSniperScope::DrawHaloGunCrossHair(float flTime)
 	iY = ScreenHeight / 2 - m_iHaloGun_Aim_BG->h();
 
 	m_iHaloGun_Aim_Gauge->Draw2DQuadScaled(iX, iY + iHeight * drawoffset, iX + iWidth, iY + iHeight, 0, drawoffset, 1, 1);
+}
+
+extern int g_iDgaxeState;
+
+void CHudSniperScope::SetDgaxeCrossHair(int iState)
+{
+	m_iDgaxeState = iState;
+}
+
+void CHudSniperScope::DrawDgaxeCrossHair(float flTime, int iType)
+{
+	float x = ScreenWidth / 2;
+	float y = ScreenHeight / 2;
+	const float flScale = 0.0f;
+
+	float iX, iY;
+
+	iX = ScreenWidth / 2 - m_iDgaxeEX_Aim_On->w() / 2;
+	iY = ScreenHeight / 2 - m_iDgaxeEX_Aim_On->h() / 2;
+
+
+	if (gWR.CountAmmo(gHUD.m_Ammo.m_pWeapon->iAmmoType) >= 50)
+	{	
+		g_iDgaxeState = 1;
+
+		if (m_iDgaxeState)
+		{
+			if (iType)
+				m_iDgaxeEX_Aim_On_2->Draw2DQuadScaled(iX, iY, iX + m_iDgaxeEX_Aim_On_2->w(), iY + m_iDgaxeEX_Aim_On_2->h());
+			else
+				m_iDgaxe_Aim_On_2->Draw2DQuadScaled(iX, iY, iX + m_iDgaxe_Aim_On_2->w(), iY + m_iDgaxe_Aim_On_2->h());
+		}
+		else
+		{
+			CalculateDistance();
+			if (m_bDestroyerInSight)
+			{
+				if (iType)
+					m_iDgaxeEX_Aim_On->Draw2DQuadScaled(iX, iY, iX + m_iDgaxeEX_Aim_On->w(), iY + m_iDgaxeEX_Aim_On->h());
+				else
+					m_iDgaxe_Aim_On->Draw2DQuadScaled(iX, iY, iX + m_iDgaxe_Aim_On->w(), iY + m_iDgaxe_Aim_On->h());
+			}
+			else
+			{
+				m_iDgaxe_Aim_Off->Draw2DQuadScaled(iX, iY, iX + m_iDgaxe_Aim_Off->w(), iY + m_iDgaxe_Aim_Off->h());
+			}
+		}
+	}
+	else
+	{
+		if (g_iDgaxeState)
+			g_iDgaxeState = 0;
+	}
+
+
 }
 
 

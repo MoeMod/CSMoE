@@ -31,6 +31,161 @@ namespace cl {
 namespace sv {
 #endif
 
+
+#ifndef CLIENT_DLL
+	class CMechanicHandGrenade : public CBaseEntity
+	{
+	public:
+		float GetArmorRatioModifier() { return 1.5; }
+		int GetWeaponsId(void) { return WEAPON_KNIFE; }
+		void Spawn() override
+		{
+			Precache();
+
+			SetThink(&CMechanicHandGrenade::FollowThink);
+			SetTouch(&CMechanicHandGrenade::OnTouch);
+			SET_MODEL(this->edict(), "sprites/ef_gungnir_missile.spr");
+
+			pev->rendermode = kRenderTransAdd;
+			pev->renderfx = kRenderFxNone;
+			pev->renderamt = 200;
+			pev->framerate = 30;
+			pev->scale = 0.8;
+			pev->solid = SOLID_BBOX;
+			pev->movetype = MOVETYPE_FLYMISSILE;
+			pev->nextthink = gpGlobals->time + 0.1s;
+
+			m_flMaxFrames = float(MODEL_FRAMES(pev->modelindex) - 1);
+
+			UTIL_SetOrigin(pev, pev->origin);
+			UTIL_SetSize(pev, Vector(-1.0, -1.0, -1.0), Vector(1.0, 1.0, 1.0));
+		}
+
+		void Precache() override
+		{
+			PRECACHE_MODEL("sprites/ef_gungnir_missile.spr");
+			PRECACHE_MODEL("sprites/ef_gungnir_chargeexplo.spr");
+			PRECACHE_SOUND("CK_WPN/WEAPON/Mechanic/arcane_explosion.wav");
+
+			m_iSprExplo = PRECACHE_MODEL("sprites/ef_gungnir_chargeexplo.spr");
+		}
+
+		void EXPORT OnTouch(CBaseEntity* pOther)
+		{
+			Explode(pOther);
+		}
+
+		void Explode(CBaseEntity* pOther)
+		{
+			EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "CK_WPN/WEAPON/Mechanic/arcane_explosion.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_TEMPSPRITE);
+			WRITE_COORD(pev->origin.x);
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z);
+			WRITE_SHORT(m_iSprExplo);
+			WRITE_BYTE(8);
+			WRITE_BYTE(200);
+			WRITE_BYTE(30);
+			MESSAGE_END();
+
+			CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+			CBasePlayer* pAttackePlayer = nullptr;
+			if (pAttacker && pAttacker->IsPlayer())
+				pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
+
+			if (!pAttackePlayer)
+				return;
+
+			TraceResult tr;
+			CBaseEntity* pEntity = NULL;
+
+			Vector vecEnd;
+			int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
+			float flRadius = 130.0;
+			while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, flRadius)) != NULL)
+			{
+				if (pEntity->edict() == pev->owner)
+					continue;
+
+				if (pEntity->IsDormant())
+					continue;
+
+				if (pEntity->pev->takedamage == DAMAGE_NO)
+					continue;
+
+				if (pEntity->Classify() == CLASS_NONE)
+					continue;
+
+				if (g_pGameRules->PlayerRelationship(pAttackePlayer, pEntity) == GR_TEAMMATE)
+					continue;
+
+				vecEnd = pEntity->BodyTarget(pev->origin);
+
+				UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
+
+				if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+					continue;
+
+				int falloff = RadiusDamageAmount / flRadius;
+
+				float flCurrentDamage = max(0, RadiusDamageAmount - (pev->origin - pEntity->pev->origin).Length() * falloff);
+
+				pEntity->TakeDamage(pev, pAttackePlayer->pev, flCurrentDamage, DMG_EXPLOSION);
+
+				if (pEntity->IsPlayer())
+				{
+					CBasePlayer* player = (CBasePlayer*)pEntity;
+
+					if (player->m_bIsZombie)
+					{
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						if (strategy)
+						{
+							strategy->SetStunSpeedTime(1.5s, 150.0);
+							strategy->SetStunGravityTime(1.5s);
+						}
+					}
+				}
+			}
+
+			SetThink(nullptr);
+			SetTouch(nullptr);
+			UTIL_Remove(this);
+		}
+
+		void EXPORT FollowThink()
+		{
+			pev->frame += pev->framerate * gpGlobals->frametime / 1s;
+
+			if (pev->frame > m_flMaxFrames)
+				pev->frame = fmod(pev->frame, m_flMaxFrames);
+
+			if (m_flRemoveTime < gpGlobals->time)
+				Explode(NULL);
+
+			pev->nextthink = gpGlobals->time + 0.01s;
+		}
+
+		void Init(Vector vecVelocity, float flExplodeDamage, int iTeam)
+		{
+			m_flRemoveTime = gpGlobals->time + 5.0s;
+			std::tie(RadiusDamageAmount, m_iTeam) = std::make_tuple(flExplodeDamage, iTeam);
+			pev->velocity = std::move(vecVelocity);
+		}
+
+		KnockbackData GetKnockBackData() override { return { 500.0f, 650.0f, 800.0f, 300.0f, 0.5f }; }
+
+		time_point_t m_flRemoveTime;
+		float m_flMaxFrames;
+		float RadiusDamageAmount;
+		int m_iSprExplo;
+
+	};
+	LINK_ENTITY_TO_CLASS(mechanichand_grenade, CMechanicHandGrenade)
+#endif
+
 class CKnifeMechanicHand: public LinkWeaponTemplate<CKnifeMechanicHand,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type,
@@ -67,7 +222,14 @@ public:
 	{
 		Base::Precache();
 
+		PRECACHE_SOUND("CK_WPN/WEAPON/Mechanic/Mechanic_Swing.WAV");
+		PRECACHE_SOUND("CK_WPN/WEAPON/Mechanic/Attack_11.wav");
+		PRECACHE_SOUND("CK_WPN/WEAPON/Mechanic/Attack_22.WAV");
+		PRECACHE_SOUND("CK_WPN/WEAPON/Mechanic/Attack_33.WAV");
+		PRECACHE_SOUND("CK_WPN/WEAPON/Mechanic/Mechanic_Stab.WAV");
 		PRECACHE_SOUND("CK_WPN/WEAPON/Mechanic/Mechanic_Hit.WAV");
+		PRECACHE_SOUND("CK_WPN/WEAPON/Mechanic/Arcane_Fire.WAV");
+
 	}
 
 	BOOL Deploy() override
@@ -98,6 +260,7 @@ public:
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
+	void SkillAttack();
 	BOOL CanDrop() override { return false; }
 	void WeaponIdle() override;
 #ifndef CLIENT_DLL
@@ -138,6 +301,18 @@ public:
 			flDamage = 1105 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
+#endif
+		return flDamage;
+	}
+
+	float GetRadiusDamage() const
+	{
+		float flDamage = 75.0f;
+#ifndef CLIENT_DLL
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage = 2230.0f;
+		else if (g_pModRunning->DamageTrack() == DT_ZBS)
+			flDamage = 4563.0f;
 #endif
 		return flDamage;
 	}
@@ -225,9 +400,38 @@ void CKnifeMechanicHand::Reload()
 #endif
 
 	SendWeaponAnim(ANIM_SKILL, UseDecrement() != FALSE);
+	pev->nextthink = gpGlobals->time + 1.17s;
+	SetThink(&CKnifeMechanicHand::SkillAttack);
+
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.2s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.2s;
 	ResetRunIdle();
+}
+
+void CKnifeMechanicHand::SkillAttack()
+{
+	EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "CK_WPN/WEAPON/Mechanic/Arcane_Fire.WAV", 0.8, ATTN_NORM, 0, PITCH_NORM);
+
+	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
+#ifndef CLIENT_DLL
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
+
+	Vector vecSrc = m_pPlayer->GetGunPosition();
+	Vector vecDir = m_pPlayer->FireBullets3(vecSrc - gpGlobals->v_up * 2.0, gpGlobals->v_forward, 0.0, 8192.0, 0, BULLET_PLAYER_556MM, 0, 0.0, m_pPlayer->pev, false, m_pPlayer->random_seed);
+
+#ifndef CLIENT_DLL
+	Vector vecProjDir = gpGlobals->v_forward + gpGlobals->v_right * vecDir.x + gpGlobals->v_up * vecDir.y;
+
+	CMechanicHandGrenade* pEnt = static_cast<CMechanicHandGrenade*>(CBaseEntity::Create("mechanichand_grenade", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+	if (pEnt)
+	{
+		pEnt->Init(vecProjDir * 1000, GetRadiusDamage(), m_pPlayer->m_iTeam);
+	}
+#endif
 }
 
 void CKnifeMechanicHand::PrimaryAttack(void)
@@ -240,9 +444,9 @@ void CKnifeMechanicHand::PrimaryAttack(void)
 	m_iSwing = 0;
 	SendWeaponAnim(pev->iuser1++ ? ANIM_SLASH1 : ANIM_SLASH2, UseDecrement() != FALSE);
 	if (pev->iuser1)
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/mechanichand/mechanichand_Attack_1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/Mechanic/Attack_11.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	else
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/mechanichand/mechanichand_Attack_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/Mechanic/Attack_22.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	pev->iuser1 %= 2;
 	SetThink(&CKnifeMechanicHand::DelayPrimaryAttack);
 	pev->nextthink = gpGlobals->time + 0.17s;
@@ -260,7 +464,7 @@ void CKnifeMechanicHand::SecondaryAttack(void)
 	m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.7s;
 #endif
 	SendWeaponAnim(RANDOM_LONG(0, 1)? ANIM_STAB1:ANIM_STAB2, UseDecrement() != FALSE);
-	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/mechanichand/Hero_ATTACK_3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	
 	SetThink(&CKnifeMechanicHand::DelaySecondaryAttack);
 	pev->nextthink = gpGlobals->time + 0.87s;
 
@@ -283,7 +487,7 @@ void CKnifeMechanicHand::DelayPrimaryAttack()
 	}
 	case HIT_WALL:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualKukri/Hero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/Mechanic/Mechanic_Swing.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	}
@@ -292,6 +496,7 @@ void CKnifeMechanicHand::DelayPrimaryAttack()
 
 void CKnifeMechanicHand::DelaySecondaryAttack()
 {
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/Mechanic/Attack_33.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 #ifndef CLIENT_DLL
 	switch (KnifeAttack(GetSecondaryAttackDamage(), 135, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
@@ -303,7 +508,7 @@ void CKnifeMechanicHand::DelaySecondaryAttack()
 	}
 	case HIT_WALL:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualKukri/Hero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/Mechanic/Mechanic_Stab.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	}

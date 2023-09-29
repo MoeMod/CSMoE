@@ -233,6 +233,56 @@ ConstSprList s_ModelLeapStrikeGunShoot = {
 	}
 };
 
+ConstSprList s_ModelY23S3BuffM249_V1 = {
+	"v_y23s3buffm249.mdl",
+	"$0b_y23s3buffm249_ef.bmp",
+	"sprites/ef_y23s3buffm249_v.spr",
+	30.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+		{ 1, true, false, 1.0, 0, 0, 0 },
+		{ 2, true, false, 1.0, 0, 0, 0 },
+		{ 3, true, false, 1.0, 0, 0, 0 },
+		{ 4, true, false, 1.0, 0, 0, 0 },
+		{ 5, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelY23S3BuffM249_V2 = {
+	"v_y23s3buffm249.mdl",
+	"$0b_y23s3buffm249_ef2.bmp",
+	"sprites/ef_y23s3buffm249_v2.spr",
+	30.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+		{ 1, true, false, 1.0, 0, 0, 0 },
+		{ 2, true, false, 1.0, 0, 0, 0 },
+		{ 3, true, false, 1.0, 0, 0, 0 },
+		{ 4, true, false, 1.0, 0, 0, 0 },
+		{ 5, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelIgniteBombFire = {
+	"ef_ignitebomb.mdl",
+	"$0b_ignitebomb_bffire.BMP",
+	"sprites/ef_ignite_bomb_fire.spr",
+	30.0,
+	{
+		{ 0, false, true, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelEFIgniteBombLine = {
+	"ef_ignitebomb.mdl",
+	"$0b_ignitebomb_bfxline.BMP",
+	"sprites/ef_ignite_bomb_line.spr",
+	30.0,
+	{
+		{ 0, false, true, 1.0, 0, 0, 0 },
+	}
+};
+
 std::vector<SprList> g_vecBindSprList;
 
 static CBindSprManager g_SprBindManager;
@@ -266,6 +316,10 @@ void CBindSprManager::Vidinit(void)
 	LoadSpr(&s_ModelLeapStrikeGunJumpFX2);
 	LoadSpr(&s_ModelM3DragonEX);
 	LoadSpr(&s_ModelM3DragonEXSign);
+	LoadSpr(&s_ModelY23S3BuffM249_V1);
+	LoadSpr(&s_ModelY23S3BuffM249_V2);
+	LoadSpr(&s_ModelIgniteBombFire);
+	LoadSpr(&s_ModelEFIgniteBombLine);
 }
 
 int CBindSprManager::LoadSpr(ConstSprList *List)

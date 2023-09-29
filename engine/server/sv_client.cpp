@@ -271,7 +271,7 @@ gotnewcl:
 		if(sv_minclver->integer > 0 && cl_build < sv_minclver->integer)
 		{
 			Netchan_OutOfBandPrint( NS_SERVER, from, "print\nServer requires build version >= %i.\n", sv_minclver->integer );
-			Netchan_OutOfBandPrint( NS_SERVER, from, "errormsg\n本服务器要求 build %i 以上版本，请加入QQ群 706711420 下载最新客户端。\n", sv_minclver->integer );
+			Netchan_OutOfBandPrint( NS_SERVER, from, "errormsg\n本服务器要求 build %i 以上版本，请加入QQ群 932329867 下载最新客户端。\n", sv_minclver->integer );
 			Netchan_OutOfBandPrint( NS_SERVER, from, "disconnect\n" );
 			return;
 		}

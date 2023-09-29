@@ -118,6 +118,7 @@ bool   g_bHoldingShield;
 bool   g_bHoldingKnife;
 float  g_flPlayerSpeed;
 int    g_iPlayerFlags;
+int g_iPlayerZombieClass;
 Vector g_vPlayerVelocity;
 
 /*
@@ -1441,6 +1442,8 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	player.m_iKnifeID = (from->client.weapons >> 20) & 0xFFF;
 	player.m_iGrenadeID = (from->client.weapons >> 8) & 0xFFF;
 	player.m_iZombieClass = (from->client.weapons >> 1) & 0x7F;
+
+	g_iPlayerZombieClass = player.m_iZombieClass;
 
 	g_iPlayerFlags = player.pev->flags = from->client.flags;
 	g_vPlayerVelocity = player.pev->velocity;

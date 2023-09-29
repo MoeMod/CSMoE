@@ -482,4 +482,41 @@ public:
 	unsigned short m_usCreateExplosion;
 };
 
+class CIgniteBomb : public CBasePlayerWeapon
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual int GetItemInfo(ItemInfo* p);
+	virtual BOOL CanDeploy();
+	virtual BOOL CanDrop() { return FALSE; }
+	virtual BOOL CanHolster();
+	virtual BOOL Deploy();
+	virtual void Holster(int skiplocal);
+	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
+	virtual int iItemSlot() { return GRENADE_SLOT; }
+	virtual void PrimaryAttack();
+	virtual void SecondaryAttack();
+	void DelaySecondaryAttack();
+	virtual void WeaponIdle();
+	virtual BOOL UseDecrement()
+	{
+#ifdef CLIENT_WEAPONS
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+
+public:
+	unsigned short m_usCreateExplosion;
+
+private:
+	int m_iEffectModel;
+
+	float GetDamageB() const;
+
+
+};
+
 }

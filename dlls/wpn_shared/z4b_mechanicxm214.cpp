@@ -118,6 +118,8 @@ namespace sv {
 
     BOOL Deploy() override
     {
+        EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "CK_WPN/WEAPON/Mechanic/XM214_S.WAV", 0.8, ATTN_NORM, 0, PITCH_NORM);
+
         ResetRunIdle();
 
         if (m_flTimeHolster != invalid_time_point)

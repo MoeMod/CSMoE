@@ -346,6 +346,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "z4b_mechanicxm214",	WEAPON_Z4B_MECHANICXM214 },
 	{ "ozwpnset1",	WEAPON_OZWPNSET1 },
 	{ "ignitemg",	WEAPON_IGNITEMG},
+	{ "y23s3buffm249",	WEAPON_Y23S3BUFFM249 },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -458,6 +459,7 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_tyrantmace",	KNIFE_TYRANTMACE },
 	{ "knife_dvhammer",	KNIFE_DVHAMMER },
 	{ "knife_hzknife",	KNIFE_HZKNIFE },
+	{ "knife_dgaxeex",	KNIFE_DGAXEEX },
 };
 
 // must same as classname
@@ -486,6 +488,7 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_waterbomb", GRENADE_WATERBOMB },
 	{ "weapon_chinaeventbomb", GRENADE_CHINAEVENTBOMB },
 	{ "weapon_sfturret", GRENADE_SFTURRET },
+	{ "weapon_ignitebomb", GRENADE_IGNITEBOMB },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -838,6 +841,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "z4b_mechanicxm214",	WEAPONCLASS_MACHINEGUN },
 	{ "ozwpnset1",	WEAPONCLASS_MACHINEGUN },
 	{ "ignitemg",	WEAPONCLASS_MACHINEGUN },
+	{ "y23s3buffm249",	WEAPONCLASS_MACHINEGUN },
 
 
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
@@ -1225,6 +1229,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_OZWPNSET1:
 	case WEAPON_IGNITEMG:
 	case WEAPON_M3DRAGONEX:
+	case WEAPON_Y23S3BUFFM249:
 		return true;
 	default:
 		break;

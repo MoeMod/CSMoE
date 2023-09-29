@@ -1068,6 +1068,8 @@ public:
 	void DrawHaloGunCrossHair(float flTime);
 	void SetHaloGunAmmo(int iClip, int iAmmo, int iMaxAmmo);
 	void DrawRetina(float flTime);
+	void DrawDgaxeCrossHair(float flTime, int iType);
+	void SetDgaxeCrossHair(int iState);
 private:
 
 	struct LockOnData
@@ -1209,6 +1211,13 @@ private:
 	UniqueTexture m_iChainSrAimBg;
 	UniqueTexture m_iChainSrAimCenter;
 	UniqueTexture m_iChainSrAimDeco[4];
+
+	int m_iDgaxeState;
+	UniqueTexture m_iDgaxe_Aim_Off;
+	UniqueTexture m_iDgaxeEX_Aim_On;
+	UniqueTexture m_iDgaxeEX_Aim_On_2;
+	UniqueTexture m_iDgaxe_Aim_On;
+	UniqueTexture m_iDgaxe_Aim_On_2;
 };
 
 //

@@ -170,14 +170,13 @@ public:
 	void Attack();
 	void ResetChargeTimer();
 
-	void CreateBeamEffect();
 	void CreateEffect();
 	void ClearEffect();
 	void DestroyEffect();
 	void SecondaryAttack_FindTargets();
 	bool SecondaryAttack_CheckTargetAvailable(CBaseEntity* a2, Vector vecAngleDirection);
 	void SecondaryAttack_InstantDamage();
-
+	duration_t GetChargeTime();
 #ifndef CLIENT_DLL
 	std::array<CBeam*, 3> m_pBeamList;
 	std::vector<EHANDLE> m_pEnemyList;

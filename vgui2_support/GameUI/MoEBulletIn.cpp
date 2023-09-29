@@ -157,7 +157,7 @@ const wchar_t* szFixedBulletinCN[] =
 	L"版权所有: [Contributors]",
 	L"CSMoE Team\nBTE Team\nXash3D FWGS\n",
 	L"官方组织: [Official Orgs]",
-	L"QQ群:706711420 & 贴吧:百度csoldjb吧\n",
+	L"QQ群:932329867 & 贴吧:百度csoldjb吧\n",
 	L"",
 	NULL
 };

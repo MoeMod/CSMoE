@@ -100,7 +100,7 @@ void SCR_DrawFPS( void )
 
     string	curbuild;
     int	width, height = 0;
-    Q_snprintf( curbuild, MAX_STRING, "柑橘官方群:706711420 %s", fpsstring);
+    Q_snprintf( curbuild, MAX_STRING, "CSMoE官方群:932329867 %s", fpsstring);
     Con_DrawStringLen(curbuild, &width, &height);
     Con_DrawString(scr_width->integer - width, 0, curbuild, color);
 

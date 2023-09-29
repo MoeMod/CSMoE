@@ -64,6 +64,12 @@ void EV_FireIgniteMG(event_args_s *args)
 
 	ent = gEngfuncs.GetViewModel();
 
+	if (args->bparam2)
+	{
+		PLAY_EVENT_SOUND("weapons/ignitemg_shoot2_loop.wav");
+		return;
+	}
+
 	if ( EV_IsLocal( args->entindex ) )
 	{
 		++g_iShotsFired;

@@ -140,6 +140,13 @@ struct model_s* CStudioModelRenderer::s_pM3DragonEXSmokeModel;
 struct model_s* CStudioModelRenderer::s_pLeapStrikeGunViewModel;
 struct model_s* CStudioModelRenderer::s_pLeapStrikeGunPartModel;
 
+struct model_s* CStudioModelRenderer::s_pY23S3BUFFM249ViewModel;
+struct model_s* CStudioModelRenderer::s_pY23S3BUFFM249FireModel;
+
+struct model_s* CStudioModelRenderer::s_pDgaxeEXViewModel;
+struct model_s* CStudioModelRenderer::s_pDgaxeEXMuzzLModel;
+struct model_s* CStudioModelRenderer::s_pDgaxeEXMuzzRModel;
+
 int g_iLeapStrikeGunAnim = 0;
 float g_iLeapStrikeGunAnimTime = 0.0;
 

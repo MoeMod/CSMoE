@@ -206,6 +206,7 @@ int CHudDeathNotice :: VidInit( void )
 	s_KnifeNamesMap["d_tyrantmace"] = TRUE;
 	s_KnifeNamesMap["d_dvhammer"] = TRUE;
 	s_KnifeNamesMap["d_hzknife"] = TRUE;
+	s_KnifeNamesMap["d_dgaxeex"] = TRUE;
 
 	s_GrenadeNamesMap["d_grenade"] = TRUE;
 	s_GrenadeNamesMap["d_m24grenade"] = TRUE;
@@ -229,6 +230,7 @@ int CHudDeathNotice :: VidInit( void )
 	//s_GrenadeNamesMap["d_bunkerbuster"] = TRUE;
 	s_GrenadeNamesMap["d_patroldrone"] = TRUE;
 	//s_GrenadeNamesMap["d_divinetitan"] = TRUE;
+	s_GrenadeNamesMap["d_ignitebomb"] = TRUE;
 
 	return 1;
 }

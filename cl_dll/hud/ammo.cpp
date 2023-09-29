@@ -124,7 +124,8 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 		strncmp(pWeapon->szName, "knife_y22s2sfsword", 18) && 
 		strncmp(pWeapon->szName, "knife_tyrantmace", 16) &&
 		strncmp(pWeapon->szName, "knife_dvhammer", 14) &&
-		strncmp(pWeapon->szName, "knife_vulcanus9", 15))
+		strncmp(pWeapon->szName, "knife_vulcanus9", 15) &&
+		strncmp(pWeapon->szName, "knife_dgaxeex", 13))
 	{
 		if (!strncmp(pWeapon->szName, "knife_", 6))
 		{

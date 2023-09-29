@@ -543,6 +543,19 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 
 		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/y20s1grenade_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
+	case EXPTYPE_IGNITEBOMB:
+
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_TEMPSPRITE);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z + 20.0);
+		WRITE_SHORT(g_sModelIndexIgniteBomb);
+		WRITE_BYTE(10);
+		WRITE_BYTE(255);
+		WRITE_BYTE(30);
+		MESSAGE_END();
+		break;
 
 	case EXPTYPE_FIRECRACKERROCKET:
 	case EXPTYPE_FGLAUNCHERROCKET:
@@ -626,7 +639,18 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 			flDamage *= 5.0f;
 
 		ChinaEventBombExplode(pev->origin, pev, pevOwner, flDamage, 325);
+		break;
+	case EXPTYPE_IGNITEBOMB:
 
+		flDamage = pev->dmg;
+
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage = 6800.0f;
+		else if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage = 12600.0f;
+
+		IgniteBombExplode(pev->origin, pev, pevOwner, flDamage, 325);
+		break;
 	default:
 		
 		if (g_pModRunning->DamageTrack() == DT_ZB)
@@ -1607,10 +1631,13 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 	case GRENADE_HOLYBOMB:
 	case GRENADE_HOLYBOMBEX:
 	case GRENADE_WATERBOMB:
+	case GRENADE_IGNITEBOMB:
 		if(pOwner->m_iGrenadeID == GRENADE_WATERBOMB)
 			SET_MODEL(ENT(pGrenade->pev), "models/w_waterbomb.mdl");
 		else if(pOwner->m_iGrenadeID == GRENADE_HOLYBOMBEX)
 			SET_MODEL(ENT(pGrenade->pev), "models/w_holybomb_ex.mdl");
+		else if (pOwner->m_iGrenadeID == GRENADE_IGNITEBOMB)
+			SET_MODEL(ENT(pGrenade->pev), "models/w_ignitebomb.mdl");
 		else
 			SET_MODEL(ENT(pGrenade->pev), "models/w_holybomb.mdl");
 		
@@ -2699,6 +2726,10 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 		WRITE_BYTE(30);
 		MESSAGE_END();
 	}
+	else if (m_iGrenadeID == GRENADE_IGNITEBOMB)
+	{
+		
+	}
 	else
 	{
 		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
@@ -2711,16 +2742,17 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 		WRITE_BYTE(30);
 		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND | TE_EXPLFLAG_NOPARTICLES);
 		MESSAGE_END();
-
 	}
 	
 
 	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3.0s);
 
-	entvars_t* pevOwner = VARS(pev->owner);
-	pev->owner = NULL;
+	entvars_t* pevOwner;
+	if (pev->owner)
+		pevOwner = VARS(pev->owner);
+	else
+		pevOwner = NULL;
 
-	
 	if (m_iGrenadeID == GRENADE_WATERBOMB)
 	{
 		EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "weapons/waterbomb_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
@@ -2733,6 +2765,8 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 		WRITE_COORD(pev->origin.z);
 		MESSAGE_END();
 	}
+	else if (m_iGrenadeID == GRENADE_IGNITEBOMB)
+		EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "weapons/ignitebomb_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	else
 		EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "zombi/Zombi_Bomb_Exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
@@ -2740,6 +2774,14 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 		HolyBombExplode(pev->origin, pev, pevOwner, 1100, 0.05, 325);
 	else if (m_iGrenadeID == GRENADE_HOLYBOMB)
 		HolyBombExplode(pev->origin, pev, pevOwner, 1300, 0.08, 325);
+	else if (m_iGrenadeID == GRENADE_IGNITEBOMB)
+	{
+		TraceResult tr;
+
+		UTIL_TraceLine(pev->origin + Vector(0, 0, 8), pev->origin - Vector(0, 0, 32), ignore_monsters, ENT(pev), &tr);
+		Explode3(&tr, DMG_EXPLOSION, EXPTYPE_IGNITEBOMB, 0);
+		return;
+	}	
 	else
 	{
 		float flDamage = pev->dmg;
@@ -2750,7 +2792,8 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 		WaterBombExplode(pev->origin, pev, pevOwner, flDamage, 325);
 	}
 		
-	if (m_iGrenadeID != GRENADE_WATERBOMB)
+	if (m_iGrenadeID == GRENADE_HOLYBOMB ||
+		m_iGrenadeID == GRENADE_HOLYBOMBEX)
 	{
 		switch (RANDOM_LONG(0, 1))
 		{
@@ -2758,6 +2801,16 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 		case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris2.wav", 0.55, ATTN_NORM); break;
 		}
 	}
+
+	if (m_iGrenadeID != GRENADE_IGNITEBOMB)
+	{
+		CBasePlayer* player = GetClassPtr<CBasePlayer>(pevOwner);
+		if (player)
+		{
+			player->m_pModStrategy->GrenadeExploded(pev->origin);
+		}
+	}
+	
 	
 	pev->effects |= EF_NODRAW;
 	UTIL_Remove(this);
@@ -2943,6 +2996,41 @@ void CGrenade::WaterBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_
 	}
 }
 
+void CGrenade::IgniteBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius)
+{
+	CBaseEntity* pEntity = NULL;
+	TraceResult tr;
+	Vector vecEnd;
+
+	float falloff;
+
+	if (flRadius)
+		falloff = flDamage / flRadius;
+	else
+		falloff = 1.0f;
+
+	bool bInWater = UTIL_PointContents(vecSrc) == CONTENTS_WATER;
+
+	vecSrc.z += 1.0;
+
+	entvars_t* pevAttack = pevAttacker ? pevAttacker : pevInflictor;
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (bInWater && pEntity->pev->waterlevel == 0)
+			continue;
+
+		if (!bInWater && pEntity->pev->waterlevel == 3)
+			continue;
+
+		float flCurrentDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+
+		pEntity->TakeDamage(pevInflictor, pevAttack, flCurrentDamage, DMG_EXPLOSION);
+	}
+}
 
 void CGrenade::DetonateFireBomb()
 {

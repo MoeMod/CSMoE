@@ -4253,6 +4253,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							killer_weapon_name = "chinaeventbomb";
 							break;
 
+						case GRENADE_IGNITEBOMB:
+							killer_weapon_name = "ignitebomb";
+							break;
+
 						default:
 							killer_weapon_name = "grenade";
 							break;
@@ -4274,9 +4278,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 				{
 					killer_weapon_name = STRING(pevInflictor->classname);
 
-					if (!Q_strcmp(killer_weapon_name, "dgaxe_summon"))
-						killer_weapon_name = "dgaxe";
-					else if (!Q_strcmp(killer_weapon_name, "dualsword_specialeffect"))
+					if (!Q_strcmp(killer_weapon_name, "dualsword_specialeffect"))
 						killer_weapon_name = "dualsword";
 					else if (!Q_strcmp(killer_weapon_name, "whipsword_stabbox"))
 						killer_weapon_name = "whipsword";
@@ -4288,6 +4290,14 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "swordbombard";
 					else if (!Q_strcmp(killer_weapon_name, "knifedvhammer_spike"))
 						killer_weapon_name = "dvhammer";
+					else if (!Q_strcmp(killer_weapon_name, "knifedgaxe_lubu"))
+					{
+						if(pInflictor->pev->iuser1)
+							killer_weapon_name = "dgaxeex";
+						else
+							killer_weapon_name = "dgaxe";
+					}
+						
 				}
 				else
 				{
@@ -4429,8 +4439,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "m3dragonex";
 					else if (iId == WEAPON_LEAPSTRIKEGUN)
 						killer_weapon_name = "leapstrikegun";
-					else if (iId ==WEAPON_SFTURRET)
+					else if (iId == WEAPON_SFTURRET)
 						killer_weapon_name = "sfturret";
+					else if (iId == WEAPON_Y23S3BUFFM249)
+						killer_weapon_name = "y23s3buffm249";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}
@@ -4504,6 +4516,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 
 					case GRENADE_CHINAEVENTBOMB:
 						killer_weapon_name = "chinaeventbomb";
+						break;
+
+					case GRENADE_IGNITEBOMB:
+						killer_weapon_name = "ignitebomb";
 						break;
 
 					default:

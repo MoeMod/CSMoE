@@ -166,6 +166,11 @@ public:
 	static struct model_s* s_pM3DragonEXSmokeModel;
 	static struct model_s* s_pLeapStrikeGunViewModel;
 	static struct model_s* s_pLeapStrikeGunPartModel;
+	static struct model_s* s_pY23S3BUFFM249ViewModel;
+	static struct model_s* s_pY23S3BUFFM249FireModel;
+	static struct model_s* s_pDgaxeEXViewModel;
+	static struct model_s* s_pDgaxeEXMuzzLModel;
+	static struct model_s* s_pDgaxeEXMuzzRModel;
 };
 
 }
