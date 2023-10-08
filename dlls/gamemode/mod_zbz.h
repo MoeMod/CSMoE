@@ -65,6 +65,7 @@ public:
 	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, ZombieClassType iZombieClass = ZOMBIE_CLASS_HUMAN) override;
 	bool ClientCommand(const char* pcmd) override;
 	void OnSpawn() override;
+	void GiveDefaultItems() override;
 	void Evolution(ZombieLevel iEvolutionLevel) override;
 	void BecomeHuman() override;
 	void BecomeZombie(ZombieLevel iEvolutionLevel) override;

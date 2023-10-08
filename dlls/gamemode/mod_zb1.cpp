@@ -423,6 +423,11 @@ void CPlayerModStrategy_ZB1::BecomeHuman()
 	m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
 	m_pPlayer->m_iTeam = CT;
 	m_pPlayer->pev->team = CT;
+
+	for (int i = 0; i < MAX_ITEM_TYPES; ++i)
+	{
+		m_pPlayer->m_iSlotBuyTime[i] = 0;
+	}
 }
 
 CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp)

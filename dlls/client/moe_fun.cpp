@@ -250,7 +250,7 @@ namespace sv {
             if (context.item("tattomenu", "纹身管理"))
                 ShowTattoMenu(playerid);
 
-            if (context.item("tattomenu", "僵尸皮肤管理"))
+            if (context.item("zombieskinmenu", "僵尸皮肤管理"))
                 ShowZombieSkinMenu(playerid);
 
             context.end(playerid);

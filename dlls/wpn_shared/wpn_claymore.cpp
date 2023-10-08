@@ -78,8 +78,7 @@ namespace sv {
 
 		if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 		{
-			m_pPlayer->RemoveWeapon(m_iId);
-			DestroyItem();
+			RetireWeapon();
 
 			return false;
 		}

@@ -60,7 +60,10 @@ void EXPORT CDeimosTail::Kill(void)
 	WRITE_SHORT(this->entindex());
 	MESSAGE_END();
 
-	if (m_bIsZombieSkill && !RANDOM_LONG(0, 8))
+	const char* mod_str = CVAR_GET_STRING("mp_gamemode");
+	bool bIsZbzMode = (!strcmp(mod_str, "zbz")) ? true : false;
+
+	if (m_bIsZombieSkill && !RANDOM_LONG(0, 8) && bIsZbzMode)
 	{
 		SetTouch(NULL);
 

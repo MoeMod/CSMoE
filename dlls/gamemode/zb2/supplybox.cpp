@@ -118,6 +118,11 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 	if (p->m_bIsZombie || p->m_iBuff & (BUFF_MASTERHUNTER | BUFF_GHOSTHUNTER | BUFF_LASTHERO))
 		return;
 
+	for (int i = 0; i < MAX_ITEM_TYPES; ++i)
+	{
+		p->m_iSlotBuyTime[i] = 0;
+	}
+
 	const char* mod_str = CVAR_GET_STRING("mp_gamemode");
 	bool bIsZbzMode = (!strcmp(mod_str, "zbz")) ? true : false;
 	if (strcmp(mod_str, "zb3f2p") && strcmp(mod_str, "zb3zp"))
@@ -141,7 +146,19 @@ void CSupplyBox::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 #ifndef XASH_DEDICATED
 			std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 #else
-			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+			if (bIsZbzMode)
+				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+			else
+			{
+				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) {
+					if (iSlot == KNIFE_SLOT)
+						return info.iSlot == iSlot && !g_pGameRules->m_setBanKnife.count(info.iID);
+					else if (iSlot == GRENADE_SLOT)
+						return info.iSlot == iSlot && !g_pGameRules->m_setBanGrenade.count(info.iID);
+					else
+						return info.iSlot == iSlot && !g_pGameRules->m_setBanWeapon.count(info.iID);
+					});
+			}
 #endif // !XASH_DEDICATED
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 			MoEWeaponBuyInfo_s& info = candidate_list.front();
@@ -246,6 +263,11 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 	if (p->m_bIsZombie || p->m_iBuff & (BUFF_MASTERHUNTER | BUFF_GHOSTHUNTER | BUFF_LASTHERO))
 		return;
 
+	for (int i = 0; i < MAX_ITEM_TYPES; ++i)
+	{
+		p->m_iSlotBuyTime[i] = 0;
+	}
+
 	const char *mod_str = CVAR_GET_STRING("mp_gamemode");
 	bool bIsZbzMode = (!strcmp(mod_str, "zbz")) ? true : false;
 	if(strcmp(mod_str, "zb3f2p") && strcmp(mod_str, "zb3zp"))
@@ -268,7 +290,19 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 #ifndef XASH_DEDICATED
 			std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 #else
-			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+			if (bIsZbzMode)
+				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+			else
+			{
+				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) {
+					if (iSlot == KNIFE_SLOT)
+						return info.iSlot == iSlot && !g_pGameRules->m_setBanKnife.count(info.iID);
+					else if (iSlot == GRENADE_SLOT)
+						return info.iSlot == iSlot && !g_pGameRules->m_setBanGrenade.count(info.iID);
+					else
+						return info.iSlot == iSlot && !g_pGameRules->m_setBanWeapon.count(info.iID);
+					});
+			}		
 #endif // !XASH_DEDICATED
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 			MoEWeaponBuyInfo_s& info = candidate_list.front();

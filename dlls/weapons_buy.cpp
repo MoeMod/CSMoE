@@ -1502,6 +1502,9 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 			return false;
 	}
 
+	if (!pPlayer->CanPlayerBuyBySlot(iter->iSlot))
+		return false;;
+
 	switch (iter->iSlot) {
 		case PRIMARY_WEAPON_SLOT:
 			DropPrimary(pPlayer);
@@ -1628,6 +1631,7 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 						}
 					}
 
+					pPlayer->m_iSlotBuyTime[iter->iSlot]--;
 					return true;				
 			}
 
@@ -1636,6 +1640,7 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 			break;
 	}
 
+	pPlayer->m_iSlotBuyTime[iter->iSlot]--;
 	pPlayer->GiveNamedItem(iter->pszClassName);
 	pPlayer->AddAccount(-iter->iCost);
 	pPlayer->BuildRebuyStruct();

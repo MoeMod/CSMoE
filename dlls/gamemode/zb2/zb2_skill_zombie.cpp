@@ -3618,7 +3618,6 @@ namespace sv {
 			{
 				if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId == WEAPON_KNIFE)
 				{
-					FireZombieSkill();
 					m_SkillStatus = DEFENSE_START;
 					m_iZombieSkillStatus = SKILL_STATUS_USING;
 					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;

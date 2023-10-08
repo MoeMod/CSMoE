@@ -52,6 +52,7 @@ public:
 
 	virtual void CheckBuyZone() = 0;
 	virtual bool CanPlayerBuy(bool display) = 0;
+	virtual bool CanPlayerBuyBySlot(int islot) = 0;
 	virtual void Pain(int m_LastHitGroup, bool HasArmour) = 0;
 	virtual void DeathSound() = 0;
 
@@ -107,6 +108,7 @@ public:
 
 	void CheckBuyZone() override;
 	bool CanPlayerBuy(bool display) override;
+	bool CanPlayerBuyBySlot(int islot) override { return true; }
 	void Pain(int m_LastHitGroup, bool HasArmour) override;
 	void DeathSound() override;
 

@@ -337,6 +337,11 @@ void CPlayerModStrategy_ZBZ::OnSpawn()
 	return CPlayerModStrategy_ZB3::OnSpawn();
 }
 
+void CPlayerModStrategy_ZBZ::GiveDefaultItems()
+{
+	return CPlayerModStrategy_Zombie::GiveDefaultItems();
+}
+
 void CPlayerModStrategy_ZBZ::BecomeHuman()
 {
 	CPlayerModStrategy_ZB3::BecomeHuman();

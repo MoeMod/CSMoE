@@ -585,6 +585,7 @@ public:
 	void Disappear();
 	void MakeVIP();
 	bool CanPlayerBuy(bool display = false);
+	bool CanPlayerBuyBySlot(int slot);
 	void SwitchTeam();
 	void TabulateAmmo();
 	void Pain(int m_LastHitGroup, bool HasArmour);
@@ -833,6 +834,7 @@ public:
 	float m_flOldHealth = 0.0;
 	float m_flZombieHealth;
 	float m_flZombieArmor;
+	int m_iSlotBuyTime[MAX_ITEM_TYPES];
 };
 
 }

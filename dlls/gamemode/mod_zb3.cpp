@@ -139,6 +139,126 @@ void CPlayerModStrategy_ZB3::UpdatePlayerEvolutionHUD()
 	MESSAGE_END();
 }
 
+
+void CPlayerModStrategy_ZB3::GiveDefaultItems()
+{
+	if (!m_pPlayer->m_bIsZombie)
+	{
+		m_pPlayer->RemoveAllItems(FALSE);
+		m_pPlayer->m_bHasPrimary = false;
+#if XASH_DEDICATED
+		if (randomwpn.value)
+		{
+			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+			{
+				std::vector<MoEWeaponBuyInfo_s> candidate_list;
+				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) {
+					if (iSlot == KNIFE_SLOT)
+						return info.iSlot == iSlot && !g_pGameRules->m_setBanKnife.count(info.iID);
+					else
+						return info.iSlot == iSlot && !g_pGameRules->m_setBanWeapon.count(info.iID);
+					});
+				std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+				const MoEWeaponBuyInfo_s& info = candidate_list.front();
+				if (iSlot == KNIFE_SLOT) {
+					m_pPlayer->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+				}
+				m_pPlayer->GiveNamedItem(info.pszClassName);
+				GiveSlotAmmo(m_pPlayer, iSlot);
+			}
+			m_pPlayer->GiveNamedItem("weapon_hegrenade");
+		}
+		else
+		{
+			if (m_pPlayer->IsBot())
+			{
+				m_pPlayer->RemoveAllItems(FALSE);
+				m_pPlayer->m_bHasPrimary = false;
+
+				for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+				{
+					std::vector<MoEWeaponBuyInfo_s> candidate_list;
+					std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) {
+						if (iSlot == KNIFE_SLOT)
+							return info.iSlot == iSlot && !g_pGameRules->m_setBanKnife.count(info.iID);
+						else
+							return info.iSlot == iSlot && !g_pGameRules->m_setBanWeapon.count(info.iID); });
+					std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+					const MoEWeaponBuyInfo_s& info = candidate_list.front();
+					if (iSlot == KNIFE_SLOT) {
+						m_pPlayer->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+					}
+					m_pPlayer->GiveNamedItem(info.pszClassName);
+					GiveSlotAmmo(m_pPlayer, iSlot);
+				}
+				m_pPlayer->GiveNamedItem("weapon_hegrenade");
+			}
+			else
+				CPlayerModStrategy_Default::GiveDefaultItems();
+		}
+#else
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+		{
+			std::vector<MoEWeaponBuyInfo_s> candidate_list;
+			std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+			const MoEWeaponBuyInfo_s& info = candidate_list.front();
+			if (iSlot == KNIFE_SLOT) {
+				m_pPlayer->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+			}
+			m_pPlayer->GiveNamedItem(info.pszClassName);
+			GiveSlotAmmo(m_pPlayer, iSlot);
+		}
+		m_pPlayer->GiveNamedItem("weapon_hegrenade");
+
+#if 0
+		if (m_pPlayer->entindex() == 1)
+		{
+
+			CBaseEntity* Entity = UTIL_PlayerByIndex(1);
+			if (Entity)
+			{
+				CBasePlayer* TargetPlayer = static_cast<CBasePlayer*>(Entity);
+
+				TargetPlayer->RemoveAllItems(FALSE);
+				TargetPlayer->GiveNamedItem("weapon_zombielaw");
+				TargetPlayer->GiveNamedItem("weapon_leapstrikegun");
+				TargetPlayer->GiveNamedItem("knife_lance");
+				TargetPlayer->GiveNamedItem("weapon_stickybomb");
+				//GiveSlotAmmo(TargetPlayer, 1);
+				GiveSlotAmmo(TargetPlayer, 2);
+				//TargetPlayer->m_iBuff |= BUFF_AVOID_INFECT;
+
+			}
+		}
+#endif
+#endif
+		return;
+	}
+
+	m_pPlayer->RemoveAllItems(FALSE);
+	m_pPlayer->m_bHasPrimary = false;
+
+	m_pPlayer->GiveNamedItem("weapon_zombibomb");
+	if (m_pPlayer->m_iZombieClass && m_pPlayer->m_iZombieClass == ZOMBIE_CLASS_DEATHKNIGHT)
+	{
+		m_pPlayer->GiveNamedItem("knife_zombi_z5");
+	}
+	else
+		m_pPlayer->GiveNamedItem("knife_zombi");
+	m_pPlayer->GiveNamedItem("weapon_zombibomb2");
+
+
+	if (!(m_pPlayer->m_flDisplayHistory & DHF_NIGHTVISION))
+	{
+		m_pPlayer->HintMessage("#Hint_use_nightvision");
+		m_pPlayer->m_flDisplayHistory |= DHF_NIGHTVISION;
+	}
+	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
+	m_pPlayer->m_bHasNightVision = true;
+	SendItemStatus(m_pPlayer);
+}
+
 float CPlayerModStrategy_ZB3::AdjustDamageTaken(entvars_t * pevInflictor, entvars_t * pevAttacker, float flDamage, int bitsDamageType)
 {
 	flDamage = CPlayerModStrategy_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
@@ -188,6 +308,24 @@ void CPlayerModStrategy_ZB3::OnThink()
 	}
 
 	return CPlayerModStrategy_ZB2::OnThink();
+}
+
+bool CPlayerModStrategy_ZB3::CanPlayerBuyBySlot(int iSlot)
+{
+	if (iSlot == GRENADE_SLOT)
+	{
+		if (m_pPlayer->m_iSlotBuyTime[iSlot] < 0)
+		{
+			MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, m_pPlayer->edict());
+			WRITE_BYTE(0);
+			WRITE_STRING("超出购买次数限制");
+			MESSAGE_END();
+
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void CPlayerModStrategy_ZB3::OnKilled(entvars_t * pKiller, entvars_t * pInflictor)

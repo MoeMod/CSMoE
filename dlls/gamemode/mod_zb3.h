@@ -85,6 +85,7 @@ public:
 	CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieHero *mp);
 
 	void OnSpawn() override;
+	void GiveDefaultItems() override;
 	bool CanUseZombieSkill() override { return true; }
 	void CheckEvolution() override;
 	void Evolution(ZombieLevel iEvolutionLevel) override;
@@ -97,6 +98,7 @@ public:
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
 	int AdjustScoreAttrib(int state) override { return IsHero() ? (state | PLAYER_VIP) : state; }
+	bool CanPlayerBuyBySlot(int islot) override;
 	void CmdStart(struct usercmd_s* cmd, unsigned int random_seed) override;
 
 	virtual void Event_OnBecomeHero(CBasePlayer *who);

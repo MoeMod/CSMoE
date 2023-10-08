@@ -5289,6 +5289,11 @@ bool CBasePlayer::CanPlayerBuy(bool display)
 	return m_pModStrategy->CanPlayerBuy(display); // rediected to IBaseMod.
 }
 
+bool CBasePlayer::CanPlayerBuyBySlot(int iSlot)
+{
+	return m_pModStrategy->CanPlayerBuyBySlot(iSlot); // rediected to IBaseMod.
+}
+
 void CBasePlayer::PreThink()
 {
 	// These buttons have changed this frame
@@ -6324,6 +6329,11 @@ void CBasePlayer::Spawn()
 
 	m_iBuff = 0;
 	m_bHasBuffWpn = 0;
+
+	for (int i = 0; i < MAX_ITEM_TYPES; ++i)
+	{
+		m_iSlotBuyTime[i] = 0;
+	}
 
 	SpawnProtection_End();
 

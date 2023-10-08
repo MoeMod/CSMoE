@@ -252,20 +252,26 @@ namespace sv {
 
 				pEntity->TraceAttack(m_pPlayer->pev, GetExpDamage(), vecDir, tr, DMG_BULLET | DMG_NEVERGIB);
 
-				CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-				if (target->m_bIsZombie)
+				if (pEntity->IsPlayer())
 				{
-					if (!(target->m_iBuff & BUFF_IGNORE_KNOCKBACK))
-					{
-						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(target->m_pModStrategy.get());
-						if (strategy)
-						{
-							strategy->SetStunSpeedTime(1.5s, m_iWeaponState & WPNSTATE_THUNDERPISTOL_MODEB ? 70.0f : 100.0f);
-							strategy->SetStunGravityTime(1.5s);
-						}
-					}
+					CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
 
+					if (target->m_bIsZombie)
+					{
+						if (!(target->m_iBuff & BUFF_IGNORE_KNOCKBACK))
+						{
+							auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(target->m_pModStrategy.get());
+							if (strategy)
+							{
+								strategy->SetStunSpeedTime(1.5s, m_iWeaponState & WPNSTATE_THUNDERPISTOL_MODEB ? 70.0f : 100.0f);
+								strategy->SetStunGravityTime(1.5s);
+							}
+						}
+
+					}
 				}
+
+				
 			}
 		}
 	}
