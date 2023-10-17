@@ -12,7 +12,7 @@
 namespace sv {
     namespace wdnmdmenu {
         
-    char g_szSounds[24][24];
+    char g_szSounds[39][39];
     time_point_t g_flSoundCD[33];
     int g_iSoundTimes[33];
 
@@ -41,6 +41,22 @@ namespace sv {
             "今天是上坟的好日子",
             "稳得很,来嘛来嘛",
             "WGNMD",
+            "比划比划",
+            "滚出去",
+            "阿米诺斯",
+            "CNM",
+            "baka1",
+            "baka2",
+            "白象方便面",
+            "呕",
+            "独立宣言1",
+            "独立宣言2",
+            "babe",
+            "tom猫①",
+            "tom猫②",
+            "tom猫③",
+            "我不知道啊",
+
     };
 
     void PrintToChat(CBasePlayer* target, const std::string& what)
@@ -66,7 +82,7 @@ namespace sv {
 
     void WdnmdSoundPrecache()
     {
-        for (int i = 0; i < 24; i++)
+        for (int i = 0; i < 39; i++)
         {
             sprintf(g_szSounds[i], "radio/qz/c%d.wav", i + 1);
 
@@ -94,23 +110,23 @@ namespace sv {
         ImMenu(playerid, [round = g_pGameRules->m_iTotalRoundsPlayed, page](auto context, CBasePlayer * playerid){         
             if (round != g_pGameRules->m_iTotalRoundsPlayed)
                 return;
-            context.begin("wdnmd语音菜单");
+            context.begin("明星大乱斗-语音菜单");
             if (page == -1)
             {
-                for (int i = 0; i < 24; i++)
+                for (int i = 0; i < 39; i++)
                 {
                     if (context.item(g_szSoundsName[i], g_szSoundsName[i]))
                     {
                         int id = playerid->entindex();
                         if (g_flSoundCD[id] > gpGlobals->time)
                         {
-                            PrintToChat(playerid, "就算是茄子本人也要喘口气啊wdnmd!");
+                            PrintToChat(playerid, "就算是本人也要喘口气啊!");
                             return;
                         }
 
                         if (10 <= g_iSoundTimes[id])
                         {
-                            PrintToChat(playerid, "wdnmd本局语音已达上限!");
+                            PrintToChat(playerid, "本局语音已达上限!");
                             return;
                         }
 
@@ -147,13 +163,13 @@ namespace sv {
                         int id = playerid->entindex();
                         if (g_flSoundCD[id] > gpGlobals->time)
                         {
-                            PrintToChat(playerid, "就算是茄子本人也要喘口气啊wdnmd!");
+                            PrintToChat(playerid, "就算是本人也要喘口气啊!");
                             return;
                         }
 
                         if (10 <= g_iSoundTimes[id])
                         {
-                            PrintToChat(playerid, "wdnmd本局语音已达上限!");
+                            PrintToChat(playerid, "本局语音已达上限!");
                             return;
                         }
 

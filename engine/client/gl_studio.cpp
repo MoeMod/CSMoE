@@ -73,10 +73,10 @@ std::map<ModelName, const char*> g_HandTextureName =
 	{ MODEL_BUFFCLASSHUNTER, "buffclasshunter" },
 	{ MODEL_BUFFCLASSA, "buffclassa" },
 	{ MODEL_BUFFCLASSB, "buffclassb" },
-	{ MODEL_BUFFCLASSFERNADO, "buffclassfernando" },
+	{ MODEL_BUFFCLASSFERNANDO, "buffclassfernando" },
 	{ MODEL_BUFFCLASSBLAIR, "buffclassblair" },
-	{ MODEL_ALICEBLUE, "ma_blue" },
-	{ MODEL_ALICERED, "ma_red" },
+	{ MODEL_MA_ALICEBLUE, "ma_blue" },
+	{ MODEL_MA_ALICERED, "ma_red" },
 	{ MODEL_Y20S1LEECHANG, "y20s1leechangtr" },
 	{ MODEL_Y20S1YEONGSIN, "y20s1yeongsinct" },
 	{ MODEL_BUFFCLASS22S4TR, "buffclass22s4tr" },
@@ -1913,6 +1913,25 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		}
 		//handtexture system end
+
+		//weaponpaint system start
+		if (RI.currententity->curstate.iuser4 > 700)
+		{
+			const char* pszFileName = pStudioDraw->StudioGetReplacedTexName(RI.currententity->curstate.iuser4, pmesh->skinref, m_pStudioHeader->name);
+
+			if (pszFileName == nullptr)
+				pszFileName = pStudioDraw->StudioGetReplacedTexName(RI.currententity->curstate.iuser4, pmesh->skinref, RI.currententity->model->name);
+
+			if (pszFileName != nullptr)
+			{
+				texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+				if (texnum)
+				{
+					//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+					bBindTex = true;
+				}
+			}
+		}
 
 		const auto& attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
 		if(xe::TexLru_Upload(attr.index))

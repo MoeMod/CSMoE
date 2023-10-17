@@ -116,7 +116,6 @@ CPlayerClassManager& PlayerClassManager()
 
 static std::map<ModelName, ClassData> gPlayerClass =
 {
-	{ MODEL_UNASSIGNED, { MODEL_UNASSIGNED, NULL, UNASSIGNED } },
 	{ MODEL_YURI, { MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 	{ MODEL_SAF, { MODEL_SAF, "saf", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
 	{ MODEL_PIRATEBOY, { MODEL_PIRATEBOY, "pirateboy", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
@@ -146,18 +145,18 @@ static std::map<ModelName, ClassData> gPlayerClass =
 	{ MODEL_BUFFCLASSHUNTER, { MODEL_BUFFCLASSHUNTER, "buffclasshunter", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 	{ MODEL_BUFFCLASSLYCAN, { MODEL_BUFFCLASSLYCAN, "buffclasslycan", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 	{ MODEL_BUFFCLASSBLAIR, { MODEL_BUFFCLASSBLAIR, "buffclassblair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
-	{ MODEL_BUFFCLASSFERNADO, { MODEL_BUFFCLASSFERNADO, "buffclassfernando", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_BUFFCLASSFERNANDO, { MODEL_BUFFCLASSFERNANDO, "buffclassfernando", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
 	{ MODEL_JPNGIRL01ORG, { MODEL_JPNGIRL01ORG, "jpngirl01org", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 	{ MODEL_SOI, { MODEL_SOI, "soi", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 	{ MODEL_IDOLGIRL, { MODEL_IDOLGIRL, "idolgirl", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 	{ MODEL_MARINEGIRL, { MODEL_MARINEGIRL, "marinegirl", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 	{ MODEL_BLAIR, { MODEL_BLAIR, "blair", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 	{ MODEL_JENNIFER, { MODEL_JENNIFER, "jennifer", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
-	{ MODEL_ALICEBLUE, { MODEL_ALICEBLUE, "ma_aliceblue", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
-	{ MODEL_ALICERED, { MODEL_ALICERED, "ma_alicered", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
-	{ MODEL_JIA, { MODEL_JIA, "jra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_MA_ALICEBLUE, { MODEL_MA_ALICEBLUE, "ma_aliceblue", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_MA_ALICERED, { MODEL_MA_ALICERED, "ma_alicered", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_JRA, { MODEL_JRA, "jra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
 	{ MODEL_SDEFENCE, { MODEL_SDEFENCE, "sdefence", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
-	{ MODEL_SCJIA, { MODEL_SCJIA, "scjra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_SCJRA, { MODEL_SCJRA, "scjra", TERRORIST, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
 	{ MODEL_SCVIP, { MODEL_SCVIP, "scvip", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
 	{ MODEL_SCYURI, { MODEL_SCYURI, "scyuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 	{ MODEL_SCCJY, { MODEL_SCCJY, "sccjy", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
@@ -329,69 +328,17 @@ void CPlayerClassManager::PlayerModel_Precache()
 	InitRadio();
 
 	char path[128];
-	for (int i = 1; i < NUM_CLASS; i++)
-	{
-		Client_ApperanceToModel(path, ModelName(i));
+
+	for (auto it : gPlayerClass) {
+		Client_ApperanceToModel(path, it.first);
 		PRECACHE_MODEL(path);
-
-		//std::string szSound;
-
-		//if (gPlayerClass[ModelName(i)].radio_json_name)
-		//{
-		//	int iSize = sizeof(m_szRadioType) / sizeof(m_szRadioType[0]);
-
-
-		//	for (int type = 0; type < iSize; type++)
-		//	{
-		//		int size = g_Radio[m_szRadioType[type]].size();
-		//		//g_Radio[m_szRadioType[type]] = "MRAD_AFFIRM"
-
-		//		if (g_Radio[m_szRadioType[type]].contains(gPlayerClass[ModelName(i)].radio_json_name))
-		//		{
-		//			if (g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).is_array())
-		//			{
-		//				for (int m = 0; m < g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).size(); m++)
-		//				{
-		//					szSound = g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name)[m].get<std::string>();
-		//					if (strstr(gPlayerClass[ModelName(i)].radio_json_name, "buffdefault"))
-		//					{
-		//						std::string new_value = gPlayerClass[ModelName(i)].model_name;
-		//						szSound = UTIL_ReplaceString(szSound, "$buffclassname", new_value);
-
-		//						if (!gPlayerClass[ModelName(i)].isFemale)
-		//						{
-		//							if (strstr(szSound.c_str(), "f_hit_flesh"))
-		//								continue;
-		//						}
-		//						else
-		//						{
-		//							if (strstr(szSound.c_str(), "/hit_flesh"))
-		//								continue;
-		//						}
-		//					}
-		//					PRECACHE_SOUND(szSound.c_str());
-		//				}
-		//			}
-		//			else
-		//			{
-		//				szSound = g_Radio[m_szRadioType[type]].at(gPlayerClass[ModelName(i)].radio_json_name).get<std::string>();
-		//				if (strstr(gPlayerClass[ModelName(i)].radio_json_name, "buffdefault"))
-		//				{
-		//					std::string new_value = gPlayerClass[ModelName(i)].model_name;
-		//					szSound = UTIL_ReplaceString(szSound, "$buffclassname", new_value);
-		//				}
-		//				PRECACHE_SOUND(szSound.c_str());
-		//			}
-		//		}			
-		//	}
-		//}
 	}
 #endif
 }
 
 const char* CPlayerClassManager::PlayerClass_GetModelName(ModelName iApperance)
 {
-	if (iApperance >= NUM_CLASS || iApperance < 1) {
+	if (iApperance >= MODEL_NUM || iApperance < 1) {
 		iApperance = MODEL_YURI;
 	}
 
@@ -400,7 +347,7 @@ const char* CPlayerClassManager::PlayerClass_GetModelName(ModelName iApperance)
 
 bool CPlayerClassManager::PlayerClass_IsFemale(ModelName iApperance)
 {
-	if (iApperance >= NUM_CLASS || iApperance < 1) {
+	if (iApperance >= MODEL_NUM || iApperance < 1) {
 		iApperance = MODEL_YURI;
 	}
 
@@ -423,10 +370,9 @@ ModelName CPlayerClassManager::Client_ModelToApperance(const char* modelname)
 	name[strlen(name) - 4] = 0;
 	name[strlen(name) / 2] = 0;
 
-	for (int i = 1; i < NUM_CLASS; i++)
-	{
-		if (!stricmp(name, gPlayerClass[ModelName(i)].model_name))
-			return ModelName(i);
+	for (auto it : gPlayerClass) {
+		if (!stricmp(name, it.second.model_name))
+			return it.first;
 	}
 
 	return MODEL_UNASSIGNED;	//cannot find
@@ -434,7 +380,11 @@ ModelName CPlayerClassManager::Client_ModelToApperance(const char* modelname)
 
 ModelName CPlayerClassManager::PlayerClass_GetRandomClass()
 {
-	return (ModelName)RANDOM_LONG(1, NUM_CLASS - 1);
+	auto it = gPlayerClass.cbegin();
+	int random = rand() % gPlayerClass.size();
+	std::advance(it, random);
+
+	return it->first;
 }
 
 int CPlayerClassManager::PlayerClass_GetNumClass()
@@ -445,22 +395,24 @@ int CPlayerClassManager::PlayerClass_GetNumClass()
 int CPlayerClassManager::PlayerClass_GetNumCT()
 {
 	int iCount = 0;
-	for (int i = 1; i < NUM_CLASS; i++)
-	{
-		if (gPlayerClass[ModelName(i)].team == CT)
+
+	for (auto it : gPlayerClass) {
+		if (it.second.team == CT)
 			iCount++;
 	}
+
 	return iCount;
 }
 
 int CPlayerClassManager::PlayerClass_GetNumTR()
 {
 	int iCount = 0;
-	for (int i = 1; i < NUM_CLASS; i++)
-	{
-		if (gPlayerClass[ModelName(i)].team == TERRORIST)
+
+	for (auto it : gPlayerClass) {
+		if (it.second.team == TERRORIST)
 			iCount++;
 	}
+
 	return iCount;
 }
 
@@ -472,8 +424,11 @@ void CPlayerClassManager::SetPlayerClass(int index, char* name)
 	ModelName ClassID = Client_ModelToApperance(name);
 	
 	if (!ClassID)
+	{
 		m_PlayerClass[index] = &m_NullClass;
-
+		return;
+	}
+		
 	m_PlayerClass[index] = &gPlayerClass[ClassID];
 }
 

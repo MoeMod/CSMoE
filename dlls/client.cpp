@@ -1744,17 +1744,17 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 			}
 			case 19:
 			{
-				appearance.model_id = MODEL_ALICERED;
+				appearance.model_id = MODEL_MA_ALICERED;
 				break;
 			}
 			case 20:
 			{
-				appearance.model_id = MODEL_JIA;
+				appearance.model_id = MODEL_JRA;
 				break;
 			}
 			case 21:
 			{
-				appearance.model_id = MODEL_SCJIA;
+				appearance.model_id = MODEL_SCJRA;
 				break;
 			}
 			case 22:
@@ -1920,7 +1920,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 		}
 		case 15:
 		{
-			appearance.model_id = MODEL_BUFFCLASSFERNADO;
+			appearance.model_id = MODEL_BUFFCLASSFERNANDO;
 			break;
 		}
 		case 16:
@@ -1940,7 +1940,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 		}
 		case 19:
 		{
-			appearance.model_id = MODEL_ALICEBLUE;
+			appearance.model_id = MODEL_MA_ALICEBLUE;
 			break;
 		}
 		case 20:
@@ -5057,6 +5057,16 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
 
    state->iuser4 = ent->v.iuser4;
 
+   pPlayer = (CBasePlayer*)GET_PRIVATE(ent);
+
+   if (pPlayer && pPlayer->IsPlayer())
+   {
+	   if (pPlayer->m_pActiveItem)
+	   {
+		   state->iuser4 = pPlayer->m_pActiveItem->m_uiKnifePaintType ? pPlayer->m_pActiveItem->m_uiKnifePaintType : pPlayer->m_pActiveItem->m_uiWeaponPaintType;
+	   }
+   }
+
    g_pModRunning->AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
 
    return 1;
@@ -5329,6 +5339,11 @@ int EXT_FUNC GetWeaponData(edict_s *player, struct weapon_data_s *info)
 	item->iuser2 = gun->pev->body;
 	item->iuser3 = gun->pev->skin;
 
+	if(item->m_iId == WEAPON_KNIFE)
+		item->iuser4 = (int)gun->m_uiKnifePaintType;
+	else
+		item->iuser4 = (int)gun->m_uiWeaponPaintType;
+	
 	//for (int i = 0; i < MAX_ITEM_TYPES; ++i)
 	//{
 	//	CBasePlayerItem *pPlayerItem = pl->m_rgpPlayerItems[i];

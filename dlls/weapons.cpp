@@ -14,7 +14,7 @@
 
 #include "bot_include.h"
 #include "player/player_mod_strategy.h"
-
+#include "studio.h"
 namespace sv {
 
 /*
@@ -1101,6 +1101,14 @@ int CBasePlayerWeapon::AddDuplicate(CBasePlayerItem *pOriginal)
 
 int CBasePlayerWeapon::AddToPlayer(CBasePlayer *pPlayer)
 {
+	if (FNullEnt(pev->owner))
+	{
+		if(m_iId == WEAPON_KNIFE)
+			m_uiKnifePaintType = pPlayer->m_uiKnifePaintType[m_iKnifeID];
+		else
+			m_uiWeaponPaintType = pPlayer->m_uiWeaponPaintType[m_iId];	
+	}
+
 	m_pPlayer = pPlayer;
 	pPlayer->AddWeapon(m_iId);
 

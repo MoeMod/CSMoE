@@ -40,6 +40,7 @@
 #include "GameStudioModelRenderer.h"
 #include "pm_defs.h"
 #include "gamemode/zb2/zb2_const.h"
+#include "weaponpaint.h"
 
 #define ANIM_WALK_SEQUENCE 3
 #define ANIM_JUMP_SEQUENCE 6
@@ -1090,12 +1091,16 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 			cl_entity_t saveent = *m_pCurrentEntity;
 
 			model_t *pweaponmodel = IEngineStudio.GetModelByIndex(pplayer->weaponmodel);
-
+	
 			//HOOK pModel
 			int idx = pplayer->number;
 
 			if (idx > 0 && idx < 33)
 			{
+				//if has it is bot
+				if(m_pCurrentEntity->curstate.iuser4 < 700)				
+					m_pCurrentEntity->curstate.iuser4 = g_PlayerExtraInfo[idx].m_uiKnifePaintType ? g_PlayerExtraInfo[idx].m_uiKnifePaintType : g_PlayerExtraInfo[idx].m_uiWeaponPaintType;
+
 				if (CStudioModelRenderer::s_pWingGunPModel && pweaponmodel == CStudioModelRenderer::s_pWingGunPModel)
 				{
 					if ((g_iWingGunShootB & (1 << idx) || g_iWingGunIdleB & (1 << idx)))
@@ -1300,6 +1305,8 @@ void CGameStudioModelRenderer::StudioFxTransform(cl_entity_t *ent, matrix3x4_ref
 void R_StudioInit(void)
 {
 	g_StudioRenderer.Init();
+	WeaponPaintManager().Init();
+
 }
 
 int R_StudioDrawPlayer(int flags, entity_state_t *pplayer)
@@ -2665,6 +2672,24 @@ int R_StudioGetPlayerClassID(int playerid)
 	return PlayerClassManager().GetPlayerClass(playerid).ClassID;
 }
 
+const char* R_StudioGetReplacedTexName(int itemid, int texID, const char* modelname)
+{
+	auto iter = std::find_if(g_vecWeaponPaintList.begin(), g_vecWeaponPaintList.end(),
+		[&](const WeaponPaint& info) {
+			return itemid == info.ItemID && texID == info.texID && strstr(modelname, info.mdlName.c_str());
+
+		});
+
+	if (iter != g_vecWeaponPaintList.end())
+	{
+		return iter->paintName.c_str();
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
 // The simple drawing interface we'll pass back to the engine
 r_studio_interface_t studio =
 {
@@ -2672,6 +2697,7 @@ r_studio_interface_t studio =
 	R_StudioDrawModel,
 	R_StudioDrawPlayer,
 	R_StudioGetPlayerClassID,
+	R_StudioGetReplacedTexName,
 };
 
 /*

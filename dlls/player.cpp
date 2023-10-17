@@ -1648,6 +1648,13 @@ void packPlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem, bool packAmmo)
 			pWeaponBox->PackAmmo(MAKE_STRING(CBasePlayerItem::ItemInfoArray[pItem->m_iId].pszAmmo1), pPlayer->m_rgAmmo[pItem->PrimaryAmmoIndex()], iMaxCarry);
 		}
 		SET_MODEL(ENT(pWeaponBox->pev), modelName);
+
+		if(pItem->m_iId == WEAPON_KNIFE)
+			pWeaponBox->pev->iuser4 = pWeaponBox->m_uiKnifePaintType = ((CBasePlayerWeapon*)pItem)->m_uiKnifePaintType;
+		else
+			pWeaponBox->pev->iuser4 = pWeaponBox->m_uiWeaponPaintType = ((CBasePlayerWeapon*)pItem)->m_uiWeaponPaintType;
+		
+		
 	}
 }
 
@@ -5773,7 +5780,7 @@ void CBasePlayer::SetNewPlayerModel(const char *modelName)
 		UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	m_modelIndexPlayer = pev->modelindex;
 
-	if (m_iModelName == MODEL_ALICEBLUE)
+	if (m_iModelName == MODEL_MA_ALICEBLUE)
 		pev->skin = 1;
 	else
 		pev->skin = 0;
@@ -8808,6 +8815,11 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 				SET_MODEL(ENT(pWeaponBox->pev), modelname);
 			}
 
+			if(pWeapon->m_iId == WEAPON_KNIFE)
+				pWeaponBox->pev->iuser4 = pWeaponBox->m_uiKnifePaintType = ((CBasePlayerWeapon*)pWeapon)->m_uiKnifePaintType;
+			else
+				pWeaponBox->pev->iuser4 = pWeaponBox->m_uiWeaponPaintType = ((CBasePlayerWeapon*)pWeapon)->m_uiWeaponPaintType;
+			
 			return;
 		}
 	}

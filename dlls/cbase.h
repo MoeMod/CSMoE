@@ -389,6 +389,8 @@ public:
 	entvars_t* m_pBuffAttacker;
 
 	std::vector<CBasePlayer*> m_vecTempAttackers;
+	unsigned int m_uiWeaponPaintType;
+	unsigned int m_uiKnifePaintType;
 };
 
 inline int FNullEnt(CBaseEntity* ent) { return (!ent) || FNullEnt(ent->edict()); }

@@ -561,6 +561,7 @@ set (STUDIORENDER_SRCS
 	./studio/StudioModelRenderer.cpp
 	./studio/studio_util.cpp
 	./studio/bonequatlru.cpp
+	./studio/weaponpaint.cpp
 
 )
 

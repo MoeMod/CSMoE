@@ -435,6 +435,8 @@ struct extra_player_info_t
 	float radarflashtimedelta;
 	char location[32];
 	byte os;
+	int m_uiWeaponPaintType;
+	int m_uiKnifePaintType;
 };
 
 struct team_info_t

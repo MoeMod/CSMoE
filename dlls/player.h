@@ -835,6 +835,8 @@ public:
 	float m_flZombieHealth;
 	float m_flZombieArmor;
 	int m_iSlotBuyTime[MAX_ITEM_TYPES];
+	unsigned int m_uiWeaponPaintType[NUM_WEAPONS];
+	unsigned int m_uiKnifePaintType[NUM_KNIVES];
 };
 
 }

@@ -1374,9 +1374,15 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	pWeapon->pev->body = pfrom->iuser2;
 	pWeapon->pev->skin = pfrom->iuser3;
 
+	if(pWeapon->m_iId == WEAPON_KNIFE)
+		pWeapon->m_uiKnifePaintType = (unsigned int)pfrom->iuser4;
+	else
+		pWeapon->m_uiWeaponPaintType = (unsigned int)pfrom->iuser4;
+
 	cl_entity_t* viewent = gEngfuncs.GetViewModel();
 	viewent->curstate.body = pfrom->iuser2;
 	viewent->curstate.skin = pfrom->iuser3;
+	viewent->curstate.iuser4 = pfrom->iuser4;
 
 	/*for ( i = 0; i < MAX_WEAPONS; i++)
 	{
@@ -1443,6 +1449,8 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	player.m_iGrenadeID = (from->client.weapons >> 8) & 0xFFF;
 	player.m_iZombieClass = (from->client.weapons >> 1) & 0x7F;
 
+	g_PlayerExtraInfo[from->playerstate.number].m_uiWeaponPaintType = pWeapon->m_uiWeaponPaintType;
+	g_PlayerExtraInfo[from->playerstate.number].m_uiKnifePaintType = pWeapon->m_uiKnifePaintType;
 	g_iPlayerZombieClass = player.m_iZombieClass;
 
 	g_iPlayerFlags = player.pev->flags = from->client.flags;
