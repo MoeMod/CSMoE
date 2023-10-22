@@ -181,7 +181,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "mk3a1se",	WEAPON_MK3A1SE },
 	{ "vulcanus11",	WEAPON_VULCANUS11 },
 	{ "m3dragonex",	WEAPON_M3DRAGONEX },
-
+	{ "linkattacksg",	WEAPON_LINKATTACKSG },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -675,6 +675,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "mk3a1se",	WEAPONCLASS_SHOTGUN },
 	{ "vulcanus11",	WEAPONCLASS_SHOTGUN },
 	{ "m3dragonex",	WEAPONCLASS_SHOTGUN },
+	{ "linkattacksg",	WEAPONCLASS_SHOTGUN },
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -1230,6 +1231,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_IGNITEMG:
 	case WEAPON_M3DRAGONEX:
 	case WEAPON_Y23S3BUFFM249:
+	case WEAPON_LINKATTACKSG:
 		return true;
 	default:
 		break;

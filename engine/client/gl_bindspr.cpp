@@ -283,6 +283,150 @@ ConstSprList s_ModelEFIgniteBombLine = {
 	}
 };
 
+ConstSprList s_ModelLinkAttackSG_Oil01 = {
+	"v_linkattacksg.mdl",
+	"$20_linkattacksg_oil01.bmp",
+	"sprites/ef_linkattacksg_oil01.spr",
+	30.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+		{ 1, true, false, 1.0, 0, 0, 0 },
+		{ 2, true, false, 1.0, 0, 0, 0 },
+		{ 3, true, false, 1.0, 0, 0, 0 },
+		{ 4, true, false, 1.0, 0, 0, 0 },
+		{ 5, true, false, 1.0, 0, 0, 0 },
+		{ 6, true, false, 1.0, 0, 0, 0 },
+		{ 7, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelLinkAttackSG_Laser01 = {
+	"v_linkattacksg.mdl",
+	"$0b_linkattacksg_laser01.bmp",
+	"sprites/ef_linkattacksg_laser01.spr",
+	30.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+		{ 1, true, false, 1.0, 0, 0, 0 },
+		{ 2, true, false, 1.0, 0, 0, 0 },
+		{ 3, true, false, 1.0, 0, 0, 0 },
+		{ 4, true, false, 1.0, 0, 0, 0 },
+		{ 5, true, false, 1.0, 0, 0, 0 },
+		{ 6, true, false, 1.0, 0, 0, 0 },
+		{ 7, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+
+ConstSprList s_ModelLinkAttackSG_Sphere_V = {
+	"v_linkattacksg.mdl",
+	"$0b_linkattacksg_sphere_v.bmp",
+	"sprites/ef_linkattacksg_sphere_v.spr",
+	30.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+		{ 1, true, false, 1.0, 0, 0, 0 },
+		{ 2, true, false, 1.0, 0, 0, 0 },
+		{ 3, true, false, 1.0, 0, 0, 0 },
+		{ 4, true, false, 1.0, 0, 0, 0 },
+		{ 5, true, false, 1.0, 0, 0, 0 },
+		{ 6, true, false, 1.0, 0, 0, 0 },
+		{ 7, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+
+ConstSprList s_ModelLinkAttackSG_Oil02 = {
+	"v_linkattacksg.mdl",
+	"$20_linkattacksg_oil02.bmp",
+	"sprites/ef_linkattacksg_oil02.spr",
+	30.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+		{ 1, true, false, 1.0, 0, 0, 0 },
+		{ 2, true, false, 1.0, 0, 0, 0 },
+		{ 3, true, false, 1.0, 0, 0, 0 },
+		{ 4, true, false, 1.0, 0, 0, 0 },
+		{ 5, true, false, 1.0, 0, 0, 0 },
+		{ 6, true, false, 1.0, 0, 0, 0 },
+		{ 7, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelLinkAttackSG_Laser02 = {
+	"v_linkattacksg.mdl",
+	"$0b_linkattacksg_laser02.bmp",
+	"sprites/ef_linkattacksg_laser02.spr",
+	30.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+		{ 1, true, false, 1.0, 0, 0, 0 },
+		{ 2, true, false, 1.0, 0, 0, 0 },
+		{ 3, true, false, 1.0, 0, 0, 0 },
+		{ 4, true, false, 1.0, 0, 0, 0 },
+		{ 5, true, false, 1.0, 0, 0, 0 },
+		{ 6, true, false, 1.0, 0, 0, 0 },
+		{ 7, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelLinkAttackSGPart_Oil01 = {
+	"v_linkattacksg_parts.mdl",
+	"$20_linkattacksg_oil01.bmp",
+	"sprites/ef_linkattacksg_oil01.spr",
+	30.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+		{ 1, true, false, 1.0, 0, 0, 0 },
+		{ 2, true, false, 1.0, 0, 0, 0 },
+		{ 3, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelLinkAttackSGPart_Oil02 = {
+	"v_linkattacksg_parts.mdl",
+	"$20_linkattacksg_oil02.bmp",
+	"sprites/ef_linkattacksg_oil02.spr",
+	30.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+		{ 1, true, false, 1.0, 0, 0, 0 },
+		{ 2, true, false, 1.0, 0, 0, 0 },
+		{ 3, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelLinkAttackSGField_Sphere01 = {
+	"ef_linkattacksg_field.mdl",
+	"$0b_linkattacksg_sphere01.bmp",
+	"sprites/ef_linkattacksg_sphere01.spr",
+	15.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelLinkAttackSGField_Sphere02 = {
+	"ef_linkattacksg_field.mdl",
+	"$0b_linkattacksg_sphere02.bmp",
+	"sprites/ef_linkattacksg_sphere02.spr",
+	15.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+ConstSprList s_ModelLinkAttackSGField_Sphere03 = {
+	"ef_linkattacksg_field.mdl",
+	"$0b_linkattacksg_sphere03.bmp",
+	"sprites/ef_linkattacksg_sphere03.spr",
+	50.0,
+	{
+		{ 0, true, false, 1.0, 0, 0, 0 },
+	}
+};
+
+
 std::vector<SprList> g_vecBindSprList;
 
 static CBindSprManager g_SprBindManager;
@@ -320,6 +464,16 @@ void CBindSprManager::Vidinit(void)
 	LoadSpr(&s_ModelY23S3BuffM249_V2);
 	LoadSpr(&s_ModelIgniteBombFire);
 	LoadSpr(&s_ModelEFIgniteBombLine);
+	LoadSpr(&s_ModelLinkAttackSG_Oil01);
+	LoadSpr(&s_ModelLinkAttackSG_Laser01);
+	LoadSpr(&s_ModelLinkAttackSG_Sphere_V);
+	LoadSpr(&s_ModelLinkAttackSG_Oil02);
+	LoadSpr(&s_ModelLinkAttackSG_Laser02);
+	LoadSpr(&s_ModelLinkAttackSGPart_Oil01);
+	LoadSpr(&s_ModelLinkAttackSGPart_Oil02);
+	LoadSpr(&s_ModelLinkAttackSGField_Sphere01);
+	LoadSpr(&s_ModelLinkAttackSGField_Sphere02);
+	LoadSpr(&s_ModelLinkAttackSGField_Sphere03);
 }
 
 int CBindSprManager::LoadSpr(ConstSprList *List)

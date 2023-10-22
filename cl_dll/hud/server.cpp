@@ -52,6 +52,10 @@ namespace cl {
 	extern int g_iLeapStrikeGunAnim;
 	extern float g_iLeapStrikeGunAnimTime;
 
+	extern int g_iLinkAttackSGAnim;
+	extern int g_iLinkAttackSGSkin;
+	extern float g_flLinkAttackSGAnimTime;
+
 	extern int g_iZombieClassSkin[33][MAX_ZOMBIE_CLASS];
 enum
 {
@@ -772,6 +776,20 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		gHUD.m_SniperScope.SetDgaxeCrossHair(arg1);
 		break;
 	}
+	case 50:
+	{
+		arg1 = reader.ReadShort();
+		arg2 = reader.ReadByte();
+		int skin = reader.ReadByte();
+		if (arg1 == WEAPON_LINKATTACKSG)
+		{
+			g_flLinkAttackSGAnimTime = gHUD.m_flTime;
+			g_iLinkAttackSGAnim = arg2;
+			g_iLinkAttackSGSkin = skin;
+		}
+
+		break;
+	}
 	case 78:	// play sound
 	{
 		int idx = reader.ReadShort();
@@ -1149,7 +1167,7 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 	}
 	case HOLYBOMBEX_BURN:
 	{
-		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/holybombex_burn.spr"),
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_holybombex_burn.spr"),
 			Vector(0.0, 0.0, 30.0), 5.0, TRUE, flags, 0.9, kRenderTransAdd, 10.0);
 		break;
 	}

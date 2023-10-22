@@ -171,6 +171,8 @@ public:
 	static struct model_s* s_pDgaxeEXViewModel;
 	static struct model_s* s_pDgaxeEXMuzzLModel;
 	static struct model_s* s_pDgaxeEXMuzzRModel;
+	static struct model_s* s_pLinkAttackSGViewModel;
+	static struct model_s* s_pLinkAttackSGPartModel;
 };
 
 }

@@ -127,6 +127,13 @@ namespace sv {
 		return { flGround, flAir, flAirStrafing, flDucking, flVelocityModifier };
 	}
 
+	void Spawn() override
+	{
+		m_iDefaultAmmo2 = 0;
+		m_flTimeNextCharge = invalid_time_point;
+		Base::Spawn();
+	}
+
 	void Precache() override
 	{
 		PRECACHE_MODEL("sprites/muzzleflash19.spr");

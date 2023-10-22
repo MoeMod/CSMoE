@@ -477,6 +477,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_y23s3buffm249.cpp
 	../dlls/wpn_shared/wpn_ignitebomb.cpp
 	../dlls/wpn_shared/knife_dgaxeex.cpp
+	../dlls/wpn_shared/wpn_linkattacksg.cpp
 	)
 
 set (HUD_SRCS

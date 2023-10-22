@@ -147,8 +147,15 @@ struct model_s* CStudioModelRenderer::s_pDgaxeEXViewModel;
 struct model_s* CStudioModelRenderer::s_pDgaxeEXMuzzLModel;
 struct model_s* CStudioModelRenderer::s_pDgaxeEXMuzzRModel;
 
+struct model_s* CStudioModelRenderer::s_pLinkAttackSGViewModel;
+struct model_s* CStudioModelRenderer::s_pLinkAttackSGPartModel;
+
 int g_iLeapStrikeGunAnim = 0;
 float g_iLeapStrikeGunAnimTime = 0.0;
+
+int g_iLinkAttackSGAnim = 0;
+int g_iLinkAttackSGSkin = 0;
+float g_flLinkAttackSGAnimTime = 0.0;
 
 void CStudioModelRenderer::Init(void)
 {
@@ -1141,6 +1148,57 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 			m_pStudioHeader = saveheader;
 			IEngineStudio.StudioSetHeader(m_pStudioHeader);
 
+			m_pCurrentEntity->curstate.sequence = saveseq;
+			m_pCurrentEntity->curstate.animtime = saveanimtime;
+			m_pCurrentEntity->curstate.frame = saveframe;
+			m_fDoInterp = save_interp;
+
+			if (flags & STUDIO_EVENTS)
+				IEngineStudio.StudioClientEvents();
+		}
+
+		if (CStudioModelRenderer::s_pLinkAttackSGPartModel && CStudioModelRenderer::s_pLinkAttackSGViewModel && curent->model == CStudioModelRenderer::s_pLinkAttackSGViewModel)
+		{
+			studiohdr_t* saveheader = m_pStudioHeader;
+
+			cl_entity_t saveent = *m_pCurrentEntity;
+			int saveseq = m_pCurrentEntity->curstate.sequence;
+			float saveanimtime = m_pCurrentEntity->curstate.animtime;
+			float saveframe = m_pCurrentEntity->curstate.frame;
+			int save_interp = m_fDoInterp;
+
+			model_t* weaponpart = s_pLinkAttackSGPartModel;
+
+			m_pStudioHeader = (studiohdr_t*)IEngineStudio.Mod_Extradata(weaponpart);
+			if (!m_pStudioHeader)
+				return 0;
+
+			m_pCurrentEntity->curstate.sequence = g_iLinkAttackSGAnim;
+			m_pCurrentEntity->curstate.animtime = g_flLinkAttackSGAnimTime;
+			m_pCurrentEntity->curstate.skin = g_iLinkAttackSGSkin;
+			m_fDoInterp = 1;
+
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			StudioMergeBones(weaponpart);
+
+			IEngineStudio.StudioSetupLighting(&lighting);
+
+
+			StudioRenderModel(dir);
+
+			StudioCalcAttachments();
+			IEngineStudio.StudioClientEvents();
+
+			if (m_pCurrentEntity->index > 0)
+				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
+			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
+			*m_pCurrentEntity = saveent;
+			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
+			m_pStudioHeader = saveheader;
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			m_pCurrentEntity->curstate.effects |= EF_NOCULL;
 			m_pCurrentEntity->curstate.sequence = saveseq;
 			m_pCurrentEntity->curstate.animtime = saveanimtime;
 			m_pCurrentEntity->curstate.frame = saveframe;

@@ -331,6 +331,7 @@ namespace sv {
         { WEAPON_RESTRICTIONPISTOL, KNIFE_NORMAL, WEAPONPAINTTRUMP, "【光轮】电击枪-扑克兵" },
         { WEAPON_KNIFE, KNIFE_DVHAMMER, WEAPONPAINTY23CHN77, "火箭重锤-浪漫七夕" },
         { WEAPON_AWP, KNIFE_NORMAL, WEAPONPAINTCUSTOM, "AWP-青葱少女" },
+        { WEAPON_KNIFE, KNIFE_MAGICKNIFE, WEAPONPAINTPURPLEDARK, "幻镜！光棱剑-恶堕" },
     };
 
     void PrintToChat(CBasePlayer* target, const std::string& what)

@@ -43,7 +43,7 @@ void CHolyBombEX::Precache(void)
 	PRECACHE_MODEL("models/p_holybomb_ex.mdl");
 	PRECACHE_MODEL("models/w_holybomb_ex.mdl");
 
-	PRECACHE_MODEL("sprites/holybombex_burn.spr");
+	PRECACHE_MODEL("sprites/ef_holybombex_burn.spr");
 
 	PRECACHE_MODEL("sprites/ef_buffclassfernando.spr");
 	PRECACHE_MODEL("sprites/ef_buffclassfernando2.spr");

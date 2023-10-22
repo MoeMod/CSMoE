@@ -295,6 +295,9 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pDgaxeEXMuzzLModel = IEngineStudio.Mod_ForName("sprites/muzzleflash333.spr", FALSE);
 	CStudioModelRenderer::s_pDgaxeEXMuzzRModel = IEngineStudio.Mod_ForName("sprites/muzzleflash334.spr", FALSE);
 
+	CStudioModelRenderer::s_pLinkAttackSGViewModel = IEngineStudio.Mod_ForName("models/v_linkattacksg.mdl", FALSE);
+	CStudioModelRenderer::s_pLinkAttackSGPartModel = IEngineStudio.Mod_ForName("models/v_linkattacksg_parts.mdl", FALSE);
+
 	//VGui_Startup();
 
 	return 1;
