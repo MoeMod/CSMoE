@@ -772,6 +772,25 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		gHUD.m_SniperScope.SetDgaxeCrossHair(arg1);
 		break;
 	}
+	case 78:	// play sound
+	{
+		int idx = reader.ReadShort();
+
+		cl_entity_t* pEnt = gEngfuncs.GetEntityByIndex(idx);
+		if (!pEnt)
+			break;
+
+		int channel = reader.ReadByte();
+		const char * sample = reader.ReadString();
+		float volume = reader.ReadByte() * 0.1;
+		float attenuation = reader.ReadByte() * 0.1;
+		int flags = reader.ReadByte();
+		int pitch = reader.ReadByte();
+
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, pEnt->origin, channel, sample, volume, attenuation, flags, pitch);
+
+		break;
+	}
 	case 79:	// stop sound
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadShort();

@@ -338,18 +338,16 @@ void CPlayerClassManager::PlayerModel_Precache()
 
 const char* CPlayerClassManager::PlayerClass_GetModelName(ModelName iApperance)
 {
-	if (iApperance >= MODEL_NUM || iApperance < 1) {
+	if (!gPlayerClass.count(iApperance))
 		iApperance = MODEL_YURI;
-	}
 
 	return gPlayerClass[iApperance].model_name;
 }
 
 bool CPlayerClassManager::PlayerClass_IsFemale(ModelName iApperance)
 {
-	if (iApperance >= MODEL_NUM || iApperance < 1) {
+	if (!gPlayerClass.count(iApperance))
 		iApperance = MODEL_YURI;
-	}
 
 	return gPlayerClass[iApperance].isFemale;
 }

@@ -169,7 +169,7 @@ void DLLEXPORT HUD_ProcessPlayerState( struct entity_state_s *dst, const struct 
 	dst->fuser2					= src->fuser2;
 	if( src->number > 0 && src->number < MAX_PLAYERS )
 	{
-		iOnTrain[src->number]		= src->iuser4;
+		iOnTrain[src->number]		= src->iuser4 & (1 << 14);
 	}
 }
 
@@ -330,7 +330,13 @@ void DLLEXPORT HUD_StudioEvent( const struct mstudioevent_s *event, const struct
 		gEngfuncs.pfnPlaySoundByNameAtLocation((char*)event->options, 1.0, entity->origin);
 		break;
 	}
-		
+	case 5050:
+	{
+		char* szSound = nullptr;
+		szSound = const_cast<char*>(event->options);
+		gHUD.m_Radio.RadioEX(entity->index, szSound, PITCH_NORM);
+		break;
+	}
 	default:
 		break;
 	}

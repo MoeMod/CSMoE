@@ -37,8 +37,8 @@ namespace sv {
     public:
 
     static constexpr const char *V_Model = "models/v_vulcanus7.mdl";
-    static constexpr const char *P_Model = "models/p_vulcanus7.mdl";
-    static constexpr const char *W_Model = "models/w_vulcanus7.mdl";
+    static constexpr const char *P_Model = "models/p_vulcanus7a.mdl";
+    static constexpr const char *W_Model = "models/w_vulcanus7a.mdl";
     static constexpr const char *EventFile = "events/vulcanus7.sc";
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
     static constexpr const char *ClassName = "weapon_vulcanus7";

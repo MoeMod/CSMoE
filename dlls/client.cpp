@@ -3421,6 +3421,11 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				}
 				break;
 			}
+			case Menu_Emotion:
+			{
+				player->PlayEmotion(slot);
+				break;
+			}
 			case Menu_CustomMenu:
 			{
 				int	pressed_key = slot - 1;
@@ -4420,6 +4425,8 @@ void ClientPrecache()
 	PlayerModel_Precache();
 	PlayerClassManager().PlayerModel_Precache();
 
+	PRECACHE_MODEL("models/v_emotion.mdl");
+
 	if (g_bIsCzeroGame)
 	{
 		for (i = FirstCustomSkin; i <= LastCustomSkin; ++i)
@@ -5063,7 +5070,7 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
    {
 	   if (pPlayer->m_pActiveItem)
 	   {
-		   state->iuser4 = pPlayer->m_pActiveItem->m_uiKnifePaintType ? pPlayer->m_pActiveItem->m_uiKnifePaintType : pPlayer->m_pActiveItem->m_uiWeaponPaintType;
+		   state->iuser4 |= pPlayer->m_pActiveItem->m_uiKnifePaintType ? pPlayer->m_pActiveItem->m_uiKnifePaintType : pPlayer->m_pActiveItem->m_uiWeaponPaintType;
 	   }
    }
 

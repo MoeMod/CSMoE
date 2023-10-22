@@ -11,10 +11,6 @@
 
 namespace sv {
     namespace wdnmdmenu {
-        
-    char g_szSounds[39][39];
-    time_point_t g_flSoundCD[33];
-    int g_iSoundTimes[33];
 
     constexpr const char* g_szSoundsName[] = {
             "A1高闪来一个好吗,秋梨膏",
@@ -59,6 +55,12 @@ namespace sv {
 
     };
 
+    constexpr int array_size = sizeof(g_szSoundsName) / sizeof(g_szSoundsName[0]);
+
+    char g_szSounds[array_size][48];
+    time_point_t g_flSoundCD[33];
+    int g_iSoundTimes[33];
+
     void PrintToChat(CBasePlayer* target, const std::string& what)
     {
         MESSAGE_BEGIN(MSG_ONE, gmsgSayText, {}, target->edict());
@@ -82,7 +84,7 @@ namespace sv {
 
     void WdnmdSoundPrecache()
     {
-        for (int i = 0; i < 39; i++)
+        for (int i = 0; i < array_size; i++)
         {
             sprintf(g_szSounds[i], "radio/qz/c%d.wav", i + 1);
 
@@ -113,7 +115,7 @@ namespace sv {
             context.begin("明星大乱斗-语音菜单");
             if (page == -1)
             {
-                for (int i = 0; i < 39; i++)
+                for (int i = 0; i < array_size; i++)
                 {
                     if (context.item(g_szSoundsName[i], g_szSoundsName[i]))
                     {

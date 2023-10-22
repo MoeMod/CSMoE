@@ -49,6 +49,7 @@
 #include "player/player_mod_strategy.h"
 #include "player/player_model.h"
 #include "player/csdm_randomspawn.h"
+#include "player/player_emotion.h"
 
 #include <chrono>
 #include <algorithm>
@@ -5424,15 +5425,16 @@ void CBasePlayer::PreThink()
 		return;
 	}
 
+	int ON_TRAIN = (1 << 14);
 	// new code to determine if a player is on a train or not
 	CBaseEntity *pGroundEntity = Instance(pev->groundentity);
 	if (pGroundEntity && pGroundEntity->Classify() == CLASS_VEHICLE)
 	{
-		pev->iuser4 = 1;
+		pev->iuser4 |= ON_TRAIN;
 	}
 	else
 	{
-		pev->iuser4 = 0;
+		pev->iuser4 &= ~ON_TRAIN;
 	}
 
 	// Train speed control
@@ -6002,6 +6004,7 @@ void CBasePlayer::PostThink()
 	if (!IsAlive())
 		goto pt_end;
 
+	CheckEmotion();
 	// Handle Tank controlling
 	if (m_pTank != nullptr)
 	{
@@ -6336,6 +6339,8 @@ void CBasePlayer::Spawn()
 
 	m_iBuff = 0;
 	m_bHasBuffWpn = 0;
+
+	m_flEmotionTime = invalid_time_point;
 
 	for (int i = 0; i < MAX_ITEM_TYPES; ++i)
 	{
@@ -10878,6 +10883,146 @@ float CBasePlayer::GetArmorRatioModifier(void)
 		return 0.0f;
 
 	return m_pActiveItem->GetArmorRatioModifier();
+}
+
+void CBasePlayer::PlayEmotion(int slot)
+{
+	if (m_bHolsterDisabled)
+		return;
+
+	if (m_pActiveItem == NULL)
+	{
+		ClientPrint(pev, HUD_PRINTCENTER, "#CSO_Dont_Zoom_Emotion");
+		return;
+	}
+
+	if (m_bIsZombie)
+	{
+		ClientPrint(pev, HUD_PRINTCENTER, "#CSO_Dont_Zombie_Emotion");
+		return;
+	}
+
+	if (pev->fov != 90)
+	{
+		ClientPrint(pev, HUD_PRINTCENTER, "#CSO_Dont_Zoom_Emotion");
+		return;
+	}
+
+	if (m_flEmotionTime >= gpGlobals->time) {
+		return;
+	}
+
+	std::string szSeq = "emotion0";
+	int iAnim = 0;
+	
+	switch (slot) {
+	case 1:
+		iAnim = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).wa01;
+		szSeq = szSeq + PlayerEmotionManager().GetEmotionByModelID(m_iModelName).seq01;
+		m_iCustomSequence = LookupSequence(szSeq.c_str());
+		m_flEmotionFrame = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).frame01;
+		break;
+
+	case 2:
+		iAnim = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).wa02;
+		szSeq = szSeq + PlayerEmotionManager().GetEmotionByModelID(m_iModelName).seq02;
+		m_iCustomSequence = LookupSequence(szSeq.c_str());	
+		m_flEmotionFrame = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).frame02;
+		break;
+
+	case 3:
+		iAnim = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).wa03;
+		szSeq = szSeq + PlayerEmotionManager().GetEmotionByModelID(m_iModelName).seq03;
+		m_iCustomSequence = LookupSequence(szSeq.c_str());
+		m_flEmotionFrame = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).frame03;
+		break;
+
+	case 4:
+		iAnim = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).wa04;
+		szSeq = szSeq + PlayerEmotionManager().GetEmotionByModelID(m_iModelName).seq04;
+		m_iCustomSequence = LookupSequence(szSeq.c_str());
+		m_flEmotionFrame = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).frame04;
+		break;
+
+	case 5:
+		iAnim = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).wa05;
+		szSeq = szSeq + PlayerEmotionManager().GetEmotionByModelID(m_iModelName).seq05;
+		m_iCustomSequence = LookupSequence(szSeq.c_str());
+		m_flEmotionFrame = PlayerEmotionManager().GetEmotionByModelID(m_iModelName).frame05;
+		break;
+	}
+
+	pev->viewmodel = MAKE_STRING("models/v_emotion.mdl");
+	pev->weaponmodel = 0;
+
+	pev->frame = 0;
+
+	ResetSequenceInfo();
+
+	if (m_pActiveItem != NULL)
+	{
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pActiveItem;
+		pWeapon->SendWeaponAnim(iAnim, TRUE);
+		pWeapon->m_flNextPrimaryAttack = 0.1s;
+		pWeapon->m_flNextSecondaryAttack = 0.1s;
+		pWeapon->m_flTimeWeaponIdle = 10.0s;
+	}	
+
+	m_flEmotionTime = m_flCustomSequenceUntilTime = gpGlobals->time + m_flEmotionFrame / 30.0 * 1.0s;
+
+	SetAnimation(PLAYER_IDLE);
+
+}
+
+void CBasePlayer::ResetEmotion()
+{
+	m_flEmotionTime = invalid_time_point;
+	m_iCustomSequence = -1;
+	m_flCustomSequenceUntilTime = invalid_time_point;
+}
+
+void CBasePlayer::CheckEmotion()
+{
+	if (m_flEmotionTime != invalid_time_point)
+	{
+		if (m_bIsZombie)
+		{
+			m_flEmotionTime = invalid_time_point;
+			ResetEmotion();
+			return;
+		}
+
+		if (m_flEmotionTime > gpGlobals->time) {
+			//in emotion
+
+			if (pev->button & (IN_ATTACK | IN_ATTACK2 | IN_RELOAD | IN_FORWARD | IN_MOVELEFT | IN_MOVERIGHT | IN_BACK | IN_JUMP))		
+			{
+				ResetEmotion();
+
+				if (m_pActiveItem != NULL)
+				{
+					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pActiveItem;
+
+					m_pModStrategy->DeployWeapon(m_pActiveItem);
+					m_pActiveItem->UpdateItemInfo();
+				}
+			}
+		}
+		else
+		{
+			ResetEmotion();
+
+			if (m_pActiveItem != NULL)
+			{
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pActiveItem;
+
+				m_pModStrategy->DeployWeapon(m_pActiveItem);
+				m_pActiveItem->UpdateItemInfo();
+			}
+		}
+	}
+
+	
 }
 
 }

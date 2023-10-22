@@ -21,6 +21,7 @@
 #include "cbase/cbase_hash.h"
 #include "luash_sv/luash_sv.h"
 #include "map_manager.h"
+#include "player/player_emotion.h"
 
 #ifdef XASH_DEDICATED
 #include "player/player_fuck.h"
@@ -515,6 +516,7 @@ void CWorld::Precache()
 	ZBS_LoadEventData();
 	ZBS_LoadMapTrgData();
 #endif
+	PlayerEmotionManager().Init();
 	// UNDONE why is there so much Spawn code in the Precache function? I'll just keep it here
 
 	// LATER - do we want a sound ent in deathmatch? (sjb)

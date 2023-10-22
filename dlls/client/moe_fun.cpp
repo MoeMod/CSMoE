@@ -8,6 +8,7 @@
 #include "player/player_const.h"
 #include "gamemode/zb2//zb2_const.h"
 #include "moe_fun.h"
+#include "player/player_emotion.h"
 #include "wdnmd.h"
 #include "immenu.h"
 
@@ -482,7 +483,7 @@ namespace sv {
     }
 
     template<class CallbackFn = void(*)(CBasePlayer* target), class FilterFn = bool(*)(CBasePlayer* target)>
-    void ShowKnifePaintMenu(CBasePlayer* adminid, const std::string& szAction, int iItemID, CallbackFn&& fnAction, FilterFn&& fnFilter = [](CBasePlayer*) { return true;  })
+    void ShowWeaponPaintMenu(CBasePlayer* adminid, const std::string& szAction, int iItemID, CallbackFn&& fnAction, FilterFn&& fnFilter = [](CBasePlayer*) { return true;  })
     {
 
         ImMenu(adminid, [szAction, iItemID](auto&& context, CBasePlayer* adminid) {
@@ -536,7 +537,7 @@ namespace sv {
 
                 if (context.item(it->second.paintName, it->second.paintName))
                 {
-                    ShowKnifePaintMenu(adminid, it->second.paintName, it->second.paintType, [](CBasePlayer* player) {  return true;  });
+                    ShowWeaponPaintMenu(adminid, it->second.paintName, it->second.paintType, [](CBasePlayer* player) {  return true;  });
                 }
             }
 
@@ -544,47 +545,38 @@ namespace sv {
         });
     }
 
- /*   void ShowWeaponPaintMenu(CBasePlayer* adminid)
+    void ShowEmotionMenu(CBasePlayer* adminid)
+    {
+        if (!adminid->IsAlive())
+            return;
+
+        std::string strText = PlayerEmotionManager().GetEmotionByModelID(adminid->m_iModelName).radioText;
+
+        int iCount = PlayerEmotionManager().GetEmotionByModelID(adminid->m_iModelName).emotionCount;
+
+        ShowMenu(adminid, (((1 << iCount) - 1) | MENU_KEY_0), -1, FALSE, strText.c_str());
+        adminid->m_iMenu = Menu_Emotion;
+    }
+
+    void ShowCameraMenu(CBasePlayer* adminid)
     {
         ImMenu(adminid, [](auto context, CBasePlayer* adminid) {
-            context.begin("武器涂装系统");
+            context.begin("摄影机菜单");
 
-            g_WeaponPaintName.size();
-
-            for (auto it = g_WeaponPaintName.begin(); it != g_WeaponPaintName.end(); it++) {
-
-                char szMenuPaintName[64];
-
-                if (adminid->m_uiWeaponPaintType[it->WeaponID] == it->itemID || adminid->m_uiKnifePaintType[it->KnifeID] == it->itemID)
-                    Q_snprintf(szMenuPaintName, sizeof(szMenuPaintName), "%s[使用中]", it->paintName);
-                else
-                    Q_snprintf(szMenuPaintName, sizeof(szMenuPaintName), "%s", it->paintName);
-
-                if (context.item(it->paintName, szMenuPaintName))
-                {
-                    if (adminid->m_uiWeaponPaintType[it->WeaponID] == it->itemID || adminid->m_uiKnifePaintType[it->KnifeID] == it->itemID)
-                    {
-                        adminid->m_uiWeaponPaintType[it->WeaponID] = 0;
-                        adminid->m_uiKnifePaintType[it->KnifeID] = 0;
-
-                        PrintToChat(adminid, "已清除皮肤");
-                    }
-                    else
-                    {
-                        if(it->WeaponID == WEAPON_KNIFE)
-                            adminid->m_uiKnifePaintType[it->KnifeID] = it->itemID;
-                        else
-                            adminid->m_uiWeaponPaintType[it->WeaponID] = it->itemID;
-
-                        PrintToChat(adminid, "已应用皮肤");
-                    }
-                }
+            if (context.item("firstperson", "第一人称视角"))
+            {
+                adminid->ClientCommand("firstperson");
             }
 
+            if (context.item("thirdperson", "第三人称视角"))
+            {
+                adminid->ClientCommand("thirdperson");
+            }
+            
             context.end(adminid);
             });
-    }*/
-
+    }
+    
     void ShowMoeFunMenu(CBasePlayer *playerid)
     {
         ImMenu(playerid, [](auto context, CBasePlayer * playerid){         
@@ -597,7 +589,10 @@ namespace sv {
             if (context.item("suicide", "自杀"))
                 ShowKillConfirmMenu(playerid);
 
-            if (context.item("wdnmd", "wdnmd语音菜单"))
+            if (context.item("cameramenu", "摄影机菜单"))
+                ShowCameraMenu(playerid);
+
+            if (context.item("wdnmd", "全明星语音菜单"))
                 wdnmdmenu::ShowWdnmdMenu(playerid);
 
             if (context.item("tattomenu", "纹身管理"))
@@ -608,6 +603,9 @@ namespace sv {
 
             if (context.item("weaponpaintmenu", "武器涂装系统"))
                 ShowPaintMenu(playerid);
+
+            if (context.item("emotionmenu", "表情系统"))
+                ShowEmotionMenu(playerid);
 
             context.end(playerid);
         });

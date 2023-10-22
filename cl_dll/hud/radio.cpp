@@ -110,7 +110,7 @@ void CHudRadio::RadioEX(int SenderID, char* sentence, int pitch)
 		std::string szSentence = sentence;
 		szSentence = szSentence.substr(2);
 		std::transform(szSentence.begin(), szSentence.end(), szSentence.begin(), ::toupper);
-		if (strstr(sentence, "MRAD_"))
+		if (strstr(szSentence.c_str(), "MRAD_"))
 		{
 			if (SenderID == 0)
 			{

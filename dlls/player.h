@@ -770,6 +770,9 @@ public:
 	void SpawnProtection_Start(duration_t flTime);
 	void SpawnProtection_End();
 
+	void PlayEmotion(int iSlot);
+	void ResetEmotion();
+	void CheckEmotion();
 	void CheckZombieModeBuff(void);
 	bool ReactToDeimosTail();
 	void AddWeapon(int iWeaponID);
@@ -837,6 +840,9 @@ public:
 	int m_iSlotBuyTime[MAX_ITEM_TYPES];
 	unsigned int m_uiWeaponPaintType[NUM_WEAPONS];
 	unsigned int m_uiKnifePaintType[NUM_KNIVES];
+
+	time_point_t m_flEmotionTime;
+	float m_flEmotionFrame;
 };
 
 }

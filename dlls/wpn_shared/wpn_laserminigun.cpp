@@ -395,7 +395,7 @@ namespace sv {
 	static constexpr const auto& DefaultDeployTime = 2.5s;
     static constexpr const auto &DefaultReloadTime = 5.0s;
     static constexpr const char *V_Model = "models/v_laserminigun.mdl";
-    static constexpr const char *P_Model = "models/p_laserminigun.mdl";
+    static constexpr const char *P_Model = "models/p_laserminiguna.mdl";
     static constexpr const char *W_Model = "models/w_laserminigun.mdl";
     static constexpr const char *EventFile = "events/laserminigun.sc";
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
@@ -459,6 +459,7 @@ namespace sv {
 
         PRECACHE_SOUND("weapons/laserminigun-1.wav");
 
+		PRECACHE_MODEL("models/p_laserminigunb.mdl");
 		PRECACHE_MODEL("sprites/muzzleflash37.spr");
 		PRECACHE_MODEL("sprites/muzzleflash38.spr");
 		PRECACHE_MODEL("sprites/muzzleflash39.spr");

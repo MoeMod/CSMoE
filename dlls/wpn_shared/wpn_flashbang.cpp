@@ -53,8 +53,8 @@ void CFlashbang::Precache(void)
 	PRECACHE_MODEL("models/shield/v_shield_flashbang.mdl");
 #endif
 #ifndef CLIENT_DLL
-	g_sModelIndexWind = PRECACHE_MODEL("models/z4e/ef_hurricane2.mdl");
-	g_sModelIndexWindExp = PRECACHE_MODEL("sprites/z4b/ef_airexplosion.spr");
+	g_sModelIndexWind = PRECACHE_MODEL("models/ef_hurricane2.mdl");
+	g_sModelIndexWindExp = PRECACHE_MODEL("sprites/ef_airexplosion.spr");
 #endif
 	PRECACHE_SOUND("metalarena/acc_up.wav");
 	PRECACHE_SOUND("weapons/flashbang-1.wav");

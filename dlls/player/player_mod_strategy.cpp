@@ -181,16 +181,33 @@ void CPlayerModStrategy_Default::Pain(int m_LastHitGroup, bool HasArmour)
 
 			if (szSound.empty())
 			{
-				goto DEFAULT_PAIN_HEAD;
+				if (m_pPlayer->m_bIsFemale)
+				{
+					switch (temp)
+					{
+					case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_headshot1.wav", VOL_NORM, ATTN_NORM); break;
+					case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_headshot2.wav", VOL_NORM, ATTN_NORM); break;
+					default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_headshot3.wav", VOL_NORM, ATTN_NORM); break;
+					}
+
+				}
+				else
+				{
+					switch (temp)
+					{
+					case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot1.wav", VOL_NORM, ATTN_NORM); break;
+					case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot2.wav", VOL_NORM, ATTN_NORM); break;
+					default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot3.wav", VOL_NORM, ATTN_NORM); break;
+					}
+				}
 			}
 			else
 			{
-				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, (szSound[temp]).c_str(), VOL_NORM, ATTN_NORM);
+				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_VOICE, (szSound[temp]).c_str(), VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			}
 		}
 		else
 		{
-DEFAULT_PAIN_HEAD:
 			if (m_pPlayer->m_bIsFemale)
 			{
 				switch (temp)
@@ -273,16 +290,32 @@ DEFAULT_PAIN_HEAD:
 
 			if (szSound.empty())
 			{
-				goto DEFAULT_PAIN_FLESH;
+				if (m_pPlayer->m_bIsFemale)
+				{
+					switch (temp)
+					{
+					case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_bhit_flesh-1.wav", VOL_NORM, ATTN_NORM); break;
+					case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_bhit_flesh-2.wav", VOL_NORM, ATTN_NORM); break;
+					default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_bhit_flesh-3.wav", VOL_NORM, ATTN_NORM); break;
+					}
+				}
+				else
+				{
+					switch (temp)
+					{
+					case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-1.wav", VOL_NORM, ATTN_NORM); break;
+					case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-2.wav", VOL_NORM, ATTN_NORM); break;
+					default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-3.wav", VOL_NORM, ATTN_NORM); break;
+					}
+				}
 			}
 			else
 			{
-				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, (szSound[temp]).c_str(), VOL_NORM, ATTN_NORM);
+				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_VOICE, (szSound[temp]).c_str(), VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			}
 		}
 		else
 		{
-DEFAULT_PAIN_FLESH:
 			if (m_pPlayer->m_bIsFemale)
 			{
 				switch (temp)
@@ -361,16 +394,34 @@ void CPlayerModStrategy_Default::DeathSound()
 
 			if (szSound.empty())
 			{
-				goto DEFAULT_DEATH_SOUND;
+				if (m_pPlayer->m_bIsFemale)
+				{
+					switch (RANDOM_LONG(1, 3))
+					{
+					case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_die1.wav", VOL_NORM, ATTN_NORM); break;
+					case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_die2.wav", VOL_NORM, ATTN_NORM); break;
+					case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/f_die3.wav", VOL_NORM, ATTN_NORM); break;
+					}
+				}
+				else
+				{
+					switch (RANDOM_LONG(1, 4))
+					{
+					case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die1.wav", VOL_NORM, ATTN_NORM); break;
+					case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die2.wav", VOL_NORM, ATTN_NORM); break;
+					case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
+					case 4: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
+					default:break;
+					}
+				}
 			}
 			else
 			{
-				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, (szSound[temp]).c_str(), VOL_NORM, ATTN_NORM);
+				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_VOICE, (szSound[temp]).c_str(), VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			}
 		}
 		else
 		{
-DEFAULT_DEATH_SOUND:
 			if (m_pPlayer->m_bIsFemale)
 			{
 				switch (RANDOM_LONG(1, 3))

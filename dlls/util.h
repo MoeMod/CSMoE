@@ -548,6 +548,7 @@ bool UTIL_IsWallBetweenEntity(CBaseEntity* pEntity, CBaseEntity* pAttackPlayer);
 void UTIL_BreakModel(const Vector& pos, const Vector& size, const Vector& velocity, int random_velocity, int modelindex, int flags, int count, float life);
 std::string UTIL_ReplaceString(const std::string& original, const std::string& old_value, const std::string& new_value);
 void UTIL_SendAudio(CBaseEntity* pEntity, const char* msg_id, short pitch, bool msgAll = false);
+void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float volume, float attenuation, int flags, int pitch, bool msg_one = false);
 }
 #else
 namespace cl {
@@ -570,6 +571,7 @@ void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTER
                     TraceResult *ptr);
 void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,
                     edict_t *pentIgnore, TraceResult *ptr);
+inline void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float volume, float attenuation, int flags, int pitch, bool msg_one = false) {}
 CBaseEntity *UTIL_PlayerByIndex(int playerIndex);
 }
 #endif

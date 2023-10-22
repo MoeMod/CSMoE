@@ -1098,7 +1098,11 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 			if (idx > 0 && idx < 33)
 			{
 				//if has it is bot
-				if(m_pCurrentEntity->curstate.iuser4 < 700)				
+				int PaintType = m_pCurrentEntity->curstate.iuser4 & 0X3FFF;
+
+				if (PaintType > 700)
+					m_pCurrentEntity->curstate.iuser4 = PaintType;
+				else
 					m_pCurrentEntity->curstate.iuser4 = g_PlayerExtraInfo[idx].m_uiKnifePaintType ? g_PlayerExtraInfo[idx].m_uiKnifePaintType : g_PlayerExtraInfo[idx].m_uiWeaponPaintType;
 
 				if (CStudioModelRenderer::s_pWingGunPModel && pweaponmodel == CStudioModelRenderer::s_pWingGunPModel)

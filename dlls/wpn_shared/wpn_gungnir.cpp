@@ -804,6 +804,7 @@ void CGungnir::ShootSpear()
 	CGungnirSpear *pEnt = static_cast<CGungnirSpear *>(CBaseEntity::Create("gungnir_spear", vecSrcA, vecSpearAngle, ENT(m_pPlayer->pev)));
 	if (pEnt)
 	{
+		pEnt->pev->iuser4 = m_uiWeaponPaintType;
 		pEnt->Init(gpGlobals->v_forward * 2000, GetDamage_SpearA(), GetDamage_SpearB(), GetDamage_SpearC(), 110, m_pPlayer->m_iTeam);
 	}
 #endif

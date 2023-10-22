@@ -126,8 +126,8 @@ namespace sv {
 		PRECACHE_MODEL("sprites/muzzleflash196.spr");
 		m_iExpIndex = PRECACHE_MODEL("sprites/bufffiveseven_exp.spr");
 		m_iExpIndex2 = PRECACHE_MODEL("sprites/bufffiveseven_exp2.spr");
-		PRECACHE_MODEL("models/bufffiveseven_field.spr");
-		PRECACHE_MODEL("models/bufffiveseven_ef.spr");
+		PRECACHE_MODEL("models/bufffiveseven_field.mdl");
+		PRECACHE_MODEL("models/bufffiveseven_ef.mdl");
 
 		PRECACHE_SOUND("weapons/bufffiveseven_beep_AC.wav");
 		PRECACHE_SOUND("weapons/bufffiveseven_beep_BC.wav");

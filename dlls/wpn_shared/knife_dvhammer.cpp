@@ -729,6 +729,7 @@ namespace sv {
 		CCKnifeDvhammer_Spike* pSpike = static_cast<CCKnifeDvhammer_Spike*>(CBaseEntity::Create("knifedvhammer_spike", vecEnd, vecAngle, m_pPlayer->edict()));
 		if (pSpike)
 		{
+			pSpike->pev->iuser4 = m_uiKnifePaintType;
 			pSpike->m_iTeam = m_pPlayer->m_iTeam;
 		}
 #endif

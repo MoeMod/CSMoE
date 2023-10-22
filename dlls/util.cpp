@@ -3002,4 +3002,22 @@ void UTIL_SendAudio(CBaseEntity * pEntity, const char* msg_id, short pitch, bool
 	MESSAGE_END();
 }
 
+//for sound without precached
+void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float volume, float attenuation, int flags, int pitch, bool msg_one)
+{
+	if(msg_one)
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, entity);
+	else
+		MESSAGE_BEGIN(MSG_PAS, gmsgMPToCL, NULL, entity);
+	WRITE_BYTE(78);
+	WRITE_SHORT(ENTINDEX(entity));
+	WRITE_BYTE(channel);
+	WRITE_STRING(sample);
+	WRITE_BYTE(int(volume * 10));
+	WRITE_BYTE(int(attenuation * 10));
+	WRITE_BYTE(flags);
+	WRITE_BYTE(pitch);
+	MESSAGE_END();
+}
+
 }

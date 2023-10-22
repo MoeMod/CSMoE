@@ -88,7 +88,7 @@ BOOL CZombieBomb2::Deploy(void)
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
 
-	EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "zombi/zombi_bomb_deploy.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "zombi/zombi_bomb_deploy.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, true);
 
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
