@@ -822,7 +822,7 @@ bool CPlayerModStrategy_Zombie::CanPlayerBuy(bool display)
 	else
 		return !m_pPlayer->m_bIsZombie;
 #else
-	return false;
+	return !m_pPlayer->m_bIsZombie;
 #endif
 }
 

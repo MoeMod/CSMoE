@@ -124,6 +124,28 @@
 #define WEAPON_SUIT			0
 #define WEAPON_ALLWEAPONS		(~(1 << WEAPON_SUIT))
 
+
+// PARTICLE flags
+#define PARTICLE_SPIRAL					(1<<1)
+#define PARTICLE_COLLIDEWORLD			(1<<2)
+#define PARTICLE_NOFORCE				(1<<3)
+#define PARTICLE_ANIMATE				(1<<4)
+#define PARTICLE_ANIMATELOOP			(1<<5)	// unknown and unused
+#define PARTICLE_COLLIDEKILL				(1<<6)
+#define PARTICLE_RAINDROP				(1<<7)
+#define PARTICLE_EXPERIMENTAL			(1<<8)
+#define PARTICLE_SPIN_COUNTWISE		(1<<9)
+#define PARTICLE_GROUPINFO				(1<<10)
+#define PARTICLE_FOLLOWATTACHMENT		(1<<11)
+#define PARTICLE_PETROLMINE				(1<<12)
+#define PARTICLE_FORWARD				(1<<13)
+#define PARTICLE_RANDOMANGLE			(1<<14)
+#define PARTICLE_PERSIST				(1<<15)
+#define PARTICLE_GRAVITY				(1<<16)
+#define PARTICLE_SLOWGRAVITY				(1<<17)
+#define PARTICLE_ROTATE				(1<<18)
+
+
 // custom enum
 enum VGUIMenu
 {

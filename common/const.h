@@ -692,6 +692,8 @@
 
 #define TE_KILLNAMEDENTITYATTACHMENTS 139
 
+#define TE_TEMPPARTICLE 140
+
 #define TE_FOLLOWINGGRENADE		150
 // short (entindex)
 // short (model)

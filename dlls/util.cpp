@@ -3020,4 +3020,37 @@ void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float vol
 	MESSAGE_END();
 }
 
+void UTIL_TempEmit(const char* model, int iEmitCounter, int fireDelay, int life, int spawnflags, int spin_speed, int framerate, int rendermode, int brightness, int r, int g, int b, Vector pos, Vector velocity, int velocity_variance, int scale, int fade_speed, int scale_speed, int fadeInSpeed, int attachment, int frameMax)
+{
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_TEMPPARTICLE);
+	WRITE_STRING(model);
+	WRITE_SHORT(0);
+	WRITE_COORD(pos.x);
+	WRITE_COORD(pos.y);
+	WRITE_COORD(pos.z);
+	WRITE_COORD(velocity.x);
+	WRITE_COORD(velocity.y);
+	WRITE_COORD(velocity.z);
+	WRITE_SHORT(iEmitCounter);
+	WRITE_BYTE(fireDelay);
+	WRITE_BYTE(life);
+	WRITE_SHORT(spawnflags);
+	WRITE_BYTE(spin_speed);
+	WRITE_BYTE(framerate);
+	WRITE_BYTE(rendermode);
+	WRITE_BYTE(brightness);
+	WRITE_BYTE(r);
+	WRITE_BYTE(g);
+	WRITE_BYTE(b);
+	WRITE_SHORT(velocity_variance);
+	WRITE_BYTE(scale);
+	WRITE_BYTE(fade_speed);
+	WRITE_BYTE(scale_speed);
+	WRITE_BYTE(fadeInSpeed);
+	WRITE_BYTE(attachment);
+	WRITE_BYTE(frameMax);
+	MESSAGE_END();
+}
+
 }

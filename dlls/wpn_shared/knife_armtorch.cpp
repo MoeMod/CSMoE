@@ -46,7 +46,7 @@ namespace sv {
 		static constexpr const char* P_Model = "models/p_armtorch.mdl";
 		static constexpr const char* W_Model = "models/w_knife.mdl";
 
-		static constexpr int MaxClip = 100;
+		static constexpr int MaxClip = -1;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
 		static constexpr const char* AnimExtension = "dragontail";
 		KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
@@ -80,23 +80,16 @@ namespace sv {
 			PRECACHE_SOUND("weapons/armtorch_fire1.wav");
 			PRECACHE_SOUND("weapons/armtorch_fire2.wav");
 	
-			PRECACHE_SOUND("weapons/armtorch_hit1.wav");
-			PRECACHE_SOUND("weapons/armtorch_hit2.wav");
-			PRECACHE_SOUND("weapons/armtorch_wall.wav");
-			
 			PRECACHE_SOUND("weapons/armtorch_idle.wav");
 		}
 		
+	
 		BOOL Deploy(void) override
 		{
-			m_fMaxSpeed = 250;
-			m_iState = 0;
-			m_iState2 = 0;
+			m_fMaxSpeed = 260;		
 			m_iCheck = 0;
-			m_iActSlash3 = 0;
 			m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
-
-			m_tTimeRestMaxSpeed = m_tTimeSoundEmit = m_flTimeCheckCharge = invalid_time_point;
+			m_flDashTime = invalid_time_point;
 			m_pPlayer->m_bShieldDrawn = false;
 
 			return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "dragontail", UseDecrement() != FALSE);
@@ -107,90 +100,94 @@ namespace sv {
 		void SecondaryAttack() override;
 		void Spawn() override;
 		void WeaponIdle() override;
-		float GetMaxSpeed() override;
 		void Holster(int skiplocal) override;
 		void DelayPrimaryAttack();
 		void DelaySecondaryAttack();
-		void Slash3Think();
-		void OnAttack2();
-		void OnAttack2Released();
-		void ComboAttack();
-		void FakeKnockBack();
+		void DelayDashAttack();
+		void DelaySpecialAttack();
+		float GetMaxSpeed(void) override { return 260.0; }
+
 #ifndef CLIENT_DLL
 		hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, int iType);
 		void MaterialSound();
 # endif
 		BOOL CanDrop() override { return false; }
-		void ItemPostFrame() override;
+
+		KnockbackData GetKnockBackData() override
+		{
+			if (pev->iuser1 == 2)
+				return { 1300.0f, 1200.0f, 1000.0f, 800.0f, 1.0f };
+			else if (pev->iuser1 == 1)
+				return { 650.0f, 550.0f, 600.0f, 500.0f, 0.7f };
+			else
+				return { 450.0f, 350.0f, 400.0f, 300.0f, 0.7f };
+		}
 
 	public:
 		float GetPrimaryAttackDamage() const
 		{
-			float flDamage = 30;
+			float flDamage = 85;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 332.0f;
+				flDamage = 1530.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 1240.0f;
-#endif
-			return flDamage;
-		}
-		float GetSecondaryAttackDamage() const
-		{
-			float flDamage = 70;
-#ifndef CLIENT_DLL
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 900.0f;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 3600.0f;
-#endif
-			return flDamage;
-		}
-		float FieldAttackDamage() const
-		{
-			float flDamage = 4;
-#ifndef CLIENT_DLL
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 110.0f;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 240.0f;
-#endif
-			return flDamage;
-		}
-		float SpecialAttackDamage() const
-		{
-			float flDamage = 35;
-#ifndef CLIENT_DLL
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 850.0f;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 1280.0f;
-#endif
-			return flDamage;
-		}
-		float Slash3ExpDamage() const
-		{
-			float flDamage = 95;
-#ifndef CLIENT_DLL
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1100.0f;
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 4900.0f;
+				flDamage = 1105.0f;
 #endif
 			return flDamage;
 		}
 
-		time_point_t m_flTimeCheckCharge;
-		time_point_t m_flNextThink;
-		time_point_t m_tTimeRestMaxSpeed;
-		int m_iThinkType;
-		int m_iDamageType;
-		int m_iState;	//pev_iuser1
-		int m_iState2;	//pev_iuser4
-		int m_iActSlash3;
+		float GetSecondaryAttackDamage() const
+		{
+			float flDamage = 110.0f;
+#ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 1980.0f;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 1430.0f;
+#endif
+			return flDamage;
+		}
+
+		float GetDashAttackDamage() const
+		{
+			float flDamage = 150.0f;
+#ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 2700.0f;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 1950.0f;
+#endif
+			return flDamage;
+		}
+
+		float GetSpecialAttackDamage() const
+		{
+			float flDamage = 200.0f;
+#ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 3600.0f;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 2600.0f;
+#endif
+			return flDamage;
+		}
+
+
+		float GetBuffDamage() const
+		{
+			float flDamage = 2.0;
+#ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 100.0;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 100.0;
+#endif
+			return flDamage;
+		}
+	
+
+		time_point_t m_flDashTime;
 		int m_iCheck;	//g_iCheck
-		int m_iFrozen;	//g_Frozen
-		int m_iCheckSpecial;	//CheckSpecial
 	};
 
 	LINK_ENTITY_TO_CLASS(knife_armtorch, CKnifeArmTorch)
@@ -203,10 +200,8 @@ namespace sv {
 		SET_MODEL(ENT(pev), "models/w_knife.mdl");
 
 		m_iClip = WEAPON_NOCLIP;
-		m_iState = 0;
-		m_iState2 = 0;
+		m_flDashTime = invalid_time_point;
 		m_iCheck = 0;
-		m_iActSlash3 = 0;
 		FallInit();
 	}
 
@@ -294,6 +289,13 @@ namespace sv {
 
 	hit_result_t CKnifeArmTorch::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, int iType)
 	{
+		if (iType == 2)
+			pev->iuser1 = 2;
+		else if (iType == 1)
+			pev->iuser1 = 1;
+		else
+			pev->iuser1 = 0;
+
 		CBaseEntity* pEntity = NULL;
 		hit_result_t result = HIT_NONE;
 		TraceResult tr;
@@ -346,50 +348,33 @@ namespace sv {
 
 			result = HIT_PLAYER;
 
-			if (pEntity->IsPlayer())
+			if ((pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY) && (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE))
 			{
-				CBasePlayer* player = (CBasePlayer*)pEntity;
+				pEntity->m_pBuffAttacker = m_pPlayer->pev;
+				pEntity->m_flHealthDecreaseAmount = GetBuffDamage();
+				pEntity->m_iHealthDecreaseCount = 2;
+				pEntity->m_flHealthDecreaseInterval = 1.0s;
 
-				if (player->m_bIsZombie)
+				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pEntity->pev);
+				WRITE_BYTE(4);
+				WRITE_SHORT(pEntity->entindex());
+				WRITE_BYTE(18);
+				MESSAGE_END();
+
+				if (pEntity->IsPlayer())
 				{
-					Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
-					vecDir.z = 0;
-					if (!iType)
-					{
-						//left
-						ApplyKnockbackData(player, vecDir, { 0.0, 0.0, 0.0, 0.0, 0.3f });
+					CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
 
-						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-						if (strategy)
-						{
-							strategy->SetStunSpeedTime(3.0s);
-							strategy->SetStunGravityTime(3.0s);
-						}	
-					}
-					else if(iType == 1)
+					if (pPlayer->m_bIsZombie && !(pPlayer->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 					{
-						//left3
-						if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
-						{
-							Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
-
-							player->pev->velocity.x = vecDir.x * 2400.0;
-							player->pev->velocity.y = vecDir.y * 2400.0;
-						}
-					}
-					else
-					{
-						//right
-						if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
-						{
-							Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
-
-							player->pev->velocity.x = vecDir.x * 2100.0;
-							player->pev->velocity.y = vecDir.y * 2100.0;
-							player->pev->velocity.z = 290.0;
-						}
+						pEntity->pev->velocity.z += 200.0;
 					}
 				}
+				else
+				{
+					pEntity->pev->velocity.z += 200.0;
+				}
+			
 			}
 		}
 
@@ -418,26 +403,53 @@ namespace sv {
 
 	void CKnifeArmTorch::DelayPrimaryAttack(void)
 	{
-		
 #ifndef CLIENT_DLL		
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-		switch (KnifeAttack(GetPrimaryAttackDamage(), 180, 85, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 0))
+		switch (KnifeAttack(GetPrimaryAttackDamage(), 100, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 1))
 		{
 		case HIT_PLAYER:
 		{
-			switch (RANDOM_LONG(0, 2))
+			switch (RANDOM_LONG(0, 1))
 			{
-			case 0: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-			case 1: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-			case 2: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit3.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+			case 0: { UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM); break; }
+			case 1: { UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM); break; }
 			}
 			break;
 		}
 		case HIT_WALL:
 		{
-			MaterialSound();
+			UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			//MaterialSound();
+			break;
+		}
+		}
+#endif
+		SetThink(nullptr);
+	}
+
+	void CKnifeArmTorch::DelaySecondaryAttack(void)
+	{
+#ifndef CLIENT_DLL		
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+		switch (KnifeAttack(GetSecondaryAttackDamage(), 125, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 0))
+		{
+		case HIT_PLAYER:
+		{
+			switch (RANDOM_LONG(0, 1))
+			{
+			case 0: { UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM); break; }
+			case 1: { UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM); break; }
+			}
+			break;
+		}
+		case HIT_WALL:
+		{
+			UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			//MaterialSound();
 			break;
 		}
 		}
@@ -446,28 +458,68 @@ namespace sv {
 		SetThink(nullptr);
 	}
 
-
-	void CKnifeArmTorch::ItemPostFrame()
+	void CKnifeArmTorch::DelayDashAttack()
 	{
+#ifndef CLIENT_DLL		
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+		switch (KnifeAttack(GetDashAttackDamage(), 100, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 2))
+		{
+		case HIT_PLAYER:
+		{
+			switch (RANDOM_LONG(0, 1))
+			{
+			case 0: { UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM); break; }
+			case 1: { UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM); break; }
+			}
+			break;
+		}
+		case HIT_WALL:
+		{
+			UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			//MaterialSound();
+			break;
+		}
+		}
+#endif
+		SetThink(nullptr);
+	}
 
-
-		return CBasePlayerWeapon::ItemPostFrame();
+	void CKnifeArmTorch::DelaySpecialAttack()
+	{
+#ifndef CLIENT_DLL		
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+		switch (KnifeAttack(GetSpecialAttackDamage(), 150, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 0))
+		{
+		case HIT_PLAYER:
+		{
+			switch (RANDOM_LONG(0, 1))
+			{
+			case 0: { UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM); break; }
+			case 1: { UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM); break; }
+			}
+			break;
+		}
+		case HIT_WALL:
+		{
+			UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/armtorch_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			//MaterialSound();
+			break;
+		}
+		}
+#endif
+		SetThink(nullptr);
 	}
 
 	void CKnifeArmTorch::PrimaryAttack(void)
 	{
-		if (m_iCheck == 3)
-		{
-			m_iCheck = 4;
-			m_iCheckSpecial = 1;
-			ComboAttack();
-
-			return;
-		}
-
 		switch (m_iCheck)
 		{
 			case 0:
+			case 1:
 			{
 				SendWeaponAnim(ANIM_SLASH1, UseDecrement() != FALSE);
 				SetThink(&CKnifeArmTorch::DelayPrimaryAttack);
@@ -483,7 +535,29 @@ namespace sv {
 			{
 				SendWeaponAnim(ANIM_SLASH3_2, UseDecrement() != FALSE);
 
-				SetThink(&CKnifeArmTorch::DelayPrimaryAttack);
+#ifndef CLIENT_DLL	
+				Vector vecAngle = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
+				vecAngle.x = 0;
+
+				UTIL_MakeVectors(vecAngle);
+
+				Vector vecOrigin = m_pPlayer->GetGunPosition();
+				Vector vecDir = gpGlobals->v_forward;
+				Vector vecEnd = vecOrigin + gpGlobals->v_forward * 100.0;
+
+				TraceResult tr;
+				UTIL_TraceLine(vecOrigin, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
+
+				Vector vecVelocity = UTIL_GetSpeedVector(m_pPlayer->pev->origin, tr.vecEndPos, 400.0);
+				vecVelocity.z = 0;
+
+				m_pPlayer->pev->velocity = vecVelocity;
+				m_pPlayer->m_flVelocityModifier = 1.0;
+
+				m_flDashTime = gpGlobals->time + 0.27s;
+#endif
+
+				SetThink(&CKnifeArmTorch::DelayDashAttack);
 				pev->nextthink = gpGlobals->time + 0.27s;
 
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
@@ -492,63 +566,7 @@ namespace sv {
 				m_iCheck = 0;
 				break;
 			}
-			case 3:
-			{
-			
-			}
 		}
-	}
-
-	void CKnifeArmTorch::Slash3Think()
-	{
-		if (!m_iActSlash3)
-		{
-			
-#ifndef CLIENT_DLL
-			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-			Vector vecSrc = m_pPlayer->GetGunPosition();
-			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-			switch (KnifeAttack(GetPrimaryAttackDamage(), 180, 85, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 0))
-			{
-			case HIT_PLAYER:
-			{
-				switch (RANDOM_LONG(0, 2))
-				{
-				case 0: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-				case 1: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-				case 2: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit3.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-				}			
-				break;
-			}
-			case HIT_WALL:
-			{
-				MaterialSound();
-				break;
-			}
-			}	
-#endif
-			m_iActSlash3 = 1;
-			SetThink(nullptr);
-			SetThink(&CKnifeArmTorch::Slash3Think);
-			pev->nextthink = gpGlobals->time + 0.67s;
-		}
-		else
-		{	
-			UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-			Vector vecSrc = m_pPlayer->GetGunPosition();
-			Vector vecOrigin = vecSrc + gpGlobals->v_forward * 55;
-
-#ifndef CLIENT_DLL
-			KnifeAttack(Slash3ExpDamage(), 260, 85, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 1);
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin, g_vecZero, 0.0, 0.0, 8, 0, FALSE, FALSE);
-#endif			
-			FakeKnockBack();
-			m_iActSlash3 = 0;
-			SetThink(nullptr);
-		}
-
-		m_iState = 0;
-		
 	}
 
 	void CKnifeArmTorch::SecondaryAttack(void)
@@ -564,9 +582,6 @@ namespace sv {
 
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
-
-			if (m_iCheck == 1)
-				m_iCheck = 2;
 			break;
 		}
 		case 1:
@@ -576,295 +591,38 @@ namespace sv {
 			SetThink(&CKnifeArmTorch::DelaySecondaryAttack);
 			pev->nextthink = gpGlobals->time + 0.2s;
 
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.43s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.33s;
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.03s;
 
 			m_iCheck = 2;
 			break;
 		}
-		default:
-			
-		}
-
-
-
-		if (!m_iState2)
+		case 2:
 		{
-			SendWeaponAnim(ANIM_FIELD_ATTACK_CHECK, UseDecrement() != FALSE);
+			SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
 
-			m_iState2 = 1;
+			SetThink(&CKnifeArmTorch::DelaySpecialAttack);
+			pev->nextthink = gpGlobals->time + 0.47s;
 
-			m_flTimeCheckCharge = gpGlobals->time + 0.2s;
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.2s;
-		}
-		if (m_flTimeCheckCharge < gpGlobals->time)
-		{
-			switch (m_iState2)
-			{
-			case 1:
-			{
-				SendWeaponAnim(ANIM_FIELD_ATTACK_START, UseDecrement() != FALSE);
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.83s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.53s;
 
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_field_attack_start.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-				m_iState2 = 2;
-
-				m_flTimeCheckCharge = gpGlobals->time + 0.66s;
-				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.67s;
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.85s;
-				break;
-			}
-			case 2:
-			{
-				SendWeaponAnim(ANIM_FIELD_ATTACK_CHARGE, UseDecrement() != FALSE);
-
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/armtorch_field_attack_charge.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-				m_iState2 = 3;
-
-				m_flTimeCheckCharge = gpGlobals->time + 1.13s;
-				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 999999s;
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.33s;
-				break;
-			}
-			case 3:
-			{
-				m_tTimeSoundEmit = gpGlobals->time + 0.01s;
-				m_flTimeCheckCharge = gpGlobals->time + 999999s;
-				m_iState2 = 4; //ChareFinsh
-				break;
-			}
-			}
-		}
-	}
-
-	void CKnifeArmTorch::ComboAttack()
-	{
-		switch (m_iCheck)
-		{
-		case 4:
-		{
-			SendWeaponAnim(ANIM_SPECIAL_ATTACK, UseDecrement() != FALSE);
-
-#ifndef CLIENT_DLL
-			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-			Vector vecSrc = m_pPlayer->GetGunPosition();
-			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-			switch (KnifeAttack(GetPrimaryAttackDamage(), 180, 85, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 0))
-			{
-			case HIT_PLAYER:
-			{
-				switch (RANDOM_LONG(0, 2))
-				{
-				case 0: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-				case 1: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-				case 2: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit3.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-				}
-
-				break;
-			}
-			case HIT_WALL:
-			{
-				MaterialSound();
-				break;
-			}
-			}
-#endif
-			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.42s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.35s;
-			m_pPlayer->m_flNextAttack = 2.4s;
-			SetThink(&CKnifeArmTorch::ComboAttack);
-			m_iCheck = 5;
-			pev->nextthink = gpGlobals->time + 1.16s;
-
-			m_iState = m_iState2 = 0;
-			break;
-		}
-		case 5:
-		{
-			SendWeaponAnim(ANIM_SPECIAL_ATTACK_INOPERATION, UseDecrement() != FALSE);
-
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
-
-			m_tTimeRestMaxSpeed = gpGlobals->time + 0.7s;
-			m_pPlayer->pev->velocity.x = 0.0;
-			m_pPlayer->pev->velocity.y = 0.0;
-			m_pPlayer->ResetMaxSpeed();
-			//do buff
-#ifndef CLIENT_DLL
-			Vector vecAngle = m_pPlayer->pev->punchangle + m_pPlayer->pev->v_angle;
-			vecAngle[0] = 0;
-			UTIL_MakeVectors(vecAngle);
-			Vector vecSrc = m_pPlayer->GetGunPosition();
-			Vector vecOrigin = vecSrc + gpGlobals->v_forward * 80;
-			Vector vecEnd = vecOrigin;
-			vecEnd[2] -= 150;	
-			TraceResult tr;
-			UTIL_TraceHull(vecOrigin, vecEnd, dont_ignore_monsters, point_hull, ENT(m_pPlayer->pev), &tr);
-			if (tr.flFraction != 1.0f)
-				vecOrigin = tr.vecEndPos;
-			else
-				vecOrigin[2] -= 64;
-			CarmtorchFountainSpecialAttack* pEnt = CarmtorchFountainSpecialAttack::Create("armtorch_fountainspecial", vecOrigin, { 0,0,0 }, ENT(m_pPlayer->pev), 1);
-			if (pEnt)
-			{
-				pEnt->Init(SpecialAttackDamage(), 0, gpGlobals->v_forward);
-			}
-#endif
-			m_iCheck = 6;
-			SetThink(nullptr);
-			SetThink(&CKnifeArmTorch::ComboAttack);
-			pev->nextthink = gpGlobals->time + 0.33s;
-			m_iFrozen = 1;
-
-			//m_pPlayer->pev->maxspeed = 1.0;
-			break;		
-		}
-		case 6:
-		{
-			SendWeaponAnim(ANIM_SPECIAL_ATTCK_END, UseDecrement() != FALSE);
-
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.86s;
-			m_iFrozen = 0;
 			m_iCheck = 0;
-
-			SetThink(nullptr);
 			break;
 		}
 		}
-	}
-
-	void CKnifeArmTorch::OnAttack2Released(void)
-	{
-		switch (m_iState2)
-		{
-		case 4:
-		{
-#ifndef CLIENT_DLL	
-			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
-			SendWeaponAnim(ANIM_FIELD_ATTACK_ACTUATION, UseDecrement() != FALSE);
-
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/armtorch_field_attack_actuation.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.5s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.86s;
-			m_iState2 = 5;
-			m_pPlayer->m_flNextAttack = 1.5s;
-			SetThink(&CKnifeArmTorch::OnAttack2Released);
-			pev->nextthink = gpGlobals->time + 0.53s;
-			break;
-		}
-		case 5:
-		{
-			SendWeaponAnim(ANIM_FIELD_ATTACK_INOPERATION, UseDecrement() != FALSE);
-
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.86s;
-			m_iState2 = 6;
-
-			m_tTimeRestMaxSpeed = gpGlobals->time + 0.7s;
-			m_pPlayer->pev->velocity.x = 0.0;
-			m_pPlayer->pev->velocity.y = 0.0;
-			m_pPlayer->ResetMaxSpeed();
-
-			//do buff
-#ifndef CLIENT_DLL
-			Vector vecOrigin = m_pPlayer->pev->origin;
-			vecOrigin[2] -= 20.0;
-
-			CarmtorchFountainFieldAttack* pEnt = static_cast<CarmtorchFountainFieldAttack*>(CBaseEntity::Create("armtorch_fountainfield", vecOrigin, { 0,0,0 }, ENT(m_pPlayer->pev)));
-			if (pEnt)
-			{
-				pEnt->Init(FieldAttackDamage(), 0, m_pPlayer);
-			}
-#endif
-
-			SetThink(nullptr);
-			SetThink(&CKnifeArmTorch::OnAttack2Released);
-			pev->nextthink = gpGlobals->time + 0.33s;
-			break;
-		}
-		case 6:
-		{
-			SendWeaponAnim(ANIM_FIELD_ATTACK_END, UseDecrement() != FALSE);
-
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
-			m_iState2 = 0;
-			SetThink(nullptr);
-			break;
-		}
-		}
-	}
-
-	void CKnifeArmTorch::DelaySecondaryAttack(void)
-	{
-#ifndef CLIENT_DLL		
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-		Vector vecSrc = m_pPlayer->GetGunPosition();
-		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/armtorch_snd_attack.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-		switch (KnifeAttack(GetSecondaryAttackDamage(), 185, 360, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 2))
-		{
-		case HIT_PLAYER:
-		{
-			switch (RANDOM_LONG(0, 2))
-			{
-			case 0: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-			case 1: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-			case 2: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/armtorch_slash_hit3.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
-			}
-			break;
-		}
-		case HIT_WALL:
-		{
-			MaterialSound();
-			break;
-		}
-		}
-#endif
-
-		SetThink(nullptr);
-	}
-
-	void CKnifeArmTorch::OnAttack2(void)
-	{
-		if (m_iCheck == 1)
-			m_iCheck = 2;
-		else if (m_iCheck == 2)
-			m_iCheck = 3;
-		else
-			m_iCheck = 0;
-
-		SendWeaponAnim(ANIM_SNDATTACK, UseDecrement() != FALSE);
-
-		SetThink(&CKnifeArmTorch::DelaySecondaryAttack);
-		pev->nextthink = gpGlobals->time + 0.3s;
-		
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.2s;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
-
-		m_iState2 = 0;
-	}
-
-	float CKnifeArmTorch::GetMaxSpeed(void)
-	{
-		if (m_tTimeRestMaxSpeed > gpGlobals->time)
-			return 1;
-		else if (m_tTimeRestMaxSpeed == invalid_time_point)
-			return 252;
-		else
-			return 252;
 	}
 
 	void CKnifeArmTorch::Holster(int skiplocal)
 	{
 		SetThink(nullptr);
-		//EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "", VOL_NORM, ATTN_NORM, 0, 94);
-		//EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "", VOL_NORM, ATTN_NORM, 0, 94);
+
+		if (m_flDashTime > gpGlobals->time)
+		{
+			m_pPlayer->pev->velocity = g_vecZero;
+		}
+
+		m_flDashTime = invalid_time_point;
 		return CBasePlayerWeapon::Holster(skiplocal);
 	}
 
@@ -872,16 +630,6 @@ namespace sv {
 	{
 		ResetEmptySound();
 		m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
-
-		m_iState = 0;
-
-		if (m_iState2 && !(m_pPlayer->pev->button & IN_ATTACK2))
-		{
-			if (m_iState2 == 4)
-				OnAttack2Released();
-			else
-				OnAttack2();
-		}
 
 		if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 			return;
@@ -892,5 +640,6 @@ namespace sv {
 		SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
 		
 	}
+
 
 }

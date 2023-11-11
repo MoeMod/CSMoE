@@ -1,8 +1,13 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
-        jcenter()
+        jcenter
+        {
+            allowInsecureProtocol = true
+            url = 'https://maven.aliyun.com/repository/public'
+        }
         google()
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
@@ -12,7 +17,12 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
+        jcenter
+        {
+            allowInsecureProtocol = true
+            url = 'https://maven.aliyun.com/repository/public'
+        }
         google()
+
     }
 }

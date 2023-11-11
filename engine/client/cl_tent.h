@@ -67,7 +67,8 @@ void CL_BreakModel( const vec3_t pos, const vec3_t size, const vec3_t dir, float
 struct tempent_s *CL_TempModel( const vec3_t pos, const vec3_t dir, const vec3_t angles, float life, int modelIndex, int soundtype );
 struct tempent_s *CL_TempSprite( const vec3_t pos, const vec3_t dir, float scale, int modelIndex, int rendermode, int renderfx, float a, float life, int flags );
 struct tempent_s *CL_DefaultSprite( const vec3_t pos, int spriteIndex, float framerate );
-struct tempent_s*CL_TempCustomModel(const vec3_t pos, const vec3_t angles, const vec3_t velocity, float life, int modelIndex, int sequence, float framerate, bool fadeOut, int brightness, int rendermode, int entity, float fadeSpeed, bool fadeIn, float fadeInSpeed, float scale, int frameMax, int flags, int skin = 0, int body = 0);
+struct tempent_s* CL_TempCustomModel(const vec3_t pos, const vec3_t angles, const vec3_t velocity, float life, int modelIndex, int sequence, float framerate, bool fadeOut, int brightness, int rendermode, int entity, float fadeSpeed, bool fadeIn, float fadeInSpeed, float scale, int frameMax, int flags, int skin = 0, int body = 0);
+struct tempent_s* CL_TempParticle(const char* modelname, const vec3_t pos, const vec3_t velocity, const vec3_t color, float life, float framerate, int brightness, int rendermode, int entity, float fadeSpeed, float fadeInSpeed, float scale, int frameMax, int flags, int emitCount, float fireDelay, int attachment, float spinSpeed, float velocityVariance, float scaleSpeed);
 struct tempent_s* CL_AttachTentToModel(int clientindex, int iAttachment, float life, int modelIndex, float framerate, int brightness, int rendermode, float scale, int frameMax, int flags, int eflags);
 void CL_Sprite_Explode( struct tempent_s *pTemp, float scale, int flags );
 void CL_Sprite_Smoke( struct tempent_s *pTemp, float scale );

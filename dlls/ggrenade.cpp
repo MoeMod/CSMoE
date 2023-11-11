@@ -669,6 +669,13 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 	// TODO: unused
 	flRndSound = RANDOM_FLOAT(0, 1);
 
+	if (type == EXPTYPE_FIRECRACKERROCKET || type == EXPTYPE_FGLAUNCHERROCKET)
+	{
+		UTIL_Remove(this);
+
+		return;
+	}
+
 	switch (RANDOM_LONG(0, 2))
 	{
 	case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris1.wav", 0.55, ATTN_NORM); break;
@@ -694,7 +701,6 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 	case EXPTYPE_JANUS1ROCKET:
 	case EXPTYPE_M79ROCKET:
 	case EXPTYPE_AT4ROCKET:
-	case EXPTYPE_FIRECRACKERROCKET:
 	case EXPTYPE_M32ROCKET:
 	case EXPTYPE_OICWROCKET:
 	case EXPTYPE_HK121ROCKET:

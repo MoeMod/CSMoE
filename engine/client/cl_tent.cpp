@@ -26,7 +26,6 @@ GNU General Public License for more details.
 #include "studio.h"
 #include "wadfile.h"	// acess decal size
 #include "sound.h"
-
 #ifdef XASH_RAGDOLL
 #include "physics.h"
 #endif
@@ -2431,6 +2430,247 @@ TEMPENTITY* GAME_EXPORT CL_TempCustomModel(const vec3_t pos, const vec3_t angles
 	return pTemp;
 }
 
+
+void R_TempParticle(sizebuf_t* msg)
+{
+	vec3_t pos, velocity, color;
+	float life;
+	int sequence;
+	float framerate;
+	bool fadeOut;
+	int brightness;
+	int rendermode;
+	int entity;
+	float fadeSpeed;
+	bool fadeIn;
+	float fadeInSpeed;
+	float scale;
+	int frameMax;
+	int flags;
+	int emitCount;
+	float fireDelay;
+	int attachment;
+	float spinSpeed;
+	float velocityVariance;
+	float scaleSpeed;
+
+	const char* modelName = BF_ReadString(msg);
+	entity = BF_ReadShort(msg);
+
+	pos.x = BF_ReadCoord(msg);
+	pos.y = BF_ReadCoord(msg);
+	pos.z = BF_ReadCoord(msg);
+
+	velocity.x = BF_ReadCoord(msg);
+	velocity.y = BF_ReadCoord(msg);
+	velocity.z = BF_ReadCoord(msg);
+
+	emitCount = BF_ReadShort(msg);
+	fireDelay = BF_ReadByte(msg) * 0.01;
+	life = BF_ReadByte(msg) * 0.1;
+	flags = BF_ReadShort(msg);
+	spinSpeed = float(BF_ReadByte(msg));
+	framerate = float(BF_ReadByte(msg));
+	rendermode = BF_ReadByte(msg);
+	brightness = BF_ReadByte(msg);
+
+	color.x = BF_ReadByte(msg);
+	color.y = BF_ReadByte(msg);
+	color.z = BF_ReadByte(msg);
+
+	velocityVariance = BF_ReadShort(msg) * 0.1;
+	scale = BF_ReadByte(msg) * 0.1;
+	fadeSpeed = BF_ReadByte(msg) * 0.1;
+	scaleSpeed = BF_ReadByte(msg) * 0.001;
+	fadeInSpeed = BF_ReadByte(msg) * 0.1;
+	attachment = BF_ReadByte(msg);
+	frameMax = BF_ReadShort(msg);
+
+	CL_TempParticle(modelName, pos, velocity, color, life, framerate, brightness, rendermode, entity, fadeSpeed, fadeInSpeed, scale, frameMax, flags, emitCount, fireDelay, attachment, spinSpeed, velocityVariance, scaleSpeed);
+}
+
+void TempParticleCallBack(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	float scaleSpeed = ent->entity.curstate.fuser2;
+	ent->entity.curstate.scale += scaleSpeed;
+
+	int emitCount = ent->entity.curstate.iuser1;
+	float appearTime = ent->entity.curstate.fuser4;
+
+	if (appearTime > cl.time || appearTime == -1.0)
+		return;
+
+	if (emitCount <= 0)
+		return;
+
+	emitCount--;
+
+	const char* modelname = ent->entity.model->name;
+	vec3_t pos = ent->entity.curstate.vuser1;
+	vec3_t velocity = ent->entity.curstate.vuser2;
+	vec3_t color = ent->entity.curstate.vuser3;
+	float life = ent->entity.curstate.vuser4.x;
+	int brightness = ent->entity.curstate.iuser2;
+	int rendermode = ent->entity.curstate.rendermode;
+
+	float framerate = ent->entity.curstate.framerate;
+	int entity = ent->clientIndex;
+	float fadeSpeed = ent->entity.curstate.vuser4.y;
+	float fadeInSpeed = ent->entity.baseline.fuser1;
+	float scale = ent->entity.curstate.vuser4.y;
+	int frameMax = ent->frameMax;
+	int flags = ent->flags;
+	float fireDelay = ent->entity.curstate.fuser3;
+	int attachment = ent->entity.curstate.iuser3;
+	float spinSpeed = ent->entity.baseline.angles.x;
+	float velocityVariance = ent->entity.curstate.vuser4.z;
+
+	ent->entity.curstate.iuser1 = emitCount;
+	ent->entity.curstate.fuser4 = cl.time + fireDelay;
+	
+	CL_TempParticle(modelname, pos, velocity, color, life, framerate, brightness, rendermode, entity, fadeSpeed, fadeInSpeed, scale, frameMax, flags, 0, -1.0, attachment, spinSpeed, velocityVariance, scaleSpeed);
+}
+
+TEMPENTITY* GAME_EXPORT CL_TempParticle(const char* modelname, const vec3_t pos, const vec3_t velocity, const vec3_t color, float life, float framerate, int brightness, int rendermode, int entity, float fadeSpeed, float fadeInSpeed, float scale, int frameMax, int flags, int emitCount, float fireDelay, int attachment, float spinSpeed, float velocityVariance, float scaleSpeed)
+{
+	struct model_s* pModel;
+
+	pModel = Mod_ForName(modelname, 0);
+
+	if (!pModel)
+	{
+		MsgDev(D_INFO, "No model %s!\n", modelname);
+		return NULL;
+	}
+
+	TEMPENTITY* pTemp = CL_TempEntAlloc(pos, pModel);
+
+	if (!pTemp)
+	{
+		MsgDev(D_INFO, "No temp ent.\n");
+		return NULL;
+	}
+
+	if (entity > 0)
+	{
+		pTemp->flags |= FTENT_PLYRATTACHMENT;
+		pTemp->clientIndex = entity;
+		pTemp->tentOffset = pos;
+
+		cl_entity_t* ent = CL_GetEntityByIndex(entity);
+
+		if (!ent)
+		{
+			MsgDev(D_INFO, "No Client %d!\n", entity);
+		}
+		else
+		{
+			pTemp->entity.origin = ent->attachment[attachment];
+		}	
+	}
+
+	int frameCount = pModel->numframes;
+
+	
+	if (frameMax > 0)
+		pTemp->frameMax = frameMax;
+	else
+		pTemp->frameMax = frameCount;
+
+	pTemp->entity.baseline.origin = velocity;
+
+	pTemp->entity.baseline.origin.x = velocity.x + Com_RandomFloat(-1.0, 1.0) * velocityVariance;
+	pTemp->entity.baseline.origin.y = velocity.y + Com_RandomFloat(-1.0, 1.0) * velocityVariance;
+	pTemp->entity.baseline.origin.z = velocity.z + Com_RandomFloat(-1.0, 1.0) * velocityVariance;
+
+	if (flags & PARTICLE_RANDOMANGLE)
+	{
+		pTemp->entity.angles.x = Com_RandomFloat(-512.0, 511.0);
+		pTemp->entity.angles.y = Com_RandomFloat(-256.0, 255.0);
+		pTemp->entity.angles.z = Com_RandomFloat(-256.0, 255.0);
+	}
+	
+	pTemp->entity.curstate.rendermode = rendermode;
+	pTemp->entity.curstate.renderamt = brightness * 2;
+	pTemp->entity.curstate.modelindex = 0;
+	pTemp->entity.curstate.framerate = framerate;
+	pTemp->entity.curstate.scale = scale;
+	pTemp->flags |= FTENT_CLIENTCUSTOM;
+	pTemp->entity.curstate.animtime = cl.time;
+	pTemp->entity.curstate.rendercolor.r = color[0];
+	pTemp->entity.curstate.rendercolor.g = color[1];
+	pTemp->entity.curstate.rendercolor.b = color[2];
+	pTemp->entity.curstate.fuser2 = scaleSpeed;
+	pTemp->entity.curstate.fuser3 = fireDelay;
+	pTemp->entity.curstate.fuser4 = cl.time + fireDelay;
+	pTemp->entity.curstate.iuser1 = emitCount;
+	pTemp->entity.curstate.iuser2 = brightness;
+	pTemp->entity.curstate.iuser3 = attachment;
+	//pTemp->entity.curstate.iuser4 = ;
+	pTemp->entity.curstate.vuser1 = pos;
+	pTemp->entity.curstate.vuser2 = velocity;
+	pTemp->entity.curstate.vuser3 = color;
+	pTemp->entity.curstate.vuser4.x = life;
+	pTemp->entity.curstate.vuser4.y = scale;
+	pTemp->entity.curstate.vuser4.z = velocityVariance;
+
+	
+	if (flags > 0)
+		pTemp->flags |= flags;
+
+	pTemp->die = cl.time + life;
+
+	if (flags & PARTICLE_ANIMATE)
+		pTemp->flags |= FTENT_SPRANIMATE;
+
+	if (flags & PARTICLE_PERSIST)
+		pTemp->flags |= FTENT_PERSIST;
+
+	if (flags & PARTICLE_SPIRAL)
+		pTemp->flags |= FTENT_SPIRAL;
+
+	if (flags & PARTICLE_COLLIDEWORLD)
+		pTemp->flags |= FTENT_COLLIDEWORLD;
+
+	if (flags & PARTICLE_COLLIDEKILL)
+		pTemp->flags |= FTENT_COLLIDEKILL | FTENT_COLLIDEWORLD;
+
+	if (flags & PARTICLE_ANIMATELOOP)
+		pTemp->flags |= FTENT_SPRANIMATELOOP;
+
+	if (flags & PARTICLE_ROTATE)
+	{
+		pTemp->flags |= FTENT_ROTATE;
+		pTemp->entity.baseline.angles = { spinSpeed, spinSpeed, spinSpeed };
+	}
+		
+	if (flags & PARTICLE_GRAVITY)
+		pTemp->flags |= FTENT_GRAVITY;
+
+	if (flags & PARTICLE_SLOWGRAVITY)
+		pTemp->flags |= FTENT_SLOWGRAVITY;
+
+	if (fadeSpeed)
+	{
+		pTemp->flags |= FTENT_FADEOUT;
+		pTemp->entity.baseline.renderamt = brightness;
+		pTemp->fadeSpeed = fadeSpeed;
+	}
+
+	if (fadeInSpeed)
+	{
+		pTemp->flags |= FTENT_FADEIN;
+		pTemp->entity.baseline.fuser1 = fadeInSpeed;
+	}
+
+	if (pTemp->flags & FTENT_NOCULL)
+		pTemp->entity.curstate.effects |= EF_NOCULL;
+
+	pTemp->callback = TempParticleCallBack;
+
+	return pTemp;
+}
+
 TEMPENTITY* GAME_EXPORT CL_AttachTentToModel(int clientindex, int iAttachment, float life, int modelIndex, float framerate, int brightness, int rendermode, float scale, int frameMax, int flags, int eflags)
 {
 	cl_entity_t* parent = CL_GetEntityByIndex(clientindex);
@@ -3605,6 +3845,9 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 		break;
 	case TE_FOLLOWINGGRENADE:
 		R_FollowingGrenade(&buf);
+	case TE_TEMPPARTICLE:
+		R_TempParticle(&buf);
+		break;
 	default:
 		MsgDev( D_ERROR, "ParseTempEntity: illegible TE message %i\n", type );
 		break;

@@ -549,6 +549,7 @@ void UTIL_BreakModel(const Vector& pos, const Vector& size, const Vector& veloci
 std::string UTIL_ReplaceString(const std::string& original, const std::string& old_value, const std::string& new_value);
 void UTIL_SendAudio(CBaseEntity* pEntity, const char* msg_id, short pitch, bool msgAll = false);
 void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float volume, float attenuation, int flags, int pitch, bool msg_one = false);
+void UTIL_TempEmit(const char* model, int iEmitCounter, int fireDelay, int life, int spawnflags, int spin_speed, int framerate, int rendermode, int brightness, int r, int g, int b, Vector pos, Vector velocity, int velocity_variance, int scale, int fade_speed, int scale_speed, int fadeInSpeed, int attachment, int frameMax);
 }
 #else
 namespace cl {

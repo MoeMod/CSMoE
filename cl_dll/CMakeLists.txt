@@ -478,6 +478,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_ignitebomb.cpp
 	../dlls/wpn_shared/knife_dgaxeex.cpp
 	../dlls/wpn_shared/wpn_linkattacksg.cpp
+	../dlls/wpn_shared/knife_armtorch.cpp
 	)
 
 set (HUD_SRCS

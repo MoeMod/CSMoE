@@ -157,7 +157,7 @@ namespace sv {
 
 		duration_t GetChargeTime()
 		{
-			duration_t flTime = 4.0s;
+			duration_t flTime = 30.0s;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				flTime = 8.0s;
@@ -655,7 +655,7 @@ namespace sv {
 		{
 			if (m_flTimeNextCharge != invalid_time_point && m_flTimeNextCharge <= gpGlobals->time)
 			{
-				m_iWeaponState += int((gpGlobals->time - m_flTimeNextCharge) / GetChargeTime() + 1.0);
+				m_iWeaponState += int((gpGlobals->time - m_flTimeNextCharge) / GetChargeTime());
 				m_flTimeNextCharge = gpGlobals->time + GetChargeTime();
 				if (m_iWeaponState >= MaxSecondClip)
 					m_iWeaponState = MaxSecondClip;
