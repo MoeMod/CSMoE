@@ -203,8 +203,7 @@ public:
 	CMonsterImprov(CBaseEntity *entity) : CHostageImprov(entity)
 	{
 	}
-	CMonsterImprov(CBaseEntity* entity, float turnTolerance) : CHostageImprov(entity),
-		m_bCalculatingPath(false)
+	CMonsterImprov(CBaseEntity* entity, float turnTolerance) : CHostageImprov(entity)
 	{
 		m_turnTolerance = turnTolerance;
 	}
