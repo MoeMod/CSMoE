@@ -43,7 +43,7 @@ model_t	cm_models[MAX_MODELS];
 int	cm_nummodels = 0;
 static byte	visdata[MAX_MAP_LEAFS/8];	// intermediate buffer
 int		bmodel_version;		// global stuff to detect bsp version
-char		modelname[64];		// short model name (without path and ext)
+char		modelname[MAX_MODEL_NAME];		// short model name (without path and ext)
 convar_t		*mod_studiocache;
 convar_t		*mod_allow_materials;
 convar_t		*r_wadtextures;
@@ -3094,7 +3094,7 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 {
 	const byte	*buf;
     fs_offset_t filesize;
-	char	tempname[64];
+	char	tempname[MAX_MODEL_NAME];
 	qboolean	loaded;
 
 	if( !mod )

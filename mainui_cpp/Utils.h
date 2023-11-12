@@ -194,7 +194,7 @@ inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 #undef register
 #endif // register
 
-#define CS_SIZE			64	// size of one config string
+#define CS_SIZE			96	// size of one config string
 #define CS_TIME			16	// size of time string
 
 #define MAX_SCOREBOARDNAME	32 // engine and dlls allows only 32 chars

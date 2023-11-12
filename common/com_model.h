@@ -29,7 +29,7 @@
 
 #define ZISCALE		((float)0x8000)
 
-#define MAX_MODEL_NAME		64
+#define MAX_MODEL_NAME		96
 #define MAX_MODEL_SUFFIX		32
 
 #define	MIPLEVELS			4
