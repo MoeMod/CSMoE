@@ -823,7 +823,10 @@ void IN_Init( void )
 	cl_sidespeed	= Cvar_Get( "cl_sidespeed", "400", CVAR_ARCHIVE | CVAR_CLIENTDLL, "Default side move speed"  );
 
 	if( !Host_IsDedicated() )
+    {
 		Joy_Init(); // common joystick support init
+        IN_GyroscopeInit();
+    }
 
 #ifdef USE_EVDEV
 	Cmd_AddCommand ("evdev_open", Evdev_OpenDevice_f, "Open event device");
@@ -957,6 +960,7 @@ void IN_EngineAppendMove( float frametime, usercmd_t *cmd, qboolean active )
 #endif
 		Joy_FinalizeMove( &forward, &side, &dyaw, &dpitch );
 		Touch_GetMove( &forward, &side, &dyaw, &dpitch );
+        IN_GyroscopeAppendMove( &dyaw, &dpitch );
 		IN_JoyAppendMove( cmd, forward, side );
 #ifdef USE_EVDEV
 		IN_EvdevMove( &dyaw, &dpitch );
@@ -1012,6 +1016,7 @@ void Host_InputFrame( void )
 
 		Joy_FinalizeMove( &forward, &side, &yaw, &pitch );
 		Touch_GetMove( &forward, &side, &yaw, &pitch );
+        IN_GyroscopeAppendMove( &yaw, &pitch );
 #ifdef USE_EVDEV
 		IN_EvdevMove( &yaw, &pitch );
 #endif

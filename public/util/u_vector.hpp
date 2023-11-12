@@ -992,8 +992,10 @@ template<class T, std::size_t Align> constexpr VectorBase<T, 3, Align> CrossProd
 U_VECTOR_FORCEINLINE VectorBase<float, 3, 16> CrossProduct(VectorBase<float, 3, 16> a, VectorBase<float, 3, 16> b)
 {
 #if U_VECTOR_NEON
-    float32x4_t yzxy_a = vextq_f32(vextq_f32(a, a, 3), a, 2); // [aj, ak, ai, aj]
-    float32x4_t yzxy_b = vextq_f32(vextq_f32(b, b, 3), b, 2); // [bj, bk, bi, bj]
+    float32x2_t xy_a = vget_low_f32(a);
+    float32x2_t xy_b = vget_low_f32(b);
+    float32x4_t yzxy_a = vcombine_f32(vext_f32(xy_a, vget_high_f32(a), 1), xy_a); // [aj, ak, ai, aj]
+    float32x4_t yzxy_b = vcombine_f32(vext_f32(xy_b, vget_high_f32(b), 1), xy_b); // [bj, bk, bi, bj]
     float32x4_t zxyy_a = vextq_f32(yzxy_a, yzxy_a, 1); // [ak, ai, aj, aj]
     float32x4_t zxyy_b = vextq_f32(yzxy_b, yzxy_b, 1); // [bk, ai, bj, bj]
     return vfmsq_f32(vmulq_f32(yzxy_a, zxyy_b), zxyy_a, yzxy_b); // [ajbk-akbj, akbi-aibk, aibj-ajbi, 0]

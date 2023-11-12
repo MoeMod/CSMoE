@@ -38,6 +38,7 @@ static struct jnimethods_s
 	jmethodID getAssetManager;
 	jmethodID getDisplayDPI;
 	jmethodID logToBugly;
+	jmethodID getDeviceOrientation;
 } jni;
 
 
@@ -71,6 +72,35 @@ DECLARE_JNI_INTERFACE_VOID( void, nativeOnLowMemory )
     return Sys_LowMemory();
 }
 
+vec3_t current_tilt, current_rotation_rate, current_gravity, current_acceleration;
+
+DECLARE_JNI_INTERFACE( void, nativeHandleSensorEvents, jfloatArray tilt, jfloatArray rotation_rate, jfloatArray gravity, jfloatArray acceleration )
+{
+    jfloat* tiltFloatValues = env->GetFloatArrayElements(tilt, 0);
+    current_tilt = { tiltFloatValues[0], tiltFloatValues[1], tiltFloatValues[2] };
+    env->ReleaseFloatArrayElements(tilt, tiltFloatValues, 0);
+
+    jfloat* rotation_rate_FloatValues = env->GetFloatArrayElements(rotation_rate, 0);
+    current_rotation_rate = { rotation_rate_FloatValues[0], rotation_rate_FloatValues[1], rotation_rate_FloatValues[2] };
+    env->ReleaseFloatArrayElements(rotation_rate, rotation_rate_FloatValues, 0);
+
+    jfloat* gravity_FloatValues = env->GetFloatArrayElements(gravity, 0);
+    current_gravity = { gravity_FloatValues[0], gravity_FloatValues[1], gravity_FloatValues[2] };
+    env->ReleaseFloatArrayElements(gravity, gravity_FloatValues, 0);
+
+    jfloat* acceleration_FloatValues = env->GetFloatArrayElements(acceleration, 0);
+    current_acceleration = { acceleration_FloatValues[0], acceleration_FloatValues[1], acceleration_FloatValues[2] };
+    env->ReleaseFloatArrayElements(acceleration, acceleration_FloatValues, 0);
+}
+
+void Android_GetMotionData(vec3_t& Tilt, vec3_t& RotationRate, vec3_t& Gravity, vec3_t& Acceleration)
+{
+    Tilt = current_tilt;
+    RotationRate = current_rotation_rate;
+    Gravity = current_gravity;
+    Acceleration = current_acceleration;
+}
+
 void Android_SetupJNI()
 {
 	/* Init callbacks. */
@@ -86,6 +116,7 @@ void Android_SetupJNI()
 	jni.getAssetManager = env->GetStaticMethodID(jni.actcls, "getAssetManager", "()Landroid/content/res/AssetManager;");
 	jni.getDisplayDPI = env->GetStaticMethodID(jni.actcls, "getDisplayDPIf", "()F");
 	jni.logToBugly = env->GetStaticMethodID(jni.actcls, "logToBugly", "(Ljava/lang/String;)V");
+    jni.getDeviceOrientation = env->GetStaticMethodID(jni.actcls, "getDeviceOrientation", "()I");
 }
 
 void *Android_GetNativeObject( const char *objName )
@@ -217,4 +248,9 @@ void Android_Log(const char *str)
 	jstring jstr = jni.env->NewString( jbuffer, size );
 	jni.env->CallStaticVoidMethod(jni.actcls, jni.logToBugly, jstr);
 	jni.env->DeleteLocalRef(jstr);
+}
+
+int Android_GetDeviceOrientation()
+{
+    return jni.env->CallStaticIntMethod(jni.actcls, jni.getDeviceOrientation);
 }

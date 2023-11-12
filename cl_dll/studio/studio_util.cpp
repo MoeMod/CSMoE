@@ -38,9 +38,9 @@ void XASH_VECTORCALL AngleMatrix(const vec3_t angles, matrix3x4_ref matrix)
     matrix[0] = vmulq_laneq_f32(_0_srsp_crsp_0, sp_sy_sr_0_cp_cy_cr_1.val[1], 1); // *cy
     matrix[1] = vmulq_laneq_f32(_0_srsp_crsp_0, sp_sy_sr_0_cp_cy_cr_1.val[0], 1); // *sy
 
-    const auto sign0 = vreinterpretq_f32_u32(vsetq_lane_u32(0x80000000, vdupq_n_u32(0), 0));
-    const auto sign1 = vreinterpretq_f32_u32(vsetq_lane_u32(0x80000000, vdupq_n_u32(0), 1));
-    const auto sign2 = vreinterpretq_f32_u32(vsetq_lane_u32(0x80000000, vdupq_n_u32(0), 2));
+    const auto sign0 = vsetq_lane_u32(0x80000000, vdupq_n_u32(0), 0);
+    const auto sign1 = vsetq_lane_u32(0x80000000, vdupq_n_u32(0), 1);
+    const auto sign2 = vsetq_lane_u32(0x80000000, vdupq_n_u32(0), 2);
 
     cy_sy_sy_0 = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(cy_sy_sy_0), sign1));
     sy_cy_cy_1 = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(sy_cy_cy_1), sign2));
@@ -125,8 +125,10 @@ CrossProduct
 void XASH_VECTORCALL CrossProduct (const vec3_t v1, const vec3_t v2, vec3_t_ref cross)
 {
 #if defined(XASH_SIMD) && U_VECTOR_NEON
-    float32x4_t yzxy_a = vextq_f32(vextq_f32(v1, v1, 3), v1, 2); // [aj, ak, ai, aj]
-    float32x4_t yzxy_b = vextq_f32(vextq_f32(v2, v2, 3), v2, 2); // [bj, bk, bi, bj]
+	float32x2_t xy_a = vget_low_f32(v1);
+	float32x2_t xy_b = vget_low_f32(v2);
+    float32x4_t yzxy_a = vcombine_f32(vext_f32(xy_a, vget_high_f32(v1), 1), xy_a); // [aj, ak, ai, aj]
+    float32x4_t yzxy_b = vcombine_f32(vext_f32(xy_b, vget_high_f32(v2), 1), xy_b); // [bj, bk, bi, bj]
     float32x4_t zxyy_a = vextq_f32(yzxy_a, yzxy_a, 1); // [ak, ai, aj, aj]
     float32x4_t zxyy_b = vextq_f32(yzxy_b, yzxy_b, 1); // [bk, ai, bj, bj]
     cross = vfmsq_f32(vmulq_f32(yzxy_a, zxyy_b), zxyy_a, yzxy_b); // [ajbk-akbj, akbi-aibk, aibj-ajbi, 0]
@@ -235,7 +237,7 @@ AngleQuaternion
 const __m128 AngleQuaternion_sign1 = _mm_castsi128_ps(_mm_setr_epi32(0x80000000, 0x00000000, 0x00000000, 0x00000000));
 const __m128 AngleQuaternion_sign2 = _mm_castsi128_ps(_mm_setr_epi32(0x00000000, 0x00000000, 0x80000000, 0x00000000));
 #elif defined(XASH_SIMD) && U_VECTOR_NEON
-const float32x4_t AngleQuaternion_sign2 = vzipq_f32(vdupq_n_u32(0x80000000), vdupq_n_u32(0x00000000)).val[0]; // { 0x80000000, 0x00000000, 0x80000000, 0x00000000 };
+const uint32x4_t AngleQuaternion_sign2 = vzipq_u32(vdupq_n_u32(0x80000000), vdupq_n_u32(0x00000000)).val[0]; // { 0x80000000, 0x00000000, 0x80000000, 0x00000000 };
 #endif
 void XASH_VECTORCALL AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
 {
@@ -264,22 +266,25 @@ void XASH_VECTORCALL AngleQuaternion(const vec3_t angles, vec4_t_ref quaternion)
     sincos_ps(angles * 0.5, &sr_sp_sy_0_cr_cp_cy_1.val[0], &sr_sp_sy_0_cr_cp_cy_1.val[1]);
 
     auto sr_sy_cr_cy_sp_0_cp_1 = vuzpq_f32(sr_sp_sy_0_cr_cp_cy_1.val[0], sr_sp_sy_0_cr_cp_cy_1.val[1]);
-    float32x4_t cp_cp_cp_cp = vdupq_laneq_f32(sr_sp_sy_0_cr_cp_cy_1.val[1], 1);
-    float32x4_t sp_sp_sp_sp = vdupq_laneq_f32(sr_sp_sy_0_cr_cp_cy_1.val[0], 1);
 
     float32x4_t sr_sy_cr_cy = sr_sy_cr_cy_sp_0_cp_1.val[0];
     float32x4_t sy_cr_cy_sr = vextq_f32(sr_sy_cr_cy_sp_0_cp_1.val[0], sr_sy_cr_cy_sp_0_cp_1.val[0], 1);
-    float32x4_t cr_cy_sr_sy = vextq_f32(sr_sy_cr_cy_sp_0_cp_1.val[0], sr_sy_cr_cy_sp_0_cp_1.val[0], 2);
-    float32x4_t cy_sr_sy_cr = vextq_f32(sr_sy_cr_cy_sp_0_cp_1.val[0], sr_sy_cr_cy_sp_0_cp_1.val[0], 3);
-    float32x4_t sp_sp_sp_sp_signed = veorq_u32(sp_sp_sp_sp, AngleQuaternion_sign2);
 
-    auto left = vmulq_f32(vmulq_f32(sr_sy_cr_cy, cp_cp_cp_cp), cy_sr_sy_cr);
+	float32x4_t srsy_sycr_crcy_cysr = vmulq_f32(sr_sy_cr_cy, sy_cr_cy_sr);
 
-    quaternion = vfmaq_f32(left, vmulq_f32(cr_cy_sr_sy, sp_sp_sp_sp_signed), sy_cr_cy_sr);
-    //quaternion[0] =   sr * cp * cy - cr * sp * sy; // X
-    //quaternion[1] =   sy * cp * sr + cy * sp * cr; // Y
-    //quaternion[2] =   cr * cp * sy - sr * sp * cy; // Z
-    //quaternion[3] =   cy * cp * cr + sy * sp * sr; // W
+	float32x4_t sycr_crcy_cysr_srsy = vextq_f32(srsy_sycr_crcy_cysr, srsy_sycr_crcy_cysr, 1);
+	float32x4_t cysr_srsy_sycr_crcy = vextq_f32(srsy_sycr_crcy_cysr, srsy_sycr_crcy_cysr, 3);
+
+	float32x4_t sycr_crcy_cysr_srsy_signed = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(sycr_crcy_cysr_srsy), AngleQuaternion_sign2));
+
+	float32x4_t left = vmulq_laneq_f32(cysr_srsy_sycr_crcy, sr_sp_sy_0_cr_cp_cy_1.val[1], 1); // *cp
+	quaternion = vfmaq_laneq_f32(left, sycr_crcy_cysr_srsy_signed, sr_sp_sy_0_cr_cp_cy_1.val[0], 1); // +*sp
+
+	// A = sr * sy, B = sy * cr, C = cr * cy, D = cy * sr
+	//quaternion[0] =   D * cp - B * sp; // X
+	//quaternion[1] =   A * cp + C * sp; // Y
+	//quaternion[2] =   B * cp - D * sp; // Z
+	//quaternion[3] =   C * cp + A * sp; // W
 #else
 	float angle;
 	float sr, sp, sy, cr, cp, cy;

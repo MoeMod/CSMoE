@@ -183,6 +183,7 @@ if(NOT XASH_DEDICATED)
 	set(XASH_ENGINE_APPLE_SOURCES
 		common/launcher.cpp
 		platform/iOS/TapicEngine.mm
+		platform/iOS/IOSInput.mm
 		platform/ime_stub.cpp
 	)
 	else()
@@ -253,6 +254,7 @@ set(XASH_ENGINE_CLIENT_SOURCES
    client/gl_studiolru.cpp
    client/gl_bindspr.cpp
    client/gl_sprbat.cpp
+   client/in_gyroscope.cpp
 )
 
 set(XASH_ENGINE_IMGUI_SOURCES

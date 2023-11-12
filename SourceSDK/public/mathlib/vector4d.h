@@ -635,7 +635,9 @@ inline void Vector4DAligned::InitZero( void )
 inline void Vector4DMultiplyAligned( Vector4DAligned const& a, Vector4DAligned const& b, Vector4DAligned& c )
 {
 	Assert( a.IsValid() && b.IsValid() );
-#if !defined( _X360 ) || defined (__arm__)
+#if defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64)
+    c.AsM128() = vmulq_f32(a.AsM128(), b.AsM128());
+#elif !defined( _X360 )
 	c.x = a.x * b.x;
 	c.y = a.y * b.y;
 	c.z = a.z * b.z;

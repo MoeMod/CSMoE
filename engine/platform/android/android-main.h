@@ -54,4 +54,7 @@ void Android_AssetList(stringlist_t *list, const char *path, void (*stringlistap
 float Android_GetDisplayDPI();
 void Android_Log(const char *str);
 
+void Android_GetMotionData(vec3_t& Tilt, vec3_t& RotationRate, vec3_t& Gravity, vec3_t& Acceleration);
+int Android_GetDeviceOrientation();
+
 #endif // ANDROID_MAIN_H
