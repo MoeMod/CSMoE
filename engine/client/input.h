@@ -55,4 +55,8 @@ long IN_WndProc( void *hWnd, uint uMsg, uint wParam, long lParam );
 void IN_SetCursor( Xash_Cursor *hCursor );
 extern qboolean	in_mouseinitialized;
 
+// in_gyroscope.cpp
+void IN_GyroscopeInit();
+void IN_GyroscopeAppendMove( float *yaw, float *pitch );
+
 #endif//INPUT_H

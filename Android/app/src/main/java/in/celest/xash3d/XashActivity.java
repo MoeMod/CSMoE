@@ -5,6 +5,7 @@ import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import android.app.*;
 import android.content.*;
 import android.content.res.AssetManager;
+import android.hardware.*;
 import android.view.*;
 import android.os.*;
 import android.util.*;
@@ -26,7 +27,8 @@ import org.libsdl.app.SDLActivity;
 /**
  Xash Activity
  */
-public class XashActivity extends SDLActivity {
+public class XashActivity extends SDLActivity implements SensorEventListener
+{
 
 	// Main components
 	protected static XashActivity mSingleton;
@@ -71,6 +73,22 @@ public class XashActivity extends SDLActivity {
 		mPref = this.getSharedPreferences( "engine", 0 );
 
 		mAssetManager = this.getAssets();
+
+		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+		gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+		if (bAllowIMU) {
+			if (accelerometer != null) {
+				sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+			}
+			if (magnetometer != null) {
+				sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
+			}
+			if (gyroscope != null) {
+				sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME);
+			}
+		}
 
 		CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
 		strategy.setAppVersion(String.valueOf(nativeGetBuildVersion()));
@@ -248,4 +266,148 @@ public class XashActivity extends SDLActivity {
 	{
 		BuglyLog.w("Xash", str);
 	}
+
+	public static int getDeviceOrientation()
+	{
+		return mSingleton.getWindowManager().getDefaultDisplay().getRotation();
+	}
+
+	private boolean bAllowIMU = true;
+	private SensorManager sensorManager;
+	private Sensor accelerometer;
+	private Sensor magnetometer;
+	private Sensor gyroscope;
+	static boolean first_acceleration_sample = true;
+	static final float SampleDecayRate = 0.85f;
+
+	private final float[] rotationMatrix = new float[9];
+	private final float[] orientationAngles = new float[3];
+
+	static float[] current_accelerometer = new float[]{0, 0, 0};
+	static float[] current_gyroscope = new float[]{0, 0, 0};
+	static float[] current_magnetometer = new float[]{0, 0, 0};
+
+	static float[] filtered_gravity = new float[]{0, 0, 0};
+	static float[] last_gravity = new float[]{0, 0, 0};
+	static float[] last_tilt = new float[]{0, 0, 0};
+
+	// active motion state to return to application on request
+	static float[] current_tilt = new float[]{0, 0, 0};
+	static float[] current_rotation_rate = new float[]{0, 0, 0};
+	static float[] current_gravity = new float[]{0, 0, 0};
+	static float[] current_acceleration = new float[]{0, 0, 0};
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		if (bAllowIMU) {
+			if (accelerometer != null) {
+				sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+			}
+			if (magnetometer != null) {
+				sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
+			}
+			if (gyroscope != null) {
+				sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME);
+			}
+		}
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		if (bAllowIMU) {
+			sensorManager.unregisterListener(this);
+		}
+	}
+
+	@Override
+	public void onSensorChanged(SensorEvent event)
+	{
+		if (bAllowIMU && accelerometer != null && magnetometer != null)
+		{
+			boolean bUpdate = false;
+			boolean bGyroUpdate = false;
+
+			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+			{
+				System.arraycopy(event.values, 0, current_accelerometer, 0, 3);
+				bUpdate = true;
+
+				// We use a low-pass filter to synthesize the gravity vector.
+				if (!first_acceleration_sample)
+				{
+					filtered_gravity[0] = last_gravity[0] * SampleDecayRate + current_accelerometer[0]*(1.0f - SampleDecayRate);
+					filtered_gravity[1] = last_gravity[1] * SampleDecayRate + current_accelerometer[1]*(1.0f - SampleDecayRate);
+					filtered_gravity[2] = last_gravity[2] * SampleDecayRate + current_accelerometer[2]*(1.0f - SampleDecayRate);
+				}
+				first_acceleration_sample = false;
+				last_gravity = filtered_gravity;
+			}
+			else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+			{
+				System.arraycopy(event.values, 0, current_magnetometer, 0, 3);
+				bUpdate = true;
+			}
+			else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE)
+			{
+				System.arraycopy(event.values, 0, current_gyroscope, 0, 3);
+				bUpdate = true;
+				bGyroUpdate = true;
+			}
+
+			// If we have motion samples we generate the single event.
+			if (bUpdate)
+			{
+				// get the rotation matrix value, the convert those to Euler angle rotation values
+				sensorManager.getRotationMatrix(rotationMatrix, null, current_accelerometer, current_magnetometer);
+				sensorManager.getOrientation(rotationMatrix, orientationAngles);
+
+				// protect against request from other thread
+				synchronized(this)
+				{
+					// remember gravity
+					current_gravity = filtered_gravity;
+
+					// fix up the tilt mapping to proper coordinate frame
+					current_tilt[0] = orientationAngles[1];
+					current_tilt[1] = orientationAngles[2];
+					current_tilt[2] = orientationAngles[0];
+
+					// And take out the gravity from the accel to get the linear acceleration.
+					current_acceleration[0] = current_accelerometer[0] - current_gravity[0];
+					current_acceleration[1] = current_accelerometer[1] - current_gravity[1];
+					current_acceleration[2] = current_accelerometer[2] - current_gravity[2];
+
+					// Figure out the rotation rate
+					if (bGyroUpdate)
+					{
+						// The rotation rate is the what the gyroscope gives us.
+						current_rotation_rate = current_gyroscope;
+					}
+					else if (null == gyroscope)
+					{
+						// If we don't have a gyroscope at all we need to calc a rotation rate from delta from previous tilt.
+						current_rotation_rate[0] = current_tilt[0] - last_tilt[0];
+						current_rotation_rate[1] = current_tilt[1] - last_tilt[1];
+						current_rotation_rate[2] = current_tilt[2] - last_tilt[2];
+					}
+					last_tilt = current_tilt;
+				}
+
+				// flag new sensor data ready
+				nativeHandleSensorEvents(current_tilt, current_rotation_rate, current_gravity, current_acceleration);
+			}
+		}
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int i)
+	{
+
+	}
+
+	public static native void nativeHandleSensorEvents(float[] tilt, float[] rotation_rate, float[] gravity, float[] acceleration);
 }
