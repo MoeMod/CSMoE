@@ -27,7 +27,7 @@ server_t		sv;	// local server
 
 int SV_ModelIndex( const char *filename )
 {
-	char	name[64];
+	char	name[CS_SIZE];
 	int	i;
 
 	if( !filename || !filename[0] )

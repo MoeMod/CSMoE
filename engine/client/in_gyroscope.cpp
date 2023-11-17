@@ -10,6 +10,7 @@
 #include "platform/android/android-main.h"
 #endif
 
+convar_t* gyroscope_enable;
 convar_t *gyroscope_pitch;
 convar_t *gyroscope_yaw;
 
@@ -43,11 +44,16 @@ void IN_GyroscopeInit()
 {
     gyroscope_pitch = Cvar_Get( "gyroscope_pitch", "0.2", CVAR_ARCHIVE, "gyroscope pitch sensitivity" );
     gyroscope_yaw = Cvar_Get( "gyroscope_yaw", "0.25", CVAR_ARCHIVE, "gyroscope yaw sensitivity" );
+    gyroscope_enable = Cvar_Get("gyroscope_enable", "0", CVAR_ARCHIVE, "gyroscope enable");
 }
 
 void IN_GyroscopeAppendMove( float *yaw, float *pitch )
 {
-    vec3_t RotationState = IN_GetRotationState();
-    *pitch += RotationState.x * gyroscope_pitch->value;
-    *yaw += RotationState.y * gyroscope_yaw->value;
+    if (gyroscope_enable->value)
+    {
+        vec3_t RotationState = IN_GetRotationState();
+        *pitch += RotationState.x * gyroscope_pitch->value;
+        *yaw += RotationState.y * gyroscope_yaw->value;
+    }
+
 }

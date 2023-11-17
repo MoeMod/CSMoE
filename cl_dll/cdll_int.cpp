@@ -298,6 +298,9 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pLinkAttackSGViewModel = IEngineStudio.Mod_ForName("models/v_linkattacksg.mdl", FALSE);
 	CStudioModelRenderer::s_pLinkAttackSGPartModel = IEngineStudio.Mod_ForName("models/v_linkattacksg_parts.mdl", FALSE);
 
+	CStudioModelRenderer::s_pPetrolBoomerViewModel = IEngineStudio.Mod_ForName("models/v_petrolboomer.mdl", FALSE);
+	CStudioModelRenderer::s_pPetrolBoomerMuzzleModel = IEngineStudio.Mod_ForName("sprites/flame3.spr", FALSE);
+
 	//VGui_Startup();
 
 	return 1;

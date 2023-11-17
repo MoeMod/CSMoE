@@ -843,6 +843,7 @@ public:
 
 	time_point_t m_flEmotionTime;
 	float m_flEmotionFrame;
+	ModelName m_iOldModelName;
 };
 
 }

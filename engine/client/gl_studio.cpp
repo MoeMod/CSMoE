@@ -92,6 +92,8 @@ std::map<ModelName, const char*> g_HandTextureName =
 	{ MODEL_BUFFCLASS23S1CT, "buffclass23s1ct" },
 	{ MODEL_BUFFCLASS23S2TR, "buffclass23s2tr" },
 	{ MODEL_BUFFCLASS23S2CT, "buffclass23s2ct" },
+	{ MODEL_BUFFCLASS23S3TR, "buffclass23s3tr" },
+	{ MODEL_BUFFCLASS23S3CT, "buffclass23s3ct" },
 };
 
 std::map<HandTattooName, const char*> g_TattoTextureName =

@@ -1832,6 +1832,11 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 				appearance.model_id = MODEL_BUFFCLASS23S2TR;
 				break;
 			}
+			case 37:
+			{
+				appearance.model_id = MODEL_BUFFCLASS23S3TR;
+				break;
+			}
 			default:
 			{
 				appearance.model_id = MODEL_YURI;
@@ -2026,6 +2031,11 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 		case 36:
 		{
 			appearance.model_id = MODEL_BUFFCLASS23S2CT;
+			break;
+		}
+		case 37:
+		{
+			appearance.model_id = MODEL_BUFFCLASS23S3CT;
 			break;
 		}
 		default:

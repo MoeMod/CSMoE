@@ -122,6 +122,7 @@ struct KeeperInfo
 
 const std::map<ZombieClassType, KeeperInfo> KeeperClassInfo =
 {
+	{ ZOMBIE_CLASS_HUMAN,  { "random", "Random Zombie",0 } },
 	{ ZOMBIE_CLASS_TANK,  { "defaultzb", "#CSO_ZombieType_defaultz",0 } },
 	{ ZOMBIE_CLASS_SPEED,{ "lightzb", "#CSO_ZombieType_lightzb",3 } },
 	{ ZOMBIE_CLASS_HEAVY, { "heavyzb", "#CSO_ZombieType_heavyzb",9 } },

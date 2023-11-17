@@ -310,3 +310,4 @@ HOOK_EVENT(transformgunadv, FireTransformGunADV);
 HOOK_EVENT(y23s3buffm249, FireY23S3BUFFM249);
 HOOK_EVENT(dgaxe, FireDgaxe);
 HOOK_EVENT(linkattacksg, FireLinkAttackSG);
+HOOK_EVENT(petrolboomer, FirePetrolBoomer);

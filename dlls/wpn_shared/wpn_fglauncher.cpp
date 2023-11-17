@@ -198,8 +198,9 @@ namespace sv {
 			vecParticleVel,
 			300,
 			5,
-			1,
+			32,
 			2,
+			0,
 			0,
 			0,
 			0
@@ -222,8 +223,9 @@ namespace sv {
 			vecParticleVel,
 			300,
 			5,
-			1,
+			32,
 			2,
+			0,
 			0,
 			0,
 			0
@@ -279,26 +281,22 @@ namespace sv {
 	int CFGLauncher::GetItemInfo(ItemInfo* p)
 	{
 		p->pszName = STRING(pev->classname);
-		p->pszAmmo1 = "FgGrenade";
-		p->iMaxAmmo1 = 90;
+		p->pszAmmo1 = "FGLauncherRocket";
+		p->iMaxAmmo1 = 40;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = 10;
 		p->iSlot = 0;
-		p->iPosition = 12;
+		p->iPosition = 1;
 		p->iId = m_iId = WEAPON_FGLAUNCHER;
 		p->iFlags = 0;
-		p->iWeight = M3_WEIGHT;
+		p->iWeight = TMP_WEIGHT;
 
 		return 1;
 	}
 
 	BOOL CFGLauncher::Deploy(void)
 	{
-#ifndef CLIENT_DLL
-		m_pPlayer->UpdateShieldCrosshair(false);
-#endif
-
 		return DefaultDeploy("models/v_fglauncher.mdl", "models/p_fglauncher.mdl", FGLAUNCHER_DRAW, "m249", UseDecrement() != FALSE);
 	}
 

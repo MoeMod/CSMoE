@@ -426,6 +426,16 @@ ConstSprList s_ModelLinkAttackSGField_Sphere03 = {
 	}
 };
 
+ConstSprList s_ModelBuffClass23S3CT = {
+	"buffclass23s3ct.mdl",
+	"buffclass23s3ct.bmp",
+	"sprites/ef_buffclass23s3ct.spr",
+	30.0,
+	{
+		{ 200, false, true, 1.0, 0, 0, 0 },
+	}
+};
+
 
 std::vector<SprList> g_vecBindSprList;
 
@@ -474,6 +484,7 @@ void CBindSprManager::Vidinit(void)
 	LoadSpr(&s_ModelLinkAttackSGField_Sphere01);
 	LoadSpr(&s_ModelLinkAttackSGField_Sphere02);
 	LoadSpr(&s_ModelLinkAttackSGField_Sphere03);
+	LoadSpr(&s_ModelBuffClass23S3CT);
 }
 
 int CBindSprManager::LoadSpr(ConstSprList *List)

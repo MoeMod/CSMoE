@@ -69,6 +69,7 @@ const ClassInfo Class_TE[] = {
 	{"buffclass22s2tr"},
 	{"buffclass23s1tr"},
 	{"buffclass23s2tr"},
+	{"buffclass23s3tr"},
 
 };
 
@@ -110,6 +111,7 @@ const ClassInfo Class_CT[] = {
 	{"buffclass22s2ct"},
 	{"buffclass23s1ct"},
 	{"buffclass23s2ct"},
+	{"buffclass23s3ct"},
 };
 
 const ClassInfo Class_Zb[] = {

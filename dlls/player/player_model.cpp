@@ -100,6 +100,9 @@ void PlayerModel_Precache()
 		Client_ApperanceToModel(path, i, CT);
 		PRECACHE_MODEL(path);
 	}
+
+	PRECACHE_MODEL("sprites/ef_buffclass23s3ct.spr");
+	PRECACHE_MODEL("sprites/muzzleflash316.spr");
 }
 
 void PlayerModel_ForceUnmodified(const Vector &vMin, const Vector &vMax)
@@ -188,6 +191,10 @@ static std::map<ModelName, ClassData> gPlayerClass =
 	{ MODEL_BUFFCLASS23S1TR, { MODEL_BUFFCLASS23S1TR, "buffclass23s1tr", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault"}},
 	{ MODEL_BUFFCLASS23S2CT, { MODEL_BUFFCLASS23S2CT, "buffclass23s2ct", CT, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault" },},
 	{ MODEL_BUFFCLASS23S2TR, { MODEL_BUFFCLASS23S2TR, "buffclass23s2tr", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault"}},
+	{ MODEL_BUFFCLASS23S3CT, { MODEL_BUFFCLASS23S3CT, "buffclass23s3ct", CT, false, SHOW_SPEED | SHOW_DAMAGE, "buffdefault" },},
+	{ MODEL_BUFFCLASS23S3TR, { MODEL_BUFFCLASS23S3TR, "buffclass23s3tr", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault"}},
+	{ MODEL_HERO, { MODEL_HERO, "hero", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
+	{ MODEL_HEROINE, { MODEL_HEROINE, "heroine", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
 
 	/*{ MODEL_UNASSIGNED, { MODEL_UNASSIGNED, NULL, UNASSIGNED } },
 	{ MODEL_YURI, { MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE} },

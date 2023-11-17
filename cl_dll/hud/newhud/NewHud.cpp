@@ -78,7 +78,8 @@ int CHudNewHud::VidInit(void)
 
 void CHudNewHud::InitHUDData(void)
 {
-	m_szLastModel = "";
+	m_iLastZombieClass = 0;
+	m_szLastModel = "yuri";
 }
 
 int CHudNewHud::Draw(float flTime)
@@ -200,6 +201,12 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 	m_iWeaponBG->Draw2DQuadScaled(iX - iW, iY - iH, iX, iY);
 
 	int idx = gEngfuncs.GetLocalPlayer()->index;
+
+	if (idx < 0 || idx > 34)
+		return 1;
+
+	GetPlayerInfo(idx, &g_PlayerInfoList[idx]);
+
 	if (!g_PlayerInfoList[idx].model) {
 		return 1;
 	}

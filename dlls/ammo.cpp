@@ -2782,4 +2782,52 @@ BOOL CLinkAttackSGAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_linkattacksg, CLinkAttackSGAmmo);
+
+void CFGLauncherAmmo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CFGLauncherAmmo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CFGLauncherAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(10, "FGLauncherRocket", 40) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_fglauncher, CFGLauncherAmmo);
+
+void CPetrolBoomerAmmo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CPetrolBoomerAmmo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CPetrolBoomerAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(5, "petrolboomer", 20) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_petrolboomer, CPetrolBoomerAmmo);
 }

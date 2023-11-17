@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "weapons.h"
 
 #include "weapons/WeaponTemplate.hpp"
+#include "decals.h"
 
 
 #ifndef CLIENT_DLL
@@ -29,8 +30,8 @@ namespace sv {
 	{
 	public:
 		int GetWeaponsId(void) override { return WEAPON_PETROLBOOMER; }
-		KnockbackData GetKnockBackData() override { return { 700.0f, 450.0f, 600.0f, 450.0f, 0.6f }; }
-		float GetArmorRatioModifier() override { return 1.0; }
+		KnockbackData GetKnockBackData() override { return  { 375.0f, 270.0f, 300.0f, 120.0f, 0.5f }; }
+		float GetArmorRatioModifier() override { return 1.5; }
 
 		void Spawn() override
 		{
@@ -47,7 +48,7 @@ namespace sv {
 			UTIL_SetOrigin(pev, pev->origin);
 
 			SetThink(&CPetrolMine::PetrolMine_Think);
-			pev->nextthink = gpGlobals->time + 0.1;
+			pev->nextthink = gpGlobals->time + 0.1s;
 
 			SetTouch(NULL);
 			m_fLaunchTime = gpGlobals->time;
@@ -67,6 +68,8 @@ namespace sv {
 				return;
 			}
 
+			int flags = PARTICLE_ANIMATE | PARTICLE_ANIMATELOOP | PARTICLE_RANDOMANGLE;
+
 			switch (m_iPartEmitCount)
 			{
 			case 0:
@@ -80,14 +83,12 @@ namespace sv {
 				WRITE_BYTE(5);
 				MESSAGE_END();
 
-				UTIL_TempEmitToAttachment(
+				UTIL_TempEmit(
 					"sprites/burn7.spr",
-					entindex(),
-					0,
 					-1,
-					0.04,
-					0.4,
-					PARTICLE_ANIMATE | PARTICLE_ANIMATEDIE,
+					20,
+					3,
+					flags,
 					0,
 					15,
 					kRenderTransAdd,
@@ -96,26 +97,26 @@ namespace sv {
 					255.0,
 					255.0,
 					Vector(0.0, 0.0, 0.0),
-					Vector(0.0, 0.0, 10.0),
-					RANDOM_LONG(70, 120),
-					RANDOM_LONG(80, 100),
-					0.0,
-					0.0,
-					RANDOM_FLOAT(2.0, 5.0),
+					Vector(0.0, 0.0, 0.0),
+					RANDOM_LONG(700, 1200),
+					RANDOM_LONG(7, 9),
+					0,
+					RANDOM_LONG(5, 7),
+					0,
+					entindex(),
+					0,
 					0
 				);
 
 				break;
 
 			case 1:
-				UTIL_TempEmitToAttachment(
+				UTIL_TempEmit(
 					"sprites/burn5.spr",
-					entindex(),
-					0,
 					-1,
-					0.04,
-					0.4,
-					PARTICLE_ANIMATE | PARTICLE_ANIMATEDIE,
+					20,
+					3,
+					flags,
 					0,
 					15,
 					kRenderTransAdd,
@@ -125,25 +126,25 @@ namespace sv {
 					255.0,
 					Vector(-50.0, -50.0, 0.0),
 					Vector(0.0, 0.0, 10.0),
-					RANDOM_LONG(70, 120),
-					RANDOM_LONG(80, 100),
-					0.0,
-					0.0,
-					RANDOM_FLOAT(2.0, 5.0),
+					RANDOM_LONG(700, 1200),
+					RANDOM_LONG(7, 9),
+					0,
+					RANDOM_LONG(5, 7),
+					0,
+					entindex(),
+					0,
 					0
 				);
 
 				break;
 
 			case 2:
-				UTIL_TempEmitToAttachment(
+				UTIL_TempEmit(
 					"sprites/burn6.spr",
-					entindex(),
-					0,
 					-1,
-					0.04,
-					0.4,
-					PARTICLE_ANIMATE | PARTICLE_ANIMATEDIE,
+					20,
+					3,
+					flags,
 					0,
 					15,
 					kRenderTransAdd,
@@ -153,25 +154,25 @@ namespace sv {
 					255.0,
 					Vector(50.0, -50.0, 0.0),
 					Vector(0.0, 0.0, 10.0),
-					RANDOM_LONG(70, 120),
-					RANDOM_LONG(80, 100),
-					0.0,
-					0.0,
-					RANDOM_FLOAT(2.0, 5.0),
+					RANDOM_LONG(700, 1200),
+					RANDOM_LONG(7, 9),
+					0,
+					RANDOM_LONG(5, 7),
+					0,
+					entindex(),
+					0,
 					0
 				);
 
 				break;
 
 			case 3:
-				UTIL_TempEmitToAttachment(
+				UTIL_TempEmit(
 					"sprites/burn5.spr",
-					entindex(),
-					0,
 					-1,
-					0.04,
-					0.4,
-					PARTICLE_ANIMATE | PARTICLE_ANIMATEDIE,
+					20,
+					3,
+					flags,
 					0,
 					15,
 					kRenderTransAdd,
@@ -181,25 +182,25 @@ namespace sv {
 					255.0,
 					Vector(-50.0, 50.0, 0.0),
 					Vector(0.0, 0.0, 10.0),
-					RANDOM_LONG(70, 120),
-					RANDOM_LONG(80, 100),
-					0.0,
-					0.0,
-					RANDOM_FLOAT(2.0, 5.0),
+					RANDOM_LONG(700, 1200),
+					RANDOM_LONG(7, 9),
+					0,
+					RANDOM_LONG(5, 7),
+					0,
+					entindex(),
+					0,
 					0
 				);
 
 				break;
 
 			case 4:
-				UTIL_TempEmitToAttachment(
+				UTIL_TempEmit(
 					"sprites/burn6.spr",
-					entindex(),
-					0,
 					-1,
-					0.04,
-					0.4,
-					PARTICLE_ANIMATE | PARTICLE_ANIMATEDIE,
+					20,
+					3,
+					flags,
 					0,
 					15,
 					kRenderTransAdd,
@@ -209,11 +210,13 @@ namespace sv {
 					255.0,
 					Vector(50.0, 50.0, 0.0),
 					Vector(0.0, 0.0, 10.0),
-					RANDOM_LONG(70, 120),
-					RANDOM_LONG(80, 100),
-					0.0,
-					0.0,
-					RANDOM_FLOAT(2.0, 5.0),
+					RANDOM_LONG(700, 1200),
+					RANDOM_LONG(7, 9),
+					0,
+					RANDOM_LONG(5, 7),
+					0,
+					entindex(),
+					0,
 					0
 				);
 
@@ -226,13 +229,13 @@ namespace sv {
 			SetThink(&CPetrolMine::PetrolMine_Think);
 			if (++m_iPartEmitCount > 5)
 			{
-				pev->nextthink = gpGlobals->time + 0.5;
+				pev->nextthink = gpGlobals->time + 0.5s;
 
 				Attack(false);
 			}
 			else
 			{
-				pev->nextthink = gpGlobals->time + 0.1;
+				pev->nextthink = gpGlobals->time + 0.1s;
 			}
 		}
 
@@ -249,7 +252,11 @@ namespace sv {
 			const float flRange = 2.5 * 39.37;
 			int iCount = UTIL_EntitiesInBox(pList, 100, vecStart - Vector(flRange, flRange, flRange), vecStart + Vector(flRange, flRange, flRange), FL_CLIENT | FL_MONSTER);
 
-			if (UTIL_IsZombieMode())
+			if (g_pModRunning->DamageTrack() == DT_ZBS)
+			{
+				flDamage = bExplode ? 800.0 : 115.0;
+			}
+			else if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
 				flDamage = bExplode ? 150.0 : 125.0;
 			}
@@ -258,51 +265,41 @@ namespace sv {
 				flDamage = 10.0;
 			}
 
-			if (g_pGameRules->IsZombieMode())
+			CBasePlayer* pOwner = (CBasePlayer*)CBaseEntity::Instance(pev->owner);
+
+			if (pOwner)
 			{
-				if (g_pGameRulesZombi->IsCountingDown())
+				if (pOwner->IsPlayer() && pOwner->m_bIsZombie)
 					flDamage = 0.0;
-			}
 
-			if (pev->owner)
-			{
-				CBasePlayer* pOwner = (CBasePlayer*)CBaseEntity::Instance(pev->owner);
-
-				if (pOwner)
+				for (int i = 0; i < iCount; i++)
 				{
-					if (pOwner->IsPlayer() && pOwner->m_bIsZombie)
-						flDamage = 0.0;
+					CBaseEntity* pEntity = pList[i];
+
+					if (pEntity == this)
+						continue;
+
+					if (pEntity->pev->takedamage == DAMAGE_NO)
+						continue;
+
+					if (pEntity->edict() == pev->owner)
+						continue;
+
+					if (g_pGameRules->PlayerRelationship(pOwner, pEntity) == GR_TEAMMATE)
+						continue;
+
+					UTIL_TraceLine(vecStart, pEntity->BodyTarget(vecStart), dont_ignore_monsters, edict(), &tr);
+
+					if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+						continue;
+
+					pEntity->TakeDamage(pev, VARS(pev->owner), flDamage, DMG_GENERIC);
 				}
-			}
-			else
-			{
-				flDamage = 0.0;
-			}
-
-			for (int i = 0; i < iCount; i++)
-			{
-				CBaseEntity* pEntity = pList[i];
-
-				if (pEntity == this)
-					continue;
-
-				if (pEntity->pev->takedamage == DAMAGE_NO)
-					continue;
-
-				if (pEntity->edict() == pev->owner)
-					continue;
-
-				UTIL_TraceLine(vecStart, pEntity->BodyTarget(vecStart), dont_ignore_monsters, edict(), &tr);
-
-				if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
-					continue;
-
-				pEntity->TakeDamage(pev, VARS(pev->owner), flDamage, DMG_GENERIC);
 			}
 		}
 
 	public:
-		float m_fLaunchTime;
+		time_point_t m_fLaunchTime;
 		int m_iPartEmitCount;
 
 	};
@@ -312,9 +309,9 @@ namespace sv {
 	class CPetrolRocket : public CBaseEntity
 	{
 	public:
-		KnockbackData GetKnockBackData() override { return { 700.0f, 450.0f, 600.0f, 450.0f, 0.6f }; }
+		KnockbackData GetKnockBackData() override { return  { 375.0f, 270.0f, 300.0f, 120.0f, 0.5f }; }
 		int GetWeaponsId(void) override { return WEAPON_PETROLBOOMER; }
-		float GetArmorRatioModifier() override { return 1.7; }
+		float GetArmorRatioModifier() override { return 1.5; }
 
 		void Spawn() override
 		{
@@ -363,18 +360,16 @@ namespace sv {
 			if (!pOther)
 				return;
 
-			float flDamage;
+			float flDamage = 85.0f;
 
-			if (UTIL_IsZombieMode())
+			if (g_pModRunning->DamageTrack() == DT_ZBS)
 			{
-				flDamage = 190.0;
+				flDamage = 800.0f;
 			}
-			else
+			else if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
-				flDamage = 85.0;
+				flDamage = 190.0f;
 			}
-
-			m_flTouchDamage = flDamage;
 
 			entvars_t* pevOwner;
 			if (pev->owner)
@@ -387,15 +382,15 @@ namespace sv {
 				{
 					if (pOwner->IsPlayer() && pOwner->m_bIsZombie)
 						flDamage = 0.0;
-				}
 
-				if (pOther->pev != pevOwner && !pOther->IsDormant())
-				{
-					if (pOther->pev->takedamage != DAMAGE_NO)
+					if (pOther->pev != pevOwner && !pOther->IsDormant())
 					{
-						pOther->TakeDamage(pev, pevOwner, flDamage, DMG_GENERIC);
+						if (pOther->pev->takedamage != DAMAGE_NO)
+						{
+							pOther->TakeDamage(pev, pevOwner, flDamage, DMG_GENERIC);
+						}
 					}
-				}
+				}		
 			}
 			else
 			{
@@ -468,7 +463,7 @@ namespace sv {
 		void EXPORT FollowThink(void)
 		{
 			pev->angles = UTIL_VecToAngles(pev->velocity);
-			pev->nextthink = gpGlobals->time + 0.1;
+			pev->nextthink = gpGlobals->time + 0.1s;
 		}
 
 		void EXPORT IgniteThink(void)
@@ -497,41 +492,16 @@ namespace sv {
 			WRITE_BYTE(255); //g
 			WRITE_BYTE(255); //b
 			WRITE_BYTE(0); //randomcolor
-			WRITE_BYTE(100); //scale in 0.01's
-			WRITE_BYTE(6); //freq(time of one cycle) in 0.01's
+			WRITE_BYTE(20); //scale in 0.01's
+			WRITE_BYTE(4); //freq(time of one cycle) in 0.01's
 			WRITE_BYTE(3); //fadetime in 0.1s
-			WRITE_BYTE(1);  //count
+			WRITE_BYTE(2);  //count
 			WRITE_BYTE(0);  //random in org
 			WRITE_BYTE(0);  //speed (if>0 do slow gravity)
 			MESSAGE_END();
 
-			UTIL_TempEmitToAttachment(
-				"sprites/burn5.spr",
-				entindex(),
-				0,
-				-1,
-				0.001,
-				0.1,
-				PARTICLE_ANIMATE | PARTICLE_ANIMATEDIE,
-				0,
-				15,
-				kRenderTransAdd,
-				150.0,
-				255.0,
-				255.0,
-				255.0,
-				Vector(0.0, 0.0, 0.0),
-				Vector(0.0, 0.0, 0.0),
-				RANDOM_LONG(50, 100),
-				RANDOM_LONG(10, 20),
-				0.0,
-				0.0,
-				RANDOM_FLOAT(2.0, 5.0),
-				0
-			);
-
 			SetThink(&CPetrolRocket::FollowThink);
-			pev->nextthink = gpGlobals->time + 0.1;
+			pev->nextthink = gpGlobals->time + 0.1s;
 		}
 
 	public:
@@ -541,7 +511,7 @@ namespace sv {
 		Vector m_vecDirection;
 		int m_iPenetration;
 		int m_iTrail;
-		float m_flTouchDamage;
+		int m_iAttach;
 	};
 
 	LINK_ENTITY_TO_CLASS(petrol_rocket, CPetrolRocket);
@@ -553,7 +523,7 @@ namespace cl {
 #else
 namespace sv {
 #endif
-    class Cpetrolboomer : public LinkWeaponTemplate< Cpetrolboomer,
+    class CPetrolBoomer : public LinkWeaponTemplate< CPetrolBoomer,
             TGeneralData,
             BuildTGetItemInfoFromCSW<WEAPON_P90>::template type,
 			TPrecacheEvent,
@@ -578,13 +548,13 @@ namespace sv {
 		ANIM_DRAW_EMPTY,
 		ANIM_IDLE_EMPTY,
 	};
-	static constexpr float ArmorRatioModifier = 1.7f;
+	static constexpr float ArmorRatioModifier = 1.5f;
 
     static constexpr int DamageDefault = 133;
 	static constexpr int DamageZB = 2750;
     static constexpr int DamageZBS = 3750;
 
-    KnockbackData KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.9f };
+    KnockbackData KnockBack = { 375.0f, 270.0f, 300.0f, 120.0f, 0.5f };
 
 	int GetItemInfo(ItemInfo* p)
 	{
@@ -596,18 +566,18 @@ namespace sv {
 		p->iMaxClip = -1;
 		p->iSlot = 0;
 		p->iPosition = 16;
-		p->iId = m_iId = WEAPON_petrolboomer;
+		p->iId = m_iId = WEAPON_PETROLBOOMER;
 		p->iFlags = 0;
-		p->iWeight = P90_WEIGHT;
+		p->iWeight = AK47_WEIGHT;
 
 		return 1;
 	}
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_drill" , 180 }; }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_petrolboomer" , 200 }; }
 #endif
-	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 0 }; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 0 }; }
 
-	float GetArmorRatioModifier() override { return 1.7; }
+	float GetArmorRatioModifier() override { return 1.5; }
 
 	float GetMaxSpeed(void) override
 	{
@@ -620,7 +590,7 @@ namespace sv {
 	{
 		Base::Spawn();
 		m_iClip = WEAPON_NOCLIP;
-		m_iId = WEAPON_petrolboomer;
+		m_iId = WEAPON_PETROLBOOMER;
 		m_iDefaultAmmo = 20;
 	}
 
@@ -644,11 +614,15 @@ namespace sv {
 		m_iShotsFired = 0;
 		m_bDelayFire = false;
 		m_flReloadTime = invalid_time_point;
-		
+
+#ifndef CLIENT_DLL
+		m_pPlayer->UpdateShieldCrosshair(false);
+#endif
+
 		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
-			return DefaultDeploy(V_Model, P_MODEL, ANIM_DRAW, "carbine", UseDecrement() != FALSE);
+			return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "carbine", UseDecrement() != FALSE);
 		else
-			return DefaultDeploy(V_Model, P_MODEL, ANIM_DRAW_EMPTY, "carbine", UseDecrement() != FALSE);
+			return DefaultDeploy(V_Model, P_Model, ANIM_DRAW_EMPTY, "carbine", UseDecrement() != FALSE);
 	}
 
 	void PrimaryAttack() override
@@ -659,7 +633,7 @@ namespace sv {
 		m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 		
-		m_flReloadTime = gpGlobals->time + 1.0;
+		m_flReloadTime = gpGlobals->time + 1.0s;
 
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
@@ -672,7 +646,11 @@ namespace sv {
 			m_pPlayer->edict());
 
 		if (pRocket)
+		{
+			pRocket->pev->iuser4 = m_uiWeaponPaintType;
 			pRocket->Setup(m_pPlayer);
+		}
+			
 #endif
 
 		int flags;
@@ -683,10 +661,10 @@ namespace sv {
 		flags = 0;
 #endif
 
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFirePetrolBoomer, 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], FALSE, FALSE);
 
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 4.7;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.7;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 4.7s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.7s;
 
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 			KickBack(1.0, 1.0, 0.5, 0.5, 5.0, 5.0, 5);
@@ -734,5 +712,5 @@ namespace sv {
 	
 };
 
-LINK_ENTITY_TO_CLASS(weapon_petrolboomer, Cpetrolboomer)
+LINK_ENTITY_TO_CLASS(weapon_petrolboomer, CPetrolBoomer)
 }

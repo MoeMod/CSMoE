@@ -59,6 +59,7 @@ public:
 	void SetBanSlot(int i);
 	void ReSetBanSlot(int i);
 
+	size_t m_iCurrentPage;
 protected:
 	virtual void ApplySchemeSettings(vgui2::IScheme* pScheme) override;
 	vgui2::EditablePanel* m_pPanel;
@@ -70,7 +71,6 @@ private:
 
 	vgui2::Label* m_pTitleLabel;
 
-	size_t m_iCurrentPage;
 	bool m_bBanned[10];
 
 	struct ZombieKeeperSlot_s

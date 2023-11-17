@@ -3003,12 +3003,15 @@ void UTIL_SendAudio(CBaseEntity * pEntity, const char* msg_id, short pitch, bool
 }
 
 //for sound without precached
-void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float volume, float attenuation, int flags, int pitch, bool msg_one)
+void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float volume, float attenuation, int flags, int pitch, int type)
 {
-	if(msg_one)
-		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, entity);
+	if(!type)
+		MESSAGE_BEGIN(MSG_PAS, gmsgMPToCL, NULL, entity);		
+	else if (type == 2)
+		MESSAGE_BEGIN(MSG_BROADCAST, gmsgMPToCL, NULL, entity);
 	else
-		MESSAGE_BEGIN(MSG_PAS, gmsgMPToCL, NULL, entity);
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, entity);
+
 	WRITE_BYTE(78);
 	WRITE_SHORT(ENTINDEX(entity));
 	WRITE_BYTE(channel);
@@ -3020,12 +3023,12 @@ void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float vol
 	MESSAGE_END();
 }
 
-void UTIL_TempEmit(const char* model, int iEmitCounter, int fireDelay, int life, int spawnflags, int spin_speed, int framerate, int rendermode, int brightness, int r, int g, int b, Vector pos, Vector velocity, int velocity_variance, int scale, int fade_speed, int scale_speed, int fadeInSpeed, int attachment, int frameMax)
+void UTIL_TempEmit(const char* model, int iEmitCounter, int fireDelay, int life, int spawnflags, int spin_speed, int framerate, int rendermode, int brightness, int r, int g, int b, Vector pos, Vector velocity, int velocity_variance, int scale, int fade_speed, int scale_speed, int fadeInSpeed, int entity, int attachment, int frameMax)
 {
 	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 	WRITE_BYTE(TE_TEMPPARTICLE);
 	WRITE_STRING(model);
-	WRITE_SHORT(0);
+	WRITE_SHORT(entity);
 	WRITE_COORD(pos.x);
 	WRITE_COORD(pos.y);
 	WRITE_COORD(pos.z);
@@ -3035,7 +3038,7 @@ void UTIL_TempEmit(const char* model, int iEmitCounter, int fireDelay, int life,
 	WRITE_SHORT(iEmitCounter);
 	WRITE_BYTE(fireDelay);
 	WRITE_BYTE(life);
-	WRITE_SHORT(spawnflags);
+	WRITE_LONG(spawnflags);
 	WRITE_BYTE(spin_speed);
 	WRITE_BYTE(framerate);
 	WRITE_BYTE(rendermode);

@@ -566,12 +566,12 @@ namespace sv {
 
             if (context.item("firstperson", "第一人称视角"))
             {
-                adminid->ClientCommand("firstperson");
+                CLIENT_COMMAND(adminid->edict(), "firstperson\n");
             }
 
             if (context.item("thirdperson", "第三人称视角"))
             {
-                adminid->ClientCommand("thirdperson");
+                CLIENT_COMMAND(adminid->edict(), "thirdperson\n");
             }
             
             context.end(adminid);

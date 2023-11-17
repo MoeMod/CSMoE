@@ -2468,7 +2468,7 @@ void R_TempParticle(sizebuf_t* msg)
 	emitCount = BF_ReadShort(msg);
 	fireDelay = BF_ReadByte(msg) * 0.01;
 	life = BF_ReadByte(msg) * 0.1;
-	flags = BF_ReadShort(msg);
+	flags = BF_ReadLong(msg);
 	spinSpeed = float(BF_ReadByte(msg));
 	framerate = float(BF_ReadByte(msg));
 	rendermode = BF_ReadByte(msg);
@@ -2486,7 +2486,7 @@ void R_TempParticle(sizebuf_t* msg)
 	attachment = BF_ReadByte(msg);
 	frameMax = BF_ReadShort(msg);
 
-	CL_TempParticle(modelName, pos, velocity, color, life, framerate, brightness, rendermode, entity, fadeSpeed, fadeInSpeed, scale, frameMax, flags, emitCount, fireDelay, attachment, spinSpeed, velocityVariance, scaleSpeed);
+	CL_TempParticle(modelName, pos, velocity, color, life, framerate, brightness, rendermode, entity, fadeSpeed, fadeInSpeed, scale, frameMax, flags, emitCount, emitCount, fireDelay, attachment, spinSpeed, velocityVariance, scaleSpeed);
 }
 
 void TempParticleCallBack(TEMPENTITY* ent, float frametime, float currenttime)
@@ -2495,43 +2495,78 @@ void TempParticleCallBack(TEMPENTITY* ent, float frametime, float currenttime)
 	ent->entity.curstate.scale += scaleSpeed;
 
 	int emitCount = ent->entity.curstate.iuser1;
+	int emitPos = ent->entity.curstate.iuser2;
 	float appearTime = ent->entity.curstate.fuser4;
 
-	if (appearTime > cl.time || appearTime == -1.0)
+	if (appearTime > cl.time || !appearTime)
 		return;
 
-	if (emitCount <= 0)
+	if (emitPos <= 0 && emitCount != -1)	//-1 拖尾，跟随实体引爆消失TODO, > 0释放若干个，礼花发射器 或 地上的火焰跟随attachment
 		return;
 
-	emitCount--;
+	if (emitPos > 0)
+		emitPos--;
+
+	int entity = ent->clientIndex;
+	int flags = ent->entity.curstate.iuser4;	//avoid flags change
+
+	if (entity)
+	{
+		cl_entity_t* pEnt = CL_GetEntityByIndex(entity);
+
+		if (!pEnt)
+			return;
+
+		if (CL_GetLocalPlayer()->curstate.messagenum != pEnt->curstate.messagenum)
+		{
+			if (!(flags & PARTICLE_PERSIST))
+			{
+				emitPos = 0;
+				emitCount = 0;
+			}
+
+			return;
+		}
+	}
 
 	const char* modelname = ent->entity.model->name;
-	vec3_t pos = ent->entity.curstate.vuser1;
+
 	vec3_t velocity = ent->entity.curstate.vuser2;
-	vec3_t color = ent->entity.curstate.vuser3;
+	vec3_t color, pos;
+	color[0] = ent->entity.curstate.rendercolor.r;
+	color[1] = ent->entity.curstate.rendercolor.g;
+	color[2] = ent->entity.curstate.rendercolor.b;
+
 	float life = ent->entity.curstate.vuser4.x;
-	int brightness = ent->entity.curstate.iuser2;
+	int brightness = int(ent->entity.curstate.vuser3.y);
 	int rendermode = ent->entity.curstate.rendermode;
 
 	float framerate = ent->entity.curstate.framerate;
-	int entity = ent->clientIndex;
-	float fadeSpeed = ent->entity.curstate.vuser4.y;
+	float fadeSpeed = ent->entity.curstate.vuser3.x;
 	float fadeInSpeed = ent->entity.baseline.fuser1;
 	float scale = ent->entity.curstate.vuser4.y;
 	int frameMax = ent->frameMax;
-	int flags = ent->flags;
+	
 	float fireDelay = ent->entity.curstate.fuser3;
 	int attachment = ent->entity.curstate.iuser3;
 	float spinSpeed = ent->entity.baseline.angles.x;
 	float velocityVariance = ent->entity.curstate.vuser4.z;
 
 	ent->entity.curstate.iuser1 = emitCount;
+	ent->entity.curstate.iuser2 = emitPos;
 	ent->entity.curstate.fuser4 = cl.time + fireDelay;
-	
-	CL_TempParticle(modelname, pos, velocity, color, life, framerate, brightness, rendermode, entity, fadeSpeed, fadeInSpeed, scale, frameMax, flags, 0, -1.0, attachment, spinSpeed, velocityVariance, scaleSpeed);
+	pos = ent->entity.curstate.vuser1;
+
+	if (emitCount != emitPos && emitCount > 0)
+	{
+		//保证子实体不再产生新的，礼花发射器，保证子实体全是母实体生成
+		emitPos = 0;
+	}
+
+	CL_TempParticle(modelname, pos, velocity, color, life, framerate, brightness, rendermode, entity, fadeSpeed, fadeInSpeed, scale, frameMax, flags, emitCount, emitPos, fireDelay, attachment, spinSpeed, velocityVariance, scaleSpeed);
 }
 
-TEMPENTITY* GAME_EXPORT CL_TempParticle(const char* modelname, const vec3_t pos, const vec3_t velocity, const vec3_t color, float life, float framerate, int brightness, int rendermode, int entity, float fadeSpeed, float fadeInSpeed, float scale, int frameMax, int flags, int emitCount, float fireDelay, int attachment, float spinSpeed, float velocityVariance, float scaleSpeed)
+TEMPENTITY* GAME_EXPORT CL_TempParticle(const char* modelname, const vec3_t pos, const vec3_t velocity, const vec3_t color, float life, float framerate, int brightness, int rendermode, int entity, float fadeSpeed, float fadeInSpeed, float scale, int frameMax, int flags, int emitCount, int emitPos, float fireDelay, int attachment, float spinSpeed, float velocityVariance, float scaleSpeed)
 {
 	struct model_s* pModel;
 
@@ -2563,10 +2598,6 @@ TEMPENTITY* GAME_EXPORT CL_TempParticle(const char* modelname, const vec3_t pos,
 		{
 			MsgDev(D_INFO, "No Client %d!\n", entity);
 		}
-		else
-		{
-			pTemp->entity.origin = ent->attachment[attachment];
-		}	
 	}
 
 	int frameCount = pModel->numframes;
@@ -2604,19 +2635,16 @@ TEMPENTITY* GAME_EXPORT CL_TempParticle(const char* modelname, const vec3_t pos,
 	pTemp->entity.curstate.fuser3 = fireDelay;
 	pTemp->entity.curstate.fuser4 = cl.time + fireDelay;
 	pTemp->entity.curstate.iuser1 = emitCount;
-	pTemp->entity.curstate.iuser2 = brightness;
+	pTemp->entity.curstate.iuser2 = emitPos;
 	pTemp->entity.curstate.iuser3 = attachment;
-	//pTemp->entity.curstate.iuser4 = ;
+	pTemp->entity.curstate.iuser4 = flags;
 	pTemp->entity.curstate.vuser1 = pos;
 	pTemp->entity.curstate.vuser2 = velocity;
-	pTemp->entity.curstate.vuser3 = color;
+	pTemp->entity.curstate.vuser3.x = fadeSpeed;
+	pTemp->entity.curstate.vuser3.y = brightness;
 	pTemp->entity.curstate.vuser4.x = life;
 	pTemp->entity.curstate.vuser4.y = scale;
 	pTemp->entity.curstate.vuser4.z = velocityVariance;
-
-	
-	if (flags > 0)
-		pTemp->flags |= flags;
 
 	pTemp->die = cl.time + life;
 

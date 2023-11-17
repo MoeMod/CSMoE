@@ -371,11 +371,16 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 			//(将字符串里的字母和下划线去掉)仅保留数字.
 			sscanf(pcmd, "%*[A-Za-z_]%31[0-9]", pCmdString);
 			//将（string）“数字”转为（int） 数字
-			iCmd = std::stoi(pCmdString) + 1;
+			iCmd = std::stoi(pCmdString);
 
 
 			auto AbsZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, ZombieClassType(iCmd));
 			
+			if (!AbsZombie)
+			{
+				AbsZombie = ZombieClassFactory(m_pPlayer->m_iZombieLevel, ZOMBIE_CLASS_TANK);
+			}
+
 			m_pCharacter_ZB2 = AbsZombie;
 			m_pCharacter = AbsZombie;
 			AbsZombie->InitHUD();
@@ -545,7 +550,6 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_ZOMBIESELECTOR); // TYPE
 	WRITE_COORD(8.0);
-	WRITE_BYTE((!m_pPlayer->IsUsingPC()) ? 0 : 1);
 	MESSAGE_END();
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);

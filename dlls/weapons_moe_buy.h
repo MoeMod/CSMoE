@@ -378,6 +378,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_LINKATTACKSG, "weapon_linkattacksg",         "【星域】霰弹枪",                  6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN ,23 },
 	{ WEAPON_FGLAUNCHER, "weapon_fglauncher",        "礼花发射器",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ KNIFE_ARMTORCH, "knife_armtorch",    "爆焰火拳",	0, KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
+	{ WEAPON_PETROLBOOMER, "weapon_petrolboomer",         "暴风烈焰",                  7900, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP ,3 },
 #endif
 };
 

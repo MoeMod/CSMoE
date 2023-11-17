@@ -85,6 +85,7 @@ void CHudViewport::CreateDefaultPanels()
     AddNewPanel(CreatePanelByName(PANEL_TEAM));
     AddNewPanel(CreatePanelByName(PANEL_CLASS));
     AddNewPanel(CreatePanelByName(PANEL_BUY));
+    AddNewPanel(CreatePanelByName(PANEL_ZOMBIEKEEPER));
     //AddNewPanel(CreatePanelByName(VIEWPORT_PANEL_SCORE));
 
 	AddNewGameUIPanel(CreateGameUIPanelByName("GameUITestPanel"));
@@ -136,6 +137,7 @@ IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
         if (!m_pZombieKeeperMenu)
         {
             m_pZombieKeeperMenu = new CZb2ZombieKeeper();
+            m_pZombieKeeperMenu->m_iCurrentPage = 0;
             m_pZombieKeeperMenu->SetupPage(0);
         }
         pPanel = m_pZombieKeeperMenu;
@@ -235,6 +237,7 @@ bool CHudViewport::ShowVGUIMenu(int iMenu)
         case MENU_MOBILE_ZOMBIEKEEPER:
         {
             panel = m_pZombieKeeperMenu;
+            m_pZombieKeeperMenu->m_iCurrentPage = 0;
             m_pZombieKeeperMenu->SetupPage(0);
             //cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + 20.0;
 
@@ -286,6 +289,10 @@ bool CHudViewport::HideVGUIMenu(int iMenu)
         case MENU_BUY_ITEM:
         {
             panel = m_pBuyMenu;
+        }
+        case MENU_MOBILE_ZOMBIEKEEPER:
+        {
+            panel = m_pZombieKeeperMenu;
         }
     }
 

@@ -691,6 +691,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_dgaxeex.cpp
 	../dlls/wpn_shared/wpn_linkattacksg.cpp
 	../dlls/wpn_shared/knife_armtorch.cpp
+	../dlls/wpn_shared/wpn_petrolboomer.cpp
 	)
 
 set(PM_SRCS

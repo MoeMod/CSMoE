@@ -226,7 +226,7 @@ struct efx_api_s
 	TEMPENTITY* (*R_AttachTentToModel)			(int clientindex, int iAttachment, float life, int modelIndex, float framerate, int brightness, int rendermode, float scale, int frameMax, int flags, int eflags);
 	BEAM* (*R_BeamPoints_Tracer)		(const vec3_t start, const vec3_t end, int modelIndex, float life, float width, float length, float amplitude, float brightness, float speed, int startFrame, float framerate, float r, float g, float b);
 	void		(*R_KillNamedAttachedTents)		(int client, int modelIndex);
-	TEMPENTITY* (*R_TempParticle)	(const char* modelname, const vec3_t pos, const vec3_t velocity, const vec3_t color, float life, float framerate, int brightness, int rendermode, int entity, float fadeSpeed, float fadeInSpeed, float scale, int frameMax, int flags, int emitCount, float fireDelay, int attachment, float spinSpeed, float velocityVariance, float scaleSpeed);
+	TEMPENTITY* (*R_TempParticle)	(const char* modelname, const vec3_t pos, const vec3_t velocity, const vec3_t color, float life, float framerate, int brightness, int rendermode, int entity, float fadeSpeed, float fadeInSpeed, float scale, int frameMax, int flags, int emitCount, int emitPos, float fireDelay, int attachment, float spinSpeed, float velocityVariance, float scaleSpeed);
 };
 
 extern efx_api_t efx;

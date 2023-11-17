@@ -175,7 +175,7 @@ typedef enum
 // config strings are a general means of communication from
 // the server to all connected clients.
 // each config string can be at most CS_SIZE characters.
-#define CS_SIZE		64	// size of one config string
+#define CS_SIZE		96	// size of one config string
 #define CS_TIME		16	// size of time string
 
 #define MAX_DECALS		1024	// touching TE_DECAL messages, etc

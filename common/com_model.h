@@ -37,6 +37,8 @@
 #define	MAXLIGHTMAPS		4
 #define	NUM_AMBIENTS		4		// automatic ambient sounds
 
+#define CS_SIZE			96	// size of one config string
+
 typedef enum
 {
 	mod_bad = -1,
@@ -384,7 +386,7 @@ typedef struct player_info_s
 	int		packet_loss;
 
 	// skin information
-	char	model[64];
+	char	model[CS_SIZE];
 	int		topcolor;
 	int		bottomcolor;
 

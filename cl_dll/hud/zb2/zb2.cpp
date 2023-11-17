@@ -24,6 +24,7 @@ GNU General Public License for more details.
 #include "hud_sub_impl.h"
 #include "player/player_model.h"
 #include "gamemode/zb2/zb2_const.h"
+#include "CBaseViewport.h"
 
 #include <vector>
 #include <calcscreen.h>
@@ -175,16 +176,15 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 	{
 
 		float flHoldTime = buf.ReadCoord();
-		int iIsPc = buf.ReadByte();
 
 		cl::gHUD.m_flZombieSelectTime = cl::gHUD.m_flTime + flHoldTime;
-		if (iIsPc)
+		if (!gEngfuncs.pfnGetCvarPointer("touch_enable")->value)
 		{
 			SetSelectorDrawTime(gHUD.m_flTime, flHoldTime);
 		}
 		else
 		{
-			ClientCmd("showvguimenu2 ZombieKeeper");
+			g_pViewport->ShowVGUIMenu(MENU_MOBILE_ZOMBIEKEEPER);
 		}
 		
 		
@@ -763,7 +763,7 @@ bool CHudZB2::Selector(int item)
 			if (m_iLevel[iNum] > gHUD.m_iZlevel && gHUD.m_iModRunning == MOD_ZBZ)
 				return false;
 
-			sprintf(ch, "BTE_Zb_Select_Zombie%d\n", iNum);
+			sprintf(ch, "BTE_Zb_Select_Zombie%d\n", iNum + 1);
 			gEngfuncs.pfnClientCmd(ch);
 
 			/*char SzText[128]; sprintf(SzText, "Choose %d || Current Choice %d  \n", item, iNum);

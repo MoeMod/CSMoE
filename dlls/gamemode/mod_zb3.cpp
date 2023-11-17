@@ -42,6 +42,7 @@ GNU General Public License for more details.
 #include "zb2/zb2_zclass_boomer.h"
 #include "zb2/zb2_zclass_spider.h"
 #include "zb2/zb2_zclass_siren.h"
+#include "player/player_model.h"
 #include "weapons_moe_buy.h"
 
 #include "util/u_range.hpp"
@@ -375,7 +376,14 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 	m_pPlayer->pev->max_health = 10000.0f;
 	m_pPlayer->pev->health += 2000.0f;
 	m_pPlayer->pev->armorvalue = 1000.0f;
+
+	m_pPlayer->m_iOldModelName = m_pPlayer->m_iModelName;
+	m_pPlayer->m_iModelName = m_pPlayer->m_bIsFemale ? MODEL_HEROINE : MODEL_HERO;
+
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", m_pPlayer->m_bIsFemale ? "heroine" : "hero");
+	m_pPlayer->SetNewPlayerModel(m_pPlayer->m_bIsFemale ? "models/player/heroine/heroine.mdl" : "models/player/hero/hero.mdl");
+
+	PlayerClassManager().SetPlayerClass(m_pPlayer->entindex(), m_pPlayer->m_iModelName);
 
 	DropPrimary(m_pPlayer);
 	int iAmount = 0;

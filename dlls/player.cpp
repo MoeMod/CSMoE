@@ -192,6 +192,15 @@ CBasePlayer::~CBasePlayer() = default;
 
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
+	if (m_iModelName == MODEL_HERO ||
+		m_iModelName == MODEL_HEROINE)
+	{
+		m_iModelName = m_iOldModelName;
+
+		PlayerClassManager().SetPlayerClass(entindex(), m_iModelName);
+	}
+		
+
 	char *infobuffer = GET_INFO_BUFFER(edict());
 	
 #if PLAYER_CLASS_SYSTEM

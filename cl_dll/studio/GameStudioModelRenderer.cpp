@@ -129,6 +129,8 @@ TEMPENTITY* g_Y23S3BUFFM249Fire = NULL;
 TEMPENTITY* g_DgaxeEXMuzzL = NULL;	//333
 TEMPENTITY* g_DgaxeEXMuzzR = NULL;	//334
 
+TEMPENTITY* g_PetrolBoomerMuzzle = NULL;
+
 float g_flBloodhunterAnimTime = 0.0;
 int g_iBloodhunterSecAnim = 0;
 int g_iBloodhunterState = 0;
@@ -2664,6 +2666,42 @@ int R_StudioDrawModel(int flags)
 			{
 				g_DgaxeEXMuzzR->die = 0.0;
 				g_DgaxeEXMuzzR = NULL;
+			}
+		}
+
+		if (CStudioModelRenderer::s_pPetrolBoomerViewModel && CStudioModelRenderer::s_pPetrolBoomerMuzzleModel && curent->model == CStudioModelRenderer::s_pPetrolBoomerViewModel && (curent->curstate.sequence == 0  || curent->curstate.sequence == 2 || curent->curstate.sequence == 3))
+		{
+			if (!g_PetrolBoomerMuzzle)
+			{
+				g_PetrolBoomerMuzzle = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], CStudioModelRenderer::s_pPetrolBoomerMuzzleModel);
+
+				if (g_PetrolBoomerMuzzle)
+				{
+					g_PetrolBoomerMuzzle->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					g_PetrolBoomerMuzzle->entity.curstate.aiment = curent->index;
+					g_PetrolBoomerMuzzle->entity.curstate.body = 2;
+					g_PetrolBoomerMuzzle->entity.curstate.rendermode = kRenderGlow;
+					g_PetrolBoomerMuzzle->entity.curstate.renderamt = 255;
+					g_PetrolBoomerMuzzle->entity.curstate.renderfx = 0;
+					g_PetrolBoomerMuzzle->entity.curstate.scale = 0.04;
+					g_PetrolBoomerMuzzle->entity.curstate.framerate = 24;
+					g_PetrolBoomerMuzzle->entity.curstate.rendercolor.r = g_PetrolBoomerMuzzle->entity.curstate.rendercolor.g = g_PetrolBoomerMuzzle->entity.curstate.rendercolor.b = 255;
+					g_PetrolBoomerMuzzle->frameMax = 16;
+					g_PetrolBoomerMuzzle->die = gHUD.m_flTime + 9999.0f;
+					g_PetrolBoomerMuzzle->entity.curstate.eflags |= EFLAG_AFTER_VIEWMODEL | EFLAG_DEPTH_CHANGED;
+					g_PetrolBoomerMuzzle->entity.curstate.weaponmodel = curent->curstate.weaponmodel;
+
+					g_PetrolBoomerMuzzle->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+
+			}
+		}
+		else
+		{
+			if (g_PetrolBoomerMuzzle)
+			{
+				g_PetrolBoomerMuzzle->die = 0.0;
+				g_PetrolBoomerMuzzle = NULL;
 			}
 		}
 	}

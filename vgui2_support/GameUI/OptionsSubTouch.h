@@ -48,11 +48,14 @@ private:
 	CCvarSlider* m_pPowerSlider;
 	CCvarSlider* m_pMultiplierSlider;
 	CCvarSlider* m_pExponentSlider;
+	CCvarSlider* m_pGyroscopePitchSlider;
+	CCvarSlider* m_pGyroscopeYawSlider;
 
 	CCvarToggleCheckButton* m_pGridButton;
 	CCvarToggleCheckButton* m_pEnableTouchButton;
 	CCvarToggleCheckButton* m_pNomouseButton;
 	CCvarToggleCheckButton* m_pAccelerationButton;
+	CCvarToggleCheckButton* m_pGyroscopeButton;
 
 	//CCvarTextEntry* m_pProfileName;
 

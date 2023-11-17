@@ -173,6 +173,8 @@ public:
 	static struct model_s* s_pDgaxeEXMuzzRModel;
 	static struct model_s* s_pLinkAttackSGViewModel;
 	static struct model_s* s_pLinkAttackSGPartModel;
+	static struct model_s* s_pPetrolBoomerViewModel;
+	static struct model_s* s_pPetrolBoomerMuzzleModel;
 };
 
 }

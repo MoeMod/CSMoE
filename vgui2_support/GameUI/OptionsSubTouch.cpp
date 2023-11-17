@@ -38,6 +38,12 @@ COptionsSubTouch::COptionsSubTouch(vgui2::Panel *parent) : PropertyPage(parent, 
 	m_pExponentSlider = new CCvarSlider(this, "Exponent Slider", "#GameUI_Exponent",
 		0.0f, 100.0f, "touch_exp_mult");
 
+	m_pGyroscopePitchSlider = new CCvarSlider(this, "GyroscopePitch Slider", "#GameUI_GyroscopePitch",
+		0.0f, 1.0f, "gyroscope_pitch");
+
+	m_pGyroscopeYawSlider = new CCvarSlider(this, "GyroscopeYaw Slider", "#GameUI_GyroscopeYaw",
+		0.0f, 1.0f, "gyroscope_yaw");
+
 	m_pGridButton = new  CCvarToggleCheckButton(
 		this,
 		"EnableGrid",
@@ -62,6 +68,12 @@ COptionsSubTouch::COptionsSubTouch(vgui2::Panel *parent) : PropertyPage(parent, 
 		"#GameUI_EnableAcceleration",
 		"touch_nonlinear_look");
 
+	m_pGyroscopeButton = new  CCvarToggleCheckButton(
+		this,
+		"EnableGyroscope",
+		"#GameUI_EnableGyroscope",
+		"gyroscope_enable");
+
 	//m_pProfileName = new CCvarTextEntry(this, "NameEntry", "name");
 
 	LoadControlSettings("Resource/optionssubtouch.res");
@@ -80,10 +92,13 @@ void COptionsSubTouch::OnResetData()
 	m_pPowerSlider->Reset();
 	m_pMultiplierSlider->Reset();
 	m_pExponentSlider->Reset();
+	m_pGyroscopePitchSlider->Reset();
+	m_pGyroscopeYawSlider->Reset();
 	m_pGridButton->Reset();
 	m_pEnableTouchButton->Reset();
 	m_pNomouseButton->Reset();
 	m_pAccelerationButton->Reset();
+	m_pGyroscopeButton->Reset();
 }
 
 void COptionsSubTouch::OnApplyChanges()
@@ -95,10 +110,13 @@ void COptionsSubTouch::OnApplyChanges()
 	m_pPowerSlider->ApplyChanges();
 	m_pMultiplierSlider->ApplyChanges();
 	m_pExponentSlider->ApplyChanges();
+	m_pGyroscopePitchSlider->ApplyChanges();
+	m_pGyroscopeYawSlider->ApplyChanges();
 	m_pGridButton->ApplyChanges();
 	m_pEnableTouchButton->ApplyChanges();
 	m_pNomouseButton->ApplyChanges();
 	m_pAccelerationButton->ApplyChanges();
+	m_pGyroscopeButton->ApplyChanges();
 }
 
 void COptionsSubTouch::OnControlModified()

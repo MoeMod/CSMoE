@@ -150,6 +150,9 @@ struct model_s* CStudioModelRenderer::s_pDgaxeEXMuzzRModel;
 struct model_s* CStudioModelRenderer::s_pLinkAttackSGViewModel;
 struct model_s* CStudioModelRenderer::s_pLinkAttackSGPartModel;
 
+struct model_s* CStudioModelRenderer::s_pPetrolBoomerViewModel;
+struct model_s* CStudioModelRenderer::s_pPetrolBoomerMuzzleModel;
+
 int g_iLeapStrikeGunAnim = 0;
 float g_iLeapStrikeGunAnimTime = 0.0;
 
