@@ -676,7 +676,12 @@ void SanityCheckNavigationMap(const char *mapName)
 	char navFilename[BufLen];
 
 	Q_snprintf(bspFilename, BufLen, "maps\\%s.bsp", mapName);
-	Q_snprintf(navFilename, BufLen, "maps\\%s.nav", mapName);
+	Q_snprintf(navFilename, BufLen, "maps\\%s.znav", mapName);
+
+	int fileDataLength;
+	byte* fileData = (byte*)LOAD_FILE_FOR_ME(const_cast<char*>(navFilename), &fileDataLength);
+	if (!fileData)
+		Q_sprintf(navFilename, "maps\\%s.nav", mapName);
 
 	SteamFile navFile(navFilename);
 
@@ -740,7 +745,12 @@ NavErrorType LoadNavigationMap()
 
 	// nav filename is derived from map filename
 	char filename[256];
-	Q_sprintf(filename, "maps\\%s.nav", STRING(gpGlobals->mapname));
+	Q_sprintf(filename, "maps\\%s.znav", STRING(gpGlobals->mapname));
+
+	int fileDataLength;
+	byte* fileData = (byte*)LOAD_FILE_FOR_ME(const_cast<char*>(filename), &fileDataLength);
+	if (!fileData)
+		Q_sprintf(filename, "maps\\%s.nav", STRING(gpGlobals->mapname));
 
 	// free previous navigation map data
 	DestroyNavigationMap();
