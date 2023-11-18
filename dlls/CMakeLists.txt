@@ -692,6 +692,16 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_linkattacksg.cpp
 	../dlls/wpn_shared/knife_armtorch.cpp
 	../dlls/wpn_shared/wpn_petrolboomer.cpp
+	../dlls/wpn_shared/wpn_magicmg.cpp
+	../dlls/wpn_shared/z4b_vk47.cpp
+	../dlls/wpn_shared/wpn_sflaser.cpp
+	../dlls/wpn_shared/wpn_augex.cpp
+	../dlls/wpn_shared/wpn_dbarrel.cpp
+	../dlls/wpn_shared/wpn_ksg12.cpp
+	../dlls/wpn_shared/wpn_turbulent11.cpp
+	../dlls/wpn_shared/wpn_usas12.cpp
+	../dlls/wpn_shared/z4b_vk47.cpp
+	../dlls/wpn_shared/wpn_sterlingbayonet.cpp
 	)
 
 set(PM_SRCS

@@ -40,6 +40,7 @@ extern triangleapi_t gTriApi;
 #ifdef XASH_RAGDOLL
 #include "physics.h"
 #endif
+#include "../../dlls/weapons_const.h"
 
 #define EVENT_CLIENT	5000	// less than this value it's a server-side studio events
 #define LEGS_BONES_COUNT	8
@@ -1915,6 +1916,52 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		}
 		//handtexture system end
+
+		static int iClipOld = -1;
+
+		int WeaponID, KnifeID, GrenadeID;
+		pStudioDraw->StudioGetWeaponID(WeaponID, KnifeID, GrenadeID);
+
+		if (WeaponID == WEAPON_Z4B_VK47)
+		{
+			if (!Q_strcmp(ptexture[pskinref[pmesh->skinref]].name, "number_A.bmp"))
+			{
+
+				iClipOld = pStudioDraw->StudioGetWeaponAmmo();
+
+				const char* pszFileName = va("models/number/+%d.tga", int(iClipOld % 100 / 10));
+
+				if (pszFileName != nullptr)
+				{
+					texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+					if (texnum)
+					{
+						//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+						bBindTex = true;
+					}
+				}
+
+			}
+
+			if (!Q_strcmp(ptexture[pskinref[pmesh->skinref]].name, "number_B.bmp"))
+			{
+
+				iClipOld = pStudioDraw->StudioGetWeaponAmmo();
+
+				const char* pszFileName = va("models/number/+%d.tga", iClipOld % 10);
+
+				if (pszFileName != nullptr)
+				{
+					texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+					if (texnum)
+					{
+						//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+						bBindTex = true;
+					}
+				}
+
+			}
+		}
 
 		//weaponpaint system start
 		if (RI.currententity->curstate.iuser4 > 700)

@@ -188,6 +188,8 @@ typedef struct r_studio_interface_s
 	int (*StudioDrawPlayer)(int flags, struct entity_state_s *pplayer);
 	int (*StudioGetPlayerClassID)(int playerid);
 	const char* (*StudioGetReplacedTexName)(int itemid, int texID, const char* modelname);
+	int (*StudioGetWeaponAmmo)(void);
+	int (*StudioGetWeaponID)(int& WeaponID, int& KnifeID, int& GrenadeID);
 
 } r_studio_interface_t;
 

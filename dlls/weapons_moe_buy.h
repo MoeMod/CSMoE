@@ -379,6 +379,15 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_FGLAUNCHER, "weapon_fglauncher",        "礼花发射器",                  6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	{ KNIFE_ARMTORCH, "knife_armtorch",    "爆焰火拳",	0, KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE },
 	{ WEAPON_PETROLBOOMER, "weapon_petrolboomer",         "暴风烈焰",                  7900, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP ,3 },
+	{ WEAPON_USAS12, "weapon_usas12",        "USAS12",                 3350, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN , 1 },
+	{ WEAPON_TURBULENT11, "weapon_turbulent1",        "飞瀑Turbulent-11",                 5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN ,3 },
+	{ WEAPON_KSG12, "weapon_ksg12",         "灼热剃刀KSG12",           2800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN ,3 },
+	{ WEAPON_DBARREL, "weapon_dbarrel",         "破碎炙炎DoubleBarrel",           2500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN ,3 },
+	{ WEAPON_Z4B_VK47, "z4b_vk47",      "平行步枪",    2500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE ,2 },
+	{ WEAPON_STERLINGBAYONET, "weapon_sterlingbayonet",        "斯特林-断剑",     5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG , 1 },
+	{ WEAPON_AUGEX, "weapon_augex",      "强袭AUG",               5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE , 3 },
+	{ WEAPON_MAGICMG, "weapon_magicmg",         "红宝石之心",                  5700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG ,15 },
+	{ WEAPON_SFLASER, "weapon_sflaser",      "粒子风暴",               6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE ,3 },
 #endif
 };
 

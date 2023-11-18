@@ -100,6 +100,26 @@ void CBTEClientWeapons::ActiveWeapon(const char *name)
 	
 }
 
+int CBTEClientWeapons::GetActiveWeaponID(int& WeaponID, int& KnifeID, int& GrenadeID)
+{
+	if (!m_pActiveWeapon)
+		return 0;
+
+	WeaponID = m_pActiveWeapon->m_iId;
+	KnifeID = GrenadeID = 0;
+	if (WeaponID == WEAPON_KNIFE)
+	{
+		KnifeID = m_pActiveWeapon->m_iKnifeID;
+	}
+
+	if (WeaponID == WEAPON_HEGRENADE)
+	{
+		GrenadeID = m_pActiveWeapon->m_iGrenadeID;
+	}
+	
+	return 1;
+}
+
 /*
 	Message Handlers
 */

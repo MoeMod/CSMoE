@@ -9698,6 +9698,14 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_M3DRAGONEX:
 		case WEAPON_Y23S3BUFFM249:
 		case WEAPON_LINKATTACKSG:
+		case WEAPON_MAGICMG:
+		case WEAPON_Z4B_VK47:
+		case WEAPON_AUGEX:
+		case WEAPON_TURBULENT11:
+		case WEAPON_USAS12:
+		case WEAPON_KSG12:
+		case WEAPON_SFLASER:
+		case WEAPON_DBARREL:
 			return TRUE;
 		}
 	}

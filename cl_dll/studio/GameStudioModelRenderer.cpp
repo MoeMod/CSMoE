@@ -41,6 +41,7 @@
 #include "pm_defs.h"
 #include "gamemode/zb2/zb2_const.h"
 #include "weaponpaint.h"
+#include "cs_wpn/bte_weapons.h"
 
 #define ANIM_WALK_SEQUENCE 3
 #define ANIM_JUMP_SEQUENCE 6
@@ -2732,6 +2733,20 @@ const char* R_StudioGetReplacedTexName(int itemid, int texID, const char* modeln
 	}
 }
 
+int R_StudioGetWeaponAmmo()
+{
+	return gHUD.m_Ammo.m_pWeapon->iClip;
+}
+
+int R_StudioGetWeaponID(int &WeaponID, int &KnifeID, int &GrenadeID)
+{
+	if (BTEClientWeapons().GetActiveWeaponID(WeaponID, KnifeID, GrenadeID))
+		return 1;
+
+	WeaponID = KnifeID = GrenadeID = 0;
+	return 0;
+}
+
 // The simple drawing interface we'll pass back to the engine
 r_studio_interface_t studio =
 {
@@ -2740,6 +2755,8 @@ r_studio_interface_t studio =
 	R_StudioDrawPlayer,
 	R_StudioGetPlayerClassID,
 	R_StudioGetReplacedTexName,
+	R_StudioGetWeaponAmmo,
+	R_StudioGetWeaponID,
 };
 
 /*

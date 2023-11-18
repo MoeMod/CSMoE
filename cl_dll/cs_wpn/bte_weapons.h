@@ -19,6 +19,7 @@ public:
 	{
 		return m_pActiveWeapon;
 	}
+	int GetActiveWeaponID(int& WeaponID, int& KnifeID, int& GrenadeID);
 
 private:
 	CBasePlayerWeapon *m_pActiveWeapon;

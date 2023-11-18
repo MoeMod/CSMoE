@@ -182,6 +182,10 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "vulcanus11",	WEAPON_VULCANUS11 },
 	{ "m3dragonex",	WEAPON_M3DRAGONEX },
 	{ "linkattacksg",	WEAPON_LINKATTACKSG },
+	{ "ksg12",	WEAPON_KSG12 },
+	{ "usas12",	WEAPON_USAS12 },
+	{ "dbarrel",	WEAPON_DBARREL },
+	{ "turbulent11",	WEAPON_TURBULENT11 },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -212,6 +216,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "skull3d",	WEAPON_SKULL3D },
 	{ "thanatos3",	WEAPON_THANATOS3 },
 	{ "y23s1sfsmg",	WEAPON_Y23S1SFSMG },
+	{ "sterlingbayonet", WEAPON_STERLINGBAYONET },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -267,6 +272,9 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "cartredh",	WEAPON_CARTREDH },
 	{ "vulcanus5",	WEAPON_VULCANUS5 },
 	{ "y23s2buffaug",	WEAPON_Y23S2BUFFAUG },
+	{ "z4b_vk47",	WEAPON_Z4B_VK47 },
+	{ "sflaser",	WEAPON_SFLASER },
+	{ "augex",	WEAPON_AUGEX },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -347,6 +355,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "ozwpnset1",	WEAPON_OZWPNSET1 },
 	{ "ignitemg",	WEAPON_IGNITEMG},
 	{ "y23s3buffm249",	WEAPON_Y23S3BUFFM249 },
+	{ "magicmg",	WEAPON_MAGICMG },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -676,6 +685,10 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "vulcanus11",	WEAPONCLASS_SHOTGUN },
 	{ "m3dragonex",	WEAPONCLASS_SHOTGUN },
 	{ "linkattacksg",	WEAPONCLASS_SHOTGUN },
+	{ "ksg12",	WEAPONCLASS_SHOTGUN },
+	{ "usas12",	WEAPONCLASS_SHOTGUN },
+	{ "dbarrel",	WEAPONCLASS_SHOTGUN },
+	{ "turbulent11",	WEAPONCLASS_SHOTGUN },
 
 	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
@@ -708,6 +721,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "skull3d",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "thanatos3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "y23s1sfsmg",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "sterlingbayonet", WEAPONCLASS_SUBMACHINEGUN },
+
 
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
@@ -766,6 +781,10 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "cartredh",	WEAPONCLASS_RIFLE },
 	{ "vulcanus5",	WEAPONCLASS_RIFLE },
 	{ "y23s2buffaug",	WEAPONCLASS_RIFLE },
+	{ "z4b_vk47",	WEAPONCLASS_RIFLE },
+	{ "sflaser",	WEAPONCLASS_RIFLE },
+	{ "augex",	WEAPONCLASS_RIFLE },
+
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -843,7 +862,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "ozwpnset1",	WEAPONCLASS_MACHINEGUN },
 	{ "ignitemg",	WEAPONCLASS_MACHINEGUN },
 	{ "y23s3buffm249",	WEAPONCLASS_MACHINEGUN },
-
+	{ "magicmg",	WEAPONCLASS_MACHINEGUN },
 
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsawm",	WEAPONCLASS_EQUIPMENT },
@@ -1232,6 +1251,15 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_M3DRAGONEX:
 	case WEAPON_Y23S3BUFFM249:
 	case WEAPON_LINKATTACKSG:
+	case WEAPON_MAGICMG:
+	case WEAPON_Z4B_VK47:
+	case WEAPON_SFLASER:
+	case WEAPON_AUGEX:
+	case WEAPON_DBARREL:
+	case WEAPON_TURBULENT11:
+	case WEAPON_KSG12:
+	case WEAPON_USAS12:
+	case WEAPON_STERLINGBAYONET:
 		return true;
 	default:
 		break;
