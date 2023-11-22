@@ -207,6 +207,8 @@ namespace sv {
         {
             pev->iuser1 = 0;
             m_iWeaponState = pev->skin = 1;
+
+            UTIL_SetPlayerPModel(m_pPlayer->entindex(), WEAPON_LASERFIST, m_iWeaponState);
         }
 #endif
         if (m_iChargeState && !(m_pPlayer->pev->button & IN_ATTACK2) && m_flNextSecondaryAttack <= 0.0s)
@@ -326,6 +328,11 @@ namespace sv {
 #endif
         m_iChargeState = 0;
         m_iWeaponState = pev->skin = 0;
+
+#ifndef CLIENT_DLL
+        UTIL_SetPlayerPModel(m_pPlayer->entindex(), WEAPON_LASERFIST, m_iWeaponState);
+#endif
+
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
     }

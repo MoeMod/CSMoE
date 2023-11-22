@@ -31,7 +31,7 @@ namespace sv {
 
 	public:
 
-		static CFGLauncherRocket* Create(Vector vecSrc, Vector vecAngles, Vector vecVelocity, CBasePlayer* pPlayer, float flDamage);
+		static CFGLauncherRocket* Create(Vector vecSrc, Vector vecAngles, Vector vecVelocity, CBasePlayer* pPlayer, float flDamage, float radius, float kickrate);
 
 		void EXPORT FollowThink(void);
 		void EXPORT IgniteThink(void);

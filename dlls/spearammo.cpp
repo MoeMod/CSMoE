@@ -564,9 +564,9 @@ namespace sv {
 					WRITE_COORD(vecEffectPos.x);
 					WRITE_COORD(vecEffectPos.y);
 					WRITE_COORD(vecEffectPos.z);
-					WRITE_ANGLE(pev->angles[0]);
-					WRITE_ANGLE(pev->angles[1]);
-					WRITE_ANGLE(pev->angles[2]);
+					WRITE_COORD(pev->angles[0]);
+					WRITE_COORD(pev->angles[1]);
+					WRITE_COORD(pev->angles[2]);
 					WRITE_SHORT(m_iArrowModel);
 					WRITE_BYTE(int((m_flTimeExplode - gpGlobals->time) / 1s * 10.0));
 					WRITE_BYTE(10);

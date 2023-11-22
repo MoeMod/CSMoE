@@ -162,6 +162,12 @@ int g_iHaloGunChargingShootB = 0;
 int g_iStickyBombSkinG = 0;
 int g_iStickyBombSkinW = 0;
 
+int g_iSterlingbayonetPModel = 0;
+
+int g_iLaserFistSkinR = 0;
+int g_iLaserFistEXSkinY = 0;
+int g_iLaserFistEXSkinR = 0;
+
 int g_iDgaxeState = 0;
 int g_iZombieClassSkin[33][MAX_ZOMBIE_CLASS];
 
@@ -1110,6 +1116,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 				if (CStudioModelRenderer::s_pWingGunPModel && pweaponmodel == CStudioModelRenderer::s_pWingGunPModel)
 				{
+					idx -= 1;
 					if ((g_iWingGunShootB & (1 << idx) || g_iWingGunIdleB & (1 << idx)))
 					{
 						if (g_iWingGunShootB & (1 << idx))
@@ -1134,6 +1141,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 				{
 					m_pCurrentEntity->curstate.effects |= EF_NOCULL;
 
+					idx -= 1;
 					if ((g_iHaloGunChargingShootB & (1 << idx) || g_iHaloGunShootB & (1 << idx)))
 					{
 						if (g_iHaloGunShootB & (1 << idx))
@@ -1167,6 +1175,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 				{
 					m_pCurrentEntity->curstate.skin = 0;
 
+					idx -= 1;
 					if (g_iStickyBombSkinW & (1 << idx))
 					{
 						m_pCurrentEntity->curstate.skin = 1;
@@ -1176,6 +1185,60 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 					{
 						m_pCurrentEntity->curstate.skin = 2;
 					}
+				}
+
+				if (CStudioModelRenderer::s_pSterlingbayonetPModel && pweaponmodel == CStudioModelRenderer::s_pSterlingbayonetPModel)
+				{
+					idx -= 1;
+					if (g_iSterlingbayonetPModel & (1 << idx))
+						m_pCurrentEntity->curstate.sequence = 1;
+					else
+						m_pCurrentEntity->curstate.sequence = 0;
+				}
+
+				if (CStudioModelRenderer::s_pLaserMiniGunAPModel && pweaponmodel == CStudioModelRenderer::s_pLaserMiniGunAPModel)
+				{
+					m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+					m_pCurrentEntity->curstate.framerate = 1.0;
+				}
+
+				if (CStudioModelRenderer::s_pLaserMiniGunBPModel && pweaponmodel == CStudioModelRenderer::s_pLaserMiniGunBPModel)
+				{
+					m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+					m_pCurrentEntity->curstate.framerate = 1.0;
+				}
+
+				if (CStudioModelRenderer::s_pLaserFistPModel && pweaponmodel == CStudioModelRenderer::s_pLaserFistPModel)
+				{
+					idx -= 1;
+					m_pCurrentEntity->curstate.skin = 0;
+
+					if (g_iLaserFistSkinR & (1 << idx))
+					{
+						m_pCurrentEntity->curstate.skin = 1;
+					}
+
+					m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+					m_pCurrentEntity->curstate.framerate = 1.0;
+				}
+
+				if (CStudioModelRenderer::s_pLaserFistEXPModel && pweaponmodel == CStudioModelRenderer::s_pLaserFistEXPModel)
+				{
+					idx -= 1;
+					m_pCurrentEntity->curstate.skin = 0;
+
+					if (g_iLaserFistEXSkinY & (1 << idx))
+					{
+						m_pCurrentEntity->curstate.skin = 1;
+					}
+
+					if (g_iLaserFistEXSkinR & (1 << idx))
+					{
+						m_pCurrentEntity->curstate.skin = 2;
+					}
+
+					m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+					m_pCurrentEntity->curstate.framerate = 1.0;
 				}
 
 				if (g_iVulcanus9State & (1 << idx) && CStudioModelRenderer::s_pVulcanus9PModel && CStudioModelRenderer::s_pVulcanus9FlameModel && pweaponmodel == CStudioModelRenderer::s_pVulcanus9PModel)

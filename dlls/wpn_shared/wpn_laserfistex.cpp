@@ -216,12 +216,16 @@ namespace sv {
             {
                 pev->iuser1 = 0;
                 m_iWeaponState = pev->skin = 2;
+
+                UTIL_SetPlayerPModel(m_pPlayer->entindex(), WEAPON_LASERFISTEX, m_iWeaponState);
             }
         }
         else if (!m_iWeaponState && pev->iuser1 >= LASERFISTEX_STATEA_CHARGE_AMMO)
         {
             pev->iuser1 = 0;
             m_iWeaponState = pev->skin = 1;
+
+            UTIL_SetPlayerPModel(m_pPlayer->entindex(), WEAPON_LASERFISTEX, m_iWeaponState);
         }
 #endif
 
@@ -370,6 +374,9 @@ namespace sv {
         pev->iuser1 = 0;
         m_iChargeState = 0;
         m_iWeaponState = pev->skin = 0;
+#ifndef CLIENT_DLL
+        UTIL_SetPlayerPModel(m_pPlayer->entindex(), WEAPON_LASERFISTEX, m_iWeaponState);
+#endif
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
     }

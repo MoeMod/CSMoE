@@ -319,3 +319,6 @@ HOOK_EVENT(dbarrel, FireDBarrel);
 HOOK_EVENT(ksg12, FireKSG12);
 HOOK_EVENT(turbulent11, FireTurbulent11);
 HOOK_EVENT(sterlingbayonet, FireSterlingBayonet);
+HOOK_EVENT(usas12, FireUSAS12);
+HOOK_EVENT(pkm, FirePKM);
+HOOK_EVENT(ma5b, FireMA5B);

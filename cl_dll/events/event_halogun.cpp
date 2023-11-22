@@ -77,6 +77,7 @@ void EV_FireHaloGun(event_args_s *args)
 
 	if (args->bparam2)
 	{
+		idx -= 1;
 		if (args->iparam2 > 2)
 		{
 			g_iHaloGunShootB &= ~(1 << idx);
@@ -114,8 +115,9 @@ void EV_FireHaloGun(event_args_s *args)
 
 	EV_GetGunPosition(args, vecSrc, origin);
 
-	g_iHaloGunChargingShootB &= ~(1 << idx);
-	g_iHaloGunShootB &= ~(1 << idx);
+	int index = idx - 1;
+	g_iHaloGunChargingShootB &= ~(1 << index);
+	g_iHaloGunShootB &= ~(1 << index);
 
 	if (args->bparam1)
 	{

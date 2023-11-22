@@ -490,7 +490,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_usas12.cpp
 	../dlls/wpn_shared/z4b_vk47.cpp
 	../dlls/wpn_shared/wpn_sterlingbayonet.cpp
-
+	../dlls/wpn_shared/wpn_pkm.cpp
+	../dlls/wpn_shared/z4b_ma5b.cpp
 	)
 
 set (HUD_SRCS

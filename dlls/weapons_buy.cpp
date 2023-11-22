@@ -275,6 +275,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "z4b_vk47",	WEAPON_Z4B_VK47 },
 	{ "sflaser",	WEAPON_SFLASER },
 	{ "augex",	WEAPON_AUGEX },
+	{ "ma5b",	WEAPON_Z4B_MA5B },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -356,6 +357,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "ignitemg",	WEAPON_IGNITEMG},
 	{ "y23s3buffm249",	WEAPON_Y23S3BUFFM249 },
 	{ "magicmg",	WEAPON_MAGICMG },
+	{ "pkm",	WEAPON_PKM },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -784,7 +786,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "z4b_vk47",	WEAPONCLASS_RIFLE },
 	{ "sflaser",	WEAPONCLASS_RIFLE },
 	{ "augex",	WEAPONCLASS_RIFLE },
-
+	{ "ma5b",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -863,6 +865,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "ignitemg",	WEAPONCLASS_MACHINEGUN },
 	{ "y23s3buffm249",	WEAPONCLASS_MACHINEGUN },
 	{ "magicmg",	WEAPONCLASS_MACHINEGUN },
+	{ "pkm",	WEAPONCLASS_MACHINEGUN },
 
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsawm",	WEAPONCLASS_EQUIPMENT },
@@ -1260,6 +1263,8 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_KSG12:
 	case WEAPON_USAS12:
 	case WEAPON_STERLINGBAYONET:
+	case WEAPON_PKM:
+	case WEAPON_Z4B_MA5B:
 		return true;
 	default:
 		break;
@@ -1511,6 +1516,15 @@ bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 		return false;
 	}
 #endif
+
+	const char* mod_str = CVAR_GET_STRING("mp_gamemode");
+	bool bIsZbzMode = (!strcmp(mod_str, "zbz")) ? true : false;
+
+	if (bIsZbzMode)
+	{
+		if (iter->iLevel > pPlayer->m_iZombieZLevel)
+			return false;
+	}
 
 	if (pPlayer->m_iAccount < iter->iCost && iter->iID != WEAPON_PATROLDRONE) {
 		ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");

@@ -135,6 +135,8 @@ void EV_FireWingGun(event_args_s *args)
 
 	if (args->iparam1 == 2)
 	{
+		idx -= 1;
+
 		if (args->iparam2 == 1)
 		{
 			g_iWingGunShootB &= ~(1 << idx);
@@ -264,8 +266,9 @@ void EV_FireWingGun(event_args_s *args)
 
 		gEngfuncs.pEfxAPI->R_BeamPoints_Stretch(vecBeamStart, vecBeamEnd, iBeamIndex, 1.0, 20.0, 255, 0, 50.0, 255, 255, 255);
 
-		g_iWingGunIdleB &= ~(1 << idx);
-		g_iWingGunShootB |= (1 << idx);
+		int index = idx - 1;
+		g_iWingGunIdleB &= ~(1 << index);
+		g_iWingGunShootB |= (1 << index);
 
 		return;
 	}

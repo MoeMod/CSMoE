@@ -665,6 +665,7 @@ public:
 	time_point_t m_flBunkerBusterCoolDown;
 	int m_iKnifeID;
 	int m_iGrenadeID;
+	unsigned int m_uiWeaponEnhancedLevel;
 };
 
 }
@@ -1609,6 +1610,38 @@ private:
 	time_point_t m_flLoopTime;
 
 
+};
+
+class CDartBombEntity : public CBaseAnimating
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+	KnockbackData GetKnockBackData(void) override;
+	float GetArmorRatioModifier(void);
+
+public:
+	void EXPORT FlyingThink(void);
+	void EXPORT FlyingTouch(CBaseEntity* pOther);
+	void EXPORT ExplodeThink(void);
+
+	//void EXPORT RemoveThink(void);
+	//void EXPORT StuckInTheWallThink(void);
+	void StuckInTheWallTouch(CBaseEntity* pOther);
+
+public:
+	static CDartBombEntity* Create(int iType, const Vector& vecOrigin, const Vector& vecAngles, edict_t* pentOwner, int iTeam);
+
+private:
+	EHANDLE m_pStickingObject;
+	float GetDamageA();
+	float GetDamageB();
+	int m_iExplodeCount;
+	int m_iType;
+	int m_iTrail;
+	int m_iExpIndex;
+	int m_iArrowModel[2];
 };
 
 #if 0

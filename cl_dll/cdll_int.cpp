@@ -301,6 +301,14 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pPetrolBoomerViewModel = IEngineStudio.Mod_ForName("models/v_petrolboomer.mdl", FALSE);
 	CStudioModelRenderer::s_pPetrolBoomerMuzzleModel = IEngineStudio.Mod_ForName("sprites/flame3.spr", FALSE);
 
+	CStudioModelRenderer::s_pSterlingbayonetPModel = IEngineStudio.Mod_ForName("models/p_sterlingbayonet.mdl", FALSE);
+
+	CStudioModelRenderer::s_pLaserMiniGunAPModel = IEngineStudio.Mod_ForName("models/p_laserminiguna.mdl", FALSE);
+	CStudioModelRenderer::s_pLaserMiniGunBPModel = IEngineStudio.Mod_ForName("models/p_laserminigunb.mdl", FALSE);
+
+	CStudioModelRenderer::s_pLaserFistPModel = IEngineStudio.Mod_ForName("models/p_laserfist.mdl", FALSE);
+	CStudioModelRenderer::s_pLaserFistEXPModel = IEngineStudio.Mod_ForName("models/p_laserfistex.mdl", FALSE);
+
 	//VGui_Startup();
 
 	return 1;

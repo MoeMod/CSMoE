@@ -1922,7 +1922,8 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		int WeaponID, KnifeID, GrenadeID;
 		pStudioDraw->StudioGetWeaponID(WeaponID, KnifeID, GrenadeID);
 
-		if (WeaponID == WEAPON_Z4B_VK47)
+		if (WeaponID == WEAPON_Z4B_VK47 ||
+			WeaponID == WEAPON_Z4B_MA5B)
 		{
 			if (!Q_strcmp(ptexture[pskinref[pmesh->skinref]].name, "number_A.bmp"))
 			{

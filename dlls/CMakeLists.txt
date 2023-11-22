@@ -277,6 +277,7 @@ set(HLDLL_SRCS
 	./client/moe_fun.cpp
 	./dgaxelubu.cpp
 	./player/player_emotion.cpp
+	./dartbomb.cpp
 
 	)
 
@@ -702,6 +703,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_usas12.cpp
 	../dlls/wpn_shared/z4b_vk47.cpp
 	../dlls/wpn_shared/wpn_sterlingbayonet.cpp
+	../dlls/wpn_shared/wpn_pkm.cpp
+	../dlls/wpn_shared/z4b_ma5b.cpp
 	)
 
 set(PM_SRCS

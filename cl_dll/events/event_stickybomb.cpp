@@ -48,6 +48,7 @@ namespace cl::event::stickybomb {
 		{
 			if (args->bparam1)
 			{
+				idx -= 1;
 				int iTransformModelIndex;
 				int iFrameMax;
 				switch (iWeaponState)

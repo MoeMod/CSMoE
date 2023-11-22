@@ -612,6 +612,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXP
 	case EXPTYPE_M32ROCKET:
 	case EXPTYPE_OICWROCKET:
 	case EXPTYPE_HK121ROCKET:
+	case EXPTYPE_FGLAUNCHERROCKET:
 		m_bHit = RadiusDamage(pev, pevOwner, flDamage, CLASS_NONE, bitsDamageType, iRadius);
 
 		if (m_bHit && type == EXPTYPE_JANUS1ROCKET)

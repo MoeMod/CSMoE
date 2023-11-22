@@ -92,7 +92,7 @@ namespace sv {
             PRECACHE_MODEL("sprites/ef_magicmgidle.spr");
             PRECACHE_MODEL("sprites/ef_magicmgreloadstart.spr");
             PRECACHE_MODEL("sprites/ef_magicmgreloadcharge.spr");
-            PRECACHE_MODEL("sprites/ef_magicmgshoot20sanma.spr");
+            PRECACHE_MODEL("sprites/ef_magicmgshoot2.spr");
             PRECACHE_MODEL("sprites/ef_magicmgdraw_left.spr");
             PRECACHE_MODEL("sprites/ef_magicmgidle_left.spr");
             PRECACHE_MODEL("sprites/ef_magicmgreloadstart_left.spr");
@@ -158,7 +158,7 @@ namespace sv {
 
         int GetShotsRequired()
         {
-            int iShotsRequired = 3;
+            int iShotsRequired = 60;
 #ifndef CLIENT_DLL
             if (g_pModRunning->DamageTrack() == DT_ZB)
                 iShotsRequired = 30;
@@ -214,6 +214,18 @@ namespace sv {
                 flDamage = 2000.0f;
 #endif
             return flDamage;
+        }
+
+        float GetHealthRate() const
+        {
+            float flRate = 0.1f;
+#ifndef CLIENT_DLL
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                flRate = 0.3f;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                flRate = 0.3f;
+#endif
+            return flRate;
         }
     };
 
@@ -387,14 +399,14 @@ namespace sv {
 
         void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, int iType, CBasePlayer* pOwner, CMagicMG* pWeapon)
         {
-            std::tie(m_flTouchDamage, m_flRadiusDamage, iType, m_pOwner, m_pWeapon) = std::make_tuple(flTouchDamage, flExplodeDamage, m_iType, pOwner, pWeapon);
+            std::tie(m_flTouchDamage, m_flRadiusDamage, m_iType, m_pOwner, m_pWeapon) = std::make_tuple(flTouchDamage, flExplodeDamage, iType, pOwner, pWeapon);
             pev->velocity = std::move(vecVelocity);
 
 
             if (m_iType)
             {
                 SET_MODEL(this->edict(), "sprites/ef_magicmgmissile2.spr");
-                pev->framerate = 30;
+                pev->framerate = 15;
                 pev->scale = 0.8;
             }           
             else
@@ -436,22 +448,15 @@ namespace sv {
 
         if (m_flTimeWeaponIdle2 < 5s)
         {
-            m_flTimeWeaponIdle2 = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3s;
+            m_flTimeWeaponIdle2 += m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
             SendWeaponAnim(ANIM_IDLE1, UseDecrement() != FALSE);
         }
         else
         {
-            int flags;
-
-#ifdef CLIENT_WEAPONS
-            flags = FEV_NOTHOST;
-#else
-            flags = 0;
+#ifndef CLIENT_DLL
+            PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFire, 0.67, g_vecZero, g_vecZero, 0.0, 0.0, 0, 3, FALSE, FALSE);
 #endif
-
-            PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 3, FALSE, FALSE);
-
-            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3s;
             SendWeaponAnim(ANIM_IDLE2, UseDecrement() != FALSE);
             m_flTimeWeaponIdle2 = 0s;
         }
@@ -578,28 +583,24 @@ namespace sv {
 
     void CMagicMG::SecondaryAttack()
     {
-        if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)        
+        if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
+        {
+            m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
             return;
-
+        }
+           
 #ifndef CLIENT_DLL
         if (m_pPlayer->m_iModelName == MODEL_BUFFCLASS19S3CT ||
             m_pPlayer->m_iModelName == MODEL_BUFFCLASS19S3TR)
             UTIL_SendAudio(m_pPlayer, "%!MRAD_MAGICMG", PITCH_NORM);
 #endif
 
-        int flags;
-
-#ifdef CLIENT_WEAPONS
-        flags = FEV_NOTHOST;
-#else
-        flags = 0;
-#endif
-
-        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, FALSE);
+        PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, TRUE, FALSE);
 
         SetThink(&CMagicMG::DelaySeconadryAttack);
         pev->nextthink = gpGlobals->time + 1.0s;
 
+        m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;
     }
 
@@ -616,6 +617,9 @@ namespace sv {
             m_pPlayer->pev->effects &= ~EF_MUZZLEFLASH;
 
 #ifndef CLIENT_DLL
+        m_pPlayer->pev->health += m_pPlayer->pev->max_health * GetHealthRate();
+        m_pPlayer->pev->health = min(m_pPlayer->pev->health, m_pPlayer->pev->max_health);
+
         UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
         Vector vecSrc = m_pPlayer->GetGunPosition();
@@ -629,7 +633,7 @@ namespace sv {
         CMagicCannon* pEnt = static_cast<CMagicCannon*>(CBaseEntity::Create("magiccannon", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
         if (pEnt)
         {
-            pEnt->Init(vecCannonDir * 1000, GetTouchDamageA(), GetTouchDamageA(), 1, m_pPlayer, this);
+            pEnt->Init(vecCannonDir * 1000, GetTouchDamageB(), GetTouchDamageB(), 1, m_pPlayer, this);
             pEnt->m_flRemoveTime = gpGlobals->time + 3.0s;
         }
 #endif
@@ -651,18 +655,9 @@ namespace sv {
 
         if (DefaultReload(MaxClip, ANIM_RELOAD, DefaultReloadTime))
         {
-            int flags;
+            PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFire, 0.5, g_vecZero, g_vecZero, 0.0, 0.0, 0, 2, FALSE, FALSE);
 
-#ifdef CLIENT_WEAPONS
-            flags = FEV_NOTHOST;
-#else
-            flags = 0;
-#endif
-
-            PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 2, FALSE, FALSE);
-
-            PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 2.46, g_vecZero, g_vecZero, 0.0, 0.0, 0, 4, FALSE, FALSE);
-
+            PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFire, 2.46, g_vecZero, g_vecZero, 0.0, 0.0, 0, 4, FALSE, FALSE);
 #ifndef CLIENT_DLL
             m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif

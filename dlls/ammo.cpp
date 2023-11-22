@@ -2701,7 +2701,7 @@ void CDartAmmo::Precache()
 
 BOOL CDartAmmo::AddAmmo(CBaseEntity* pOther)
 {
-	if (pOther->GiveAmmo(5, "drat", 35) == -1) {
+	if (pOther->GiveAmmo(5, "dart", 35) == -1) {
 		return FALSE;
 	}
 

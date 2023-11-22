@@ -840,6 +840,8 @@ public:
 	int m_iSlotBuyTime[MAX_ITEM_TYPES];
 	unsigned int m_uiWeaponPaintType[NUM_WEAPONS];
 	unsigned int m_uiKnifePaintType[NUM_KNIVES];
+	unsigned int m_uiWeaponEnhancedLevels[NUM_WEAPONS];
+	unsigned int m_uiKnifeEnhancedLevels[NUM_KNIVES];
 
 	time_point_t m_flEmotionTime;
 	float m_flEmotionFrame;

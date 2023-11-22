@@ -56,6 +56,12 @@ namespace cl {
 	extern int g_iLinkAttackSGSkin;
 	extern float g_flLinkAttackSGAnimTime;
 
+	extern int g_iSterlingbayonetPModel;
+
+	extern int g_iLaserFistSkinR;
+	extern int g_iLaserFistEXSkinY;
+	extern int g_iLaserFistEXSkinR;
+
 	extern int g_iZombieClassSkin[33][MAX_ZOMBIE_CLASS];
 enum
 {
@@ -786,6 +792,59 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 			g_flLinkAttackSGAnimTime = gHUD.m_flTime;
 			g_iLinkAttackSGAnim = arg2;
 			g_iLinkAttackSGSkin = skin;
+		}
+
+		break;
+	}
+	case 51:
+	{
+		//setPmodel
+		int iPlayer = reader.ReadByte() - 1;
+
+		if (iPlayer < 0 || iPlayer > 32)
+			return 1;
+
+		int iWeapon = reader.ReadShort();
+		int iState = reader.ReadByte();
+
+		switch (iWeapon)
+		{
+		case WEAPON_STERLINGBAYONET:
+		{
+			if (iState)
+				g_iSterlingbayonetPModel |= (1 << iPlayer);
+			else
+				g_iSterlingbayonetPModel &= ~(1 << iPlayer);
+			break;
+		}
+		case WEAPON_LASERFIST:
+		{
+			if (iState)
+				g_iLaserFistSkinR |= (1 << iPlayer);
+			else
+				g_iLaserFistSkinR &= ~(1 << iPlayer);
+			break;
+		}
+		case WEAPON_LASERFISTEX:
+		{
+			if (iState == 1)
+			{
+				g_iLaserFistEXSkinY |= (1 << iPlayer);
+				g_iLaserFistEXSkinR &= ~(1 << iPlayer);
+			}
+			else if (iState == 2)
+			{
+				g_iLaserFistEXSkinR |= (1 << iPlayer);
+				g_iLaserFistEXSkinY &= ~(1 << iPlayer);
+			}
+			else
+			{
+				g_iLaserFistEXSkinY &= ~(1 << iPlayer);
+				g_iLaserFistEXSkinR &= ~(1 << iPlayer);
+			}
+			break;
+		}
+	
 		}
 
 		break;

@@ -444,6 +444,8 @@ TL_ADD(CUSAS12)
 TL_ADD(CKSG12)
 TL_ADD(CTurbulent11)
 TL_ADD(CSterlingBayonet)
+TL_ADD(CPKM)
+TL_ADD(CZ4B_MA5B)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -861,6 +863,7 @@ TL_ADD(CPetrolMine)
 TL_ADD(CPetrolRocket)
 TL_ADD(CMagicCannon)
 TL_ADD(CAUGEXGrenade)
+TL_ADD(CDartBombEntity)
 #endif
 
 TL_END(AllEntityTypeList)

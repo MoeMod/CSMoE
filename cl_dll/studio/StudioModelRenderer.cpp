@@ -153,6 +153,14 @@ struct model_s* CStudioModelRenderer::s_pLinkAttackSGPartModel;
 struct model_s* CStudioModelRenderer::s_pPetrolBoomerViewModel;
 struct model_s* CStudioModelRenderer::s_pPetrolBoomerMuzzleModel;
 
+struct model_s* CStudioModelRenderer::s_pSterlingbayonetPModel;
+
+struct model_s* CStudioModelRenderer::s_pLaserMiniGunAPModel;
+struct model_s* CStudioModelRenderer::s_pLaserMiniGunBPModel;
+
+struct model_s* CStudioModelRenderer::s_pLaserFistPModel;
+struct model_s* CStudioModelRenderer::s_pLaserFistEXPModel;
+
 int g_iLeapStrikeGunAnim = 0;
 float g_iLeapStrikeGunAnimTime = 0.0;
 

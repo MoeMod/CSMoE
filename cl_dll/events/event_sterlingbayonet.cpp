@@ -29,14 +29,21 @@
 
 namespace cl::event::sterlingbayonet {
 
-enum mac10_e
+enum sterlingbayonet_e
 {
-	SFSMG_IDLE1,
-	SFSMG_RELOAD,
-	SFSMG_DRAW,
-	SFSMG_SHOOT1,
-	SFSMG_SHOOT2,
-	SFSMG_SHOOT3
+	ANIM_IDLE1 = 0,
+	ANIM_IDLE1_BROKEN,
+	ANIM_SHOOT1,
+	ANIM_SHOOT1_BROKEN,
+	ANIM_KNIFE_READY,
+	ANIM_KNIFE_01,
+	ANIM_KNIFE_02,
+	ANIM_KNIFE_BROKEN01,
+	ANIM_KNIFE_BROKEN02,
+	ANIM_RELOAD,
+	ANIM_RELOAD_BROKEN,
+	ANIM_DRAW,
+	ANIM_DRAW_BROKEN,
 };
 
 void EV_FireSterlingBayonet(event_args_s *args)
@@ -61,7 +68,13 @@ void EV_FireSterlingBayonet(event_args_s *args)
 	if ( EV_IsLocal( args->entindex ) )
 	{
 		++g_iShotsFired;
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(SFSMG_SHOOT1, SFSMG_SHOOT3), 2);
+
+		if (args->bparam1)
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT1_BROKEN, 2);
+		else
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT1, 2);
+
+		
 		EV_MuzzleFlash();
 		if( !gHUD.cl_righthand->value )
 		{
@@ -73,7 +86,7 @@ void EV_FireSterlingBayonet(event_args_s *args)
 		}
 		ShellVelocity[2] -= 50;
 
-		VectorCopy(ent->attachment[1], ShellOrigin);
+		VectorCopy(ent->attachment[0], ShellOrigin);
 	}
 	else
 	{
@@ -82,7 +95,7 @@ void EV_FireSterlingBayonet(event_args_s *args)
 
 	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iPShell, TE_BOUNCE_SHELL);
 
-	PLAY_EVENT_SOUND( "weapons/sfsmg-1.wav" );
+	PLAY_EVENT_SOUND( "weapons/sterlingbayonet-1.wav" );
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );

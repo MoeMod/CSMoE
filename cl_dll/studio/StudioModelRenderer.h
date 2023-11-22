@@ -175,6 +175,11 @@ public:
 	static struct model_s* s_pLinkAttackSGPartModel;
 	static struct model_s* s_pPetrolBoomerViewModel;
 	static struct model_s* s_pPetrolBoomerMuzzleModel;
+	static struct model_s* s_pSterlingbayonetPModel;
+	static struct model_s* s_pLaserMiniGunAPModel;
+	static struct model_s* s_pLaserMiniGunBPModel;
+	static struct model_s* s_pLaserFistPModel;
+	static struct model_s* s_pLaserFistEXPModel;
 };
 
 }

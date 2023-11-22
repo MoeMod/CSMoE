@@ -3040,9 +3040,9 @@ void R_ArrowModel(sizebuf_t* msg)
 	pos.y = BF_ReadCoord(msg);
 	pos.z = BF_ReadCoord(msg);
 
-	angles.x = BF_ReadAngle(msg);
-	angles.y = BF_ReadAngle(msg);
-	angles.z = BF_ReadAngle(msg);
+	angles.x = BF_ReadCoord(msg);
+	angles.y = BF_ReadCoord(msg);
+	angles.z = BF_ReadCoord(msg);
 
 	model = BF_ReadShort(msg);
 	life = BF_ReadByte(msg) * 0.1f;

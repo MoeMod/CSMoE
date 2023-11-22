@@ -2182,9 +2182,9 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 		WRITE_COORD(pev->origin.x);
 		WRITE_COORD(pev->origin.y);
 		WRITE_COORD(pev->origin.z);
-		WRITE_ANGLE(0);
-		WRITE_ANGLE(0.0f + rand() * (1.0f / 32767.0f) * (180.0f - 0.0f));
-		WRITE_ANGLE(0);
+		WRITE_COORD(0);
+		WRITE_COORD(0.0f + rand() * (1.0f / 32767.0f) * (180.0f - 0.0f));
+		WRITE_COORD(0);
 		WRITE_SHORT(g_sModelIndexBoomerEffect);
 		WRITE_BYTE(0);
 		WRITE_BYTE(10);
@@ -9706,6 +9706,8 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_KSG12:
 		case WEAPON_SFLASER:
 		case WEAPON_DBARREL:
+		case WEAPON_PKM:
+		case WEAPON_Z4B_MA5B:
 			return TRUE;
 		}
 	}

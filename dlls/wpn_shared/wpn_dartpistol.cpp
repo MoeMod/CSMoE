@@ -65,7 +65,7 @@ int CDartPistol::GetItemInfo(ItemInfo *p)
 	p->iMaxAmmo1 = 35;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = 7;
+	p->iMaxClip = 5;
 	p->iSlot = 1;
 	p->iPosition = 2;
 	p->iId = m_iId = WEAPON_DARTPISTOL;
@@ -78,6 +78,7 @@ int CDartPistol::GetItemInfo(ItemInfo *p)
 BOOL CDartPistol::Deploy(void)
 {
 	m_fMaxSpeed = 250;
+	m_flAccuracy = 0.95;
 
 	return DefaultDeploy("models/v_dartpistol.mdl", "models/p_dartpistol.mdl", ANIM_DRAW, "onehanded", UseDecrement() != FALSE);
 }
@@ -142,11 +143,19 @@ void CDartPistol::DartPistolFire(float flSpread, duration_t flCycleTime, BOOL fU
 	Vector vecDartDir = gpGlobals->v_forward + gpGlobals->v_right * vecDir.x + gpGlobals->v_up * vecDir.y;
 	Vector vecAngles = UTIL_VecToAngles(vecDartDir);
 
-	float flSpeed;
-	if (m_pPlayer->pev->waterlevel == 3)
-		flSpeed = 1800.0;
-	else
-		flSpeed = 2000.0;
+	CDartBombEntity* pDartBombEntity = CDartBombEntity::Create(0, vecSrc, vecAngles, ENT(m_pPlayer->pev), m_pPlayer->m_iTeam);
+
+	if (pDartBombEntity)
+	{
+		float flSpeed;
+		if (m_pPlayer->pev->waterlevel == 3)
+			flSpeed = 1800.0;
+		else
+			flSpeed = 2000.0;
+
+		pDartBombEntity->pev->velocity = vecDartDir * flSpeed;
+		pDartBombEntity->pev->speed = flSpeed;
+	}
 #endif
 
 	int flags;
@@ -174,7 +183,7 @@ void CDartPistol::Reload(void)
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
-	if (DefaultReload(7, ANIM_RELOAD, 4s))
+	if (DefaultReload(5, ANIM_RELOAD, 4s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);

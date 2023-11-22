@@ -2218,9 +2218,9 @@ void CMonsterSkill_Boomer::OnKilled(entvars_t* pKiller, int iGib)
 	WRITE_COORD(m_pMonster->pev->origin.x);
 	WRITE_COORD(m_pMonster->pev->origin.y);
 	WRITE_COORD(m_pMonster->pev->origin.z);
-	WRITE_ANGLE(0);
-	WRITE_ANGLE(0.0f + rand() * (1.0f / 32767.0f) * (180.0f - 0.0f));
-	WRITE_ANGLE(0);
+	WRITE_COORD(0);
+	WRITE_COORD(0.0f + rand() * (1.0f / 32767.0f) * (180.0f - 0.0f));
+	WRITE_COORD(0);
 	WRITE_SHORT(g_sModelIndexBoomerEffect);
 	WRITE_BYTE(0);
 	WRITE_BYTE(10);

@@ -396,6 +396,7 @@ namespace sv {
     static constexpr const auto &DefaultReloadTime = 5.0s;
     static constexpr const char *V_Model = "models/v_laserminigun.mdl";
     static constexpr const char *P_Model = "models/p_laserminiguna.mdl";
+	static constexpr const char* P_Model_2 = "models/p_laserminigunb.mdl";
     static constexpr const char *W_Model = "models/w_laserminigun.mdl";
     static constexpr const char *EventFile = "events/laserminigun.sc";
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
@@ -707,6 +708,8 @@ namespace sv {
 
 	void OnAttack2Released()
 	{
+		m_pPlayer->pev->weaponmodel = MAKE_STRING(P_Model);
+
 		if (m_iChargeState < 2)
 		{
 			pev->skin = m_iWeaponState;
@@ -791,6 +794,8 @@ namespace sv {
 		{
 			if (pev->skin != SKIN_CHARGE)
 				pev->skin = SKIN_CHARGE;
+
+			m_pPlayer->pev->weaponmodel = MAKE_STRING(P_Model_2);
 
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/laserminigun-charge_origin.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 

@@ -3056,4 +3056,14 @@ void UTIL_TempEmit(const char* model, int iEmitCounter, int fireDelay, int life,
 	MESSAGE_END();
 }
 
+void UTIL_SetPlayerPModel(int iPlayerIndex, int iWeaponID, int iState)
+{
+	MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL);
+	WRITE_BYTE(51);
+	WRITE_BYTE(iPlayerIndex);
+	WRITE_SHORT(iWeaponID);
+	WRITE_BYTE(iState);
+	MESSAGE_END();
+}
+
 }

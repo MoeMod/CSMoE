@@ -32,7 +32,7 @@ namespace sv {
 
 #ifndef CLIENT_DLL	
 
-	CFGLauncherRocket* CFGLauncherRocket::Create(Vector vecSrc, Vector vecAngles, Vector vecVelocity, CBasePlayer* pPlayer, float flDamage)
+	CFGLauncherRocket* CFGLauncherRocket::Create(Vector vecSrc, Vector vecAngles, Vector vecVelocity, CBasePlayer* pPlayer, float flDamage, float radius, float kickrate)
 	{
 		CFGLauncherRocket* pRocket = (CFGLauncherRocket*)CBaseEntity::Create("fglauncher_rocket", vecSrc, vecAngles, pPlayer->edict());
 
@@ -44,6 +44,8 @@ namespace sv {
 			pRocket->m_bBounce = false;
 			pRocket->m_iBounce = 0;
 			pRocket->pev->dmg = pRocket->m_flFGLauncherRocketDamage = flDamage;
+			pRocket->m_flFGLauncherRocketExplodeRadius = radius;
+			pRocket->m_flFGLauncherRocketExplodeKickRate = kickrate;
 			pRocket->SetTouch(&CFGLauncherRocket::RocketTouch);
 		}
 		return pRocket;
@@ -346,7 +348,7 @@ namespace sv {
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
 		CFGLauncherRocket::Create(m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8,
-			m_pPlayer->pev->v_angle, gpGlobals->v_forward * flFGLauncherRocketVelBase + Vector(0, 0, 100), m_pPlayer, flFGLauncherRocketDamage);
+			m_pPlayer->pev->v_angle, gpGlobals->v_forward * flFGLauncherRocketVelBase + Vector(0, 0, 100), m_pPlayer, flFGLauncherRocketDamage, flFGLauncherRocketExplodeRadius, flFGLauncherRocketExplodeKickRate);
 
 		if (m_iClip)
 			UTIL_EMIT_SOUND(edict(), CHAN_WEAPON, "weapons/fglauncher-1.wav", VOL_NORM, 0.7, 0, PITCH_NORM);
