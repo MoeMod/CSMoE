@@ -62,6 +62,7 @@ public:
 	void Spawn() override;
 	void Precache() override;
 	void PrimaryAttack() override;
+	void SecondaryAttack() override;
 	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannon" , 200 }; }
@@ -92,6 +93,8 @@ public:
 public:
 	void CannonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();
+	float GetTouchDamage();
+	float GetRadiusDamage();
 
 private:
 	unsigned short m_usFire;

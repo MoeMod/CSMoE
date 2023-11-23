@@ -910,6 +910,13 @@ bool WeaponHasAttachments(entity_state_t *pplayer)
 	if (!pplayer)
 		return false;
 
+	int weaponmodel = pplayer->weaponmodel;
+
+	if (weaponmodel > 4096)
+	{
+		weaponmodel %= 4096;
+	}
+
 	pweaponmodel = IEngineStudio.GetModelByIndex(pplayer->weaponmodel);
 	modelheader = (studiohdr_t *)IEngineStudio.Mod_Extradata(pweaponmodel);
 
@@ -1098,8 +1105,18 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 		{
 			studiohdr_t *saveheader = m_pStudioHeader;
 			cl_entity_t saveent = *m_pCurrentEntity;
+			int weaponmodel = pplayer->weaponmodel;
+			int skin = 0;
 
-			model_t *pweaponmodel = IEngineStudio.GetModelByIndex(pplayer->weaponmodel);
+			if (weaponmodel > 4096)
+			{
+				skin = weaponmodel / 4096;
+				weaponmodel = weaponmodel - 4096 * skin;
+			}
+
+			m_pCurrentEntity->curstate.skin = skin;
+
+			model_t *pweaponmodel = IEngineStudio.GetModelByIndex(weaponmodel);
 	
 			//HOOK pModel
 			int idx = pplayer->number;
@@ -1262,7 +1279,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 								g_Vulcanus9PFlame[idx][i]->entity.curstate.rendercolor.r = g_Vulcanus9PFlame[idx][i]->entity.curstate.rendercolor.g = g_Vulcanus9PFlame[idx][i]->entity.curstate.rendercolor.b = 255;
 								g_Vulcanus9PFlame[idx][i]->frameMax = 16;
 								g_Vulcanus9PFlame[idx][i]->die = gHUD.m_flTime + 9999.0f;
-								g_Vulcanus9PFlame[idx][i]->entity.curstate.weaponmodel = pplayer->weaponmodel;
+								g_Vulcanus9PFlame[idx][i]->entity.curstate.weaponmodel = weaponmodel;
 
 								g_Vulcanus9PFlame[idx][i]->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
 							}

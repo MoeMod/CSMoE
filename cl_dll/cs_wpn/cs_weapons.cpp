@@ -1371,17 +1371,27 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	pWeapon->m_iWeaponState = pfrom->m_iWeaponState;
 	pWeapon->m_flLastFire = time_point_t(duration_t(pfrom->m_fAimedDamage));
 	pWeapon->m_iShotsFired = pfrom->m_fInZoom;
-	pWeapon->pev->body = pfrom->iuser2;
-	pWeapon->pev->skin = pfrom->iuser3;
 
-	if(pWeapon->m_iId == WEAPON_KNIFE)
+	int body = pfrom->iuser2 & 0xF;
+	int skin = (pfrom->iuser2 >> 4) & 0xF;
+	pWeapon->pev->body = body;
+	pWeapon->pev->skin = skin;
+
+	if (pWeapon->m_iId == WEAPON_KNIFE)
+	{
+		pWeapon->m_uiKnifeEnhancedLevel = pfrom->iuser3;
 		pWeapon->m_uiKnifePaintType = (unsigned int)pfrom->iuser4;
+	}	
 	else
+	{
+		pWeapon->m_uiWeaponEnhancedLevel = pfrom->iuser3;
 		pWeapon->m_uiWeaponPaintType = (unsigned int)pfrom->iuser4;
+	}
+		
 
 	cl_entity_t* viewent = gEngfuncs.GetViewModel();
-	viewent->curstate.body = pfrom->iuser2;
-	viewent->curstate.skin = pfrom->iuser3;
+	viewent->curstate.body = body;
+	viewent->curstate.skin = skin;
 	viewent->curstate.iuser4 = pfrom->iuser4;
 
 	/*for ( i = 0; i < MAX_WEAPONS; i++)
@@ -1605,7 +1615,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	//  over the wire ( fixes some animation glitches )
 	if (g_runfuncs && (HUD_GetWeaponAnim() != to->client.weaponanim || HUD_GetWeapon() != pWeapon->m_iId))
 		// Force a fixed anim down to viewmodel
-		HUD_SendWeaponAnim(to->client.weaponanim, pWeapon->m_iId, pfrom->iuser2, 1);
+		HUD_SendWeaponAnim(to->client.weaponanim, pWeapon->m_iId, body, 1);
 
 	if (pWeapon->m_iPrimaryAmmoType < MAX_AMMO_TYPES)
 	{

@@ -1103,10 +1103,16 @@ int CBasePlayerWeapon::AddToPlayer(CBasePlayer *pPlayer)
 {
 	if (FNullEnt(pev->owner))
 	{
-		if(m_iId == WEAPON_KNIFE)
+		if (m_iId == WEAPON_KNIFE)
+		{
+			m_uiWeaponEnhancedLevel = pPlayer->m_uiKnifeEnhancedLevels[m_iKnifeID];
 			m_uiKnifePaintType = pPlayer->m_uiKnifePaintType[m_iKnifeID];
+		}	
 		else
-			m_uiWeaponPaintType = pPlayer->m_uiWeaponPaintType[m_iId];	
+		{
+			m_uiWeaponEnhancedLevel = pPlayer->m_uiWeaponEnhancedLevels[m_iId];
+			m_uiWeaponPaintType = pPlayer->m_uiWeaponPaintType[m_iId];
+		}
 	}
 
 	m_pPlayer = pPlayer;
@@ -1282,6 +1288,12 @@ BOOL CBasePlayerWeapon::DefaultDeploy(const char *szViewModel, const char *szWea
 	if (!m_pPlayer->m_bIsZombie)
 	{
 		pev->body = m_pPlayer->m_bIsFemale ? 1 : 0;
+
+		int level = GetTotalEnhancedLevel();
+		if (level >= 8)
+			pev->skin = 2;
+		else if (level >= 6)
+			pev->skin = 1;
 	}
 
 	m_pPlayer->TabulateAmmo();

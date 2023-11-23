@@ -864,6 +864,7 @@ TL_ADD(CPetrolRocket)
 TL_ADD(CMagicCannon)
 TL_ADD(CAUGEXGrenade)
 TL_ADD(CDartBombEntity)
+TL_ADD(CCannonFireBall)
 #endif
 
 TL_END(AllEntityTypeList)

@@ -1661,9 +1661,15 @@ void packPlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem, bool packAmmo)
 		SET_MODEL(ENT(pWeaponBox->pev), modelName);
 
 		if(pItem->m_iId == WEAPON_KNIFE)
-			pWeaponBox->pev->iuser4 = pWeaponBox->m_uiKnifePaintType = ((CBasePlayerWeapon*)pItem)->m_uiKnifePaintType;
+			pWeaponBox->pev->iuser4 = ((CBasePlayerWeapon*)pItem)->m_uiKnifePaintType;
 		else
-			pWeaponBox->pev->iuser4 = pWeaponBox->m_uiWeaponPaintType = ((CBasePlayerWeapon*)pItem)->m_uiWeaponPaintType;
+			pWeaponBox->pev->iuser4 = ((CBasePlayerWeapon*)pItem)->m_uiWeaponPaintType;
+
+		int level = ((CBasePlayerWeapon*)pItem)->GetTotalEnhancedLevel();
+		if (level >= 8)
+			pWeaponBox->pev->skin = 2;
+		else if (level >= 6)
+			pWeaponBox->pev->skin = 1;
 		
 		
 	}
@@ -8831,10 +8837,16 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			}
 
 			if(pWeapon->m_iId == WEAPON_KNIFE)
-				pWeaponBox->pev->iuser4 = pWeaponBox->m_uiKnifePaintType = ((CBasePlayerWeapon*)pWeapon)->m_uiKnifePaintType;
+				pWeaponBox->pev->iuser4 = ((CBasePlayerWeapon*)pWeapon)->m_uiKnifePaintType;
 			else
-				pWeaponBox->pev->iuser4 = pWeaponBox->m_uiWeaponPaintType = ((CBasePlayerWeapon*)pWeapon)->m_uiWeaponPaintType;
+				pWeaponBox->pev->iuser4 = ((CBasePlayerWeapon*)pWeapon)->m_uiWeaponPaintType;
 			
+			int level = ((CBasePlayerWeapon*)pWeapon)->GetTotalEnhancedLevel();
+			if (level >= 8)
+				pWeaponBox->pev->skin = 2;
+			else if (level >= 6)
+				pWeaponBox->pev->skin = 1;
+
 			return;
 		}
 	}

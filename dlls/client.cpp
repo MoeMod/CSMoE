@@ -2866,6 +2866,31 @@ BOOL HandleRadioAliasCommands(CBasePlayer *pPlayer, const char *pszCommand)
 	return bRetVal;
 }
 
+
+void LoadEnhanceWeapon(CBasePlayer* pPlayer)
+{
+	int argnum = CMD_ARGC();
+	int id = pPlayer->entindex();
+
+	if (id < 1 || id > gpGlobals->maxClients)
+		return;
+
+	if (argnum == 1 || !(argnum & 1))
+		return;
+
+	for (int i = 1; i < argnum; i = i + 2)
+	{
+		int weaponid = atoi(CMD_ARGV(i));
+
+		if (weaponid < 0 || weaponid > NUM_WEAPONS)
+			continue;
+
+		unsigned int enhancedlevel = (unsigned int)atol(CMD_ARGV(i + 1));
+
+		pPlayer->m_uiWeaponEnhancedLevels[weaponid] = enhancedlevel;
+	}
+}
+
 // Use CMD_ARGV,  CMD_ARGV, and CMD_ARGC to get pointers the character string command.
 
 void EXT_FUNC ClientCommand(edict_t *pEntity)
@@ -4031,6 +4056,10 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				MoE_HandleBuyCommands(player, CMD_ARGV_(1));
 			}
+			else if (FStrEq(pcmd, "cl_enhanceweapon"))
+			{
+				LoadEnhanceWeapon(player);
+			}
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))
@@ -5080,7 +5109,17 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
    {
 	   if (pPlayer->m_pActiveItem)
 	   {
-		   state->iuser4 |= pPlayer->m_pActiveItem->m_uiKnifePaintType ? pPlayer->m_pActiveItem->m_uiKnifePaintType : pPlayer->m_pActiveItem->m_uiWeaponPaintType;
+		   CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pPlayer->m_pActiveItem;
+
+		   state->iuser4 |= pWeapon->m_uiKnifePaintType ? pWeapon->m_uiKnifePaintType : pWeapon->m_uiWeaponPaintType;
+
+		   if (pWeapon)
+		   {
+			   if (pWeapon->GetTotalEnhancedLevel() >= 8)
+				   state->weaponmodel += 8192;
+			   else if (pWeapon->GetTotalEnhancedLevel() >= 6)
+				   state->weaponmodel += 4096;
+		   }
 	   }
    }
 
@@ -5353,13 +5392,20 @@ int EXT_FUNC GetWeaponData(edict_s *player, struct weapon_data_s *info)
 	item->fuser2 = gun->m_flStartThrow.time_since_epoch() / 1s;
 	item->fuser3 = gun->m_flReleaseThrow.time_since_epoch() / 1s;
 	item->iuser1 = gun->m_iSwing;
-	item->iuser2 = gun->pev->body;
-	item->iuser3 = gun->pev->skin;
+	item->iuser2 |= gun->pev->body;
+	item->iuser2 |= (gun->pev->skin << 4);
 
-	if(item->m_iId == WEAPON_KNIFE)
+	if (item->m_iId == WEAPON_KNIFE)
+	{
+		item->iuser3 = gun->m_uiKnifeEnhancedLevel;
 		item->iuser4 = (int)gun->m_uiKnifePaintType;
+	}		
 	else
+	{
+		item->iuser3 = gun->m_uiWeaponEnhancedLevel;
 		item->iuser4 = (int)gun->m_uiWeaponPaintType;
+	}
+		
 	
 	//for (int i = 0; i < MAX_ITEM_TYPES; ++i)
 	//{
