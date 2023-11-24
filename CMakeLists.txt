@@ -171,9 +171,12 @@ if(XASH_IMGUI)
 				imgui/imgui_demo.cpp
 				imgui/imgui_draw.cpp
 				imgui/imgui_widgets.cpp
-				imgui/imgui.cpp)
+				imgui/imgui.cpp
+				imgui/misc/freetype/imgui_freetype.cpp
+		)
 		add_library(imgui STATIC ${IMGUI_SRC})
 		target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
+		target_link_libraries(imgui PRIVATE 3rdparty-freetype)
 	endif()
 	add_library(imgui_ext STATIC 
 		imgui_ext/ImGuiFileDialog/ImGuiFileDialog.cpp

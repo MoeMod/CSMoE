@@ -46,6 +46,7 @@ GNU General Public License for more details.
 #endif
 
 #include "gl_shader.h"
+#include "misc/freetype/imgui_freetype.h"
 
 // Data
 double g_Time = 0.0;
@@ -144,7 +145,8 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	if (fb_width <= 0 || fb_height <= 0)
 		return;
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
-	pglShadeModel(GL_SMOOTH);
+    // MoeMod warning : very expensive!
+	//pglShadeModel(GL_SMOOTH);
 	g_imguiRenderMode = kRenderNormal;
 	GL_SetRenderMode(kRenderNormal);
 	// Render command lists
@@ -409,6 +411,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 
 	unsigned char* pixels;
 	int width, height, bytes_per_pixel;
+    ImGuiFreeType::BuildFontAtlas(io.Fonts);
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
 #ifdef XASH_SHADER
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytes_per_pixel);
