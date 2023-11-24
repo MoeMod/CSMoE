@@ -43,7 +43,8 @@ void IOSInputInterface_GetMovementData(vec3_t& Attitude, vec3_t& RotationRate, v
     if (MotionManager.deviceMotionActive)
     {
         // Grab the values
-        CMAttitude* CurrentAttitude = MotionManager.deviceMotion.attitude;
+        // TODO : alloc detected here. dont copy or retain
+        __unsafe_unretained CMAttitude* CurrentAttitude = MotionManager.deviceMotion.attitude;
         CMRotationRate CurrentRotationRate = MotionManager.deviceMotion.rotationRate;
         CMAcceleration CurrentGravity = MotionManager.deviceMotion.gravity;
         CMAcceleration CurrentUserAcceleration = MotionManager.deviceMotion.userAcceleration;

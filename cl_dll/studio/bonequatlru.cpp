@@ -178,7 +178,10 @@ namespace cl {
 		// no data, construct now
 		if (!pcache)
 		{
-			pcache = std::make_shared<bonequatlru_value::element_type>();
+            // 这里ios里面memset会耗内存带宽（很神奇），所以直接进行默认初始化不进行值初始化
+            // TODO : 等编译器支持之后换成 make_shared_default_init
+			pcache = std::shared_ptr<bonequatlru_value::element_type>(new bonequatlru_value::element_type);
+            pcache->numbones = 0;
 			BoneQuatLru_StudioCalcBoneBatch_MakeCacheData(frame, numbones, pbone, panim, *pcache);
 			bonequatlru.insert(key, pcache);
 		}
