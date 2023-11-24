@@ -27,7 +27,7 @@ extern int Q_buildnum( void );
 enum XashGameStatus_e g_iStartGameStatus = XGS_SKIP;
 
 @implementation UIApplication(CADisplayLinkExt)
-- (void) CADisplayLinkStep
+- (void) CADisplayLinkStep:(CADisplayLink *)sender
 {
 	
 }
@@ -138,7 +138,7 @@ void IOS_LaunchDialog( void )
 	IOS_SetDefaultArgs();
 	
 	// return back to xash3d
-	auto displayLink = [CADisplayLink displayLinkWithTarget:[UIApplication sharedApplication] selector:@selector(CADisplayLinkStep)];
+	auto displayLink = [CADisplayLink displayLinkWithTarget:[UIApplication sharedApplication] selector:@selector(CADisplayLinkStep:)];
 	if (@available(iOS 15.0, *)) {
 		displayLink.preferredFrameRateRange = CAFrameRateRangeMake( 120, 120, 120 );
 	} else {
