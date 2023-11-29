@@ -619,17 +619,14 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 
 	if ((m_fInReload) && m_pPlayer->m_flNextAttack <= UTIL_WeaponTimeBase())
 	{
-		int j = min(iMaxClip() - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+		if (m_iId != WEAPON_TURBULENT1)
+		{
+			int j = min(iGetMaxClip() - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
 
-		m_iClip += j;
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
-
-		if (this->m_iId == WEAPON_TURBULENT1)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
-		else
+			m_iClip += j;
 			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
-
-		m_fInReload = FALSE;
+			m_fInReload = FALSE;
+		}
 	}
 
 	if ((button & IN_ATTACK2) && m_flNextSecondaryAttack <= UTIL_WeaponTimeBase())
@@ -642,13 +639,13 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 	}
 	else if ((m_pPlayer->pev->button & IN_ATTACK) && m_flNextPrimaryAttack <= UTIL_WeaponTimeBase())
 	{
-		if ((!m_iClip && pszAmmo1()) || (iMaxClip() == WEAPON_NOCLIP && !m_pPlayer->m_rgAmmo[PrimaryAmmoIndex()]))
+		if ((!m_iClip && pszAmmo1()) || (iGetMaxClip() == WEAPON_NOCLIP && !m_pPlayer->m_rgAmmo[PrimaryAmmoIndex()]))
 			m_fFireOnEmpty = TRUE;
 
 		if (m_pPlayer->m_bCanShoot == true)
 			PrimaryAttack();
 	}
-	else if (m_pPlayer->pev->button & IN_RELOAD && iMaxClip() != WEAPON_NOCLIP && !m_fInReload)
+	else if (m_pPlayer->pev->button & IN_RELOAD && iGetMaxClip() != WEAPON_NOCLIP && !m_fInReload)
 	{
 		if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
 		{
@@ -1377,18 +1374,16 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	pWeapon->pev->body = body;
 	pWeapon->pev->skin = skin;
 
+	pWeapon->m_uiWeaponEnhancedLevel = pfrom->iuser3;
 	if (pWeapon->m_iId == WEAPON_KNIFE)
-	{
-		pWeapon->m_uiKnifeEnhancedLevel = pfrom->iuser3;
+	{	
 		pWeapon->m_uiKnifePaintType = (unsigned int)pfrom->iuser4;
 	}	
 	else
 	{
-		pWeapon->m_uiWeaponEnhancedLevel = pfrom->iuser3;
 		pWeapon->m_uiWeaponPaintType = (unsigned int)pfrom->iuser4;
 	}
 		
-
 	cl_entity_t* viewent = gEngfuncs.GetViewModel();
 	viewent->curstate.body = body;
 	viewent->curstate.skin = skin;

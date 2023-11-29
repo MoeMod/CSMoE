@@ -272,10 +272,10 @@ int CFireCracker::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "40mmGrenade";
-	p->iMaxAmmo1 = 5;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = -1;
+	p->iMaxClip = 5;
 	p->iSlot = 1;
 	p->iPosition = 2;
 	p->iId = m_iId = WEAPON_FIRECRACKER;
@@ -298,7 +298,7 @@ BOOL CFireCracker::Deploy(void)
 
 void CFireCracker::PrimaryAttack(void)
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+	if (m_iClip > 0)
 		FireCrackerFire(false);
 	else
 	{
@@ -310,7 +310,7 @@ void CFireCracker::PrimaryAttack(void)
 
 void CFireCracker::SecondaryAttack(void)
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+	if (m_iClip > 0)
 		FireCrackerFire(true);
 	else
 	{
@@ -322,10 +322,10 @@ void CFireCracker::SecondaryAttack(void)
 
 void CFireCracker::FireCrackerFire(bool bBounce)
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		return;
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 
 	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
@@ -350,7 +350,7 @@ void CFireCracker::FireCrackerFire(bool bBounce)
 		pRocket->SetTouch(&CFireCrackerRocket::RocketTouch);
 	}
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	if (m_iClip)
 		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/firecracker-1.wav", 0.7, ATTN_NORM, 0, PITCH_NORM);
 	else
 		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/firecracker-2.wav", 0.7, ATTN_NORM, 0, PITCH_NORM);
@@ -364,7 +364,7 @@ void CFireCracker::FireCrackerFire(bool bBounce)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM79, 0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0, FALSE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM79, 0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), m_iClip != 0, FALSE);
 
 
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.8s;
@@ -372,7 +372,7 @@ void CFireCracker::FireCrackerFire(bool bBounce)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
 
 #ifndef CLIENT_DLL
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 

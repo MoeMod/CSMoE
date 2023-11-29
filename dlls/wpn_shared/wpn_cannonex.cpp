@@ -44,8 +44,7 @@ enum cannonexdragon_effect_state_e
 void CCannonEX::Spawn(void)
 {
 	Base::Spawn();
-	m_iClip = WEAPON_NOCLIP;
-	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
+	m_iClip = m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
 	m_iId = WEAPON_CANNONEX;
 #ifndef CLIENT_DLL
 	m_pDragon = NULL;
@@ -73,20 +72,6 @@ void CCannonEX::Precache(void)
 	m_iExplodeModelIndex = PRECACHE_MODEL("models/p_cannonexplo.mdl");
 	m_iExplodeEffectModelIndex = PRECACHE_MODEL("sprites/ef_cannonex.spr");
 }
-
-int CCannonEX::ExtractAmmo(CBasePlayerWeapon *pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		if (m_pPlayer)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 
 void CCannonEX::InitializeData(void)
 {
@@ -140,7 +125,7 @@ void CCannonEX::SecondaryAttack(void)
 
 void CCannonEX::CannonEXFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		PlayEmptySound();
 
@@ -149,7 +134,7 @@ void CCannonEX::CannonEXFire(float flSpread, duration_t flCycleTime, BOOL fUseAu
 		return;
 	}
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 	
 
@@ -162,7 +147,7 @@ void CCannonEX::CannonEXFire(float flSpread, duration_t flCycleTime, BOOL fUseAu
 	Vector vecDir = KnifeAttack2(vecSrc, gpGlobals->v_forward, GetDamageAmount(), 405.0f, 45.0f, DMG_BULLET, this->pev, m_pPlayer->pev);
 	m_pPlayer->m_iExtraSoundTypes = bits_SOUND_DANGER;
 
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	if (!m_iClip)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", 0, 0);
 #endif
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;

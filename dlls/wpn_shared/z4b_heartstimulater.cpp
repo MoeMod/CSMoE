@@ -83,10 +83,10 @@ public:
 
 		if (m_flTimeHostler != invalid_time_point)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeHostler) / 0.125s;
+			m_iClip += (gpGlobals->time - m_flTimeHostler) / 0.125s;
 		}
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100;
+		if (m_iClip >= 100)
+			m_iClip = 100;
 
 		return Base::Deploy();
 	}
@@ -95,7 +95,6 @@ public:
 	void Reload() override;
 	int GetItemInfo(ItemInfo* p) override;
 	void Holster(int skiplocal) override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 	void Spawn() override;
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
@@ -150,7 +149,7 @@ int CKnifeHeartStimulater::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "heartstimulaterammo";
-	p->iMaxAmmo1 = 100;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = 100;
@@ -170,29 +169,17 @@ void CKnifeHeartStimulater::Spawn()
 	m_iId = WEAPON_KNIFE;
 	Precache();
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");
-	m_iClip = WEAPON_NOCLIP;
 	m_iDefaultAmmo = 100;
 	m_flTimeHostler = gpGlobals->time;
 	m_flTimeNextCharge = invalid_time_point;
 	FallInit();
 }
 
-int CKnifeHeartStimulater::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iDefaultAmmo = 0;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
-
 void CKnifeHeartStimulater::Holster(int skiplocal)
 {
 	SetThink(nullptr);
 
-	m_iHolsterAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+	m_iHolsterAmmo = m_iClip;
 	m_flTimeHostler = gpGlobals->time;
 	return CBasePlayerWeapon::Holster(skiplocal);
 }
@@ -200,11 +187,11 @@ void CKnifeHeartStimulater::Holster(int skiplocal)
 
 void CKnifeHeartStimulater::ItemPostFrame()
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 100)
+	if (m_iClip < 100)
 	{
 		if (m_flTimeNextCharge <= gpGlobals->time)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+			m_iClip++;
 			m_flTimeNextCharge = gpGlobals->time + 0.125s;
 		}
 	}
@@ -219,9 +206,9 @@ void CKnifeHeartStimulater::Reload()
 	if (pWeapon)
 		return;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
+	if (m_iClip >= 100)
 	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+		m_iClip = 0;
 #ifndef CLIENT_DLL
 		m_pPlayer->GiveNamedItem("z4b_syringe");
 #endif

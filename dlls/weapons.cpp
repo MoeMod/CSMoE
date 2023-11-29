@@ -814,19 +814,18 @@ void CBasePlayerWeapon::ItemPostFrame()
 	if (m_fInReload && m_pPlayer->m_flNextAttack <= UTIL_WeaponTimeBase())
 	{
 		// complete the reload.
-		int j = Q_min(iMaxClip() - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
-		j = m_pPlayer->m_pModStrategy->AdjustDefaultReloadClip(this, j);
+		if (m_iId != WEAPON_TURBULENT1)
+		{
+			int j = Q_min(iGetMaxClip() - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+			j = m_pPlayer->m_pModStrategy->AdjustDefaultReloadClip(this, j);
 
-		// Add them to the clip
-		m_iClip += j;
-		
-		if(this->m_iId == WEAPON_TURBULENT1)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
-		else
+			// Add them to the clip
+			m_iClip += j;
 			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
 
-		m_pPlayer->TabulateAmmo();
-		m_fInReload = FALSE;
+			m_pPlayer->TabulateAmmo();
+			m_fInReload = FALSE;
+		}
 	}
 
 	if ((usableButtons & IN_ATTACK2) && CanAttack(m_flNextSecondaryAttack, UTIL_WeaponTimeBase(), UseDecrement()))
@@ -843,7 +842,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 	}
 	else if ((m_pPlayer->pev->button & IN_ATTACK) && CanAttack(m_flNextPrimaryAttack, UTIL_WeaponTimeBase(), UseDecrement()))
 	{
-		if ((m_iClip == 0 && pszAmmo1()) || (iMaxClip() == WEAPON_NOCLIP && !m_pPlayer->m_rgAmmo[PrimaryAmmoIndex()]))
+		if ((m_iClip == 0 && pszAmmo1()) || (iGetMaxClip() == WEAPON_NOCLIP && !m_pPlayer->m_rgAmmo[PrimaryAmmoIndex()]))
 		{
 			m_fFireOnEmpty = TRUE;
 		}
@@ -860,7 +859,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 			
 		}
 	}
-	else if ((m_pPlayer->pev->button & IN_RELOAD) && iMaxClip() != WEAPON_NOCLIP && !m_fInReload && m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
+	else if ((m_pPlayer->pev->button & IN_RELOAD) && iGetMaxClip() != WEAPON_NOCLIP && !m_fInReload && m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
 	{
 		// reload when reload is pressed, or if no buttons are down and weapon is empty.
 		if (m_flFamasShoot == invalid_time_point && m_flGlock18Shoot == invalid_time_point)
@@ -1588,7 +1587,10 @@ int CBasePlayerWeapon::ExtractAmmo(CBasePlayerWeapon *pWeapon)
 	{
 		// blindly call with m_iDefaultAmmo. It's either going to be a value or zero. If it is zero,
 		// we only get the ammo in the weapon's clip, which is what we want.
-		iReturn = pWeapon->AddPrimaryAmmo(m_iDefaultAmmo, (char *)pszAmmo1(), iMaxClip(), iMaxAmmo1());
+		if (m_iDefaultAmmo > 0 && iGetMaxClip() > 0)
+			m_iDefaultAmmo = iGetMaxClip();
+
+		iReturn = pWeapon->AddPrimaryAmmo(m_iDefaultAmmo, (char *)pszAmmo1(), iGetMaxClip(), iMaxAmmo1());
 		m_iDefaultAmmo = 0;
 	}
 

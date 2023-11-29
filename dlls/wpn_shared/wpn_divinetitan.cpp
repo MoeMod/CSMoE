@@ -83,10 +83,10 @@ namespace sv {
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "titanenergy";
-		p->iMaxAmmo1 = 100;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = "titanenergy2";
 		p->iMaxAmmo2 = 1;
-		p->iMaxClip = WEAPON_NOCLIP;
+		p->iMaxClip = 100;
 		p->iSlot = 3;
 		p->iPosition = 1;
 		p->iId = m_iId = WEAPON_HEGRENADE;
@@ -102,8 +102,7 @@ namespace sv {
 		if (m_iDefaultAmmo)
 		{
 			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-			m_iClip = WEAPON_NOCLIP;
+			m_iClip = m_iDefaultAmmo;
 			m_iDefaultAmmo = 0;
 
 			return TRUE;
@@ -113,12 +112,12 @@ namespace sv {
 
 	int CDivineTitan::GetClip(void)
 	{
-		return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+		return m_iClip;
 	}
 
 	void CDivineTitan::ChangeClip(int clip ,bool bSecond)
 	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= clip;
+		m_iClip -= clip;
 		if(bSecond)
 			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = clip;
 
@@ -154,12 +153,12 @@ namespace sv {
 		{
 			if (!m_iWpnState)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 0.20s;
+				m_iClip += (gpGlobals->time - m_flTimeholster) / 0.20s;
 			}
 				
 			else
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= (gpGlobals->time - m_flTimeholster) / 0.10s;
+				m_iClip -= (gpGlobals->time - m_flTimeholster) / 0.10s;
 			}
 		}
 		else
@@ -175,12 +174,12 @@ namespace sv {
 		}
 
 			
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100;
+		if (m_iClip >= 100)
+			m_iClip = 100;
 
 		if (m_iWpnState)
 		{
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 20)
+			if (m_iClip && m_iClip <= 20)
 				m_iFade = 1;
 			else
 				m_iFade = 0;
@@ -424,15 +423,15 @@ namespace sv {
 	{
 		m_iButton = m_pPlayer->pev->button;
 
-		//if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]||!m_iSaveSpecialAmmo)
+		//if (!m_iClip||!m_iSaveSpecialAmmo)
 		//{
 		//	ResetSequence();
 		//	return CBasePlayerWeapon::ItemPostFrame();
 		//}
 
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+		if (m_iClip <= 0)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+			m_iClip = 0;
 			m_pPlayer->m_flPlayerBuffData = 0;
 		}
 		if (m_flBlockTime <= gpGlobals->time)
@@ -459,11 +458,11 @@ namespace sv {
 #ifndef CLIENT_DLL
 		if (!m_pPlayer->m_flPlayerBuffData)
 		{
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 100)
+			if (m_iClip < 100)
 			{
 				if (m_flTimeNextCharge <= gpGlobals->time)
 				{
-					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+					m_iClip++;
 					m_flTimeNextCharge = gpGlobals->time + 0.20s;			
 				}
 			}
@@ -472,7 +471,7 @@ namespace sv {
 		{
 //			if (m_flTimeNextCharge <= gpGlobals->time)
 //			{
-//				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+//				m_iClip--;
 //				m_flTimeNextCharge = gpGlobals->time + 0.25s;
 //
 //				if (m_iSaveShoots < 70)
@@ -614,7 +613,7 @@ namespace sv {
 		{
 			if (m_pTitan->m_pWeapon)
 			{
-				if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] || !m_iWpnState)
+				if (!m_iClip || !m_iWpnState)
 				{
 					m_pTitan->m_pWeapon = NULL;
 				}

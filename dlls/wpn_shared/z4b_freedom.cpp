@@ -178,6 +178,9 @@ namespace sv {
 		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 			return;
 
+		if (!m_iWeaponState)
+			return;
+
 		if (m_pPlayer->pev->fov != 90)
 		{
 			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
@@ -197,7 +200,7 @@ namespace sv {
 
 	void ItemPostFrame(void)
 	{
-		if (m_flNextPrimaryAttack <= UTIL_WeaponTimeBase())
+		if (!m_iWeaponState)
 		{
 			if (m_pPlayer->m_bResumeZoom)
 			{

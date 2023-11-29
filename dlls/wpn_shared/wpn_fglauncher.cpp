@@ -382,7 +382,7 @@ namespace sv {
 		if (m_flNextPrimaryAttack > UTIL_WeaponTimeBase())
 			return;
 
-		if (DefaultReload(iMaxClip(), FGLAUNCHER_RELOAD, 5.04s))
+		if (DefaultReload(iGetMaxClip(), FGLAUNCHER_RELOAD, 5.04s))
 		{
 #ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_RELOAD);

@@ -127,7 +127,6 @@ void CZeus::Spawn(void)
 	Precache();
 	m_iId = WEAPON_CSGO_ZEUS;
 	SET_MODEL(ENT(pev), "models/w_zeus.mdl");
-	m_iClip = -1;
 	m_iDefaultAmmo = 1;
 	FallInit();
 }
@@ -147,10 +146,10 @@ int CZeus::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "ZeusAmmo";
-	p->iMaxAmmo1 = 1;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = -1;
+	p->iMaxClip = 1;
 	p->iSlot = 2;
 	p->iPosition = 2;
 	p->iId = m_iId = WEAPON_CSGO_ZEUS;
@@ -207,9 +206,9 @@ void CZeus::PrimaryAttack(void)
 	}
 	}
 #endif
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	if (!m_iClip)
 		m_flTimeWeaponIdle = m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
 
 }
@@ -219,7 +218,7 @@ void CZeus::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		RetireWeapon();
 		return;
@@ -233,7 +232,7 @@ void CZeus::Holster(int skiplocal)
 {
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
 
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	if (!m_iClip)
 	{
 		m_pPlayer->RemoveWeapon(m_iId);
 		DestroyItem();
@@ -252,17 +251,4 @@ float CZeus::GetPrimaryAttackDamage() const
 #endif
 	return flDamage;
 }
-
-int CZeus::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 }

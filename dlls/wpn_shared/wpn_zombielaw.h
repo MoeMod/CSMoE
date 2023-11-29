@@ -73,7 +73,6 @@ public:
 	void Precache() override;
 	int GetItemInfo(ItemInfo *p) override;
 	BOOL Deploy() override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 	float GetMaxSpeed() override { return ZOMBIELAW_MAX_SPEED; }
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
 	void PrimaryAttack() override;

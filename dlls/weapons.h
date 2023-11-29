@@ -443,6 +443,7 @@ public:
 	inline int iWeight() const { return ItemInfoInstance().iWeight; }
 	inline int iFlags() const { return ItemInfoInstance().iFlags; }
 
+	virtual int iGetMaxClip() { return ItemInfoInstance().iMaxClip; }
 public:
 	static TYPEDESCRIPTION m_SaveData[3];
 	static std::map<int, ItemInfo> ItemInfoArray;
@@ -567,7 +568,7 @@ public:
 	{
 		return DefaultDeploy(szViewModel, szWeaponModel, iAnim, szAnimExt, skiplocal, 0.75s, 1.5s);
 	}*/
-	int DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body = 0);
+	virtual int DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body = 0);
 	virtual void FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18);
 	void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max,
 	              float lateral_max, int direction_change);
@@ -666,34 +667,18 @@ public:
 	int m_iKnifeID;
 	int m_iGrenadeID;
 	unsigned int m_uiWeaponEnhancedLevel;
-	unsigned int m_uiKnifeEnhancedLevel;
 	unsigned int m_uiWeaponPaintType;
 	unsigned int m_uiKnifePaintType;
 
 	int GetTotalEnhancedLevel(void)
 	{
-		if (m_iId == WEAPON_KNIFE)
-		{
-			return (m_uiKnifeEnhancedLevel & 0xF) +
-				((m_uiKnifeEnhancedLevel >> 4) & 0xF) +
-				((m_uiKnifeEnhancedLevel >> 8) & 0xF) +
-				((m_uiKnifeEnhancedLevel >> 12) & 0xF) +
-				((m_uiKnifeEnhancedLevel >> 16) & 0xF) +
-				((m_uiKnifeEnhancedLevel >> 20) & 0xF) +
-				((m_uiKnifeEnhancedLevel >> 24) & 0xF);
-		}
-		else
-		{
-			return (m_uiWeaponEnhancedLevel & 0xF) +		//accuracy
-				((m_uiWeaponEnhancedLevel >> 4) & 0xF) +	//damage
-				((m_uiWeaponEnhancedLevel >> 8) & 0xF) +	//rebound
-				((m_uiWeaponEnhancedLevel >> 12) & 0xF) +	//weight
-				((m_uiWeaponEnhancedLevel >> 16) & 0xF) +	//repeatedly
-				((m_uiWeaponEnhancedLevel >> 20) & 0xF) +	//load
-				((m_uiWeaponEnhancedLevel >> 24) & 0xF);
-		}
-
-		
+		return (m_uiWeaponEnhancedLevel & 0xF) +		//accuracy
+			((m_uiWeaponEnhancedLevel >> 4) & 0xF) +	//damage
+			((m_uiWeaponEnhancedLevel >> 8) & 0xF) +	//rebound
+			((m_uiWeaponEnhancedLevel >> 12) & 0xF) +	//weight
+			((m_uiWeaponEnhancedLevel >> 16) & 0xF) +	//repeatedly
+			((m_uiWeaponEnhancedLevel >> 20) & 0xF) +	//load
+			((m_uiWeaponEnhancedLevel >> 24) & 0xF);
 	}
 };
 

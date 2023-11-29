@@ -68,10 +68,10 @@ namespace sv {
     {
         p->pszName = STRING(pev->classname);
         p->pszAmmo1 = "MusketAmmo";
-        p->iMaxAmmo1 = 30;
+        p->iMaxAmmo1 = -1;
         p->pszAmmo2 = NULL;
         p->iMaxAmmo2 = -1;
-        p->iMaxClip = -1;
+        p->iMaxClip = 30;
         p->iSlot = 1;
         p->iPosition = 4;
         p->iId = m_iId = WEAPON_MUSKET;
@@ -91,19 +91,6 @@ namespace sv {
     {
         PRECACHE_MODEL("sprites/muzzleflash14.spr");
         Base::Precache();
-    }
-
-    int ExtractAmmo(CBasePlayerWeapon* pWeapon)
-    {
-        if (m_iDefaultAmmo)
-        {
-            m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 30;
-            m_iClip = WEAPON_NOCLIP;
-            m_iDefaultAmmo = 0;
-            return TRUE;
-        }
-
-        return CBasePlayerWeapon::ExtractAmmo(pWeapon);
     }
 
     void Spawn() override
@@ -155,7 +142,7 @@ namespace sv {
 
     void MusketFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
-        if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+        if (m_iClip <= 0)
         {
             if (m_fFireOnEmpty)
             {
@@ -165,7 +152,7 @@ namespace sv {
             return;
         }
 
-        m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+        m_iClip--;
         m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 
         UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
@@ -179,14 +166,14 @@ namespace sv {
         flags = 0;
 #endif
 
-        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], FALSE);
+        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), m_iClip, FALSE);
         
         m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
         m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 #ifndef CLIENT_DLL
-        if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+        if (m_iClip <= 0)
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", 0, 0);
 #endif
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.5s;
@@ -210,7 +197,7 @@ namespace sv {
 
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0s;
  
-        if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+        if (m_iClip)
             SendWeaponAnim(ANIM_IDLE1, UseDecrement() != FALSE);
         else
             SendWeaponAnim(ANIM_IDLE2, UseDecrement() != FALSE);

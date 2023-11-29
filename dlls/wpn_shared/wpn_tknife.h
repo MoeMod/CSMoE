@@ -42,8 +42,6 @@ public:
 
 	const char* GetCSModelName() override { return "models/w_tknife.mdl"; }
 
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
-
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_tknife" , 30 }; }
 #endif

@@ -589,24 +589,9 @@ namespace sv {
 	void Spawn(void)
 	{
 		Base::Spawn();
-		m_iClip = WEAPON_NOCLIP;
 		m_iId = WEAPON_PETROLBOOMER;
 		m_iDefaultAmmo = 20;
 	}
-
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon)
-	{
-		if (m_iDefaultAmmo)
-		{
-			if (m_pPlayer)
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-			m_iClip = WEAPON_NOCLIP;
-			m_iDefaultAmmo = 0;
-			return TRUE;
-		}
-		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-	}
-
 
 	BOOL Deploy(void) override
 	{
@@ -619,7 +604,7 @@ namespace sv {
 		m_pPlayer->UpdateShieldCrosshair(false);
 #endif
 
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+		if (m_iClip > 0)
 			return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "carbine", UseDecrement() != FALSE);
 		else
 			return DefaultDeploy(V_Model, P_Model, ANIM_DRAW_EMPTY, "carbine", UseDecrement() != FALSE);
@@ -627,11 +612,11 @@ namespace sv {
 
 	void PrimaryAttack() override
 	{
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+		if (m_iClip <= 0)
 			return;
 
 		m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+		m_iClip--;
 		
 		m_flReloadTime = gpGlobals->time + 1.0s;
 
@@ -661,7 +646,7 @@ namespace sv {
 		flags = 0;
 #endif
 
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, m_iClip, m_iClip, FALSE, FALSE);
 
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 4.7s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.7s;
@@ -699,7 +684,7 @@ namespace sv {
 
 		int iAnim;
 
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+		if (m_iClip <= 0)
 			iAnim = ANIM_IDLE_EMPTY;
 		else
 			iAnim = ANIM_IDLE1;

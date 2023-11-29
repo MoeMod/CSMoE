@@ -130,6 +130,8 @@ void PlayerModStrategy_ZBS::ClientPutInServer()
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBSMsg, NULL, m_pPlayer->edict());
 	WRITE_BYTE(4);
 	MESSAGE_END();
+
+	return CPlayerModStrategy_Default::ClientPutInServer();
 }
 
 void PlayerModStrategy_ZBS::OnSpawn()

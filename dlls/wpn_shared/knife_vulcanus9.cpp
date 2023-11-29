@@ -94,10 +94,10 @@ public:
 
 		if (m_flTimeholster != invalid_time_point)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 2.0s;
+			m_iClip += (gpGlobals->time - m_flTimeholster) / 2.0s;
 		}
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= VULCANUS9_MAXAMMO)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = VULCANUS9_MAXAMMO;
+		if (m_iClip >= VULCANUS9_MAXAMMO)
+			m_iClip = VULCANUS9_MAXAMMO;
 			
 		SetSkin();
 
@@ -136,7 +136,7 @@ public:
 
 	float GetSecondaryAttackDamage() const
 	{
-		bool bFireOn = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0 ? true : false;
+		bool bFireOn = m_iClip > 0 ? true : false;
 
 		float flDamage = bFireOn ? 120.0f : 80.0f;
 #ifndef CLIENT_DLL
@@ -161,7 +161,6 @@ public:
 	}
 
 	void Holster(int skiplocal) override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 	void ItemPostFrame() override;
 
 	time_point_t m_flTimeNextCharge;
@@ -171,23 +170,11 @@ public:
 
 LINK_ENTITY_TO_CLASS(knife_vulcanus9, CKnifeVulcanus9)
 
-int CKnifeVulcanus9::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 int CKnifeVulcanus9::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "vulcanus9ammo";
-	p->iMaxAmmo1 = VULCANUS9_MAXAMMO;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = VULCANUS9_MAXAMMO;
@@ -207,10 +194,9 @@ void CKnifeVulcanus9::Spawn()
 	m_iId = WEAPON_KNIFE;
 	Precache();
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");
-	m_iClip = WEAPON_NOCLIP;
 	m_flTimeholster = gpGlobals->time;
 
-	m_iDefaultAmmo = VULCANUS9_MAXAMMO;
+	m_iClip = m_iDefaultAmmo = VULCANUS9_MAXAMMO;
 	FallInit();
 }
 
@@ -265,7 +251,7 @@ void CKnifeVulcanus9::OnPrimaryAttack()
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	SendWeaponAnim(m_iSwing++ % 4 ? ANIM_MIDSLASH1 : ANIM_MIDSLASH2, UseDecrement() != FALSE);
 #ifndef CLIENT_DLL
-	bool bFireOn = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0 ? true : false;
+	bool bFireOn = m_iClip > 0 ? true : false;
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
@@ -344,7 +330,7 @@ void CKnifeVulcanus9::OffPrimaryAttack()
 #ifndef CLIENT_DLL
 hit_result_t CKnifeVulcanus9::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer)
 {
-	bool bFireOn = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0 ? true : false;
+	bool bFireOn = m_iClip > 0 ? true : false;
 
 	CBaseEntity* pEntity = NULL;
 	hit_result_t result = HIT_NONE;
@@ -441,7 +427,7 @@ hit_result_t CKnifeVulcanus9::KnifeAttack(float flDamage, float flRadius, float 
 
 void CKnifeVulcanus9::SetSkin()
 {
-	float flRatio = float(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]) / float(VULCANUS9_MAXAMMO);
+	float flRatio = float(m_iClip) / float(VULCANUS9_MAXAMMO);
 
 	if (flRatio >= 0.8)
 		pev->skin = 4;
@@ -469,13 +455,13 @@ void CKnifeVulcanus9::ItemPostFrame()
 #ifndef CLIENT_DLL
 	if (m_iWeaponState & WPNSTATE_VULCANUS9_MODEB)
 	{
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0 && m_flTimeNextCharge <= gpGlobals->time)
+		if (m_iClip > 0 && m_flTimeNextCharge <= gpGlobals->time)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+			m_iClip--;
 			
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+			if (m_iClip <= 0)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+				m_iClip = 0;
 
 				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
 				WRITE_BYTE(79);
@@ -498,11 +484,11 @@ void CKnifeVulcanus9::ItemPostFrame()
 	}
 	else
 	{
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < VULCANUS9_MAXAMMO)
+		if (m_iClip < VULCANUS9_MAXAMMO)
 		{
 			if (m_flTimeNextCharge <= gpGlobals->time)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+				m_iClip++;
 				m_flTimeNextCharge = gpGlobals->time + 2.0s;
 				SetSkin();
 			}

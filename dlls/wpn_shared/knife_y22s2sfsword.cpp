@@ -101,10 +101,10 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (m_flTimeholster != invalid_time_point)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 0.1s;
+				m_iClip += (gpGlobals->time - m_flTimeholster) / 0.1s;
 			}
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100;
+			if (m_iClip >= 100)
+				m_iClip = 100;
 
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
@@ -130,7 +130,6 @@ namespace sv {
 		void WeaponIdle() override;
 		float GetMaxSpeed() override;
 		void Holster(int skiplocal) override;
-		int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 		void DelayPrimaryAttack();
 #ifndef CLIENT_DLL
 		hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsPrimaryAttack);
@@ -249,10 +248,10 @@ namespace sv {
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "Y22s2sfswordcharge";
-		p->iMaxAmmo1 = 100;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = WEAPON_NOCLIP;
+		p->iMaxClip = 100;
 		p->iSlot = 2;
 		p->iPosition = 1;
 		p->iId = WEAPON_KNIFE;
@@ -262,21 +261,10 @@ namespace sv {
 		return 1;
 	}
 
-	int CKnifeY22s2SFSword::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-	{
-		if (m_iDefaultAmmo)
-		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-			m_iClip = WEAPON_NOCLIP;
-			m_iDefaultAmmo = 0;
-			return TRUE;
-		}
-		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-	}
 	BOOL CKnifeY22s2SFSword::IsSignal()
 	{
 #ifndef CLIENT_DLL
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 100)
+		if (m_iClip == 100)
 		{
 			return TRUE;
 		}
@@ -375,7 +363,7 @@ namespace sv {
 					}
 					else
 					{
-						if(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+						if(m_iClip)
 							ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 1.0f });
 
 						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
@@ -690,15 +678,15 @@ namespace sv {
 	void CKnifeY22s2SFSword::ItemPostFrame()
 	{
 #ifndef CLIENT_DLL
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 100)
+		if (m_iClip < 100)
 		{
 			if (m_flTimeNextCharge <= gpGlobals->time)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+				m_iClip++;
 				m_flTimeNextCharge = gpGlobals->time + 0.1s;
 			}
 		}
-		else if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100)
+		else if (m_iClip = 100)
 		{
 			if (IsSignal())
 			{
@@ -735,7 +723,7 @@ namespace sv {
 
 	void CKnifeY22s2SFSword::SecondaryAttack(void)
 	{
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 100)
+		if (m_iClip == 100)
 		{
 			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireY22s2sfsword, 0.266, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_SKILL, 0, FALSE, FALSE);
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/y22s2sfsword_skill.wav", VOL_NORM, ATTN_NORM, 0, 94);
@@ -776,7 +764,7 @@ namespace sv {
 #endif
 
 			m_iState = 0;
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+			m_iClip = 0;
 
 
 		}

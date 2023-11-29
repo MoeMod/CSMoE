@@ -27,10 +27,12 @@ GNU General Public License for more details.
 #include "player/player_model.h"
 #include <vector>
 #include <algorithm>
-
+#include "FileSystem.h"
+#include "fs_int.h"
 
 namespace sv {
 
+extern fs_api_t gFileSystemAPI;
 extern	nlohmann::json g_Radio;
 
 void CPlayerModStrategy_Default::CheckBuyZone()
@@ -875,6 +877,117 @@ bool IBasePlayerModStrategy::GiveSlotAmmo(CBasePlayer* player, int nSlot)
 	}
 
 	return true;
+}
+
+nlohmann::json g_EnhanceWeaponInfo;
+nlohmann::json g_ZombieTypeInfo;
+nlohmann::json g_WeaponPaintInfo;
+
+void InitWeaponEnhanceData()
+{
+	fs_offset_t length;
+
+	auto data = gFileSystemAPI.FS_MapFile("WeaponEnhance.json", &length, true);
+	if (data)
+	{
+		g_EnhanceWeaponInfo = nlohmann::json::parse(std::string_view((const char*)data, length));
+		gFileSystemAPI.FS_MapFree(data, length);
+	}
+}
+
+void InitZombieSkinData()
+{
+	fs_offset_t length;
+
+	auto data = gFileSystemAPI.FS_MapFile("ZombieSkin.json", &length, true);
+	if (data)
+	{
+		g_ZombieTypeInfo = nlohmann::json::parse(std::string_view((const char*)data, length));
+		gFileSystemAPI.FS_MapFree(data, length);
+	}
+}
+
+void InitWeaponPaintData()
+{
+	fs_offset_t length;
+
+	auto data = gFileSystemAPI.FS_MapFile("WeaponPaint.json", &length, true);
+	if (data)
+	{
+		g_WeaponPaintInfo = nlohmann::json::parse(std::string_view((const char*)data, length));
+		gFileSystemAPI.FS_MapFree(data, length);
+	}
+}
+
+void CPlayerModStrategy_Default::ClientPutInServer()
+{
+	InitWeaponEnhanceData();
+	InitZombieSkinData();
+	InitWeaponPaintData();
+
+	for (auto& info : g_EnhanceWeaponInfo)
+	{
+		int uiWeaponEnhancedLevels;
+		int WeaponID = info["WeaponID"].get<int>();
+		int damage = info["Damage"].get<int>();
+		int accuracy = info["Accuracy"].get<int>();
+		int rebound = info["Rebound"].get<int>();
+		int weight = info["Weight"].get<int>();
+		int repeatedly = info["Repeatedly"].get<int>();
+		int load = info["Load"].get<int>();
+
+		uiWeaponEnhancedLevels = (accuracy & 0xF) |
+								((damage & 0xF) << 4) |
+								((rebound & 0xF) << 8) |
+								((weight & 0xF) << 12) |
+								((repeatedly & 0xF) << 16) |
+								((load & 0xF) << 20);
+
+		if (WeaponID >= 10000)
+		{	
+			//Grenade Not suport
+			WeaponID -= 10000;
+		}
+		else if (WeaponID >= 5000)
+		{
+			//Knife
+			WeaponID -= 5000;
+			m_pPlayer->m_uiKnifeEnhancedLevels[WeaponID] = uiWeaponEnhancedLevels;
+		}
+		else
+		{
+			m_pPlayer->m_uiWeaponEnhancedLevels[WeaponID] = uiWeaponEnhancedLevels;
+		}
+	}
+
+	for (auto& info : g_ZombieTypeInfo)
+	{
+		int iClass = info["ZombieClass"].get<int>();
+		int iSkin = info["ZombieSkin"].get<int>();
+		m_pPlayer->m_iZombieClassSkin[iClass] = iSkin;		
+	}
+
+	for (auto& info : g_WeaponPaintInfo)
+	{
+		int WeaponID = info["WeaponID"].get<int>();
+		int Paint = info["Paint"].get<int>();
+		
+		if (WeaponID >= 10000)
+		{
+			//Grenade Not suport
+			WeaponID -= 10000;
+		}
+		else if (WeaponID >= 5000)
+		{
+			//Knife
+			WeaponID -= 5000;
+			m_pPlayer->m_uiKnifePaintType[WeaponID] = Paint;
+		}
+		else
+		{
+			m_pPlayer->m_uiWeaponPaintType[WeaponID] = Paint;
+		}
+	}
 }
 
 }

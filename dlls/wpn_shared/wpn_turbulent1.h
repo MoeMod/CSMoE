@@ -86,6 +86,7 @@ namespace sv {
 	void Precache() override;
 	void Spawn() override;
 	BOOL Deploy() override;
+    int DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body = 0) override;
 	void Reload(void) override;
 	void WeaponIdle(void) override;
 	void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

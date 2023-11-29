@@ -37,7 +37,6 @@ LINK_ENTITY_TO_CLASS(z4b_cannontiger, CCannonTiger)
 void CCannonTiger::Spawn(void)
 {
 	Base::Spawn();
-	m_iClip = WEAPON_NOCLIP;
 	m_iId = WEAPON_Z4B_CANNONTIGER;
 	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
 }
@@ -57,18 +56,6 @@ WeaponBotStrategy CCannonTiger::GetBotStrategy() const
 	return BOT_STRATEGY_CANNON;
 }
 
-int CCannonTiger::ExtractAmmo(CBasePlayerWeapon *pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 void CCannonTiger::PrimaryAttack(void)
 {
 	CannonTigerFire(0, 3.5s, FALSE);
@@ -78,7 +65,7 @@ void CCannonTiger::CannonTigerFire(float flSpread, duration_t flCycleTime, BOOL 
 {
 	m_bDelayFire = true;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
 		{
@@ -89,7 +76,7 @@ void CCannonTiger::CannonTigerFire(float flSpread, duration_t flCycleTime, BOOL 
 		return;
 	}
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL

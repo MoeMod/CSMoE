@@ -86,10 +86,10 @@ namespace sv {
     {
         p->pszName = STRING(pev->classname);
         p->pszAmmo1 = "chainsawoil";
-        p->iMaxAmmo1 = 1600;
+        p->iMaxAmmo1 = -1;
         p->pszAmmo2 = NULL;
         p->iMaxAmmo2 = -1;
-        p->iMaxClip = -1;
+        p->iMaxClip = 1600;
         p->iSlot = 0;
         p->iPosition = 4;
         p->iId = m_iId = WEAPON_HEROCHAINSAW;
@@ -104,14 +104,6 @@ namespace sv {
 #endif
     float GetArmorRatioModifier() override { return 1.8; }
     WeaponCrosshairData GetCrosshairData() override { return { 0, 6, 3, 0 }; }
-
-    int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
-    {
-        m_iClip = WEAPON_NOCLIP;
-        m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 1600;
-        return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-    }
-
 
     float GetPrimaryAttackDamage() const
     {
@@ -365,7 +357,7 @@ namespace sv {
 
         PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100.0), int(m_pPlayer->pev->punchangle.y * 100.0), FALSE, TRUE);
 #ifndef CLIENT_DLL
-        if (!m_iClip && !m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+        if (!m_iClip)
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", 0, 0);
 #endif
         if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -415,7 +407,7 @@ namespace sv {
 
         PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100.0), int(m_pPlayer->pev->punchangle.y * 100.0), TRUE, FALSE);
 #ifndef CLIENT_DLL
-        if (!m_iClip && !m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+        if (!m_iClip)
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", 0, 0);
 #endif
     }

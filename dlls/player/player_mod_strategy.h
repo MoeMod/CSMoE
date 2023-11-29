@@ -133,7 +133,7 @@ public:
 	float AdjustZombieKnifeRange(bool bStab, float flRange) override { return flRange; }
 	int AdjustScoreAttrib(int state) override { return state; }
 	Vector AdjustFireBullets3Dir(Vector vecDir) override { return vecDir; }
-	void ClientPutInServer() {}
+	void ClientPutInServer();
 	void ShootGrenade(const std::function<void(void)>& f) {}
 	void GrenadeExploded(Vector vecStart) {}
 	void ZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) {};

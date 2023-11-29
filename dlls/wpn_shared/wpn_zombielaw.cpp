@@ -171,7 +171,7 @@ int CZombieLaw::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "ZombieLawGrenade";
-	p->iMaxAmmo1 = 3;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = 3;
@@ -193,23 +193,11 @@ BOOL CZombieLaw::Deploy(void)
 	return DefaultDeploy("models/v_zombielaw.mdl", "models/p_zombielaw.mdl", ZOMBIELAW_DRAW, "at4", UseDecrement() != FALSE, 3.1s, 3.5s);
 }
 
-int CZombieLaw::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 void CZombieLaw::PrimaryAttack(void)
 {
 	m_bDelayFire = true;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
 		{
@@ -219,7 +207,7 @@ void CZombieLaw::PrimaryAttack(void)
 
 		return;
 	}
-	--m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+	--m_iClip;
 
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -252,7 +240,7 @@ void CZombieLaw::PrimaryAttack(void)
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
 #ifndef CLIENT_DLL
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.1s;
@@ -269,7 +257,7 @@ void CZombieLaw::Reload(void)
 
 void CZombieLaw::Holster(int skiplocal)
 {
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	if (!m_iClip)
 	{
 		m_pPlayer->RemoveWeapon(m_iId);
 		DestroyItem();
@@ -293,7 +281,7 @@ void CZombieLaw::WeaponIdle(void)
 		return;
 	}
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		m_flNextTimeCanHolster = gpGlobals->time + 1.2s;
 		SendWeaponAnim(ZOMBIELAW_DISCARD, UseDecrement() != FALSE);
@@ -309,7 +297,7 @@ void CZombieLaw::WeaponIdle(void)
 
 BOOL CZombieLaw::CanDeploy(void)
 {
-	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
+	return m_iClip != 0;
 }
 
 }

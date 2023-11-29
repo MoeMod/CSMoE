@@ -62,10 +62,10 @@ int CM79G::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "40mmGrenade2";
-	p->iMaxAmmo1 = 6;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = -1;
+	p->iMaxClip = 6;
 	p->iSlot = 1;
 	p->iPosition = 2;
 	p->iId = m_iId = WEAPON_M79G;
@@ -88,10 +88,10 @@ BOOL CM79G::Deploy(void)
 
 void CM79G::M79Fire()
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		return;
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 
 	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
@@ -113,7 +113,7 @@ void CM79G::M79Fire()
 		pRocket->m_iTeam = m_pPlayer->m_iTeam;
 	}
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	if (m_iClip)
 		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/m79-1.wav", 0.7, ATTN_NORM, 0, PITCH_NORM);
 #endif
 
@@ -125,7 +125,7 @@ void CM79G::M79Fire()
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM79, 0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0, FALSE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM79, 0, g_vecZero, g_vecZero, 0.0, 0.0, int(m_pPlayer->pev->punchangle.x * 100), int(m_pPlayer->pev->punchangle.y * 100), m_iClip != 0, FALSE);
 
 
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.8s;
@@ -133,7 +133,7 @@ void CM79G::M79Fire()
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
 
 #ifndef CLIENT_DLL
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 

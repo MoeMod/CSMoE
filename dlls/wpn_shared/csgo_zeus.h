@@ -26,7 +26,6 @@ public:
 	BOOL CanDrop() override { return TRUE; }
 	void PrimaryAttack() override;
 	void WeaponIdle() override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 	const char *GetCSModelName() override { return "models/w_zeus.mdl"; }
 	float GetPrimaryAttackDamage() const;
 	void Holster(int skiplocal) override;

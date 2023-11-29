@@ -1400,15 +1400,46 @@ int CHudAmmo::Draw(float flTime)
 		m_pTexture_Black->Draw2DQuadScaled(x, y - gHUD.m_iFontHeight / 2, x + (8 * AmmoWidth) + iIconWidth, ScreenHeight, 0, 0, 1, 1, 255, 255, 255, 100);
 	}
 	// Does weapon have any ammo at all?
-	if (m_pWeapon->iAmmoType > 0)
+	if (m_pWeapon->iClip >= 0 && m_pWeapon->iMax1 <= 0)
+	{
+		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
+
+
+		// No clip weapon, draws blue special ammo
+		DrawUtils::UnpackRGB(r, g, b, gHUD.m_hudstyle->value == 1 ? RGB_WHITE : RGB_LIGHTBLUE);
+		//DrawUtils::ScaleColors(r, g, b, a);
+
+
+		// SPR_Draw a bullets only line
+		if (pw->iClip > 1500)
+		{
+			x = ScreenWidth - AmmoWidth - iIconWidth;
+			int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+			x -= width;
+
+			SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+			SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
+			x = ScreenWidth - AmmoWidth - iIconWidth;
+		}
+		else
+		{
+			x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+			x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, pw->iClip, r, g, b);			
+		}
+		
+		// Draw the ammo Icon	patroldrone dont't draw!!! TODO
+		int iOffset = (m_pWeapon->rcAmmo.bottom - m_pWeapon->rcAmmo.top) / 8;
+		SPR_Set(m_pWeapon->hAmmo, r, g, b);
+		SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo);
+	}
+	else if (m_pWeapon->iAmmoType > 0)
 	{
 		DrawUtils::UnpackRGB(r, g, b, gHUD.m_hudstyle->value == 1 ? RGB_WHITE : RGB_YELLOWISH);
 		DrawUtils::ScaleColors(r, g, b, a);
 
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 
-		if (pw->iClip >= 0 &&
-			m_pWeapon->iId != WEAPON_TURBULENT1)
+		if (pw->iClip >= 0)
 		{
 			// room for the number and the '|' and the current ammo
 
@@ -1439,56 +1470,17 @@ int CHudAmmo::Draw(float flTime)
 			else
 				x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
 
-
 		}
 		else
 		{
-			if (pw->iSlot < 3)
-			{
-				// No clip weapon, draws blue special ammo
-				DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
-				//DrawUtils::ScaleColors(r, g, b, a);
-			}
-
-
-			// SPR_Draw a bullets only line
-
-			if (m_pWeapon->iId == WEAPON_TURBULENT1)
-			{
-				x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
-				x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, pw->iClip, r, g, b);
-			}
-			else
-			{
-				if (gWR.CountAmmo(pw->iAmmoType) > 1500)
-				{
-					x = ScreenWidth - AmmoWidth - iIconWidth;
-					int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
-					x -= width;
-
-					SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
-					SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_iInfinite));
-					x = ScreenWidth - AmmoWidth - iIconWidth;
-				}
-				else
-				{
-					
-					if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))
-					{
-						x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
-						x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
-					}
-				}
-			}
+			x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
+			x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
 		}
 
-		// Draw the ammo Icon
-		if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))
-		{
-			int iOffset = (m_pWeapon->rcAmmo.bottom - m_pWeapon->rcAmmo.top) / 8;
-			SPR_Set(m_pWeapon->hAmmo, r, g, b);
-			SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo);
-		}
+		// Draw the ammo Icon	patroldrone dont't draw!!! TODO
+		int iOffset = (m_pWeapon->rcAmmo.bottom - m_pWeapon->rcAmmo.top) / 8;
+		SPR_Set(m_pWeapon->hAmmo, r, g, b);
+		SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo);
 	}
 
 	// Does weapon have seconday ammo?
@@ -2121,19 +2113,48 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 	int iX = ScreenWidth - 5;
 
 	// Does weapon have any ammo at all?
-	if (m_pWeapon->iAmmoType > 0)
+	if (m_pWeapon->iClip >= 0 && m_pWeapon->iMax1 <= 0)
+	{
+		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
+
+		if (pw->iSlot == 2)
+			DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
+		else
+			DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
+
+		iX = ScreenWidth - 5 - iIconWidth;
+		// GL Seems to need this
+		if (pw->iClip > 1500)
+		{
+			int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
+			iX -= width;
+
+			SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
+			SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iInfinite));
+		}
+		else
+		{
+			iX -= DrawUtils::GetNEWHudNumberWidth(0, pw->iClip, FALSE, 3, 0);
+			DrawUtils::DrawNEWHudNumber(0, iX, iY, pw->iClip, r, g, b, 255, FALSE, 3);	
+		}
+		
+
+		// Draw the ammo Icon	patroldrone dont't draw!!! TODO
+		iY = ScreenHeight - 15 - gHUD.m_NEWHUD_iFontHeight;
+		iX = ScreenWidth - 5;
+		SPR_Set(m_pWeapon->hAmmo, r, g, b);
+		SPR_DrawAdditive(0, iX - iIconWidth, iY, &m_pWeapon->rcAmmo);
+	}
+	else if (m_pWeapon->iAmmoType > 0)
 	{
 		DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
 		DrawUtils::ScaleColors(r, g, b, a);
 
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 
-		if (pw->iClip >= 0 &&
-			m_pWeapon->iId != WEAPON_TURBULENT1)
+		if (pw->iClip >= 0)
 		{
 			// room for the number and the '|' and the current ammo
-
-
 			iX -= (8 * AmmoWidth) - iIconWidth;
 
 			DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
@@ -2159,45 +2180,16 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 		}
 		else
 		{
-			if (pw->iSlot < 3)
-				DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
-
 			iX = ScreenWidth - 5 - iIconWidth;
-			// GL Seems to need this
-			if (m_pWeapon->iId == WEAPON_TURBULENT1)
-			{
-				iX -= DrawUtils::GetNEWHudNumberWidth(0, pw->iClip, FALSE, 3, 0);
-				DrawUtils::DrawNEWHudNumber(0, iX, iY, pw->iClip, r, g, b, 255, FALSE, 3);
-			}
-			else
-			{
-				if (gWR.CountAmmo(pw->iAmmoType) > 1500)
-				{
-					int width = gHUD.GetSpriteRect(m_iInfinite).right - gHUD.GetSpriteRect(m_iInfinite).left;
-					iX -= width;
-
-					SPR_Set(gHUD.GetSprite(m_iInfinite), r, g, b);
-					SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iInfinite));
-				}
-				else
-				{
-					if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))
-					{
-						iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
-						DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 3);
-					}
-				}
-			}
+			iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pw->iAmmoType), FALSE, 3, 0);
+			DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pw->iAmmoType), r, g, b, 255, FALSE, 4);
 		}
 
 		// Draw the ammo Icon
-		if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))
-		{
-			iY = ScreenHeight - 15 - gHUD.m_NEWHUD_iFontHeight;
-			iX = ScreenWidth - 5;
-			SPR_Set(m_pWeapon->hAmmo, r, g, b);
-			SPR_DrawAdditive(0, iX - iIconWidth, iY, &m_pWeapon->rcAmmo);
-		}
+		iY = ScreenHeight - 15 - gHUD.m_NEWHUD_iFontHeight;
+		iX = ScreenWidth - 5;
+		SPR_Set(m_pWeapon->hAmmo, r, g, b);
+		SPR_DrawAdditive(0, iX - iIconWidth, iY, &m_pWeapon->rcAmmo);
 	}
 
 	// Does weapon have seconday ammo?
@@ -2625,15 +2617,39 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 				iY += iDrawOffset;
 				// Draw HudAmmo ?
 				// Does weapon have any ammo at all?
-				if (pWeapon->iAmmoType > 0)
+				iX += (i == 1) ? (iWpnBarWidth + iDrawOffset) : 0;
+				int iAmmoIconWidth = pWeapon->rcAmmo.right - pWeapon->rcAmmo.left;
+
+				iX -= iAmmoWidth;
+				iX -= iAmmoIconWidth;
+
+				if (m_pWeapon->iClip >= 0 && m_pWeapon->iMax1 <= 0)
 				{
-					iX += (i == 1) ? (iWpnBarWidth + iDrawOffset) : 0;
-					int iAmmoIconWidth = pWeapon->rcAmmo.right - pWeapon->rcAmmo.left;
+					//Draw Special Ammo (Like Cannon ?	
+					int iClipSafe = 0;
+					iClipSafe = pWeapon->iClip >= 0 ? pWeapon->iClip : 0;
 
-					iX -= iAmmoWidth;
-					iX -= iAmmoIconWidth;
+					DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
 
-					if (pWeapon->iClip >= 0 && pWeapon->iId != WEAPON_TURBULENT1)
+					// GL Seems to need this
+					//petroldrone don't draw TODO
+#if 0
+					iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 3, 0);
+					DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pWeapon->iAmmoType), r, g, b, 255, FALSE, 3);
+					iX += DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 3, 0);
+#else
+					//iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
+					iX -= floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
+					CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iClipSafe, iX + 3, iY, DHN_CENTERALIGNED, 0, flFontProportion, r, g, b);
+					//iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
+					iX += floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
+#endif
+						
+					
+				}
+				else if (pWeapon->iAmmoType > 0)
+				{
+					if (pWeapon->iClip >= 0)
 					{
 						//Draw Clip
 
@@ -2688,59 +2704,35 @@ int CHudAmmo::DrawApexHudWpnList(float flTime)
 						iY -= iAmmoBigHeight;
 						iY -= iDrawOffset;
 					}
-					//Draw Special Ammo (Like Cannon ?
 					else
 					{
 						int iClipSafe = 0;
 						iClipSafe = pWeapon->iClip >= 0 ? pWeapon->iClip : 0;
 
-						int iAmmoSafe = 0;
-						iAmmoSafe = gWR.CountAmmo(pWeapon->iAmmoType) >= 0 ? gWR.CountAmmo(pWeapon->iAmmoType) : 0;
-
-
-						if (pWeapon->iSlot < 3)
-							DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
+						DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
 
 						// GL Seems to need this
-						if (pWeapon->iId == WEAPON_TURBULENT1)
-						{
-#if 0
-							iX -= DrawUtils::GetNEWHudNumberWidth(0, pWeapon->iClip, FALSE, 3, 0);
-							DrawUtils::DrawNEWHudNumber(0, iX, iY, pWeapon->iClip, r, g, b, 255, FALSE, 3);
-							iX += DrawUtils::GetNEWHudNumberWidth(0, pWeapon->iClip, FALSE, 3, 0);
-#else
 
-							//iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
-							iX -= floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
-							CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iClipSafe, iX + 3, iY, DHN_CENTERALIGNED, 0, flFontProportion, r, g, b);
-							//iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
-							iX += floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
-#endif
-						}
-						else
-						{
-
-							if (m_pWeapon->iId != WEAPON_PATROLDRONE)
-							{
 #if 0
-								iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 3, 0);
-								DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pWeapon->iAmmoType), r, g, b, 255, FALSE, 3);
-								iX += DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 3, 0);
+						iX -= DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 3, 0);
+						DrawUtils::DrawNEWHudNumber(0, iX, iY, gWR.CountAmmo(pWeapon->iAmmoType), r, g, b, 255, FALSE, 3);
+						iX += DrawUtils::GetNEWHudNumberWidth(0, gWR.CountAmmo(pWeapon->iAmmoType), FALSE, 3, 0);
 #else
-								//iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * flFontProportion);
-								iX -= floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 0, 150 * flFontProportion));
-								CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iAmmoSafe, iX + 3, iY, DHN_CENTERALIGNED, 0, flFontProportion, r, g, b);
-								//iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iAmmoSafe, FALSE, 3, 1) * flFontProportion);
-								iX += floor(DrawUtils::GetHudNumberWidthCustom(iAmmoSafe, 0, 3, 0, 150 * flFontProportion));
+						//iX -= floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
+						iX -= floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
+						CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_BigWhite, m_iNum_BigWhiteC, iClipSafe, iX + 3, iY, DHN_CENTERALIGNED, 0, flFontProportion, r, g, b);
+						//iX += floor(DrawUtils::GetNEWHudNumberWidth(0, iClipSafe, FALSE, 3, 1) * flFontProportion);
+						iX += floor(DrawUtils::GetHudNumberWidthCustom(iClipSafe, 0, 3, 0, 150 * flFontProportion));
 #endif
-							}
-						}
+						
+						
 					}
-					iX -= (i == 1) ? (iWpnBarWidth + iDrawOffset) : 0;
-
-					iX += iAmmoWidth;
-					iX += iAmmoIconWidth;
 				}
+
+				iX -= (i == 1) ? (iWpnBarWidth + iDrawOffset) : 0;
+
+				iX += iAmmoWidth;
+				iX += iAmmoIconWidth;
 
 				// Draw the ammo Icon
 				if (!(strstr(m_pWeapon->szName, "weapon_patroldrone")))

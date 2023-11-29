@@ -47,7 +47,6 @@ public:
 	struct ItemInfoData_t : Base::ItemInfoData_t
 	{
 		static constexpr int iId = WEAPON_Z4B_CANNONTIGER;
-		static constexpr int iFlags = ITEM_FLAG_EXHAUSTIBLE;
 		static constexpr const char *szAmmo1 = "CannonAmmo";
 		static constexpr int iMaxAmmo1 = 20;
 	};
@@ -63,13 +62,12 @@ public:
 	void Spawn() override;
 	void Precache() override;
 	void PrimaryAttack() override;
-	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
 
 	int GetItemInfo(ItemInfo* p) override
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "CannonAmmo";
-		p->iMaxAmmo1 = 20;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = 20;

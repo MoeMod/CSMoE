@@ -129,7 +129,7 @@ void CDesperado::SecondaryAttack(void)
 	{
 		SendWeaponAnim(GetCorrectedAnim(SWAB_M), UseDecrement() != FALSE);
 
-		int iClipDiff = iMaxClip() - m_iClip;
+		int iClipDiff = iGetMaxClip() - m_iClip;
 
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= iClipDiff;
 
@@ -242,7 +242,7 @@ void CDesperado::PrimaryAttack(void)
 	{
 		SendWeaponAnim(GetCorrectedAnim(SWAB_M), UseDecrement() != FALSE);
 
-		int iClipDiff = iMaxClip() - m_iClip;
+		int iClipDiff = iGetMaxClip() - m_iClip;
 
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= iClipDiff;
 
@@ -365,7 +365,7 @@ void CDesperado::Reload(void)
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
-	if (DefaultReload(iMaxClip(), GetCorrectedAnim(RELOAD_M), 0.47s))
+	if (DefaultReload(iGetMaxClip(), GetCorrectedAnim(RELOAD_M), 0.47s))
 	{
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.67s;
 

@@ -2954,14 +2954,14 @@ void CCSTutor::CheckForNeedToReload(bool isPassiveCheck)
 	{
 		if (isPassiveCheck)
 		{
-			if (2 * currentWeapon->m_iClip < currentItem->iMaxClip() && !currentWeapon->m_fInReload)
+			if (2 * currentWeapon->m_iClip < currentItem->iGetMaxClip() && !currentWeapon->m_fInReload)
 			{
 				CreateAndAddEventToList(YOU_SHOULD_RELOAD);
 			}
 		}
 		else
 		{
-			if (5 * currentWeapon->m_iClip < currentItem->iMaxClip() && !currentWeapon->m_fInReload)
+			if (5 * currentWeapon->m_iClip < currentItem->iGetMaxClip() && !currentWeapon->m_fInReload)
 			{
 				TutorMessage *message = GetTutorMessageDefinition(YOU_SHOULD_RELOAD);
 

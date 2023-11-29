@@ -37,7 +37,6 @@ LINK_ENTITY_TO_CLASS(z4b_cannonplasma, CCannonPlasma)
 void CCannonPlasma::Spawn(void)
 {
 	Base::Spawn();
-	m_iClip = WEAPON_NOCLIP;
 	m_iId = WEAPON_Z4B_CANNONPLASMA;
 	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
 }
@@ -52,18 +51,6 @@ void CCannonPlasma::Precache(void)
 	m_usFire = PRECACHE_EVENT(1, "events/cannonplasma.sc");
 }
 
-int CCannonPlasma::ExtractAmmo(CBasePlayerWeapon *pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 void CCannonPlasma::PrimaryAttack(void)
 {
 	CannonPlasmaFire(0, 3.5s, FALSE);
@@ -73,7 +60,7 @@ void CCannonPlasma::CannonPlasmaFire(float flSpread, duration_t flCycleTime, BOO
 {
 	m_bDelayFire = true;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
 		{
@@ -84,7 +71,7 @@ void CCannonPlasma::CannonPlasmaFire(float flSpread, duration_t flCycleTime, BOO
 		return;
 	}
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL

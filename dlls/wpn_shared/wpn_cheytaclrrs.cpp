@@ -77,10 +77,10 @@ namespace sv {
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "408CheyTac";
-		p->iMaxAmmo1 = 30;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = -1;
+		p->iMaxClip = 30;
 		p->iSlot = 0;
 		p->iPosition = 2;
 		p->iId = m_iId = WEAPON_CHEYTACLRRS;
@@ -94,20 +94,6 @@ namespace sv {
 	{
 		return;
 	}
-
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon)
-	{
-		if (m_iDefaultAmmo)
-		{
-			if (m_pPlayer)
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-			m_iClip = WEAPON_NOCLIP;
-			m_iDefaultAmmo = 0;
-			return TRUE;
-		}
-		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-	}
-
 
 	void PrimaryAttack(void)
 	{
@@ -140,7 +126,7 @@ namespace sv {
 		else // not zoomed, so bullets diverts more
 			flSpread += 0.05;
 
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+		if (m_iClip <= 0)
 		{
 			if (m_fFireOnEmpty)
 			{
@@ -150,7 +136,7 @@ namespace sv {
 
 			return;
 		}
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+		m_iClip--;
 
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
@@ -180,7 +166,7 @@ namespace sv {
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
 #ifndef CLIENT_DLL
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+		if (m_iClip <= 0)
 			m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 
@@ -199,7 +185,7 @@ namespace sv {
 		flags = 0;
 #endif
 
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 0, FALSE);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), m_iClip == 0, FALSE);
 	}
 
 #ifndef CLIENT_DLL

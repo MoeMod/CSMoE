@@ -83,8 +83,6 @@ public:
 	float GetArmorRatioModifier() override { return 1.95; }
 	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 4, 3, 0 }; }
 
-	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override;
-
 	void HuntbowFire(float flSpread, duration_t flCycleTime, BOOL fChargeInterrupted);
 	void ChargedFire(void);
 	

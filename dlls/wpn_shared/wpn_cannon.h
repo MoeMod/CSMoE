@@ -51,7 +51,7 @@ public:
 		static constexpr int iMaxAmmo1 = 20;
 	};
 
-	static constexpr int MaxClip = -1;
+	static constexpr int MaxClip = 20;
 	static constexpr float PlayerMaxSpeed = 230;
 	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
 
@@ -63,7 +63,6 @@ public:
 	void Precache() override;
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
-	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannon" , 200 }; }
 	int GetPriority() override;
@@ -74,7 +73,7 @@ public:
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "CannonAmmo";
-		p->iMaxAmmo1 = 20;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = 20;
@@ -87,6 +86,7 @@ public:
 		return 1;
 	}
 
+	int iGetMaxClip(void) override;
 	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 0 }; }
 	WeaponBotStrategy GetBotStrategy() const;
 
@@ -95,6 +95,7 @@ public:
 	float GetDamage();
 	float GetTouchDamage();
 	float GetRadiusDamage();
+	
 
 private:
 	unsigned short m_usFire;

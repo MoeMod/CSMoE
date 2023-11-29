@@ -51,7 +51,6 @@ public:
 #endif
 
 	void SFSniperFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override;
 	int m_iShell;
 	int iShellOn;
 	bool m_bSearchingTarget;

@@ -7693,6 +7693,60 @@ BOOL CBasePlayer::RemovePlayerItem(CBasePlayerItem *pItem)
 	return FALSE;
 }
 
+
+BOOL GiveClipAmmo(CBasePlayer* pPlayer, int iCount, const char* pszName)
+{
+	//For Blue Ammo
+	CBasePlayerWeapon* pItem = NULL;
+	int iIndex = CBasePlayer::GetAmmoIndex(pszName);
+
+	if (iIndex < 0 || iIndex >= MAX_AMMO_TYPES)
+		return TRUE;
+
+	for (int i = 0; i < MAX_ITEM_TYPES; i++)
+	{
+		if (pPlayer->m_rgpPlayerItems[i])
+		{
+			if (pPlayer->m_rgpPlayerItems[i]->PrimaryAmmoIndex() == iIndex)
+			{
+				pItem = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[i]->GetWeaponPtr();
+
+				break;
+			}
+		}
+	}
+
+	if (!pItem)
+		return FALSE;
+
+	int iMaxClip = pItem->iGetMaxClip();
+
+	if (iMaxClip <= 0)
+		return FALSE;
+
+	if (pItem->iMaxAmmo1() > 0)
+		return FALSE;
+
+	int iAdd = min(iCount, iMaxClip - pItem->m_iClip);
+
+	if (iAdd < 1)
+		return TRUE;
+
+	pItem->m_iClip += iAdd;
+
+	if (gmsgAmmoPickup)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, pPlayer->pev);
+		WRITE_SHORT(iIndex);
+		WRITE_SHORT(iAdd);
+		MESSAGE_END();
+	}
+
+	pPlayer->TabulateAmmo();
+
+	return TRUE;
+}
+
 // Returns the unique ID for the ammo, or -1 if error
 
 int CBasePlayer::GiveAmmo(int iCount, const char *szName, int iMax)
@@ -7705,6 +7759,9 @@ int CBasePlayer::GiveAmmo(int iCount, const char *szName, int iMax)
 		// no ammo.
 		return -1;
 	}
+
+	if (GiveClipAmmo(this, iCount, szName))	//blue ammo
+		return 1;
 
 	iMax = m_pModStrategy->ComputeMaxAmmo(const_cast<const char *>(szName), iMax);
 

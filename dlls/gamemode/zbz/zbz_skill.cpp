@@ -2066,8 +2066,11 @@ namespace sv {
 					|| pWeapon->m_iId == WEAPON_Z4B_DEATHRAY
 					|| pWeapon->m_iId == WEAPON_M79
 					|| pWeapon->m_iId == WEAPON_M79G
+					|| pWeapon->m_iId == WEAPON_JANUS1
 					|| pWeapon->m_iId == WEAPON_FIRECRACKER
 					|| pWeapon->m_iId == WEAPON_Z4B_MECHANICXM214
+					|| pWeapon->m_iId == WEAPON_CHEYTACLRRS
+					|| pWeapon->m_iId == WEAPON_PETROLBOOMER
 					)
 					return;
 				switch (pWeapon->iItemSlot())
@@ -2075,7 +2078,7 @@ namespace sv {
 				case PRIMARY_WEAPON_SLOT:
 				case PISTOL_SLOT:
 				{
-					int delta = Q_min(pWeapon->iMaxClip() - pWeapon->m_iClip, m_pPlayer->m_rgAmmo[pWeapon->m_iPrimaryAmmoType]);
+					int delta = Q_min(pWeapon->iGetMaxClip() - pWeapon->m_iClip, m_pPlayer->m_rgAmmo[pWeapon->m_iPrimaryAmmoType]);
 
 					// Add them to the clip
 					pWeapon->m_iClip += delta;

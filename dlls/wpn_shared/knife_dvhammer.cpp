@@ -346,19 +346,19 @@ namespace sv {
 			if (m_flTimeholster != invalid_time_point)
 			{
 
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 0.5s * 7;
+				m_iClip += (gpGlobals->time - m_flTimeholster) / 0.5s * 7;
 
-				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= DVHAMMER_MAXAMMO)
+				if (m_iClip >= DVHAMMER_MAXAMMO)
 				{
-					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = DVHAMMER_MAXAMMO;
+					m_iClip = DVHAMMER_MAXAMMO;
 				}
 			}
 
-			if (!m_iWeaponState && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= DVHAMMER_MAXAMMO)
+			if (!m_iWeaponState && m_iClip >= DVHAMMER_MAXAMMO)
 			{
 				m_iWeaponState |= WPNSTATE_DVHAMMER_MODEB;
 
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = DVHAMMER_MAXAMMO;
+				m_iClip = DVHAMMER_MAXAMMO;
 			}
 #endif
 
@@ -483,11 +483,9 @@ namespace sv {
 		}
 
 		void Holster(int skiplocal) override;
-		int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 		void ItemPostFrame() override;
 
 		int m_iChargeShotsFired;
-
 		int m_iEfIndex;
 		int m_iModelIndex;
 		time_point_t m_flTimeNextCharge;
@@ -586,23 +584,11 @@ namespace sv {
 	}
 #endif
 
-	int CKnifeDVHammer::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-	{
-		if (m_iDefaultAmmo)
-		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-			m_iClip = WEAPON_NOCLIP;
-			m_iDefaultAmmo = 0;
-			return TRUE;
-		}
-		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-	}
-
 	int CKnifeDVHammer::GetItemInfo(ItemInfo* p)
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "dvhammerammo";
-		p->iMaxAmmo1 = DVHAMMER_MAXAMMO;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = DVHAMMER_MAXAMMO;
@@ -622,7 +608,7 @@ namespace sv {
 		m_iId = WEAPON_KNIFE;
 		Precache();
 		SET_MODEL(ENT(pev), "models/w_knife.mdl");
-		m_iClip = WEAPON_NOCLIP;
+		m_iClip = 0;
 		m_flTimeholster = gpGlobals->time;
 
 		m_iDefaultAmmo = DVHAMMER_MAXAMMO;
@@ -744,9 +730,9 @@ namespace sv {
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 			m_iChargeShotsFired = 0;
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 100;
+			m_iClip -= 100;
 
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+			if (m_iClip <= 0)
 			{
 				SetToAMode();
 				m_iWeaponState &= ~WPNSTATE_DVHAMMER_MODEB;
@@ -791,15 +777,15 @@ namespace sv {
 		}
 		else
 		{
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < DVHAMMER_MAXAMMO)
+			if (m_iClip < DVHAMMER_MAXAMMO)
 			{
 				if (m_flTimeNextCharge <= gpGlobals->time)
 				{
-					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += 7;
+					m_iClip += 7;
 
-					if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= DVHAMMER_MAXAMMO)
+					if (m_iClip >= DVHAMMER_MAXAMMO)
 					{
-						m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = DVHAMMER_MAXAMMO;
+						m_iClip = DVHAMMER_MAXAMMO;
 
 						if (m_pPlayer->pev->weaponanim == ANIM_IDLE)
 						{

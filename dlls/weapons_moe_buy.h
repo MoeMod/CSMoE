@@ -390,6 +390,12 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_DARTPISTOL, "weapon_dartpistol",	 "爆裂镖镖枪",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL ,1 },
 	{ WEAPON_PKM, "weapon_pkm",        "裁决者PKM",                  5600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG ,2 },
 	{ WEAPON_Z4B_MA5B, "z4b_ma5b",        "MA5B",                  2750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE ,2 },
+	{ WEAPON_TURBULENT1, "weapon_turbulent1",	 "涌泉Turbulent-1",			  1500,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL ,5 },
+	{ GRENADE_BUNKERBUSTER, "weapon_bunkerbuster",      "天降正义LTD",    6000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP ,19 },
+	{ GRENADE_PATROLDRONE, "weapon_patroldrone",      "【幽浮】控制核心",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP ,24 },
+	{ GRENADE_DIVINETITAN, "weapon_divinetitan",      "圣翼皓印",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP ,32 },
+	{ WEAPON_HEROCHAINSAW, "weapon_herochainsaw",      "2",    100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP ,32 },
+	{ KNIFE_TYRANTMACE, "knife_tyrantmace",     "【雪崩】冰霜巨锤",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE ,10 },
 #endif
 };
 

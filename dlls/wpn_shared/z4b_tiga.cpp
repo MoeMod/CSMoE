@@ -92,10 +92,10 @@ public:
 
 		if (m_flTimeHostler != invalid_time_point)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeHostler) / 0.125s;
+			m_iClip += (gpGlobals->time - m_flTimeHostler) / 0.125s;
 		}
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100;
+		if (m_iClip >= 100)
+			m_iClip = 100;
 
 		return Base::Deploy();
 	}
@@ -111,7 +111,6 @@ public:
 	void Holster(int skiplocal) override;
 	void DelaySkillAttack();
 	void WeaponIdle() override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 #ifndef CLIENT_DLL
 	hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsSkillAttack = false);
 #endif
@@ -176,7 +175,6 @@ void CKnifeTIGA::Spawn()
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");
 	m_flTimeHostler = gpGlobals->time;
 	m_iDefaultAmmo = 100;
-	m_iClip = WEAPON_NOCLIP;
 	m_flTimeNextCharge = invalid_time_point;
 	FallInit();
 }
@@ -185,7 +183,7 @@ int CKnifeTIGA::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "tigaammo";
-	p->iMaxAmmo1 = 100;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = 100;
@@ -198,21 +196,11 @@ int CKnifeTIGA::GetItemInfo(ItemInfo* p)
 	return 1;
 }
 
-int CKnifeTIGA::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iDefaultAmmo = 0;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 void CKnifeTIGA::Holster(int skiplocal)
 {
 	SetThink(nullptr);
 
-	m_iHolsterAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+	m_iHolsterAmmo = m_iClip;
 	m_flTimeHostler = gpGlobals->time;
 	return CBasePlayerWeapon::Holster(skiplocal);
 }
@@ -220,11 +208,11 @@ void CKnifeTIGA::Holster(int skiplocal)
 
 void CKnifeTIGA::ItemPostFrame()
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 100)
+	if (m_iClip < 100)
 	{
 		if (m_flTimeNextCharge <= gpGlobals->time)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+			m_iClip++;
 			m_flTimeNextCharge = gpGlobals->time + 0.125s;
 		}
 	}
@@ -266,9 +254,9 @@ void CKnifeTIGA::ItemPostFrame()
 
 void CKnifeTIGA::Reload()
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
+	if (m_iClip >= 100)
 	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+		m_iClip = 0;
 
 		m_iThinkType = 1;
 		m_tNextThink = gpGlobals->time + 0.7s;

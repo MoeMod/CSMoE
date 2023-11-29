@@ -108,21 +108,21 @@ namespace sv {
 			if (m_flTimeholster != invalid_time_point)
 			{
 
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 0.6s * (g_pModRunning->DamageTrack() == DT_NONE ? 1 : 6);
+				m_iClip += (gpGlobals->time - m_flTimeholster) / 0.6s * (g_pModRunning->DamageTrack() == DT_NONE ? 1 : 6);
 
-				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= TYRANTMACE_MAXAMMO)
+				if (m_iClip >= TYRANTMACE_MAXAMMO)
 				{
-					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = TYRANTMACE_MAXAMMO;
+					m_iClip = TYRANTMACE_MAXAMMO;
 				}
 			}
 
-			if (!m_iWeaponState && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= TYRANTMACE_MAXAMMO)
+			if (!m_iWeaponState && m_iClip >= TYRANTMACE_MAXAMMO)
 			{
 				m_iWeaponState |= WPNSTATE_TYRANTMACE_MODEB;
 
 				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/tyrantmace_skill_ready.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = TYRANTMACE_MAXAMMO;
+				m_iClip = TYRANTMACE_MAXAMMO;
 			}
 #endif
 
@@ -256,7 +256,6 @@ namespace sv {
 		void CreateHitFX(Vector pos);
 		bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr);
 		void Holster(int skiplocal) override;
-		int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 		void ItemPostFrame() override;
 
 		int m_iBModeIndex;
@@ -274,23 +273,13 @@ namespace sv {
 
 	LINK_ENTITY_TO_CLASS(knife_tyrantmace, CKnifeTyrantmace)
 
-	int CKnifeTyrantmace::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-	{
-		if (m_iDefaultAmmo)
-		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-			m_iClip = WEAPON_NOCLIP;
-			m_iDefaultAmmo = 0;
-			return TRUE;
-		}
-		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-	}
+	
 
 	int CKnifeTyrantmace::GetItemInfo(ItemInfo* p)
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "tyrantmaceammo";
-		p->iMaxAmmo1 = TYRANTMACE_MAXAMMO;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = TYRANTMACE_MAXAMMO;
@@ -310,7 +299,7 @@ namespace sv {
 		m_iId = WEAPON_KNIFE;
 		Precache();
 		SET_MODEL(ENT(pev), "models/w_knife.mdl");
-		m_iClip = WEAPON_NOCLIP;
+
 		m_flTimeholster = gpGlobals->time;
 
 		m_iDefaultAmmo = TYRANTMACE_MAXAMMO;
@@ -475,7 +464,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+			m_iClip = 0;
 			SetToAMode();
 			m_iWeaponState &= ~WPNSTATE_TYRANTMACE_MODEB;
 
@@ -681,11 +670,11 @@ namespace sv {
 
 			if (!m_iWeaponState && (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY) && (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE))
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += GetBonus();
+				m_iClip += GetBonus();
 
-				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= TYRANTMACE_MAXAMMO)
+				if (m_iClip >= TYRANTMACE_MAXAMMO)
 				{
-					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = TYRANTMACE_MAXAMMO;
+					m_iClip = TYRANTMACE_MAXAMMO;
 
 					m_iWeaponState |= WPNSTATE_TYRANTMACE_MODEB;
 
@@ -737,15 +726,15 @@ namespace sv {
 		}
 		else
 		{
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < TYRANTMACE_MAXAMMO)
+			if (m_iClip < TYRANTMACE_MAXAMMO)
 			{
 				if (m_flTimeNextCharge <= gpGlobals->time)
 				{
-					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (g_pModRunning->DamageTrack() == DT_NONE ? 1 : 6);
+					m_iClip += (g_pModRunning->DamageTrack() == DT_NONE ? 1 : 6);
 
-					if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= TYRANTMACE_MAXAMMO)
+					if (m_iClip >= TYRANTMACE_MAXAMMO)
 					{
-						m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = TYRANTMACE_MAXAMMO;
+						m_iClip = TYRANTMACE_MAXAMMO;
 
 						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/tyrantmace_skill_ready.wav", VOL_NORM, ATTN_NORM, 0, 94);
 

@@ -41,7 +41,7 @@ int CSpearGun::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "SpearAmmo";
-	p->iMaxAmmo1 = 30;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = 30;
@@ -57,7 +57,6 @@ int CSpearGun::GetItemInfo(ItemInfo* p)
 void CSpearGun::Spawn(void)
 {
 	Base::Spawn();
-	m_iClip = WEAPON_NOCLIP;
 	m_iId = WEAPON_SPEARGUN;
 	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
 }
@@ -77,19 +76,6 @@ void CSpearGun::Precache(void)
 	m_usFireSpearGun = PRECACHE_EVENT(1, "events/speargun.sc");
 }
 
-int CSpearGun::ExtractAmmo(CBasePlayerWeapon *pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		if(m_pPlayer)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 BOOL CSpearGun::Deploy(void)
 {
 	m_flAccuracy = 0.05;
@@ -99,7 +85,7 @@ BOOL CSpearGun::Deploy(void)
 	m_flTimeReloadSpear = invalid_time_point;
 	iShellOn = 0;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+	if (m_iClip > 0)
 		return DefaultDeploy("models/v_speargun.mdl", "models/p_speargun.mdl", SPEARGUN_DRAW, "carbine", UseDecrement() != FALSE);
 	else
 		return DefaultDeploy("models/v_speargun.mdl", "models/p_speargun.mdl", SPEARGUN_DRAW_EMPTY, "carbine", UseDecrement() != FALSE);
@@ -130,12 +116,12 @@ void CSpearGun::PrimaryAttack(void)
 	if (index == -1 || index >= 2)
 		return;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		return;
 
 	m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 
 	
 	m_pPlayer->pev->effects &= ~EF_MUZZLEFLASH;
@@ -218,7 +204,7 @@ void CSpearGun::PrimaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireSpearGun, 0, g_vecZero, g_vecZero, 0, 0, 0, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireSpearGun, 0, g_vecZero, g_vecZero, 0, 0, 0, m_iClip, FALSE, FALSE);
 
 	m_flNextPrimaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.33s;
 
@@ -247,7 +233,7 @@ void CSpearGun::SecondaryAttack(void)
 
 void CSpearGun::ItemPostFrame(void)
 {
-	if (m_flTimeReloadSpear != invalid_time_point && gpGlobals->time > m_flTimeReloadSpear && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+	if (m_flTimeReloadSpear != invalid_time_point && gpGlobals->time > m_flTimeReloadSpear && m_iClip > 0)
 	{
 		SendWeaponAnim(SPEARGUN_RELOAD);
 
@@ -269,7 +255,7 @@ void CSpearGun::WeaponIdle(void)
 
 	int iAnim;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		iAnim = SPEARGUN_IDLE_EMPTY;
 	else
 		iAnim = SPEARGUN_IDLE1;

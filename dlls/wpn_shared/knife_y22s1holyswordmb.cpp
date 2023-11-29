@@ -113,10 +113,10 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (m_flTimeholster != invalid_time_point)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 0.25s;
+				m_iClip += (gpGlobals->time - m_flTimeholster) / 0.25s;
 			}
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100;
+			if (m_iClip >= 100)
+				m_iClip = 100;
 #endif
 			DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "sfsword", UseDecrement() != FALSE, 0.1s, 1.0s);
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
@@ -168,18 +168,6 @@ namespace sv {
 		void ParingAttack();
 		void OnAttackReleased();
 		void ItemPostFrame() override;
-
-		int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
-		{
-			if (m_iDefaultAmmo)
-			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-				m_iClip = WEAPON_NOCLIP;
-				m_iDefaultAmmo = 0;
-				return TRUE;
-			}
-			return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-		}
 
 		BOOL CanHolster() override
 		{
@@ -449,7 +437,6 @@ namespace sv {
 		m_flTimeholster = gpGlobals->time;
 #endif
 		m_flNextTimeCanHolster = m_flTimeBuff = m_tNextThink = m_flTimeCheckCharge = invalid_time_point;
-		m_iClip = WEAPON_NOCLIP;
 		m_iDefaultAmmo = 100;
 		m_iState = 0;
 		m_iState2 = 0;
@@ -460,10 +447,10 @@ namespace sv {
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "holyswordmbcharge";
-		p->iMaxAmmo1 = 100;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = WEAPON_NOCLIP;
+		p->iMaxClip = 100;
 		p->iSlot = 2;
 		p->iPosition = 1;
 		p->iId = WEAPON_KNIFE;
@@ -871,14 +858,14 @@ namespace sv {
 	void CKnifeY22S1HolySwordMB::ItemPostFrame()
 	{
 #ifndef CLIENT_DLL
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 100)
+		if (m_iClip < 100)
 		{
 			if (m_flTimeNextCharge <= gpGlobals->time)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+				m_iClip++;
 				m_flTimeNextCharge = gpGlobals->time + 0.5s;
 
-				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 100)
+				if (m_iClip == 100)
 					EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/y22s1holyswordmb_paring_ready.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			}
 		}
@@ -957,13 +944,13 @@ namespace sv {
 
 	void CKnifeY22S1HolySwordMB::SecondaryAttack()
 	{
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 50)
+		if (m_iClip < 50)
 		{
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 			return;
 		}
 			
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 50;
+		m_iClip -= 50;
 
 		pev->iuser1 = 1;	//enable paring
 		m_flTimeBuff = gpGlobals->time + 3.0s;

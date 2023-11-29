@@ -93,10 +93,10 @@ public:
 
 		if (m_flTimeHostler != invalid_time_point)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeHostler) / 0.1s;
+			m_iClip += (gpGlobals->time - m_flTimeHostler) / 0.1s;
 		}
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100;
+		if (m_iClip >= 100)
+			m_iClip = 100;
 
 		return Base::Deploy();
 	}
@@ -111,7 +111,6 @@ public:
 	BOOL CanDrop() override { return false; }
 	void Holster(int skiplocal) override;
 	void WeaponIdle() override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 #ifndef CLIENT_DLL
 	hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsSkillAttack = false);
 #endif
@@ -178,7 +177,6 @@ void CKnifeDualStinger::Spawn()
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");
 	m_flTimeHostler = gpGlobals->time;
 	m_iDefaultAmmo = 100;
-	m_iClip = WEAPON_NOCLIP;
 #ifndef CLIENT_DLL
 	m_flDashTime = invalid_time_point;
 #endif
@@ -203,21 +201,11 @@ int CKnifeDualStinger::GetItemInfo(ItemInfo* p)
 	return 1;
 }
 
-int CKnifeDualStinger::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iDefaultAmmo = 0;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 void CKnifeDualStinger::Holster(int skiplocal)
 {
 	SetThink(nullptr);
 
-	m_iHolsterAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+	m_iHolsterAmmo = m_iClip;
 	m_flTimeHostler = gpGlobals->time;
 	return CBasePlayerWeapon::Holster(skiplocal);
 }
@@ -230,11 +218,11 @@ void CKnifeDualStinger::ItemPostFrame()
 		m_pPlayer->pev->velocity = m_vecDashVelocity;
 	}
 #endif
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 100)
+	if (m_iClip < 100)
 	{
 		if (m_flTimeNextCharge <= gpGlobals->time)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+			m_iClip++;
 			m_flTimeNextCharge = gpGlobals->time + 0.1s;
 		}
 	}
@@ -274,9 +262,9 @@ void CKnifeDualStinger::ItemPostFrame()
 
 void CKnifeDualStinger::Reload()
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
+	if (m_iClip >= 100)
 	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+		m_iClip = 0;
 		
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 

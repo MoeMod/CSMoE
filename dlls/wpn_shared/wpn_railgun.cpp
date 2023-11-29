@@ -87,13 +87,6 @@ namespace sv {
         return 1;
     }
 
-    int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
-    {
-        m_iClip = WEAPON_NOCLIP;
-        m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 35;
-        return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-    }
-
     float GetDamage(int iState) const
     {
         float flDamage;
@@ -171,7 +164,7 @@ namespace sv {
 
     void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
-        if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+        if (m_iClip <= 0)
         {
             PlayEmptySound();
 
@@ -180,7 +173,7 @@ namespace sv {
             return;
         }
 
-        m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+        m_iClip--;
 #ifndef CLIENT_DLL
         m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
@@ -205,7 +198,7 @@ namespace sv {
         m_iChargeState = 0;
 
 #ifndef CLIENT_DLL
-        if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+        if (m_iClip <= 0)
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
@@ -215,7 +208,7 @@ namespace sv {
 
     void SecondaryAttack(void)
     {
-        if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+        if (m_iClip <= 0)
         {
             m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 

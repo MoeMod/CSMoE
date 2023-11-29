@@ -972,6 +972,8 @@ void CPlayerModStrategy_ZBZ::ClientPutInServer()
 			iMinLevel = strategy->m_iLevel;
 	}
 	SetLevel(iMinLevel == 9999 ? 1 : iMinLevel);
+
+	return CPlayerModStrategy_Default::ClientPutInServer();
 }
 
 CMod_ZombieZ::CMod_ZombieZ()

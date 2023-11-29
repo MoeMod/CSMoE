@@ -449,8 +449,7 @@ void CHuntbow::Spawn(void)
 	SET_MODEL(ENT(pev), "models/w_huntbow.mdl");
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
-	m_iClip = -1;
-	m_iDefaultAmmo = 250;
+	m_iClip = m_iDefaultAmmo = 250;
 	m_CrossHairStateStored = HUNTBOW_AIM_IDLE;
 	m_flAccuracy = 0.05;
 	m_iShotsFired = 0;
@@ -536,19 +535,7 @@ BOOL CHuntbow::Deploy(void)
 	MESSAGE_END();
 #endif
 
-	return DefaultDeploy("models/v_huntbow.mdl", m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0 ? "models/p_huntbow_empty.mdl" : "models/p_huntbow.mdl", BOW_DRAW + (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0), "slingshot", UseDecrement() != FALSE, 0.3s, 1.5s);
-}
-
-int CHuntbow::ExtractAmmo(CBasePlayerWeapon *pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+	return DefaultDeploy("models/v_huntbow.mdl", m_iClip <= 0 ? "models/p_huntbow_empty.mdl" : "models/p_huntbow.mdl", BOW_DRAW + (m_iClip <= 0), "slingshot", UseDecrement() != FALSE, 0.3s, 1.5s);
 }
 
 void CHuntbow::PrimaryAttack(void)
@@ -566,7 +553,7 @@ void CHuntbow::PrimaryAttack(void)
 
 void CHuntbow::SetWeaponModel(void)
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_huntbow_empty.mdl");
 	else
 		m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_huntbow.mdl");
@@ -578,7 +565,7 @@ void CHuntbow::ChargedFire(void)
 
 	m_iChargeState = 0;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		PlayEmptySound();
 
@@ -587,7 +574,7 @@ void CHuntbow::ChargedFire(void)
 		return;
 	}
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
@@ -607,7 +594,7 @@ void CHuntbow::ChargedFire(void)
 
 	//int iEffect = 3;
 	//Vector vecDir = m_pPlayer->FireBullets4(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, 0, 8192, 7, 16, GetSecondaryAttackDamage(), 0.99, m_pPlayer->pev, true, m_pPlayer->random_seed, &iEffect, m_pPlayer);
-	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireHuntbow, 0, g_vecZero, g_vecZero, 0, 0, int(m_pPlayer->pev->punchangle.x * 100), 1, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0, TRUE);
+	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireHuntbow, 0, g_vecZero, g_vecZero, 0, 0, int(m_pPlayer->pev->punchangle.x * 100), 1, m_iClip > 0, TRUE);
 #endif
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.28s;
 	m_pPlayer->pev->punchangle.x -= 2.0;
@@ -635,11 +622,11 @@ void CHuntbow::HuntbowFire(float flSpread, duration_t flCycleTime, BOOL fChargeI
 
 	m_flAccuracy = (m_iShotsFired * m_iShotsFired * m_iShotsFired) / 240.0 + 0.1;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		return;
 
 	m_pPlayer->m_iWeaponVolume = QUIET_GUN_VOLUME;
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
@@ -697,7 +684,7 @@ void CHuntbow::HuntbowFire(float flSpread, duration_t flCycleTime, BOOL fChargeI
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireHuntbow, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0, fChargeInterrupted);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireHuntbow, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, m_iClip > 0, fChargeInterrupted);
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + flCycleTime;
 
@@ -745,7 +732,7 @@ void CHuntbow::Holster(int skiplocal)
 
 void CHuntbow::SecondaryAttack(void)
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 
@@ -1091,7 +1078,7 @@ void CHuntbow::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0 ? BOW_IDLE_EMPTY : BOW_IDLE);
+	SendWeaponAnim(m_iClip <= 0 ? BOW_IDLE_EMPTY : BOW_IDLE);
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0s;
 }
 

@@ -40,8 +40,8 @@ public:
 	static constexpr const auto &DefaultDeployTime = 0s;
 	static constexpr InventorySlotType ItemSlot = PISTOL_SLOT;
 	static constexpr const char *V_Model = "models/z4b/v_ragingbull.mdl";
-	static constexpr const char *P_Model = "models/z4b/p_ragingbull.mdl";
-	static constexpr const char *W_Model = "models/z4b/p_ragingbull.mdl";
+	static constexpr const char *P_Model = "models/z4b/pw_ragingbull.mdl";
+	static constexpr const char *W_Model = "models/z4b/pw_ragingbull.mdl";
 	static constexpr const char *EventFile = "events/ragingbull.sc";
 	static constexpr const char *ClassName = "z4b_ragingbull";
 	static constexpr const char *AnimExtension = "onehanded";

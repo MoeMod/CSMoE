@@ -77,10 +77,10 @@ int CGuillotine::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "guillotineAmmo";
-	p->iMaxAmmo1 = iMaxClip();
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = -1;
+	p->iMaxClip = GUILLOTINE_MAX_AMMO;
 	p->iSlot = 0;
 	p->iPosition = 5;
 	p->iId = m_iId = WEAPON_GUILLOTINE;
@@ -90,25 +90,11 @@ int CGuillotine::GetItemInfo(ItemInfo *p)
 	return 1;
 }
 
-int CGuillotine::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 10;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
-
 BOOL CGuillotine::Deploy(void)
 {
 	int iAnim;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+	if (m_iClip > 0)
 		iAnim = GUILLOTINE_DRAW;
 	else
 		iAnim = GUILLOTINE_DRAW_EMPTY;
@@ -143,13 +129,13 @@ BOOL CGuillotine::Deploy(void)
 void CGuillotine::CatchAmmo(void)
 {
 #ifndef CLIENT_DLL
-	int iMaxClip = this->iMaxClip();
+	int iMaxClip = this->iGetMaxClip();
 
 	if (m_iWeaponState == 1 || m_iWeaponState == 2)
 		iMaxClip++;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < iMaxClip)
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+	if (m_iClip < iMaxClip)
+		m_iClip++;
 
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -222,7 +208,7 @@ void CGuillotine::ItemPostFrame(void)
 #endif
 
 	if ((m_iWeaponState == 3 && m_flTimeWeaponIdle2 != invalid_time_point && gpGlobals->time > m_flTimeWeaponIdle2) ||
-		(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0 && (m_pPlayer->pev->weaponanim == GUILLOTINE_IDLE_EMPTY || m_pPlayer->pev->weaponanim == GUILLOTINE_DRAW_EMPTY)))
+		(m_iClip > 0 && (m_pPlayer->pev->weaponanim == GUILLOTINE_IDLE_EMPTY || m_pPlayer->pev->weaponanim == GUILLOTINE_DRAW_EMPTY)))
 	{
 		Deploy();
 	}
@@ -233,7 +219,7 @@ void CGuillotine::PrimaryAttack(void)
 	if (m_iWeaponState)
 		return;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
 		{
@@ -250,7 +236,7 @@ void CGuillotine::PrimaryAttack(void)
 		return;
 	}
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
@@ -303,7 +289,7 @@ void CGuillotine::WeaponIdle(void)
 		else
 			iAnim = GUILLOTINE_EIDLE_FX;
 	}
-	else if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+	else if (m_iClip > 0)
 	{
 		iAnim = GUILLOTINE_IDLE;
 	}
@@ -350,7 +336,7 @@ float CGuillotine::GetDamageAmountB(void)
 }
 
 
-int CGuillotine::iMaxClip(void)
+int CGuillotine::iGetMaxClip(void)
 {
 	int iMaxClip = GUILLOTINE_MAX_AMMO;
 

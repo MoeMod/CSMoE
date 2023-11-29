@@ -256,10 +256,10 @@ int CBow::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "bowarrow";
-	p->iMaxAmmo1 = 60;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = -1;
+	p->iMaxClip = 60;
 	p->iSlot = 0;
 	p->iPosition = 4;
 	p->iId = m_iId = WEAPON_BOW;
@@ -277,34 +277,22 @@ BOOL CBow::Deploy(void)
 	pev->iuser1 = 0;
 	fFinishTime = invalid_time_point;
 
-	return DefaultDeploy("models/v_bow.mdl", "models/p_bow.mdl", m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? ANIM_DRAW : ANIM_DRAW_EMPTY, "slingshot", UseDecrement() != FALSE);
-}
-
-int CBow::ExtractAmmo(CBasePlayerWeapon *pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+	return DefaultDeploy("models/v_bow.mdl", "models/p_bow.mdl", m_iClip ? ANIM_DRAW : ANIM_DRAW_EMPTY, "slingshot", UseDecrement() != FALSE);
 }
 
 void CBow::PrimaryAttack(void)
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		return;
 	}
 	m_iShotsFired++;
 	m_pPlayer->pev->punchangle.x -= 2.0;
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-	SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? ANIM_SHOOT1 : ANIM_SHOOT1_EMPTY, UseDecrement() != FALSE);
+	SendWeaponAnim(m_iClip ? ANIM_SHOOT1 : ANIM_SHOOT1_EMPTY, UseDecrement() != FALSE);
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.425s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.925s;
@@ -312,7 +300,7 @@ void CBow::PrimaryAttack(void)
 	PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireBow, 0, m_pPlayer->pev->origin, g_vecZero, 0.0, 0.0, (1 << 1), 0, FALSE, TRUE);
 
 #ifndef CLIENT_DLL
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (!m_iClip && m_iClip <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 #ifndef CLIENT_DLL
@@ -341,7 +329,7 @@ void CBow::PrimaryAttack(void)
 
 void CBow::SecondaryAttack(void)
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		return;
 	}
@@ -351,16 +339,16 @@ void CBow::ItemPostFrame(void)
 {
 	if (m_flNextPrimaryAttack > 0.0s)
 		return CBasePlayerWeapon::ItemPostFrame();
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	if (!m_iClip)
 		return CBasePlayerWeapon::ItemPostFrame();
 
-	if (m_pPlayer->pev->button & IN_ATTACK && !(m_pPlayer->pev->button & IN_ATTACK2) && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	if (m_pPlayer->pev->button & IN_ATTACK && !(m_pPlayer->pev->button & IN_ATTACK2) && m_iClip)
 	{
 		PrimaryAttack();
 		m_pPlayer->pev->button &= ~IN_ATTACK;
 		return CBasePlayerWeapon::ItemPostFrame();
 	}
-	else if (m_pPlayer->pev->button & IN_ATTACK2 && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	else if (m_pPlayer->pev->button & IN_ATTACK2 && m_iClip)
 	{
 		if (!pev->iuser1)
 		{
@@ -391,9 +379,9 @@ void CBow::ItemPostFrame(void)
 #ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-			SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? ANIM_CHARGE_SHOOT1 : ANIM_CHARGE_SHOOT1_EMPTY, UseDecrement() != FALSE);
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+			m_iClip--;
+			SendWeaponAnim(m_iClip ? ANIM_CHARGE_SHOOT1 : ANIM_CHARGE_SHOOT1_EMPTY, UseDecrement() != FALSE);
+			if (m_iClip)
 			{
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.28s;
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.36s;
@@ -403,7 +391,7 @@ void CBow::ItemPostFrame(void)
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.7s;
 			}
-			EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? "weapons/bow-shoot1.wav" : "weapons/bow-shoot1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, m_iClip ? "weapons/bow-shoot1.wav" : "weapons/bow-shoot1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 #ifndef CLIENT_DLL
 			Vector vecArrowAngle;
@@ -445,7 +433,7 @@ void CBow::ItemPostFrame(void)
 
 			Vector vecSrc = m_pPlayer->GetGunPosition();
 			Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0f, 8192, 7, BULLET_PLAYER_556MM, GetSecondaryAttackDamage(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+			m_iClip--;
 
 			int flags;
 #ifdef CLIENT_WEAPONS
@@ -454,11 +442,11 @@ void CBow::ItemPostFrame(void)
 			flags = 0;
 #endif
 
-			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBow, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], 0, FALSE, FALSE);
+			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBow, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, m_iClip, 0, FALSE, FALSE);
 
-			SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? ANIM_CHARGE_SHOOT2 : ANIM_CHARGE_SHOOT2_EMPTY, UseDecrement() != FALSE);
+			SendWeaponAnim(m_iClip ? ANIM_CHARGE_SHOOT2 : ANIM_CHARGE_SHOOT2_EMPTY, UseDecrement() != FALSE);
 
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+			if (m_iClip)
 			{
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.28s;
 				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.28s;
@@ -506,7 +494,7 @@ void CBow::WeaponIdle(void)
 		return;
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
-	SendWeaponAnim(pev->iuser1 >= 1 ? (pev->iuser1 == 2 ? ANIM_CHARGE_IDLE2 : ANIM_CHARGE_IDLE1) : (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? ANIM_IDLE : ANIM_IDLE_EMPTY), UseDecrement() != FALSE);
+	SendWeaponAnim(pev->iuser1 >= 1 ? (pev->iuser1 == 2 ? ANIM_CHARGE_IDLE2 : ANIM_CHARGE_IDLE1) : (m_iClip ? ANIM_IDLE : ANIM_IDLE_EMPTY), UseDecrement() != FALSE);
 }
 
 float CBow::GetPrimaryAttackDamage() const

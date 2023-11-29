@@ -67,7 +67,6 @@ public:
 	void Precache() override;
 	void PrimaryAttack() override;
 	BOOL Deploy() override;
-	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
 	void SecondaryAttack(void) override;
 	void ItemPostFrame(void) override;
 	void Reload(void) override { };
@@ -100,7 +99,6 @@ public:
 	void Precache() override;
 	void PrimaryAttack() override;
 	BOOL Deploy() override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override { return CBasePlayerWeapon::ExtractAmmo(pWeapon); }; // sync Clip -> BpAmmo
 	void SecondaryAttack(void) override;
 	void ItemPostFrame(void) override;
 	void Reload(void) override;

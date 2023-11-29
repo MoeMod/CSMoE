@@ -59,7 +59,6 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_bow" , 200 }; }
 #endif
-	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override;
 	int m_iShell;
 	time_point_t fFinishTime;
 	int iShellOn;

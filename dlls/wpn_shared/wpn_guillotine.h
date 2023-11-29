@@ -21,7 +21,6 @@ public:
 	void ItemPostFrame() override;
 	void Reload() override { ; }
 	void WeaponIdle() override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 	const char* GetCSModelName() override { return "models/w_guillotine.mdl"; }
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -30,6 +29,7 @@ public:
 		return FALSE;
 #endif
 	}
+	int iGetMaxClip(void) override;
 #ifndef CLIENT_DLL
 	void Drop(void);
 	void CrashAmmo(void);
@@ -73,7 +73,6 @@ public:
 	void ItemPostFrame() override;
 	void Reload() override { ; }
 	void WeaponIdle() override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 	const char* GetCSModelName() override { return "models/w_guillotineex.mdl"; }
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -88,7 +87,7 @@ public:
 #endif
 	void CatchAmmo(void);
 
-	int iMaxClip(void);
+	int iGetMaxClip(void) override;
 	float GetDamageAmountA(void);
 	float GetDamageAmountB(void);
 

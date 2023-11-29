@@ -49,7 +49,7 @@ void CSyringe::Spawn(void)
 void CSyringe::Precache(void)
 {
 	PRECACHE_MODEL("models/z4b/v_syringe.mdl");
-	PRECACHE_MODEL("models/z4b/p_syringe.mdl");
+	PRECACHE_MODEL("models/null.mdl");
 	PRECACHE_SOUND("CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Combo1.wav");
 	PRECACHE_SOUND("CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Fx.wav");
 	PRECACHE_SOUND("CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Select.wav");
@@ -79,7 +79,7 @@ BOOL CSyringe::Deploy(void)
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Select.wav", VOL_NORM, ATTN_NORM, 0, 94);
-	return DefaultDeploy("models/z4b/v_syringe.mdl", "models/z4b/p_syringe.mdl", SYRINGE_DRAW, "dualpistols_2", UseDecrement() != FALSE);
+	return DefaultDeploy("models/z4b/v_syringe.mdl", "models/null.mdl", SYRINGE_DRAW, "dualpistols_2", UseDecrement() != FALSE);
 }
 
 

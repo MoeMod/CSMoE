@@ -68,7 +68,6 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack(void) override;
 	void ItemPostFrame(void) override;
-	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
 	void Holster(int skiplocal = 0) override;
 	void Reload(void) override { };
 	void WeaponIdle(void) override;
@@ -93,7 +92,7 @@ public:
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "CannonEXAmmo";
-		p->iMaxAmmo1 = 30;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = 30;

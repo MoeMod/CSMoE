@@ -275,10 +275,10 @@ namespace sv {
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "drillgun";
-		p->iMaxAmmo1 = 20;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = -1;
+		p->iMaxClip = 20;
 		p->iSlot = 0;
 		p->iPosition = 16;
 		p->iId = m_iId = WEAPON_DRILLGUN;
@@ -304,24 +304,9 @@ namespace sv {
 	void Spawn(void)
 	{
 		Base::Spawn();
-		m_iClip = WEAPON_NOCLIP;
 		m_iId = WEAPON_DRILLGUN;
-		m_iDefaultAmmo = 20;
+		m_iClip = m_iDefaultAmmo = 20;
 	}
-
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon)
-	{
-		if (m_iDefaultAmmo)
-		{
-			if (m_pPlayer)
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-			m_iClip = WEAPON_NOCLIP;
-			m_iDefaultAmmo = 0;
-			return TRUE;
-		}
-		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-	}
-
 
 	BOOL Deploy(void) override
 	{
@@ -331,7 +316,7 @@ namespace sv {
 
 		m_flTimeReloadDrill = invalid_time_point;
 		
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+		if (m_iClip > 0)
 			return DefaultDeploy("models/v_drillgun.mdl", "models/p_drillgun.mdl", ANIM_DRAW, "carbine", UseDecrement() != FALSE);
 		else
 			return DefaultDeploy("models/v_drillgun.mdl", "models/p_drillgun.mdl", ANIM_DRAW_EMPTY, "carbine", UseDecrement() != FALSE);
@@ -352,12 +337,12 @@ namespace sv {
 
 	void PrimaryAttack() override
 	{
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+		if (m_iClip <= 0)
 			return;
 
 		m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
 
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+		m_iClip--;
 
 
 		m_pPlayer->pev->effects &= ~EF_MUZZLEFLASH;
@@ -402,7 +387,7 @@ namespace sv {
 		flags = 0;
 #endif
 
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 0, 0, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 0, 0, 0, m_iClip, FALSE, FALSE);
 
 		m_flNextPrimaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.8s;
 
@@ -419,7 +404,7 @@ namespace sv {
 
 	void ItemPostFrame(void)
 	{
-		if (m_flTimeReloadDrill != invalid_time_point && gpGlobals->time > m_flTimeReloadDrill && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+		if (m_flTimeReloadDrill != invalid_time_point && gpGlobals->time > m_flTimeReloadDrill && m_iClip > 0)
 		{
 			SendWeaponAnim(ANIM_RELOAD);
 
@@ -441,7 +426,7 @@ namespace sv {
 
 		int iAnim;
 
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+		if (m_iClip <= 0)
 			iAnim = ANIM_IDLE_EMPTY;
 		else
 			iAnim = ANIM_IDLE1;

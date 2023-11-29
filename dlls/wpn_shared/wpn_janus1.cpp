@@ -223,10 +223,10 @@ int CJANUS1::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "40mmGrenade";
-	p->iMaxAmmo1 = 5;
-	p->pszAmmo2 = NULL;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = "InfiniteAmmo";
 	p->iMaxAmmo2 = 255;
+	p->iMaxClip = 5;
 	p->iSlot = 1;
 	p->iPosition = 2;
 	p->iId = m_iId = WEAPON_JANUS1;
@@ -234,20 +234,6 @@ int CJANUS1::GetItemInfo(ItemInfo *p)
 	p->iWeight = GLOCK18_WEIGHT;
 
 	return 1;
-}
-
-int CJANUS1::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		if (m_pPlayer)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
 }
 
 BOOL CJANUS1::Deploy(void)
@@ -281,7 +267,7 @@ void CJANUS1::Janus1Fire(bool bSignal)
 {
 	if (!bSignal)
 	{
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+		if (m_iClip <= 0)
 		{
 			PlayEmptySound();
 
@@ -289,7 +275,7 @@ void CJANUS1::Janus1Fire(bool bSignal)
 			return;
 		}
 
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+		m_iClip--;
 	}
 
 	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
@@ -318,7 +304,7 @@ void CJANUS1::Janus1Fire(bool bSignal)
 		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/janus1-2.wav", 0.7, ATTN_NORM, 0, PITCH_NORM);
 	else
 	{
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+		if (m_iClip)
 			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/janus1-1.wav", 0.7, ATTN_NORM, 0, PITCH_NORM);
 		else
 			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/janus1-2.wav", 0.7, ATTN_NORM, 0, PITCH_NORM);
@@ -333,14 +319,14 @@ void CJANUS1::Janus1Fire(bool bSignal)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM79, 0, g_vecZero, g_vecZero, 0.0, 0.0, m_iWeaponState, int(m_pPlayer->pev->punchangle.y * 100), m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0, bSignal);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM79, 0, g_vecZero, g_vecZero, 0.0, 0.0, m_iWeaponState, int(m_pPlayer->pev->punchangle.y * 100), m_iClip != 0, bSignal);
 
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + (bSignal ? 0.33s : 2.8s);
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.8s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
 
 #ifndef CLIENT_DLL
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 

@@ -39,8 +39,6 @@ public:
 
 	const char* GetCSModelName() override { return "models/w_m79.mdl"; }
 
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
-
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_40mmgrenade" , 300 }; }
 #endif
@@ -104,8 +102,6 @@ public:
 	void WeaponIdle() override;
 	void ItemPostFrame() override;
 	const char* GetCSModelName() override { return "models/w_janus1.mdl"; }
-
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 
 	WeaponCrosshairData GetCrosshairData() override
 	{

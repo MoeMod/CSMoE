@@ -266,12 +266,12 @@ public:
 
 		if (m_flTimeholster != invalid_time_point)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 0.33s;
+			m_iClip += (gpGlobals->time - m_flTimeholster) / 0.33s;
 		}
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100;
+		if (m_iClip >= 100)
+			m_iClip = 100;
 			
-		return DefaultDeploy(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100 ? V_Model_1 : V_Model, P_Model, ANIM_DRAW, "skullaxe", UseDecrement() != FALSE);
+		return DefaultDeploy(m_iClip >= 100 ? V_Model_1 : V_Model, P_Model, ANIM_DRAW, "skullaxe", UseDecrement() != FALSE);
 	}
 
 	void Spawn() override;
@@ -325,7 +325,6 @@ public:
 	}
 
 	void Holster(int skiplocal) override;
-	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 	BOOL IsSignal();
 	void ItemPostFrame() override;
 
@@ -341,23 +340,11 @@ public:
 
 LINK_ENTITY_TO_CLASS(knife_skullt9, CKnifeSkullT9)
 
-int CKnifeSkullT9::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
 int CKnifeSkullT9::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "skullt9ammo";
-	p->iMaxAmmo1 = 100;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = 100;
@@ -377,7 +364,7 @@ void CKnifeSkullT9::Spawn()
 	m_iId = WEAPON_KNIFE;
 	Precache();
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");
-	m_iClip = WEAPON_NOCLIP;
+	m_iClip = 0;
 	m_flTimeholster = gpGlobals->time;
 	m_iDefaultAmmo = 0;
 	m_iUseSkill = 0;
@@ -405,9 +392,9 @@ void CKnifeSkullT9::SecondaryAttack(void)
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
+	if (m_iClip >= 100)
 	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+		m_iClip = 0;
 		m_iUseSkill = 1;
 	}
 	SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
@@ -514,7 +501,7 @@ void CKnifeSkullT9::DelaySecondaryAttack()
 BOOL CKnifeSkullT9::IsSignal()
 {
 #ifndef CLIENT_DLL
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 100)
+	if (m_iClip == 100)
 	{
 		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_skullt9_1.mdl");
 		return TRUE;
@@ -659,14 +646,14 @@ void CKnifeSkullT9::ItemPostFrame()
 #ifndef CLIENT_DLL
 	m_iButton = m_pPlayer->pev->button;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 100)
+	if (m_iClip < 100)
 	{
 		if (m_flTimeNextCharge <= gpGlobals->time)
 		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+			m_iClip++;
 			m_flTimeNextCharge = gpGlobals->time + 0.3s;
 
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 100)
+			if (m_iClip == 100)
 				EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/skullt9_fx.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		}
 	}
@@ -694,7 +681,7 @@ void CKnifeSkullT9::ItemPostFrame()
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgAmmoX, NULL, m_pPlayer->pev);
 		WRITE_BYTE(m_iPrimaryAmmoType);
-		WRITE_SHORT(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+		WRITE_SHORT(m_iClip);
 		MESSAGE_END();
 #endif
 

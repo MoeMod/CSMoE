@@ -230,7 +230,7 @@ void CCannon::Spawn(void)
 {
 	Base::Spawn();
 	m_iId = WEAPON_CANNON;
-	m_iClip = WEAPON_NOCLIP;
+
 	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
 }
 
@@ -246,18 +246,6 @@ void CCannon::Precache(void)
 	m_usFire = PRECACHE_EVENT(1, "events/cannon.sc");
 }
 
-int CCannon::ExtractAmmo(CBasePlayerWeapon *pWeapon)
-{
-	if (m_iDefaultAmmo)
-	{
-		if(m_pPlayer)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-		m_iClip = WEAPON_NOCLIP;
-		m_iDefaultAmmo = 0;
-		return TRUE;
-	}
-	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
 
 void CCannon::PrimaryAttack(void)
 {
@@ -269,7 +257,7 @@ void CCannon::SecondaryAttack(void)
 	if (GetTotalEnhancedLevel() < 6)
 		return;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
 		{
@@ -284,7 +272,7 @@ void CCannon::SecondaryAttack(void)
 
 	UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/canon_fireball.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
@@ -307,6 +295,11 @@ void CCannon::SecondaryAttack(void)
 	}
 #endif
 
+#ifndef CLIENT_DLL
+	if (!m_iClip)
+		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
+#endif
+
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.5s;
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 3.5s;
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3.5s;
@@ -317,7 +310,7 @@ void CCannon::CannonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAi
 {
 	m_bDelayFire = true;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
 		{
@@ -328,7 +321,7 @@ void CCannon::CannonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAi
 		return;
 	}
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	m_iClip--;
 
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
@@ -418,6 +411,20 @@ float CCannon::GetRadiusDamage()
 WeaponBotStrategy CCannon::GetBotStrategy() const
 {
 	return BOT_STRATEGY_CANNON;
+}
+
+
+int CCannon::iGetMaxClip(void)
+{
+	int maxClip = 20;
+	int level;
+
+	level = (m_uiWeaponEnhancedLevel >> 20) & 0xF;
+
+	if (level)
+		return maxClip + int(s_flClipEnhanced[level]);
+	else
+		return maxClip;
 }
 
 #ifndef CLIENT_DLL

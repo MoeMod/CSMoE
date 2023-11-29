@@ -119,19 +119,19 @@ namespace sv {
 			m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 			m_pPlayer->m_bShieldDrawn = false;
 
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeNextCharge) / GetChargeTime();
+			m_iClip += (gpGlobals->time - m_flTimeNextCharge) / GetChargeTime();
 			m_flTimeNextCharge = gpGlobals->time + GetChargeTime();
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= DGAXE_MAX_AMMO)
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = DGAXE_MAX_AMMO;
+			if (m_iClip >= DGAXE_MAX_AMMO)
+				m_iClip = DGAXE_MAX_AMMO;
 
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50 && m_iHolsterAmmo < 50)
+			if (m_iClip >= 50 && m_iHolsterAmmo < 50)
 			{
 				PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, FALSE);
 			}
 
 			if (DefaultDeploy(V_Model, P_Model, DGAXE_DRAW, "tomahawk", UseDecrement() != FALSE, 0.1s))
 			{
-				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50)
+				if (m_iClip >= 50)
 				{
 					pev->skin = 1;
 				}
@@ -152,7 +152,6 @@ namespace sv {
 		void Spawn() override;
 		void Holster(int skiplocal) override;
 		void WeaponIdle() override;
-		int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 		void ComboAttack();
 		void Guard();
 		KnockbackData GetKnockBackData() override;
@@ -268,7 +267,7 @@ namespace sv {
 		SET_MODEL(ENT(pev), "models/w_knife.mdl");
 		m_flTimeNextSkill1 = m_flTimeNextSkill2 = invalid_time_point;
 		m_flTimeNextCharge = gpGlobals->time;
-		m_iClip = -1;
+		m_iClip = 0;
 		m_iComboState = 0;
 		m_iDefaultAmmo = 0;
 		m_iSlashAnim = 3;
@@ -280,7 +279,7 @@ namespace sv {
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "dgaxeammo";
-		p->iMaxAmmo1 = DGAXE_MAX_AMMO;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
 		p->iMaxClip = DGAXE_MAX_AMMO;
@@ -495,18 +494,6 @@ namespace sv {
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
 	}
 
-	int CKnifeDgaxe::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-	{
-		if (m_iDefaultAmmo)
-		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-			m_iClip = WEAPON_NOCLIP;
-			m_iDefaultAmmo = 0;
-			return TRUE;
-		}
-		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-	}
-
 	void CKnifeDgaxe::SecondaryAttack(void)
 	{
 		if (!m_iComboState)
@@ -624,7 +611,7 @@ namespace sv {
 	{
 		SetThink(nullptr);
 		m_pPlayer->m_iBuff &= ~BUFF_AVOID_INFECT;
-		m_iHolsterAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+		m_iHolsterAmmo = m_iClip;
 		m_flTimeNextCharge = gpGlobals->time;
 		return CBasePlayerWeapon::Holster(skiplocal);
 	}
@@ -666,20 +653,20 @@ namespace sv {
 	{
 		int m_iButton = m_pPlayer->pev->button;
 
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < DGAXE_MAX_AMMO)
+		if (m_iClip < DGAXE_MAX_AMMO)
 		{
 			if (m_flTimeNextCharge <= gpGlobals->time)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+				m_iClip++;
 
 				m_flTimeNextCharge = gpGlobals->time + GetChargeTime();
 
-				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 50)
+				if (m_iClip == 50)
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, FALSE);
 			}
 		}
 		else
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = DGAXE_MAX_AMMO;
+			m_iClip = DGAXE_MAX_AMMO;
 
 
 #ifndef CLIENT_DLL
@@ -687,7 +674,7 @@ namespace sv {
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		CBaseEntity* pevAttacker = this->m_pPlayer;
 		auto vecShootPosition = Get_ShootPosition(pevAttacker, vecSrc, &bHit);
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50)
+		if (m_iClip >= 50)
 		{
 			if (m_iButton & IN_ATTACK)
 			{
@@ -719,7 +706,7 @@ namespace sv {
 
 						CKnifeDGAXE_LuBu* pEnt = CKnifeDGAXE_LuBu::Create(0, vecShootPosition, g_vecZero, ENT(m_pPlayer->pev), m_pPlayer, m_pPlayer->m_iTeam, 0);
 
-						m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 40;
+						m_iClip -= 40;
 						m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.51s;
 						m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;
 						m_flTimeNextSkill2 = gpGlobals->time + 3.0s;
@@ -739,7 +726,7 @@ namespace sv {
 
 						CKnifeDGAXE_LuBu* pEnt = CKnifeDGAXE_LuBu::Create(0, vecShootPosition, g_vecZero, ENT(m_pPlayer->pev), m_pPlayer, m_pPlayer->m_iTeam, 1);
 
-						m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 50;
+						m_iClip -= 50;
 						m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.51s;
 						m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;
 						m_flTimeNextSkill1 = gpGlobals->time + 8.0s;
@@ -752,7 +739,7 @@ namespace sv {
 
 
 
-		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50)
+		if (m_iClip >= 50)
 		{
 			if (!pev->skin)
 				pev->skin = 1;

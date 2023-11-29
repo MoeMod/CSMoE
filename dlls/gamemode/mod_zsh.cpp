@@ -480,6 +480,8 @@ namespace sv {
 	void CPlayerModStrategy_ZSH::ClientPutInServer()
 	{
 		m_flSpawnTime = invalid_time_point;
+
+		return CPlayerModStrategy_Default::ClientPutInServer();
 	}
 
 	void CPlayerModStrategy_ZSH::OnSpawn()

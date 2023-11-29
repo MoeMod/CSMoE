@@ -35,7 +35,7 @@ int CTurbulent1::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "Turbulent1Ammo";
-	p->iMaxAmmo1 = 150;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = 150;
@@ -64,11 +64,26 @@ void CTurbulent1::Spawn()
 
 void CTurbulent1::ItemPostFrame()
 {
-	if (m_iSwing)
+	if (m_fInReload && m_flNextReload != invalid_time_point && m_flNextReload < gpGlobals->time)
 	{
-		m_iSwing = 0;
+		// complete the reload.
+		int j = MaxClip - m_iClip;
+
+		// Add them to the clip
+		m_iClip += j;
+		m_fInReload = FALSE;
+		m_flNextReload = invalid_time_point;
+		m_iWeaponState = 0;
+	}
+
+	if (m_fInReload)
+		return;
+
+	if (m_iWeaponState)
+	{	
 		Reload();
-	}	
+	}
+
 
 	return CBasePlayerWeapon::ItemPostFrame();
 }
@@ -78,27 +93,70 @@ BOOL CTurbulent1::Deploy()
 {
 	m_flAccuracy = AccuracyDefault;
 
-	if (m_iClip >= MaxClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == MaxClip)
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
-
-	if(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
-		m_iSwing = 1;
-
 	m_fInReload = FALSE;
 
 	return DefaultDeploy(V_Model, P_Model, m_iClip > 0 ? ANIM_DRAW : ANIM_DRAW_EMPTY, "onehanded", UseDecrement() != FALSE, 1.3s);
 }
+#ifndef CLIENT_DLL
+int CTurbulent1::DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body)
+{
+	duration_t fNewDelay = m_pPlayer->m_pModStrategy->OnDefaultReload_Pre(this, fDelay);
+	if (body)
+		this->m_flNextPrimaryAttack = m_flNextSecondaryAttack = fNewDelay;
+	else
+		m_pPlayer->m_flNextAttack = fNewDelay;
+	ReloadSound();
+	SendWeaponAnimEx(iAnim, UseDecrement() ? 1 : 0, fDelay / fNewDelay);
+
+	m_fInReload = TRUE;
+	m_flTimeWeaponIdle = fDelay + 0.5s;
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+	WRITE_BYTE(41);
+	WRITE_BYTE(1);
+	WRITE_COORD(float(fNewDelay / 1.0s));		// framerate
+	MESSAGE_END();
+
+	return TRUE;
+}
+#else
+BOOL CTurbulent1::DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body)
+{
+	if (!m_pPlayer->m_pActiveItem)
+		return FALSE;
+
+	if (body)
+		this->m_flNextPrimaryAttack = m_flNextSecondaryAttack = fDelay;
+	else
+		m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + fDelay;
+
+	//!!UNDONE -- reload sound goes here !!!
+
+	if (gHUD.m_ZBZ.CheckHasSkill(Skill_RapidReloader)) {
+		SendWeaponAnimEx(iAnim, UseDecrement(), 1 / max(0.0f, 1.0f - (0.32f + 0.022f * (gHUD.m_Scoreboard.m_iTeamScore_T + gHUD.m_Scoreboard.m_iTeamScore_CT))));
+	}
+	else {
+		SendWeaponAnim(iAnim, UseDecrement());
+	}
+
+	m_fInReload = TRUE;
+
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + fDelay + 0.5s;
+	return TRUE;
+}
+#endif
 
 void CTurbulent1::Reload(void)
 {
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+	if (!m_iWeaponState)
 		return;
 
-	if (DefaultReload(150, m_iClip > 0 ? ANIM_RELOAD : ANIM_RELOAD_EMPTY, 4.03s))
+	if (DefaultReload(150, m_iClip > 0 ? ANIM_RELOAD : ANIM_RELOAD_EMPTY, 4.03s, 1))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
+		m_flNextReload = gpGlobals->time + 4.03s;
 		m_flAccuracy = AccuracyDefault;
 		m_iShotsFired = 0;
 	}

@@ -39,8 +39,8 @@ namespace sv {
     public:
     static constexpr const auto &DefaultReloadTime = 3.9s;
     static constexpr const char *V_Model = "models/z4b/v_mechanicxm214.mdl";
-    static constexpr const char *P_Model = "models/z4b/p_mechanicxm214.mdl";
-    static constexpr const char *W_Model = "models/z4b/w_mechanicxm214.mdl";
+    static constexpr const char *P_Model = "models/null.mdl";
+    static constexpr const char *W_Model = "models/null.mdl";
     static constexpr const char *EventFile = "events/mechanicxm214.sc";
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
     static constexpr const char *ClassName = "z4b_mechanicxm214";
@@ -92,10 +92,10 @@ namespace sv {
     {
         p->pszName = STRING(pev->classname);
         p->pszAmmo1 = "M214Ammo";
-        p->iMaxAmmo1 = MECHANICXM214_MAXAMMO;
+        p->iMaxAmmo1 = -1;
         p->pszAmmo2 = NULL;
         p->iMaxAmmo2 = -1;
-        p->iMaxClip = -1;
+        p->iMaxClip = MECHANICXM214_MAXAMMO;
         p->iSlot = 0;
         p->iPosition = 4;
         p->iId = m_iId = WEAPON_Z4B_MECHANICXM214;
@@ -124,10 +124,10 @@ namespace sv {
 
         if (m_flTimeHolster != invalid_time_point)
         {
-            m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeHolster) / 0.125s;
+           m_iClip += (gpGlobals->time - m_flTimeHolster) / 0.125s;
         }
         if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= MECHANICXM214_MAXAMMO)
-            m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = MECHANICXM214_MAXAMMO;
+           m_iClip = MECHANICXM214_MAXAMMO;
 
         return Base::Deploy();
     }
@@ -137,21 +137,11 @@ namespace sv {
         m_flNextIdle = m_flNextRunIdle = UTIL_WeaponTimeBase();
     }
 
-    int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
-    {
-        if (m_iDefaultAmmo)
-        {
-            m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-            m_iDefaultAmmo = 0;
-        }
-        return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-    }
-
     void Holster(int skiplocal) override
     {
         SetThink(nullptr);
 
-        m_iHolsterAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
+        m_iHolsterAmmo =m_iClip;
         m_flTimeHolster = gpGlobals->time;
         return CBasePlayerWeapon::Holster(skiplocal);
     }
@@ -162,7 +152,7 @@ namespace sv {
         {
             if (m_flTimeNextCharge <= gpGlobals->time)
             {
-                m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+               m_iClip++;
                 m_flTimeNextCharge = gpGlobals->time + 0.125s;
             }
         }
@@ -197,7 +187,7 @@ namespace sv {
 
         ResetRunIdle();
         m_flTimeNextCharge = gpGlobals->time + 1s;
-        m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+       m_iClip--;
         m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
         m_pPlayer->SetAnimation(PLAYER_ATTACK1);

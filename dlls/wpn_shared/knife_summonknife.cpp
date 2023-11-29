@@ -893,10 +893,10 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (m_flTimeholster != invalid_time_point)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeholster) / 0.25s;
+				m_iClip += (gpGlobals->time - m_flTimeholster) / 0.25s;
 			}
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100;
+			if (m_iClip >= 100)
+				m_iClip = 100;
 #endif
 			int iAnim = ANIM_DRAW_B;
 			const char* szAnim = "sfsword";
@@ -921,7 +921,6 @@ namespace sv {
 		void WeaponIdle() override;
 		float GetMaxSpeed() override;
 		void Holster(int skiplocal) override;
-		int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 		void DelayPrimaryAttack();
 		void DelaySecondaryAttack();
 		void OnAttack2Released();
@@ -1034,7 +1033,6 @@ namespace sv {
 #ifndef CLIENT_DLL
 		m_flTimeholster = gpGlobals->time;
 #endif
-		m_iClip = WEAPON_NOCLIP;
 		m_iDefaultAmmo = 0;
 		m_iState = 0;
 		m_iState2 = 0;
@@ -1051,10 +1049,10 @@ namespace sv {
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "summoncharge";
-		p->iMaxAmmo1 = 100;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = WEAPON_NOCLIP;
+		p->iMaxClip = 100;
 		p->iSlot = 2;
 		p->iPosition = 1;
 		p->iId = WEAPON_KNIFE;
@@ -1062,18 +1060,6 @@ namespace sv {
 		p->iWeight = KNIFE_WEIGHT;
 
 		return 1;
-	}
-
-	int CKnifeSummonKnife::ExtractAmmo(CBasePlayerWeapon* pWeapon)
-	{
-		if (m_iDefaultAmmo)
-		{
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-			m_iClip = WEAPON_NOCLIP;
-			m_iDefaultAmmo = 0;
-			return TRUE;
-		}
-		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
 	}
 
 	void CKnifeSummonKnife::RemoveSummoner(void)
@@ -1241,7 +1227,7 @@ namespace sv {
 	{
 		m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_summonknife_a.mdl");
 		Q_strcpy(m_pPlayer->m_szAnimExtention, "katanad");
-		if (m_iCheck == 3 && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
+		if (m_iCheck == 3 && m_iClip >= 100)
 		{
 
 			m_iCheck = 0;
@@ -1387,14 +1373,14 @@ namespace sv {
 #ifndef CLIENT_DLL
 		if (!m_pSummoner)
 		{
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] < 100)
+			if (m_iClip < 100)
 			{
 				if (m_flTimeNextCharge <= gpGlobals->time)
 				{
-					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
+					m_iClip++;
 					m_flTimeNextCharge = gpGlobals->time + 0.25s;
 
-					if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 100)
+					if (m_iClip == 100)
 						EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/summoning_ready.wav", VOL_NORM, ATTN_NORM, 0, 94);
 				}
 			}
@@ -1403,12 +1389,12 @@ namespace sv {
 		{
 			if (m_flTimeNextCharge <= gpGlobals->time)
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+				m_iClip--;
 				m_flTimeNextCharge = gpGlobals->time + 0.13s;
 
-				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+				if (m_iClip <= 0)
 				{
-					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+					m_iClip = 0;
 					RemoveSummoner();
 				}		
 			}
@@ -1738,7 +1724,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 		m_flTimeholster = gpGlobals->time;
 		if(m_pSummoner)
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+			m_iClip = 0;
 #endif
 		RemoveSummoner();
 		return CBasePlayerWeapon::Holster(skiplocal);

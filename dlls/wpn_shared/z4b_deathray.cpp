@@ -119,20 +119,6 @@ namespace sv {
         return 1;
     }
 
-    int ExtractAmmo(CBasePlayerWeapon* pWeapon)
-    {
-        if (m_iDefaultAmmo)
-        {
-            m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
-            m_iClip = WEAPON_NOCLIP;
-            m_iDefaultAmmo = 0;
-            return TRUE;
-        }
-
-        m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
-        return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-    }
-
 #ifndef CLIENT_DLL
     WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_railbeam" , 180 }; }
 #endif
@@ -231,7 +217,7 @@ namespace sv {
         }
 
         if (m_iWeaponState != WPNSTATE_DEATHRAY_USING)
-            m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+           m_iClip--;
         m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
         m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -268,7 +254,7 @@ namespace sv {
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
 #ifndef CLIENT_DLL
-        if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+        if (!m_iClip)
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 

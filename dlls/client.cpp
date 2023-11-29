@@ -2566,11 +2566,102 @@ void Radio3(CBasePlayer *player, int slot)
 	}
 }
 
+
+BOOL BuyClipAmmo(CBasePlayer* player, CBasePlayerItem* weapon, bool bBlinkMoney)
+{
+	if (!weapon)
+		return FALSE;
+
+	CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)weapon->GetWeaponPtr();
+
+	if (!pWeapon)
+		return FALSE;
+
+	int iIndex = weapon->PrimaryAmmoIndex();
+
+	if (iIndex == -1)
+		return 2;
+
+	int iMaxClip = weapon->iGetMaxClip();
+
+	if (iMaxClip <= 0)
+		return FALSE;
+
+	if (weapon->iMaxAmmo1() > 0)
+		return FALSE;
+
+	if (pWeapon->m_iClip >= iMaxClip)	//blue ammo is full
+		return 2;
+
+	WeaponBuyAmmoConfig config = weapon->GetBuyAmmoConfig();
+	int cost = config.cost;
+	const char* classname = config.classname;
+
+	if (!classname) {
+		ALERT(at_console, "Tried to buy ammo for an unrecognized gun\n");
+		return 2;
+	}
+
+	// Can only buy if the player does not already have full ammo
+	auto psz = weapon->pszAmmo1();
+	if (pWeapon->m_iClip >= player->m_pModStrategy->ComputeMaxAmmo(psz, iMaxClip)) {
+		return 2;
+	}
+
+	// Purchase the ammo if the player has enough money
+	if (player->m_iAccount >= cost) {
+		if (pWeapon->m_iId == WEAPON_TURBULENT1)
+		{
+			if (pWeapon->m_iWeaponState)
+				return 2;
+			else
+			{
+				pWeapon->m_iWeaponState = 1;
+				player->AddAccount(-cost);
+			}
+		}	
+		else
+		{
+			player->GiveNamedItem(classname);
+			player->AddAccount(-cost);
+		}
+		return TRUE;
+	}
+
+	if (bBlinkMoney) {
+		if (g_bClientPrintEnable) {
+			// Not enough money.. let the player know
+			ClientPrint(player->pev, HUD_PRINTCENTER, "#Not_Enough_Money");
+			BlinkAccount(player, 2);
+		}
+	}
+
+	return 2;
+}
+
 bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 {
 	if (!player->CanPlayerBuy(true)) {
 		return false;
 	}
+
+	switch (BuyClipAmmo(player, weapon, bBlinkMoney))
+	{
+	case TRUE:
+	{
+		//for blue ammo
+		return true;
+	}
+	case FALSE:
+	{
+		break;
+	}
+	case 2:
+	{
+		return false;
+	}
+	}
+
 
 	// Ensure that the weapon uses ammo
 	int nAmmo = weapon->PrimaryAmmoIndex();
@@ -2597,9 +2688,7 @@ bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 	// Purchase the ammo if the player has enough money
 	if (player->m_iAccount >= cost) {
 		player->GiveNamedItem(classname);
-		player->AddAccount(-cost);
-		if (weapon->m_iId == WEAPON_TURBULENT1)
-			weapon->m_iSwing = 1;
+		player->AddAccount(-cost);	
 		return true;
 	}
 
@@ -5394,15 +5483,13 @@ int EXT_FUNC GetWeaponData(edict_s *player, struct weapon_data_s *info)
 	item->iuser1 = gun->m_iSwing;
 	item->iuser2 |= gun->pev->body;
 	item->iuser2 |= (gun->pev->skin << 4);
-
+	item->iuser3 = gun->m_uiWeaponEnhancedLevel;
 	if (item->m_iId == WEAPON_KNIFE)
 	{
-		item->iuser3 = gun->m_uiKnifeEnhancedLevel;
 		item->iuser4 = (int)gun->m_uiKnifePaintType;
 	}		
 	else
-	{
-		item->iuser3 = gun->m_uiWeaponEnhancedLevel;
+	{	
 		item->iuser4 = (int)gun->m_uiWeaponPaintType;
 	}
 		
