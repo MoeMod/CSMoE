@@ -112,44 +112,7 @@ namespace cl {
 namespace sv {
 #endif
 
-template<> struct PrivateData<class CBaseEntity, void>
-{
-    entvars_t * pev;
-	CBaseEntity *m_pGoalEnt;
-	CBaseEntity *m_pLink;
-	void (CBaseEntity::*m_pfnThink)(void);
-	void (CBaseEntity::*m_pfnTouch)(CBaseEntity *pOther);
-	void (CBaseEntity::*m_pfnUse)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-	void (CBaseEntity::*m_pfnBlocked)(CBaseEntity *pOther);
-	int current_ammo;
-	int currentammo;
-	int maxammo_buckshot;
-	int ammo_buckshot;
-	int maxammo_9mm;
-	int ammo_9mm;
-	int maxammo_556nato;
-	int ammo_556nato;
-	int maxammo_556natobox;
-	int ammo_556natobox;
-	int maxammo_762nato;
-	int ammo_762nato;
-	int maxammo_45acp;
-	int ammo_45acp;
-	int maxammo_50ae;
-	int ammo_50ae;
-	int maxammo_338mag;
-	int ammo_338mag;
-	int maxammo_57mm;
-	int ammo_57mm;
-	int maxammo_357sig;
-	int ammo_357sig;
-	time_point_t m_flStartThrow;
-	time_point_t m_flReleaseThrow;
-	int m_iSwing;
-	bool has_disconnected;
-};
-
-class CBaseEntity : public PrivateData<class CBaseEntity, void>
+class CBaseEntity
 {
 #ifndef CLIENT_DLL
 public:
@@ -379,6 +342,41 @@ public:
 	}
 
 public:
+	entvars_t * pev;
+	CBaseEntity *m_pGoalEnt;
+	CBaseEntity *m_pLink;
+	void (CBaseEntity::*m_pfnThink)(void);
+	void (CBaseEntity::*m_pfnTouch)(CBaseEntity *pOther);
+	void (CBaseEntity::*m_pfnUse)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void (CBaseEntity::*m_pfnBlocked)(CBaseEntity *pOther);
+	int current_ammo;
+	int currentammo;
+	int maxammo_buckshot;
+	int ammo_buckshot;
+	int maxammo_9mm;
+	int ammo_9mm;
+	int maxammo_556nato;
+	int ammo_556nato;
+	int maxammo_556natobox;
+	int ammo_556natobox;
+	int maxammo_762nato;
+	int ammo_762nato;
+	int maxammo_45acp;
+	int ammo_45acp;
+	int maxammo_50ae;
+	int ammo_50ae;
+	int maxammo_338mag;
+	int ammo_338mag;
+	int maxammo_57mm;
+	int ammo_57mm;
+	int maxammo_357sig;
+	int ammo_357sig;
+	time_point_t m_flStartThrow;
+	time_point_t m_flReleaseThrow;
+	int m_iSwing;
+	bool has_disconnected;
+
+public:
 	static TYPEDESCRIPTION m_SaveData[];
 	int m_iTeam;
 	int m_LastHitGroup;
@@ -416,13 +414,7 @@ namespace cl {
 namespace sv {
 #endif
 
-template<> struct PrivateData<class CBaseDelay, CBaseEntity>
-{
-    duration_t m_flDelay;
-    int m_iszKillTarget;
-};
-
-class CBaseDelay : public CBaseEntity, public PrivateData<class CBaseDelay, CBaseEntity>
+class CBaseDelay : public CBaseEntity
 {
 public:
 #ifdef CLIENT_DLL
@@ -442,19 +434,14 @@ public:
 	void EXPORT DelayThink(void);
 
 public:
+	duration_t m_flDelay;
+	int m_iszKillTarget;
+
+public:
 	static TYPEDESCRIPTION m_SaveData[];
 };
 
-template<> struct PrivateData<class CBaseAnimating, CBaseDelay>
-{
-	float m_flFrameRate;
-	float m_flGroundSpeed;
-	time_point_t m_flLastEventCheck;
-	BOOL m_fSequenceFinished;
-	BOOL m_fSequenceLoops;
-};
-
-class CBaseAnimating : public CBaseDelay, public PrivateData<class CBaseAnimating, CBaseDelay>
+class CBaseAnimating : public CBaseDelay
 {
 public:
 #ifdef CLIENT_DLL
@@ -492,33 +479,17 @@ public:
 	void SetSequenceBox(void);
 
 public:
+	float m_flFrameRate;
+	float m_flGroundSpeed;
+	time_point_t m_flLastEventCheck;
+	BOOL m_fSequenceFinished;
+	BOOL m_fSequenceLoops;
+
+public:
 	static TYPEDESCRIPTION m_SaveData[];
 };
 
-template<> struct PrivateData<class CBaseToggle, CBaseAnimating>
-{
-	TOGGLE_STATE m_toggle_state;
-	time_point_t m_flActivateFinished;
-	float m_flMoveDistance;
-	duration_t m_flWait;
-	float m_flLip;
-	float m_flTWidth;
-	float m_flTLength;
-	Vector m_vecPosition1;
-	Vector m_vecPosition2;
-	Vector m_vecAngle1;
-	Vector m_vecAngle2;
-	int m_cTriggersLeft;
-	float m_flHeight;
-	EHANDLE m_hActivator;
-	void (CBaseToggle::*m_pfnCallWhenMoveDone)(void);
-	Vector m_vecFinalDest;
-	Vector m_vecFinalAngle;
-	int m_bitsDamageInflict;
-	string_t m_sMaster;
-};
-
-class CBaseToggle : public CBaseAnimating, public PrivateData<class CBaseToggle, CBaseAnimating>
+class CBaseToggle : public CBaseAnimating
 {
 public:
 #ifdef CLIENT_DLL
@@ -544,6 +515,27 @@ public:
 	static float AxisValue(int flags, const Vector &angles);
 	static void AxisDir(entvars_t *pev);
 	static float AxisDelta(int flags, const Vector &angle1, const Vector &angle2);
+
+public:
+	TOGGLE_STATE m_toggle_state;
+	time_point_t m_flActivateFinished;
+	float m_flMoveDistance;
+	duration_t m_flWait;
+	float m_flLip;
+	float m_flTWidth;
+	float m_flTLength;
+	Vector m_vecPosition1;
+	Vector m_vecPosition2;
+	Vector m_vecAngle1;
+	Vector m_vecAngle2;
+	int m_cTriggersLeft;
+	float m_flHeight;
+	EHANDLE m_hActivator;
+	void (CBaseToggle::*m_pfnCallWhenMoveDone)(void);
+	Vector m_vecFinalDest;
+	Vector m_vecFinalAngle;
+	int m_bitsDamageInflict;
+	string_t m_sMaster;
 
 public:
 	static TYPEDESCRIPTION m_SaveData[];

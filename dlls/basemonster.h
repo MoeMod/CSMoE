@@ -21,27 +21,7 @@ namespace cl {
 namespace sv {
 #endif
 
-template<> struct PrivateData<class CBaseMonster, CBaseToggle>
-{
-	Activity m_Activity;
-	Activity m_IdealActivity;
-	int m_bitsDamageType;
-	BYTE m_rgbTimeBasedDamage[CDMG_TIMEBASED];
-	MONSTERSTATE m_MonsterState;
-	MONSTERSTATE m_IdealMonsterState;
-	int m_afConditions;
-	int m_afMemory;
-	duration_t m_flNextAttack;
-	EHANDLE m_hEnemy;
-	EHANDLE m_hTargetEnt;
-	float m_flFieldOfView;
-	int m_bloodColor;
-	Vector m_HackedGunPos;
-	Vector m_vecEnemyLKP;
-	time_point_t m_timeNextAttack;
-};
-
-class CBaseMonster : public CBaseToggle, public PrivateData<class CBaseMonster, CBaseToggle>
+class CBaseMonster : public CBaseToggle
 {
 public:
 #ifdef CLIENT_DLL
@@ -143,6 +123,25 @@ public:
 		return FALSE;
 	}
 	inline void StopAnimation(void) { pev->framerate = 0; }
+
+public:
+	Activity m_Activity;
+	Activity m_IdealActivity;
+	int m_bitsDamageType;
+	BYTE m_rgbTimeBasedDamage[CDMG_TIMEBASED];
+	MONSTERSTATE m_MonsterState;
+	MONSTERSTATE m_IdealMonsterState;
+	int m_afConditions;
+	int m_afMemory;
+	duration_t m_flNextAttack;
+	EHANDLE m_hEnemy;
+	EHANDLE m_hTargetEnt;
+	float m_flFieldOfView;
+	int m_bloodColor;
+	Vector m_HackedGunPos;
+	Vector m_vecEnemyLKP;
+	time_point_t m_timeNextAttack;
+
 #ifndef CLIENT_DLL
 	EHANDLE m_hSpearAttached;
 #endif

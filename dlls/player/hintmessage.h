@@ -24,18 +24,12 @@ namespace cl {
 namespace sv {
 #endif
 
-class CHintMessage
+struct CHintMessage
 {
-public:
-	CHintMessage(const char *hintString, bool isHint, CUtlVector<const char *> *args, duration_t duration);
-	~CHintMessage() = default;
-
-public:
 	duration_t GetDuration(void) const { return m_duration; }
 	void Send(CBaseEntity *client);
 	bool IsEquivalent(const char *hintString, CUtlVector<const char *> *args) const;
 
-private:
 	std::string m_hintString;
 	std::vector<std::string> m_args;
 	duration_t m_duration;
@@ -48,9 +42,6 @@ struct CHintMessageQueue
 	void Update(CBaseEntity *player);
 	bool AddMessage(const char *message, duration_t duration, bool isHint, CUtlVector<const char *> *args);
 	bool IsEmpty(void) { return m_messages.empty(); }
-
-	void LuaPush(lua_State* L) const;
-	void LuaGet(lua_State* L, int N);
 
 	time_point_t m_tmMessageEnd;
 	std::vector<CHintMessage> m_messages;
