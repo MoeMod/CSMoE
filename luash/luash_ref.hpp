@@ -9,6 +9,12 @@
 
 namespace luash
 {
+	template<class T> using IsRefType = std::disjunction<
+	        typename std::negation<IsCompleteType<typename std::remove_cv<T>::type>>::type,
+			std::is_aggregate<typename std::remove_cv<T>::type>,
+	        IsSupportedClass<typename std::remove_cv<T>::type>
+		>;
+
 	class ITypeInterface
 	{
 	public:
@@ -63,7 +69,7 @@ namespace luash
 		// hackme : ref type as pointer when pushed by __index to support a.b.c=2
 		template<class T> auto MetaIndexImpl2(lua_State* L, T&& arg)
 		{
-			if constexpr(std::disjunction<typename std::negation<IsCompleteType<typename std::remove_cv<T>::type>>::type, std::is_aggregate<typename std::remove_cv<T>::type>, IsSupportedClass<typename std::remove_cv<T>::type>>::value)
+			if constexpr(IsRefType<T>::value && !std::is_array<T>::value)
 				Push(L, &arg);
 			else
 				Push(L, arg);
@@ -242,8 +248,7 @@ namespace luash
 	class TypeInterfaceDecoratorToString<char, Base> : public TypeInterfaceDecoratorToString<const char, Base> {};
 
 	template<class T, class Base, 
-		bool = std::conjunction<IsCompleteType<typename std::remove_cv<T>::type>, std::is_aggregate<typename std::remove_cv<T>::type>>::value,
-		bool = std::conjunction<IsCompleteType<typename std::remove_cv<T>::type>, IsSupportedClass<typename std::remove_cv<T>::type>>::value
+		bool = std::conjunction<IsCompleteType<typename std::remove_cv<T>::type>, std::is_aggregate<typename std::remove_cv<T>::type>>::value
 	>
 	class TypeInterfaceDecoratorIndex : public Base
 	{
@@ -279,7 +284,7 @@ namespace luash
 	}
 
 	template<class T, class Base>
-	class TypeInterfaceDecoratorIndex<T, Base, true, false> : public Base
+	class TypeInterfaceDecoratorIndex<T, Base, true> : public Base
 	{
 	public:
 		size_t GetMemberCount() const override
@@ -323,69 +328,6 @@ namespace luash
 				return luaL_error(L, "can not assign field %s[%d]", type.c_str(), N);
 			}
 			return success;
-		}
-	};
-
-
-	template<class T, class Base>
-	class TypeInterfaceDecoratorIndex<T, Base, false, true> : public Base
-	{
-	public:
-		static constexpr auto MemberCount = GetAmountOfPrivateDataFields<typename std::remove_const<T>::type>::value;
-		size_t GetMemberCount() const override
-		{
-			return MemberCount;
-		}
-		template<std::size_t...I>
-		int MetaIndexImpl(lua_State* L, T &objref, std::size_t N, std::index_sequence<I...>) const
-		{
-			static constexpr void (*meta_switch[sizeof...(I)])(lua_State * L, T & objref) = {
-				+[](lua_State* L, T& objref) { detail::MetaIndexImpl2(L, GetStructMember<I>(objref)); }...
-			};
-			if (N < 1 || N > sizeof...(I))
-				return 0;
-			meta_switch[N - 1](L, objref);
-			return 1;
-		}
-		template<std::size_t...I>
-		int MetaNewIndexImpl(lua_State* L, T& objref, std::size_t N, std::index_sequence<I...>) const
-		{
-			static constexpr void (*meta_switch[sizeof...(I)])(lua_State * L, T & objref) = {
-				+[](lua_State* L, T& objref) { Get(L, -1, GetStructMember<I>(objref)); }...
-			};
-			if (N < 1 || N > sizeof...(I))
-				return 0;
-			meta_switch[N - 1](L, objref);
-			return 1;
-		}
-		int MetaIndex(lua_State* L) const override
-		{
-			if (lua_type(L, 2) == LUA_TSTRING)
-			{
-				if (!strcmp(lua_tostring(L, 2), "self"))
-					return this->Copy(L);
-			}
-			detail::TypeInterfaceStringIndexReplace(this, L, "class/", nameof::nameof_short_type<typename std::decay<T>::type>());
-			void* value = lua_touserdata(L, 1);
-			int N = lua_tointeger(L, 2);
-			if (T* object = reinterpret_cast<T*>(value))
-				return MetaIndexImpl(L, *object, N, std::make_index_sequence<MemberCount>());
-			return 0;
-		}
-		int MetaNewIndex(lua_State* L) const override
-		{
-			if (lua_type(L, 2) == LUA_TSTRING)
-			{
-				if (!strcmp(lua_tostring(L, 2), "self"))
-					return this->Assign(L);
-			}
-			detail::TypeInterfaceStringIndexReplace(this, L, "class/", nameof::nameof_short_type<typename std::decay<T>::type>());
-			void* value = lua_touserdata(L, 1);
-			int N = lua_tointeger(L, 2);
-			T* object = reinterpret_cast<T*>(value);
-			if (T* object = reinterpret_cast<T*>(value))
-				return MetaNewIndexImpl(L, *object, N, std::make_index_sequence<MemberCount>());
-			return 0;
 		}
 	};
 
@@ -491,8 +433,7 @@ namespace luash
 		void* value = lua_touserdata(L, 1);
 		if (const ITypeInterface* ti = GetTypeInterface(L, value))
 			return (ti->*pmemfn)(L);
-		luaL_error(L, "unrecognized ref ptr %x", value);
-		return 0;
+        return luaL_error(L, "unrecognized ref ptr");
 	}
 
 	int SetupTypeInterfaceTable(lua_State* L);

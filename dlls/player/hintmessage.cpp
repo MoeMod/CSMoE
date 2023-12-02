@@ -8,18 +8,6 @@
 
 namespace sv {
 
-CHintMessage::CHintMessage(const char *hintString, bool isHint, CUtlVector<const char *> *args, duration_t duration)
-{
-	m_hintString = hintString;
-	m_duration = duration;
-	m_isHint = isHint;
-
-	if (args) {
-		for (int i = 0; i < args->Count(); ++i)
-			m_args.emplace_back((*args)[i]);
-	}
-}
-
 void CHintMessage::Send(CBaseEntity *client)
 {
 	CUtlVector<char *> args;
@@ -50,7 +38,13 @@ void CHintMessageQueue::Update(CBaseEntity *client)
 
 bool CHintMessageQueue::AddMessage(const char *message, duration_t duration, bool isHint, CUtlVector<const char *> *args)
 {
-	m_messages.emplace_back(message, isHint, args, duration);
+	std::vector<std::string> m_args;
+	if (args) {
+		for (int i = 0; i < args->Count(); ++i)
+			m_args.emplace_back((*args)[i]);
+	}
+
+	m_messages.emplace_back(CHintMessage{ message, m_args, duration, isHint });
 
 	return true;
 }

@@ -86,11 +86,8 @@ namespace cl {
 	}
 
 	#define CLASS_BEGIN(ClassName, BaseClass) \
-		template<class Base> struct PrivateData<LuaClass<ClassName, Base>, LuaClass<BaseClass, Base>> {}; \
-		template<class Base> struct PrivateData<LuaClass<ClassName, Base>, Base> {}; \
 		template<class Base> class LuaClass<ClassName, Base> : \
-			public std::conditional<std::is_void<BaseClass>::value, Base, LuaClass<BaseClass, Base>>::type, \
-			public std::conditional<std::is_void<BaseClass>::value, PrivateData<LuaClass<ClassName, Base>, Base>, PrivateData<LuaClass<ClassName, Base>, LuaClass<BaseClass, Base>>>::type \
+			public std::conditional<std::is_void<BaseClass>::value, Base, LuaClass<BaseClass, Base>>::type \
 		{ \
 		using ThisClass = ClassName; \
 		static_assert(std::is_base_of<BaseClass, ThisClass>::value || std::is_void<BaseClass>::value); \
@@ -108,13 +105,10 @@ namespace cl {
 			return ReturnFromLuaIfNotVoid<ResultType>(L, 1); \
 		}
 	#define ADD_OVERRIDE_VIRTUAL_FUNCTION(...) ADD_VIRTUAL_FUNCTION(__VA_ARGS__)
-	#define ADD_MEMBER_FUNCTION(FunctionName, ...) 
-	#define ADD_STATIC_MEMBER_FUNCTION(FunctionName, ...) 
 
 	#define CLASS_END() };
-#define ITER
 #include "cbase/cbase_iter.h"
-#undef ITER
+
 
 	template<class T> void LuaSetupRefTypeInterface(lua_State* L, CBaseEntity* ptr)
 	{
@@ -159,12 +153,6 @@ namespace cl {
 
 #endif
 
-#define ADD_VIRTUAL_FUNCTION(FunctionName, ...)
-#define ADD_MEMBER_FUNCTION(FunctionName, ...) 
-#define ADD_STATIC_MEMBER_FUNCTION(FunctionName, ...) 
-#define CLASS_END()
-#define ITER
 #include "cbase/cbase_iter.h"
-#undef ITER
 
 }

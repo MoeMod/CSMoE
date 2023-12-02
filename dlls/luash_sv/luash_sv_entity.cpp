@@ -56,6 +56,10 @@ namespace cl {
 		lua_getfield(L, -1, "cppclass"); // #3 = cppclass "CBaseEntity"
 
 		const char* cppClassName = lua_tostring(L, -1);
+        if(!cppClassName)
+        {
+            return false;
+        }
 
 		auto iter = g_pfnLuaCreateClassPtrMap.find(cppClassName);
 		if (iter == g_pfnLuaCreateClassPtrMap.end())
@@ -106,6 +110,10 @@ namespace cl {
 		lua_getfield(L, -1, "cppclass"); // #3 = cppclass "CBaseEntity"
 
 		const char* cppClassName = lua_tostring(L, -1);
+        if(!cppClassName)
+        {
+            return nullptr;
+        }
 
 		if(auto iter = g_pPlaceHolderEntityCache.find(classname); iter != g_pPlaceHolderEntityCache.end())
 		{
@@ -278,24 +286,4 @@ namespace cl {
 		luash::GetPointer(L, N, ent);
 		p = ent ? ent->edict() : nullptr;
 	}
-	void CHintMessageQueue::LuaPush(lua_State* L) const
-	{
-		// TODO
-		lua_pushnil(L);
-		assert(false && "luasv unsupported method");
-	}
-	void CHintMessageQueue::LuaGet(lua_State* L, int N)
-	{
-		// TODO
-		assert(false && "luasv unsupported method");
-	}
-
-	static_assert(luash::GetAmountOfPrivateDataFields<CBaseEntity>::value == 33);
-	static_assert(luash::GetAmountOfPrivateDataFields<CBaseDelay>::value == 35);
-	static_assert(luash::GetAmountOfPrivateDataFields<CBaseAnimating>::value == 40);
-	static_assert(luash::GetAmountOfPrivateDataFields<CBaseToggle>::value == 59);
-	static_assert(luash::GetAmountOfPrivateDataFields<CBaseMonster>::value == 75);
-	static_assert(luash::GetAmountOfPrivateDataFields<CBasePlayer>::value > 75);
-	static_assert(luash::GetAmountOfPrivateDataFields<CBasePlayerItem>::value == 43);
-	static_assert(luash::GetAmountOfPrivateDataFields<CBasePlayerWeapon>::value == 78);
 }
