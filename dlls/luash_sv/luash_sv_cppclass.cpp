@@ -25,7 +25,9 @@ namespace cl {
 	{
 		static int LuaGetter(lua_State *L)
 		{
-			if(auto that = (T *)lua_touserdata(L, 1))
+            T *that = nullptr;
+            luash::GetPointer(L, 1, that);
+			if(that)
 			{
 				if constexpr(luash::IsRefType<U>::value && !std::is_array<U>::value)
 					luash::Push(L, &(that->*memptr));
@@ -37,14 +39,22 @@ namespace cl {
 		}
 		static int LuaSetter(lua_State *L)
 		{
-			if(auto that = (T *)lua_touserdata(L, 1))
+            T *that = nullptr;
+            luash::GetPointer(L, 1, that);
+            if(that)
 			{
-				luash::Get(L, 1, (that->*memptr));
+				luash::Get(L, 2, (that->*memptr));
 				return 0;
 			}
 			return 0;
 		}
 	};
+
+    int LuaSV_SetFieldCFunction(lua_State *L, const char *mem, lua_CFunction cf)
+    {
+        lua_pushcfunction(L, cf);
+        lua_setfield(L, -2, mem);
+    }
 
 	int LuaSV_ExportCppClass(lua_State* L)
 	{
@@ -75,9 +85,9 @@ namespace cl {
 
 #define ADD_MEMBER_DATA(MemberName) \
         lua_pushcfunction(L, (MakeLuaGetterSetter<ThisClass, decltype(ThisClass::MemberName), &ThisClass::MemberName>::LuaGetter)); \
-        lua_setfield(L, -2, "set_" #MemberName); \
+        lua_setfield(L, -2, "get_" #MemberName); \
         lua_pushcfunction(L, (MakeLuaGetterSetter<ThisClass, decltype(ThisClass::MemberName), &ThisClass::MemberName>::LuaSetter)); \
-        lua_setfield(L, -2, "get_" #MemberName);
+        lua_setfield(L, -2, "set_" #MemberName);
 
 #define ADD_STATIC_MEMBER_DATA(MemberName) // TODO
 

@@ -56,6 +56,10 @@ namespace cl {
 		lua_getfield(L, -1, "cppclass"); // #3 = cppclass "CBaseEntity"
 
 		const char* cppClassName = lua_tostring(L, -1);
+        if(!cppClassName)
+        {
+            return false;
+        }
 
 		auto iter = g_pfnLuaCreateClassPtrMap.find(cppClassName);
 		if (iter == g_pfnLuaCreateClassPtrMap.end())
@@ -106,6 +110,10 @@ namespace cl {
 		lua_getfield(L, -1, "cppclass"); // #3 = cppclass "CBaseEntity"
 
 		const char* cppClassName = lua_tostring(L, -1);
+        if(!cppClassName)
+        {
+            return nullptr;
+        }
 
 		if(auto iter = g_pPlaceHolderEntityCache.find(classname); iter != g_pPlaceHolderEntityCache.end())
 		{

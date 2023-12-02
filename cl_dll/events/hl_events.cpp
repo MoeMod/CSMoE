@@ -45,13 +45,13 @@ That was what we were going to do, but we ran out of time...oh well.
 */
 void Game_HookEvents( void )
 {
+#ifdef XASH_LUASH
+        LuaCL_HookEvents();
+#endif
+
 #define HOOK_EVENT( x, y ) gEngfuncs.pfnHookEvent( "events/" #x ".sc", EV_##y )
 #include "eventdef.h"
 #undef HOOK_EVENT
-
-#ifdef XASH_LUASH
-	LuaCL_HookEvents();
-#endif
 
 	cl_gunbubbles = gEngfuncs.pfnRegisterVariable("cl_gunbubbles", "2", FCVAR_ARCHIVE);
 	cl_tracereffect = gEngfuncs.pfnRegisterVariable("cl_tracereffect", "0", FCVAR_ARCHIVE);

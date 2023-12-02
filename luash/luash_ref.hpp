@@ -12,7 +12,7 @@ namespace luash
 	template<class T> using IsRefType = std::disjunction<
 	        typename std::negation<IsCompleteType<typename std::remove_cv<T>::type>>::type,
 			std::is_aggregate<typename std::remove_cv<T>::type>,
-	        std::is_class<typename std::remove_cv<T>::type>
+	        IsSupportedClass<typename std::remove_cv<T>::type>
 		>;
 
 	class ITypeInterface
@@ -433,8 +433,7 @@ namespace luash
 		void* value = lua_touserdata(L, 1);
 		if (const ITypeInterface* ti = GetTypeInterface(L, value))
 			return (ti->*pmemfn)(L);
-		luaL_error(L, "unrecognized ref ptr %x", value);
-		return 0;
+        return luaL_error(L, "unrecognized ref ptr");
 	}
 
 	int SetupTypeInterfaceTable(lua_State* L);
