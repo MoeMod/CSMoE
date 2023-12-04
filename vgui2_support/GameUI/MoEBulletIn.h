@@ -24,6 +24,10 @@
 #define BULLETIN_MAX_PAGES 32
 #define BULLETIN_MAX_IMAGE 32
 
+#ifdef MessageBox
+#undef MessageBox
+#endif
+
 class CCSBTEBulletinFrameImage : public vgui2::Panel
 {
 	DECLARE_CLASS_SIMPLE(CCSBTEBulletinFrameImage, Panel);

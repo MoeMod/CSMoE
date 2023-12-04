@@ -34,6 +34,7 @@
 #include "OptionsDialog.h"
 #include "CreateMultiplayerGameDialog.h"
 #include "MoeSettings.h"
+#include "InventoryMenu_V2/InventoryMainMenu.h"
 
 #include "ToolBar.h"
 #include <keydefs.h>
@@ -767,6 +768,7 @@ CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 {
 	CGameMenu *menu = new CGameMenu(this, "GameMenu");
 
+	menu->AddMenuItem("#CSO_Bulletin_Notice", "#MOE_InventoryMenu", "OpenInventoryMenu", this, nullptr);
 	menu->AddMenuItem("#CSO_Bulletin_Notice", "#CSO_Bulletin_Notice", "OpenCSBTEBulletin", this, nullptr);
 	menu->AddMenuItem("#LOGIN_TITLE", "#LOGIN_TITLE", "MoeLogin", this, nullptr);
 	menu->AddMenuItem("#GameUI_CSMoESettings", "#GameUI_CSMoESettings", "OpenMoeSettings", this, nullptr);
@@ -1028,6 +1030,11 @@ void CBasePanel::RunMenuCommand(const char *command)
 		//OpenCSBTEBulletin();
 		OnOpenSubDialog<CCSBTEBulletin>();
 	}
+	else if (!Q_stricmp(command, "OpenInventoryMenu"))
+	{
+		OpenInventoryMenu();
+		//OnOpenSubDialog<CMainInventoryMenu>();
+	}
 
 	else
 		BaseClass::OnCommand(command);
@@ -1157,6 +1164,17 @@ void CBasePanel::OpenCSBTEBulletin(void)
 
 	m_hCSBteBulletIn->Activate();
 }
+void CBasePanel::OpenInventoryMenu(void)
+{
+	if (!m_hInventoryMenu.Get())
+	{
+		m_hInventoryMenu = new CInventoryMainMenu(this);
+		PositionDialog(m_hInventoryMenu);
+	}
+
+	m_hInventoryMenu->Activate();
+}
+
 
 void CBasePanel::PositionDialog(vgui2::PHandle dlg)
 {

@@ -50,12 +50,6 @@ namespace cl {
 		}
 	};
 
-    int LuaSV_SetFieldCFunction(lua_State *L, const char *mem, lua_CFunction cf)
-    {
-        lua_pushcfunction(L, cf);
-        lua_setfield(L, -2, mem);
-    }
-
 	int LuaSV_ExportCppClass(lua_State* L)
 	{
 

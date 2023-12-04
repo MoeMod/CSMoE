@@ -143,6 +143,7 @@ public:
 	void OnOpenMoeSettings(void);
 	void OnOpenMoeLogin(void);
 	void OpenCSBTEBulletin(void);
+	void OpenInventoryMenu(void);
 
 public:
 	KeyValues *GetConsoleControlSettings(void);
@@ -221,6 +222,7 @@ private:
 	vgui2::DHANDLE<vgui2::PropertyDialog> m_hMoeSettings;
 	vgui2::DHANDLE<vgui2::Frame> m_hMoeLogin;
 	vgui2::DHANDLE<vgui2::Frame> m_hCSBteBulletIn;
+	vgui2::DHANDLE<vgui2::PropertyDialog> m_hInventoryMenu;
 	
 	vgui2::AnimationController *m_pConsoleAnimationController;
 	KeyValues *m_pConsoleControlSettings;

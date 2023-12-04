@@ -34,6 +34,7 @@ public:
 
 	// wrapper for PropertySheet interface
 	virtual void AddPage(Panel *page, const char *title);
+	virtual void RemoveAllPage();
 	virtual Panel *GetActivePage();
 	virtual void ResetAllData();
 	virtual void ApplyChanges();
@@ -47,6 +48,8 @@ public:
 	void SetOKButtonVisible(bool state);
 	void SetCancelButtonVisible(bool state);
 	void SetApplyButtonVisible(bool state);
+	void SetOffset(int x, int y);
+	void SetSizeOffset(int w, int t);
 
 	/* MESSAGES SENT
 		"ResetData"			- sent when page is loaded.  Data should be reloaded from document into controls.
@@ -67,6 +70,7 @@ protected:
 	virtual void OnKeyCodeTyped(KeyCode code);
 	virtual void RequestFocus(int direction = 0);
 
+
 	MESSAGE_FUNC( OnApplyButtonEnable, "ApplyButtonEnable" );
 	void EnableApplyButton(bool bEnable);
 	
@@ -75,6 +79,9 @@ private:
 	Button *_okButton;
 	Button *_cancelButton;
 	Button *_applyButton;
+
+	int m_iOffsetX, m_iOffsetY;
+	int m_iOffsetSizeW, m_iOffsetSizeT;
 };
 
 }; // vgui

@@ -6,7 +6,11 @@ buildscript {
             allowInsecureProtocol = true
             url = 'https://maven.aliyun.com/repository/public'
         }
-        google()
+        google
+        {
+            allowInsecureProtocol = true
+            url = 'https://maven.aliyun.com/repository/google'
+        }
 
     }
     dependencies {
@@ -22,7 +26,11 @@ allprojects {
             allowInsecureProtocol = true
             url = 'https://maven.aliyun.com/repository/public'
         }
-        google()
+        google
+        {
+            allowInsecureProtocol = true
+            url = 'https://maven.aliyun.com/repository/google'
+        }
 
     }
 }

@@ -48,6 +48,9 @@ PropertyDialog::PropertyDialog(Panel *parent, const char *panelName) : Frame(par
 	_applyButton->SetCommand("Apply");
 
 	SetSizeable(false);
+
+	m_iOffsetX = m_iOffsetY = 0;
+	m_iOffsetSizeW = m_iOffsetSizeT = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -83,6 +86,13 @@ void PropertyDialog::AddPage(Panel *page, const char *title)
 	_propertySheet->AddPage(page, title);
 }
 
+void PropertyDialog::RemoveAllPage()
+{
+	_propertySheet->RemoveAllPages();
+}
+
+
+
 //-----------------------------------------------------------------------------
 // Purpose: reloads the data in all the property page
 //-----------------------------------------------------------------------------
@@ -108,7 +118,7 @@ void PropertyDialog::PerformLayout()
 
 	int x, y, wide, tall;
 	GetClientArea(x, y, wide, tall);
-	_propertySheet->SetBounds(x, y, wide, tall - 32);
+	_propertySheet->SetBounds(x + m_iOffsetX, y + m_iOffsetY, wide - 16 + m_iOffsetSizeW, tall - 16 + m_iOffsetSizeT);
 
 
 	// move the buttons to the bottom-right corner
@@ -295,4 +305,18 @@ void PropertyDialog::EnableApplyButton(bool bEnable)
 void PropertyDialog::RequestFocus(int direction)
 {
     _propertySheet->RequestFocus(direction);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void PropertyDialog::SetOffset(int x, int y)
+{
+	m_iOffsetX = x;
+	m_iOffsetY = y;
+}
+void PropertyDialog::SetSizeOffset(int w, int t)
+{
+	m_iOffsetSizeW = w;
+	m_iOffsetSizeT = t;
 }

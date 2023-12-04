@@ -39,6 +39,26 @@ add_library(GameUI STATIC
 	OptionsSubMoeSettings.cpp
 	MoeLogin.cpp
 	MoEBulletIn.cpp
+
+	InventoryMenu_V2/InventoryMainMenu.cpp
+	
+	InventoryMenu_V2/Support/STLHelper.cpp
+	InventoryMenu_V2/Util/Util.cpp
+
+	InventoryMenu_V2/Shared/CSearchBar/CSearchBar.cpp
+	InventoryMenu_V2/Shared/CTexturedButton/CTexturedButton.cpp
+	InventoryMenu_V2/Shared/CTexturedMixButton/CTexturedMixButton.cpp
+
+	InventoryMenu_V2/WeaponEnchant/CWeaponEnchant.cpp
+	InventoryMenu_V2/WeaponPaint/CWeaponPaint.cpp
+
+	InventoryMenu_V2/CharacterManager/CCharacterManager.cpp
+
+	InventoryMenu_V2/WeaponEnchant/Class/CWeaponListLeftPanel.cpp
+	InventoryMenu_V2/WeaponEnchant/Class/CWeaponListRightPanel.cpp
+	InventoryMenu_V2/WeaponEnchant/Class/CWeaponListRightPanelEle.cpp
+	InventoryMenu_V2/WeaponEnchant/Class/CWeaponLevelGauge.cpp
+	InventoryMenu_V2/WeaponEnchant/Class/CWeaponDescription.cpp
  )
 
 if(SE_WIN32)
