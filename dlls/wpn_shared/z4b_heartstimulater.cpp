@@ -84,9 +84,13 @@ public:
 		if (m_flTimeHostler != invalid_time_point)
 		{
 			m_iClip += (gpGlobals->time - m_flTimeHostler) / 0.125s;
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += (gpGlobals->time - m_flTimeHostler) / 0.125s;
 		}
 		if (m_iClip >= 100)
 			m_iClip = 100;
+
+		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 100)
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 100;
 
 		return Base::Deploy();
 	}
@@ -104,8 +108,17 @@ public:
 #ifndef CLIENT_DLL
 	hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer);
 #endif
+
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
+	{
+		if (m_iDefaultAmmo)
+		{
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iDefaultAmmo;
+		}
+		
+		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+	}
 private:
-	int m_iHolsterAmmo;
 	time_point_t m_flTimeHolster;
 	time_point_t m_flTimeNextCharge;
 	duration_t m_flNextRunIdle;
@@ -150,8 +163,8 @@ int CKnifeHeartStimulater::GetItemInfo(ItemInfo* p)
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "heartstimulaterammo";
 	p->iMaxAmmo1 = -1;
-	p->pszAmmo2 = NULL;
-	p->iMaxAmmo2 = -1;
+	p->pszAmmo2 = "heartstimulaterammo2";
+	p->iMaxAmmo2 = 100;
 	p->iMaxClip = 100;
 	p->iSlot = 2;
 	p->iPosition = 1;
@@ -179,7 +192,6 @@ void CKnifeHeartStimulater::Holster(int skiplocal)
 {
 	SetThink(nullptr);
 
-	m_iHolsterAmmo = m_iClip;
 	m_flTimeHostler = gpGlobals->time;
 	return CBasePlayerWeapon::Holster(skiplocal);
 }
@@ -187,14 +199,38 @@ void CKnifeHeartStimulater::Holster(int skiplocal)
 
 void CKnifeHeartStimulater::ItemPostFrame()
 {
-	if (m_iClip < 100)
+	if (m_flTimeNextCharge <= gpGlobals->time)
 	{
-		if (m_flTimeNextCharge <= gpGlobals->time)
+		if (m_iClip < 100)
 		{
 			m_iClip++;
-			m_flTimeNextCharge = gpGlobals->time + 0.125s;
+		}
+
+		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < 100)
+		{
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
+		}
+
+		m_flTimeNextCharge = gpGlobals->time + 0.125s;
+	}
+
+	if (m_pPlayer->pev->button & IN_USE && m_pPlayer->m_flNextAttack < 0s)
+	{
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+
+		if (pWeapon)
+			return CBasePlayerWeapon::ItemPostFrame();
+
+		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 100)
+		{
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
+#ifndef CLIENT_DLL
+			m_pPlayer->GiveNamedItem("z4b_icegrenade");
+#endif
+			m_pPlayer->m_iGrenadeID = GRENADE_ICEGRENADE;
 		}
 	}
+	
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 

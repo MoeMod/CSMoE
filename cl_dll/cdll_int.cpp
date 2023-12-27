@@ -309,6 +309,9 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pLaserFistPModel = IEngineStudio.Mod_ForName("models/p_laserfist.mdl", FALSE);
 	CStudioModelRenderer::s_pLaserFistEXPModel = IEngineStudio.Mod_ForName("models/p_laserfistex.mdl", FALSE);
 
+	CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel = IEngineStudio.Mod_ForName("models/z4b/Balisong_LuminousEdge/v_balisong_luminousedge.mdl", FALSE);
+
+	CStudioModelRenderer::s_pLightningARPModel = IEngineStudio.Mod_ForName("models/p_lightningar_b.mdl", FALSE);
 	//VGui_Startup();
 
 	return 1;

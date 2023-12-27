@@ -965,6 +965,22 @@ public:
 	virtual void Precache();
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
+
+class CLightningARAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class CLightningSMGAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
 }
 
 #endif // AMMO_H

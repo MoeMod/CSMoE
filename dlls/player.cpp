@@ -40,6 +40,7 @@
 #include "wpn_shared/wpn_guillotine.h"
 #include "wpn_shared/z4b_shovelex.h"
 #include "wpn_shared/wpn_leapstrikegun.h"
+#include "wpn_shared/z4b_ak47_angelicbeast.h"
 // gamemode
 #include "gamemode/mods.h"
 
@@ -6358,6 +6359,9 @@ void CBasePlayer::Spawn()
 
 	m_flEmotionTime = invalid_time_point;
 
+	m_flLastKillTime = invalid_time_point;
+	m_iMultiKillCount = 1;
+
 	for (int i = 0; i < MAX_ITEM_TYPES; ++i)
 	{
 		m_iSlotBuyTime[i] = 0;
@@ -6505,6 +6509,8 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/v_at4ex.mdl");
 		case WEAPON_BAZOOKA:
 			pev->viewmodel = MAKE_STRING("models/v_bazooka.mdl");
+		case WEAPON_Z4B_M82A1ANGELICBEAST:
+			pev->viewmodel = MAKE_STRING("models/z4b/v_m82a1angelicbeast.mdl");
 
 		default:
 			break;
@@ -6970,6 +6976,11 @@ void CBasePlayer::SelectItem(const char *pstr)
 			CKnifeShovelEX* pWeapon = (CKnifeShovelEX*)m_pActiveItem;
 			pWeapon->ChangeWeapon();
 			goto CHANGEMODE;
+		}
+		else if (FClassnameIs(m_pActiveItem->pev, "z4b_ak47_angelicbeast"))
+		{
+			CAK47_AngelicBeast* pWeapon = (CAK47_AngelicBeast*)m_pActiveItem;
+			pWeapon->ChangeMode();
 		}
 
 		return;
@@ -9777,6 +9788,10 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_DBARREL:
 		case WEAPON_PKM:
 		case WEAPON_Z4B_MA5B:
+		case WEAPON_Z4B_M82A1ANGELICBEAST:
+		case WEAPON_Z4B_DEAGLEEL:
+		case WEAPON_Z4B_AK47_ANGELICBEAST:
+		case WEAPON_LIGHTNINGAR:
 			return TRUE;
 		}
 	}
@@ -11042,7 +11057,10 @@ void CBasePlayer::PlayEmotion(int slot)
 		break;
 	}
 
-	pev->viewmodel = MAKE_STRING("models/v_emotion.mdl");
+	if(m_iModelName >= MODEL_BUFFCLASS23S4TR)
+		pev->viewmodel = MAKE_STRING("models/v_emotion1.mdl");
+	else
+		pev->viewmodel = MAKE_STRING("models/v_emotion.mdl");
 	pev->weaponmodel = 0;
 
 	pev->frame = 0;

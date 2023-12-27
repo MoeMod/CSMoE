@@ -1639,12 +1639,15 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 	case GRENADE_HOLYBOMBEX:
 	case GRENADE_WATERBOMB:
 	case GRENADE_IGNITEBOMB:
+	case GRENADE_ICEGRENADE:
 		if(pOwner->m_iGrenadeID == GRENADE_WATERBOMB)
 			SET_MODEL(ENT(pGrenade->pev), "models/w_waterbomb.mdl");
 		else if(pOwner->m_iGrenadeID == GRENADE_HOLYBOMBEX)
 			SET_MODEL(ENT(pGrenade->pev), "models/w_holybomb_ex.mdl");
 		else if (pOwner->m_iGrenadeID == GRENADE_IGNITEBOMB)
 			SET_MODEL(ENT(pGrenade->pev), "models/w_ignitebomb.mdl");
+		else if (pOwner->m_iGrenadeID == GRENADE_ICEGRENADE)
+			SET_MODEL(ENT(pGrenade->pev), "models/z4b/pw_icegrenade.mdl");
 		else
 			SET_MODEL(ENT(pGrenade->pev), "models/w_holybomb.mdl");
 		
@@ -2737,6 +2740,19 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 	{
 		
 	}
+	else if (m_iGrenadeID == GRENADE_ICEGRENADE)
+	{
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_TEMPSPRITE);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z + 20.0);
+		WRITE_SHORT(g_sModelIndexIceGrenadeExp);
+		WRITE_BYTE(10);
+		WRITE_BYTE(255);
+		WRITE_BYTE(30);
+		MESSAGE_END();
+	}
 	else
 	{
 		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
@@ -2774,6 +2790,8 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 	}
 	else if (m_iGrenadeID == GRENADE_IGNITEBOMB)
 		EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "weapons/ignitebomb_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	else if (m_iGrenadeID == GRENADE_ICEGRENADE)
+		UTIL_EMIT_SOUND(edict(), CHAN_WEAPON, "CK_WPN/WEAPON/NanoGrenade/NanoGrenade_Explosion.WAV", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	else
 		EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "zombi/Zombi_Bomb_Exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
@@ -2781,6 +2799,15 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 		HolyBombExplode(pev->origin, pev, pevOwner, 1100, 0.05, 325);
 	else if (m_iGrenadeID == GRENADE_HOLYBOMB)
 		HolyBombExplode(pev->origin, pev, pevOwner, 1300, 0.08, 325);
+	else if (m_iGrenadeID == GRENADE_ICEGRENADE)
+	{
+		float flDamage = pev->dmg;
+
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage *= 10.0f;
+
+		IceGrenadeExplode(pev->origin, pev, pevOwner, flDamage, 500);
+	}	
 	else if (m_iGrenadeID == GRENADE_IGNITEBOMB)
 	{
 		TraceResult tr;
@@ -2797,6 +2824,7 @@ void CGrenade::ExplodeTouchHolyBomb(void)
 			flDamage *= 11.0f;
 
 		WaterBombExplode(pev->origin, pev, pevOwner, flDamage, 325);
+		return;
 	}
 		
 	if (m_iGrenadeID == GRENADE_HOLYBOMB ||
@@ -2944,6 +2972,70 @@ void CGrenade::HolyBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t
 			continue;
 
 		// ..
+	}
+}
+
+
+void CGrenade::IceGrenadeExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius)
+{
+	CBaseEntity* pEntity = NULL;
+	TraceResult tr;
+	Vector vecEnd;
+
+	float falloff;
+
+	if (flRadius)
+		falloff = flDamage / flRadius;
+	else
+		falloff = 1.0f;
+
+	bool bInWater = UTIL_PointContents(vecSrc) == CONTENTS_WATER;
+
+	vecSrc.z += 1.0;
+
+	entvars_t* pevAttack = pevAttacker ? pevAttacker : pevInflictor;
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity->pev == pevAttacker)
+			continue;
+
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (bInWater && pEntity->pev->waterlevel == 0)
+			continue;
+
+		if (!bInWater && pEntity->pev->waterlevel == 3)
+			continue;
+
+		UTIL_TraceLine(vecSrc, pEntity->BodyTarget(vecSrc), dont_ignore_monsters, ENT(pevInflictor), &tr);
+
+		if (tr.flFraction < 1.0f && tr.pHit != pEntity->edict())
+			continue;
+
+		if (tr.fStartSolid)
+		{
+			tr.vecEndPos = vecSrc;
+			tr.flFraction = 0;
+		}
+
+		float flCurrentDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+
+		pEntity->TakeDamage(pevInflictor, pevAttack, flCurrentDamage, DMG_EXPLOSION);
+
+		if (pEntity->IsPlayer())
+		{
+			CBasePlayer* player = (CBasePlayer*)pEntity;
+
+			player->pev->velocity = g_vecZero;
+			player->m_tLockBuffTime = gpGlobals->time + 3.0s;
+			player->m_flLockGravity = 10.0f;
+			player->m_flLockSpeed = 1.0f;
+			player->ResetMaxSpeed();
+
+			UTIL_TempModel({ 0, 0, -16 }, g_vecZero, g_vecZero, g_sModelIndexIceGrenadeIce, 30, 0, 10, 0, 0, 255, kRenderTransAdd, player, false, 0, 0, 256, 0);
+		}
 	}
 }
 

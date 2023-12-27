@@ -62,7 +62,16 @@ public:
 		ANIM_SLASH2,
 		ANIM_RUN,
 		ANIM_SKILL,
+		ANIM_STAB2_HIT,
 	};
+
+	enum dualslayer_effect_state_e
+	{
+		EFFECT_NONE,
+		EFFECT_ZOOMIN,
+		EFFECT_ZOOMOUT
+	};
+
 	void Precache() override
 	{
 		Base::Precache();
@@ -119,6 +128,8 @@ private:
 	int m_iThinkType;
 	int m_iSkillEffect;
 	int m_iHolsterAmmo;
+	int m_iEffectState;
+	time_point_t m_flEffectTime;
 	time_point_t m_tNextThink;
 	time_point_t m_flTimeNextCharge;
 	time_point_t m_flTimeHostler;
@@ -176,13 +187,14 @@ LINK_ENTITY_TO_CLASS(z4b_dualslayer, CKnifeDualSlayer)
 void CKnifeDualSlayer::Spawn()
 {
 	m_iKnifeID = KNIFE_DUALSLAYER;
+	m_iEffectState = EFFECT_NONE;
 	pev->classname = MAKE_STRING("z4b_dualslayer");
 	m_iId = WEAPON_KNIFE;
 	Precache();
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");
 	m_flTimeHostler = gpGlobals->time;
 	m_iDefaultAmmo = 100;
-	m_flTimeNextCharge = invalid_time_point;
+	m_flEffectTime = m_flTimeNextCharge = invalid_time_point;
 	FallInit();
 }
 
@@ -244,16 +256,39 @@ void CKnifeDualSlayer::ItemPostFrame()
 			m_iThinkType = 4;
 			break;
 		case 4:
+
+#ifndef CLIENT_DLL
+			UTIL_PlayAnimation(m_pPlayer, "MasterHero_Retina", 0, POSITIONFLAG_FULLSCREEN);
+#endif
+			m_flEffectTime = gpGlobals->time;
+			m_iEffectState = EFFECT_ZOOMIN;
 			DelaySkillAttack();
 			m_tNextThink = gpGlobals->time + 0.1s;
 			m_iThinkType = 5;
 			break;
 		case 5:
 			m_tNextThink = invalid_time_point;
-			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 			m_iThinkType = 0;
 			break;
 		}
+	}
+
+	duration_t interval = gpGlobals->time - m_flEffectTime;
+
+	if (m_flEffectTime != invalid_time_point && interval > 0.5s)
+	{
+		m_flEffectTime = invalid_time_point;
+		m_iEffectState = EFFECT_NONE;
+
+	}
+	else
+	{
+		if (m_iEffectState == EFFECT_ZOOMIN)
+			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90 + int((1.0 - interval / 0.5s) * 15);
+		else if (m_iEffectState == EFFECT_ZOOMOUT)
+			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 105 - int((1.0 - interval / 0.5s) * 15);
+		else
+			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 	}
 
 	return CBasePlayerWeapon::ItemPostFrame();
@@ -272,7 +307,8 @@ void CKnifeDualSlayer::Reload()
 		SendWeaponAnim(ANIM_SKILL, UseDecrement() != FALSE);
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
-		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 105;
+		m_flEffectTime = gpGlobals->time;
+		m_iEffectState = EFFECT_ZOOMOUT;
 		ResetRunIdle();
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
@@ -391,6 +427,7 @@ void CKnifeDualSlayer::DelaySecondaryAttack()
 	{
 	case HIT_PLAYER:
 	{
+		SendWeaponAnim(ANIM_STAB2_HIT, UseDecrement() != FALSE);
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/dualslayer/MasterHero_HIT.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/dualslayer/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;

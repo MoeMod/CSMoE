@@ -224,6 +224,10 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iDgaxe_Aim_On, "sprites/dgaxe_aim_on.tga");
 	R_InitTexture(m_iDgaxe_Aim_On_2, "sprites/dgaxe_aim_on_2.tga");
 
+	R_InitTexture(m_iMarkEffect, "sprites/MarkEffect.tga");
+
+	R_InitTexture(m_iM82A1_S_BornBeastScope, "sprites/M82A1_S_BornBeast.tga");
+
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
@@ -414,6 +418,20 @@ int CHudSniperScope::Draw(float flTime)
 	CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
 	if (pActiveBTEWeapon)
 	{
+		if (gHUD.m_alarmstyle->value == 2 && gHUD.m_iFOV > 40)
+		{
+			if (gHUD.m_Ammo.m_pWeapon)
+			{
+				int iHealth = gHUD.m_Health.m_iHealth;
+				int iMaxHealth = gHUD.m_Health.m_iMaxHealth;
+
+				int iClip = pActiveBTEWeapon->m_iId == WEAPON_HEGRENADE ? gWR.CountAmmo(gHUD.m_Ammo.m_pWeapon->iAmmoType) : gHUD.m_Ammo.m_pWeapon->iClip;
+				int iMaxClip = pActiveBTEWeapon->iGetMaxClip() == -1 ? pActiveBTEWeapon->iMaxAmmo1() : pActiveBTEWeapon->iGetMaxClip();
+
+				DrawMarkEffect(iHealth, iMaxHealth, iClip, iMaxClip);
+			}
+		}
+		
 		if (pActiveBTEWeapon->m_iId == WEAPON_KNIFE)
 		{
 			if (pActiveBTEWeapon->m_iKnifeID == KNIFE_DGAXEEX ||
@@ -543,13 +561,18 @@ int CHudSniperScope::Draw(float flTime)
 			pActiveBTEWeapon->m_iId == WEAPON_AT4 || 
 			pActiveBTEWeapon->m_iId == WEAPON_AT4EX ||
 			pActiveBTEWeapon->m_iId == WEAPON_BAZOOKA ||
-			pActiveBTEWeapon->m_iId == WEAPON_CHAINSR)
+			pActiveBTEWeapon->m_iId == WEAPON_CHAINSR ||
+			pActiveBTEWeapon->m_iId == WEAPON_Z4B_BARRETTD)
 		{
 			if (gHUD.m_iFOV > 40)
 				return 1;
 
 			DrawSpecialScope(pActiveBTEWeapon->m_iId, pActiveBTEWeapon->pev->iuser1);
 			return 0;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_Z4B_AK47_ANGELICBEAST)
+		{
+			return 1;
 		}
 		else
 		{
@@ -709,6 +732,16 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 	{
 
 	}
+	if (iId == WEAPON_Z4B_BARRETTD)
+	{
+		int iX = ScreenWidth / 2;
+		int iY = ScreenHeight / 2;
+
+		float Height = min(ScreenWidth, ScreenHeight);
+		float Width = (Height * m_iM82A1_S_BornBeastScope->w() / m_iM82A1_S_BornBeastScope->h());
+
+		m_iM82A1_S_BornBeastScope->FuncDraw2DQuadScaled(iX - Width / 2, iY - Height / 2, Width, Height);
+	}
 
 }
 
@@ -716,15 +749,16 @@ void CHudSniperScope::DrawRetina(float flTime)
 {
 	float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
 
+	int iWidth = ScreenWidth;
+	int iHeight = ScreenHeight;
+
+	int iX = 0;
+	int iY = 0;
+
 	if (m_pHaloGunLoopSprite && bHaloGunLoopRetinaOn)
 	{
 		static int iHaloGunLoopSpriteFrame = 0;
-		int iWidth = ScreenWidth;
-		int iHeight = ScreenHeight;
-
-		int iX = 0;
-		int iY = 0;
-
+		
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
 
 		gEngfuncs.pTriAPI->SpriteTexture(m_pHaloGunLoopSprite, iHaloGunLoopSpriteFrame);
@@ -761,12 +795,7 @@ void CHudSniperScope::DrawRetina(float flTime)
 	if (m_pHaloGunHitSprite && bHaloGunHitRetinaOn)
 	{
 		static int iHaloGunHitSpriteFrame = 0;
-		int iWidth = ScreenWidth;
-		int iHeight = ScreenHeight;
-
-		int iX = 0;
-		int iY = 0;
-
+	
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
 
 		gEngfuncs.pTriAPI->SpriteTexture(m_pHaloGunHitSprite, iHaloGunHitSpriteFrame);
@@ -807,12 +836,7 @@ void CHudSniperScope::DrawRetina(float flTime)
 	if (m_pReviveGunLoopSprite && bReviveGunLoopRetinaOn)
 	{
 		static int iReviveGunLoopSpriteFrame = 0;
-		int iWidth = ScreenWidth;
-		int iHeight = ScreenHeight;
-
-		int iX = 0;
-		int iY = 0;
-
+	
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
 
 		gEngfuncs.pTriAPI->SpriteTexture(m_pReviveGunLoopSprite, iReviveGunLoopSpriteFrame);
@@ -849,12 +873,7 @@ void CHudSniperScope::DrawRetina(float flTime)
 	if (m_pReviveGunSprite && bReviveGunRetinaOn)
 	{
 		static int iReviveGunSpriteFrame = 0;
-		int iWidth = ScreenWidth;
-		int iHeight = ScreenHeight;
-
-		int iX = 0;
-		int iY = 0;
-
+	
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
 
 		gEngfuncs.pTriAPI->SpriteTexture(m_pReviveGunSprite, iReviveGunSpriteFrame);
@@ -1670,6 +1689,121 @@ void CHudSniperScope::DrawDgaxeCrossHair(float flTime, int iType)
 	}
 
 
+}
+
+void CHudSniperScope::DrawMarkEffect(int iHealth, int iMaxHealth, int iClip, int iMaxClip)
+{
+	//18*51	234*102
+	int iX = ScreenWidth / 2;
+	int iY = ScreenHeight / 2;
+
+	int iWidth, iHeight;
+
+	iHeight = m_iMarkEffect->h() * 0.5;
+	iWidth = m_iMarkEffect->w() / 13;
+
+	float flHealthRate = float(iHealth) / float(iMaxHealth);
+	float flClipRate = float(iClip) / float(iMaxClip);
+
+	bool bHealthBlink = false;
+	bool bClipBlink = false;
+
+	int iHealthGauge = 1;
+
+	if (flHealthRate <= 0)
+	{
+		bHealthBlink = true;
+		iHealthGauge = 11;
+	}
+	else if (flHealthRate <= 0.1)
+	{
+		bHealthBlink = true;
+		iHealthGauge = 10;
+	}	
+	else if (flHealthRate <= 0.2)
+	{
+		bHealthBlink = true;
+		iHealthGauge = 9;
+	}	
+	else if (flHealthRate <= 0.3)
+		iHealthGauge = 8;
+	else if (flHealthRate <= 0.4)
+		iHealthGauge = 7;
+	else if (flHealthRate <= 0.5)
+		iHealthGauge = 6;
+	else if (flHealthRate <= 0.6)
+		iHealthGauge = 5;
+	else if (flHealthRate <= 0.7)
+		iHealthGauge = 4;
+	else if (flHealthRate <= 0.8)
+		iHealthGauge = 3;
+	else if (flHealthRate <= 0.9)
+		iHealthGauge = 2;
+	else if (flHealthRate < 1)
+		iHealthGauge = 1;
+	else
+		iHealthGauge = 0;
+
+	int iClipGauge = 1;
+
+	if (flClipRate <= 0)
+	{
+		bClipBlink = true;
+		iClipGauge = 11;
+	}
+	else if (flClipRate <= 0.1)
+	{
+		bClipBlink = true;
+		iClipGauge = 10;
+	}
+	else if (flClipRate <= 0.2)
+	{
+		bClipBlink = true;
+		iClipGauge = 9;
+	}
+	else if (flClipRate <= 0.3)
+		iClipGauge = 8;
+	else if (flClipRate <= 0.4)
+		iClipGauge = 7;
+	else if (flClipRate <= 0.5)
+		iClipGauge = 6;
+	else if (flClipRate <= 0.6)
+		iClipGauge = 5;
+	else if (flClipRate <= 0.7)
+		iClipGauge = 4;
+	else if (flClipRate <= 0.8)
+		iClipGauge = 3;
+	else if (flClipRate <= 0.9)
+		iClipGauge = 2;
+	else if (flClipRate < 1)
+		iClipGauge = 1;
+	else
+		iClipGauge = 0;
+
+	float a1 = 255.0;
+	float a2 = 255.0;
+
+	if (bHealthBlink)
+	{
+		float modDelta = abs(sin(gHUD.m_flTime * 3));
+		a1 = 255.0 * modDelta;
+	}
+
+	if (bClipBlink)
+	{
+		float modDelta = abs(sin(gHUD.m_flTime * 3));
+		a2 = 255.0 * modDelta;
+	}
+
+	//left BG
+	m_iMarkEffect->FuncDraw2DQuadScaled(iX - iWidth * 4, iY - (iHeight / 2), iWidth, iHeight, 0.0, 0.0, 1.0 / 13, 0.5);
+
+	m_iMarkEffect->FuncDraw2DQuadScaled(iX - iWidth * 4, iY - (iHeight / 2), iWidth, iHeight, (1.0 + iHealthGauge) / 13, 0.0, (2.0 + iHealthGauge) / 13, 0.5, 255, 255, 255, a1);
+
+	//right BG
+	m_iMarkEffect->FuncDraw2DQuadScaled(iX + iWidth * 3, iY - (iHeight / 2), iWidth, iHeight, 0.0, 0.5, 1.0 / 13, 1.0);
+
+	m_iMarkEffect->FuncDraw2DQuadScaled(iX + iWidth * 3, iY - (iHeight / 2), iWidth, iHeight, (1.0 + iClipGauge) / 13, 0.5, (2.0 + iClipGauge) / 13, 1.0, 255, 255, 255, a2);
 }
 
 

@@ -187,6 +187,8 @@ void W_Precache()
 	g_sModelIndexMoonCakeExp = PRECACHE_MODEL("sprites/mooncake.spr");
 	g_sModelIndexHolyWater = PRECACHE_MODEL("sprites/ef_hwater.spr");
 	g_sModelIndexIgniteBomb = PRECACHE_MODEL("sprites/ef_ignite_bomb.spr");
+	g_sModelIndexIceGrenadeExp = PRECACHE_MODEL("sprites/z4b/nanogrenade_exp.spr");
+	g_sModelIndexIceGrenadeIce = PRECACHE_MODEL("sprites/z4b/nanogrenade_ice.spr");
 
 	g_sModelIndexCTGhost = PRECACHE_MODEL("sprites/b-tele1.spr");
 	g_sModelIndexTGhost = PRECACHE_MODEL("sprites/c-tele1.spr");

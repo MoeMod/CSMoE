@@ -148,6 +148,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "dartpistol",	WEAPON_DARTPISTOL },
 	{ "y23s1dartpistol",	WEAPON_Y23S1DARTPISTOL },
 	{ "leapstrikegun",	WEAPON_LEAPSTRIKEGUN },
+	{ "z4b_deagleel",	WEAPON_Z4B_DEAGLEEL },
 
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
@@ -217,6 +218,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "thanatos3",	WEAPON_THANATOS3 },
 	{ "y23s1sfsmg",	WEAPON_Y23S1SFSMG },
 	{ "sterlingbayonet", WEAPON_STERLINGBAYONET },
+	{ "lightningsmg",	WEAPON_LIGHTNINGSMG },
 
 	{ "ak47dragon",	WEAPON_AK47DRAGON },
 	{ "ak47l",	WEAPON_AK47_LONG },
@@ -275,7 +277,10 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "z4b_vk47",	WEAPON_Z4B_VK47 },
 	{ "sflaser",	WEAPON_SFLASER },
 	{ "augex",	WEAPON_AUGEX },
-	{ "ma5b",	WEAPON_Z4B_MA5B },
+	{ "z4b_ma5b",	WEAPON_Z4B_MA5B },
+	{ "ak47l3",	WEAPON_AK47L3 },
+	{ "z4b_ak47_angelicbeast",	WEAPON_Z4B_AK47_ANGELICBEAST },
+	{ "lightningar",	WEAPON_LIGHTNINGAR },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -309,6 +314,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "starchasersr",	WEAPON_STARCHASERSR },
 	{ "mosin",	WEAPON_MOSIN },
 	{ "deathray",	WEAPON_Z4B_DEATHRAY },
+	{ "z4b_m82a1angelicbeast",	WEAPON_Z4B_M82A1ANGELICBEAST },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -471,6 +477,8 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_dvhammer",	KNIFE_DVHAMMER },
 	{ "knife_hzknife",	KNIFE_HZKNIFE },
 	{ "knife_dgaxeex",	KNIFE_DGAXEEX },
+	{ "z4b_dualaxe",	KNIFE_DUALAXE },
+	{ "z4b_ghostblade",	KNIFE_GHOSTBLADE },
 };
 
 // must same as classname
@@ -500,6 +508,7 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_chinaeventbomb", GRENADE_CHINAEVENTBOMB },
 	{ "weapon_sfturret", GRENADE_SFTURRET },
 	{ "weapon_ignitebomb", GRENADE_IGNITEBOMB },
+	{ "z4b_icegrenade", GRENADE_ICEGRENADE },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -724,7 +733,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "thanatos3",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "y23s1sfsmg",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "sterlingbayonet", WEAPONCLASS_SUBMACHINEGUN },
-
+	{ "lightningsmg",	WEAPONCLASS_SUBMACHINEGUN },
 
 	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
@@ -786,7 +795,10 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "z4b_vk47",	WEAPONCLASS_RIFLE },
 	{ "sflaser",	WEAPONCLASS_RIFLE },
 	{ "augex",	WEAPONCLASS_RIFLE },
-	{ "ma5b",	WEAPONCLASS_RIFLE },
+	{ "z4b_ma5b",	WEAPONCLASS_RIFLE },
+	{ "ak47l3",	WEAPONCLASS_RIFLE },
+	{ "z4b_ak47_angelicbeast",	WEAPONCLASS_RIFLE },
+	{ "lightningar",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -821,6 +833,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "mosin",	WEAPONCLASS_SNIPERRIFLE },
 	{ "deathray",	WEAPONCLASS_SNIPERRIFLE },
 	{ "cartblues",	WEAPONCLASS_SNIPERRIFLE },
+	{ "z4b_m82a1angelicbeast",	WEAPONCLASS_SNIPERRIFLE },
 
 
 	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
@@ -1265,6 +1278,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_STERLINGBAYONET:
 	case WEAPON_PKM:
 	case WEAPON_Z4B_MA5B:
+	case WEAPON_Z4B_AK47_ANGELICBEAST:
 		return true;
 	default:
 		break;
@@ -1341,6 +1355,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_DARTPISTOL:
 	case WEAPON_Y23S1DARTPISTOL:
 	case WEAPON_LEAPSTRIKEGUN:
+	case WEAPON_Z4B_DEAGLEEL:
 		return true;
 	default:
 		break;

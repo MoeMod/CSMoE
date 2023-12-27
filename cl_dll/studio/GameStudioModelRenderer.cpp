@@ -42,6 +42,7 @@
 #include "gamemode/zb2/zb2_const.h"
 #include "weaponpaint.h"
 #include "cs_wpn/bte_weapons.h"
+#include <client/gl_export.h>
 
 #define ANIM_WALK_SEQUENCE 3
 #define ANIM_JUMP_SEQUENCE 6
@@ -1225,6 +1226,12 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 					m_pCurrentEntity->curstate.framerate = 1.0;
 				}
 
+				if (CStudioModelRenderer::s_pLightningARPModel && pweaponmodel == CStudioModelRenderer::s_pLightningARPModel)
+				{
+					m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+					m_pCurrentEntity->curstate.framerate = 1.0;
+				}
+
 				if (CStudioModelRenderer::s_pLaserFistPModel && pweaponmodel == CStudioModelRenderer::s_pLaserFistPModel)
 				{
 					idx -= 1;
@@ -1401,6 +1408,20 @@ int R_StudioDrawPlayer(int flags, entity_state_t *pplayer)
 	return g_StudioRenderer.StudioDrawPlayer(flags, pplayer);
 }
 
+//
+//void pgluPerspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+//{
+//	GLdouble xmin, xmax, ymin, ymax;
+//
+//	ymax = zNear * tan(fovy * M_PI / 360.0);
+//	ymin = -ymax;
+//
+//	xmin = ymin * aspect;
+//	xmax = ymax * aspect;
+//
+//	pglFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
+//}
+
 int R_StudioDrawModel(int flags)
 {
 	int idx;
@@ -1480,6 +1501,28 @@ int R_StudioDrawModel(int flags)
 			return iReturn;
 		}
 
+		//SCREENINFO	screen;
+
+		/*if (CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && curent->model == CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel)
+		{
+			float fov = 40;
+			float aspect = 0;
+
+			if (aspect <= 0)
+			{
+				screen.iSize = sizeof(screen);
+				gEngfuncs.pfnGetScreenInfo(&screen);
+
+				aspect = (float)screen.iWidth / (float)screen.iHeight;
+			}
+
+			pglMatrixMode(GL_PROJECTION);
+			pglPushMatrix();
+			pglLoadIdentity();
+			pgluPerspective(fov, aspect, 4.0, 8192.0);
+			pglMatrixMode(GL_MODELVIEW);
+		}*/
+
 		if (m_vecExtraViewModels.size())
 		{
 			static cl_entity_t saveent;
@@ -1521,6 +1564,14 @@ int R_StudioDrawModel(int flags)
 	//}
 
 	int iReturn = g_StudioRenderer.StudioDrawModel(flags);
+
+	//if (CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && curent->model == CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel)
+	//{
+	//	pglMatrixMode(GL_PROJECTION);
+	//	pglPopMatrix();
+	//	pglMatrixMode(GL_MODELVIEW);
+	//}
+	//	
 
 	if (curent == viewent)
 	{

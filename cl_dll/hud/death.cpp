@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "draw_util.h"
-
+#include "player/player_model.h"
 #include "vgui_controls/controls.h"
 #include "vgui/ILocalize.h"
 
@@ -72,6 +72,19 @@ DeathNoticeItem rgDeathNoticeList[ MAX_DEATHNOTICES + 1 ];
 
 static std::map<std::string, BOOL> s_KnifeNamesMap;
 static std::map<std::string, BOOL> s_GrenadeNamesMap;
+
+// Kill effect
+#define KILLFLAG_HEADSHOT		(1<<0)
+#define KILLFLAG_FIRSTKILL		(1<<1)
+#define KILLFLAG_LASTKILL		(1<<2)
+#define KILLFLAG_WALLSHOT		(1<<3)
+#define KILLFLAG_SHOWMARK		(1<<4)
+#define KILLFLAG_HEADSHOT_GOLD	(1<<5)
+#define KILLFLAG_KNIFE			(1<<6)
+#define KILLFLAG_GRENADE		(1<<7)
+#define KILLFLAG_REVENGE		(1<<8)
+#define KILLFLAG_INFECT			(1<<9)
+#define KILLFLAG_KILLZOMBIE		(1<<10)
 
 int CHudDeathNotice :: Init( void )
 {
@@ -141,7 +154,7 @@ int CHudDeathNotice :: VidInit( void )
 	R_InitTexture(m_csgo_defaultBg[0], "resource/hud/csgo/DeathNotice/DefaultBg_left");
 	R_InitTexture(m_csgo_defaultBg[1], "resource/hud/csgo/DeathNotice/DefaultBg_center");
 	R_InitTexture(m_csgo_defaultBg[2], "resource/hud/csgo/DeathNotice/DefaultBg_right");
-
+	
 	NewAlarm().VidInit();
 	HudDeathInfo().VidInit();
 
@@ -203,6 +216,16 @@ int CHudDeathNotice :: VidInit( void )
 	s_KnifeNamesMap["d_swordbombard"] = TRUE;
 	s_KnifeNamesMap["d_z4b_mechanichand"] = TRUE;
 	s_KnifeNamesMap["d_z4b_shovelex"] = TRUE;
+	s_KnifeNamesMap["d_z4b_kukri"] = TRUE;
+	s_KnifeNamesMap["d_z4b_classickukri"] = TRUE;
+	s_KnifeNamesMap["d_z4b_knife"] = TRUE;
+	s_KnifeNamesMap["d_z4b_axe"] = TRUE;
+	s_KnifeNamesMap["d_z4b_hawlchicken"] = TRUE;
+	s_KnifeNamesMap["d_z4b_shovel"] = TRUE;
+	s_KnifeNamesMap["d_z4b_knuckle"] = TRUE;
+	s_KnifeNamesMap["d_z4b_bcaxevip"] = TRUE;
+	s_KnifeNamesMap["d_z4b_btfknife"] = TRUE;
+	s_KnifeNamesMap["d_z4b_balisong_luminousedge"] = TRUE;
 	s_KnifeNamesMap["d_tyrantmace"] = TRUE;
 	s_KnifeNamesMap["d_dvhammer"] = TRUE;
 	s_KnifeNamesMap["d_hzknife"] = TRUE;
@@ -231,6 +254,7 @@ int CHudDeathNotice :: VidInit( void )
 	s_GrenadeNamesMap["d_patroldrone"] = TRUE;
 	//s_GrenadeNamesMap["d_divinetitan"] = TRUE;
 	s_GrenadeNamesMap["d_ignitebomb"] = TRUE;
+	s_GrenadeNamesMap["d_z4b_icegrenade"] = TRUE;
 
 	return 1;
 }
@@ -377,7 +401,7 @@ int CHudDeathNotice :: Draw( float flTime )
 		}
 	}
 
-	if (m_showKill && gHUD.m_alarmstyle->value != 0)
+	if (m_showKill && gHUD.m_alarmstyle->value == 1)
 	{
 		m_killEffectTime = min(m_killEffectTime, gHUD.m_flTime + KILLEFFECT_DISPLAY_TIME);
 
@@ -507,6 +531,36 @@ int CHudDeathNotice :: Draw( float flTime )
 	return 1;
 }
 
+void CHudDeathNotice::_PlaySound(const char* sentence)
+{
+	std::string language = "english";
+	std::string team = "GR";
+
+	if (PlayerClassManager().GetPlayerClass(gEngfuncs.GetLocalPlayer()->index).isFemale)
+	{
+		if (PlayerClassManager().GetPlayerClass(gEngfuncs.GetLocalPlayer()->index).ClassID == MODEL_JPNGIRL01
+			|| PlayerClassManager().GetPlayerClass(gEngfuncs.GetLocalPlayer()->index).ClassID == MODEL_JPNGIRL01ORG
+			|| PlayerClassManager().GetPlayerClass(gEngfuncs.GetLocalPlayer()->index).ClassID == MODEL_CHNGIRL01)
+			language = "chineseWoman";
+		else
+			language = "woman";
+	}
+	else
+	{
+		if (PlayerClassManager().GetPlayerClass(gEngfuncs.GetLocalPlayer()->index).ClassID == MODEL_Y20S1YEONGSIN
+			|| PlayerClassManager().GetPlayerClass(gEngfuncs.GetLocalPlayer()->index).ClassID == MODEL_Y20S1LEECHANG)
+			language = "chinese";
+	}
+
+	if (PlayerClassManager().GetPlayerClass(gEngfuncs.GetLocalPlayer()->index).team == TERRORIST)
+		team = "BL";
+
+	char path[96];
+	snprintf(path, sizeof(path), "vox/%s/Message/%s_%s.wav", language.c_str(), sentence, team.c_str());
+
+	HUD_EmitSound(path);
+}
+
 // This message handler may be better off elsewhere
 int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *pbuf )
 {
@@ -516,13 +570,15 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 
 	int killer = reader.ReadByte();
 	int victim = reader.ReadByte();
-	int headshot = reader.ReadByte();
+	int flag = reader.ReadShort();
+	int headshot = flag & KILLFLAG_HEADSHOT;
 	int multiKills = 0;
 	int idx = gEngfuncs.GetLocalPlayer()->index;
 
 	char killedwith[32];
 	strncpy( killedwith, "d_", sizeof(killedwith) );
 	strcat( killedwith, reader.ReadString() );
+	int iMultiKill = reader.ReadByte();	//CF Msg
 
 	//if (gViewPort)
 	//	gViewPort->DeathMsg( killer, victim );
@@ -578,7 +634,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 			{
 				if (!multiKills)
 				{
-					if (gHUD.m_alarmstyle->value != 0)
+					if (gHUD.m_alarmstyle->value == 1)
 						gEngfuncs.pfnClientCmd("speak \"HeadShot\"\n");
 				}
 				NewAlarm().SetAlarm(ALARM_HEADSHOT);
@@ -596,8 +652,10 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 			if (s_GrenadeNamesMap.find(killedwith) != s_GrenadeNamesMap.end())
 			{
 				if (!multiKills)
-					if (gHUD.m_alarmstyle->value != 0)
+				{
+					if (gHUD.m_alarmstyle->value == 1)
 						gEngfuncs.pfnClientCmd("speak \"GotIt\"\n");
+				}
 
 				NewAlarm().SetAlarm(ALARM_GRENADE);
 				bSpecialKill = true;
@@ -605,6 +663,10 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 				m_showIcon = true;
 				m_iconIndex = 3;
 				m_killIconTime = gHUD.m_flTime + KILLICON_DISPLAY_TIME;
+
+				flag |= KILLFLAG_GRENADE;
+				flag &= ~KILLFLAG_INFECT;
+				
 			}
 		}
 
@@ -613,7 +675,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 			if (killer == idx)
 			{
 				if (!multiKills)
-					if (gHUD.m_alarmstyle->value != 0)
+					if (gHUD.m_alarmstyle->value == 1)
 						gEngfuncs.pfnClientCmd("speak \"Humililation\"\n");
 
 				NewAlarm().SetAlarm(ALARM_KNIFE);
@@ -626,6 +688,8 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 				char* szSound =nullptr;
 				szSound = const_cast<char*>("%!MRAD_KNIFEKILL");
 				gHUD.m_Radio.RadioEX(killer, szSound, PITCH_NORM);
+
+				flag |= KILLFLAG_KNIFE;
 			}
 
 			if (victim == idx)
@@ -648,105 +712,363 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 
 		if (killer == idx && victim != idx)
 		{
-			switch (multiKills)
+			if (gHUD.m_alarmstyle->value == 2)
 			{
-			case 0:
-			{
-				if (!bSpecialKill)
-					NewAlarm().SetAlarm(ALARM_KILL);
+				HUD_EmitSound("vox/ui_specialkill2.wav");
 
-				m_showKill = true;
-				m_multiKills = 1;
-				m_killEffectTime = gHUD.m_flTime + KILLEFFECT_DISPLAY_TIME;
-				break;
+				int iMainKillMark = gHUD.m_cfalarm_partmain->value;
+				int iKillMarkUP = gHUD.m_cfalarm_part1->value;
+				int iKillMarkEX = gHUD.m_cfalarm_part2->value;
+
+				bool bShowExtra = iMainKillMark == KILLMARK_CLASSIC ? true : false;
+				bool bKillSprite = false;
+
+				switch (iMainKillMark)
+				{
+				case KILLMARK_M82A1ANGELICBEAST:
+				case KILLMARK_M82A1DEMONICBEAST:
+					bKillSprite = true;
+				default:
+					break;
+				}
+
+				if (flag & KILLFLAG_INFECT)
+				{
+					gHUD.m_AnimationPlayer.AddAnimInfo("InvaderMark", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+				}
+				else
+				{
+					if (flag & KILLFLAG_HEADSHOT)
+					{
+						if (flag & KILLFLAG_HEADSHOT_GOLD)
+							gHUD.m_NewHud.AddMark(2);
+						else
+							gHUD.m_NewHud.AddMark(1);
+					}
+					else if (flag & KILLFLAG_KNIFE)
+					{
+						gHUD.m_NewHud.AddMark(3);
+					}
+					else
+					{
+						gHUD.m_NewHud.AddMark(0);
+					}
+
+					switch (iMultiKill)
+					{
+					case 1:
+					{
+						if (flag & KILLFLAG_HEADSHOT)
+						{
+							if (flag & KILLFLAG_WALLSHOT)
+							{
+								if (flag & KILLFLAG_HEADSHOT_GOLD)
+									gHUD.m_AnimationPlayer.AddAnimInfo("badge_headwallshot_gold", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+								else
+									gHUD.m_AnimationPlayer.AddAnimInfo("badge_headwallshot", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							}
+							else
+							{
+								if (flag & KILLFLAG_KILLZOMBIE)
+								{
+									gHUD.m_AnimationPlayer.AddAnimInfo("badge_ghostshot", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+								}
+								else
+								{
+									if (flag & KILLFLAG_HEADSHOT_GOLD)
+										gHUD.m_AnimationPlayer.AddAnimInfo("badge_headshot_gold", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+									else
+										gHUD.m_AnimationPlayer.AddAnimInfo("badge_headshot", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+								}
+							}
+
+							_PlaySound("Headshot");
+
+							bShowExtra = false;
+						}
+						else
+						{
+							if (flag & KILLFLAG_KNIFE)
+							{
+								bShowExtra = false;
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_knife", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+								_PlaySound("Knifekill");
+							}
+							else if (flag & KILLFLAG_GRENADE)
+							{
+								bShowExtra = false;
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_grenade", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+								_PlaySound("Grenadekill");
+							}
+							else if (flag & KILLFLAG_WALLSHOT)
+							{
+								bShowExtra = false;
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_wallshot", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							}
+							else
+							{
+								if (flag & KILLFLAG_KILLZOMBIE)
+								{
+									bShowExtra = false;
+									gHUD.m_AnimationPlayer.AddAnimInfo("NANO_multi1", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+								}
+								else
+									gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi1", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							}
+						}
+						break;
+					}
+					case 2:
+					{
+						if (flag & KILLFLAG_KILLZOMBIE)
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("NANO_multi2", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+						}
+						else
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi2", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+
+							if (!bKillSprite)
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi2_fx", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKFX, POSITIONFLAG_KILLMARK);
+						}
+						
+						_PlaySound("MultiKill_2");
+						break;
+					}
+					case 3:
+					{
+						if (flag & KILLFLAG_KILLZOMBIE)
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("NANO_multi3", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+						}
+						else
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi3", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							if (!bKillSprite)
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi3_fx", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKFX, POSITIONFLAG_KILLMARK);
+						}
+						_PlaySound("MultiKill_3");
+						break;
+					}
+					case 4:
+					{
+						if (flag & KILLFLAG_KILLZOMBIE)
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("NANO_multi4", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+						}
+						else
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi4", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							if (!bKillSprite)
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi4_fx", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKFX, POSITIONFLAG_KILLMARK);
+						}
+						_PlaySound("MultiKill_4");
+						break;
+					}
+					case 5:
+					{
+						if (flag & KILLFLAG_KILLZOMBIE)
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("NANO_multi4", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+						}
+						else
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi5", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							if (!bKillSprite)
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi5_fx", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKFX, POSITIONFLAG_KILLMARK);
+						}
+						_PlaySound("MultiKill_5");
+						break;
+					}
+					case 6:
+					{
+						if (flag & KILLFLAG_KILLZOMBIE)
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("NANO_multi4", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+						}
+						else
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi6", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							if (!bKillSprite)
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi6_fx", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKFX, POSITIONFLAG_KILLMARK);
+						}
+						_PlaySound("MultiKill_6");
+						break;
+					}
+					case 7:
+					{
+						if (flag & KILLFLAG_KILLZOMBIE)
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("NANO_multi4", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+						}
+						else
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi6", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							if (!bKillSprite)
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi6_fx", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKFX, POSITIONFLAG_KILLMARK);
+						}
+						_PlaySound("MultiKill_7");
+						break;
+					}
+					case 8:
+					{
+						if (flag & KILLFLAG_KILLZOMBIE)
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("NANO_multi4", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+						}
+						else
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi6", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							if (!bKillSprite)
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi6_fx", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKFX, POSITIONFLAG_KILLMARK);
+						}
+						_PlaySound("MultiKill_8");
+						break;
+					}
+					default:
+					{
+						if (flag & KILLFLAG_KILLZOMBIE)
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("NANO_multi4", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+						}
+						else
+						{
+							gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi6", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARK, POSITIONFLAG_KILLMARK);
+							if (!bKillSprite)
+								gHUD.m_AnimationPlayer.AddAnimInfo("badge_multi6_fx", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKFX, POSITIONFLAG_KILLMARK);
+						}
+						break;
+					}
+					}
+
+					if (bKillSprite)
+					{
+						gHUD.m_AnimationPlayer.AddAnimInfo("Sprite", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKSPRITE, POSITIONFLAG_KILLMARK);
+					}
+
+					if (bShowExtra)
+					{				
+						switch (iKillMarkEX)
+						{
+						case 1: gHUD.m_AnimationPlayer.AddAnimInfo("badge_Elite1", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKEX, POSITIONFLAG_KILLMARK); break;
+						case 2: gHUD.m_AnimationPlayer.AddAnimInfo("badge_Elite2", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKEX, POSITIONFLAG_KILLMARK); break;
+						default:
+							break;
+						}
+
+						switch (iKillMarkUP)
+						{
+						case 1: gHUD.m_AnimationPlayer.AddAnimInfo("KillMark_Upgrade1", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKUP, POSITIONFLAG_KILLMARK); break;
+						case 2: gHUD.m_AnimationPlayer.AddAnimInfo("KillMark_Upgrade2", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKUP, POSITIONFLAG_KILLMARK); break;
+						case 3: gHUD.m_AnimationPlayer.AddAnimInfo("KillMark_Upgrade3", ANIMATIONJSONFLAG_STATIC | ANIMATIONJSONFLAG_KILLMARKUP, POSITIONFLAG_KILLMARK); break;
+						default:
+							break;
+						}				
+					}
+				}
 			}
-
-			case 1:
+			else
 			{
-				if (gHUD.m_alarmstyle->value != 0)
-					gEngfuncs.pfnClientCmd("speak \"DoubleKill\"\n");
+				switch (multiKills)
+				{
+				case 0:
+				{
+					if (!bSpecialKill)
+						NewAlarm().SetAlarm(ALARM_KILL);
 
-				NewAlarm().SetAlarm(ALARM_2KILL);
+					m_showKill = true;
+					m_multiKills = 1;
+					m_killEffectTime = gHUD.m_flTime + KILLEFFECT_DISPLAY_TIME;
+					break;
+				}
 
-				m_showKill = true;
-				m_multiKills = 2;
-				m_killEffectTime = gHUD.m_flTime + KILLEFFECT_DISPLAY_TIME;
-				break;
-			}
+				case 1:
+				{
+					if (gHUD.m_alarmstyle->value == 1)
+						gEngfuncs.pfnClientCmd("speak \"DoubleKill\"\n");
 
-			case 2:
-			{
-				if (gHUD.m_alarmstyle->value != 0)
-					gEngfuncs.pfnClientCmd("speak \"TripleKill\"\n");
+					NewAlarm().SetAlarm(ALARM_2KILL);
 
-				NewAlarm().SetAlarm(ALARM_3KILL);
+					m_showKill = true;
+					m_multiKills = 2;
+					m_killEffectTime = gHUD.m_flTime + KILLEFFECT_DISPLAY_TIME;
+					break;
+				}
 
-				m_showKill = true;
-				m_multiKills = 3;
-				m_killEffectTime = gHUD.m_flTime + KILLEFFECT_DISPLAY_TIME;
-				break;
-			}
+				case 2:
+				{
+					if (gHUD.m_alarmstyle->value == 1)
+						gEngfuncs.pfnClientCmd("speak \"TripleKill\"\n");
 
-			default:
-			{
-				if (gHUD.m_alarmstyle->value != 0)
-					gEngfuncs.pfnClientCmd("speak \"MultiKill\"\n");
+					NewAlarm().SetAlarm(ALARM_3KILL);
 
-				NewAlarm().SetAlarm(ALARM_4KILL);
+					m_showKill = true;
+					m_multiKills = 3;
+					m_killEffectTime = gHUD.m_flTime + KILLEFFECT_DISPLAY_TIME;
+					break;
+				}
 
-				m_showKill = true;
-				m_multiKills = 4;
-				m_killEffectTime = gHUD.m_flTime + KILLEFFECT_DISPLAY_TIME;
-				break;
-			}
-			}
+				default:
+				{
+					if (gHUD.m_alarmstyle->value == 1)
+						gEngfuncs.pfnClientCmd("speak \"MultiKill\"\n");
 
-			switch (m_killNums)
-			{
-			case 5:
-			{
-				if (gHUD.m_alarmstyle->value != 0)
-					gEngfuncs.pfnClientCmd("speak \"Excellent\"\n");
-				NewAlarm().SetAlarm(ALARM_EXCELLENT);
-				break;
-			}
-			case 6:
-			{
-				if (gHUD.IsZombieMod())
-					NewAlarm().SetAlarm(ALARM_LIBERATOR);
-				break;
-			}
-			case 10:
-			{
-				if (gHUD.m_alarmstyle->value != 0)
-					gEngfuncs.pfnClientCmd("speak \"Incredible\"\n");
-				NewAlarm().SetAlarm(ALARM_INCREDIBLE);
-				break;
-			}
+					NewAlarm().SetAlarm(ALARM_4KILL);
 
-			case 15:
-			{
-				if (gHUD.m_alarmstyle->value != 0)
-					gEngfuncs.pfnClientCmd("speak \"Crazy\"\n");
-				NewAlarm().SetAlarm(ALARM_CRAZY);
-				break;
-			}
+					m_showKill = true;
+					m_multiKills = 4;
+					m_killEffectTime = gHUD.m_flTime + KILLEFFECT_DISPLAY_TIME;
+					break;
+				}
+				}
 
-			case 20:
-			{
-				if (gHUD.m_alarmstyle->value != 0)
-					gEngfuncs.pfnClientCmd("speak \"CantBelive\"\n");
-				NewAlarm().SetAlarm(ALARM_CANTBELIEVE);
-				break;
-			}
+				switch (m_killNums)
+				{
+				case 5:
+				{
+					if (gHUD.m_alarmstyle->value == 1)
+						gEngfuncs.pfnClientCmd("speak \"Excellent\"\n");
+					NewAlarm().SetAlarm(ALARM_EXCELLENT);
+					break;
+				}
+				case 6:
+				{
+					if (gHUD.IsZombieMod())
+						NewAlarm().SetAlarm(ALARM_LIBERATOR);
+					break;
+				}
+				case 10:
+				{
+					if (gHUD.m_alarmstyle->value == 1)
+						gEngfuncs.pfnClientCmd("speak \"Incredible\"\n");
+					NewAlarm().SetAlarm(ALARM_INCREDIBLE);
+					break;
+				}
 
-			case 25:
-			{
-				if (gHUD.m_alarmstyle->value != 0)
-					gEngfuncs.pfnClientCmd("speak \"OutofWorld\"\n");
-				NewAlarm().SetAlarm(ALARM_OUTOFWORLD);
-				break;
-			}
+				case 15:
+				{
+					if (gHUD.m_alarmstyle->value == 1)
+						gEngfuncs.pfnClientCmd("speak \"Crazy\"\n");
+					NewAlarm().SetAlarm(ALARM_CRAZY);
+					break;
+				}
+
+				case 20:
+				{
+					if (gHUD.m_alarmstyle->value == 1)
+						gEngfuncs.pfnClientCmd("speak \"CantBelive\"\n");
+					NewAlarm().SetAlarm(ALARM_CANTBELIEVE);
+					break;
+				}
+
+				case 25:
+				{
+					if (gHUD.m_alarmstyle->value == 1)
+						gEngfuncs.pfnClientCmd("speak \"OutofWorld\"\n");
+					NewAlarm().SetAlarm(ALARM_OUTOFWORLD);
+					break;
+				}
+				}
 			}
 		}
 	}
@@ -1111,6 +1433,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 
 	return 1;
 }
+
 
 }
 

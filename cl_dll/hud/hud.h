@@ -132,6 +132,7 @@ struct HUDLIST {
 #include "hud_mvp.h"
 #include "newhud/NewHud.h"
 #include "newhud/NewAlarm.h"
+#include "AnimationPlayer.h"
 #include "newhud/NewFontManager.h"
 #include "hud_centertips.h"
 #include "weapons_const.h"
@@ -642,6 +643,7 @@ public:
 	int VidInit( void );
 	void Shutdown(void);
 	int Draw( float flTime );
+	void _PlaySound(const char* sentence);
 	CHudMsgFunc(DeathMsg);
 
 private:
@@ -1072,6 +1074,7 @@ public:
 	void DrawRetina(float flTime);
 	void DrawDgaxeCrossHair(float flTime, int iType);
 	void SetDgaxeCrossHair(int iState);
+	void DrawMarkEffect(int iHealth, int iMaxHealth, int iClip, int iMaxClip);
 private:
 
 	struct LockOnData
@@ -1220,6 +1223,10 @@ private:
 	UniqueTexture m_iDgaxeEX_Aim_On_2;
 	UniqueTexture m_iDgaxe_Aim_On;
 	UniqueTexture m_iDgaxe_Aim_On_2;
+
+	UniqueTexture m_iMarkEffect;
+
+	UniqueTexture m_iM82A1_S_BornBeastScope;
 };
 
 //
@@ -1497,6 +1504,9 @@ public:
 	cvar_t *cl_shadows;
 	cvar_t *m_hudstyle;
 	cvar_t* m_alarmstyle;
+	cvar_t* m_cfalarm_partmain;
+	cvar_t* m_cfalarm_part1;
+	cvar_t* m_cfalarm_part2;
 	cvar_t *fastsprites;
 	cvar_t *cl_predict;
 	cvar_t *cl_weapon_wallpuff;
@@ -1576,6 +1586,7 @@ public:
 	CHudDeathInfo m_DeathInfo;
 	CHudNewAlarm  m_NewAlarm;
 	CHudDrawFontText m_DrawFontText;
+	CAnimationPlayer m_AnimationPlayer;
 
 	// user messages
 	CHudMsgFunc(Damage);

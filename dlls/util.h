@@ -408,6 +408,19 @@ inline void STOP_SOUND(edict_t *entity, int channel, const char *sample)
 #ifndef CLIENT_DLL
 namespace sv {
 
+	//Json flag
+#define ANIMATIONJSONFLAG_STATIC		(1<<0)
+#define ANIMATIONJSONFLAG_KILLMARK		(1<<1)
+#define ANIMATIONJSONFLAG_KILLMARKFX		(1<<2)
+#define ANIMATIONJSONFLAG_KILLMARKUP		(1<<3)
+#define ANIMATIONJSONFLAG_KILLMARKEX		(1<<4)
+#define ANIMATIONJSONFLAG_KILLMARKSPRITE		(1<<5)
+//Postion flag
+#define POSITIONFLAG_KILLMARK		(1<<0)
+#define POSITIONFLAG_FULLSCREEN		(1<<1)
+
+#define MAX_ANIMATION		8
+
 void TEXTURETYPE_Init();
 char TEXTURETYPE_Find(char *name);
 float TEXTURETYPE_PlaySound(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int iBulletType);
@@ -551,6 +564,7 @@ void UTIL_SendAudio(CBaseEntity* pEntity, const char* msg_id, short pitch, bool 
 void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float volume, float attenuation, int flags, int pitch, int type = 0);
 void UTIL_TempEmit(const char* model, int iEmitCounter, int fireDelay, int life, int spawnflags, int spin_speed, int framerate, int rendermode, int brightness, int r, int g, int b, Vector pos, Vector velocity, int velocity_variance, int scale, int fade_speed, int scale_speed, int fadeInSpeed, int entity, int attachment, int frameMax);
 void UTIL_SetPlayerPModel(int iPlayerIndex, int iWeaponID, int iState);
+void UTIL_PlayAnimation(CBaseEntity* pEntity, const char* szFile, int iAnimJsonFlag, int iAnimPostionFlag);
 }
 #else
 namespace cl {

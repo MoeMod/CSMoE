@@ -291,6 +291,7 @@ public:
 	void FireBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flBurnAmount, float flRadius);
 	void ChinaEventBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius);
 	void WaterBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius);
+	void IceGrenadeExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius);
 	void IgniteBombExplode(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius);
 	void EXPORT SFGrenadeExplodeThink(void);
 	void EXPORT SFGrenadeTouch(CBaseEntity* pOther);
@@ -596,6 +597,7 @@ public:
 			|| m_iId == WEAPON_JANUS1
 			|| m_iId == WEAPON_FIRECRACKER
 			|| m_iId == WEAPON_LEAPSTRIKEGUN
+			|| m_iId == WEAPON_Z4B_DEAGLEEL
 			);
 	}
 	void SetPlayerShieldAnim();
@@ -1748,6 +1750,8 @@ extern short g_sModelIndexEventBombExp2;
 extern short g_sModelIndexMoonCakeExp;
 extern short g_sModelIndexHolyWater;
 extern short g_sModelIndexIgniteBomb;
+extern short g_sModelIndexIceGrenadeExp;
+extern short g_sModelIndexIceGrenadeIce;
 
 extern short g_sModelIndexBoomerEffect;
 extern short g_sModelIndexBoomerSprite;

@@ -492,6 +492,15 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sterlingbayonet.cpp
 	../dlls/wpn_shared/wpn_pkm.cpp
 	../dlls/wpn_shared/z4b_ma5b.cpp
+	../dlls/wpn_shared/z4b_m82a1angelicbeast.cpp
+	../dlls/wpn_shared/z4b_icegrenade.cpp
+	../dlls/wpn_shared/z4b_dualaxe.cpp
+	../dlls/wpn_shared/z4b_deagleel.cpp
+	../dlls/wpn_shared/z4b_ghostblade.cpp
+	../dlls/wpn_shared/wpn_ak47l3.cpp
+	../dlls/wpn_shared/z4b_ak47_angelicbeast.cpp
+	../dlls/wpn_shared/wpn_lightningar.cpp
+	../dlls/wpn_shared/wpn_lightningsmg.cpp
 	)
 
 set (HUD_SRCS
@@ -569,6 +578,7 @@ set (HUD_SRCS
 	./hud/followitem.cpp
 	../dlls/player/player_model.cpp
 	./hud/hud_zecounter.cpp
+	./hud/AnimationPlayer.cpp
 )
 
 set (STUDIORENDER_SRCS

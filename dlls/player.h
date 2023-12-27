@@ -844,6 +844,9 @@ public:
 	time_point_t m_flEmotionTime;
 	float m_flEmotionFrame;
 	ModelName m_iOldModelName;
+	time_point_t m_flLastKillTime;
+	int m_iMultiKillCount;
+	int m_iRevengeTarget;
 };
 
 }

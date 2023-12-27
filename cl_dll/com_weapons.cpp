@@ -139,6 +139,13 @@ void HUD_PlaySound( char *sound, float volume )
 	gEngfuncs.pfnPlaySoundByNameAtLocation( sound, volume, g_finalstate->playerstate.origin );
 }
 
+void HUD_EmitSound(const char* szSound)
+{
+	char cmd[256];
+	snprintf(cmd, sizeof(cmd), "spk \"%s\"\n", szSound);
+	gEngfuncs.pfnClientCmd(cmd);
+}
+
 /*
 =====================
 HUD_PlaybackEvent

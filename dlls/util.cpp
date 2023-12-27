@@ -3066,4 +3066,13 @@ void UTIL_SetPlayerPModel(int iPlayerIndex, int iWeaponID, int iState)
 	MESSAGE_END();
 }
 
+void UTIL_PlayAnimation(CBaseEntity* pEntity, const char* szFile, int iAnimJsonFlag, int iAnimPostionFlag)
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgPlayAnimation, NULL, pEntity->edict());
+	WRITE_STRING(szFile);
+	WRITE_SHORT(iAnimJsonFlag);
+	WRITE_SHORT(iAnimPostionFlag);
+	MESSAGE_END();
+}
+
 }

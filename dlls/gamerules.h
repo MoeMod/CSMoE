@@ -65,6 +65,19 @@
 #define	WINNER_NONE			0
 #define WINNER_DRAW			1
 
+// Kill effect
+#define KILLFLAG_HEADSHOT		(1<<0)
+#define KILLFLAG_FIRSTKILL		(1<<1)
+#define KILLFLAG_LASTKILL		(1<<2)
+#define KILLFLAG_WALLSHOT		(1<<3)
+#define KILLFLAG_SHOWMARK		(1<<4)
+#define KILLFLAG_HEADSHOT_GOLD	(1<<5)
+#define KILLFLAG_KNIFE			(1<<6)
+#define KILLFLAG_GRENADE		(1<<7)
+#define KILLFLAG_REVENGE		(1<<8)
+#define KILLFLAG_INFECT		(1<<9)
+#define KILLFLAG_KILLZOMBIE		(1<<10)
+
 #ifndef CLIENT_DLL
 namespace sv {
 

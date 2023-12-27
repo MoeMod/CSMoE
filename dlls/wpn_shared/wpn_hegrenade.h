@@ -519,4 +519,41 @@ private:
 
 };
 
+
+class CZ4B_IceGrenade : public CBasePlayerWeapon
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual int GetItemInfo(ItemInfo* p);
+	virtual BOOL CanDeploy();
+	virtual BOOL CanDrop() { return FALSE; }
+	virtual BOOL CanHolster();
+	virtual BOOL Deploy();
+	virtual void Holster(int skiplocal);
+	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
+	virtual int iItemSlot() { return GRENADE_SLOT; }
+	virtual void PrimaryAttack();
+	virtual void WeaponIdle();
+	virtual BOOL UseDecrement()
+	{
+#ifdef CLIENT_WEAPONS
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+	void ResetRunIdle()
+	{
+		m_flNextIdle = m_flNextRunIdle = UTIL_WeaponTimeBase();
+	}
+
+public:
+	unsigned short m_usCreateExplosion;
+
+private:
+	duration_t m_flNextRunIdle;
+	duration_t m_flNextIdle;
+};
+
 }

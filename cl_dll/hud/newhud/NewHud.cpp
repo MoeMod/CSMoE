@@ -73,6 +73,9 @@ int CHudNewHud::VidInit(void)
 	if (!m_iCharacterStateBG)
 		m_iCharacterStateBG = R_LoadTextureShared("resource/hud/custom/hud_apex/hud_player_bg");
 
+	R_InitTexture(m_pMarkTexture, "sprites/KILLMARKUNDER.tga");
+
+
 	return 1;
 }
 
@@ -98,6 +101,9 @@ int CHudNewHud::Draw(float flTime)
 
 	if (g_iUser1)
 		return 0;
+
+	if (gHUD.m_alarmstyle->value == 2)
+		DrawUnderMark(flTime);
 
 	if (gHUD.m_hudstyle->value != 2 && gHUD.m_hudstyle->value != 3)
 		return 0;
@@ -360,6 +366,74 @@ int CHudNewHud::MsgFunc_NewHudMsg(const char* pszName, int iSize, void* pbuf)
 
 
 	return 1;
+}
+
+
+void CHudNewHud::DrawUnderMark(float time)
+{
+	if (gHUD.m_alarmstyle->value != 2)
+		return;
+
+	if (m_rgMark.empty())
+		return;
+
+	int iBaseX = ScreenWidth / 2 + 116;
+	int iBaseY = ScreenHeight - 36;
+
+	int iDrawX = iBaseX;
+
+	int iW = m_pMarkTexture->w() / 5;
+
+	int iCurrentMark = 0;
+
+	int iNumMark = m_rgMark.size();
+
+	for (int i = iNumMark - 10; i >= 0; i = i - 10)
+	{
+		iCurrentMark += 10;
+
+		DrawMark(iDrawX, iBaseY, 4);
+
+		iDrawX -= iW;
+	}
+
+	for (int i = iCurrentMark; iCurrentMark < iNumMark; iCurrentMark++)
+	{
+		DrawMark(iDrawX, iBaseY, m_rgMark[iCurrentMark]);
+
+		iDrawX -= iW;
+	}
+
+}
+
+void CHudNewHud::DrawMark(int x, int y, int type)
+{
+	int iW = m_pMarkTexture->w() / 5;
+	int iH = m_pMarkTexture->h();
+
+	static float rc[5][4] =
+	{
+		{  52, 0, 26, 64 },	// 0 NORMAL
+		{  26, 0, 26, 64 },	// 1 HEADSHOT
+		{ 103, 0, 25, 64 },	// 2 GOLDHEADSHOT
+		{   0, 0, 26, 64 },	// 3 KNIFE
+		{  78, 0, 26, 64 },	// 4 10KILLS
+		// x, y, w, h
+		//128*64
+	};
+
+	float s1 = rc[type][0] / 128.0;
+	float t1 = rc[type][1] / 64.0;
+	float s2 = s1 + rc[type][2] / 128.0;
+	float t2 = t1 + rc[type][3] / 64.0;
+
+	m_pMarkTexture->FuncDraw2DQuadScaled(x, y, iW, iH, s1, t1, s2, t2, 255, 255, 255, 255);
+
+}
+
+void CHudNewHud::AddMark(int type)
+{
+	m_rgMark.push_back(type);
 }
 
 

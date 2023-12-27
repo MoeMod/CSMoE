@@ -1837,6 +1837,16 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 				appearance.model_id = MODEL_BUFFCLASS23S3TR;
 				break;
 			}
+			case 38:
+			{
+				appearance.model_id = MODEL_BUFFCLASS23S4TR;
+				break;
+			}
+			case 39:
+			{
+				appearance.model_id = MODEL_BUFFCLASS23S5TR;
+				break;
+			}
 			default:
 			{
 				appearance.model_id = MODEL_YURI;
@@ -2036,6 +2046,11 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 		case 37:
 		{
 			appearance.model_id = MODEL_BUFFCLASS23S3CT;
+			break;
+		}
+		case 38:
+		{
+			appearance.model_id = MODEL_BUFFCLASS23S4CT;
 			break;
 		}
 		default:
@@ -3998,15 +4013,17 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (((pstr = Q_strstr(pcmd, "z4b_")) != NULL) && (pstr == pcmd))
 			{
-				if (FStrEq(pcmd, SHOVELEX_CLASSNAME[0]) ||
-					FStrEq(pcmd, SHOVELEX_CLASSNAME[1]) ||
-					FStrEq(pcmd, SHOVELEX_CLASSNAME[2]) ||
-					FStrEq(pcmd, SHOVELEX_CLASSNAME[3]) ||
-					FStrEq(pcmd, SHOVELEX_CLASSNAME[4]) || 
-					FStrEq(pcmd, SHOVELEX_CLASSNAME[5]) || 
-					FStrEq(pcmd, SHOVELEX_CLASSNAME[6]) ||
-					FStrEq(pcmd, SHOVELEX_CLASSNAME[7]) ||
-					FStrEq(pcmd, SHOVELEX_CLASSNAME[8]))
+				if (FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_SHOVELEX]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_KUKRI]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_CLASSICKUKRI]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_KNIFE]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_AXE]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_HAWLCHICKEN]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_SHOVEL]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_KNUCKLE]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_BCAXE_VIP]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_BTFKNIFE]) ||
+					FStrEq(pcmd, SHOVELEX_CLASSNAME[TYPE_BALISONG_LUMINOUSEDGE]))
 				{
 					GetClassPtr<CBasePlayer>(pev)->SelectItem("z4b_shovelex");
 				}
@@ -4554,6 +4571,7 @@ void ClientPrecache()
 	PlayerClassManager().PlayerModel_Precache();
 
 	PRECACHE_MODEL("models/v_emotion.mdl");
+	PRECACHE_MODEL("models/v_emotion1.mdl");
 
 	if (g_bIsCzeroGame)
 	{

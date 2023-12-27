@@ -4257,6 +4257,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 							killer_weapon_name = "ignitebomb";
 							break;
 
+						case GRENADE_ICEGRENADE:
+							killer_weapon_name = "z4b_icegrenade";
+							break;
+
 						default:
 							killer_weapon_name = "grenade";
 							break;
@@ -4459,6 +4463,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "y23s1dartpistol";
 					else if (iId == WEAPON_CANNON)
 						killer_weapon_name = "cannon";
+					else if (iId == WEAPON_LIGHTNINGAR)
+						killer_weapon_name = "lightningar";
+					else if (iId == WEAPON_LIGHTNINGSMG)
+						killer_weapon_name = "lightningsmg";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}
@@ -4538,6 +4546,10 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "ignitebomb";
 						break;
 
+					case GRENADE_ICEGRENADE:
+						killer_weapon_name = "z4b_icegrenade";
+						break;
+
 					default:
 						killer_weapon_name = "grenade";
 						break;
@@ -4574,13 +4586,59 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 	if (pVictim->m_bHeadshotKilled)
 		iGotHeadshot = 1;
 
+	int iMultiKill = 1, iFlags = 0;
+	iFlags = iGotHeadshot;
+
+	if (killer_index)
+	{
+		CBasePlayer* pAttackPlayer = dynamic_cast<CBasePlayer*>(CBaseEntity::Instance(pKiller));
+
+		if (pAttackPlayer->m_bIsZombie)
+			iFlags |= KILLFLAG_INFECT;
+		else
+		{
+			if (pVictim->m_bIsZombie)
+				iFlags |= KILLFLAG_KILLZOMBIE;
+		}
+
+		
+
+		if (gpGlobals->time - pAttackPlayer->m_flLastKillTime <= 5.0s)
+		{
+			pAttackPlayer->m_iMultiKillCount++;
+		}
+		else
+		{
+			pAttackPlayer->m_iMultiKillCount = 1;
+		}
+
+		// Save for this time
+		pAttackPlayer->m_flLastKillTime = gpGlobals->time;
+
+		// SetUp 'MULTIKILL' effect
+		iMultiKill = pAttackPlayer->m_iMultiKillCount;
+
+		// If kill the revenge target...
+		if (pAttackPlayer->m_iRevengeTarget == pVictim->entindex())
+		{
+			iFlags |= KILLFLAG_REVENGE;
+			pAttackPlayer->m_iRevengeTarget = 0;
+		}
+
+		// Save revenge target for victim
+		pVictim->m_iRevengeTarget = pAttackPlayer->entindex();
+	}
+
+	
+
 	if (TheTutor == NULL)
 	{
 		MESSAGE_BEGIN(MSG_ALL, gmsgDeathMsg);
 		WRITE_BYTE(killer_index);			// the killer
 		WRITE_BYTE(ENTINDEX(pVictim->edict()));		// the victim
-		WRITE_BYTE(iGotHeadshot);			// is killed headshot
+		WRITE_SHORT(iFlags);			// is killed headshot
 		WRITE_STRING(killer_weapon_name);		// what they were killed by (should this be a string?)
+		WRITE_BYTE(iMultiKill);	//for CF
 		MESSAGE_END();
 
 		////For DeathInfo

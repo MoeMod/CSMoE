@@ -36,7 +36,7 @@
 
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
-
+#include <client/gl_export.h>
 #include "bonequatlru.h"
 
 #include "event_api.h"
@@ -160,6 +160,11 @@ struct model_s* CStudioModelRenderer::s_pLaserMiniGunBPModel;
 
 struct model_s* CStudioModelRenderer::s_pLaserFistPModel;
 struct model_s* CStudioModelRenderer::s_pLaserFistEXPModel;
+
+struct model_s* CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel;
+
+struct model_s* CStudioModelRenderer::s_pLightningARPModel;
+
 
 int g_iLeapStrikeGunAnim = 0;
 float g_iLeapStrikeGunAnimTime = 0.0;
@@ -1006,6 +1011,134 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 	IEngineStudio.GetViewInfo(m_vRenderOrigin, m_vUp, m_vRight, m_vNormal);
 	IEngineStudio.GetAliasScale(&m_fSoftwareXScale, &m_fSoftwareYScale);
 
+
+	SCREENINFO screen;
+	bool gunmodel;
+	bool recaclFov = false;
+	float fov;
+	float aspect;
+	matrix4x4 savedworldviewmatrix;
+	matrix4x4 savedprojectionmatrix;
+
+	if (m_pCurrentEntity == IEngineStudio.GetViewEntity())
+		gunmodel = true;
+	else
+		gunmodel = false;
+
+	if (gunmodel)
+	{
+		int WeaponID, KnifeID, GrenadeID;
+
+		R_StudioGetWeaponID(WeaponID, KnifeID, GrenadeID);
+
+		switch (WeaponID)
+		{
+		case WEAPON_Z4B_M82A1ANGELICBEAST:
+		case WEAPON_Z4B_DEAGLEEL:
+		case WEAPON_Z4B_AK47_ANGELICBEAST:
+		case WEAPON_Z4B_RAGINGBULL:
+		case WEAPON_Z4B_STEYRTMPD:
+		{
+			fov = 45;
+			aspect = 1.45;
+			recaclFov = true;
+			break;
+		}
+		case WEAPON_Z4B_MECHANICXM214:
+		{
+			fov = 40;
+			aspect = 1.45;
+			recaclFov = true;
+			break;
+		}
+		case WEAPON_KNIFE:
+		{
+			switch (KnifeID)
+			{
+			case KNIFE_HEARTSTIMULATER:
+			case KNIFE_DUALSTINGER:
+			case KNIFE_DUALSLAYER:
+			{
+				fov = 45;
+				aspect = 1.45;
+				recaclFov = true;
+				break;
+			}
+			case KNIFE_MECHANICHAND:
+			{
+				fov = 53;
+				aspect = 1.5;
+				recaclFov = true;
+				break;
+			}
+			case KNIFE_HOLYFIST:
+			{
+				fov = 52;
+				aspect = 1.95;
+				recaclFov = true;
+				break;
+			}
+			case KNIFE_DUALKUKRI:
+			{
+				fov = 35;
+				aspect = 1.45;
+				recaclFov = true;
+				break;
+			}
+			case KNIFE_DUALAXE:
+			{
+				fov = 55;
+				aspect = 1.45;
+				recaclFov = true;
+				break;
+			}
+			case KNIFE_SHOVELEX:
+			{
+				if (m_pCurrentEntity->model == s_pBalisongLuminousEdgeViewModel)
+				{
+					fov = 45;
+					aspect = 1.45;
+					recaclFov = true;
+					break;
+				}
+			}
+			}
+		}
+		case WEAPON_HEGRENADE:
+		{
+			switch (GrenadeID)
+			{
+			case WEAPON_MECHANICHEROGUN:
+			case GRENADE_ICEGRENADE:
+			{
+				fov = 45;
+				aspect = 1.45;
+				recaclFov = true;
+				break;
+			}
+			}
+		}
+		default:
+			break;
+		}
+
+		if (recaclFov)
+		{
+			if (aspect <= 0)
+			{
+				screen.iSize = sizeof(screen);
+				gEngfuncs.pfnGetScreenInfo(&screen);
+
+				aspect = (float)screen.iWidth / (float)screen.iHeight;
+			}
+
+
+			IEngineStudio.StudioGetProjectionMatrix(savedworldviewmatrix, savedprojectionmatrix);
+
+			IEngineStudio.StudioPgluPerspective(fov, aspect, 4.0, 8192.0);
+		}
+	}
+
 	if (m_pCurrentEntity->curstate.renderfx == kRenderFxDeadPlayer)
 	{
 		entity_state_t deadplayer;
@@ -1219,6 +1352,11 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 				IEngineStudio.StudioClientEvents();
 		}
 
+	}
+
+	if (recaclFov)
+	{
+		IEngineStudio.StudioSetProjectionMatrix(savedworldviewmatrix, savedprojectionmatrix);
 	}
 
 	return 1;

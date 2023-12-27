@@ -31,6 +31,7 @@ GNU General Public License for more details.
 #include "gl_studioshader.h"
 #include "gl_studiolru.h"
 #include "gl_bindspr.h"
+#include "gl_bindbmp.h"
 #include "../dlls/player/player_const.h"
 #include <map>
 #include <triangleapi.h>
@@ -95,6 +96,10 @@ std::map<ModelName, const char*> g_HandTextureName =
 	{ MODEL_BUFFCLASS23S2CT, "buffclass23s2ct" },
 	{ MODEL_BUFFCLASS23S3TR, "buffclass23s3tr" },
 	{ MODEL_BUFFCLASS23S3CT, "buffclass23s3ct" },
+	{ MODEL_BUFFCLASS23S4TR, "buffclass23s4tr" },
+	{ MODEL_BUFFCLASS23S4CT, "buffclass23s4ct" },
+	{ MODEL_BUFFCLASS23S5TR, "buffclass23s5tr" },
+	
 };
 
 std::map<HandTattooName, const char*> g_TattoTextureName =
@@ -348,6 +353,7 @@ void R_StudioInit( void )
     xe::CubeMap_Init();
 
 	BindSprManager().Vidinit();
+	BindBMPManager().Vidinit();
 #endif
 }
 
@@ -590,6 +596,33 @@ cl_entity_t* GAME_EXPORT pfnModCurrentEntity(cl_entity_t* ent)
 	return RI.currententity;
 }
 
+
+void GAME_EXPORT R_StudioPgluPerspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+{
+	GLdouble xmin, xmax, ymin, ymax;
+
+	ymax = zNear * tan(fovy * M_PI / 360.0);
+	ymin = -ymax;
+
+	xmin = ymin * aspect;
+	xmax = ymax * aspect;
+
+	Matrix4x4_CreateProjection(RI.projectionMatrix, xmax, xmin, ymax, ymin, zNear, zFar);
+
+	Matrix4x4_Concat(RI.worldviewProjectionMatrix, RI.projectionMatrix, RI.worldviewMatrix);
+}
+
+void GAME_EXPORT R_StudioGetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix)
+{
+	worldviewmatrix = RI.worldviewProjectionMatrix;
+	projectionmatrix = RI.projectionMatrix;
+}
+
+void GAME_EXPORT R_StudioSetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix)
+{
+	RI.worldviewProjectionMatrix = worldviewmatrix;
+	RI.projectionMatrix = projectionmatrix;
+}
 
 /*
 ===============
@@ -1983,6 +2016,60 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			}
 		}
 
+		for (auto iter = g_vecBindBMPList.begin(); iter != g_vecBindBMPList.end(); iter++)
+		{
+			if (!Q_stricmp(m_pStudioHeader->name, iter->mdlname) && !Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, iter->texname))
+			{
+				int curSeq = RI.currententity->curstate.sequence;
+
+				for (auto iterseq = iter->vecSequence.begin(); iterseq != iter->vecSequence.end(); iterseq++)
+				{
+					if (curSeq == iterseq->index)
+					{
+						int frame = 0;
+						float framerate = iter->BmpFPS;
+						int startFrame = iterseq->startFrame ? iterseq->startFrame : 0;
+						int endFrame = iterseq->endFrame;
+
+						bool isSyncFrame = iterseq->isSyncFrame;
+						if (isSyncFrame)
+						{
+
+						}
+						else
+						{
+							frame = int(framerate * (cl.time - RI.currententity->curstate.animtime)) + startFrame;
+
+							if (frame > endFrame)
+							{
+								if (iterseq->isLoop)
+								{
+									frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
+									//frame = frame - (int)frame;
+									//frame = startFrame;
+								}
+								else
+									frame = endFrame;
+							}
+
+							const char* pszFileName = va("resource/weapontexture/%s/%s%d.bmp", iter->bmpname, iter->bmpname, frame);
+
+							texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+							if (texnum)
+							{
+								//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+								bBindTex = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if (bBindTex)
+					break;
+			}
+		}
+
 		const auto& attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
 		if(xe::TexLru_Upload(attr.index))
 			xe::TexLru_UpdateAttr(&ptexture[pskinref[pmesh->skinref]]);
@@ -2253,6 +2340,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		if (!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_lockongun_lcd.bmp") ||
 			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$20_winggun_gold.bmp") ||
 			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_winggun_laser01.bmp") ||
+			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "sgfx_jy_aura_31_00.bmp") ||
 			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_winggun_laser02.bmp"))
 		{
 			pglUniform4fARB(g_pstudioshader->uniform.texOffset, cl.time, 0, 1, 1);
@@ -3819,6 +3907,9 @@ static engine_studio_api_t gStudioAPI =
 	StudioSetupBones_Pre,
 	StudioSetupBones_Post,
 	pfnModCurrentEntity,
+	R_StudioPgluPerspective,
+	R_StudioGetProjectionMatrix,
+	R_StudioSetProjectionMatrix,
 };
 
 static r_studio_interface_t gStudioDraw =

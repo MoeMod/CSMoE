@@ -643,7 +643,7 @@ namespace sv {
 
             pev->modelindex = m_iModelIndex;
 
-            UTIL_TempModel(m_pPlayer->pev->origin, vecAngle, vecForward * speed, m_iSlashFx, 5, 0, 10, 0, 0, 255, kRenderTransAdd, NULL, false, 0, 0, 255, 0, false, GetBodygroup(GROUP_GLOW));
+            UTIL_TempModel(m_pPlayer->pev->origin, vecAngle, vecForward * speed, m_iSlashFx, 5, 0, 10, 0, 0, 255, kRenderTransAdd, NULL, false, 0, 0, 255, 0x20000000, false, GetBodygroup(GROUP_GLOW));
 
             pev->modelindex = 0;
         }
@@ -911,7 +911,7 @@ namespace sv {
         }
            
 
-        if (DefaultReload(60, iAnim, 2.5s))
+        if (DefaultReload(60, iAnim, 2.5s, 1))
         {
             m_flNextReload = gpGlobals->time + 2.5s;
 

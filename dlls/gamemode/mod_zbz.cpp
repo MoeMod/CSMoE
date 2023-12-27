@@ -816,8 +816,17 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 				m_pPlayer->pev->health = m_pPlayer->pev->max_health;
 
 			m_pPlayer->pev->armorvalue = 1000.0f;
-			SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "ghosthunter");
-			m_pPlayer->SetNewPlayerModel("models/player/ghosthunter/ghosthunter.mdl");
+
+			if (m_pPlayer->m_bIsFemale)
+			{
+				SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "ghosthunterw");
+				m_pPlayer->SetNewPlayerModel("models/player/ghosthunterw/ghosthunterw.mdl");
+			}
+			else
+			{
+				SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "ghosthunter");
+				m_pPlayer->SetNewPlayerModel("models/player/ghosthunter/ghosthunter.mdl");
+			}
 			m_pPlayer->RemoveAllItems(FALSE);
 			m_pPlayer->m_bHasPrimary = false;
 			m_pPlayer->GiveNamedItem("z4b_dualkukri");
@@ -1184,7 +1193,8 @@ void CMod_ZombieZ::PlayerKilled(CBasePlayer * pVictim, entvars_t * pKiller, entv
 		FClassnameIs(pInflictor, "z4b_dualslayer") ||
 		FClassnameIs(pInflictor, "z4b_holyfist") ||
 		FClassnameIs(pInflictor, "z4b_dualstinger") ||
-		FClassnameIs(pInflictor, "z4b_mechanichand")))
+		FClassnameIs(pInflictor, "z4b_mechanichand") ||
+		FClassnameIs(pInflictor, "z4b_dualaxe")))
 		UTIL_BroadcastStuffText("spk \"zombi/KILLNANOCOUNTSND\"\n");
 	return CMod_ZombieHero::PlayerKilled(pVictim, pKiller, pInflictor);
 }

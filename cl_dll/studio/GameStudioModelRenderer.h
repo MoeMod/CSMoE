@@ -94,6 +94,13 @@ private:
 	bool m_bLocal;
 };
 
+//Engine StudioAPI
+int R_StudioGetWeaponID(int& WeaponID, int& KnifeID, int& GrenadeID);
+int R_StudioGetWeaponAmmo();
+const char* R_StudioGetReplacedTexName(int itemid, int texID, const char* modelname);
+int R_StudioGetPlayerClassID(int playerid);
+
+
 extern CGameStudioModelRenderer g_StudioRenderer;
 
 

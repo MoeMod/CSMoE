@@ -438,8 +438,8 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 
 			if (pWeapon)
 			{
-				if (!Q_strcmp(STRING(pWeapon->pev->classname), "knife_holysword") || !Q_strcmp(STRING(pWeapon->pev->classname), "knife_y22s1holyswordmb"))
-					pWeapon->WeaponCallBack(0);
+				if (pWeapon->m_iKnifeID == KNIFE_HOLYSWORD || pWeapon->m_iKnifeID == KNIFE_Y22S1HOLYSWORDMB || pWeapon->m_iKnifeID == KNIFE_GHOSTBLADE)
+					pWeapon->WeaponCallBack(bitsDamageType);
 			}
 
 			if (bitsDamageType & DMG_BULLET)

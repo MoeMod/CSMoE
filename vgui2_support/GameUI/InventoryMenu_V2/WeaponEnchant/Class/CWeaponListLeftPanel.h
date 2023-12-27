@@ -28,6 +28,7 @@ public:
 protected:
     MESSAGE_FUNC_PTR(OnGaugeClicked, "GaugeClicked", gauge);
     MESSAGE_FUNC(OnSaveEnhancementData, "SaveEnhancementData");
+    MESSAGE_FUNC(OnClearEnhancementData, "ClearEnhancementData");
 
     virtual void ApplySchemeSettings(vgui2::IScheme* pScheme);
 
@@ -76,4 +77,5 @@ private:
     CWeaponDescription* m_pDescriptionPanel;
 
     vgui2::Button* m_pApplyButton;
+    vgui2::Button* m_pClearButton;
 };

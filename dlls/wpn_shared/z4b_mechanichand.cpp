@@ -44,18 +44,16 @@ namespace sv {
 
 			SetThink(&CMechanicHandGrenade::FollowThink);
 			SetTouch(&CMechanicHandGrenade::OnTouch);
-			SET_MODEL(this->edict(), "sprites/ef_gungnir_missile.spr");
+			SET_MODEL(this->edict(), "models/z4b/ef_mechanic_arcane.mdl");
 
 			pev->rendermode = kRenderTransAdd;
 			pev->renderfx = kRenderFxNone;
 			pev->renderamt = 200;
 			pev->framerate = 30;
-			pev->scale = 0.8;
+			pev->scale = 1.0;
 			pev->solid = SOLID_BBOX;
 			pev->movetype = MOVETYPE_FLYMISSILE;
 			pev->nextthink = gpGlobals->time + 0.1s;
-
-			m_flMaxFrames = float(MODEL_FRAMES(pev->modelindex) - 1);
 
 			UTIL_SetOrigin(pev, pev->origin);
 			UTIL_SetSize(pev, Vector(-1.0, -1.0, -1.0), Vector(1.0, 1.0, 1.0));
@@ -63,11 +61,9 @@ namespace sv {
 
 		void Precache() override
 		{
-			PRECACHE_MODEL("sprites/ef_gungnir_missile.spr");
-			PRECACHE_MODEL("sprites/ef_gungnir_chargeexplo.spr");
+			PRECACHE_MODEL("models/z4b/ef_mechanic_arcane.mdl");
+			m_iSprExplo = PRECACHE_MODEL("sprites/z4b/ef_fexplo.spr");
 			PRECACHE_SOUND("CK_WPN/WEAPON/Mechanic/arcane_explosion.wav");
-
-			m_iSprExplo = PRECACHE_MODEL("sprites/ef_gungnir_chargeexplo.spr");
 		}
 
 		void EXPORT OnTouch(CBaseEntity* pOther)
@@ -134,20 +130,8 @@ namespace sv {
 
 				pEntity->TakeDamage(pev, pAttackePlayer->pev, flCurrentDamage, DMG_EXPLOSION);
 
-				if (pEntity->IsPlayer())
-				{
-					CBasePlayer* player = (CBasePlayer*)pEntity;
-
-					if (player->m_bIsZombie)
-					{
-						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-						if (strategy)
-						{
-							strategy->SetStunSpeedTime(1.5s, 150.0);
-							strategy->SetStunGravityTime(1.5s);
-						}
-					}
-				}
+				Vector vecDirection = (pEntity->pev->origin - pAttackePlayer->pev->origin).Normalize();
+				UTIL_AddKickRateBoost(pEntity, vecDirection.Make2D(), 1.0, 1500.0, 500);			
 			}
 
 			SetThink(nullptr);
@@ -157,15 +141,10 @@ namespace sv {
 
 		void EXPORT FollowThink()
 		{
-			pev->frame += pev->framerate * gpGlobals->frametime / 1s;
-
-			if (pev->frame > m_flMaxFrames)
-				pev->frame = fmod(pev->frame, m_flMaxFrames);
-
 			if (m_flRemoveTime < gpGlobals->time)
 				Explode(NULL);
 
-			pev->nextthink = gpGlobals->time + 0.01s;
+			pev->nextthink = gpGlobals->time + 0.1s;
 		}
 
 		void Init(Vector vecVelocity, float flExplodeDamage, int iTeam)
@@ -177,8 +156,7 @@ namespace sv {
 
 		KnockbackData GetKnockBackData() override { return { 500.0f, 650.0f, 800.0f, 300.0f, 0.5f }; }
 
-		time_point_t m_flRemoveTime;
-		float m_flMaxFrames;
+		time_point_t m_flRemoveTime;;
 		float RadiusDamageAmount;
 		int m_iSprExplo;
 
@@ -244,9 +222,13 @@ public:
 		if (m_flTimeHolster != invalid_time_point)
 		{
 			m_iClip += (gpGlobals->time - m_flTimeHolster) / 0.125s;
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += (gpGlobals->time - m_flTimeHolster) / 0.125s;
 		}
 		if (m_iClip >= 100)
 			m_iClip = 100;
+
+		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 100)
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 100;
 
 		return Base::Deploy();
 	}
@@ -262,11 +244,19 @@ public:
 	void SkillAttack();
 	BOOL CanDrop() override { return false; }
 	void WeaponIdle() override;
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
+	{
+		if (m_iDefaultAmmo)
+		{
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iDefaultAmmo;
+		}
+
+		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+	}
 #ifndef CLIENT_DLL
 	hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer);
 #endif
 
-	int m_iHolsterAmmo;
 	time_point_t m_flTimeHolster;
 	time_point_t m_flTimeNextCharge;
 	duration_t m_flNextRunIdle;
@@ -324,8 +314,8 @@ int CKnifeMechanicHand::GetItemInfo(ItemInfo* p)
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "mechanichandammo";
 	p->iMaxAmmo1 = -1;
-	p->pszAmmo2 = NULL;
-	p->iMaxAmmo2 = -1;
+	p->pszAmmo2 = "mechanichandammo2";
+	p->iMaxAmmo2 = 100;
 	p->iMaxClip = 100;
 	p->iSlot = 2;
 	p->iPosition = 1;
@@ -353,7 +343,6 @@ void CKnifeMechanicHand::Holster(int skiplocal)
 {
 	SetThink(nullptr);
 
-	m_iHolsterAmmo = m_iClip;
 	m_flTimeHolster = gpGlobals->time;
 	return CBasePlayerWeapon::Holster(skiplocal);
 }
@@ -361,14 +350,37 @@ void CKnifeMechanicHand::Holster(int skiplocal)
 
 void CKnifeMechanicHand::ItemPostFrame()
 {
-	if (m_iClip < 100)
+	if (m_flTimeNextCharge <= gpGlobals->time)
 	{
-		if (m_flTimeNextCharge <= gpGlobals->time)
+		if (m_iClip < 100)
 		{
 			m_iClip++;
-			m_flTimeNextCharge = gpGlobals->time + 0.125s;
+		}
+
+		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < 100)
+		{
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
+		}
+
+		m_flTimeNextCharge = gpGlobals->time + 0.125s;
+	}
+
+	if (m_pPlayer->pev->button & IN_USE && m_pPlayer->m_flNextAttack < 0s)
+	{
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+
+		if (pWeapon)
+			return CBasePlayerWeapon::ItemPostFrame();
+
+		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 100)
+		{
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
+#ifndef CLIENT_DLL
+			m_pPlayer->GiveNamedItem("z4b_mechanicherogun");
+#endif
 		}
 	}
+
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 

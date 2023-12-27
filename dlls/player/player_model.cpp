@@ -103,6 +103,7 @@ void PlayerModel_Precache()
 
 	PRECACHE_MODEL("sprites/ef_buffclass23s3ct.spr");
 	PRECACHE_MODEL("sprites/muzzleflash316.spr");
+	PRECACHE_MODEL("sprites/muzzleflash352.spr");
 }
 
 void PlayerModel_ForceUnmodified(const Vector &vMin, const Vector &vMax)
@@ -195,6 +196,9 @@ static std::map<ModelName, ClassData> gPlayerClass =
 	{ MODEL_BUFFCLASS23S3TR, { MODEL_BUFFCLASS23S3TR, "buffclass23s3tr", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault"}},
 	{ MODEL_HERO, { MODEL_HERO, "hero", CT, false, SHOW_SPEED | SHOW_DAMAGE, "man" } },
 	{ MODEL_HEROINE, { MODEL_HEROINE, "heroine", CT, true, SHOW_SPEED | SHOW_DAMAGE, "woman" } },
+	{ MODEL_BUFFCLASS23S4CT, { MODEL_BUFFCLASS23S4CT, "buffclass23s4ct", CT, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault"}},
+	{ MODEL_BUFFCLASS23S4TR, { MODEL_BUFFCLASS23S4TR, "buffclass23s4tr", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault"}},
+	{ MODEL_BUFFCLASS23S5TR, { MODEL_BUFFCLASS23S5TR, "buffclass23s5tr", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE, "buffdefault"}},
 
 	/*{ MODEL_UNASSIGNED, { MODEL_UNASSIGNED, NULL, UNASSIGNED } },
 	{ MODEL_YURI, { MODEL_YURI, "yuri", TERRORIST, true, SHOW_SPEED | SHOW_DAMAGE} },
@@ -309,6 +313,7 @@ static const char* m_szRadioType[] =
 	"MRAD_WANTHELP" ,
 	"MRAD_WIN",
 	"MRAD_LOSE",
+	"MRAD_INFECTION"
 	"VOICE_HURT_HEAD",
 	"VOICE_HURT_FLESH" ,
 	"VOICE_DEATH"

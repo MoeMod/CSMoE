@@ -188,7 +188,7 @@ int CKnifeDualStinger::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "dualstingerammo";
-	p->iMaxAmmo1 = 100;
+	p->iMaxAmmo1 = -1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = 100;

@@ -161,6 +161,10 @@ typedef struct engine_studio_api_s
 	// change entity that is set for rendering
 	struct cl_entity_s* (*ModCurrentEntity)(cl_entity_s* ent);
 
+	void (*StudioPgluPerspective)(double fovy, double aspect, double zNear, double zFar);
+	void (*StudioGetProjectionMatrix)(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix);
+	void (*StudioSetProjectionMatrix)(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix);
+
 } engine_studio_api_t;
 
 typedef struct server_studio_api_s

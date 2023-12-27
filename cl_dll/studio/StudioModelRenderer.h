@@ -180,6 +180,8 @@ public:
 	static struct model_s* s_pLaserMiniGunBPModel;
 	static struct model_s* s_pLaserFistPModel;
 	static struct model_s* s_pLaserFistEXPModel;
+	static struct model_s* s_pBalisongLuminousEdgeViewModel;
+	static struct model_s* s_pLightningARPModel;
 };
 
 }

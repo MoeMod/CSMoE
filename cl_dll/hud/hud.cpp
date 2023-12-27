@@ -156,6 +156,10 @@ void CHud :: Init( void )
 	m_pCvarDraw  = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
 	m_hudstyle  = CVAR_CREATE( "hud_style", "0", FCVAR_ARCHIVE );
 	m_alarmstyle = CVAR_CREATE("alarm_style", "1", FCVAR_ARCHIVE);
+	m_cfalarm_partmain = CVAR_CREATE("cf_alarm_partmain", "0", FCVAR_ARCHIVE);
+	m_cfalarm_part1 = CVAR_CREATE("cf_alarm_part1", "0", FCVAR_ARCHIVE);
+	m_cfalarm_part2 = CVAR_CREATE("cf_alarm_part2", "0", FCVAR_ARCHIVE);
+
 	m_bMordenRadar = FALSE;
 	fastsprites  = CVAR_CREATE( "fastsprites", "0", FCVAR_ARCHIVE );
 	cl_gunsmoke  = CVAR_CREATE( "cl_gunsmoke", "0", FCVAR_ARCHIVE );
@@ -216,6 +220,7 @@ void CHud :: Init( void )
 	m_MVP.Init();
     m_CenterTips.Init();
 	m_ZECounter.Init();
+	m_AnimationPlayer.Init();
 
 	// chat, death notice, status bars and other
 	m_SayText.Init();

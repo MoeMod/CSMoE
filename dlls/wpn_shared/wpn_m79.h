@@ -110,6 +110,7 @@ public:
 		else
 			return { ACCURACY_AIR, 6, 3, 0 };
 	}
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 
 public:
 	void Janus1Fire(bool bmode);

@@ -127,6 +127,7 @@ DLL_GLOBAL int gmsgMPToCL = 0;
 DLL_GLOBAL int gmsgNewHudMsg = 0;
 DLL_GLOBAL int gmsgResetRound = 0;
 DLL_GLOBAL int gmsgDeathInfo = 0;
+DLL_GLOBAL int gmsgPlayAnimation = 0;
 
 // main code
 
@@ -238,6 +239,7 @@ void LinkUserMessages()
 
 	gmsgDeathInfo = REG_USER_MSG("DeathInfo", -1);
 	gmsgResetRound = REG_USER_MSG("ResetRound", -1);
+	gmsgPlayAnimation = REG_USER_MSG("PlayAnimation", -1);
 }
 
 /*void WriteWeaponInfo(const ItemInfo &II)

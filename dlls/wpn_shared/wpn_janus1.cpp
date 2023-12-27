@@ -236,6 +236,13 @@ int CJANUS1::GetItemInfo(ItemInfo *p)
 	return 1;
 }
 
+
+int CJANUS1::ExtractAmmo(CBasePlayerWeapon* pWeapon)
+{
+	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 0;
+	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+}
+
 BOOL CJANUS1::Deploy(void)
 {
 	m_fMaxSpeed = 250;

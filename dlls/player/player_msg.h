@@ -130,6 +130,7 @@ extern int gmsgMPToCL;
 extern int gmsgNewHudMsg;
 extern int gmsgDeathInfo;
 extern int gmsgResetRound;
+extern int gmsgPlayAnimation;
 
 void LinkUserMessages();
 void WriteSigonMessages();

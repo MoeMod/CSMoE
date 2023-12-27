@@ -59,6 +59,9 @@ public:
 	int Draw(float flTime);
 	int DrawNewHudCharacterBG(float flTime);
 	int DrawApexHudCharacterBG(float flTime);
+	void DrawUnderMark(float flTime);
+	void DrawMark(int x, int y, int type);
+	void AddMark(int iType);
 
 	void InitHUDData(void);
 	CHudMsgFunc(NewHudMsg);
@@ -83,5 +86,9 @@ private:
 	UniqueTexture m_iCharacter;
 	std::string m_szLastModel;
 	int m_iLastZombieClass;
+
+	std::vector<int> m_rgMark;
+
+	SharedTexture m_pMarkTexture;
 };
 }

@@ -217,6 +217,8 @@ void COptionsSubMoeSettings::InitAlarmStyleList(CLabeledCommandComboBox* cb)
 
 	cb->AddItem("#CSMoE_AlarmStyle_New", "alarm_style 0");
 	cb->AddItem("#CSMoE_AlarmStyle_Old", "alarm_style 1");
+	cb->AddItem("#CSMoE_AlarmStyle_CF", "alarm_style 2");
+
 
 	auto value = engine->pfnGetCvarString("alarm_style");
 

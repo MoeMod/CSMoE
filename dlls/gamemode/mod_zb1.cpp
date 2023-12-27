@@ -582,7 +582,15 @@ void CMod_Zombi::EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker)
 	if(!player->m_bIsFemale)
 		EMIT_SOUND(ENT(player->pev), CHAN_BODY, RANDOM_LONG(0, 1) ? "zombi/human_death_01.wav" : "zombi/human_death_02.wav", VOL_NORM, ATTN_NORM);
 	else
-		EMIT_SOUND(ENT(player->pev), CHAN_BODY, RANDOM_LONG(0, 1) ? "zombi/human_death_female_01.wav" : "zombi/human_death_female_02.wav", VOL_NORM, ATTN_NORM);
+	{
+		if (player->m_iModelName == MODEL_BUFFCLASS23S5TR)
+		{
+			UTIL_SendAudio(player, "%!MRAD_INFECTION", PITCH_NORM);
+		}
+		else
+			EMIT_SOUND(ENT(player->pev), CHAN_BODY, RANDOM_LONG(0, 1) ? "zombi/human_death_female_01.wav" : "zombi/human_death_female_02.wav", VOL_NORM, ATTN_NORM);
+	}
+		
 }
 
 void CMod_Zombi::RestartRound()
@@ -661,7 +669,7 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 
 				if (pWeapon)
 				{
-					if (!Q_strcmp(STRING(pWeapon->pev->classname), "knife_holysword") || !Q_strcmp(STRING(pWeapon->pev->classname), "knife_y22s1holyswordmb"))
+					if (pWeapon->m_iKnifeID == KNIFE_HOLYSWORD || pWeapon->m_iKnifeID == KNIFE_Y22S1HOLYSWORDMB || pWeapon->m_iKnifeID == KNIFE_GHOSTBLADE)
 						pWeapon->WeaponCallBack(0);
 				}
 				return 1;

@@ -55,6 +55,49 @@ public:
         Draw2DQuad(x1 * flScale, y1 * flScale, x2 * flScale, y2 * flScale, s1, t1, s2, t2, r, g, b, a);
 #endif
 	}
+
+	void FuncDraw2DQuadScaled(float x1, float y1, float width, float height, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255, int rendermode = kRenderTransTexture) const noexcept
+	{
+		gRenderAPI.GL_Upload(m_iInternalId);
+#if defined(XASH_IMGUI_SURFACE)
+		float x2 = x1 + width;
+		float y2 = y1 + height;
+
+		x1 *= g_ImGUI_DPI;
+		y1 *= g_ImGUI_DPI;
+		x2 *= g_ImGUI_DPI;
+		y2 *= g_ImGUI_DPI;
+
+		ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
+		ImGui_Surface_SetRenderMode(rendermode);
+		drawlist->AddImage((ImTextureID)m_iInternalId, ImVec2(x1, y1), ImVec2(x2, y2), ImVec2(s1, t1), ImVec2(s2, t2), ImColor(r, g, b, a));
+#else
+		float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
+		float x2 = x1 + width;
+		float y2 = y1 + height;
+
+		x1 *= flScale;
+		y1 *= flScale;
+		x2 *= flScale;
+		y2 *= flScale;
+
+		gEngfuncs.pTriAPI->RenderMode(rendermode);
+		gEngfuncs.pTriAPI->Color4ub(r, g, b, a);
+		gRenderAPI.GL_Bind(0, m_iInternalId);
+		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+		gEngfuncs.pTriAPI->TexCoord2f(s1, t1);
+		gEngfuncs.pTriAPI->Vertex3f(x1, y1, 0);
+		gEngfuncs.pTriAPI->TexCoord2f(s1, t2);
+		gEngfuncs.pTriAPI->Vertex3f(x1, y2, 0);
+		gEngfuncs.pTriAPI->TexCoord2f(s2, t2);
+		gEngfuncs.pTriAPI->Vertex3f(x2, y2, 0);
+		gEngfuncs.pTriAPI->TexCoord2f(s2, t1);
+		gEngfuncs.pTriAPI->Vertex3f(x2, y1, 0);
+		gEngfuncs.pTriAPI->End();
+#endif
+	}
+
+
 	void Draw2DQuadRotatedScaled(float x1, float y1, float x2, float y2, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255) const noexcept
 	{
 #if defined(XASH_IMGUI_SURFACE)

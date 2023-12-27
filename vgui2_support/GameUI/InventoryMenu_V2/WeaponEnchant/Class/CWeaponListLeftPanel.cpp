@@ -159,6 +159,11 @@ CWeaponListLeftPanel::CWeaponListLeftPanel(vgui2::Panel* parent, const char* pan
 	m_pApplyButton->AddActionSignalTarget(this);
 	m_pApplyButton->SetCommand(new KeyValues("SaveEnhancementData"));
 
+	m_pClearButton = new Button(this, "ClearButton", "#CSO_WeaponEnhanceBtn_Anti");
+	m_pClearButton->SetFont(hFont);
+	m_pClearButton->AddActionSignalTarget(this);
+	m_pClearButton->SetCommand(new KeyValues("ClearEnhancementData"));
+
 	m_pDescriptionPanel = new CWeaponDescription(this, "WpnDescPanel");
 	m_pDescriptionPanel->AddActionSignalTarget(this);
 	m_pDescriptionPanel->SetVisible(false);
@@ -224,6 +229,8 @@ void CWeaponListLeftPanel::PerformLayout()
 	m_pLevel8UnreachableImage->SetBounds(320, 465, 180, 60);
 	
 	m_pApplyButton->SetBounds(380, 280, 100, 48);
+
+	m_pClearButton->SetBounds(380, 220, 100, 48);
 
 }
 
@@ -722,4 +729,39 @@ void CWeaponListLeftPanel::OnSaveEnhancementData()
 	pParent->SwitchToLine(pParent->GetScrollBarLine());
 }
 
+void CWeaponListLeftPanel::OnClearEnhancementData()
+{
+	if (!m_iActiveEnchantWeapon_Internal)
+	{
+		MessageBox* pHelper = new MessageBox("#CSO_WeaponEnhanceTitle", "#CSO_WeaponEnhance_CantAddEnhacer_EmptyWpnEnh", this);
+
+		pHelper->DoModal();
+		pHelper->SetDeleteSelfOnClose(true);
+		pHelper->SetOKButtonVisible(true);
+		return;
+	}
+
+	CWeaponEnchant* pParent = dynamic_cast<CWeaponEnchant*>(GetParent());
+
+	if (!pParent)
+		return;
+
+	WeaponEnchantInfo& pInfo = pParent->FindWeaponInfoByID(pParent->GetOnProcessWeapon());
+
+	for (int i = 0; i < 6; i++)
+	{
+		pInfo.iCustomInfo[i] = 0;
+		m_iEnhanceLevelGauge[i] = 0;
+		pInfo.iMaxCustomLevel = GetOnProcessWeaponCurrentTotalLevel();
+	}
+
+	pParent->SaveEnhancementData(pInfo);
+
+	//Refresh RightPanel
+	pParent->SwitchToLine(pParent->GetScrollBarLine());
+
+	//Reload LeftPanel
+	SetOnProcessWeapon(m_iActiveEnchantWeapon_Internal, pInfo.szName);
+
+}
 
