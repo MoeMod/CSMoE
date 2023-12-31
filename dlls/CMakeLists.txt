@@ -714,6 +714,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_ak47_angelicbeast.cpp
 	../dlls/wpn_shared/wpn_lightningar.cpp
 	../dlls/wpn_shared/wpn_lightningsmg.cpp
+	../dlls/wpn_shared/z4b_m4a1_s_transformers.cpp
 	)
 
 set(PM_SRCS

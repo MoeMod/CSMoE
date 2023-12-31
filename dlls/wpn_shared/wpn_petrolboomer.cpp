@@ -560,10 +560,10 @@ namespace sv {
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "petrolboomer";
-		p->iMaxAmmo1 = 20;
+		p->iMaxAmmo1 = -1;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = -1;
+		p->iMaxClip = 20;
 		p->iSlot = 0;
 		p->iPosition = 16;
 		p->iId = m_iId = WEAPON_PETROLBOOMER;

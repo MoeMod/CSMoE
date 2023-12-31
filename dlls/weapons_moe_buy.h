@@ -410,6 +410,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_Z4B_AK47_ANGELICBEAST, "z4b_ak47_angelicbeast",      "传说辉光",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE ,4 },
 	{ WEAPON_LIGHTNINGSMG, "weapon_lightningsmg",         "闪电Bizon",                  3000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG ,10 },
 	{ WEAPON_LIGHTNINGAR, "weapon_lightningar",         "闪电AN-94",                  3000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE ,7 },
+	{ WEAPON_Z4B_STEYRTMPD, "z4b_steyrtmpd",        "死亡之眼",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG ,8 },
+	{ WEAPON_Z4B_M4A1_S_TRANSFORMERS , "z4b_m4a1_s_transformers",  "M4A1-雷神",    3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE ,1 },
 #endif
 };
 

@@ -213,7 +213,7 @@ namespace cl {
 		for (int i = 0; i < 39; i++)
 		{
 			char szFile[64];
-			snprintf(szFile, 64, "resource/weapontexture/MasterHero_Retina/%d.tga", i);
+			snprintf(szFile, 64, "resource/animation/MasterHero_Retina/%d.tga", i);
 			R_InitTexture(m_pDualSlayerRetina[i], szFile);
 		}
 

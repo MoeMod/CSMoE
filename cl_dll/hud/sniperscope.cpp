@@ -570,10 +570,6 @@ int CHudSniperScope::Draw(float flTime)
 			DrawSpecialScope(pActiveBTEWeapon->m_iId, pActiveBTEWeapon->pev->iuser1);
 			return 0;
 		}
-		else if (pActiveBTEWeapon->m_iId == WEAPON_Z4B_AK47_ANGELICBEAST)
-		{
-			return 1;
-		}
 		else
 		{
 			if (gHUD.m_iFOV > 40)

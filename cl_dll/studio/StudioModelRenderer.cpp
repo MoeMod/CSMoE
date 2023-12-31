@@ -45,6 +45,7 @@
 #include "pm_shared.h"
 
 #include "com_weapons.h"
+#include "ParticlePlayer.h"
 
 namespace cl {
 
@@ -187,6 +188,8 @@ void CStudioModelRenderer::Init(void)
 	m_plighttransform = IEngineStudio.StudioGetLightTransform();
 	m_paliastransform = IEngineStudio.StudioGetAliasTransform();
 	m_protationmatrix = IEngineStudio.StudioGetRotationMatrix();
+
+	g_ParticleManager.Init();
 }
 
 CStudioModelRenderer::CStudioModelRenderer(void)
@@ -1034,11 +1037,18 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 		switch (WeaponID)
 		{
 		case WEAPON_Z4B_M82A1ANGELICBEAST:
+		{
+			fov = 35;
+			aspect = 1.45;
+			recaclFov = true;
+			break;
+		}
 		case WEAPON_Z4B_DEAGLEEL:
 		case WEAPON_Z4B_AK47_ANGELICBEAST:
 		case WEAPON_Z4B_RAGINGBULL:
 		case WEAPON_Z4B_STEYRTMPD:
-		{
+		case WEAPON_Z4B_M4A1_S_TRANSFORMERS:
+		{	
 			fov = 45;
 			aspect = 1.45;
 			recaclFov = true;
@@ -1352,6 +1362,14 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 				IEngineStudio.StudioClientEvents();
 		}
 
+	}
+
+
+	if (gunmodel)
+	{
+		g_ParticleManager.AddAnimInfo();
+
+		g_ParticleManager.Draw(m_clTime);
 	}
 
 	if (recaclFov)

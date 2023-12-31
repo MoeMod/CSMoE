@@ -9792,6 +9792,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_Z4B_DEAGLEEL:
 		case WEAPON_Z4B_AK47_ANGELICBEAST:
 		case WEAPON_LIGHTNINGAR:
+		case WEAPON_Z4B_M4A1_S_TRANSFORMERS:
 			return TRUE;
 		}
 	}

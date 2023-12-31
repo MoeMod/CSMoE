@@ -329,3 +329,4 @@ HOOK_EVENT(deagleel, FireDeagleEL);
 HOOK_EVENT(ak47_angelicbeast, FireAK47_AngelicBeast);
 HOOK_EVENT(lightningar, FireLightningAR);
 HOOK_EVENT(lightningsmg, FireLightningSMG);
+HOOK_EVENT(m4a1_s_transformers, FireM4A1_S_Transformers);

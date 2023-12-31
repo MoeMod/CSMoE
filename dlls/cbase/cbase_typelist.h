@@ -455,6 +455,7 @@ TL_ADD(CAK47L3)
 TL_ADD(CAK47_AngelicBeast)
 TL_ADD(CLightningAR)
 TL_ADD(CLightningSMG)
+TL_ADD(CM4A1_S_Transformers)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -878,6 +879,7 @@ TL_ADD(CDartBombEntity)
 TL_ADD(CCannonFireBall)
 TL_ADD(CAK47_AngelicBeastGrenade)
 TL_ADD(CLightningARElectroField)
+TL_ADD(CLightningSMGElectroMissile)
 
 #endif
 

@@ -281,6 +281,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "ak47l3",	WEAPON_AK47L3 },
 	{ "z4b_ak47_angelicbeast",	WEAPON_Z4B_AK47_ANGELICBEAST },
 	{ "lightningar",	WEAPON_LIGHTNINGAR },
+	{ "z4b_m4a1_s_transformers", WEAPON_Z4B_M4A1_S_TRANSFORMERS },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -799,6 +800,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "ak47l3",	WEAPONCLASS_RIFLE },
 	{ "z4b_ak47_angelicbeast",	WEAPONCLASS_RIFLE },
 	{ "lightningar",	WEAPONCLASS_RIFLE },
+	{ "z4b_m4a1_s_transformers", WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -1279,6 +1281,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_PKM:
 	case WEAPON_Z4B_MA5B:
 	case WEAPON_Z4B_AK47_ANGELICBEAST:
+	case WEAPON_Z4B_M4A1_S_TRANSFORMERS:
 		return true;
 	default:
 		break;

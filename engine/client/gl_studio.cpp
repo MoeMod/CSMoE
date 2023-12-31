@@ -610,6 +610,12 @@ void GAME_EXPORT R_StudioPgluPerspective(GLdouble fovy, GLdouble aspect, GLdoubl
 	Matrix4x4_CreateProjection(RI.projectionMatrix, xmax, xmin, ymax, ymin, zNear, zFar);
 
 	Matrix4x4_Concat(RI.worldviewProjectionMatrix, RI.projectionMatrix, RI.worldviewMatrix);
+
+	pglMatrixMode(GL_PROJECTION);
+	GL_LoadMatrix(RI.projectionMatrix);
+
+	pglMatrixMode(GL_MODELVIEW);
+	GL_LoadMatrix(RI.worldviewMatrix);
 }
 
 void GAME_EXPORT R_StudioGetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix)
@@ -620,8 +626,12 @@ void GAME_EXPORT R_StudioGetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4
 
 void GAME_EXPORT R_StudioSetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix)
 {
+	pglMatrixMode(GL_PROJECTION);
+
 	RI.worldviewProjectionMatrix = worldviewmatrix;
 	RI.projectionMatrix = projectionmatrix;
+
+	pglMatrixMode(GL_MODELVIEW);
 }
 
 /*
