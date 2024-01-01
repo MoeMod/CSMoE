@@ -436,26 +436,26 @@ ConstSprList s_ModelBuffClass23S3CT = {
 	}
 };
 
-ConstSprList s_ModelM82A1AngelicBeast = {
-	"PV-M82A1_AngelicBeast.mdl",
-	"FXBASE.bmp",
-	"sprites/v_m82a1angelicbeast.spr",
-	30.0,
-	{
-		{ 0, true, false, 1.0, 0, 0, 0 },
-		{ 1, true, false, 1.0, 0, 0, 0 },
-		{ 2, true, false, 1.0, 0, 0, 0 },
-		{ 3, true, false, 1.0, 0, 0, 0 },
-		{ 4, true, false, 1.0, 0, 0, 0 },
-		{ 5, true, false, 1.0, 0, 0, 0 },
-		{ 6, true, false, 1.0, 0, 0, 0 },
-		{ 7, true, false, 1.0, 0, 0, 0 },
-		{ 8, true, false, 1.0, 0, 0, 0 },
-		{ 9, true, false, 1.0, 0, 0, 0 },
-		{ 10, true, false, 1.0, 0, 0, 0 },
-		{ 11, true, false, 1.0, 0, 0, 0 },
-	}
-};
+// ConstSprList s_ModelM82A1AngelicBeast = {
+// 	"PV-M82A1_AngelicBeast.mdl",
+// 	"FXBASE.bmp",
+// 	"sprites/v_m82a1angelicbeast.spr",
+// 	30.0,
+// 	{
+// 		{ 0, true, false, 1.0, 0, 0, 0 },
+// 		{ 1, true, false, 1.0, 0, 0, 0 },
+// 		{ 2, true, false, 1.0, 0, 0, 0 },
+// 		{ 3, true, false, 1.0, 0, 0, 0 },
+// 		{ 4, true, false, 1.0, 0, 0, 0 },
+// 		{ 5, true, false, 1.0, 0, 0, 0 },
+// 		{ 6, true, false, 1.0, 0, 0, 0 },
+// 		{ 7, true, false, 1.0, 0, 0, 0 },
+// 		{ 8, true, false, 1.0, 0, 0, 0 },
+// 		{ 9, true, false, 1.0, 0, 0, 0 },
+// 		{ 10, true, false, 1.0, 0, 0, 0 },
+// 		{ 11, true, false, 1.0, 0, 0, 0 },
+// 	}
+// };
 
 
 std::vector<SprList> g_vecBindSprList;
