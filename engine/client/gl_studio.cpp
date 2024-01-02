@@ -599,6 +599,8 @@ cl_entity_t* GAME_EXPORT pfnModCurrentEntity(cl_entity_t* ent)
 
 void GAME_EXPORT R_StudioPgluPerspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
 {
+	//相当于重写 设置新的投影矩阵
+	// R_SetupProjectionMatrix(&RI.refdef, RI.projectionMatrix);
 	GLdouble xmin, xmax, ymin, ymax;
 
 	ymax = zNear * tan(fovy * M_PI / 360.0);
@@ -613,9 +615,6 @@ void GAME_EXPORT R_StudioPgluPerspective(GLdouble fovy, GLdouble aspect, GLdoubl
 
 	pglMatrixMode(GL_PROJECTION);
 	GL_LoadMatrix(RI.projectionMatrix);
-
-	pglMatrixMode(GL_MODELVIEW);
-	GL_LoadMatrix(RI.worldviewMatrix);
 }
 
 void GAME_EXPORT R_StudioGetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix)
@@ -626,12 +625,8 @@ void GAME_EXPORT R_StudioGetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4
 
 void GAME_EXPORT R_StudioSetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix)
 {
-	pglMatrixMode(GL_PROJECTION);
-
 	RI.worldviewProjectionMatrix = worldviewmatrix;
 	RI.projectionMatrix = projectionmatrix;
-
-	pglMatrixMode(GL_MODELVIEW);
 }
 
 /*

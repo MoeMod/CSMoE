@@ -88,6 +88,7 @@ public:
 	char m_nCachedBoneNames[MAXSTUDIOBONES][32];
     matrix3x4 m_rgCachedBoneTransform[MAXSTUDIOBONES];
     matrix3x4 m_rgCachedLightTransform[MAXSTUDIOBONES];
+	matrix3x4 m_rgCachedBoneTransform_Animation[MAXSTUDIOBONES];
 	float m_fSoftwareXScale, m_fSoftwareYScale;
 	float m_vUp[3];
 	float m_vRight[3];

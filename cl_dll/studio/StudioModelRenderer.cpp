@@ -874,6 +874,7 @@ void CStudioModelRenderer::StudioSetupBones(void)
 
 	for (i = 0; i < m_pStudioHeader->numbones; i++)
 	{
+		//bonematrix由此bone的rotation(angles)和transform(origin)生成
 		QuaternionMatrix(q[i], bonematrix);
 
 		bonematrix[0][3] = pos[i][0];
@@ -893,11 +894,18 @@ void CStudioModelRenderer::StudioSetupBones(void)
 
 			if (IEngineStudio.IsHardware())
 			{
+				//RotationMatrix * BoneMatrix完成curstate.angles和curstate.origin 的变换把bone变到世界坐标world space。也就是说rotationMatrix会把顶点变换到世界坐标去
 				ConcatTransforms((*m_protationmatrix), bonematrix, (*m_pbonetransform)[i]);
 				MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
+
+				if (bIsViewModel)
+				{
+					MatrixCopy(bonematrix, m_rgCachedBoneTransform_Animation[i]);				
+				}
 			}
 			else
 			{
+				//ParentBoneMatrix * BoneMatrix把bone变换到他爹bone的空间
 				ConcatTransforms((*m_paliastransform), bonematrix, (*m_pbonetransform)[i]);
 				ConcatTransforms((*m_protationmatrix), bonematrix, (*m_plighttransform)[i]);
 			}
@@ -908,6 +916,11 @@ void CStudioModelRenderer::StudioSetupBones(void)
 		{
 			ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
 			ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
+
+			if (bIsViewModel)
+			{
+				ConcatTransforms(m_rgCachedBoneTransform_Animation[pbones[i].parent], bonematrix, m_rgCachedBoneTransform_Animation[i]);
+			}
 		}
 	}
 }
@@ -1362,20 +1375,18 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 				IEngineStudio.StudioClientEvents();
 		}
 
-	}
-
-
-	if (gunmodel)
-	{
-		g_ParticleManager.AddAnimInfo();
-
-		g_ParticleManager.Draw(m_clTime);
+		if (gunmodel)
+		{
+			g_ParticleManager.Draw(m_clTime, *m_protationmatrix);
+		}
 	}
 
 	if (recaclFov)
 	{
 		IEngineStudio.StudioSetProjectionMatrix(savedworldviewmatrix, savedprojectionmatrix);
 	}
+
+
 
 	return 1;
 }
@@ -1683,8 +1694,35 @@ void CStudioModelRenderer::StudioCalcAttachments(void)
 
 	pattachment = (mstudioattachment_t *)((byte *)m_pStudioHeader + m_pStudioHeader->attachmentindex);
 
+	vec3_t	attachment[20];
+
 	for (i = 0; i < m_pStudioHeader->numattachments; i++)
+	{
 		VectorTransform(pattachment[i].org, (*m_plighttransform)[pattachment[i].bone], m_pCurrentEntity->attachment[i]);
+
+		//VectorTransform(pattachment[i].org, m_rgCachedBoneTransform_Animation[pattachment[i].bone], attachment[i]);
+	}
+		
+	if (m_pCurrentEntity == IEngineStudio.GetViewEntity() && m_pStudioHeader->numattachments >= 3)
+	{
+		vec3_t shootPos;
+		vec3_t shootDir = (pattachment[2].org - pattachment[1].org).Normalize();
+		
+		VectorTransform(pattachment[1].org, m_rgCachedBoneTransform_Animation[pattachment[1].bone], shootPos);
+		
+		g_ParticleManager.AddAnimInfo(shootPos, shootDir);
+	}
+
+
+	//即ProjectionMatrix * ModelViewMatrix * bontransform[n] * attachment.origin
+
+	/*假设一个模型只有两个bone，root->bone1  那么完整的变换将会是这样
+
+	BoneMatrix = ProjectionMatrix * ModelViewMatrix * RotationMatrix * RootBoneMatrix * Bone1Matrix
+
+	此时有一个附件绑定到Bone1，那么附件的屏幕坐标就是这样计算的
+
+	BoneMatrix * attachment.org*/
 }
 
 void CStudioModelRenderer::StudioRenderModel(const vec3_t lightdir)

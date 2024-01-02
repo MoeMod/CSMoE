@@ -15,16 +15,37 @@
 //
 // new alarm
 //
+#include <assert.h>
 #include "hud.h"
 #include "cl_util.h"
-#include "parsemsg.h"
+#include "const.h"
+#include "com_model.h"
+#include "studio.h"
+#include "entity_state.h"
+#include "cl_entity.h"
+#include "dlight.h"
+#include "triangleapi.h"
 
-#include <string.h>
 #include <stdio.h>
-#include "draw_util.h"
-#include "ParticlePlayer.h"
-#include "mathlib.h"
+#include <string.h>
+#include <memory.h>
+#include <math.h>
+
+#include "studio_util.h"
 #include "r_studioint.h"
+
+#include "StudioModelRenderer.h"
+#include "GameStudioModelRenderer.h"
+#include <client/gl_export.h>
+#include "bonequatlru.h"
+
+#include "event_api.h"
+#include "pm_defs.h"
+#include "pm_math.h"
+#include "pm_shared.h"
+
+#include "com_weapons.h"
+#include "ParticlePlayer.h"
 
 namespace cl {
 
@@ -38,15 +59,15 @@ namespace cl {
 		R_InitTexture(test.Data.pTexture, "resource/weapontexture/SGFX_se_glow_05.tga");
 		CalcData(test.Data);
 
-		test.flIntervalTime = 0.01;
-		test.flLifeTime = 0.8;
-		test.flSize = 0.2;
-		test.flSpeed = 0.7;
+		//test.flIntervalTime = 0.01;
+		test.flLifeTime = 0.6;
+		test.flSize = 1.9;
+		test.flSpeed = 70.0;
 		test.flAlpha = 200;
-		test.iStartAttachment = 1;
-		test.iEndAttachment = 2;
-		test.iStartColor = { 0, 135, 255 };
-		test.iEndColor = { 50, 0, 200 };
+		//test.iStartAttachment = 1;
+		//test.iEndAttachment = 2;
+		//test.iStartColor = { 0, 135, 255 };
+		//test.iEndColor = { 50, 0, 200 };
 		m_flNextTime = 0;
 		return 1;
 	}
@@ -56,10 +77,10 @@ namespace cl {
 		int w = info.pTexture->w();
 		int h = info.pTexture->h();
 
-		info.up = (h >> 1);
-		info.left = -(w >> 1);
-		info.down = (h >> 1) - h;
-		info.right = w + -(w >> 1);
+		info.up     = 1;//(h >> 1);
+		info.left   = -1;//-(w >> 1);
+		info.down   = -1;//(h >> 1) - h;
+		info.right  = 1;//w + -(w >> 1);
 	}
 
 	void CParticlePlayer::DrawTGAQuad(ParticleData& particle, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color)
@@ -69,7 +90,7 @@ namespace cl {
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
 		gRenderAPI.GL_Upload(particle.pTexture->texnum());
 		gRenderAPI.GL_Bind(0, particle.pTexture->texnum());
-		gEngfuncs.pTriAPI->Color4ub(color[0], color[1], color[2], color[3]);
+		gEngfuncs.pTriAPI->Color4f(0.0, 0.1, 0.8, 1);
 
 		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
 		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
@@ -109,12 +130,19 @@ namespace cl {
 	{
 	}
 
-	void CParticlePlayer::AddAnimInfo()
+	void CParticlePlayer::AddAnimInfo(const vec3_t& shootPos, const vec3_t& shootDir)
 	{
 		if (gHUD.m_flTime > m_flNextTime)
 		{
+			// for (int i = 0 ; i < 20; i++)
+			// {
+			// 	test.vecAttachment[i] = attachment[i];
+			// }
+			test.vecOrigin = shootPos;
+			test.vecDir = shootDir;
+			
 			AddToTempParticleArray(test);
-			m_flNextTime = gHUD.m_flTime + test.flIntervalTime;
+			m_flNextTime = gHUD.m_flTime + 0.01;
 		}
 			
 	}
@@ -124,34 +152,30 @@ namespace cl {
 		m_TempParticleArray.emplace_back();
 		ParticleInfo& Temp = m_TempParticleArray.back();
 
-		Temp.flAlpha = info.flAlpha;
-		Temp.flIntervalTime = info.flIntervalTime;
+		// for (int i = 0; i < 20; i++)
+		// {
+		// 	Temp.vecAttachment[i] = info.vecAttachment[i];
+		// }
+		
+		//Temp.flAlpha = info.flAlpha;
+		//Temp.flIntervalTime = info.flIntervalTime;
 		Temp.flLifeTime = info.flLifeTime;
 		Temp.flSize = info.flSize;
 		Temp.flSpeed = info.flSpeed;
-		Temp.iStartAttachment = info.iStartAttachment;
-		Temp.iEndAttachment = info.iEndAttachment;
-		Temp.iStartColor = info.iStartColor;
-		Temp.iEndColor = info.iEndColor;
+		//Temp.iStartAttachment = info.iStartAttachment;
+		//Temp.iEndAttachment = info.iEndAttachment;
+		//Temp.iStartColor = info.iStartColor;
+		//Temp.iEndColor = info.iEndColor;
 		Temp.Data = info.Data;
-		Temp.iId = m_TempParticleArray.size() - 1;
+		//Temp.iId = m_TempParticleArray.size() - 1;
 		Temp.flStartTime = gHUD.m_flTime;
 		Temp.bActive = true;
 
+		//Temp.vecStartAttachment = Temp.vecAttachment[info.iStartAttachment];
+		//Temp.vecEndAttachment = Temp.vecAttachment[info.iEndAttachment];
+		Temp.vecDir = info.vecDir; //(Temp.vecEndAttachment - Temp.vecStartAttachment).Normalize();
+		Temp.vecOrigin = info.vecOrigin;
 
-		cl_entity_t* viewent = gEngfuncs.GetViewModel();
-
-		if (viewent)
-		{
-			Temp.vecDir = (viewent->attachment[info.iEndAttachment] - viewent->attachment[info.iStartAttachment]).Normalize();
-			Temp.vecStartAttachment = viewent->attachment[info.iStartAttachment];
-			Temp.vecEndAttachment = viewent->attachment[info.iEndAttachment];
-			
-		}
-		else
-		{
-			 Temp.vecDir = Temp.vecEndAttachment = Temp.vecStartAttachment = { 0, 0, 0 };
-		}
 	}
 
 	bool CParticlePlayer::compare(ParticleInfo& Particle1, ParticleInfo& Particle2)
@@ -170,73 +194,89 @@ namespace cl {
 		vecRenderOrigin[2] = vRenderOrigin[2];
 
 
-		return (Particle1.vecOrigin - vecRenderOrigin).Length() > (Particle2.vecOrigin - vecRenderOrigin).Length();
+		return (Particle1.vecWorldOrigin - vecRenderOrigin).Length() < (Particle2.vecWorldOrigin - vecRenderOrigin).Length();
 	}
-
-
-	void CParticlePlayer::UpdateTempAnimation(void)
+	
+	int CParticlePlayer::Draw(float flTime, matrix3x4& matrix)
 	{
 		cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
 		if (!viewent)
-			return;
+			return 0;
 
-
-		for (auto iter = m_TempParticleArray.begin(); iter != m_TempParticleArray.end();/**/)
+		int index = 0;
+		for (int i = 0; i < m_TempParticleArray.size(); i++)
 		{
+			//删除播放完的队列
+			float currentTime = gHUD.m_flTime - m_TempParticleArray[i].flStartTime;
 
+			if (currentTime < m_TempParticleArray[i].flLifeTime)
+			{
+				m_TempParticleArray[index] = m_TempParticleArray[i];
+				index++;
+			}
+			/*else
+			{
+				m_TempParticleArray[i].bActive = false;
+			}	*/
+		}
+		m_TempParticleArray.resize(index);
+
+
+		for (auto iter = m_TempParticleArray.begin(); iter != m_TempParticleArray.end(); iter++)
+		{
+			//转世界坐标
 			float currentTime = gHUD.m_flTime - iter->flStartTime;
-
-			if (currentTime > iter->flLifeTime)
-			{
-				iter->bActive = false;
-			}
-
-			if (!iter->bActive)
-			{
-				iter = m_TempParticleArray.erase(iter);
-				continue;
-			}
 
 			if (iter->Data.pTexture)
 			{
-				float vUp[3];
-				float vRight[3];
-				float vNormal[3];
-				float vRenderOrigin[3];
+				//float vUp[3];
+				//float vRight[3];
+				//float vNormal[3];
+				//float vRenderOrigin[3];
 
-				IEngineStudio.GetViewInfo(vRenderOrigin, vUp, vRight, vNormal);
-				vec3_t vecOrigin, vecRight, vecUp, vecColor;
-				vec3_t StartAttachment = viewent->attachment[iter->iStartAttachment];
-				vec3_t EndAttachment = viewent->attachment[iter->iEndAttachment];
+				//IEngineStudio.GetViewInfo(vRenderOrigin, vUp, vRight, vNormal);
+				//vec3_t vecOrigin, vecRight, vecUp, vecColor, vecWorldOrigin;
 
-				if (iter->vecDir.IsZero())
-				{
-					VectorLerp(StartAttachment, currentTime / iter->flLifeTime, EndAttachment, vecOrigin);
-				}
-				else
-				{
-					//StartAttachment = iter->vecStartAttachment + iter->vecDir * iter->flSpeed * currentTime;
+				//StartAttachment = iter->vecStartAttachment + iter->vecDir * iter->flSpeed * currentTime;
 
-					VectorLerp(iter->vecStartAttachment, (iter->flSpeed * currentTime) / iter->flLifeTime, iter->vecEndAttachment, vecOrigin);
-				}
+				//VectorLerp(iter->vecStartAttachment, (iter->flSpeed * currentTime) / iter->flLifeTime, iter->vecEndAttachment, vecOrigin);
 
-				VectorLerp(iter->iStartColor, currentTime / iter->flLifeTime, iter->iEndColor, vecColor);
+				//VectorLerp(iter->iStartColor, currentTime / iter->flLifeTime, iter->iEndColor, vecColor);
 
-				iter->vecOrigin = vecOrigin;
-				iter->vecColor[0] = vecColor[0];
-				iter->vecColor[1] = vecColor[1];
-				iter->vecColor[2] = vecColor[2];
-				iter->vecColor[3] = iter->flAlpha;
-
+				iter->vecOrigin += iter->vecDir * iter->flSpeed * gHUD.m_flTimeDelta;
+				//iter->vecColor[0] = vecColor[0];
+				//iter->vecColor[1] = vecColor[1];
+				//iter->vecColor[2] = vecColor[2];
+				//iter->vecColor[3] = iter->flAlpha;
+				VectorTransform(iter->vecOrigin, matrix, iter->vecWorldOrigin);
 			}
 
-			++iter;
-		}
 			
+		}
 
-		std::sort(m_TempParticleArray.begin(), m_TempParticleArray.end(), &compare);
 
+		// std::sort(m_TempParticleArray.begin(), m_TempParticleArray.end(), &compare);
+		float vRenderOrigin[3];
+		IEngineStudio.GetViewInfo(vRenderOrigin, NULL, NULL, NULL);
+		vec3_t vecRenderOrigin = { vRenderOrigin[0],vRenderOrigin[1],vRenderOrigin[2], 0 };
+		//排序vector
+		std::sort(m_TempParticleArray.begin(), m_TempParticleArray.end(), [vecRenderOrigin](const ParticleInfo& a, const ParticleInfo& b) -> bool {
+			//auto a1 = (a.vecWorldOrigin - vecRenderOrigin).LengthSquared();
+			//auto a2 = (b.vecWorldOrigin - vecRenderOrigin).LengthSquared();  
+			auto a1 = (a.vecWorldOrigin[0]-vecRenderOrigin[0]) * (a.vecWorldOrigin[0]-vecRenderOrigin[0]) + 
+					  (a.vecWorldOrigin[1]-vecRenderOrigin[1]) * (a.vecWorldOrigin[1]-vecRenderOrigin[1]) +
+					  (a.vecWorldOrigin[2]-vecRenderOrigin[2]) * (a.vecWorldOrigin[2]-vecRenderOrigin[2]);
+
+			auto a2 = (b.vecWorldOrigin[0]-vecRenderOrigin[0]) * (b.vecWorldOrigin[0]-vecRenderOrigin[0]) + 
+					  (b.vecWorldOrigin[1]-vecRenderOrigin[1]) * (b.vecWorldOrigin[1]-vecRenderOrigin[1]) +
+					  (b.vecWorldOrigin[2]-vecRenderOrigin[2]) * (b.vecWorldOrigin[2]-vecRenderOrigin[2]);
+
+			return a1 > a2;
+		});
+
+
+		//播放,TGA播放必须由远到近播放
 		for (auto iter = m_TempParticleArray.begin(); iter != m_TempParticleArray.end(); iter++)
 		{
 			if (iter->Data.pTexture)
@@ -257,17 +297,11 @@ namespace cl {
 				vecUp[1] = vUp[1];
 				vecUp[2] = vUp[2];
 
-				DrawTGAQuad(iter->Data, iter->vecOrigin, vecRight, vecUp, iter->flSize, iter->vecColor);
+				DrawTGAQuad(iter->Data, iter->vecWorldOrigin, vecRight, vecUp, iter->flSize, iter->vecColor);
 			}
 		}
-	
 
-	}
 
-	
-	int CParticlePlayer::Draw(float flTime)
-	{
-		UpdateTempAnimation();
 		return 1;
 	}
 	
