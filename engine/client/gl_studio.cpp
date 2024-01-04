@@ -2206,73 +2206,84 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 			for (auto iter = g_vecBindSprList.begin(); iter != g_vecBindSprList.end(); iter++)
 			{
-				if (!Q_stricmp(m_pStudioHeader->name, iter->mdlname) && !Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, iter->texname))
+				//if (!Q_stricmp(m_pStudioHeader->name, iter->mdlname) && !Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, iter->texname))
+				//Find model
+				if (!Q_stricmp(m_pStudioHeader->name, iter->mdlname))
 				{
-					
-					int curSeq = RI.currententity->curstate.sequence;
-
-					for (auto iterseq = iter->vecSequence.begin(); iterseq != iter->vecSequence.end(); iterseq++)
+					//Traversal all spr
+					for (auto bindSpr = iter->vecBindSpr.begin(); bindSpr != iter->vecBindSpr.end(); bindSpr++)
 					{
-						if (curSeq == iterseq->index)
+						if (pskinref[pmesh->skinref] == bindSpr->texIndex)
 						{
-							model_t* pModel = Mod_ForName(iter->sprname, false);
+							int curSeq = RI.currententity->curstate.sequence;
 
-							float frame = 0.0;
-							float framerate = iter->sprFPS;
-							int startFrame = iterseq->startFrame ? iterseq->startFrame : 0;
-							int maxframe = pModel->numframes - 1;
-
-							int endFrame = iterseq->endFrame ? iterseq->endFrame : maxframe;
-
-							bool isSyncFrame = iterseq->isSyncFrame;
-							if (isSyncFrame)
+							for (auto iterseq = bindSpr->vecSequence.begin(); iterseq != bindSpr->vecSequence.end(); iterseq++)
 							{
-								mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
-
-								frame = R_StudioEstimateFrame(RI.currententity, pseqdesc) / pseqdesc->numframes * (endFrame - startFrame)+ startFrame;
-
-								if (iterseq->isLoop)
+								if (curSeq == iterseq->index)
 								{
-									frame = startFrame;
-								}
-							}
-							else
-							{
-								//double dt = (cl.time - cl.oldtime);
-								//frame += dt * framerate;
+									model_t* pModel = Mod_ForName(bindSpr->sprName, false);
 
-								frame = framerate * (cl.time - RI.currententity->curstate.animtime) + startFrame;
+									float frame = 0.0;
+									float framerate = bindSpr->sprFPS;
+									int startFrame = iterseq->startFrame ? iterseq->startFrame : 0;
+									int maxframe = pModel->numframes - 1;
 
-								if (frame > maxframe)
-								{
-									if (iterseq->isLoop)
+									int endFrame = iterseq->endFrame ? iterseq->endFrame : maxframe;
+
+									bool isSyncFrame = iterseq->isSyncFrame;
+									if (isSyncFrame)
 									{
-										frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
-										//frame = frame - (int)frame;
-										//frame = startFrame;
+										mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + RI.currententity->curstate.sequence;
+
+										frame = R_StudioEstimateFrame(RI.currententity, pseqdesc) / pseqdesc->numframes * (endFrame - startFrame) + startFrame;
+
+										if (iterseq->isLoop)
+										{
+											frame = startFrame;
+										}
 									}
 									else
-										frame = maxframe;
+									{
+										//double dt = (cl.time - cl.oldtime);
+										//frame += dt * framerate;
+
+										frame = framerate * (cl.time - RI.currententity->curstate.animtime) + startFrame;
+
+										if (frame > maxframe)
+										{
+											if (iterseq->isLoop)
+											{
+												frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
+												//frame = frame - (int)frame;
+												//frame = startFrame;
+											}
+											else
+												frame = maxframe;
+										}
+									}
+
+									auto pspriteframe = R_GetSpriteFrame(pModel, frame, 0.0);
+									int index = pspriteframe->gl_texturenum;
+
+									if (pspriteframe->gl_texturenum)
+									{
+										xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
+										extern std::set<model_t*> persist_models;
+										persist_models.insert(pModel);
+									}
+
+									bBindSpr = true;
+									break;
 								}
 							}
 
-							auto pspriteframe = R_GetSpriteFrame(pModel, frame, 0.0);
-							int index = pspriteframe->gl_texturenum;
-
-							if (pspriteframe->gl_texturenum)
-							{
-								xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
-								extern std::set<model_t*> persist_models;
-								persist_models.insert(pModel);
-							}
-
-							bBindSpr = true;
-							break;
+							if (bBindSpr)
+								break;
 						}
 					}
 
 					if (bBindSpr)
-						break;			
+						break;
 				}
 			}
 			

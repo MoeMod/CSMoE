@@ -28,32 +28,29 @@ struct seq
 	int offsetFrame;	//???
 };
 
-struct SprList
+struct texInfo
 {
-
-	SprList()
-	{
-		memset(mdlname, 0, sizeof(mdlname));
-		memset(texname, 0, sizeof(texname));
-		memset(sprname, 0, sizeof(sprname));
-
-		sprFPS = 0;
-	};
-
-	char mdlname[64];
-	char texname[64];
-	char sprname[64];
+	int texIndex;
+	char sprName[64];
 	float sprFPS;
 	std::vector<seq> vecSequence;
 };
 
+struct SprList
+{
+	SprList()
+	{
+		memset(mdlname, 0, sizeof(mdlname));
+	};
+
+	char mdlname[64];
+	std::vector<texInfo> vecBindSpr;
+};
+
 struct ConstSprList
 {
-	const char* mdlname;
-	const char* texname;
-	const char* sprname;
-	float sprFPS;
-	std::vector<seq> vecSequence;
+	char mdlname[64];
+	std::vector<texInfo> vecBindSpr;
 };
 
 class CBindSprManager
