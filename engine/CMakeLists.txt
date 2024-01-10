@@ -256,6 +256,7 @@ set(XASH_ENGINE_CLIENT_SOURCES
    client/gl_sprbat.cpp
    client/in_gyroscope.cpp
    client/gl_bindbmp.cpp
+   client/gl_triapi.cpp
 )
 
 set(XASH_ENGINE_IMGUI_SOURCES

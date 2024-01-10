@@ -22,7 +22,7 @@ GNU General Public License for more details.
 #include "mod_local.h"
 #include "input.h"
 #include "gl_vidnt.h"
-#include <triangleapi.h>
+#include "gl_triapi.h"
 extern triangleapi_t gTriApi;
 
 #if defined(XASH_WINRT)
@@ -1163,6 +1163,7 @@ qboolean R_Init( void )
 	GL_SetDefaults();
 	R_CheckVBO();
 	R_InitImages();
+	TriAPI_Init();
 	R_SpriteInit();
 	R_StudioInit();
     R_BspInit();
@@ -1200,6 +1201,7 @@ void R_Shutdown( void )
 
     R_BspShutdown();
     R_StudioShutdown();
+	TriAPI_Shutdown();
 	GL_RemoveCommands();
 	R_ShutdownImages();
 

@@ -113,11 +113,6 @@ struct beam_s* CL_BeamPoints_Tracer(const vec3_t start, const vec3_t end, int mo
 //BEAM* CL_BeamParticle(int startEnt, int modelIndex1, int modelIndex2, int modelIndex3, float scale, float freq, float fadetime, int count, int random, int speed);
 void  CL_FancySpray(const vec3_t pos, int count, float fadetime, float scale, int iRand, float speed, int id1, int id2, int id3,float r,float g,float b,float frametime,int randomcolor);
 
-// TriAPI
-void TriVertex3fv( const float *v );
-void TriNormal3fv( const float *v );
-void TriColor4f( float r, float g, float b, float a );
-int TriSpriteTexture( model_t *pSpriteModel, int frame );
-int TriWorldToScreen( const vec3_t world, vec3_t_ref screen );
+#include "gl_triapi.h"
 
 #endif//CL_TENT_H

@@ -286,11 +286,7 @@ namespace physics
 		pglDisable(GL_DEPTH_TEST);
 		pglLineWidth(1);
 
-		clgame.ds.triColor[0] = (byte)bound(0, (color1.getX() * 255.0f), 255);
-		clgame.ds.triColor[1] = (byte)bound(0, (color1.getY() * 255.0f), 255);
-		clgame.ds.triColor[2] = (byte)bound(0, (color1.getZ() * 255.0f), 255);
-		clgame.ds.triColor[3] = (byte)bound(0, (1.0f * 255.0f), 255);
-		pglColor4ub(clgame.ds.triColor[0], clgame.ds.triColor[1], clgame.ds.triColor[2], clgame.ds.triColor[3]);
+		gTriApi.Color4f(color1.getX(), color1.getY(), color1.getZ(), 1);
 		gTriApi.Begin(TRI_LINES);
 
 		vec3_t from = { from1.getX(), from1.getY(), from1.getZ() };
