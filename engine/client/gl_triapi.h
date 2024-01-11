@@ -18,6 +18,8 @@ int TriWorldToScreen( const vec3_t world, vec3_t_ref screen );
 void TriFog( const vec3_t flFogColor, float flStart, float flEnd, int bOn );
 void TriGetMatrix( const int pname, float *matrix );
 void TriFogParams( float flDensity, int iFogSkybox );
+void TriColor4fRendermode( float r, float g, float b, float a, int rendermode );
+void TriPointSize(float x); // Xash3D added
 
 void TriAPI_Init();
 void TriAPI_Shutdown();

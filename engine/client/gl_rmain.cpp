@@ -26,6 +26,7 @@ GNU General Public License for more details.
 #include "entity_types.h"
 #include "gl_texlru.h"
 #include "gl_sprbat.h"
+#include "gl_triapi.h"
 
 #ifdef XASH_RAGDOLL
 #include "physics.h"
@@ -897,7 +898,7 @@ static void R_SetupGL( void )
 
     pglDisable( GL_BLEND );
     pglDisable( GL_ALPHA_TEST );
-    pglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	TriColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 }
 
 /*

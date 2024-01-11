@@ -514,7 +514,7 @@ void CL_UpdateParticle( particle_t *p, float ft )
 
 	gTriApi.TexCoord2f( 0.0f, 1.0f );
 	gTriApi.Vertex3f( p->org[0] - right[0] + up[0], p->org[1] - right[1] + up[1], p->org[2] - right[2] + up[2] );
-	pglTexCoord2f( 0.0f, 0.0f );
+	gTriApi.TexCoord2f( 0.0f, 0.0f );
 	gTriApi.Vertex3f( p->org[0] + right[0] + up[0], p->org[1] + right[1] + up[1], p->org[2] + right[2] + up[2] );
 	gTriApi.TexCoord2f( 1.0f, 0.0f );
 	gTriApi.Vertex3f( p->org[0] + right[0] - up[0], p->org[1] + right[1] - up[1], p->org[2] + right[2] - up[2] );

@@ -796,7 +796,7 @@ static void GL_SetDefaults( void )
 	pglEnable( GL_TEXTURE_2D );
 	pglShadeModel( GL_FLAT );
 
-	pglPointSize( 1.2f );
+	TriPointSize( 1.2f );
 	pglLineWidth( 1.2f );
 
 	GL_Cull( 0 );

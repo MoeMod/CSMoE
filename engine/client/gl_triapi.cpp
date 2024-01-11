@@ -51,6 +51,7 @@ namespace xe {
 		struct {
 			GLint tex;
 			GLint muWVP;
+			GLint uPointSize;
 		} uniform;
 
 		struct {
@@ -69,6 +70,8 @@ namespace xe {
 		vec3_t cur_pos = { 0, 0, 0 };
 		vec2_t cur_uv = { 0, 0 };
 		vec4_t cur_col = { 1, 1, 1, 1 };
+
+		float cur_point_size = 1.2f;
 
 		void InsertVert()
 		{
@@ -183,6 +186,7 @@ namespace xe {
 					xe::GetShaderVersionString(),
 					R"(
 uniform mat4 muWVP;
+uniform float uPointSize;
 attribute vec3 pos;
 attribute vec2 uv;
 attribute vec4 col;
@@ -193,6 +197,7 @@ varying vec4 vvColor;
 void main(void)
 {
     gl_Position = muWVP * vec4(pos.x, pos.y, pos.z, 1.0);
+	gl_PointSize = uPointSize;
     vvTexCoord = uv;
 	vvColor = col;
 }
@@ -230,6 +235,7 @@ void main (void)
 
 			this->uniform.tex = pglGetUniformLocationARB(this->program, "tex");
 			this->uniform.muWVP = pglGetUniformLocationARB(this->program, "muWVP");
+			this->uniform.uPointSize = pglGetUniformLocationARB(this->program, "uPointSize");
 
 			this->attrib.pos = pglGetAttribLocationARB(this->program, "pos");
 			this->attrib.uv = pglGetAttribLocationARB(this->program, "uv");
@@ -376,6 +382,7 @@ void GAME_EXPORT TriEnd( void )
 	pglUseProgramObjectARB(xe::TriFFE.program);
 	pglUniform1iARB(xe::TriFFE.uniform.tex, 0);
 	pglUniformMatrix4fvARB(xe::TriFFE.uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
+	pglUniform1fARB(xe::TriFFE.uniform.uPointSize, xe::TriFFE.cur_point_size);
 
 	pglBindBufferARB(GL_ARRAY_BUFFER_ARB, xe::TriFFE.vbo);
 	pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, xe::TriFFE.ebo);
@@ -660,5 +667,28 @@ void GAME_EXPORT TriBrightness( float brightness )
 	rgba[3] = clgame.ds.triColor[3] * brightness;
 
 	pglColor4ubv( rgba );
+#endif
+}
+
+/*
+=============
+TriColor4fRendermode
+
+Heavy legacy of Quake...
+=============
+*/
+void GAME_EXPORT TriColor4fRendermode( float r, float g, float b, float a, int rendermode )
+{
+	if( rendermode == kRenderTransAlpha )
+		TriColor4f( r, g, b, a );
+	else TriColor4f( r * a, g * a, b * a, 1.0f );
+}
+
+void GAME_EXPORT TriPointSize(float x)
+{
+#if XASH_SHADER_TRIAPI
+	xe::TriFFE.cur_point_size = x;
+#else
+	pglPointSize( x );
 #endif
 }

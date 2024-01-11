@@ -2495,7 +2495,7 @@ static void GAME_EXPORT R_StudioDrawHulls( void )
 		alpha = 0.5f;
 	else alpha = 1.0f;
 
-	pglDisable( GL_TEXTURE_2D );
+	GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
 
 	for( i = 0; i < m_pStudioHeader->numhitboxes; i++ )
 	{
@@ -2570,8 +2570,6 @@ static void GAME_EXPORT R_StudioDrawHulls( void )
 		gTriApi.Vertex3fv( v2[5] );
 		gTriApi.End( );			
 	}
-
-	pglEnable( GL_TEXTURE_2D );
 }
 
 /*
@@ -2631,14 +2629,14 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 	vec3_t		point;
 	int		i;
 
-	pglDisable( GL_TEXTURE_2D );
+	GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
 
 	for( i = 0; i < m_pStudioHeader->numbones; i++ )
 	{
 		if( pbones[i].parent >= 0 )
 		{
-			pglPointSize( 3.0f );
-			pglColor3f( 1, 0.7f, 0 );
+			TriPointSize( 3.0f );
+			gTriApi.Color4f( 1, 0.7f, 0, 1 );
 			gTriApi.Begin( TRI_LINES );
 			
 			Matrix3x4_OriginFromMatrix( g_bonestransform[pbones[i].parent], point );
@@ -2648,7 +2646,7 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 			
 			gTriApi.End();
 
-			pglColor3f( 0, 0, 0.8f );
+			gTriApi.Color4f( 0, 0, 0.8f, 1 );
 			gTriApi.Begin( TRI_POINTS );
 			if( pbones[pbones[i].parent].parent != -1 )
 			{
@@ -2662,24 +2660,20 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 		else
 		{
 			// draw parent bone node
-			pglPointSize( 5.0f );
-			pglColor3f( 0.8f, 0, 0 );
+			TriPointSize( 5.0f );
+			gTriApi.Color4f( 0.8f, 0, 0, 1 );
 			gTriApi.Begin( TRI_POINTS );
 			Matrix3x4_OriginFromMatrix( g_bonestransform[i], point );
 			gTriApi.Vertex3fv( point );
 			gTriApi.End();
 		}
 	}
-
-	pglPointSize( 1.0f );
-	pglEnable( GL_TEXTURE_2D );
 }
 
 static void R_StudioDrawAttachments( void )
 {
 	int	i;
-	
-	pglDisable( GL_TEXTURE_2D );
+	GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
 	pglDisable( GL_DEPTH_TEST );
 	
 	for( i = 0; i < m_pStudioHeader->numattachments; i++ )
@@ -2694,29 +2688,27 @@ static void R_StudioDrawAttachments( void )
 		Matrix3x4_VectorTransform( g_bonestransform[pattachments[i].bone], pattachments[i].vectors[2], v[3] );
 		
 		gTriApi.Begin( TRI_LINES );
-		pglColor3f( 1, 0, 0 );
+		gTriApi.Color4f( 1, 0, 0, 1 );
 		gTriApi.Vertex3fv( v[0] );
-		pglColor3f( 1, 1, 1 );
+		gTriApi.Color4f( 1, 1, 1, 1 );
 		gTriApi.Vertex3fv (v[1] );
-		pglColor3f( 1, 0, 0 );
+		gTriApi.Color4f( 1, 0, 0, 1 );
 		gTriApi.Vertex3fv (v[0] );
-		pglColor3f( 1, 1, 1 );
+		gTriApi.Color4f( 1, 1, 1, 1 );
 		gTriApi.Vertex3fv (v[2] );
-		pglColor3f( 1, 0, 0 );
+		gTriApi.Color4f( 1, 0, 0, 1 );
 		gTriApi.Vertex3fv (v[0] );
-		pglColor3f( 1, 1, 1 );
+		gTriApi.Color4f( 1, 1, 1, 1 );
 		gTriApi.Vertex3fv( v[3] );
 		gTriApi.End();
 
-		pglPointSize( 5.0f );
-		pglColor3f( 0, 1, 0 );
+		TriPointSize( 5.0f );
+		gTriApi.Color4f( 0, 1, 0, 1 );
 		gTriApi.Begin( TRI_POINTS );
 		gTriApi.Vertex3fv( v[0] );
 		gTriApi.End();
-		pglPointSize( 1.0f );
 	}
 
-	pglEnable( GL_TEXTURE_2D );
 	pglEnable( GL_DEPTH_TEST );
 }
 

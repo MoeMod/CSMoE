@@ -631,7 +631,7 @@ static void SPR_DrawGeneric( int frame, float x, float y, float width, float hei
 #if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_DrawImage( texnum, x, y, x + width, y + height, s1, t1, s2, t2,  clgame.ds.spriteColor[0], clgame.ds.spriteColor[1], clgame.ds.spriteColor[2], clgame.ds.spriteColor[3] );
 #else
-	pglColor4ubv( clgame.ds.spriteColor );
+	gTriApi.Color4ub( clgame.ds.spriteColor[0], clgame.ds.spriteColor[1], clgame.ds.spriteColor[2], clgame.ds.spriteColor[3] );
 	R_DrawStretchPic( x, y, width, height, s1, t1, s2, t2, texnum );
 #endif
 }
@@ -758,12 +758,12 @@ void CL_DrawScreenFade( void )
 	else ImGui_Surface_SetRenderMode( kRenderTransTexture );
 	ImGui_Surface_DrawRectangle(0, 0, scr_width->integer, scr_height->integer, sf->fader, sf->fadeg, sf->fadeb, iFadeAlpha);
 #else
-	pglColor4ub( sf->fader, sf->fadeg, sf->fadeb, iFadeAlpha );
+	gTriApi.Color4ub( sf->fader, sf->fadeg, sf->fadeb, iFadeAlpha );
 	if( sf->fadeFlags & FFADE_MODULATE )
 		GL_SetRenderMode( kRenderTransAdd );
 	else GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( 0, 0, scr_width->integer, scr_height->integer, 0, 0, 1, 1, cls.fillImage );
-	pglColor4ub( 255, 255, 255, 255 );
+	gTriApi.Color4ub( 255, 255, 255, 255 );
 #endif
 }
 
@@ -1048,7 +1048,7 @@ static void CL_DrawLoading( float percent )
 		ImGui_Surface_SetRenderMode( kRenderTransTexture );
 		ImGui_Surface_DrawImage( cls.loadingBar, x, y, x + width, y + height, 0, 0, 1, 1, 128, 128, 128, 255 );
 #else
-		pglColor4ub( 128, 128, 128, 255 );
+		gTriApi.Color4ub( 128, 128, 128, 255 );
 		GL_SetRenderMode( kRenderTransTexture );
 		R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cls.loadingBar );
 #endif
@@ -1062,10 +1062,10 @@ static void CL_DrawLoading( float percent )
 		ImGui_Surface_SetRenderMode( kRenderTransTexture );
 		ImGui_Surface_DrawImage( cls.loadingBar, x, y, x + width, y + height, 0, 0, s2, 1, 208, 152, 0, 255 );
 #else
-		pglColor4ub( 208, 152, 0, 255 );
+		gTriApi.Color4ub( 208, 152, 0, 255 );
 		GL_SetRenderMode( kRenderTransTexture );
 		R_DrawStretchPic( x, y, width, height, 0, 0, s2, 1, cls.loadingBar );
-		pglColor4ub( 255, 255, 255, 255 );
+		gTriApi.Color4ub( 255, 255, 255, 255 );
 #endif
 	}
 	else
@@ -1074,7 +1074,7 @@ static void CL_DrawLoading( float percent )
 		ImGui_Surface_SetRenderMode( kRenderTransTexture );
 		ImGui_Surface_DrawImage( cls.loadingBar, x, y, x + width, y + height, 0, 0, 1, 1, 255, 255, 255, 255 );
 #else
-		pglColor4ub( 255, 255, 255, 255 );
+		gTriApi.Color4ub( 255, 255, 255, 255 );
 		GL_SetRenderMode( kRenderTransTexture );
 		R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cls.loadingBar );
 #endif
@@ -1109,7 +1109,7 @@ static void CL_DrawPause( void )
 	ImGui_Surface_SetRenderMode( kRenderTransTexture );
 	ImGui_Surface_DrawImage( cls.pauseIcon, x, y, x + width, y + height, 0, 0, 1, 1, 255, 255, 255, 255 );
 #else
-	pglColor4ub( 255, 255, 255, 255 );
+	gTriApi.Color4ub( 255, 255, 255, 255 );
 	GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cls.pauseIcon );
 #endif
@@ -1595,13 +1595,13 @@ void GAME_EXPORT CL_FillRGBA( int x, int y, int width, int height, int r, int g,
 	g = bound( 0, g, 255 );
 	b = bound( 0, b, 255 );
 	a = bound( 0, a, 255 );
-	pglColor4ub( r, g, b, a );
+	gTriApi.Color4ub( r, g, b, a );
 
 	SPR_AdjustSize( &x1, &y1, &w1, &h1 );
 
 	GL_SetRenderMode( kRenderTransAdd );
 	R_DrawStretchPic( x1, y1, w1, h1, 0, 0, 1, 1, cls.fillImage );
-	pglColor4ub( 255, 255, 255, 255 );
+	gTriApi.Color4ub( 255, 255, 255, 255 );
 #endif
 }
 
@@ -3139,13 +3139,13 @@ void GAME_EXPORT CL_FillRGBABlend( int x, int y, int width, int height, int r, i
 	g = bound( 0, g, 255 );
 	b = bound( 0, b, 255 );
 	a = bound( 0, a, 255 );
-	pglColor4ub( r, g, b, a );
+	gTriApi.Color4ub( r, g, b, a );
 
 	SPR_AdjustSize( &x1, &y1, &w1, &h1 );
 
 	GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( x1, y1, w1, h1, 0, 0, 1, 1, cls.fillImage );
-	pglColor4ub( 255, 255, 255, 255 );
+	gTriApi.Color4ub( 255, 255, 255, 255 );
 #endif
 }
 
@@ -3202,20 +3202,6 @@ void GAME_EXPORT TriLightAtPoint( const vec3_t pos, float *value )
 	value[0] = (float)ambient.r * 255.0f;
 	value[1] = (float)ambient.g * 255.0f;
 	value[2] = (float)ambient.b * 255.0f;
-}
-
-/*
-=============
-TriColor4fRendermode
-
-Heavy legacy of Quake...
-=============
-*/
-void GAME_EXPORT TriColor4fRendermode( float r, float g, float b, float a, int rendermode )
-{
-	if( rendermode == kRenderTransAlpha )
-		pglColor4f( r, g, b, a );
-	else pglColor4f( r * a, g * a, b * a, 1.0f );
 }
 
 /*
