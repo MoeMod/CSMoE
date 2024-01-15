@@ -1037,44 +1037,9 @@ register VBO cvars and get default value
 */
 static void R_CheckVBO( void )
 {
-	const char *def = "1";
-	const char *dlightmode = "1";
-	int flags = CVAR_ARCHIVE;
-	qboolean disable = false;
-
-	// some bad GLES1 implementations breaks dlights completely
-	if( glConfig.max_texture_units < 3 )
-		disable = true;
-
-#ifdef XASH_MOBILE_PLATFORM
-	// VideoCore4 drivers have a problem with mixing VBO and client arrays
-	// Disable it, as there is no suitable workaround here
-	if( Q_stristr( glConfig.renderer_string, "VideoCore IV" ) || Q_stristr( glConfig.renderer_string, "vc4" ) )
-		disable = true;
-
-	// dlightmode 1 is not too much tested on android
-	// so better to left it off
-	dlightmode = "0";
-#endif
-
-#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
-	disable = true;
-#endif
-
-	if( disable )
-	{
-		// do not keep in config unless dev > 3 and enabled
-		flags = CVAR_READ_ONLY;
-		def = "0";
-	}
-
-	r_vbo = Cvar_Get( "r_vbo", def, flags, "draw world using VBO" );
-	r_bump = Cvar_Get( "r_bump", def, CVAR_ARCHIVE, "enable bump-mapping (r_vbo required)" );
-	r_vbo_dlightmode = Cvar_Get( "r_vbo_dlightmode", dlightmode, CVAR_ARCHIVE, "vbo dlight rendering mode(0-1)" );
-
-	// check if enabled manually
-	if( r_vbo->integer && host.developer > 3 )
-		r_vbo->flags |= CVAR_ARCHIVE;
+	r_vbo = Cvar_Get( "r_vbo", "0", CVAR_READ_ONLY, "draw world using VBO" );
+	r_bump = Cvar_Get( "r_bump", "0", CVAR_READ_ONLY, "enable bump-mapping (r_vbo required)" );
+	r_vbo_dlightmode = Cvar_Get( "r_vbo_dlightmode", "1", CVAR_ARCHIVE, "vbo dlight rendering mode(0-1)" );
 }
 
 static int GetCommandLineIntegerValue(const char* argName)

@@ -77,7 +77,6 @@ Restore identity texmatrix
 void R_EndDrawMirror( void )
 {
 	GL_CleanUpTextureUnits( 0 );
-	pglMatrixMode( GL_MODELVIEW );
 }
 
 /*
