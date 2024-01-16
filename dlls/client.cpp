@@ -3756,6 +3756,12 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		wdnmdmenu::ShowWdnmdMenu(player);
 	}
+	else if (FStrEq(pcmd, "clearjson"))
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, player->pev);
+		WRITE_BYTE(54);
+		MESSAGE_END();
+	}
 	else if (FStrEq(pcmd, "moe_fun"))
 	{
 		moefunmenu::ShowMoeFunMenu(player);

@@ -27,10 +27,12 @@
 #include "cbase.h"
 #include "weapons.h"
 #include "cs_wpn/bte_weapons.h"
+#include "ParticlePlayer.h"
 #include "gamemode/zb2/zb2_const.h"
 
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
+	extern CParticlePlayer g_ParticleManager;
 
 	extern float g_flBloodhunterAnimTime;
 	extern int g_iBloodhunterSecAnim;
@@ -847,6 +849,54 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	
 		}
 
+		break;
+	}
+	case 52:
+	{
+		vec3_t dir;
+		vec3_t startboneoffset;
+		vec3_t startcolor;
+		vec3_t endcolor;
+		const char* texture = reader.ReadString();
+		int channel = reader.ReadByte();
+		int emitcount = reader.ReadByte();
+		float intervaltime = reader.ReadShort() * 0.01;
+		float life = reader.ReadShort() * 0.01;
+		float speed = reader.ReadShort() * 0.1;
+		float startsize = reader.ReadShort() * 0.1;
+		float endsize = reader.ReadShort() * 0.1;
+		int startbone = reader.ReadByte();
+		int endbone = reader.ReadByte();
+		int startattachment = reader.ReadByte();
+		int endattachment = reader.ReadByte();
+		startboneoffset.x = reader.ReadCoord();
+		startboneoffset.y = reader.ReadCoord();
+		startboneoffset.z = reader.ReadCoord();
+		dir.x = reader.ReadCoord();
+		dir.y = reader.ReadCoord();
+		dir.z = reader.ReadCoord();
+		startcolor.x = reader.ReadByte();
+		startcolor.y = reader.ReadByte();
+		startcolor.z = reader.ReadByte();
+		endcolor.x = reader.ReadByte();
+		endcolor.y = reader.ReadByte();
+		endcolor.z = reader.ReadByte();
+		float startalpha = float(reader.ReadByte()) / 255.0;
+		float endalpha = float(reader.ReadByte()) / 255.0;
+
+		g_ParticleManager.MSG_AddParticle(texture, channel, emitcount, intervaltime, life, speed, startsize, endsize, startbone, endbone, startattachment, endattachment, startboneoffset, dir, startcolor, endcolor, startalpha, endalpha, { 0, 0, 0 }, { 0, 0, 0 });
+		break;
+	}
+	case 53:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		gHUD.m_SniperScope.SetHeartBeat(arg1, arg2);
+		break;
+	}
+	case 54:
+	{
+		g_ParticleManager.ClearPrecache();
 		break;
 	}
 	case 78:	// play sound

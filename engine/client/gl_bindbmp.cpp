@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "studio.h"
 
 #include "gl_studioshader.h"
+#include "../../3rdparty/json/single_include/nlohmann/json.hpp"
 
 std::vector<BMPList> g_vecBindBMPList;
 
@@ -140,6 +141,18 @@ void CBindBMPManager::Vidinit(void)
 	LoadBMP(&s_ModelMechanicHand);
 	LoadBMP(&s_ModelDualStingerA);
 	LoadBMP(&s_ModelDualStingerB);
+
+	fs_offset_t length;
+
+	nlohmann::json g_VVIPEyeWeapons;
+
+	auto data = FS_MapFile("ExternModel.json", &length, true);
+	if (data)
+	{
+		g_VVIPEyeWeapons = nlohmann::json::parse(std::string_view((const char*)data, length));
+		FS_MapFree(data, length);
+	}
+
 
 }
 

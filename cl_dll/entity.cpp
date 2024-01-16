@@ -20,10 +20,13 @@
 #include "r_efx.h"
 #include "event_api.h"
 #include "player/player_model.h"
+#include "ParticlePlayer.h"
 
 namespace cl {
 
 extern engine_studio_api_t IEngineStudio;
+
+extern CParticlePlayer g_ParticleManager;
 
 extern vec3_t v_origin;
 
@@ -328,6 +331,12 @@ void DLLEXPORT HUD_StudioEvent( const struct mstudioevent_s *event, const struct
 		}
 
 		gEngfuncs.pfnPlaySoundByNameAtLocation((char*)event->options, 1.0, entity->origin);
+		break;
+	}
+	case 5040:
+	{
+		g_ParticleManager.ReadTempParticleInfo((char*)event->options);
+
 		break;
 	}
 	case 5050:

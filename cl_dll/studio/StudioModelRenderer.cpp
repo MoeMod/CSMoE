@@ -51,6 +51,7 @@ namespace cl {
 
 extern CGameStudioModelRenderer g_StudioRenderer;
 extern engine_studio_api_t IEngineStudio;
+CParticlePlayer g_ParticleManager;
 typedef struct pmtrace_s pmtrace_t;
 
 struct model_s* CStudioModelRenderer::s_pBuffAugViewModel;
@@ -163,9 +164,12 @@ struct model_s* CStudioModelRenderer::s_pLaserFistPModel;
 struct model_s* CStudioModelRenderer::s_pLaserFistEXPModel;
 
 struct model_s* CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel;
+struct model_s* CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model;
 
 struct model_s* CStudioModelRenderer::s_pLightningARPModel;
 
+struct model_s* CStudioModelRenderer::s_pM4A1_S_TransformersViewModel;
+struct model_s* CStudioModelRenderer::s_pRingModel;
 
 int g_iLeapStrikeGunAnim = 0;
 float g_iLeapStrikeGunAnimTime = 0.0;
@@ -190,6 +194,27 @@ void CStudioModelRenderer::Init(void)
 	m_protationmatrix = IEngineStudio.StudioGetRotationMatrix();
 
 	g_ParticleManager.Init();
+
+	m_vecViewModels.clear();
+	fs_offset_t length;
+	nlohmann::json viewmodel;
+
+	auto data = gFileSystemAPI.FS_MapFile("ViewModel.json", &length, true);
+	if (data)
+	{
+		viewmodel = nlohmann::json::parse(std::string_view((const char*)data, length));
+		gFileSystemAPI.FS_MapFree(data, length);
+
+		for (auto& info : viewmodel)
+		{
+			std::string szName = info["Name"].get<std::string>();
+			int iFOV = info["FOV"].get<int>();
+			float flAspect = info["aspect"].get<float>();
+
+			m_vecViewModels.insert(std::pair<std::string, ViewModel>(szName, { iFOV, flAspect }));
+		}
+	}
+
 }
 
 CStudioModelRenderer::CStudioModelRenderer(void)
@@ -955,7 +980,7 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 	static vec3_t pos[MAXSTUDIOBONES];
 	matrix3x4 bonematrix;
 	static vec4_t q[MAXSTUDIOBONES];
-
+	//m_pStudioHeader为要拼合的p模型
 	if( !m_pStudioHeader || !m_pCurrentEntity )
 		return;
 
@@ -974,11 +999,82 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 	StudioCalcRotations(pos, q, pseqdesc, panim, f);
 
 	pbones = (mstudiobone_t *)((byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
+	//p模型的关节点
+	if (CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model && m_pSubModel == CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model)
+	{
+		for (i = 0; i < m_pStudioHeader->numbones; i++)
+		{
+			QuaternionMatrix(q[i], bonematrix);
+
+			bonematrix[0][3] = pos[i][0];
+			bonematrix[1][3] = pos[i][1];
+			bonematrix[2][3] = pos[i][2];
+
+			if (pbones[i].parent == -1)
+			{
+				for (j = 0; j < m_nCachedBones; j++)
+				{
+					if (stricmp(m_nCachedBoneNames[j], "FvARM-bone L Hand") == 0)
+					{
+						MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
+						//ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
+						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
+						break;
+					}
+				}
+
+				StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
+			}
+			else
+			{
+				ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
+				ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
+			}
+		}
+
+		return;
+	}
+
+	if (CStudioModelRenderer::s_pRingModel && m_pSubModel == CStudioModelRenderer::s_pRingModel)
+	{
+		for (i = 0; i < m_pStudioHeader->numbones; i++)
+		{
+			QuaternionMatrix(q[i], bonematrix);
+
+			bonematrix[0][3] = pos[i][0];
+			bonematrix[1][3] = pos[i][1];
+			bonematrix[2][3] = pos[i][2];
+
+			if (pbones[i].parent == -1)
+			{
+				for (j = 0; j < m_nCachedBones; j++)
+				{
+					if (stricmp(m_nCachedBoneNames[j], "Box002") == 0)
+					{
+						MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
+						//ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
+						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
+						break;
+					}
+				}
+
+				StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
+			}
+			else
+			{
+				ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
+				ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
+			}
+		}
+		
+		return;
+	}
 
 	for (i = 0; i < m_pStudioHeader->numbones; i++)
 	{
 		for (j = 0; j < m_nCachedBones; j++)
 		{
+			//m_nCachedBoneNames是StudioSaveBones保存下来的名字,如果一样，一起加入变换
 			if (stricmp(pbones[i].name, m_nCachedBoneNames[j]) == 0)
 			{
 				MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
@@ -986,7 +1082,7 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 				break;
 			}
 		}
-
+		//要合并的模型独立的部分，加入进去
 		if (j >= m_nCachedBones)
 		{
 			QuaternionMatrix(q[i], bonematrix);
@@ -1041,127 +1137,6 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 	else
 		gunmodel = false;
 
-	if (gunmodel)
-	{
-		int WeaponID, KnifeID, GrenadeID;
-
-		R_StudioGetWeaponID(WeaponID, KnifeID, GrenadeID);
-
-		switch (WeaponID)
-		{
-		case WEAPON_Z4B_M82A1ANGELICBEAST:
-		{
-			fov = 35;
-			aspect = 1.45;
-			recaclFov = true;
-			break;
-		}
-		case WEAPON_Z4B_DEAGLEEL:
-		case WEAPON_Z4B_AK47_ANGELICBEAST:
-		case WEAPON_Z4B_RAGINGBULL:
-		case WEAPON_Z4B_STEYRTMPD:
-		case WEAPON_Z4B_M4A1_S_TRANSFORMERS:
-		{	
-			fov = 45;
-			aspect = 1.45;
-			recaclFov = true;
-			break;
-		}
-		case WEAPON_Z4B_MECHANICXM214:
-		{
-			fov = 40;
-			aspect = 1.45;
-			recaclFov = true;
-			break;
-		}
-		case WEAPON_KNIFE:
-		{
-			switch (KnifeID)
-			{
-			case KNIFE_HEARTSTIMULATER:
-			case KNIFE_DUALSTINGER:
-			case KNIFE_DUALSLAYER:
-			{
-				fov = 45;
-				aspect = 1.45;
-				recaclFov = true;
-				break;
-			}
-			case KNIFE_MECHANICHAND:
-			{
-				fov = 53;
-				aspect = 1.5;
-				recaclFov = true;
-				break;
-			}
-			case KNIFE_HOLYFIST:
-			{
-				fov = 52;
-				aspect = 1.95;
-				recaclFov = true;
-				break;
-			}
-			case KNIFE_DUALKUKRI:
-			{
-				fov = 35;
-				aspect = 1.45;
-				recaclFov = true;
-				break;
-			}
-			case KNIFE_DUALAXE:
-			{
-				fov = 55;
-				aspect = 1.45;
-				recaclFov = true;
-				break;
-			}
-			case KNIFE_SHOVELEX:
-			{
-				if (m_pCurrentEntity->model == s_pBalisongLuminousEdgeViewModel)
-				{
-					fov = 45;
-					aspect = 1.45;
-					recaclFov = true;
-					break;
-				}
-			}
-			}
-		}
-		case WEAPON_HEGRENADE:
-		{
-			switch (GrenadeID)
-			{
-			case WEAPON_MECHANICHEROGUN:
-			case GRENADE_ICEGRENADE:
-			{
-				fov = 45;
-				aspect = 1.45;
-				recaclFov = true;
-				break;
-			}
-			}
-		}
-		default:
-			break;
-		}
-
-		if (recaclFov)
-		{
-			if (aspect <= 0)
-			{
-				screen.iSize = sizeof(screen);
-				gEngfuncs.pfnGetScreenInfo(&screen);
-
-				aspect = (float)screen.iWidth / (float)screen.iHeight;
-			}
-
-
-			IEngineStudio.StudioGetProjectionMatrix(savedworldviewmatrix, savedprojectionmatrix);
-
-			IEngineStudio.StudioPgluPerspective(fov, aspect, 4.0, 8192.0);
-		}
-	}
-
 	if (m_pCurrentEntity->curstate.renderfx == kRenderFxDeadPlayer)
 	{
 		entity_state_t deadplayer;
@@ -1196,6 +1171,32 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 	IEngineStudio.StudioSetHeader(m_pStudioHeader);
 	IEngineStudio.SetRenderModel(m_pRenderModel);
+
+
+	if (gunmodel)
+	{
+		if (m_vecViewModels.find(m_pStudioHeader->name) != m_vecViewModels.end()) {
+			aspect = m_vecViewModels[m_pStudioHeader->name].flAspect;
+			fov = m_vecViewModels[m_pStudioHeader->name].iFOV;
+			recaclFov = true;
+		}
+
+		if (recaclFov)
+		{
+			if (aspect <= 0)
+			{
+				screen.iSize = sizeof(screen);
+				gEngfuncs.pfnGetScreenInfo(&screen);
+
+				aspect = (float)screen.iWidth / (float)screen.iHeight;
+			}
+
+
+			IEngineStudio.StudioGetProjectionMatrix(savedworldviewmatrix, savedprojectionmatrix);
+
+			IEngineStudio.StudioPgluPerspective(fov, aspect, 4.0, 8192.0);
+		}
+	}
 
 	StudioSetUpTransform(0);
 
@@ -1375,9 +1376,123 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 				IEngineStudio.StudioClientEvents();
 		}
 
+		if (CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && curent->model == CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel)
+		{
+			studiohdr_t* saveheader = m_pStudioHeader;
+
+			cl_entity_t saveent = *m_pCurrentEntity;
+			int saveseq = m_pCurrentEntity->curstate.sequence;
+			float saveanimtime = m_pCurrentEntity->curstate.animtime;
+			float saveframe = m_pCurrentEntity->curstate.frame;
+			int save_interp = m_fDoInterp;
+
+			model_t* weaponpart = s_pSGFX_JY_OBJ_BALISONG_02Model;
+
+			m_pStudioHeader = (studiohdr_t*)IEngineStudio.Mod_Extradata(weaponpart);
+			if (!m_pStudioHeader)
+				return 0;
+
+			m_pCurrentEntity->curstate.sequence = 0;
+			m_pCurrentEntity->curstate.animtime = 0.0;
+			m_fDoInterp = 1;
+
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			StudioMergeBones(weaponpart);
+
+			IEngineStudio.StudioSetupLighting(&lighting);
+
+
+			StudioRenderModel(dir);
+
+			StudioCalcAttachments();
+			IEngineStudio.StudioClientEvents();
+
+			if (m_pCurrentEntity->index > 0)
+				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
+			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
+			*m_pCurrentEntity = saveent;
+			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
+			m_pStudioHeader = saveheader;
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			m_pCurrentEntity->curstate.sequence = saveseq;
+			m_pCurrentEntity->curstate.animtime = saveanimtime;
+			m_pCurrentEntity->curstate.frame = saveframe;
+			m_fDoInterp = save_interp;
+
+			if (flags & STUDIO_EVENTS)
+				IEngineStudio.StudioClientEvents();
+		}
+
+		if (CStudioModelRenderer::s_pM4A1_S_TransformersViewModel && CStudioModelRenderer::s_pM4A1_S_TransformersViewModel && curent->model == CStudioModelRenderer::s_pM4A1_S_TransformersViewModel)
+		{
+			studiohdr_t* saveheader = m_pStudioHeader;
+
+			cl_entity_t saveent = *m_pCurrentEntity;
+			int saveseq = m_pCurrentEntity->curstate.sequence;
+			float saveanimtime = m_pCurrentEntity->curstate.animtime;
+			float saveframe = m_pCurrentEntity->curstate.frame;
+			int save_interp = m_fDoInterp;
+
+			model_t* weaponpart = s_pRingModel;
+
+			m_pStudioHeader = (studiohdr_t*)IEngineStudio.Mod_Extradata(weaponpart);
+			if (!m_pStudioHeader)
+				return 0;
+
+			m_pCurrentEntity->curstate.sequence = 0;
+			m_pCurrentEntity->curstate.animtime = 0.0;
+			m_fDoInterp = 1;
+
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			StudioMergeBones(weaponpart);
+
+			IEngineStudio.StudioSetupLighting(&lighting);
+
+
+			StudioRenderModel(dir);
+
+			StudioCalcAttachments();
+			IEngineStudio.StudioClientEvents();
+
+			if (m_pCurrentEntity->index > 0)
+				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
+
+			*m_pCurrentEntity = saveent;
+			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
+			m_pStudioHeader = saveheader;
+			IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+			m_pCurrentEntity->curstate.sequence = saveseq;
+			m_pCurrentEntity->curstate.animtime = saveanimtime;
+			m_pCurrentEntity->curstate.frame = saveframe;
+			m_fDoInterp = save_interp;
+
+			if (flags & STUDIO_EVENTS)
+				IEngineStudio.StudioClientEvents();
+		}
+
 		if (gunmodel)
 		{
-			g_ParticleManager.Draw(m_clTime, *m_protationmatrix);
+			mstudioattachment_t* pattachment;
+
+			if (m_pStudioHeader->numattachments > MAXSTUDIOATTACHMENTS)
+				gEngfuncs.Con_DPrintf("Too many attachments on %s\n", m_pCurrentEntity->model->name);
+
+			pattachment = (mstudioattachment_t*)((byte*)m_pStudioHeader + m_pStudioHeader->attachmentindex);
+
+			std::string vmodel = viewent->model->name;
+
+			std::string file_path = vmodel.substr(vmodel.find_last_of('/') + 1);
+
+			if (!stricmp(file_path.c_str(), m_pStudioHeader->name))
+			{
+				g_ParticleManager.AddParticleInfo(pattachment, m_rgCachedBoneTransform_Animation, m_pStudioHeader->name);
+
+				g_ParticleManager.Draw(m_clTime, *m_protationmatrix);
+			}
 		}
 	}
 
@@ -1694,26 +1809,11 @@ void CStudioModelRenderer::StudioCalcAttachments(void)
 
 	pattachment = (mstudioattachment_t *)((byte *)m_pStudioHeader + m_pStudioHeader->attachmentindex);
 
-	vec3_t	attachment[20];
-
 	for (i = 0; i < m_pStudioHeader->numattachments; i++)
 	{
 		VectorTransform(pattachment[i].org, (*m_plighttransform)[pattachment[i].bone], m_pCurrentEntity->attachment[i]);
-
-		//VectorTransform(pattachment[i].org, m_rgCachedBoneTransform_Animation[pattachment[i].bone], attachment[i]);
 	}
-		
-	if (m_pCurrentEntity == IEngineStudio.GetViewEntity() && m_pStudioHeader->numattachments >= 3)
-	{
-		vec3_t shootPos;
-		vec3_t shootDir = (pattachment[2].org - pattachment[1].org).Normalize();
-		
-		VectorTransform(pattachment[1].org, m_rgCachedBoneTransform_Animation[pattachment[1].bone], shootPos);
-		
-		g_ParticleManager.AddAnimInfo(shootPos, shootDir);
-	}
-
-
+	
 	//即ProjectionMatrix * ModelViewMatrix * bontransform[n] * attachment.origin
 
 	/*假设一个模型只有两个bone，root->bone1  那么完整的变换将会是这样

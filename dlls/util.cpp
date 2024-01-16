@@ -3075,4 +3075,37 @@ void UTIL_PlayAnimation(CBaseEntity* pEntity, const char* szFile, int iAnimJsonF
 	MESSAGE_END();
 }
 
+void UTIL_EMIT_PV_PARTICLE(edict_t* entity, const char* texture, int channel, int emitcount, int interval, int life, int speed, int startsize, int endsize, int startbone, int endbone, int startattachment, int endattachment, Vector startboneoffset, Vector dir, Vector startcolor, Vector endcolor, int startalpha, int endalpha)
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, entity);
+	WRITE_BYTE(52);
+	WRITE_STRING(texture);
+	WRITE_BYTE(channel);
+	WRITE_BYTE(emitcount);
+	WRITE_SHORT(interval);	//* 0.01
+	WRITE_SHORT(life);		//* 0.01
+	WRITE_SHORT(speed);		//* 0.1
+	WRITE_SHORT(startsize);	//* 0.1
+	WRITE_SHORT(endsize);	//* 0.1
+	WRITE_BYTE(startbone);
+	WRITE_BYTE(endbone);
+	WRITE_BYTE(startattachment);
+	WRITE_BYTE(endattachment);
+	WRITE_COORD(startboneoffset.x);
+	WRITE_COORD(startboneoffset.y);
+	WRITE_COORD(startboneoffset.z);
+	WRITE_COORD(dir.x);
+	WRITE_COORD(dir.y);
+	WRITE_COORD(dir.z);
+	WRITE_BYTE(startcolor.x);
+	WRITE_BYTE(startcolor.y);
+	WRITE_BYTE(startcolor.z);
+	WRITE_BYTE(endcolor.x);
+	WRITE_BYTE(endcolor.y);
+	WRITE_BYTE(endcolor.z);
+	WRITE_BYTE(startalpha);
+	WRITE_BYTE(endalpha);
+	MESSAGE_END();
+}
+
 }

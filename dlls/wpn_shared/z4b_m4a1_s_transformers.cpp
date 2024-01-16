@@ -59,7 +59,7 @@ namespace sv {
         };
 
         static constexpr const auto& DefaultReloadTime = 1.6s;
-        static constexpr const char* V_Model = "models/z4b/v_m4a1_s_transformers.mdl";
+        static constexpr const char* V_Model = "models/z4b/PV-M4A1_S_Transformers.mdl";
         static constexpr const char* P_Model = "models/z4b/pw_m4a1_s_transformers.mdl";
         static constexpr const char* W_Model = "models/z4b/pw_m4a1_s_transformers.mdl";
         static constexpr const char* EventFile = "events/m4a1_s_transformers.sc";
@@ -127,6 +127,7 @@ namespace sv {
         }
 
         BOOL Deploy() override;
+        void Reload() override;
         void WeaponIdle(void) override;
         void SecondaryAttack(void) override;
         void DelaySecondaryAttack();
@@ -152,6 +153,26 @@ namespace sv {
     }
   
     return FALSE;
+}
+
+void CM4A1_S_Transformers::Reload(void)
+{
+    if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+        return;
+
+    if (DefaultReload(MaxClip, ANIM_RELOAD, DefaultReloadTime))
+    {
+#ifndef CLIENT_DLL
+        m_pPlayer->SetAnimation(PLAYER_RELOAD);
+
+        //UTIL_EMIT_PV_PARTICLE(m_pPlayer->edict(), "resource/weapontexture/SGFX_se_smoke_04.tga", 1, 6, 3, 60, 400, 2, 255, 255, 255, 1, 2, { 0.0, 0.0, 0.0 }, { 0, -0.5, -0.5 }, { 255, 255, 255 }, { 255, 255, 255 }, 255, 0);
+#endif
+        ResetRunIdle();
+        m_iWeaponState = 0;
+        m_flAccuracy = 0.0;
+        m_iShotsFired = 0;
+        m_bDelayFire = false;
+    }
 }
 
 float CM4A1_S_Transformers::GetSecondaryAttackDamage() const

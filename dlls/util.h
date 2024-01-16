@@ -565,6 +565,7 @@ void UTIL_EMIT_SOUND(edict_t* entity, int channel, const char* sample, float vol
 void UTIL_TempEmit(const char* model, int iEmitCounter, int fireDelay, int life, int spawnflags, int spin_speed, int framerate, int rendermode, int brightness, int r, int g, int b, Vector pos, Vector velocity, int velocity_variance, int scale, int fade_speed, int scale_speed, int fadeInSpeed, int entity, int attachment, int frameMax);
 void UTIL_SetPlayerPModel(int iPlayerIndex, int iWeaponID, int iState);
 void UTIL_PlayAnimation(CBaseEntity* pEntity, const char* szFile, int iAnimJsonFlag, int iAnimPostionFlag);
+void UTIL_EMIT_PV_PARTICLE(edict_t* entity, const char* texture, int channel, int emitcount, int interval, int life, int speed, int startsize, int endsize, int startbone, int endbone, int startattachment, int endattachment, Vector startboneoffset, Vector dir, Vector startcolor, Vector endcolor, int startalpha, int endalpha);
 }
 #else
 namespace cl {

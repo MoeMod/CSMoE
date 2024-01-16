@@ -32,16 +32,17 @@ namespace cl::event::m82a1angelicbeast {
 enum m82a1angelicbeast_e
 {
 	ANIM_IDLE1 = 0,
+	ANIM_RUN,
 	ANIM_SHOOT1,
 	ANIM_SHOOT2,
 	ANIM_SHOOT3,
-	ANIM_RELOAD1,
-	ANIM_DRAW1,
-	ANIM_RUN,
 	ANIM_SHOOT4,
+	ANIM_RELOAD1,
+	ANIM_RELOAD2,
+	ANIM_DRAW1,
+	ANIM_CHANGEMODE,
 	ANIM_INSPECT,
 	ANIM_HANDSKILL,
-	ANIM_RELOAD2,
 	ANIM_DRAW2,
 };
 
@@ -76,9 +77,9 @@ void EV_FireM82A1AngelicBeast( event_args_t *args )
 		EV_MuzzleFlash();
 
 		if(args->bparam1 == 2)
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT4, 2);
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT3, 2);
 		else
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT1 + Com_RandomLong(0, 2), 2);
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT1 + Com_RandomLong(0, 1), 2);
 
 		if (gHUD.cl_gunsmoke->value)
 		{

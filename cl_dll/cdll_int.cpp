@@ -309,9 +309,13 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pLaserFistPModel = IEngineStudio.Mod_ForName("models/p_laserfist.mdl", FALSE);
 	CStudioModelRenderer::s_pLaserFistEXPModel = IEngineStudio.Mod_ForName("models/p_laserfistex.mdl", FALSE);
 
-	CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel = IEngineStudio.Mod_ForName("models/z4b/Balisong_LuminousEdge/v_balisong_luminousedge.mdl", FALSE);
+	CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel = IEngineStudio.Mod_ForName("models/z4b/PV-M82A1_AngelicBeast1.mdl", FALSE);
+	CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model = IEngineStudio.Mod_ForName("models/z4b/SGFX_SE_GUN_VVIP_M82A1_ANGELICBEAST_OBJ_KINFE.mdl", FALSE);
 
 	CStudioModelRenderer::s_pLightningARPModel = IEngineStudio.Mod_ForName("models/p_lightningar_b.mdl", FALSE);
+
+	CStudioModelRenderer::s_pM4A1_S_TransformersViewModel = IEngineStudio.Mod_ForName("models/z4b/PV-M4A1_S_Transformers.mdl", FALSE);
+	CStudioModelRenderer::s_pRingModel = IEngineStudio.Mod_ForName("models/z4b/SGFX_se_gun_M4A1Transformers_plane_01.mdl", FALSE);
 	//VGui_Startup();
 
 	return 1;

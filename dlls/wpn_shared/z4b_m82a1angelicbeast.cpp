@@ -35,7 +35,7 @@ namespace sv {
     {
     public:
 
-    static constexpr const char *V_Model = "models/z4b/v_m82a1angelicbeast.mdl";
+    static constexpr const char *V_Model = "models/z4b/PV-M82A1_AngelicBeast.mdl";
     static constexpr const char *P_Model = "models/z4b/pw_m82a1angelicbeast.mdl";
     static constexpr const char *W_Model = "models/z4b/pw_m82a1angelicbeast.mdl";
     static constexpr const char *EventFile = "events/m82a1angelicbeast.sc";
@@ -46,16 +46,17 @@ namespace sv {
 	enum
 	{
         ANIM_IDLE1 = 0,
+        ANIM_RUN,
         ANIM_SHOOT1,
         ANIM_SHOOT2,
         ANIM_SHOOT3,
-        ANIM_RELOAD1,
-        ANIM_DRAW1,
-        ANIM_RUN,
         ANIM_SHOOT4,
+        ANIM_RELOAD1,
+        ANIM_RELOAD2,
+        ANIM_DRAW1,
+        ANIM_CHANGEMODE,
         ANIM_INSPECT,
         ANIM_HANDSKILL,
-        ANIM_RELOAD2,
         ANIM_DRAW2, 
 	};
     static constexpr float PlayerMaxSpeed = 230;
@@ -71,13 +72,16 @@ namespace sv {
     duration_t m_flNextIdle;
     int m_iShotsRequired;
     int m_bHit;
+    int m_iHeartBeat;
+    time_point_t m_flNextHeartBeat;
+
 
 #define WPNSTATE_M82A1ANGELICBEAST_SIGNAL 1
 #define WPNSTATE_M82A1ANGELICBEAST_USING 2
 
     void Spawn() override
     {  
-        m_flNextReset = invalid_time_point;
+        m_flNextHeartBeat = m_flNextReset = invalid_time_point;
         m_iShotsRequired = GetShotsRequired();
         Base::Spawn();
         m_iDefaultAmmo = 35;
@@ -140,13 +144,12 @@ namespace sv {
         m_flNextIdle = m_flNextRunIdle = UTIL_WeaponTimeBase();
     }
 
-
     void Reload() override
     {
-        if (DefaultReload(MaxClip, ANIM_RELOAD1, 2.8s))
+        if (DefaultReload(MaxClip, ANIM_RELOAD2, 2.8s))
         {
 #ifndef CLIENT_DLL
-            m_pPlayer->SetAnimation(PLAYER_RELOAD);
+            m_pPlayer->SetAnimation(PLAYER_RELOAD);     
 #endif
             if (m_pPlayer->pev->fov != 90)
             {
@@ -162,7 +165,7 @@ namespace sv {
         m_flAccuracy = 0.05;
         m_iShotsFired = 0;
         ResetRunIdle();
-
+        m_flNextHeartBeat = gpGlobals->time + 1.0s;
         return DefaultDeploy(V_Model, P_Model, ANIM_DRAW1, "carbine", UseDecrement() != FALSE);
     }
 
@@ -272,10 +275,14 @@ namespace sv {
             }
         }
 
-        PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), m_iWeaponState, FALSE);
+        BOOL fastfire = m_iHeartBeat < 80 ? TRUE : FALSE;
+
+        PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), fastfire, FALSE);
+
+        if (fastfire)
+            flCycleTime = 1.3s;
 #endif
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
-
 #ifndef CLIENT_DLL
         if (!m_iClip)
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
@@ -288,6 +295,42 @@ namespace sv {
 
     void ItemPostFrame(void) override
     {
+        if (m_pPlayer->pev->fov != 90)
+        {
+            if (m_flNextHeartBeat != invalid_time_point && m_flNextHeartBeat < gpGlobals->time)
+            {
+                m_iHeartBeat = RANDOM_LONG(60, 130);
+#ifndef CLIENT_DLL
+                MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+                WRITE_BYTE(53);
+                WRITE_BYTE(m_iHeartBeat);
+                WRITE_BYTE(0);
+                MESSAGE_END();
+#endif
+                m_flNextHeartBeat = gpGlobals->time + 1.0s;
+            }
+        }
+        if (m_pPlayer->pev->button & IN_USE)
+        {
+            if (RANDOM_LONG(0, 1))
+            {
+
+                SendWeaponAnim(ANIM_INSPECT, UseDecrement() != FALSE);
+
+                m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.7s;
+            }
+            else
+            {
+
+                SendWeaponAnim(ANIM_HANDSKILL, UseDecrement() != FALSE);
+
+                m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.3s;
+            }
+
+
+            ResetRunIdle();
+        }
+
         if (m_flNextReset != invalid_time_point && m_flNextReset < gpGlobals->time)
         {
             if (m_iWeaponState == WPNSTATE_M82A1ANGELICBEAST_SIGNAL)
@@ -337,6 +380,16 @@ namespace sv {
             case 40: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 10; break;
             default: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 90; break;
             }
+
+            m_iHeartBeat = RANDOM_LONG(60, 90);
+#ifndef CLIENT_DLL
+            MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+            WRITE_BYTE(53);
+            WRITE_BYTE(m_iHeartBeat);
+            WRITE_BYTE(1);
+            MESSAGE_END();
+#endif
+            m_flNextHeartBeat = gpGlobals->time + 1.0s;
 
             m_pPlayer->ResetMaxSpeed();
             EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);

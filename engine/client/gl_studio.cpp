@@ -2248,12 +2248,13 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 										//frame += dt * framerate;
 
 										frame = framerate * (cl.time - RI.currententity->curstate.animtime) + startFrame;
-
+										
 										if (frame > maxframe)
 										{
 											if (iterseq->isLoop)
 											{
-												frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
+												frame = int(frame) % maxframe + startFrame;
+												//frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
 												//frame = frame - (int)frame;
 												//frame = startFrame;
 											}

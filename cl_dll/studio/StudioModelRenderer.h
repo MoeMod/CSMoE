@@ -182,7 +182,19 @@ public:
 	static struct model_s* s_pLaserFistPModel;
 	static struct model_s* s_pLaserFistEXPModel;
 	static struct model_s* s_pBalisongLuminousEdgeViewModel;
+	static struct model_s* s_pSGFX_JY_OBJ_BALISONG_02Model;
 	static struct model_s* s_pLightningARPModel;
+	static struct model_s* s_pM4A1_S_TransformersViewModel;
+	static struct model_s* s_pRingModel;
+
+
+	struct ViewModel
+	{
+		int iFOV;
+		float flAspect;
+	};
+
+	std::unordered_map<std::string, ViewModel> m_vecViewModels;
 };
 
 }

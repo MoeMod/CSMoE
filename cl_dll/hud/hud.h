@@ -1075,6 +1075,8 @@ public:
 	void DrawDgaxeCrossHair(float flTime, int iType);
 	void SetDgaxeCrossHair(int iState);
 	void DrawMarkEffect(int iHealth, int iMaxHealth, int iClip, int iMaxClip);
+	void SetHeartBeat(int iHeartBeat, bool OpenScope);
+	void DrawAimParticle();
 private:
 
 	struct LockOnData
@@ -1227,6 +1229,13 @@ private:
 	UniqueTexture m_iMarkEffect;
 
 	UniqueTexture m_iM82A1_S_BornBeastScope;
+
+	int m_iHeartBeat;
+	float m_flInScopeTime;
+
+	UniqueTexture m_iSniperbreathing[3][3];
+
+	int m_iParticleState;
 };
 
 //

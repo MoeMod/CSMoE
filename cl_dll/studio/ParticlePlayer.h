@@ -9,6 +9,9 @@
 namespace cl {
 
 #define MAX_PARTICLE		128
+#define MAX_PARTICLE_CHANNEL		16
+
+#define PARTICLE_FLAGS_ENDCENTER	1
 
 class CParticlePlayer
 {
@@ -91,30 +94,35 @@ public:
 			this->flStartTime=r.flStartTime;
 			this->bActive=r.bActive;
 		}*/
-		//int iId;
-		//int iStartAttachment;
+		int iChannel;
+		int iEmitCount;
+		int iStartBone;
+		int iEndBone;
+		int iStartAttachment;
+		int iEndAttachment;
+		vec3_t vecStartOffsetMin;
+		vec3_t vecStartOffsetMax;
 		vec3_t vecDir;
-		//vec3_t vecStartAttachment;
-		//int iEndAttachment;
-		//vec3_t vecEndAttachment;
-		//vec3_t vecAttachment[20];
+		vec3_t vecDirMin;
+		vec3_t vecDirMax;
 		vec3_t vecOrigin;
 		vec3_t vecWorldOrigin;
-		//vec3_t iStartColor;
-		//vec3_t iEndColor;
+		vec3_t vecStartColor;
+		vec3_t vecEndColor;
 		vec4_t vecColor;
-		float flSize;
-		float flAlpha;
+		vec3_t vecAmplitude;
+		vec3_t vecFreq;
+		float flStartSize;
+		float flEndSize;
+		float flStartAlpha;
+		float flEndAlpha;
 		float flLifeTime;
-		//float flIntervalTime;
+		float flIntervalTime;
 		float flStartTime;
 		float flSpeed;
 		ParticleData Data;
-		bool bActive;
+		int iFlag;
 	};
-
-	ParticleInfo test;
-
 
     int Init(void);
     int VidInit(void);
@@ -122,20 +130,29 @@ public:
     int Draw(float flTime, matrix3x4& matrix);
     void Shutdown();
 	void CalcData(ParticleData& info);
-
-	void AddAnimInfo(const vec3_t& shootPos, const vec3_t& shootDir);
-	void AddToTempParticleArray(ParticleInfo& info);
+	void ReadTempParticleInfo(std::string szFile);
+	void AddParticleInfo(mstudioattachment_t* pattachment, matrix3x4 *transform, char modelName[64]);
+	void ModifyStaticParticle(std::string szModelName, const char* szTexture, int iChannel, int iEmitCount, float flIntervalTime, float flLifeTime, float flSpeed, float flStartSize, float flEndSize, int iStartBone, int iEndBone, int iStartAttachment, int iEndAttachment, vec3_t vecStartBoneOffset, vec3_t vecDir, vec3_t vecStartColor, vec3_t vecEndColor, float flStartAlpha, float flEndAlpha, vec3_t vecAmplitude, vec3_t vecFreq);
+	void MSG_AddParticle(const char* szTexture, int iChannel, int iEmitCount, float flIntervalTime, float flLifeTime, float flSpeed, float flStartSize, float flEndSize, int startbone, int iEndBone, int iStartAttachment, int iEndAttachment, vec3_t vecStartBoneOffset, vec3_t vecDir, vec3_t vecStartColor, vec3_t vecEndColor, float flStartAlpha, float flEndAlpha, vec3_t vecAmplitude, vec3_t vecFreq);
+	void AddToParticleArray(ParticleInfo& info);
 	void DrawTGAQuad(ParticleData& particle, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color);
-	static bool compare(ParticleInfo& Particle1, ParticleInfo& Particle2);
+	void PrecacheTexture(std::string szFile);
+	void ClearPrecache();
+
 private:
+	//std::vector<ParticleInfo> m_vecTempParticle;
+	std::vector<std::pair<std::string, std::vector<ParticleInfo>>> m_vecTempParticle;
+	std::unordered_map<std::string, SharedTexture> m_vecCachedTexture;
+	std::unordered_map<std::string, std::vector<ParticleInfo>> m_vecCachedParticleJson;	//FileName,  modelName,  particle
+	std::unordered_map<std::string, std::vector<ParticleInfo>> m_vecStaticParticle;
+	std::vector<ParticleInfo> m_ParticleArray;
+	float m_flNextTime[MAX_PARTICLE_CHANNEL];
 
-	std::vector<ParticleInfo>  m_TempParticleArray;
-	float m_flNextTime;
-
+	SharedTexture m_iM4A1_S_TransformerParticle;
 
 };
 
-static CParticlePlayer g_ParticleManager;
+
 
 
 }

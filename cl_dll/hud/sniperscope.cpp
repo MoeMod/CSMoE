@@ -38,7 +38,7 @@ version.
 #include "util.h"
 #include "cbase.h"
 #include "weapons.h"
-
+#include "ParticlePlayer.h"
 #include "draw_util.h"
 #include "cs_wpn/bte_weapons.h"
 
@@ -49,6 +49,7 @@ extern bool bHaloGunHitRetinaOn;
 extern bool bReviveGunLoopRetinaOn;
 extern bool bReviveGunRetinaOn;
 extern vec3_t g_vecEyePos;
+extern CParticlePlayer g_ParticleManager;
 
 enum drawscope_type
 {
@@ -63,6 +64,21 @@ enum drawcorner_type
 	TYPE_CORNER_SE,
 	TYPE_CORNER_NW,
 	TYPE_CORNER_NE
+};
+
+enum sniperbreathing_type
+{
+	SNIPERBREATHING_HEART,
+	SNIPERBREATHING_NUM,
+	SNIPERBREATHING_BPM,
+};
+
+
+enum sniperbreathing_level
+{
+	SNIPERBREATHING_LOW,
+	SNIPERBREATHING_MEDIUM,
+	SNIPERBREATHING_HIGH,
 };
 
 int CHudSniperScope::Init()
@@ -227,6 +243,20 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iMarkEffect, "sprites/MarkEffect.tga");
 
 	R_InitTexture(m_iM82A1_S_BornBeastScope, "sprites/M82A1_S_BornBeast.tga");
+
+	R_InitTexture(m_iSniperbreathing[SNIPERBREATHING_LOW][SNIPERBREATHING_HEART], "resource/weapontexture/Sniperbreathing/LowHeart.tga");
+	R_InitTexture(m_iSniperbreathing[SNIPERBREATHING_LOW][SNIPERBREATHING_NUM], "resource/weapontexture/Sniperbreathing/Low_NUM.tga");
+	R_InitTexture(m_iSniperbreathing[SNIPERBREATHING_LOW][SNIPERBREATHING_BPM], "resource/weapontexture/Sniperbreathing/Low_BPM.tga");
+	R_InitTexture(m_iSniperbreathing[SNIPERBREATHING_MEDIUM][SNIPERBREATHING_HEART], "resource/weapontexture/Sniperbreathing/MediumHeart.tga");
+	R_InitTexture(m_iSniperbreathing[SNIPERBREATHING_MEDIUM][SNIPERBREATHING_NUM], "resource/weapontexture/Sniperbreathing/Medium_NUM.tga");
+	R_InitTexture(m_iSniperbreathing[SNIPERBREATHING_MEDIUM][SNIPERBREATHING_BPM], "resource/weapontexture/Sniperbreathing/Medium_BPM.tga");
+	R_InitTexture(m_iSniperbreathing[SNIPERBREATHING_HIGH][SNIPERBREATHING_HEART], "resource/weapontexture/Sniperbreathing/HighHeart.tga");
+	R_InitTexture(m_iSniperbreathing[SNIPERBREATHING_HIGH][SNIPERBREATHING_NUM], "resource/weapontexture/Sniperbreathing/High_NUM.tga");
+	R_InitTexture(m_iSniperbreathing[SNIPERBREATHING_HIGH][SNIPERBREATHING_BPM], "resource/weapontexture/Sniperbreathing/High_BPM.tga");
+	
+
+	m_iHeartBeat = 0;
+	m_flInScopeTime = 0.0;
 
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
@@ -554,6 +584,11 @@ int CHudSniperScope::Draw(float flTime)
 			return 0;
 
 		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_Z4B_M4A1_S_TRANSFORMERS)
+		{
+			//DrawAimParticle();
+			return 1;
+		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || 
 			pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS ||
 			pActiveBTEWeapon->m_iId == WEAPON_M400 || 
@@ -562,7 +597,8 @@ int CHudSniperScope::Draw(float flTime)
 			pActiveBTEWeapon->m_iId == WEAPON_AT4EX ||
 			pActiveBTEWeapon->m_iId == WEAPON_BAZOOKA ||
 			pActiveBTEWeapon->m_iId == WEAPON_CHAINSR ||
-			pActiveBTEWeapon->m_iId == WEAPON_Z4B_BARRETTD)
+			pActiveBTEWeapon->m_iId == WEAPON_Z4B_BARRETTD ||
+			pActiveBTEWeapon->m_iId == WEAPON_Z4B_M82A1ANGELICBEAST)
 		{
 			if (gHUD.m_iFOV > 40)
 				return 1;
@@ -728,7 +764,8 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 	{
 
 	}
-	if (iId == WEAPON_Z4B_BARRETTD)
+	if (iId == WEAPON_Z4B_BARRETTD ||
+		iId == WEAPON_Z4B_M82A1ANGELICBEAST)
 	{
 		int iX = ScreenWidth / 2;
 		int iY = ScreenHeight / 2;
@@ -737,6 +774,68 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 		float Width = (Height * m_iM82A1_S_BornBeastScope->w() / m_iM82A1_S_BornBeastScope->h());
 
 		m_iM82A1_S_BornBeastScope->FuncDraw2DQuadScaled(iX - Width / 2, iY - Height / 2, Width, Height);
+
+		int iWidth, iHeight;
+		
+		sniperbreathing_level level;
+
+		int NumA, NumB, NumC;
+
+		if (m_iHeartBeat > 90)
+		{
+			level = SNIPERBREATHING_HIGH;
+			
+		}
+		else if (m_iHeartBeat > 80)
+		{
+			level = SNIPERBREATHING_MEDIUM;
+		}
+		else
+			level = SNIPERBREATHING_LOW;
+
+		NumA = (m_iHeartBeat / 100) % 10;
+		NumB = (m_iHeartBeat / 10) % 10;
+		NumC = m_iHeartBeat % 10;
+
+		//8 Frame
+		static int iTexHeartFrame = 1;
+		iTexHeartFrame = 10.0 * (gHUD.m_flTime - m_flInScopeTime) + 1;
+		iTexHeartFrame = int(iTexHeartFrame) % 8;
+		
+		float flPercent = float((int(iTexHeartFrame) % 8)) / 8.0;
+
+		//Final 8 percent = 0; first percent = 0.875 
+
+		int iHeartWidth = m_iSniperbreathing[level][SNIPERBREATHING_HEART]->w() / 8;
+		int iHeartHeight = m_iSniperbreathing[level][SNIPERBREATHING_HEART]->h();
+
+		int iNumWidth = m_iSniperbreathing[level][SNIPERBREATHING_NUM]->w() / 11;
+		int iNumHeight = m_iSniperbreathing[level][SNIPERBREATHING_NUM]->h();
+
+		int iBPMWidth = m_iSniperbreathing[level][SNIPERBREATHING_BPM]->w();
+		int iBPMHeight = m_iSniperbreathing[level][SNIPERBREATHING_BPM]->h();
+
+		m_iSniperbreathing[level][SNIPERBREATHING_HEART]->FuncDraw2DQuadScaled(iX - (5 * iNumWidth) / 2, 0.8 * ScreenHeight, iHeartWidth, iHeartHeight, 0.875 - flPercent,  0.0, (0.875 - flPercent) + 0.125, 1.0);
+
+		//drawNumA
+		if(!NumA)
+			m_iSniperbreathing[level][SNIPERBREATHING_NUM]->FuncDraw2DQuadScaled(iX - (2 * iNumWidth) / 2, 0.8 * ScreenHeight + 5, iNumWidth, iNumHeight, 10.0 / 11.0, 0.0, 1.0, 1.0);
+		else
+			m_iSniperbreathing[level][SNIPERBREATHING_NUM]->FuncDraw2DQuadScaled(iX - (2 * iNumWidth) / 2, 0.8 * ScreenHeight + 5, iNumWidth, iNumHeight, float(NumA - 1) / 11.0, 0.0, float(NumA) / 11.0, 1.0);
+
+		//drawNumB
+		if (!NumB)
+			m_iSniperbreathing[level][SNIPERBREATHING_NUM]->FuncDraw2DQuadScaled(iX - (0.5 * iNumWidth) / 2, 0.8 * ScreenHeight + 5, iNumWidth, iNumHeight, 9.0 / 11.0, 0.0, 10.0 / 11.0, 1.0);
+		else
+			m_iSniperbreathing[level][SNIPERBREATHING_NUM]->FuncDraw2DQuadScaled(iX - (0.5 * iNumWidth) / 2, 0.8 * ScreenHeight + 5, iNumWidth, iNumHeight, float(NumB - 1) / 11.0, 0.0, float(NumB) / 11.0, 1.0);
+
+		//drawNumC
+		if (!NumC)
+			m_iSniperbreathing[level][SNIPERBREATHING_NUM]->FuncDraw2DQuadScaled(iX + iNumWidth / 2, 0.8 * ScreenHeight + 5, iNumWidth, iNumHeight, 9.0 / 11.0, 0.0, 10.0 / 11.0, 1.0);
+		else
+			m_iSniperbreathing[level][SNIPERBREATHING_NUM]->FuncDraw2DQuadScaled(iX + iNumWidth / 2, 0.8 * ScreenHeight + 5, iNumWidth, iNumHeight, float(NumC - 1) / 11.0, 0.0, float(NumC) / 11.0, 1.0);
+
+		m_iSniperbreathing[level][SNIPERBREATHING_BPM]->FuncDraw2DQuadScaled(iX + (2 * iNumWidth) / 2, 0.8 * ScreenHeight + iNumHeight - iBPMHeight, iBPMWidth, iBPMHeight);
 	}
 
 }
@@ -1802,7 +1901,36 @@ void CHudSniperScope::DrawMarkEffect(int iHealth, int iMaxHealth, int iClip, int
 	m_iMarkEffect->FuncDraw2DQuadScaled(iX + iWidth * 3, iY - (iHeight / 2), iWidth, iHeight, (1.0 + iClipGauge) / 13, 0.5, (2.0 + iClipGauge) / 13, 1.0, 255, 255, 255, a2);
 }
 
+void CHudSniperScope::SetHeartBeat(int iHeartBeat, bool OpenScope)
+{
+	m_iHeartBeat = iHeartBeat;
+	if(OpenScope)
+		m_flInScopeTime = gHUD.m_flTime;
+}
 
+void CHudSniperScope::DrawAimParticle()
+{
+	CalculateDistance();
+
+	if (m_bDestroyerInSight)
+	{
+		if (!m_iParticleState)
+		{
+			m_iParticleState = 1;
+			g_ParticleManager.ModifyStaticParticle("PV-M4A1_S_Transformers.mdl", nullptr, 0, 255, 0.01, 0.6, 30, 1.3, 1.3, 255, 255, 1, 2, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 135, 255 }, { 50, 0, 200 }, 0.8, 0.8, { 0, 0, 0 }, { 0, 0, 0 });
+
+		}
+		
+	}
+	else
+	{
+		if (m_iParticleState)
+		{
+			m_iParticleState = 0;
+			g_ParticleManager.ModifyStaticParticle("PV-M4A1_S_Transformers.mdl", nullptr, 0, 255, 0.01, 0.6, 30, 1.3, 1.3, 255, 255, 1, 2, { 0, 0, 0 }, { 0, 0, 0 }, { 235, 51, 36 }, { 240, 134, 80 }, 0.8, 0.8, { 0, 0, 0 }, { 0, 0, 0 });
+		}
+	}
+}
 
 void CHudSniperScope::Shutdown()
 {
