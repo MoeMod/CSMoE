@@ -49,21 +49,156 @@
 
 namespace cl {
 
+static constexpr float ParticleUp = 1.0;
+static constexpr float ParticleDown = -1.0;
+static constexpr float ParticleLeft = 1.0;
+static constexpr float ParticleRight = -1.0;
+
 	extern engine_studio_api_t IEngineStudio;
+
+	void CParticlePlayer::SinCos(float rad, float* sine, float* cosine)
+	{
+		*sine = sinf(rad);
+		*cosine = cosf(rad);
+	}
 
 	void CParticlePlayer::PrecacheTexture(std::string szFile)
 	{
-		SharedTexture Temp;
+		if (!m_vecCachedTexture.count(szFile))
+		{
+			SharedTexture Temp;
 
-		R_InitTexture(Temp, szFile.c_str());
+			R_InitTexture(Temp, szFile.c_str());
 
-		m_vecCachedTexture.insert(std::pair<std::string, SharedTexture>(szFile, Temp));
-
+			m_vecCachedTexture.insert(std::pair<std::string, SharedTexture>(szFile, Temp));
+		}
 	}
 
 	void CParticlePlayer::ClearPrecache()
 	{
 		m_vecCachedParticleJson.clear();
+	}
+
+	CParticlePlayer::Scale* CParticlePlayer::GetCurrentScale(std::vector<Scale> scaleArray, float rate)
+	{
+		static Scale result;
+
+		int iNumFrame = scaleArray.size();
+
+		rate = std::clamp(rate, scaleArray[0].rate, scaleArray[iNumFrame - 1].rate);
+
+		for (int i = 0; i < iNumFrame; i++)
+		{
+			Scale& FrameData = scaleArray[i];
+
+			if (rate == FrameData.rate)
+			{
+				result = FrameData;
+
+				if (i == iNumFrame - 1)
+				{
+					//Final
+				}
+
+				return &result;
+			}
+
+			if (i + 1 < iNumFrame)
+			{
+				Scale& NextFramedata = scaleArray[i + 1];
+
+				if (rate > FrameData.rate && rate < NextFramedata.rate)
+				{
+					float percen = (rate - FrameData.rate) / (NextFramedata.rate - FrameData.rate);
+
+					result.scale = FrameData.scale + (NextFramedata.scale - FrameData.scale) * percen;
+
+					return &result;
+				}
+			}
+		}
+
+		return NULL;
+	}
+
+	CParticlePlayer::Color* CParticlePlayer::GetCurrentColor(std::vector<Color> colorArray, float rate)
+	{
+		static Color result;
+
+		int iNumFrame = colorArray.size();
+
+		rate = std::clamp(rate, colorArray[0].rate, colorArray[iNumFrame - 1].rate);
+
+		for (int i = 0; i < iNumFrame; i++)
+		{
+			Color& FrameData = colorArray[i];
+
+			if (rate == FrameData.rate)
+			{
+				result = FrameData;
+
+				if (i == iNumFrame - 1)
+				{
+					//Final
+				}
+
+				return &result;
+			}
+
+			if (i + 1 < iNumFrame)
+			{
+				Color& NextFramedata = colorArray[i + 1];
+
+				if (rate > FrameData.rate && rate < NextFramedata.rate)
+				{
+					float percen = (rate - FrameData.rate) / (NextFramedata.rate - FrameData.rate);
+
+					result.r = FrameData.r + (NextFramedata.r - FrameData.r) * percen;
+					result.g = FrameData.g + (NextFramedata.g - FrameData.g) * percen;
+					result.b = FrameData.b + (NextFramedata.b - FrameData.b) * percen;
+					result.a = FrameData.a + (NextFramedata.a - FrameData.a) * percen;
+
+					return &result;
+				}
+			}
+		}
+
+		return NULL;
+	}
+
+	void CParticlePlayer::ReadSprInfo(ParticleInfo& info, std::string sprFile)
+	{
+		if (m_vecCachedSpriteJson.count(sprFile))
+		{
+			
+			info.vecSpriteTexName = m_vecCachedSpriteJson[sprFile];
+		}
+		else
+		{
+			fs_offset_t length;
+
+			nlohmann::json jsSPR;
+
+			auto data = gFileSystemAPI.FS_MapFile(sprFile.c_str(), &length, true);
+			if (data)
+			{
+
+				jsSPR = nlohmann::json::parse(std::string_view((const char*)data, length));
+				gFileSystemAPI.FS_MapFree(data, length);
+
+				std::vector<std::string> vecTexName;
+				for (auto& SPR : jsSPR)
+				{
+					vecTexName.push_back(SPR.get<std::string>());
+					PrecacheTexture(SPR.get<std::string>());
+				}
+
+
+				info.vecSpriteTexName = vecTexName;
+
+				m_vecCachedSpriteJson.insert(std::pair<std::string, std::vector<std::string>>(sprFile, vecTexName));
+			}
+		}
 	}
 
 	void CParticlePlayer::ReadTempParticleInfo(std::string szFile)
@@ -77,6 +212,12 @@ namespace cl {
 			std::string modelname = vmodel.substr(vmodel.find_last_of('/') + 1);
 
 			std::vector<ParticleInfo> info = m_vecCachedParticleJson[szFile];
+
+			for (auto iter = info.begin(); iter != info.end(); iter++)
+			{
+				iter->flStartTime = gHUD.m_flTime + iter->flStartTime;
+				iter->flEndTime = gHUD.m_flTime + iter->flEndTime;
+			}
 
 			m_vecTempParticle.push_back(std::pair<std::string, std::vector<ParticleInfo>>(modelname, info));
 
@@ -105,13 +246,14 @@ namespace cl {
 					int iChannel = spring["Channel"].get<int>();
 					int iFlag = spring["Flag"].get<int>();
 					std::string szTexture = spring["TextureFile"].get<std::string>();
+					std::string szSprite = spring["Sprite"].get<std::string>();
 					int iEmitCount = spring["EmitCount"].get<int>();
 					int iStartAttachment = spring["StartAttachment"].get<int>();
 					int iEndAttachment = spring["EndAttachment"].get<int>();
 					int iStartBone = spring["StartBone"].get<int>();
 					int iEndBone = spring["EndBone"].get<int>();
-					vec3_t vecStartColor;
-					vec3_t vecEndColor;
+					int iEmitPerCount = spring["ParticlesPerEmission"].get<int>();
+					
 					vec3_t vecDir;
 					vec3_t vecDirMin;
 					vec3_t vecDirMax;
@@ -119,10 +261,28 @@ namespace cl {
 					vec3_t vecStartOffsetMax;
 					vec3_t vecAmplitude;
 					vec3_t vecFreq;
+					std::vector<Color> vecColorKeyFrame;
+					std::vector<Scale> vecScaleKeyFrame;
+
+					for (const auto& row : spring["ColorKeyFrame"]) {
+						Color rowData;
+						rowData.rate = row[0];
+						rowData.r = row[1];
+						rowData.g = row[2];
+						rowData.b = row[3];
+						rowData.a = row[4];
+						vecColorKeyFrame.push_back(rowData);
+					}
+
+					for (const auto& row : spring["ScaleKeyFrame"]) {
+						Scale rowData;
+						rowData.rate = row[0];
+						rowData.scale = row[1];
+						vecScaleKeyFrame.push_back(rowData);
+					}
+
 					for (int i = 0; i < 3; i++)
 					{
-						vecStartColor[i] = spring["StartColor"].at(i);
-						vecEndColor[i] = spring["EndColor"].at(i);
 						vecDir[i] = spring["Dirction"].at(i);
 						vecDirMin[i] = spring["MinDir"].at(i);
 						vecDirMax[i] = spring["MaxDir"].at(i);
@@ -131,39 +291,36 @@ namespace cl {
 						vecAmplitude[i] = spring["Amplitude"].at(i);
 						vecFreq[i] = spring["Freq"].at(i);
 					}
-					float flStartSize = spring["StartSize"].get<float>();
-					float flEndSize = spring["EndSize"].get<float>();
-					float flStartAlpha = spring["StartAlpha"].get<float>();
-					float flEndAlpha = spring["EndAlpha"].get<float>();
-					float flLifeTime = spring["LifeTime"].get<float>();
 					float flSpeed = spring["Speed"].get<float>();
 					float flIntervalTime = spring["IntervalTime"].get<float>();
+					float flRotateSpeed = spring["RotateSpeed"].get<float>();
+					float flStartTime = spring["StartTime"].get<float>();
+					float flEndTime = spring["EndTime"].get<float>();
+					float flFrameRate = spring["FrameRate"].get<float>();
 
 					vecSpring.emplace_back();
 					ParticleInfo& Temp = vecSpring.back();
 
 					Temp.iChannel = iChannel;
 
-					if (!m_vecCachedTexture.count(szTexture))
+					if (szSprite == "" || szSprite == "null")
 					{
 						PrecacheTexture(szTexture);
+					
+						Temp.pTexture = m_vecCachedTexture[szTexture];			
+					}
+					else
+					{
+						ReadSprInfo(Temp, szSprite);
 					}
 
-					Temp.Data.pTexture = m_vecCachedTexture[szTexture];
-					CalcData(Temp.Data);
+
 					Temp.iStartBone = iStartBone;
 					Temp.vecStartOffsetMin = vecStartOffsetMin;
 					Temp.vecStartOffsetMax = vecStartOffsetMax;
 					Temp.iEndBone = iEndBone;
 					Temp.iStartAttachment = iStartAttachment;
 					Temp.iEndAttachment = iEndAttachment;
-					Temp.vecStartColor = vecStartColor;
-					Temp.vecEndColor = vecEndColor;
-					Temp.flStartSize = flStartSize;
-					Temp.flEndSize = flEndSize;
-					Temp.flStartAlpha = flStartAlpha;
-					Temp.flEndAlpha = flEndAlpha;
-					Temp.flLifeTime = flLifeTime;
 					Temp.flSpeed = flSpeed;
 					Temp.iEmitCount = iEmitCount;	//forever
 					Temp.flIntervalTime = flIntervalTime;
@@ -172,16 +329,30 @@ namespace cl {
 					Temp.vecDirMax = vecDirMax;
 					Temp.vecAmplitude = vecAmplitude;
 					Temp.vecFreq = vecFreq;
+					Temp.flRotateSpeed = flRotateSpeed;
+					Temp.flStartTime = flStartTime;
+					Temp.flEndTime = flEndTime;
 					Temp.iFlag = iFlag;
+					Temp.iEmitPerCount = iEmitPerCount;
+					Temp.vecColorKeyFrame = vecColorKeyFrame;
+					Temp.vecScaleKeyFrame = vecScaleKeyFrame;
+					Temp.flFrameRate = flFrameRate;
 
 					//m_vecTempParticle.insert(std::pair<std::string, std::vector<ParticleInfo>>(szFile, Temp));
 					//m_vecTempParticle.emplace_back(Temp);
 
 				}
+				
+				m_vecCachedParticleJson.insert(std::pair<std::string, std::vector<ParticleInfo>>(szFile, vecSpring));
+
+				for (auto iter = vecSpring.begin(); iter != vecSpring.end(); iter++)
+				{
+					iter->flStartTime = gHUD.m_flTime + iter->flStartTime;
+					iter->flEndTime = gHUD.m_flTime + iter->flEndTime;
+				}
+		
 				m_vecTempParticle.push_back(std::pair<std::string, std::vector<ParticleInfo>>(szName, vecSpring));
 
-				m_vecCachedParticleJson.insert(std::pair<std::string, std::vector<ParticleInfo>>(szFile, vecSpring));
-		
 			}
 		}
 	}
@@ -190,8 +361,6 @@ namespace cl {
 	{
 		m_ParticleArray.clear();
 		m_vecTempParticle.clear();
-
-		PrecacheTexture("resource/weapontexture/SGFX_se_glow_05.tga");
 
 		fs_offset_t length;
 
@@ -212,12 +381,13 @@ namespace cl {
 					int iChannel = spring["Channel"].get<int>();
 					int iFlag = spring["Flag"].get<int>();
 					std::string szTexture = spring["TextureFile"].get<std::string>();
+					std::string szSprite = spring["Sprite"].get<std::string>();
 					int iStartAttachment = spring["StartAttachment"].get<int>();
 					int iEndAttachment = spring["EndAttachment"].get<int>();
 					int iStartBone = spring["StartBone"].get<int>();
 					int iEndBone = spring["EndBone"].get<int>();
-					vec3_t vecStartColor;
-					vec3_t vecEndColor;
+					int iEmitPerCount = spring["ParticlesPerEmission"].get<int>();
+
 					vec3_t vecDir;
 					vec3_t vecDirMin;
 					vec3_t vecDirMax;
@@ -225,10 +395,28 @@ namespace cl {
 					vec3_t vecStartOffsetMax;
 					vec3_t vecAmplitude;
 					vec3_t vecFreq;
+					std::vector<Color> vecColorKeyFrame;
+					std::vector<Scale> vecScaleKeyFrame;
+
+					for (const auto& row : spring["ColorKeyFrame"]) {
+						Color rowData;
+						rowData.rate = row[0];
+						rowData.r = row[1];
+						rowData.g = row[2];
+						rowData.b = row[3];
+						rowData.a = row[4];
+						vecColorKeyFrame.push_back(rowData);
+					}
+
+					for (const auto& row : spring["ScaleKeyFrame"]) {
+						Scale rowData;
+						rowData.rate = row[0];
+						rowData.scale = row[1];			
+						vecScaleKeyFrame.push_back(rowData);
+					}
+
 					for (int i = 0; i < 3; i++)
 					{
-						vecStartColor[i] = spring["StartColor"].at(i);
-						vecEndColor[i] = spring["EndColor"].at(i);
 						vecDir[i] = spring["Dirction"].at(i);
 						vecDirMin[i] = spring["MinDir"].at(i);
 						vecDirMax[i] = spring["MaxDir"].at(i);
@@ -237,39 +425,35 @@ namespace cl {
 						vecAmplitude[i] = spring["Amplitude"].at(i);
 						vecFreq[i] = spring["Freq"].at(i);
 					}
-					float flStartSize = spring["StartSize"].get<float>();
-					float flEndSize = spring["EndSize"].get<float>();
-					float flStartAlpha = spring["StartAlpha"].get<float>();
-					float flEndAlpha = spring["EndAlpha"].get<float>();
-					float flLifeTime = spring["LifeTime"].get<float>();
 					float flSpeed = spring["Speed"].get<float>();
 					float flIntervalTime = spring["IntervalTime"].get<float>();
+					float flStartTime = spring["StartTime"].get<float>();
+					float flEndTime = spring["EndTime"].get<float>();
+					float flRotateSpeed = spring["RotateSpeed"].get<float>();
+					float flFrameRate = spring["FrameRate"].get<float>();
 
 					vecSpring.emplace_back();
 					ParticleInfo& Temp = vecSpring.back();
 
 					Temp.iChannel = iChannel;
 
-					if (!m_vecCachedTexture.count(szTexture))
+					if (szSprite == "" || szSprite == "null")
 					{
 						PrecacheTexture(szTexture);
+					
+						Temp.pTexture = m_vecCachedTexture[szTexture];
+					}
+					else
+					{
+						ReadSprInfo(Temp, szSprite);
 					}
 
-					Temp.Data.pTexture = m_vecCachedTexture[szTexture];
-					CalcData(Temp.Data);
 					Temp.iStartBone = iStartBone;
 					Temp.vecStartOffsetMin = vecStartOffsetMin;
 					Temp.vecStartOffsetMax = vecStartOffsetMax;
 					Temp.iEndBone = iEndBone;
 					Temp.iStartAttachment = iStartAttachment;
 					Temp.iEndAttachment = iEndAttachment;			
-					Temp.vecStartColor = vecStartColor;
-					Temp.vecEndColor = vecEndColor;
-					Temp.flStartSize = flStartSize;
-					Temp.flEndSize = flEndSize;
-					Temp.flStartAlpha = flStartAlpha;
-					Temp.flEndAlpha = flEndAlpha;
-					Temp.flLifeTime = flLifeTime;
 					Temp.flSpeed = flSpeed;
 					Temp.iEmitCount = 255;	//forever
 					Temp.flIntervalTime = flIntervalTime;
@@ -278,7 +462,15 @@ namespace cl {
 					Temp.vecDirMax = vecDirMax;
 					Temp.vecAmplitude = vecAmplitude;
 					Temp.vecFreq = vecFreq;
+					Temp.flRotateSpeed = flRotateSpeed;
+					Temp.flStartTime = flStartTime;
+					Temp.flEndTime = flEndTime;
 					Temp.iFlag = iFlag;
+					Temp.iEmitPerCount = iEmitPerCount;
+					Temp.vecColorKeyFrame = vecColorKeyFrame;
+					Temp.vecScaleKeyFrame = vecScaleKeyFrame;
+					Temp.flFrameRate = flFrameRate;
+				
 
 				}
 
@@ -289,53 +481,49 @@ namespace cl {
 		return 1;
 	}
 
-	void CParticlePlayer::CalcData(ParticleData& info)
-	{
-		int w = info.pTexture->w();
-		int h = info.pTexture->h();
-
-		info.up     = 1;//(h >> 1);
-		info.left   = -1;//-(w >> 1);
-		info.down   = -1;//(h >> 1) - h;
-		info.right  = 1;//w + -(w >> 1);
-	}
-
-	void CParticlePlayer::DrawTGAQuad(ParticleData& particle, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color)
+	void CParticlePlayer::DrawTGAQuad(int iTexnum, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color)
 	{
 		vec3_t	point;
 
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
-		gRenderAPI.GL_Upload(particle.pTexture->texnum());
-		gRenderAPI.GL_Bind(0, particle.pTexture->texnum());
+		gRenderAPI.GL_Upload(iTexnum);
+		gRenderAPI.GL_Bind(0, iTexnum);
 		gEngfuncs.pTriAPI->Color4f(color[0], color[1], color[2], color[3]);
 
 		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
 		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
-		VectorMA(org, particle.down * scale, v_up, point);
-		VectorMA(point, particle.left * scale, v_right, point);
+		VectorMA(org, ParticleDown * scale, v_up, point);
+		VectorMA(point, ParticleLeft * scale, v_right, point);
 		gEngfuncs.pTriAPI->Vertex3fv(point);
 
 		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
-		VectorMA(org, particle.up * scale, v_up, point);
-		VectorMA(point, particle.left * scale, v_right, point);
+		VectorMA(org, ParticleUp * scale, v_up, point);
+		VectorMA(point, ParticleLeft * scale, v_right, point);
 		gEngfuncs.pTriAPI->Vertex3fv(point);
 
 		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
-		VectorMA(org, particle.up * scale, v_up, point);
-		VectorMA(point, particle.right * scale, v_right, point);
+		VectorMA(org, ParticleUp * scale, v_up, point);
+		VectorMA(point, ParticleRight * scale, v_right, point);
 		gEngfuncs.pTriAPI->Vertex3fv(point);
 
 		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
-		VectorMA(org, particle.down * scale, v_up, point);
-		VectorMA(point, particle.right * scale, v_right, point);
+		VectorMA(org, ParticleDown * scale, v_up, point);
+		VectorMA(point, ParticleRight * scale, v_right, point);
 		gEngfuncs.pTriAPI->Vertex3fv(point);
 	
 		gEngfuncs.pTriAPI->End();
 	}
 
-	void CParticlePlayer::InitHUDData(void)
+	void CParticlePlayer::ResetData(void)
 	{
+		m_ParticleArray.clear();
+		m_vecTempParticle.clear();
 
+		for (int i = 0; i < MAX_PARTICLE_CHANNEL; i++)
+		{
+			m_flNextTime[i] = 0;
+		}
+		
 	}
 	int CParticlePlayer::VidInit(void)
 	{
@@ -347,40 +535,6 @@ namespace cl {
 	{
 	}
 
-	void CParticlePlayer::MSG_AddParticle(const char* szTexture, int iChannel, int iEmitCount, float flIntervalTime, float flLifeTime, float flSpeed, float flStartSize, float flEndSize, int iStartBone, int iEndBone, int iStartAttachment, int iEndAttachment, vec3_t vecStartBoneOffset, vec3_t vecDir, vec3_t vecStartColor, vec3_t vecEndColor, float flStartAlpha, float flEndAlpha, vec3_t vecAmplitude, vec3_t vecFreq)
-	{
-#if 0
-		m_vecTempParticle.emplace_back();
-		ParticleInfo& Temp = m_vecTempParticle.back();
-
-		Temp.iChannel = iChannel;
-		if (!m_vecCachedTexture.count(szTexture))
-		{
-			PrecacheTexture(szTexture);
-		}
-		Temp.Data.pTexture = m_vecCachedTexture[szTexture];
-		CalcData(Temp.Data);
-		Temp.iStartBone = iStartBone;
-		Temp.iEndBone = iEndBone;
-		Temp.vecStartBoneOffset = vecStartBoneOffset;
-		Temp.iStartAttachment = iStartAttachment;
-		Temp.iEndAttachment = iEndAttachment;
-		Temp.vecStartColor = vecStartColor;
-		Temp.vecEndColor = vecEndColor;
-		Temp.flStartSize = flStartSize;
-		Temp.flEndSize = flEndSize;
-		Temp.flStartAlpha = flStartAlpha;
-		Temp.flEndAlpha = flEndAlpha;
-		Temp.flLifeTime = flLifeTime;
-		Temp.flSpeed = flSpeed;
-		Temp.iEmitCount = iEmitCount;
-		Temp.flIntervalTime = flIntervalTime;
-		Temp.vecDir = vecDir;
-		Temp.vecAmplitude = vecAmplitude;
-		Temp.vecFreq = vecFreq;
-#endif
-	}
-
 	void CParticlePlayer::ModifyStaticParticle(std::string szModelName, const char* szTexture, int iChannel, int iEmitCount, float flIntervalTime, float flLifeTime, float flSpeed, float flStartSize, float flEndSize, int iStartBone, int iEndBone, int iStartAttachment, int iEndAttachment, vec3_t vecStartOffset, vec3_t vecDir, vec3_t vecStartColor, vec3_t vecEndColor, float flStartAlpha, float flEndAlpha, vec3_t vecAmplitude, vec3_t vecFreq)
 	{
 		if (m_vecStaticParticle.count(szModelName))
@@ -389,36 +543,21 @@ namespace cl {
 			{
 				if (info.iChannel == iChannel)
 				{
-					info.flEndAlpha = flEndAlpha;
-					info.flEndSize = flEndSize;
 					info.flIntervalTime = flIntervalTime;
-					info.flLifeTime = flLifeTime;
 					info.flSpeed = flSpeed;
-					info.flStartAlpha = flStartAlpha;
-					info.flStartSize = flStartSize;
 					info.iEmitCount = iEmitCount;
 					info.iEndAttachment = iEndAttachment;
 					info.iEndBone = iEndBone;
 					info.iStartAttachment = iStartAttachment;
 					info.iStartBone = iStartBone;
 					info.vecDir = vecDir;
-					//info.vecDirMin = { 0, 0, 0 };
-					//info.vecDirMax = { 0, 0, 0 };
-					info.vecEndColor = vecEndColor;
-					info.vecStartColor = vecStartColor;
-					//info.vecStartOffsetMin = { 0, 0, 0 };
-					//info.vecStartOffsetMax = { 0, 0, 0 };
 					info.vecAmplitude = vecAmplitude;
 					info.vecFreq = vecFreq;
-					//info.iFlag = iFlag;
 					if (szTexture != nullptr)
-					{
-						if (!m_vecCachedTexture.count(szTexture))
-						{
-							PrecacheTexture(szTexture);
-						}
-						info.Data.pTexture = m_vecCachedTexture[szTexture];
-						CalcData(info.Data);
+					{			
+						PrecacheTexture(szTexture);
+
+						info.pTexture = m_vecCachedTexture[szTexture];
 					}
 						
 				}	
@@ -436,113 +575,128 @@ namespace cl {
 			}				
 			else
 			{
+				if (mapParticle->second.empty())
+				{
+					mapParticle = m_vecTempParticle.erase(mapParticle);
+					continue;
+				}
+
 				int index = 0;
 				for (int i = 0; i < mapParticle->second.size(); i++)
 				{
 					if (mapParticle->second[i].iEmitCount > 0)
 					{
-						if (gHUD.m_flTime > m_flNextTime[mapParticle->second[i].iChannel])
+						if (mapParticle->second[i].flStartTime < gHUD.m_flTime && gHUD.m_flTime > m_flNextTime[mapParticle->second[i].iChannel])
 						{
 							if (mapParticle->second[i].iEmitCount < 255)
 								mapParticle->second[i].iEmitCount--;
 
-							vec3_t shootPos;
-							vec3_t vecStart;
-							vec3_t vecStartOffset;
-							vec3_t vecEnd;
-							vec3_t shootDir;
-							vec3_t shootEnd;	//world
-
-							vecStartOffset.x = RandomFloat(mapParticle->second[i].vecStartOffsetMin.x, mapParticle->second[i].vecStartOffsetMax.x);
-							vecStartOffset.y = RandomFloat(mapParticle->second[i].vecStartOffsetMin.y, mapParticle->second[i].vecStartOffsetMax.y);
-							vecStartOffset.z = RandomFloat(mapParticle->second[i].vecStartOffsetMin.z, mapParticle->second[i].vecStartOffsetMax.z);
-
-							if (mapParticle->second[i].iStartBone != 255)
+							for (int j = 0; j < mapParticle->second[i].iEmitPerCount; j++)
 							{
-								vecStart.x = transform[mapParticle->second[i].iStartBone][0][3] + vecStartOffset.x;
-								vecStart.y = transform[mapParticle->second[i].iStartBone][1][3] + vecStartOffset.y;
-								vecStart.z = transform[mapParticle->second[i].iStartBone][2][3] + vecStartOffset.z;
+								vec3_t shootPos;
+								vec3_t vecStart;
+								vec3_t vecStartOffset;
+								vec3_t vecEnd;
+								vec3_t shootDir;
+								vec3_t shootEnd;	//world
 
-								if (mapParticle->second[i].iFlag & PARTICLE_FLAGS_ENDCENTER)
+								vecStartOffset.x = RandomFloat(mapParticle->second[i].vecStartOffsetMin.x, mapParticle->second[i].vecStartOffsetMax.x);
+								vecStartOffset.y = RandomFloat(mapParticle->second[i].vecStartOffsetMin.y, mapParticle->second[i].vecStartOffsetMax.y);
+								vecStartOffset.z = RandomFloat(mapParticle->second[i].vecStartOffsetMin.z, mapParticle->second[i].vecStartOffsetMax.z);
+
+								if (mapParticle->second[i].iStartBone != 255)
 								{
-									vecStart.x = transform[mapParticle->second[i].iStartBone][0][3] + (RandomInt(0 , 1) ? -vecStartOffset.x : vecStartOffset.x);
-									vecStart.y = transform[mapParticle->second[i].iStartBone][1][3] + (RandomInt(0, 1) ? -vecStartOffset.y : vecStartOffset.y);
-									vecStart.z = transform[mapParticle->second[i].iStartBone][2][3] + (RandomInt(0, 1) ? -vecStartOffset.z : vecStartOffset.z);
+									vecStart.x = transform[mapParticle->second[i].iStartBone][0][3] + vecStartOffset.x;
+									vecStart.y = transform[mapParticle->second[i].iStartBone][1][3] + vecStartOffset.y;
+									vecStart.z = transform[mapParticle->second[i].iStartBone][2][3] + vecStartOffset.z;
+
+									if (mapParticle->second[i].iFlag & PARTICLE_FLAGS_ENDCENTER)
+									{
+										vecStart.x = transform[mapParticle->second[i].iStartBone][0][3] + (RandomInt(0, 1) ? -vecStartOffset.x : vecStartOffset.x);
+										vecStart.y = transform[mapParticle->second[i].iStartBone][1][3] + (RandomInt(0, 1) ? -vecStartOffset.y : vecStartOffset.y);
+										vecStart.z = transform[mapParticle->second[i].iStartBone][2][3] + (RandomInt(0, 1) ? -vecStartOffset.z : vecStartOffset.z);
+									}
+
+									VectorTransform(vecStart, transform[mapParticle->second[i].iStartBone], shootPos);
+								}
+								else
+								{
+									vecStart = pattachment[mapParticle->second[i].iStartAttachment].org + vecStartOffset;
+
+									if (mapParticle->second[i].iFlag & PARTICLE_FLAGS_ENDCENTER)
+									{
+										vecStart.x = pattachment[mapParticle->second[i].iStartAttachment].org.x + (RandomInt(0, 1) ? -vecStartOffset.x : vecStartOffset.x);
+										vecStart.y = pattachment[mapParticle->second[i].iStartAttachment].org.y + (RandomInt(0, 1) ? -vecStartOffset.y : vecStartOffset.y);
+										vecStart.z = pattachment[mapParticle->second[i].iStartAttachment].org.z + (RandomInt(0, 1) ? -vecStartOffset.z : vecStartOffset.z);
+									}
+
+									VectorTransform(vecStart, transform[pattachment[mapParticle->second[i].iStartAttachment].bone], shootPos);
 								}
 
-								VectorTransform(vecStart, transform[mapParticle->second[i].iStartBone], shootPos);
-							}
-							else
-							{
-								vecStart = pattachment[mapParticle->second[i].iStartAttachment].org + vecStartOffset;
 
-								if (mapParticle->second[i].iFlag & PARTICLE_FLAGS_ENDCENTER)
+
+								mapParticle->second[i].vecOrigin = shootPos;
+
+								if (mapParticle->second[i].iEndBone != 255)
 								{
-									vecStart.x = pattachment[mapParticle->second[i].iStartAttachment].org.x + (RandomInt(0, 1) ? -vecStartOffset.x : vecStartOffset.x);
-									vecStart.y = pattachment[mapParticle->second[i].iStartAttachment].org.y + (RandomInt(0, 1) ? -vecStartOffset.y : vecStartOffset.y);
-									vecStart.z = pattachment[mapParticle->second[i].iStartAttachment].org.z + (RandomInt(0, 1) ? -vecStartOffset.z : vecStartOffset.z);
+									vecEnd.x = transform[mapParticle->second[i].iEndBone][0][3];
+									vecEnd.y = transform[mapParticle->second[i].iEndBone][1][3];
+									vecEnd.z = transform[mapParticle->second[i].iEndBone][2][3];
+
+									VectorTransform(vecEnd, transform[mapParticle->second[i].iEndBone], shootEnd);
+								}
+								else
+								{
+									vecEnd = pattachment[mapParticle->second[i].iEndAttachment].org;
+
+									VectorTransform(vecEnd, transform[pattachment[mapParticle->second[i].iEndAttachment].bone], shootEnd);
 								}
 
-								VectorTransform(vecStart, transform[pattachment[mapParticle->second[i].iStartAttachment].bone], shootPos);
+								vec3_t savedDir = mapParticle->second[i].vecDir;
+								vec3_t savedStartOffsetMin = mapParticle->second[i].vecStartOffsetMin;
+								vec3_t savedStartOffsetMax = mapParticle->second[i].vecStartOffsetMax;
+
+								if (mapParticle->second[i].vecDir.IsNaN() || mapParticle->second[i].vecDir.IsZero())
+								{
+									shootDir = (vecEnd - vecStart);
+									float length = sqrt(shootDir[0] * shootDir[0] + shootDir[1] * shootDir[1] + shootDir[2] * shootDir[2]);
+									shootDir.x /= length;
+									shootDir.y /= length;
+									shootDir.z /= length;
+
+									if (shootDir.IsNaN())
+										shootDir = { 0, 0, 0 };
+									mapParticle->second[i].vecDir = shootDir;
+								}
+
+								vec3_t vecDirOffset;
+
+								vecDirOffset.x = RandomFloat(mapParticle->second[i].vecDirMin.x, mapParticle->second[i].vecDirMax.x);
+								vecDirOffset.y = RandomFloat(mapParticle->second[i].vecDirMin.y, mapParticle->second[i].vecDirMax.y);
+								vecDirOffset.z = RandomFloat(mapParticle->second[i].vecDirMin.z, mapParticle->second[i].vecDirMax.z);
+
+								mapParticle->second[i].vecDir = (mapParticle->second[i].vecDir + vecDirOffset).Normalize();
+								mapParticle->second[i].vecStartOffsetMin = shootPos;
+								mapParticle->second[i].vecStartOffsetMax = shootEnd;
+								if (!mapParticle->second[i].vecSpriteTexName.empty())
+								{
+									mapParticle->second[i].pTexture = m_vecCachedTexture[mapParticle->second[i].vecSpriteTexName[0]];
+								}
+
+								AddToParticleArray(mapParticle->second[i]);
+
+								mapParticle->second[i].vecDir = savedDir;
+								mapParticle->second[i].vecStartOffsetMin = savedStartOffsetMin;
+								mapParticle->second[i].vecStartOffsetMax = savedStartOffsetMax;
 							}
-
-
-
-							mapParticle->second[i].vecOrigin = shootPos;
-
-							if (mapParticle->second[i].iEndBone != 255)
-							{
-								vecEnd.x = transform[mapParticle->second[i].iEndBone][0][3];
-								vecEnd.y = transform[mapParticle->second[i].iEndBone][1][3];
-								vecEnd.z = transform[mapParticle->second[i].iEndBone][2][3];
-
-								VectorTransform(vecEnd, transform[mapParticle->second[i].iEndBone], shootEnd);
-							}
-							else
-							{
-								vecEnd = pattachment[mapParticle->second[i].iEndAttachment].org;
-
-								VectorTransform(vecEnd, transform[pattachment[mapParticle->second[i].iEndAttachment].bone], shootEnd);
-							}
-
-							vec3_t savedDir = mapParticle->second[i].vecDir;
-							vec3_t savedStartOffsetMin = mapParticle->second[i].vecStartOffsetMin;
-							vec3_t savedStartOffsetMax = mapParticle->second[i].vecStartOffsetMax;
-
-							if (mapParticle->second[i].vecDir.IsNaN() || mapParticle->second[i].vecDir.IsZero())
-							{
-								shootDir = (vecEnd - vecStart);
-								float length = sqrt(shootDir[0] * shootDir[0] + shootDir[1] * shootDir[1] + shootDir[2] * shootDir[2]);
-								shootDir.x /= length;
-								shootDir.y /= length;
-								shootDir.z /= length;
-
-								if (shootDir.IsNaN())
-									shootDir = { 0, 0, 0 };
-								mapParticle->second[i].vecDir = shootDir;
-							}
-
-							vec3_t vecDirOffset;
-
-							vecDirOffset.x = RandomFloat(mapParticle->second[i].vecDirMin.x, mapParticle->second[i].vecDirMax.x);
-							vecDirOffset.y = RandomFloat(mapParticle->second[i].vecDirMin.y, mapParticle->second[i].vecDirMax.y);
-							vecDirOffset.z = RandomFloat(mapParticle->second[i].vecDirMin.z, mapParticle->second[i].vecDirMax.z);
-
-							mapParticle->second[i].vecDir = (mapParticle->second[i].vecDir + vecDirOffset).Normalize();
-							mapParticle->second[i].vecStartOffsetMin = shootPos;
-							mapParticle->second[i].vecStartOffsetMax = shootEnd;
-
-							AddToParticleArray(mapParticle->second[i]);
-
-							mapParticle->second[i].vecDir = savedDir;
-							mapParticle->second[i].vecStartOffsetMin = savedStartOffsetMin;
-							mapParticle->second[i].vecStartOffsetMax = savedStartOffsetMax;
-							
 
 							m_flNextTime[mapParticle->second[i].iChannel] = gHUD.m_flTime + mapParticle->second[i].flIntervalTime;
 						}
+						
 						mapParticle->second[index] = mapParticle->second[i];
 						index++;
+						
+						
 					}
 				}
 				mapParticle->second.resize(index);
@@ -550,81 +704,6 @@ namespace cl {
 			}
 		}
 		
-		
-#if 0
-		if (!m_vecTempParticle.empty())
-		{
-			int index = 0;
-			for (int i = 0; i < m_vecTempParticle.size(); i++)
-			{
-				if (m_vecTempParticle[i].iEmitCount > 0)
-				{
-					if (gHUD.m_flTime > m_flNextTime[m_vecTempParticle[i].iChannel])
-					{
-						if (m_vecTempParticle[i].iEmitCount < 255)
-							m_vecTempParticle[i].iEmitCount--;
-
-						vec3_t shootPos;
-						vec3_t vecStart;
-						vec3_t vecEnd;
-						vec3_t shootDir;
-
-						if (m_vecTempParticle[i].iStartBone != 255)
-						{
-							vecStart.x = transform[m_vecTempParticle[i].iStartBone][0][3] + m_vecTempParticle[i].vecStartBoneOffset.x;
-							vecStart.y = transform[m_vecTempParticle[i].iStartBone][1][3] + m_vecTempParticle[i].vecStartBoneOffset.y;
-							vecStart.z = transform[m_vecTempParticle[i].iStartBone][2][3] + m_vecTempParticle[i].vecStartBoneOffset.z;
-
-							VectorTransform(vecStart, transform[m_vecTempParticle[i].iStartBone], shootPos);
-						}
-						else
-						{
-							vecStart = pattachment[m_vecTempParticle[i].iStartAttachment].org + m_vecTempParticle[i].vecStartBoneOffset;
-
-							VectorTransform(vecStart, transform[pattachment[m_vecTempParticle[i].iStartAttachment].bone], shootPos);
-						}
-
-
-
-						m_vecTempParticle[i].vecOrigin = shootPos;
-
-						if (m_vecTempParticle[i].iEndBone != 255)
-						{
-							vecEnd.x = transform[m_vecTempParticle[i].iEndBone][0][3];
-							vecEnd.y = transform[m_vecTempParticle[i].iEndBone][1][3];
-							vecEnd.z = transform[m_vecTempParticle[i].iEndBone][2][3];
-						}
-						else
-						{
-							vecEnd = pattachment[m_vecTempParticle[i].iEndAttachment].org;
-						}
-
-						if (m_vecTempParticle[i].vecDir.IsNaN() || m_vecTempParticle[i].vecDir.IsZero())
-						{
-							shootDir = (vecEnd - vecStart);
-							float length = sqrt(shootDir[0] * shootDir[0] + shootDir[1] * shootDir[1] + shootDir[2] * shootDir[2]);
-							shootDir.x /= length;
-							shootDir.y /= length;
-							shootDir.z /= length;
-
-							if (shootDir.IsNaN())
-								shootDir = { 0, 0, 0 };
-							m_vecTempParticle[i].vecDir = shootDir;
-						}
-
-						AddToParticleArray(m_vecTempParticle[i]);
-
-						m_flNextTime[m_vecTempParticle[i].iChannel] = gHUD.m_flTime + m_vecTempParticle[i].flIntervalTime;
-					}			
-					m_vecTempParticle[index] = m_vecTempParticle[i];
-					index++;
-				}
-			}
-
-			m_vecTempParticle.resize(index);
-
-		}
-#endif
 		if (m_vecStaticParticle.count(modelName))
 		{
 			for (ParticleInfo& info : m_vecStaticParticle[modelName])
@@ -634,81 +713,95 @@ namespace cl {
 					if (info.iEmitCount < 255)
 						info.iEmitCount--;
 
-					vec3_t shootPos;
-					vec3_t vecStart;
-					vec3_t vecStartOffset;
-					vec3_t vecEnd;
-					vec3_t shootDir;
-					vec3_t shootEnd;	//world
-					
-					vecStartOffset.x = RandomFloat(info.vecStartOffsetMin.x, info.vecStartOffsetMax.x);
-					vecStartOffset.y = RandomFloat(info.vecStartOffsetMin.y, info.vecStartOffsetMax.y);
-					vecStartOffset.z = RandomFloat(info.vecStartOffsetMin.z, info.vecStartOffsetMax.z);
-
-					if (info.iStartBone != 255)
+					for (int i = 0; i < info.iEmitPerCount; i++)
 					{
-						vecStart.x = transform[info.iStartBone][0][3] + vecStartOffset.x;
-						vecStart.y = transform[info.iStartBone][1][3] + vecStartOffset.y;
-						vecStart.z = transform[info.iStartBone][2][3] + vecStartOffset.z;
+						vec3_t shootPos;
+						vec3_t vecStart;
+						vec3_t vecStartOffset;
+						vec3_t vecEnd;
+						vec3_t shootDir;
+						vec3_t shootEnd;	//world
 
-						VectorTransform(vecStart, transform[info.iStartBone], shootPos);
+						vecStartOffset.x = RandomFloat(info.vecStartOffsetMin.x, info.vecStartOffsetMax.x);
+						vecStartOffset.y = RandomFloat(info.vecStartOffsetMin.y, info.vecStartOffsetMax.y);
+						vecStartOffset.z = RandomFloat(info.vecStartOffsetMin.z, info.vecStartOffsetMax.z);
+
+						if (info.iStartBone != 255)
+						{
+							vecStart.x = transform[info.iStartBone][0][3] + vecStartOffset.x;
+							vecStart.y = transform[info.iStartBone][1][3] + vecStartOffset.y;
+							vecStart.z = transform[info.iStartBone][2][3] + vecStartOffset.z;
+
+							VectorTransform(vecStart, transform[info.iStartBone], shootPos);
+						}
+						else
+						{
+							vecStart = pattachment[info.iStartAttachment].org + vecStartOffset;
+
+							VectorTransform(vecStart, transform[pattachment[info.iStartAttachment].bone], shootPos);
+						}
+
+						info.vecOrigin = shootPos;
+
+						if (info.iEndBone != 255)
+						{
+							vecEnd.x = transform[info.iEndBone][0][3];
+							vecEnd.y = transform[info.iEndBone][1][3];
+							vecEnd.z = transform[info.iEndBone][2][3];
+
+							VectorTransform(vecEnd, transform[info.iEndBone], shootEnd);
+						}
+						else
+						{
+							vecEnd = pattachment[info.iEndAttachment].org;
+
+							VectorTransform(vecEnd, transform[pattachment[info.iEndAttachment].bone], shootEnd);
+						}
+
+						float life = info.flEndTime - info.flStartTime;
+						float savedStartTime = info.flStartTime;
+						float savedEndTime = info.flEndTime;
+						vec3_t savedDir = info.vecDir;
+						vec3_t savedStartOffsetMin = info.vecStartOffsetMin;
+						vec3_t savedStartOffsetMax = info.vecStartOffsetMax;
+
+						if (info.vecDir.IsZero())
+						{
+							shootDir = (vecEnd - vecStart);
+							float length = sqrt(shootDir[0] * shootDir[0] + shootDir[1] * shootDir[1] + shootDir[2] * shootDir[2]);
+							shootDir.x /= length;
+							shootDir.y /= length;
+							shootDir.z /= length;
+							if (shootDir.IsNaN())
+								shootDir = { 0, 0, 0 };
+
+							info.vecDir = shootDir;
+						}
+
+						vec3_t vecDirOffset;
+
+						vecDirOffset.x = RandomFloat(info.vecDirMin.x, info.vecDirMax.x);
+						vecDirOffset.y = RandomFloat(info.vecDirMin.y, info.vecDirMax.y);
+						vecDirOffset.z = RandomFloat(info.vecDirMin.z, info.vecDirMax.z);
+
+						info.vecDir = (info.vecDir + vecDirOffset).Normalize();
+						info.vecStartOffsetMin = shootPos;
+						info.vecStartOffsetMax = shootEnd;
+						info.flStartTime = gHUD.m_flTime;
+						info.flEndTime = gHUD.m_flTime + life;
+						if (!info.vecSpriteTexName.empty())
+						{
+							info.pTexture = m_vecCachedTexture[info.vecSpriteTexName[0]];
+						}
+
+						AddToParticleArray(info);
+
+						info.vecDir = savedDir;
+						info.vecStartOffsetMin = savedStartOffsetMin;
+						info.vecStartOffsetMax = savedStartOffsetMax;
+						info.flStartTime = savedStartTime;
+						info.flEndTime = savedEndTime;
 					}
-					else
-					{
-						vecStart = pattachment[info.iStartAttachment].org + vecStartOffset;
-
-						VectorTransform(vecStart, transform[pattachment[info.iStartAttachment].bone], shootPos);
-					}
-
-					info.vecOrigin = shootPos;
-
-					if (info.iEndBone != 255)
-					{
-						vecEnd.x = transform[info.iEndBone][0][3];
-						vecEnd.y = transform[info.iEndBone][1][3];
-						vecEnd.z = transform[info.iEndBone][2][3];
-
-						VectorTransform(vecEnd, transform[info.iEndBone], shootEnd);
-					}
-					else
-					{
-						vecEnd = pattachment[info.iEndAttachment].org;
-
-						VectorTransform(vecEnd, transform[pattachment[info.iEndAttachment].bone], shootEnd);
-					}
-
-					vec3_t savedDir = info.vecDir;
-					vec3_t savedStartOffsetMin = info.vecStartOffsetMin;
-					vec3_t savedStartOffsetMax = info.vecStartOffsetMax;
-
-					if (info.vecDir.IsZero())
-					{			
-						shootDir = (vecEnd - vecStart);
-						float length = sqrt(shootDir[0] * shootDir[0] + shootDir[1] * shootDir[1] + shootDir[2] * shootDir[2]);
-						shootDir.x /= length;
-						shootDir.y /= length;
-						shootDir.z /= length;
-						if (shootDir.IsNaN())
-							shootDir = { 0, 0, 0 };
-
-						info.vecDir = shootDir;
-					}
-
-					vec3_t vecDirOffset;
-
-					vecDirOffset.x = RandomFloat(info.vecDirMin.x, info.vecDirMax.x);
-					vecDirOffset.y = RandomFloat(info.vecDirMin.y, info.vecDirMax.y);
-					vecDirOffset.z = RandomFloat(info.vecDirMin.z, info.vecDirMax.z);
-
-					info.vecDir = (info.vecDir + vecDirOffset).Normalize();
-					info.vecStartOffsetMin = shootPos;
-					info.vecStartOffsetMax = shootEnd;
-
-					AddToParticleArray(info);
-
-					info.vecDir = savedDir;
-					info.vecStartOffsetMin = savedStartOffsetMin;
-					info.vecStartOffsetMax = savedStartOffsetMax;
 
 					m_flNextTime[info.iChannel] = gHUD.m_flTime + info.flIntervalTime;
 				}
@@ -721,12 +814,7 @@ namespace cl {
 		m_ParticleArray.emplace_back();
 		ParticleInfo& Temp = m_ParticleArray.back();
 
-		Temp.flStartAlpha = info.flStartAlpha;
-		Temp.flEndAlpha = info.flEndAlpha;
 		Temp.flIntervalTime = info.flIntervalTime;
-		Temp.flLifeTime = info.flLifeTime;
-		Temp.flStartSize = info.flStartSize;
-		Temp.flEndSize = info.flEndSize;
 		Temp.flSpeed = info.flSpeed;
 		Temp.iStartBone = info.iStartBone;	//useless
 		Temp.iEndBone = info.iEndBone;
@@ -736,17 +824,20 @@ namespace cl {
 		Temp.iEndAttachment = info.iEndAttachment;		//useless
 		Temp.vecDirMin = info.vecDirMin;	//useless
 		Temp.vecDirMax = info.vecDirMax;	//useless
-		Temp.vecStartColor = info.vecStartColor;
-		Temp.vecEndColor = info.vecEndColor;
-		Temp.Data = info.Data;
+		Temp.pTexture = info.pTexture;
 		Temp.iChannel = info.iChannel;
-		Temp.flStartTime = gHUD.m_flTime;	
+		Temp.flStartTime = info.flStartTime;	
+		Temp.flEndTime = info.flEndTime;
 		Temp.vecDir = info.vecDir;
 		Temp.vecOrigin = info.vecOrigin;
 		Temp.iEmitCount = info.iEmitCount;
 		Temp.vecAmplitude = info.vecAmplitude;
 		Temp.vecFreq = info.vecFreq;
+		Temp.flRotateSpeed = info.flRotateSpeed;
 		Temp.iFlag = info.iFlag;
+		Temp.vecScaleKeyFrame = info.vecScaleKeyFrame;
+		Temp.vecColorKeyFrame = info.vecColorKeyFrame;
+		Temp.iEmitPerCount = info.iEmitPerCount;
 
 	}
 
@@ -755,15 +846,14 @@ namespace cl {
 	{
 		cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
-		if (!viewent)0;
+		if (!viewent)
+			return 0;
 
 		int index = 0;
 		for (int i = 0; i < m_ParticleArray.size(); i++)
 		{
 			//删除播放完的队列
-			float currentTime = gHUD.m_flTime - m_ParticleArray[i].flStartTime;
-
-			if (currentTime < m_ParticleArray[i].flLifeTime)
+			if (gHUD.m_flTime <= m_ParticleArray[i].flEndTime)
 			{
 				m_ParticleArray[index] = m_ParticleArray[i];
 				index++;
@@ -775,7 +865,7 @@ namespace cl {
 		for (auto iter = m_ParticleArray.begin(); iter != m_ParticleArray.end(); iter++)
 		{
 			//转世界坐标
-			if (iter->Data.pTexture)
+			if (iter->pTexture)
 			{
 				vec3_t vecWorldOrigin;
 
@@ -789,12 +879,21 @@ namespace cl {
 
 					if (DotProduct(iter->vecDir, Dir) < 0)
 					{
-						iter->flLifeTime = 0;
+						iter->flEndTime = 0;
 					}
 
 				}
 
-				VectorTransform(iter->vecOrigin, matrix, iter->vecWorldOrigin);
+				if (iter->iFlag & PARTICLE_FLAGS_ATTACHED)
+				{
+					iter->vecWorldOrigin = viewent->attachment[iter->iStartAttachment];
+				}
+				else
+				{
+					VectorTransform(iter->vecOrigin, matrix, iter->vecWorldOrigin);
+				}
+
+			
 			}	
 		}
 
@@ -825,9 +924,11 @@ namespace cl {
 		{
 			float currentTime = gHUD.m_flTime - iter->flStartTime;
 
-			if (iter->Data.pTexture)
+			if (iter->pTexture)
 			{	
-				vec3_t vecRight, vecUp, vecColor;
+				vec3_t vecRight, vecUp;
+				vec4_t vecColor;
+				float sr, cr;
 
 				vecRight[0] = vRight[0];
 				vecRight[1] = vRight[1];
@@ -837,17 +938,54 @@ namespace cl {
 				vecUp[1] = vUp[1];
 				vecUp[2] = vUp[2];
 
-				VectorLerp(iter->vecStartColor, currentTime / iter->flLifeTime, iter->vecEndColor, vecColor);
+				iter->flAngle += iter->flRotateSpeed;
 
-				float alpha = std::lerp(iter->flStartAlpha, iter->flEndAlpha, currentTime / iter->flLifeTime);
-				float size = std::lerp(iter->flStartSize, iter->flEndSize, currentTime / iter->flLifeTime);
+				if (iter->flAngle > 360)
+					iter->flAngle = 0;
 
-				iter->vecColor[0] = vecColor[0] / 255.0;
-				iter->vecColor[1] = vecColor[1] / 255.0;
-				iter->vecColor[2] = vecColor[2] / 255.0;
-				iter->vecColor[3] = alpha;
+				float flAngle = iter->flAngle * (M_PI2 / 360.0f);
+				SinCos(flAngle, &sr, &cr);
 
-				DrawTGAQuad(iter->Data, iter->vecWorldOrigin, vecRight, vecUp, size, iter->vecColor);
+				vecRight = vecRight * cr + vecUp * sr;
+				vecUp = vecRight * -sr + vecUp * cr;
+
+				float life = iter->flEndTime - iter->flStartTime;
+
+				float rate = currentTime / life;
+
+				Color* pColor = GetCurrentColor(iter->vecColorKeyFrame, rate);
+				Scale* pScale = GetCurrentScale(iter->vecScaleKeyFrame, rate);
+
+				vecColor[0] = pColor->r;
+				vecColor[1] = pColor->g;
+				vecColor[2] = pColor->b;
+				vecColor[3] = 1.0 - pColor->a;
+
+				if (!iter->vecSpriteTexName.empty())
+				{		
+					int frame = 0;
+					int maxframe = iter->vecSpriteTexName.size() - 1;
+					frame = int(iter->flFrameRate * currentTime);
+
+					if (frame > maxframe)
+					{
+						if (iter->iFlag & PARTICLE_FLAGS_SPR_LOOP)
+						{
+							frame = int(frame) % maxframe;						
+						}
+						else
+						{
+							frame = maxframe;
+						}
+
+					}
+
+					iter->pTexture = m_vecCachedTexture[iter->vecSpriteTexName[frame]];
+				}
+
+				DrawTGAQuad(iter->pTexture->texnum(), iter->vecWorldOrigin, vecRight, vecUp, pScale->scale, vecColor);
+		
+				
 			}
 		}
 

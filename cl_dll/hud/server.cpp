@@ -884,7 +884,6 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		float startalpha = float(reader.ReadByte()) / 255.0;
 		float endalpha = float(reader.ReadByte()) / 255.0;
 
-		g_ParticleManager.MSG_AddParticle(texture, channel, emitcount, intervaltime, life, speed, startsize, endsize, startbone, endbone, startattachment, endattachment, startboneoffset, dir, startcolor, endcolor, startalpha, endalpha, { 0, 0, 0 }, { 0, 0, 0 });
 		break;
 	}
 	case 53:

@@ -46,12 +46,13 @@
 
 #include "com_weapons.h"
 #include "ParticlePlayer.h"
-
+#include "ModelFXPlayer.h"
 namespace cl {
 
 extern CGameStudioModelRenderer g_StudioRenderer;
 extern engine_studio_api_t IEngineStudio;
 CParticlePlayer g_ParticleManager;
+CModelFXPlayer g_ModelFXManager;
 typedef struct pmtrace_s pmtrace_t;
 
 struct model_s* CStudioModelRenderer::s_pBuffAugViewModel;
@@ -165,6 +166,9 @@ struct model_s* CStudioModelRenderer::s_pLaserFistEXPModel;
 
 struct model_s* CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel;
 struct model_s* CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model;
+struct model_s* CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_04Model;
+struct model_s* CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_05Model;
+struct model_s* CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_06Model;
 
 struct model_s* CStudioModelRenderer::s_pLightningARPModel;
 
@@ -968,6 +972,134 @@ void CStudioModelRenderer::StudioSaveBones(void)
 
 }
 
+
+void CStudioModelRenderer::StudioMergeFXModelBones(model_t* m_pSubModel, const char* szBoneName, int iMergeType)
+{
+	int i, j;
+	double f;
+
+	mstudiobone_t* pbones;
+	mstudioseqdesc_t* pseqdesc;
+	mstudioanim_t* panim;
+
+	static vec3_t pos[MAXSTUDIOBONES];
+	matrix3x4 bonematrix;
+	static vec4_t q[MAXSTUDIOBONES];
+	//m_pStudioHeader为要拼合的p模型
+	if (!m_pStudioHeader || !m_pCurrentEntity)
+		return;
+
+	if (m_pCurrentEntity->curstate.sequence >= m_pStudioHeader->numseq)
+		m_pCurrentEntity->curstate.sequence = 0;
+
+	pseqdesc = (mstudioseqdesc_t*)((byte*)m_pStudioHeader + m_pStudioHeader->seqindex) + m_pCurrentEntity->curstate.sequence;
+
+	f = StudioEstimateFrame(pseqdesc);
+
+	/*if (m_pCurrentEntity->latched.prevframe > f)
+	{
+	}*/
+
+	panim = StudioGetAnim(m_pSubModel, pseqdesc);
+	StudioCalcRotations(pos, q, pseqdesc, panim, f);
+
+	pbones = (mstudiobone_t*)((byte*)m_pStudioHeader + m_pStudioHeader->boneindex);
+	//p模型的关节点
+
+	if (!strcmp(szBoneName, "null") || !strcmp(szBoneName, ""))
+	{
+		for (i = 0; i < m_pStudioHeader->numbones; i++)
+		{
+			for (j = 0; j < m_nCachedBones; j++)
+			{
+				//m_nCachedBoneNames是StudioSaveBones保存下来的名字,如果一样，一起加入变换
+				if (stricmp(pbones[i].name, m_nCachedBoneNames[j]) == 0)
+				{
+					MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
+					MatrixCopy(m_rgCachedLightTransform[j], (*m_plighttransform)[i]);
+					break;
+				}
+			}
+			//要合并的模型独立的部分，加入进去
+			if (j >= m_nCachedBones)
+			{
+				QuaternionMatrix(q[i], bonematrix);
+
+				bonematrix[0][3] = pos[i][0];
+				bonematrix[1][3] = pos[i][1];
+				bonematrix[2][3] = pos[i][2];
+
+				if (pbones[i].parent == -1)
+				{
+					if (IEngineStudio.IsHardware())
+					{
+						ConcatTransforms((*m_protationmatrix), bonematrix, (*m_pbonetransform)[i]);
+						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
+					}
+					else
+					{
+						ConcatTransforms((*m_paliastransform), bonematrix, (*m_pbonetransform)[i]);
+						ConcatTransforms((*m_protationmatrix), bonematrix, (*m_plighttransform)[i]);
+					}
+
+					StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
+				}
+				else
+				{
+					ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
+					ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
+				}
+			}
+		}
+
+	}
+	else
+	{
+		for (i = 0; i < m_pStudioHeader->numbones; i++)
+		{
+			QuaternionMatrix(q[i], bonematrix);
+
+			bonematrix[0][3] = pos[i][0];
+			bonematrix[1][3] = pos[i][1];
+			bonematrix[2][3] = pos[i][2];
+
+			if (pbones[i].parent == -1)
+			{
+				for (j = 0; j < m_nCachedBones; j++)
+				{
+					if (stricmp(m_nCachedBoneNames[j], szBoneName) == 0)
+					{
+						if (iMergeType)
+						{
+							//现在的写法是最终位置=socket_bone的位置 加上 特效模型的root的位置
+							ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
+						}
+						else
+						{
+							//最终位置 = socket_bone的位置。copy相当于丢弃了特效模型root的变换
+							MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
+						}
+										
+						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
+						break;
+					}
+				}
+
+				StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
+			}
+			else
+			{
+				ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
+				ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
+			}
+		}
+
+		return;
+	}
+
+	
+}
+
 void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 {
 	int i, j;
@@ -1000,6 +1132,77 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 
 	pbones = (mstudiobone_t *)((byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
 	//p模型的关节点
+	
+	if (m_pSubModel == CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_05Model || m_pSubModel == CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_06Model)
+	{
+		for (i = 0; i < m_pStudioHeader->numbones; i++)
+		{
+			QuaternionMatrix(q[i], bonematrix);
+
+			bonematrix[0][3] = pos[i][0];
+			bonematrix[1][3] = pos[i][1];
+			bonematrix[2][3] = pos[i][2];
+
+			if (pbones[i].parent == -1)
+			{
+				for (j = 0; j < m_nCachedBones; j++)
+				{
+					if (stricmp(m_nCachedBoneNames[j], "Dummy004") == 0)
+					{
+						MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
+						//ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
+						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
+						break;
+					}
+				}
+
+				StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
+			}
+			else
+			{
+				ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
+				ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
+			}
+		}
+
+		return;
+	}
+
+	if (CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_04Model && m_pSubModel == CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_04Model)
+	{
+		for (i = 0; i < m_pStudioHeader->numbones; i++)
+		{
+			QuaternionMatrix(q[i], bonematrix);
+
+			bonematrix[0][3] = pos[i][0];
+			bonematrix[1][3] = pos[i][1];
+			bonematrix[2][3] = pos[i][2];
+
+			if (pbones[i].parent == -1)
+			{
+				for (j = 0; j < m_nCachedBones; j++)
+				{
+					if (stricmp(m_nCachedBoneNames[j], "Scene Root") == 0)
+					{
+						MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
+						//ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
+						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
+						break;
+					}
+				}
+
+				StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
+			}
+			else
+			{
+				ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
+				ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
+			}
+		}
+
+		return;
+	}
+
 	if (CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model && m_pSubModel == CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model)
 	{
 		for (i = 0; i < m_pStudioHeader->numbones; i++)
@@ -1014,8 +1217,9 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 			{
 				for (j = 0; j < m_nCachedBones; j++)
 				{
-					if (stricmp(m_nCachedBoneNames[j], "FvARM-bone L Hand") == 0)
+					if (stricmp(m_nCachedBoneNames[j], "Dummy004") == 0)
 					{
+						
 						MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
 						//ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
 						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
@@ -1276,6 +1480,85 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 		cl_entity_s* viewent = IEngineStudio.GetViewEntity();
 		cl_entity_s* curent = IEngineStudio.GetCurrentEntity();
 
+		if (gunmodel)
+		{
+			std::string vmodel = curent->model->name;
+
+			std::string modelname = vmodel.substr(vmodel.find_last_of('/') + 1);
+
+			g_ModelFXManager.UpdateModelInfo(modelname, m_clTime);
+
+			if (g_ModelFXManager.m_vecModelFXArray.count(modelname))
+			{
+				for (CModelFXPlayer::ModelFXInfo& info : g_ModelFXManager.m_vecModelFXArray[modelname])
+				{
+					studiohdr_t* saveheader = m_pStudioHeader;
+
+					cl_entity_t saveent = *m_pCurrentEntity;
+					int saveseq = m_pCurrentEntity->curstate.sequence;
+					float saveanimtime = m_pCurrentEntity->curstate.animtime;
+					float saveframe = m_pCurrentEntity->curstate.frame;
+					int save_interp = m_fDoInterp;
+
+					model_t* weaponpart = g_ModelFXManager.s_pFXModel[info.szFXModelName];
+
+					m_pStudioHeader = (studiohdr_t*)IEngineStudio.Mod_Extradata(weaponpart);
+					if (!m_pStudioHeader)
+						return 0;
+
+					m_pCurrentEntity->curstate.sequence = info.iSequence;
+					m_pCurrentEntity->curstate.animtime = info.flStartTime;
+					m_pCurrentEntity->curstate.rendermode = info.rendermode;
+					m_pCurrentEntity->curstate.renderamt = info.renderamt;
+					m_pCurrentEntity->curstate.renderfx = info.renderfx;
+					m_pCurrentEntity->curstate.rendercolor.r = info.r;
+					m_pCurrentEntity->curstate.rendercolor.g = info.g;
+					m_pCurrentEntity->curstate.rendercolor.b = info.b;
+			
+					m_fDoInterp = 1;
+
+					IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+					StudioMergeFXModelBones(weaponpart, info.szBoneName.c_str(), info.iMergeType);
+		
+					for (int i = 0; i < info.vecSpriteSkin.size(); i++)
+					{
+						if (info.vecSpriteSkin[i].iTex == -1)
+							break;
+
+						IEngineStudio.StudioAddBindBMPList(m_pCurrentEntity, m_pStudioHeader, info.vecSpriteSkin[i].szSprName, info.vecSpriteSkin[i].iTex, info.iFlag, info.flFrameRate, info.flStartTime, info.flEndTime);
+					}
+
+					//AddToBmpListOnce
+					info.vecSpriteSkin[0].iTex = -1;
+					
+					IEngineStudio.StudioSetupLighting(&lighting);
+
+
+					StudioRenderModel(dir);
+
+					StudioCalcAttachments();
+					IEngineStudio.StudioClientEvents();
+
+					if (m_pCurrentEntity->index > 0)
+						memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
+
+					*m_pCurrentEntity = saveent;
+					gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
+					m_pStudioHeader = saveheader;
+					IEngineStudio.StudioSetHeader(m_pStudioHeader);
+
+					m_pCurrentEntity->curstate.sequence = saveseq;
+					m_pCurrentEntity->curstate.animtime = saveanimtime;
+					m_pCurrentEntity->curstate.frame = saveframe;
+					m_fDoInterp = save_interp;
+
+					if (flags & STUDIO_EVENTS)
+						IEngineStudio.StudioClientEvents();
+				}
+			}
+		}
+		
 		if (CStudioModelRenderer::s_pLeapStrikeGunPartModel && CStudioModelRenderer::s_pLeapStrikeGunViewModel && curent->model == CStudioModelRenderer::s_pLeapStrikeGunViewModel)
 		{
 			studiohdr_t* saveheader = m_pStudioHeader;
@@ -1376,7 +1659,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 				IEngineStudio.StudioClientEvents();
 		}
 
-		if (CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && curent->model == CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel)
+	/*	if (CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && curent->model == CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel)
 		{
 			studiohdr_t* saveheader = m_pStudioHeader;
 
@@ -1394,6 +1677,9 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 			m_pCurrentEntity->curstate.sequence = 0;
 			m_pCurrentEntity->curstate.animtime = 0.0;
+			m_pCurrentEntity->curstate.rendermode = kRenderGlow;
+			m_pCurrentEntity->curstate.renderamt = 255;
+			m_pCurrentEntity->curstate.renderfx = 0;
 			m_fDoInterp = 1;
 
 			IEngineStudio.StudioSetHeader(m_pStudioHeader);
@@ -1423,7 +1709,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 			if (flags & STUDIO_EVENTS)
 				IEngineStudio.StudioClientEvents();
-		}
+		}*/
 
 		if (CStudioModelRenderer::s_pM4A1_S_TransformersViewModel && CStudioModelRenderer::s_pM4A1_S_TransformersViewModel && curent->model == CStudioModelRenderer::s_pM4A1_S_TransformersViewModel)
 		{

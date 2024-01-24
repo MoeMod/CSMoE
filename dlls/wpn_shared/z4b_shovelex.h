@@ -183,7 +183,7 @@ public:
 		"models/z4b/knuckle/v_knuckle.mdl",
 		"models/z4b/bcaxevip/v_bcaxevip.mdl",
 		"models/z4b/btfknife/v_BTFknife.mdl",
-		"models/z4b/Balisong_LuminousEdge/v_balisong_luminousedge.mdl",
+		"models/z4b/Balisong_LuminousEdge/PV-Balisong_LuminousEdge.mdl",
 	};
 
 	const char* P_CUSTOM_MODEL[TYPE_NUM] =
@@ -198,7 +198,7 @@ public:
 		"models/z4b/knuckle/p_knuckle.mdl",
 		"models/z4b/bcaxevip/p_bcaxevip.mdl",
 		"models/z4b/btfknife/p_BTFknife.mdl",
-		"models/z4b/Balisong_LuminousEdge/p_balisong_luminousedge.mdl",
+		"models/z4b/Balisong_LuminousEdge/QV-Balisong_LuminousEdge.mdl",
 	};
 
 	std::vector<int> m_iStoredChange;

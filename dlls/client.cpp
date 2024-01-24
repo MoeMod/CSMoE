@@ -2053,6 +2053,11 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 			appearance.model_id = MODEL_BUFFCLASS23S4CT;
 			break;
 		}
+		case 39:
+		{
+			appearance.model_id = MODEL_BUFFCLASSMISAKA;
+			break;
+		}
 		default:
 		{
 			appearance.model_id = MODEL_SAF;

@@ -589,7 +589,7 @@ set (STUDIORENDER_SRCS
 	./studio/bonequatlru.cpp
 	./studio/weaponpaint.cpp
 	./studio/ParticlePlayer.cpp
-
+	./studio/ModelFXPlayer.cpp
 )
 
 set(PM_SRCS

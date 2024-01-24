@@ -596,6 +596,10 @@ cl_entity_t* GAME_EXPORT pfnModCurrentEntity(cl_entity_t* ent)
 	return RI.currententity;
 }
 
+void R_StudioAddBindBMPList(cl_entity_s* ent, studiohdr_t* header, std::string sprFile, int texIndex, int flag, float framerate, float starttime, float endtime)
+{
+	BindBMPManager().ReadSprInfo(ent, header, sprFile, texIndex, flag, framerate, starttime, endtime);
+}
 
 void GAME_EXPORT R_StudioPgluPerspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
 {
@@ -2021,8 +2025,55 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			}
 		}
 
-		for (auto iter = g_vecBindBMPList.begin(); iter != g_vecBindBMPList.end(); iter++)
+		for (auto iter = g_vecBindBMPList.begin(); iter != g_vecBindBMPList.end();)
 		{
+			if (iter->pEntModel == RI.currententity && iter->pHeader == m_pStudioHeader)
+			{
+				if (pskinref[pmesh->skinref] == iter->iTexIndex)
+				{	
+					if (cl.time > iter->flEndTime)
+					{
+						iter = g_vecBindBMPList.erase(iter);
+						continue;
+					}
+
+					int frame = 0;
+					int maxframe = iter->vecTexName.size() - 1;
+					frame = int(iter->flFrameRate * (cl.time - iter->flStartTime));
+
+					if (frame > maxframe)
+					{
+						if (iter->iFlag)
+						{
+							frame = maxframe;
+						
+						}
+						else
+						{
+							frame = int(frame) % maxframe;
+
+							//frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
+							//frame = frame - (int)frame;
+							//frame = startFrame;
+						}
+							
+					}
+
+					const char* pszFileName = iter->vecTexName[frame].c_str();
+
+					texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+					if (texnum)
+					{
+						//xe::TexLru_CreateAttr(&ptexture[pskinref[pmesh->skinref]], texnum);
+						bBindTex = true;
+						break;
+					}
+					
+				}
+			}
+		
+			iter++;
+#if 0
 			if (!Q_stricmp(m_pStudioHeader->name, iter->mdlname) && !Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, iter->texname))
 			{
 				int curSeq = RI.currententity->curstate.sequence;
@@ -2073,6 +2124,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 				if (bBindTex)
 					break;
 			}
+#endif
 		}
 
 		const auto& attr = xe::TexLru_GetAttr(&ptexture[pskinref[pmesh->skinref]]);
@@ -3919,6 +3971,7 @@ static engine_studio_api_t gStudioAPI =
 	R_StudioPgluPerspective,
 	R_StudioGetProjectionMatrix,
 	R_StudioSetProjectionMatrix,
+	R_StudioAddBindBMPList
 };
 
 static r_studio_interface_t gStudioDraw =

@@ -114,6 +114,7 @@ const ClassInfo Class_CT[] = {
 	{"buffclass23s2ct"},
 	{"buffclass23s3ct"},
 	{"buffclass23s4ct"},
+	{"buffclassmisaka"},
 };
 
 const ClassInfo Class_Zb[] = {

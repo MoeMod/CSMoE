@@ -17,41 +17,19 @@ GNU General Public License for more details.
 
 #include "gl_export.h"
 #include "vector"
-struct seqBmp
-{
-	int index;
-	bool isLoop;
-	bool isSyncFrame;
-	int startFrame;
-	int endFrame;
-};
+#include "studio.h"
 
 struct BMPList
 {
-	BMPList()
-	{
-		memset(mdlname, 0, sizeof(mdlname));
-		memset(texname, 0, sizeof(texname));
-		memset(bmpname, 0, sizeof(bmpname));
-		BmpFPS = 0;
-	};
-
-	char mdlname[64];
-	char texname[64];
-	char bmpname[64];
-	float BmpFPS;
-	std::vector<seqBmp> vecSequence;
+	cl_entity_t* pEntModel;
+	studiohdr_t* pHeader;
+	int iTexIndex;
+	int iFlag;
+	float flFrameRate;
+	float flStartTime;
+	float flEndTime;
+	std::vector<std::string> vecTexName;
 };
-
-struct ConstBMPList
-{
-	const char* mdlname;
-	const char* texname;
-	const char* bmpname;
-	float BmpFPS;
-	std::vector<seqBmp> vecSequence;
-};
-
 
 class CBindBMPManager
 {
@@ -61,8 +39,9 @@ public:
 
 	void Vidinit(void);
 
+	void ReadSprInfo(cl_entity_s* ent, studiohdr_t* header, std::string sprFile, int texIndex, int flag, float framerate, float starttime, float endtime);
 
-	int LoadBMP(ConstBMPList* List);
+	std::unordered_map<std::string, std::vector<std::string>> m_vecCachedSpriteJson;
 
 };
 

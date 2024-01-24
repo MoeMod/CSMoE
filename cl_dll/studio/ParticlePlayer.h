@@ -12,10 +12,27 @@ namespace cl {
 #define MAX_PARTICLE_CHANNEL		16
 
 #define PARTICLE_FLAGS_ENDCENTER	1
+#define PARTICLE_FLAGS_SPR_LOOP		2
+#define PARTICLE_FLAGS_ATTACHED		4
 
 class CParticlePlayer
 {
 public:
+
+	struct Color
+	{
+		float rate;
+		float r;
+		float g;
+		float b;
+		float a;
+	};
+
+	struct Scale
+	{
+		float rate;
+		float scale;
+	};
 
 	struct ParticleData
 	{
@@ -46,10 +63,6 @@ public:
 			return *this;
 		}*/
 		SharedTexture pTexture;
-		float up;
-		float left;
-		float down;
-		float right;
 	};
 
 	struct ParticleInfo
@@ -96,6 +109,7 @@ public:
 		}*/
 		int iChannel;
 		int iEmitCount;
+		int iEmitPerCount;
 		int iStartBone;
 		int iEndBone;
 		int iStartAttachment;
@@ -107,48 +121,50 @@ public:
 		vec3_t vecDirMax;
 		vec3_t vecOrigin;
 		vec3_t vecWorldOrigin;
-		vec3_t vecStartColor;
-		vec3_t vecEndColor;
-		vec4_t vecColor;
 		vec3_t vecAmplitude;
 		vec3_t vecFreq;
-		float flStartSize;
-		float flEndSize;
-		float flStartAlpha;
-		float flEndAlpha;
-		float flLifeTime;
+		std::vector<Color> vecColorKeyFrame;
+		std::vector<Scale> vecScaleKeyFrame;
+		std::vector<std::string> vecSpriteTexName;
+		float flRotateSpeed;
+		float flAngle;
 		float flIntervalTime;
 		float flStartTime;
+		float flEndTime;
 		float flSpeed;
-		ParticleData Data;
+		float flFrameRate;
+		SharedTexture pTexture;
 		int iFlag;
 	};
 
     int Init(void);
     int VidInit(void);
-    void InitHUDData(void);
+    void ResetData(void);
     int Draw(float flTime, matrix3x4& matrix);
     void Shutdown();
-	void CalcData(ParticleData& info);
+	void ReadSprInfo(ParticleInfo& info, std::string sprFile);
 	void ReadTempParticleInfo(std::string szFile);
 	void AddParticleInfo(mstudioattachment_t* pattachment, matrix3x4 *transform, char modelName[64]);
 	void ModifyStaticParticle(std::string szModelName, const char* szTexture, int iChannel, int iEmitCount, float flIntervalTime, float flLifeTime, float flSpeed, float flStartSize, float flEndSize, int iStartBone, int iEndBone, int iStartAttachment, int iEndAttachment, vec3_t vecStartBoneOffset, vec3_t vecDir, vec3_t vecStartColor, vec3_t vecEndColor, float flStartAlpha, float flEndAlpha, vec3_t vecAmplitude, vec3_t vecFreq);
 	void MSG_AddParticle(const char* szTexture, int iChannel, int iEmitCount, float flIntervalTime, float flLifeTime, float flSpeed, float flStartSize, float flEndSize, int startbone, int iEndBone, int iStartAttachment, int iEndAttachment, vec3_t vecStartBoneOffset, vec3_t vecDir, vec3_t vecStartColor, vec3_t vecEndColor, float flStartAlpha, float flEndAlpha, vec3_t vecAmplitude, vec3_t vecFreq);
 	void AddToParticleArray(ParticleInfo& info);
-	void DrawTGAQuad(ParticleData& particle, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color);
+	void DrawTGAQuad(int iTexnum, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color);
 	void PrecacheTexture(std::string szFile);
 	void ClearPrecache();
+	void SinCos(float rad, float* sine, float* cosine);
+	Color* GetCurrentColor(std::vector<Color> colorArray, float rate);
+	Scale* GetCurrentScale(std::vector<Scale> scaleArray, float rate);
 
 private:
 	//std::vector<ParticleInfo> m_vecTempParticle;
 	std::vector<std::pair<std::string, std::vector<ParticleInfo>>> m_vecTempParticle;
 	std::unordered_map<std::string, SharedTexture> m_vecCachedTexture;
 	std::unordered_map<std::string, std::vector<ParticleInfo>> m_vecCachedParticleJson;	//FileName,  modelName,  particle
+	std::unordered_map<std::string, std::vector<std::string>> m_vecCachedSpriteJson;
 	std::unordered_map<std::string, std::vector<ParticleInfo>> m_vecStaticParticle;
 	std::vector<ParticleInfo> m_ParticleArray;
 	float m_flNextTime[MAX_PARTICLE_CHANNEL];
 
-	SharedTexture m_iM4A1_S_TransformerParticle;
 
 };
 

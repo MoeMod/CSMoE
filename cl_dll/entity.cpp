@@ -21,12 +21,15 @@
 #include "event_api.h"
 #include "player/player_model.h"
 #include "ParticlePlayer.h"
+#include "ModelFXPlayer.h"
 
 namespace cl {
 
 extern engine_studio_api_t IEngineStudio;
 
 extern CParticlePlayer g_ParticleManager;
+
+extern CModelFXPlayer g_ModelFXManager;
 
 extern vec3_t v_origin;
 
@@ -331,6 +334,12 @@ void DLLEXPORT HUD_StudioEvent( const struct mstudioevent_s *event, const struct
 		}
 
 		gEngfuncs.pfnPlaySoundByNameAtLocation((char*)event->options, 1.0, entity->origin);
+		break;
+	}
+	case 5030:
+	{
+		g_ModelFXManager.ReadTempModelFXInfo((char*)event->options);
+
 		break;
 	}
 	case 5040:
