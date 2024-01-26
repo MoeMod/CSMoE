@@ -31,6 +31,14 @@ struct BMPList
 	std::vector<std::string> vecTexName;
 };
 
+struct ReplacedTexList
+{
+	int iTexIndex;
+	float flFrameRate;
+	std::string szModelName;
+	std::vector<std::string> vecTexName;
+};
+
 class CBindBMPManager
 {
 public:
@@ -40,7 +48,7 @@ public:
 	void Vidinit(void);
 
 	void ReadSprInfo(cl_entity_s* ent, studiohdr_t* header, std::string sprFile, int texIndex, int flag, float framerate, float starttime, float endtime);
-
+	void ReadSprInfo(std::string sprFile, std::vector<std::string> &vecSpr);
 	std::unordered_map<std::string, std::vector<std::string>> m_vecCachedSpriteJson;
 
 };
@@ -49,7 +57,7 @@ public:
 CBindBMPManager& BindBMPManager(void);
 
 
-
+extern std::vector<ReplacedTexList> g_vecReplacedTexList;
 extern std::vector<BMPList> g_vecBindBMPList;
 
 

@@ -61,7 +61,7 @@ public:
 	virtual void StudioProcessGait(entity_state_t *pplayer);
 	virtual void StudioSetShadowSprite(int idx);
 	virtual void StudioDrawShadow(Vector origin, float scale);
-	virtual void StudioMergeFXModelBones(model_t* m_pSubModel, const char* szBoneName = nullptr, int iMergeType = 0);
+	virtual void StudioMergeFXModelBones(model_t* m_pSubModel, studiohdr_t* savedheader, const char* szBoneName = nullptr, int iMergeType = 0);
 
 
 public:
@@ -182,14 +182,7 @@ public:
 	static struct model_s* s_pLaserMiniGunBPModel;
 	static struct model_s* s_pLaserFistPModel;
 	static struct model_s* s_pLaserFistEXPModel;
-	static struct model_s* s_pBalisongLuminousEdgeViewModel;
-	static struct model_s* s_pSGFX_JY_OBJ_BALISONG_02Model;
-	static struct model_s* s_pSGFX_JY_OBJ_BALISONG_04Model;
-	static struct model_s* s_pSGFX_JY_OBJ_BALISONG_05Model;
-	static struct model_s* s_pSGFX_JY_OBJ_BALISONG_06Model;
 	static struct model_s* s_pLightningARPModel;
-	static struct model_s* s_pM4A1_S_TransformersViewModel;
-	static struct model_s* s_pRingModel;
 
 
 	struct ViewModel

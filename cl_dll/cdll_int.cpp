@@ -36,6 +36,7 @@
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
 #include "ParticlePlayer.h"
+#include "ModelFXPlayer.h"
 #ifdef XASH_LUASH
 #include "luash_cl/lua_cl.h"
 #endif
@@ -68,6 +69,7 @@ void IN_Commands( void );
 void Input_Shutdown (void);
 extern engine_studio_api_t IEngineStudio;
 extern CParticlePlayer g_ParticleManager;
+extern CModelFXPlayer g_ModelFXManager;
 /*
 ==========================
 	Initialize
@@ -311,20 +313,12 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pLaserFistPModel = IEngineStudio.Mod_ForName("models/p_laserfist.mdl", FALSE);
 	CStudioModelRenderer::s_pLaserFistEXPModel = IEngineStudio.Mod_ForName("models/p_laserfistex.mdl", FALSE);
 
-	CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel = IEngineStudio.Mod_ForName("models/z4b/PV-Balisong_LuminousEdge.mdl", FALSE);
-	CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model = IEngineStudio.Mod_ForName("models/z4b/SGFX_JY_OBJ_BALISONG_02.mdl", FALSE);
-	CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_04Model = IEngineStudio.Mod_ForName("models/z4b/SGFX_SE_GUN_VVIP_M82A1_ANGELICBEAST_OBJ_KINFE.mdl", FALSE);
-	CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_05Model = IEngineStudio.Mod_ForName("models/z4b/SGFX_JY_OBJ_BALISONG_08_2.mdl", FALSE);
-	CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_06Model = IEngineStudio.Mod_ForName("models/z4b/SGFX_JY_OBJ_BALISONG_07_2.mdl", FALSE);
-
-
 	CStudioModelRenderer::s_pLightningARPModel = IEngineStudio.Mod_ForName("models/p_lightningar_b.mdl", FALSE);
 
-	CStudioModelRenderer::s_pM4A1_S_TransformersViewModel = IEngineStudio.Mod_ForName("models/z4b/PV-M4A1_S_Transformers.mdl", FALSE);
-	CStudioModelRenderer::s_pRingModel = IEngineStudio.Mod_ForName("models/z4b/SGFX_se_gun_M4A1Transformers_plane_01.mdl", FALSE);
 	//VGui_Startup();
 
 	g_ParticleManager.ResetData();
+	g_ModelFXManager.ResetData();
 
 	return 1;
 }

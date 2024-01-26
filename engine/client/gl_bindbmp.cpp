@@ -23,6 +23,7 @@ GNU General Public License for more details.
 #include "../../3rdparty/json/single_include/nlohmann/json.hpp"
 
 std::vector<BMPList> g_vecBindBMPList;
+std::vector<ReplacedTexList> g_vecReplacedTexList;
 
 static CBindBMPManager g_BMPBindManager;
 
@@ -86,7 +87,81 @@ void CBindBMPManager::ReadSprInfo(cl_entity_s* ent, studiohdr_t* header, std::st
 
 }
 
+void CBindBMPManager::ReadSprInfo(std::string sprFile, std::vector<std::string> &vecSpr)
+{
+	if (m_vecCachedSpriteJson.count(sprFile))
+	{
+		vecSpr = m_vecCachedSpriteJson[sprFile];
+	}
+	else
+	{
+		fs_offset_t length;
+
+		nlohmann::json jsSPR;
+
+		auto data = FS_MapFile(sprFile.c_str(), &length, true);
+		if (data)
+		{
+
+			jsSPR = nlohmann::json::parse(std::string_view((const char*)data, length));
+			FS_MapFree(data, length);
+
+			std::vector<std::string> vecTexName;
+			for (auto& SPR : jsSPR)
+			{
+				vecTexName.push_back(SPR.get<std::string>());
+			}
+
+			vecSpr = vecTexName;
+
+			m_vecCachedSpriteJson.insert(std::pair<std::string, std::vector<std::string>>(sprFile, vecTexName));
+		}
+	}
+}
+
 void CBindBMPManager::Vidinit(void)
 {
 	g_vecBindBMPList.clear();
+	g_vecReplacedTexList.clear();
+	fs_offset_t length;
+
+	nlohmann::json jsTex;
+
+	auto data = FS_MapFile("ExternalTexture.json", &length, true);
+	if (data)
+	{
+		jsTex = nlohmann::json::parse(std::string_view((const char*)data, length));
+		FS_MapFree(data, length);
+
+		for (auto& info : jsTex)
+		{
+			g_vecReplacedTexList.emplace_back();
+			ReplacedTexList& Temp = g_vecReplacedTexList.back();
+			std::string szName = info["Name"].get<std::string>();
+			for (auto& Info : info["TextureInfo"])
+			{
+				std::string szTexName = Info["TexName"].get<std::string>();
+				std::string Tex = szTexName.substr(szTexName.find_last_of('.') + 1);
+				std::vector<std::string> vecTexName;
+
+				float flFrameRate = Info["FrameRate"].get<float>();
+				float iTexIndex = Info["TexIndex"].get<int>();
+
+				if (Tex == "json")
+				{
+					//sprFile
+					ReadSprInfo(szTexName, vecTexName);
+					Temp.vecTexName = vecTexName;
+				}
+				else
+				{
+					vecTexName.push_back(szTexName);
+				}
+
+				Temp.szModelName = szName;
+				Temp.iTexIndex = iTexIndex;
+				Temp.flFrameRate = flFrameRate;
+			}
+		}
+	}
 }

@@ -2025,6 +2025,47 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			}
 		}
 
+		for (auto iter = g_vecReplacedTexList.begin(); iter != g_vecReplacedTexList.end(); iter++)
+		{
+			if (iter->szModelName == m_pStudioHeader->name)
+			{
+				if (pskinref[pmesh->skinref] == iter->iTexIndex)
+				{
+					int frame = 0;
+					int maxframe = iter->vecTexName.size();
+
+					if (maxframe == 1)
+					{
+						const char* pszFileName = iter->vecTexName[0].c_str();
+
+						texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+
+					}
+					else
+					{
+						frame = int(iter->flFrameRate * (cl.time - RI.currententity->curstate.animtime));
+
+						if (frame >= maxframe)
+						{
+							frame = int(frame) % maxframe;
+						}
+
+						const char* pszFileName = iter->vecTexName[frame].c_str();
+
+						texnum = xe::TexLru_LoadTextureExternal(pszFileName, flags, NULL);
+
+					}
+								
+					if (texnum)
+					{
+						bBindTex = true;
+						break;
+					}
+
+				}
+			}
+		}
+
 		for (auto iter = g_vecBindBMPList.begin(); iter != g_vecBindBMPList.end();)
 		{
 			if (iter->pEntModel == RI.currententity && iter->pHeader == m_pStudioHeader)
@@ -2038,20 +2079,19 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 					}
 
 					int frame = 0;
-					int maxframe = iter->vecTexName.size() - 1;
+					int maxframe = iter->vecTexName.size();
 					frame = int(iter->flFrameRate * (cl.time - iter->flStartTime));
 
-					if (frame > maxframe)
+					if (frame >= maxframe)
 					{
 						if (iter->iFlag)
 						{
-							frame = maxframe;
+							frame = maxframe - 1;
 						
 						}
 						else
 						{
 							frame = int(frame) % maxframe;
-
 							//frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
 							//frame = frame - (int)frame;
 							//frame = startFrame;

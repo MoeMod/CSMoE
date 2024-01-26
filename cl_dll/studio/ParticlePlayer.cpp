@@ -653,9 +653,7 @@ static constexpr float ParticleRight = -1.0;
 								}
 
 								vec3_t savedDir = mapParticle->second[i].vecDir;
-								vec3_t savedStartOffsetMin = mapParticle->second[i].vecStartOffsetMin;
-								vec3_t savedStartOffsetMax = mapParticle->second[i].vecStartOffsetMax;
-
+			
 								if (mapParticle->second[i].vecDir.IsNaN() || mapParticle->second[i].vecDir.IsZero())
 								{
 									shootDir = (vecEnd - vecStart);
@@ -676,18 +674,15 @@ static constexpr float ParticleRight = -1.0;
 								vecDirOffset.z = RandomFloat(mapParticle->second[i].vecDirMin.z, mapParticle->second[i].vecDirMax.z);
 
 								mapParticle->second[i].vecDir = (mapParticle->second[i].vecDir + vecDirOffset).Normalize();
-								mapParticle->second[i].vecStartOffsetMin = shootPos;
-								mapParticle->second[i].vecStartOffsetMax = shootEnd;
+							
 								if (!mapParticle->second[i].vecSpriteTexName.empty())
 								{
 									mapParticle->second[i].pTexture = m_vecCachedTexture[mapParticle->second[i].vecSpriteTexName[0]];
 								}
 
-								AddToParticleArray(mapParticle->second[i]);
+								AddToParticleArray(modelName, mapParticle->second[i]);
 
 								mapParticle->second[i].vecDir = savedDir;
-								mapParticle->second[i].vecStartOffsetMin = savedStartOffsetMin;
-								mapParticle->second[i].vecStartOffsetMax = savedStartOffsetMax;
 							}
 
 							m_flNextTime[mapParticle->second[i].iChannel] = gHUD.m_flTime + mapParticle->second[i].flIntervalTime;
@@ -762,9 +757,7 @@ static constexpr float ParticleRight = -1.0;
 						float savedStartTime = info.flStartTime;
 						float savedEndTime = info.flEndTime;
 						vec3_t savedDir = info.vecDir;
-						vec3_t savedStartOffsetMin = info.vecStartOffsetMin;
-						vec3_t savedStartOffsetMax = info.vecStartOffsetMax;
-
+					
 						if (info.vecDir.IsZero())
 						{
 							shootDir = (vecEnd - vecStart);
@@ -785,8 +778,6 @@ static constexpr float ParticleRight = -1.0;
 						vecDirOffset.z = RandomFloat(info.vecDirMin.z, info.vecDirMax.z);
 
 						info.vecDir = (info.vecDir + vecDirOffset).Normalize();
-						info.vecStartOffsetMin = shootPos;
-						info.vecStartOffsetMax = shootEnd;
 						info.flStartTime = gHUD.m_flTime;
 						info.flEndTime = gHUD.m_flTime + life;
 						if (!info.vecSpriteTexName.empty())
@@ -794,11 +785,9 @@ static constexpr float ParticleRight = -1.0;
 							info.pTexture = m_vecCachedTexture[info.vecSpriteTexName[0]];
 						}
 
-						AddToParticleArray(info);
+						AddToParticleArray(modelName,info);
 
 						info.vecDir = savedDir;
-						info.vecStartOffsetMin = savedStartOffsetMin;
-						info.vecStartOffsetMax = savedStartOffsetMax;
 						info.flStartTime = savedStartTime;
 						info.flEndTime = savedEndTime;
 					}
@@ -809,91 +798,90 @@ static constexpr float ParticleRight = -1.0;
 		}
 	}
 
-	void CParticlePlayer::AddToParticleArray(ParticleInfo& info)
+	void CParticlePlayer::AddToParticleArray(std::string modelname, ParticleInfo& info)
 	{
-		m_ParticleArray.emplace_back();
-		ParticleInfo& Temp = m_ParticleArray.back();
-
-		Temp.flIntervalTime = info.flIntervalTime;
-		Temp.flSpeed = info.flSpeed;
-		Temp.iStartBone = info.iStartBone;	//useless
-		Temp.iEndBone = info.iEndBone;
-		Temp.vecStartOffsetMin = info.vecStartOffsetMin;	//use for startpos
-		Temp.vecStartOffsetMax = info.vecStartOffsetMax;	//use for endpos
-		Temp.iStartAttachment = info.iStartAttachment;	//useless
-		Temp.iEndAttachment = info.iEndAttachment;		//useless
-		Temp.vecDirMin = info.vecDirMin;	//useless
-		Temp.vecDirMax = info.vecDirMax;	//useless
-		Temp.pTexture = info.pTexture;
-		Temp.iChannel = info.iChannel;
-		Temp.flStartTime = info.flStartTime;	
-		Temp.flEndTime = info.flEndTime;
-		Temp.vecDir = info.vecDir;
-		Temp.vecOrigin = info.vecOrigin;
-		Temp.iEmitCount = info.iEmitCount;
-		Temp.vecAmplitude = info.vecAmplitude;
-		Temp.vecFreq = info.vecFreq;
-		Temp.flRotateSpeed = info.flRotateSpeed;
-		Temp.iFlag = info.iFlag;
-		Temp.vecScaleKeyFrame = info.vecScaleKeyFrame;
-		Temp.vecColorKeyFrame = info.vecColorKeyFrame;
-		Temp.iEmitPerCount = info.iEmitPerCount;
-
+		m_ParticleArray.push_back(std::pair<std::string, ParticleInfo>(modelname, info));
 	}
 
 
-	int CParticlePlayer::Draw(float flTime, matrix3x4& matrix)
+	int CParticlePlayer::Draw(float flTime, matrix3x4& matrix, mstudioattachment_t* pattachment, matrix3x4* transform, char modelName[64])
 	{
 		cl_entity_t* viewent = gEngfuncs.GetViewModel();
 
 		if (!viewent)
 			return 0;
 
-		int index = 0;
-		for (int i = 0; i < m_ParticleArray.size(); i++)
+		for (auto Particle = m_ParticleArray.begin(); Particle != m_ParticleArray.end();)
 		{
-			//删除播放完的队列
-			if (gHUD.m_flTime <= m_ParticleArray[i].flEndTime)
+			if (Particle->first != modelName)
 			{
-				m_ParticleArray[index] = m_ParticleArray[i];
-				index++;
+				Particle = m_ParticleArray.erase(Particle);
+				continue;
 			}
-		}
-		m_ParticleArray.resize(index);
+			else
+			{
+				if (gHUD.m_flTime > Particle->second.flEndTime)
+				{
+					Particle = m_ParticleArray.erase(Particle);
+					continue;
+				}
+			}
 
+			Particle++;
+		}
 
 		for (auto iter = m_ParticleArray.begin(); iter != m_ParticleArray.end(); iter++)
 		{
 			//转世界坐标
-			if (iter->pTexture)
+			if (iter->second.pTexture)
 			{
 				vec3_t vecWorldOrigin;
 
-				iter->vecOrigin[0] += iter->vecDir[0] * iter->flSpeed * gHUD.m_flTimeDelta + iter->vecAmplitude[0] * cos((gHUD.m_flTime - iter->flStartTime) * 2 * M_PI * iter->vecFreq[0]);
-				iter->vecOrigin[1] += iter->vecDir[1] * iter->flSpeed * gHUD.m_flTimeDelta + iter->vecAmplitude[1] * cos((gHUD.m_flTime - iter->flStartTime) * 2 * M_PI * iter->vecFreq[1]);
-				iter->vecOrigin[2] += iter->vecDir[2] * iter->flSpeed * gHUD.m_flTimeDelta + iter->vecAmplitude[2] * cos((gHUD.m_flTime - iter->flStartTime) * 2 * M_PI * iter->vecFreq[2]);
+				iter->second.vecOrigin[0] += iter->second.vecDir[0] * iter->second.flSpeed * gHUD.m_flTimeDelta + iter->second.vecAmplitude[0] * cos((gHUD.m_flTime - iter->second.flStartTime) * 2 * M_PI * iter->second.vecFreq[0]);
+				iter->second.vecOrigin[1] += iter->second.vecDir[1] * iter->second.flSpeed * gHUD.m_flTimeDelta + iter->second.vecAmplitude[1] * cos((gHUD.m_flTime - iter->second.flStartTime) * 2 * M_PI * iter->second.vecFreq[1]);
+				iter->second.vecOrigin[2] += iter->second.vecDir[2] * iter->second.flSpeed * gHUD.m_flTimeDelta + iter->second.vecAmplitude[2] * cos((gHUD.m_flTime - iter->second.flStartTime) * 2 * M_PI * iter->second.vecFreq[2]);
 
-				if (iter->iFlag & PARTICLE_FLAGS_ENDCENTER)
+				if (iter->second.iFlag & PARTICLE_FLAGS_ENDCENTER)
 				{
-					vec3_t Dir = (iter->vecStartOffsetMax - iter->vecOrigin).Normalize();
+					vec3_t Dir = (iter->second.vecStartOffsetMax - iter->second.vecOrigin).Normalize();
 
-					if (DotProduct(iter->vecDir, Dir) < 0)
+					if (DotProduct(iter->second.vecDir, Dir) < 0)
 					{
-						iter->flEndTime = 0;
+						iter->second.flEndTime = 0;
 					}
 
 				}
 
-				if (iter->iFlag & PARTICLE_FLAGS_ATTACHED)
+				if (iter->second.iFlag & PARTICLE_FLAGS_ATTACHED)
 				{
-					iter->vecWorldOrigin = viewent->attachment[iter->iStartAttachment];
-				}
-				else
-				{
-					VectorTransform(iter->vecOrigin, matrix, iter->vecWorldOrigin);
-				}
+					vec3_t shootPos;
+					vec3_t vecStart;
+					vec3_t vecStartOffset;
 
-			
+					vecStartOffset.x = RandomFloat(iter->second.vecStartOffsetMin.x, iter->second.vecStartOffsetMax.x);
+					vecStartOffset.y = RandomFloat(iter->second.vecStartOffsetMin.y, iter->second.vecStartOffsetMax.y);
+					vecStartOffset.z = RandomFloat(iter->second.vecStartOffsetMin.z, iter->second.vecStartOffsetMax.z);
+
+					if (iter->second.iStartBone != 255)
+					{
+						vecStart.x = transform[iter->second.iStartBone][0][3] + vecStartOffset.x;
+						vecStart.y = transform[iter->second.iStartBone][1][3] + vecStartOffset.y;
+						vecStart.z = transform[iter->second.iStartBone][2][3] + vecStartOffset.z;
+
+						VectorTransform(vecStart, transform[iter->second.iStartBone], shootPos);
+					}
+					else
+					{
+						vecStart = pattachment[iter->second.iStartAttachment].org + vecStartOffset;
+
+						VectorTransform(vecStart, transform[pattachment[iter->second.iStartAttachment].bone], shootPos);
+					}
+
+					iter->second.vecOrigin = shootPos;
+				}
+				
+				VectorTransform(iter->second.vecOrigin, matrix, iter->second.vecWorldOrigin);
+				
 			}	
 		}
 
@@ -904,16 +892,16 @@ static constexpr float ParticleRight = -1.0;
 		IEngineStudio.GetViewInfo(vRenderOrigin, vUp, vRight, vNormal);
 		vec3_t vecRenderOrigin = { vRenderOrigin[0], vRenderOrigin[1], vRenderOrigin[2], 0 };
 		//排序vector
-		std::sort(m_ParticleArray.begin(), m_ParticleArray.end(), [vecRenderOrigin](const ParticleInfo& a, const ParticleInfo& b) -> bool {
+		std::sort(m_ParticleArray.begin(), m_ParticleArray.end(), [vecRenderOrigin](const std::pair<std::string, ParticleInfo> &a, const std::pair<std::string, ParticleInfo> &b) -> bool {
 			//auto a1 = (a.vecWorldOrigin - vecRenderOrigin).LengthSquared();
 			//auto a2 = (b.vecWorldOrigin - vecRenderOrigin).LengthSquared();  
-			auto a1 = (a.vecWorldOrigin[0]-vecRenderOrigin[0]) * (a.vecWorldOrigin[0]-vecRenderOrigin[0]) + 
-					  (a.vecWorldOrigin[1]-vecRenderOrigin[1]) * (a.vecWorldOrigin[1]-vecRenderOrigin[1]) +
-					  (a.vecWorldOrigin[2]-vecRenderOrigin[2]) * (a.vecWorldOrigin[2]-vecRenderOrigin[2]);
+			auto a1 = (a.second.vecWorldOrigin[0]-vecRenderOrigin[0]) * (a.second.vecWorldOrigin[0]-vecRenderOrigin[0]) +
+					  (a.second.vecWorldOrigin[1]-vecRenderOrigin[1]) * (a.second.vecWorldOrigin[1]-vecRenderOrigin[1]) +
+					  (a.second.vecWorldOrigin[2]-vecRenderOrigin[2]) * (a.second.vecWorldOrigin[2]-vecRenderOrigin[2]);
 
-			auto a2 = (b.vecWorldOrigin[0]-vecRenderOrigin[0]) * (b.vecWorldOrigin[0]-vecRenderOrigin[0]) + 
-					  (b.vecWorldOrigin[1]-vecRenderOrigin[1]) * (b.vecWorldOrigin[1]-vecRenderOrigin[1]) +
-					  (b.vecWorldOrigin[2]-vecRenderOrigin[2]) * (b.vecWorldOrigin[2]-vecRenderOrigin[2]);
+			auto a2 = (b.second.vecWorldOrigin[0]-vecRenderOrigin[0]) * (b.second.vecWorldOrigin[0]-vecRenderOrigin[0]) +
+					  (b.second.vecWorldOrigin[1]-vecRenderOrigin[1]) * (b.second.vecWorldOrigin[1]-vecRenderOrigin[1]) +
+					  (b.second.vecWorldOrigin[2]-vecRenderOrigin[2]) * (b.second.vecWorldOrigin[2]-vecRenderOrigin[2]);
 
 			return a1 > a2;
 		});
@@ -922,9 +910,9 @@ static constexpr float ParticleRight = -1.0;
 		//播放,TGA播放必须由远到近播放
 		for (auto iter = m_ParticleArray.begin(); iter != m_ParticleArray.end(); iter++)
 		{
-			float currentTime = gHUD.m_flTime - iter->flStartTime;
+			float currentTime = gHUD.m_flTime - iter->second.flStartTime;
 
-			if (iter->pTexture)
+			if (iter->second.pTexture)
 			{	
 				vec3_t vecRight, vecUp;
 				vec4_t vecColor;
@@ -938,52 +926,52 @@ static constexpr float ParticleRight = -1.0;
 				vecUp[1] = vUp[1];
 				vecUp[2] = vUp[2];
 
-				iter->flAngle += iter->flRotateSpeed;
+				iter->second.flAngle += iter->second.flRotateSpeed;
 
-				if (iter->flAngle > 360)
-					iter->flAngle = 0;
+				if (iter->second.flAngle > 360)
+					iter->second.flAngle = 0;
 
-				float flAngle = iter->flAngle * (M_PI2 / 360.0f);
+				float flAngle = iter->second.flAngle * (M_PI2 / 360.0f);
 				SinCos(flAngle, &sr, &cr);
 
 				vecRight = vecRight * cr + vecUp * sr;
 				vecUp = vecRight * -sr + vecUp * cr;
 
-				float life = iter->flEndTime - iter->flStartTime;
+				float life = iter->second.flEndTime - iter->second.flStartTime;
 
 				float rate = currentTime / life;
 
-				Color* pColor = GetCurrentColor(iter->vecColorKeyFrame, rate);
-				Scale* pScale = GetCurrentScale(iter->vecScaleKeyFrame, rate);
+				Color* pColor = GetCurrentColor(iter->second.vecColorKeyFrame, rate);
+				Scale* pScale = GetCurrentScale(iter->second.vecScaleKeyFrame, rate);
 
 				vecColor[0] = pColor->r;
 				vecColor[1] = pColor->g;
 				vecColor[2] = pColor->b;
 				vecColor[3] = 1.0 - pColor->a;
 
-				if (!iter->vecSpriteTexName.empty())
+				if (!iter->second.vecSpriteTexName.empty())
 				{		
 					int frame = 0;
-					int maxframe = iter->vecSpriteTexName.size() - 1;
-					frame = int(iter->flFrameRate * currentTime);
+					int maxframe = iter->second.vecSpriteTexName.size();
+					frame = int(iter->second.flFrameRate * currentTime);
 
-					if (frame > maxframe)
+					if (frame >= maxframe)
 					{
-						if (iter->iFlag & PARTICLE_FLAGS_SPR_LOOP)
+						if (iter->second.iFlag & PARTICLE_FLAGS_SPR_LOOP)
 						{
 							frame = int(frame) % maxframe;						
 						}
 						else
 						{
-							frame = maxframe;
+							frame = maxframe - 1;
 						}
 
 					}
 
-					iter->pTexture = m_vecCachedTexture[iter->vecSpriteTexName[frame]];
+					iter->second.pTexture = m_vecCachedTexture[iter->second.vecSpriteTexName[frame]];
 				}
 
-				DrawTGAQuad(iter->pTexture->texnum(), iter->vecWorldOrigin, vecRight, vecUp, pScale->scale, vecColor);
+				DrawTGAQuad(iter->second.pTexture->texnum(), iter->second.vecWorldOrigin, vecRight, vecUp, pScale->scale, vecColor);
 		
 				
 			}

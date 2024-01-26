@@ -27,7 +27,8 @@ GNU General Public License for more details.
 #include "vgui_draw.h"
 #include "library.h"
 #include "voice.h"
-
+#include "gl_bindspr.h"
+#include "gl_bindbmp.h"
 #ifdef XASH_IMGUI
 #include "imgui_impl_xash.h"
 #include "imgui_menu_msgbox.h"
@@ -1623,6 +1624,8 @@ boost::asio::awaitable<void> CL_PrepVideo( void )
 
 	// must be called after lightmap loading!
 	clgame.dllFuncs.pfnVidInit();
+	BindSprManager().Vidinit();
+	BindBMPManager().Vidinit();
 #ifdef XASH_VGUI2
     extern int VGui2_VidInit();
     VGui2_VidInit();

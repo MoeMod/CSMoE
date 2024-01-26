@@ -140,14 +140,14 @@ public:
     int Init(void);
     int VidInit(void);
     void ResetData(void);
-    int Draw(float flTime, matrix3x4& matrix);
+    int Draw(float flTime, matrix3x4& matrix, mstudioattachment_t* pattachment, matrix3x4* transform, char modelName[64]);
     void Shutdown();
 	void ReadSprInfo(ParticleInfo& info, std::string sprFile);
 	void ReadTempParticleInfo(std::string szFile);
 	void AddParticleInfo(mstudioattachment_t* pattachment, matrix3x4 *transform, char modelName[64]);
 	void ModifyStaticParticle(std::string szModelName, const char* szTexture, int iChannel, int iEmitCount, float flIntervalTime, float flLifeTime, float flSpeed, float flStartSize, float flEndSize, int iStartBone, int iEndBone, int iStartAttachment, int iEndAttachment, vec3_t vecStartBoneOffset, vec3_t vecDir, vec3_t vecStartColor, vec3_t vecEndColor, float flStartAlpha, float flEndAlpha, vec3_t vecAmplitude, vec3_t vecFreq);
 	void MSG_AddParticle(const char* szTexture, int iChannel, int iEmitCount, float flIntervalTime, float flLifeTime, float flSpeed, float flStartSize, float flEndSize, int startbone, int iEndBone, int iStartAttachment, int iEndAttachment, vec3_t vecStartBoneOffset, vec3_t vecDir, vec3_t vecStartColor, vec3_t vecEndColor, float flStartAlpha, float flEndAlpha, vec3_t vecAmplitude, vec3_t vecFreq);
-	void AddToParticleArray(ParticleInfo& info);
+	void AddToParticleArray(std::string modelname ,ParticleInfo& info);
 	void DrawTGAQuad(int iTexnum, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color);
 	void PrecacheTexture(std::string szFile);
 	void ClearPrecache();
@@ -162,7 +162,8 @@ private:
 	std::unordered_map<std::string, std::vector<ParticleInfo>> m_vecCachedParticleJson;	//FileName,  modelName,  particle
 	std::unordered_map<std::string, std::vector<std::string>> m_vecCachedSpriteJson;
 	std::unordered_map<std::string, std::vector<ParticleInfo>> m_vecStaticParticle;
-	std::vector<ParticleInfo> m_ParticleArray;
+
+	std::vector<std::pair<std::string, ParticleInfo>> m_ParticleArray;
 	float m_flNextTime[MAX_PARTICLE_CHANNEL];
 
 

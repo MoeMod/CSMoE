@@ -164,16 +164,8 @@ struct model_s* CStudioModelRenderer::s_pLaserMiniGunBPModel;
 struct model_s* CStudioModelRenderer::s_pLaserFistPModel;
 struct model_s* CStudioModelRenderer::s_pLaserFistEXPModel;
 
-struct model_s* CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel;
-struct model_s* CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model;
-struct model_s* CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_04Model;
-struct model_s* CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_05Model;
-struct model_s* CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_06Model;
-
 struct model_s* CStudioModelRenderer::s_pLightningARPModel;
 
-struct model_s* CStudioModelRenderer::s_pM4A1_S_TransformersViewModel;
-struct model_s* CStudioModelRenderer::s_pRingModel;
 
 int g_iLeapStrikeGunAnim = 0;
 float g_iLeapStrikeGunAnimTime = 0.0;
@@ -198,6 +190,8 @@ void CStudioModelRenderer::Init(void)
 	m_protationmatrix = IEngineStudio.StudioGetRotationMatrix();
 
 	g_ParticleManager.Init();
+	g_ModelFXManager.Init();
+
 
 	m_vecViewModels.clear();
 	fs_offset_t length;
@@ -973,7 +967,7 @@ void CStudioModelRenderer::StudioSaveBones(void)
 }
 
 
-void CStudioModelRenderer::StudioMergeFXModelBones(model_t* m_pSubModel, const char* szBoneName, int iMergeType)
+void CStudioModelRenderer::StudioMergeFXModelBones(model_t* m_pSubModel, studiohdr_t* savedheader, const char* szBoneName, int iMergeType)
 {
 	int i, j;
 	double f;
@@ -1132,148 +1126,6 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 
 	pbones = (mstudiobone_t *)((byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
 	//p模型的关节点
-	
-	if (m_pSubModel == CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_05Model || m_pSubModel == CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_06Model)
-	{
-		for (i = 0; i < m_pStudioHeader->numbones; i++)
-		{
-			QuaternionMatrix(q[i], bonematrix);
-
-			bonematrix[0][3] = pos[i][0];
-			bonematrix[1][3] = pos[i][1];
-			bonematrix[2][3] = pos[i][2];
-
-			if (pbones[i].parent == -1)
-			{
-				for (j = 0; j < m_nCachedBones; j++)
-				{
-					if (stricmp(m_nCachedBoneNames[j], "Dummy004") == 0)
-					{
-						MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
-						//ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
-						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
-						break;
-					}
-				}
-
-				StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
-			}
-			else
-			{
-				ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
-				ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
-			}
-		}
-
-		return;
-	}
-
-	if (CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_04Model && m_pSubModel == CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_04Model)
-	{
-		for (i = 0; i < m_pStudioHeader->numbones; i++)
-		{
-			QuaternionMatrix(q[i], bonematrix);
-
-			bonematrix[0][3] = pos[i][0];
-			bonematrix[1][3] = pos[i][1];
-			bonematrix[2][3] = pos[i][2];
-
-			if (pbones[i].parent == -1)
-			{
-				for (j = 0; j < m_nCachedBones; j++)
-				{
-					if (stricmp(m_nCachedBoneNames[j], "Scene Root") == 0)
-					{
-						MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
-						//ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
-						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
-						break;
-					}
-				}
-
-				StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
-			}
-			else
-			{
-				ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
-				ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
-			}
-		}
-
-		return;
-	}
-
-	if (CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model && m_pSubModel == CStudioModelRenderer::s_pSGFX_JY_OBJ_BALISONG_02Model)
-	{
-		for (i = 0; i < m_pStudioHeader->numbones; i++)
-		{
-			QuaternionMatrix(q[i], bonematrix);
-
-			bonematrix[0][3] = pos[i][0];
-			bonematrix[1][3] = pos[i][1];
-			bonematrix[2][3] = pos[i][2];
-
-			if (pbones[i].parent == -1)
-			{
-				for (j = 0; j < m_nCachedBones; j++)
-				{
-					if (stricmp(m_nCachedBoneNames[j], "Dummy004") == 0)
-					{
-						
-						MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
-						//ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
-						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
-						break;
-					}
-				}
-
-				StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
-			}
-			else
-			{
-				ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
-				ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
-			}
-		}
-
-		return;
-	}
-
-	if (CStudioModelRenderer::s_pRingModel && m_pSubModel == CStudioModelRenderer::s_pRingModel)
-	{
-		for (i = 0; i < m_pStudioHeader->numbones; i++)
-		{
-			QuaternionMatrix(q[i], bonematrix);
-
-			bonematrix[0][3] = pos[i][0];
-			bonematrix[1][3] = pos[i][1];
-			bonematrix[2][3] = pos[i][2];
-
-			if (pbones[i].parent == -1)
-			{
-				for (j = 0; j < m_nCachedBones; j++)
-				{
-					if (stricmp(m_nCachedBoneNames[j], "Box002") == 0)
-					{
-						MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
-						//ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
-						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
-						break;
-					}
-				}
-
-				StudioFxTransform(m_pCurrentEntity, (*m_pbonetransform)[i]);
-			}
-			else
-			{
-				ConcatTransforms((*m_pbonetransform)[pbones[i].parent], bonematrix, (*m_pbonetransform)[i]);
-				ConcatTransforms((*m_plighttransform)[pbones[i].parent], bonematrix, (*m_plighttransform)[i]);
-			}
-		}
-		
-		return;
-	}
-
 	for (i = 0; i < m_pStudioHeader->numbones; i++)
 	{
 		for (j = 0; j < m_nCachedBones; j++)
@@ -1519,7 +1371,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 					IEngineStudio.StudioSetHeader(m_pStudioHeader);
 
-					StudioMergeFXModelBones(weaponpart, info.szBoneName.c_str(), info.iMergeType);
+					StudioMergeFXModelBones(weaponpart, saveheader, info.szBoneName.c_str(), info.iMergeType);
 		
 					for (int i = 0; i < info.vecSpriteSkin.size(); i++)
 					{
@@ -1659,107 +1511,6 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 				IEngineStudio.StudioClientEvents();
 		}
 
-	/*	if (CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel && curent->model == CStudioModelRenderer::s_pBalisongLuminousEdgeViewModel)
-		{
-			studiohdr_t* saveheader = m_pStudioHeader;
-
-			cl_entity_t saveent = *m_pCurrentEntity;
-			int saveseq = m_pCurrentEntity->curstate.sequence;
-			float saveanimtime = m_pCurrentEntity->curstate.animtime;
-			float saveframe = m_pCurrentEntity->curstate.frame;
-			int save_interp = m_fDoInterp;
-
-			model_t* weaponpart = s_pSGFX_JY_OBJ_BALISONG_02Model;
-
-			m_pStudioHeader = (studiohdr_t*)IEngineStudio.Mod_Extradata(weaponpart);
-			if (!m_pStudioHeader)
-				return 0;
-
-			m_pCurrentEntity->curstate.sequence = 0;
-			m_pCurrentEntity->curstate.animtime = 0.0;
-			m_pCurrentEntity->curstate.rendermode = kRenderGlow;
-			m_pCurrentEntity->curstate.renderamt = 255;
-			m_pCurrentEntity->curstate.renderfx = 0;
-			m_fDoInterp = 1;
-
-			IEngineStudio.StudioSetHeader(m_pStudioHeader);
-
-			StudioMergeBones(weaponpart);
-
-			IEngineStudio.StudioSetupLighting(&lighting);
-
-
-			StudioRenderModel(dir);
-
-			StudioCalcAttachments();
-			IEngineStudio.StudioClientEvents();
-
-			if (m_pCurrentEntity->index > 0)
-				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
-			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
-			*m_pCurrentEntity = saveent;
-			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
-			m_pStudioHeader = saveheader;
-			IEngineStudio.StudioSetHeader(m_pStudioHeader);
-
-			m_pCurrentEntity->curstate.sequence = saveseq;
-			m_pCurrentEntity->curstate.animtime = saveanimtime;
-			m_pCurrentEntity->curstate.frame = saveframe;
-			m_fDoInterp = save_interp;
-
-			if (flags & STUDIO_EVENTS)
-				IEngineStudio.StudioClientEvents();
-		}*/
-
-		if (CStudioModelRenderer::s_pM4A1_S_TransformersViewModel && CStudioModelRenderer::s_pM4A1_S_TransformersViewModel && curent->model == CStudioModelRenderer::s_pM4A1_S_TransformersViewModel)
-		{
-			studiohdr_t* saveheader = m_pStudioHeader;
-
-			cl_entity_t saveent = *m_pCurrentEntity;
-			int saveseq = m_pCurrentEntity->curstate.sequence;
-			float saveanimtime = m_pCurrentEntity->curstate.animtime;
-			float saveframe = m_pCurrentEntity->curstate.frame;
-			int save_interp = m_fDoInterp;
-
-			model_t* weaponpart = s_pRingModel;
-
-			m_pStudioHeader = (studiohdr_t*)IEngineStudio.Mod_Extradata(weaponpart);
-			if (!m_pStudioHeader)
-				return 0;
-
-			m_pCurrentEntity->curstate.sequence = 0;
-			m_pCurrentEntity->curstate.animtime = 0.0;
-			m_fDoInterp = 1;
-
-			IEngineStudio.StudioSetHeader(m_pStudioHeader);
-
-			StudioMergeBones(weaponpart);
-
-			IEngineStudio.StudioSetupLighting(&lighting);
-
-
-			StudioRenderModel(dir);
-
-			StudioCalcAttachments();
-			IEngineStudio.StudioClientEvents();
-
-			if (m_pCurrentEntity->index > 0)
-				memcpy(saveent.attachment, m_pCurrentEntity->attachment, sizeof(vec3_t) * m_pStudioHeader->numattachments);
-
-			*m_pCurrentEntity = saveent;
-			gRenderAPI.R_SetCurrentEntity(m_pCurrentEntity);
-			m_pStudioHeader = saveheader;
-			IEngineStudio.StudioSetHeader(m_pStudioHeader);
-
-			m_pCurrentEntity->curstate.sequence = saveseq;
-			m_pCurrentEntity->curstate.animtime = saveanimtime;
-			m_pCurrentEntity->curstate.frame = saveframe;
-			m_fDoInterp = save_interp;
-
-			if (flags & STUDIO_EVENTS)
-				IEngineStudio.StudioClientEvents();
-		}
-
 		if (gunmodel)
 		{
 			mstudioattachment_t* pattachment;
@@ -1777,7 +1528,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 			{
 				g_ParticleManager.AddParticleInfo(pattachment, m_rgCachedBoneTransform_Animation, m_pStudioHeader->name);
 
-				g_ParticleManager.Draw(m_clTime, *m_protationmatrix);
+				g_ParticleManager.Draw(m_clTime, *m_protationmatrix, pattachment, m_rgCachedBoneTransform_Animation, m_pStudioHeader->name);
 			}
 		}
 	}

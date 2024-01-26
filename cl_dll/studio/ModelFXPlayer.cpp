@@ -51,6 +51,96 @@ namespace cl {
 
 	extern engine_studio_api_t IEngineStudio;
 
+	void CModelFXPlayer::ResetData()
+	{
+		m_vecStaticModelFX.clear();
+		m_vecModelFXArray.clear();
+		m_vecTempModelFX.clear();
+
+		Init();
+	}
+
+	int CModelFXPlayer::Init(void)
+	{
+		m_vecStaticModelFX.clear();
+
+		fs_offset_t length;
+
+		nlohmann::json jsModelFX;
+
+		auto data = gFileSystemAPI.FS_MapFile("ModelFXWeapons.json", &length, true);
+		if (data)
+		{
+			jsModelFX = nlohmann::json::parse(std::string_view((const char*)data, length));
+			gFileSystemAPI.FS_MapFree(data, length);
+
+			for (auto& info : jsModelFX)
+			{
+				std::string szName = info["Name"].get<std::string>();
+				std::vector<ModelFXInfo> vecModelFX;
+				for (auto& ModelFX : info["ModelFX"])
+				{
+
+					std::string szBoneName = ModelFX["AttachBone"].get<std::string>();
+					std::string szModelName = ModelFX["Model"].get<std::string>();
+
+					float flStartTime = ModelFX["StartTime"].get<float>();
+					float flEndTime = ModelFX["EndTime"].get<float>();
+					float flFrameRate = ModelFX["FrameRate"].get<float>();
+					int rendermode = ModelFX["RenderMode"].get<int>();
+					int renderfx = ModelFX["RenderFX"].get<int>();
+					int sequence = ModelFX["Sequence"].get<int>();
+					int iFlag = ModelFX["Flag"].get<int>();
+					int iMergeType = ModelFX["MergeType"].get<int>();
+
+					std::vector<Color> vecColorKeyFrame;
+					for (const auto& row : ModelFX["ColorKeyFrame"]) {
+						Color rowData;
+						rowData.rate = row[0];
+						rowData.r = row[1];
+						rowData.g = row[2];
+						rowData.b = row[3];
+						rowData.a = row[4];
+						vecColorKeyFrame.push_back(rowData);
+					}
+
+					std::vector<SpriteSkin> vecSpriteSkin;
+					for (const auto& row : ModelFX["SpriteSkin"])
+					{
+						SpriteSkin rowData;
+						rowData.iTex = row["TexIndex"].get<int>();
+						rowData.szSprName = row["TexName"].get<std::string>();
+						vecSpriteSkin.push_back(rowData);
+					}
+
+					vecModelFX.emplace_back();
+					ModelFXInfo& Temp = vecModelFX.back();
+
+					Temp.szBoneName = szBoneName;
+					Temp.szFXModelName = szModelName;
+
+					s_pFXModel[szModelName] = IEngineStudio.Mod_ForName(szModelName.c_str(), FALSE);
+					Temp.flStartTime = flStartTime;
+					Temp.flEndTime = flEndTime;
+					Temp.rendermode = rendermode;
+					Temp.renderfx = renderfx;
+					Temp.iSequence = sequence;
+					Temp.flFrameRate = flFrameRate;
+					Temp.iFlag = iFlag;
+					Temp.vecColorKeyFrame = vecColorKeyFrame;
+					Temp.iMergeType = iMergeType;
+					Temp.vecSpriteSkin = vecSpriteSkin;
+				}
+
+				m_vecStaticModelFX.insert(std::pair<std::string, std::vector<ModelFXInfo>>(szName, vecModelFX));
+			}
+
+			
+		}
+
+		return 1;
+	}
+
 	void CModelFXPlayer::ReadTempModelFXInfo(std::string szFile)
 	{
 		if (m_vecCachedModelFXJson.count(szFile))
@@ -239,7 +329,25 @@ namespace cl {
 			}
 		}
 
+		if (m_vecStaticModelFX.count(szModelName))
+		{
+			for (ModelFXInfo& info : m_vecStaticModelFX[szModelName])
+			{	
+				if (info.flStartTime < gHUD.m_flTime)
+				{
+					float life = info.flEndTime - info.flStartTime;
+					
+					info.flEndTime = gHUD.m_flTime + life;
+					info.flStartTime = gHUD.m_flTime;
+		
+					AddToModelFXArray(szModelName, info);
 
+					info.flStartTime = info.flEndTime;
+					info.flEndTime = info.flStartTime + life;
+				}		
+			}
+		}
+	
 		for (auto mapModelFX = m_vecModelFXArray.begin(); mapModelFX != m_vecModelFXArray.end();)
 		{
 			if (mapModelFX->first != szModelName)

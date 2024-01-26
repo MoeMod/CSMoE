@@ -55,6 +55,8 @@ public:
 		int iFlag;
 	};
 
+	void ResetData();
+	int Init(void);
 	void AddToModelFXArray(std::string szModelName, ModelFXInfo& info);
 	void ReadTempModelFXInfo(std::string szFile);
 	void UpdateModelInfo(std::string szModelName, float flTime);
@@ -64,6 +66,7 @@ public:
 	std::unordered_map<std::string, std::vector<ModelFXInfo>> m_vecModelFXArray;
 	std::unordered_map<std::string, model_s*> s_pFXModel;
 private:
+	std::unordered_map<std::string, std::vector<ModelFXInfo>> m_vecStaticModelFX;
 	std::vector<std::pair<std::string, std::vector<ModelFXInfo>>> m_vecTempModelFX;
 	std::unordered_map<std::string, std::vector<ModelFXInfo>> m_vecCachedModelFXJson;	//FileName,  modelName,  particle
 	
