@@ -2203,49 +2203,6 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			gTriApi.Color4ub( clr->r, clr->g, clr->b, 255 );
 			alpha = 1.0f;
 		}
-		else if (g_nForceFaceFlags & STUDIO_NF_OUTLINE)
-		{
-			GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
-			pglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			pglLineWidth(5.0);
-			//pglEnable(GL_LINE_SMOOTH);
-			if (RI.currententity->curstate.renderfx == kRenderFxGreenOutLine) {
-				pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				RI.currententity->curstate.rendercolor.r = 100;
-				RI.currententity->curstate.rendercolor.g = 200;
-				RI.currententity->curstate.rendercolor.b = 150;
-
-				alpha = 0.5f;
-
-				pglEnable(GL_STENCIL_TEST);
-				pglStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-				pglDisable(GL_DEPTH_TEST);
-			}
-			else if (RI.currententity->curstate.renderfx == kRenderFxRedOutLine) {
-				pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				RI.currententity->curstate.rendercolor.r = 200;
-				RI.currententity->curstate.rendercolor.g = 0;
-				RI.currententity->curstate.rendercolor.b = 0;
-
-				alpha = 0.5f;
-
-				pglEnable(GL_STENCIL_TEST);
-				pglStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-				pglDisable(GL_DEPTH_TEST);
-			}
-			else {
-				pglBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-				RI.currententity->curstate.rendercolor.r = 1;
-				RI.currententity->curstate.rendercolor.g = 1;
-				RI.currententity->curstate.rendercolor.b = 1;
-
-				alpha = 1.0f;
-
-				pglEnable(GL_STENCIL_TEST);
-				pglStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-			}
-
-		}
 		else if( g_nFaceFlags & STUDIO_NF_TRANSPARENT && R_StudioOpaque( RI.currententity ))
 		{
 			GL_SetRenderMode( kRenderTransAlpha );
@@ -2289,7 +2246,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			else alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
 		}
 
-		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
+		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
 		{
 			bool bBindSpr = false;
 
@@ -2401,14 +2358,6 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			}
 		}
 
-		if (RI.currententity->syncbase == 1.0f)   //set stencil
-		{
-			pglEnable(GL_STENCIL_TEST);
-			pglStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
-
-			pglStencilMask(0xFF);  // �����޸�ģ�建��			
-			pglStencilFunc(GL_ALWAYS, 1, 0xFF); //����Ƭ�ζ�Ҫд��ģ�建��
-		}
 #ifdef XASH_SHADER
         vec3_t colormix = g_studiolight.lightcolor;
         if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
@@ -3143,29 +3092,6 @@ R_StudioSetForceFaceFlags
 void GAME_EXPORT R_StudioSetForceFaceFlags( int flags )
 {
 	g_nForceFaceFlags = flags;
-	int flag = RI.currententity->curstate.renderfx;
-	if (!(flag == kRenderFxBlackOutLine || flag == kRenderFxRedOutLine || flag == kRenderFxGreenOutLine)) return;
-	if (RI.currententity->syncbase == 1.0f && flags == 0)   //DrawOutLinePause
-	{
-		pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		pglLineWidth(1.0);
-
-		pglStencilMask(0x00); // ��ֹ�޸�ģ�建��
-		pglDisable(GL_STENCIL_TEST);
-		pglEnable(GL_DEPTH_TEST);
-	}
-	else if (RI.currententity->syncbase == 2.0f && flags == 0)   //DrawOutLineEnd
-	{
-		pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		pglLineWidth(1.0);
-
-		pglClear(GL_STENCIL_BUFFER_BIT);
-		pglStencilMask(0x00); // ��ֹ�޸�ģ�建��
-		pglDisable(GL_STENCIL_TEST);
-		pglEnable(GL_DEPTH_TEST);
-
-		RI.currententity->syncbase = 0.0f;
-	}
 }
 
 /*

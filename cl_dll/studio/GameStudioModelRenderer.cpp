@@ -42,7 +42,6 @@
 #include "gamemode/zb2/zb2_const.h"
 #include "weaponpaint.h"
 #include "cs_wpn/bte_weapons.h"
-#include <client/gl_export.h>
 
 #define ANIM_WALK_SEQUENCE 3
 #define ANIM_JUMP_SEQUENCE 6
@@ -1092,13 +1091,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 		IEngineStudio.StudioSetRemapColors(m_nTopColor, m_nBottomColor);
 
-		//m_pCurrentEntity->curstate.renderfx = kRenderFxBlackOutLine;  //debug player outline
-
-
-		if (DrawOutLineCheck(0)) DrawOutLineBegin(0);
 		StudioRenderModel(dir);
-		if (DrawOutLineCheck(0)) DrawOutLine(0);
-		if (DrawOutLineCheck(0)) DrawOutLinePause(0);
 
 		m_pPlayerInfo = NULL;
 
@@ -1317,10 +1310,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 			IEngineStudio.StudioSetupLighting(&lighting);
 
-			if (DrawOutLineCheck(0)) DrawOutLineBegin(0);
 			StudioRenderModel(dir);
-			if (DrawOutLineCheck(0))DrawOutLine(0);
-			if (DrawOutLineCheck(0))DrawOutLineEnd(0);
 
 			StudioCalcAttachments();
 

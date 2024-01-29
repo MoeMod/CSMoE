@@ -219,7 +219,6 @@ set(XASH_ENGINE_CLIENT_SOURCES
    client/gl_decals.cpp
    client/gl_draw.cpp
    client/gl_image.cpp
-   client/gl_mirror.cpp
    client/gl_refrag.cpp
    client/gl_rlight.cpp
    client/gl_rmain.cpp
@@ -358,7 +357,7 @@ elseif(XASH_WES)
 elseif(XASH_GL4ES)
 	add_definitions(-DXASH_GL4ES)
 elseif(XASH_QINDIEGL)
-	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES 
+	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES
 		${XASH_QINDIEGL_SRC}/code/d3d_array.cpp
 		${XASH_QINDIEGL_SRC}/code/d3d_blend.cpp
 		${XASH_QINDIEGL_SRC}/code/d3d_clip.cpp
@@ -392,7 +391,7 @@ elseif(XASH_QINDIEGL)
 	if(NOT ${DirectX9_FOUND})
 		message(FATAL_ERROR "DirectX SDK not found! Please install DirectX SDK from https://www.microsoft.com/en-us/download/details.aspx?id=6812")
 	endif()
-	
+
 	add_library(QindieGL STATIC ${XASH_ENGINE_GLESWRAP_SOURCES})
 	target_include_directories(QindieGL PRIVATE ${DirectX9_INCLUDE_DIR})
 	target_include_directories(QindieGL PRIVATE ${XASH_QINDIEGL_SRC}/code)

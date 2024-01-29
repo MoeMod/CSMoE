@@ -451,4 +451,3 @@ extern GLuint ( APIENTRY *pglGetDebugMessageLogARB)( GLuint count, GLsizei bufsi
 
 
 #endif // GL_DYNAMIC_H
-

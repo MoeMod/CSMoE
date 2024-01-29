@@ -865,20 +865,6 @@ static void R_SetupGL( void )
         pglViewport( RI.viewport[0], RI.viewport[1], RI.viewport[2], RI.viewport[3] );
     }
 
-    if( RI.params & RP_CLIPPLANE )
-    {
-        GLdouble	clip[4];
-        mplane_t	*p = &RI.clipPlane;
-
-        clip[0] = p->normal[0];
-        clip[1] = p->normal[1];
-        clip[2] = p->normal[2];
-        clip[3] = -p->dist;
-
-        pglClipPlane( GL_CLIP_PLANE0, clip );
-        pglEnable( GL_CLIP_PLANE0 );
-    }
-
     if( RI.params & RP_FLIPFRONTFACE )
         GL_FrontFace( !glState.frontFace );
 
@@ -898,9 +884,6 @@ static void R_EndGL( void )
 {
     if( RI.params & RP_FLIPFRONTFACE )
         GL_FrontFace( !glState.frontFace );
-
-    if( RI.params & RP_CLIPPLANE )
-        pglDisable( GL_CLIP_PLANE0 );
 }
 
 /*
@@ -1302,7 +1285,7 @@ void R_BeginFrame( qboolean clearScene )
     R_Set2DMode( true );
 
     // draw buffer stuff
-    pglDrawBuffer( GL_BACK );
+    //pglDrawBuffer( GL_BACK );
 
     // texturemode stuff
     // update texture parameters
@@ -1364,13 +1347,6 @@ void R_RenderFrame( const ref_params_t *fd, qboolean drawWorld )
 
     if( gl_finish->integer && drawWorld )
         pglFinish();
-
-    if( gl_allow_mirrors->integer )
-    {
-        // render mirrors
-        R_FindMirrors( fd );
-        R_DrawMirrors ();
-    }
 
     R_RenderScene( fd );
 

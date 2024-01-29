@@ -549,11 +549,6 @@ qboolean CL_AddVisibleEntity( cl_entity_t *ent, int entityType )
 		// don't add himself on firstperson
 		if (RP_LOCALCLIENT(ent) && !cl.thirdperson && cl.refdef.viewentity == (cl.playernum + 1))
 		{
-			if (gl_allow_mirrors->integer && world.has_mirrors)
-			{
-				if (!R_AddEntity(ent, entityType))
-					return false;
-			}
 			// otherwise just pass to player effects like flashlight, particles etc
 		}
 		// menu entities ignores client filter
@@ -578,11 +573,6 @@ qboolean CL_AddVisibleEntity( cl_entity_t *ent, int entityType )
 		// don't add himself on firstperson
 		if( RP_LOCALCLIENT( ent ) && !cl.thirdperson && cls.key_dest != key_menu && cl.refdef.viewentity == ( cl.playernum + 1 ))
 		{
-			if( gl_allow_mirrors->integer && world.has_mirrors )
-			{
-				if( !R_AddEntity( ent, entityType ))
-					return false;
-			}
 			// otherwise just pass to player effects like flashlight, particles etc
 		}
 		else if( entityType == ET_BEAM )

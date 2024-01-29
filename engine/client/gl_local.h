@@ -347,14 +347,6 @@ int GL_AllocateTextureSlot(const char *name);
 void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfilter_t *filter );
 
 //
-// gl_mirror.c
-//
-void R_BeginDrawMirror( msurface_t *fa );
-void R_EndDrawMirror( void );
-void R_DrawMirrors( void );
-void R_FindMirrors( const ref_params_t *fd );
-
-//
 // gl_refrag.c
 //
 void R_StoreEfrags( efrag_t **ppefrag, int framecount );

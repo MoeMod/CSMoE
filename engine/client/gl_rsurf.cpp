@@ -1182,7 +1182,6 @@ void R_RenderBrushPoly( msurface_t *fa )
 	texture_t	*t;
 	int	maps;
 	qboolean	is_dynamic = false;
-	qboolean	is_mirror = false;
 	
 	if( RI.currententity == clgame.entities )
 		r_stats.c_world_polys++;
@@ -1200,33 +1199,12 @@ void R_RenderBrushPoly( msurface_t *fa )
 		
 	t = R_TextureAnimation( fa->texinfo->texture, fa - RI.currententity->model->surfaces );
 
-	if( RP_NORMALPASS() && fa->flags & SURF_REFLECT )
-	{
-		if( SURF_INFO( fa, RI.currentmodel )->mirrortexturenum )
-		{
-			GL_Bind( XASH_TEXTURE0, SURF_INFO( fa, RI.currentmodel )->mirrortexturenum );
-			is_mirror = true;
-
-			// BEGIN WATER STUFF
-			if( fa->flags & SURF_DRAWTURB )
-			{
-				R_BeginDrawMirror( fa );
-				GL_Bind( XASH_TEXTURE1, t->gl_texturenum );
-				pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-			}
-		}
-		else GL_Bind( XASH_TEXTURE0, t->gl_texturenum ); // dummy
-
-		// DEBUG: reset the mirror texture after drawing
-		SURF_INFO( fa, RI.currentmodel )->mirrortexturenum = 0;
-	}
-	else GL_Bind( XASH_TEXTURE0, t->gl_texturenum );
+	GL_Bind( XASH_TEXTURE0, t->gl_texturenum );
 
 	if( fa->flags & SURF_DRAWTURB )
 	{	
 		// warp texture, no lightmaps
 		EmitWaterPolys( fa->polys, ( fa->flags & SURF_NOCULL ));
-		if( is_mirror ) R_EndDrawMirror();
 		// END WATER STUFF
 		return;
 	}
@@ -1270,9 +1248,7 @@ void R_RenderBrushPoly( msurface_t *fa )
 		}
 	}
 
-	if( is_mirror ) R_BeginDrawMirror( fa );
 	DrawGLPoly( fa->polys, 0.0f, 0.0f );
-	if( is_mirror ) R_EndDrawMirror();
 	DrawSurfaceDecals( fa );
 
 	// NOTE: draw mirror through in mirror show dummy lightmapped texture
@@ -2006,60 +1982,6 @@ void R_DrawWorldTopView( mnode_t *node, uint clipflags )
 
 /*
 =============
-R_DrawTriangleOutlines
-=============
-*/
-void R_DrawTriangleOutlines( void )
-{
-	int		i, j;
-	msurface_t	*surf;
-	glpoly_t		*p;
-		
-	if( !gl_wireframe->integer )
-		return;
-
-	pglDisable( GL_TEXTURE_2D );
-	pglDisable( GL_DEPTH_TEST );
-	gTriApi.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	pglPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-	// render static surfaces first
-	for( i = 0; i < MAX_LIGHTMAPS; i++ )
-	{
-		for( surf = gl_lms.lightmap_surfaces[i]; surf != NULL; surf = surf->lightmapchain )
-		{
-			p = surf->polys;
-			for( ; p != NULL; p = p->chain )
-			{
-				gTriApi.Begin( TRI_POLYGON );
-				for( j = 0; j < p->numverts; j++ )
-					gTriApi.Vertex3fv( p->verts[i].xyz );
-				gTriApi.End ();
-			}
-		}
-	}
-
-	// render surfaces with dynamic lightmaps
-	for( surf = gl_lms.dynamic_surfaces; surf != NULL; surf = surf->lightmapchain )
-	{
-		p = surf->polys;
-
-		for( ; p != NULL; p = p->chain )
-		{
-			gTriApi.Begin( TRI_POLYGON );
-			for( j = 0; j < p->numverts; j++ )
-				gTriApi.Vertex3fv( p->verts[i].xyz );
-			gTriApi.End();
-		}
-	}
-
-	pglPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	pglEnable( GL_DEPTH_TEST );
-	pglEnable( GL_TEXTURE_2D );
-}
-
-/*
-=============
 R_DrawWorld
 =============
 */
@@ -2113,8 +2035,6 @@ void R_DrawWorld( void )
 	if( skychain )
 		R_DrawSkyBox();
 	skychain = NULL;
-
-	R_DrawTriangleOutlines ();
 }
 
 /*
