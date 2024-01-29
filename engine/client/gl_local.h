@@ -408,7 +408,6 @@ imgfilter_t *R_FindTexFilter( const char *texname );
 //
 void R_MarkLeaves( void );
 void R_DrawWorld( void );
-void R_DrawMirrors( void );
 void R_DrawWaterSurfaces( void );
 void R_DrawBrushModel( cl_entity_t *e );
 void GL_SubdivideSurface( msurface_t *fa );
@@ -525,10 +524,6 @@ void R_NewMap( void );
 
 =======================================================================
 */
-#ifdef XASH_NANOGL
-#undef GL_TEXTURE_3D_EXT
-#undef GL_VERTEX_SHADER_EXT
-#endif
 enum
 {
 	GL_OPENGL_110 = 0,		// base

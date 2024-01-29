@@ -70,12 +70,8 @@ const char *GL_Target( GLenum target )
 {
 	switch( target )
 	{
-	case GL_TEXTURE_1D:
-		return "1D";
 	case GL_TEXTURE_2D:
 		return "2D";
-	case GL_TEXTURE_3D:
-		return "3D";
 	case GL_TEXTURE_CUBE_MAP_ARB:
 		return "Cube";
 	case GL_TEXTURE_RECTANGLE_EXT:
@@ -201,9 +197,9 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 			pglTexParameteri( tex->target, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB );
 		}
 
-		if( tex->flags & TF_LUMINANCE )
-			pglTexParameteri( tex->target, GL_DEPTH_TEXTURE_MODE_ARB, GL_LUMINANCE );
-		else pglTexParameteri( tex->target, GL_DEPTH_TEXTURE_MODE_ARB, GL_INTENSITY );
+		//if( tex->flags & TF_LUMINANCE )
+		//	pglTexParameteri( tex->target, GL_DEPTH_TEXTURE_MODE_ARB, GL_LUMINANCE );
+		//else pglTexParameteri( tex->target, GL_DEPTH_TEXTURE_MODE_ARB, GL_INTENSITY );
 
 		if( GL_Support( GL_ANISOTROPY_EXT ))
 			pglTexParameterf( tex->target, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.0f );
@@ -266,32 +262,26 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 		if( GL_Support( GL_CLAMPTOEDGE_EXT ))
 		{
 			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
-			if( tex->target != GL_TEXTURE_1D )
-				pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-
-			if( tex->target == GL_TEXTURE_3D || tex->target == GL_TEXTURE_CUBE_MAP_ARB )
+			if( tex->target == GL_TEXTURE_CUBE_MAP_ARB )
 				pglTexParameteri( tex->target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 		}
 		else
 		{
 			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP );
+			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
-			if( tex->target != GL_TEXTURE_1D )
-				pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP );
-
-			if( tex->target == GL_TEXTURE_3D || tex->target == GL_TEXTURE_CUBE_MAP_ARB )
+			if( tex->target == GL_TEXTURE_CUBE_MAP_ARB )
 				pglTexParameteri( tex->target, GL_TEXTURE_WRAP_R, GL_CLAMP );
 		}
 	}
 	else if( tex->flags & ( TF_BORDER|TF_ALPHA_BORDER ))
 	{
 		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
+		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
 
-		if( tex->target != GL_TEXTURE_1D )
-			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
-
-		if( tex->target == GL_TEXTURE_3D || tex->target == GL_TEXTURE_CUBE_MAP_ARB )
+		if( tex->target == GL_TEXTURE_CUBE_MAP_ARB )
 			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER );
 
 		if( tex->flags & TF_BORDER )
@@ -302,11 +292,9 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 	else
 	{
 		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_REPEAT );
+		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
-		if( tex->target != GL_TEXTURE_1D )
-			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
-		if( tex->target == GL_TEXTURE_3D || tex->target == GL_TEXTURE_CUBE_MAP_ARB )
+		if( tex->target == GL_TEXTURE_CUBE_MAP_ARB )
 			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_R, GL_REPEAT );
 	}
 }
@@ -521,14 +509,8 @@ void R_TextureList_f( void )
 
 		switch( image->target )
 		{
-		case GL_TEXTURE_1D:
-			Msg( " 1D  " );
-			break;
 		case GL_TEXTURE_2D:
 			Msg( " 2D  " );
-			break;
-		case GL_TEXTURE_3D:
-			Msg( " 3D  " );
 			break;
 		case GL_TEXTURE_CUBE_MAP_ARB:
 			Msg( "CUBE " );
@@ -1098,20 +1080,10 @@ static void GL_TextureImage( GLenum inFormat, GLenum outFormat, GLenum glTarget,
 {
 	GLint	dataType = GL_UNSIGNED_BYTE;
 
-	if( glTarget == GL_TEXTURE_1D )
-	{
-		if( subImage ) pglTexSubImage1D( glTarget, level, 0, width, inFormat, dataType, data );
-		else pglTexImage1D( glTarget, level, outFormat, width, 0, inFormat, dataType, data );
-	}
-	else if( glTarget == GL_TEXTURE_CUBE_MAP_ARB )
+	if( glTarget == GL_TEXTURE_CUBE_MAP_ARB )
 	{
 		if( subImage ) pglTexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + side, level, 0, 0, width, height, inFormat, dataType, data );
 		else pglTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + side, level, outFormat, width, height, 0, inFormat, dataType, data );
-	}
-	else if( glTarget == GL_TEXTURE_3D )
-	{
-		if( subImage ) pglTexSubImage3D( glTarget, level, 0, 0, 0, width, height, depth, inFormat, dataType, data );
-		else pglTexImage3D( glTarget, level, outFormat, width, height, depth, 0, inFormat, dataType, data );
 	}
 	else
 	{
@@ -1123,20 +1095,10 @@ static void GL_TextureImage( GLenum inFormat, GLenum outFormat, GLenum glTarget,
 static void GL_TextureImageDXT( GLenum format, GLenum glTarget, GLint side, GLint level, GLint width, GLint height, GLint depth, qboolean subImage, size_t size, const void *data )
 {
 #if !defined XASH_NANOGL && !defined XASH_WES
-	if( glTarget == GL_TEXTURE_1D )
-	{
-		if( subImage ) pglCompressedTexSubImage1DARB( glTarget, level, 0, width, format, size, data );
-		else pglCompressedTexImage1DARB( glTarget, level, format, width, 0, size, data );
-	}
-	else if( glTarget == GL_TEXTURE_CUBE_MAP_ARB )
+	if( glTarget == GL_TEXTURE_CUBE_MAP_ARB )
 	{
 		if( subImage ) pglCompressedTexSubImage2DARB( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + side, level, 0, 0, width, height, format, size, data );
 		else pglCompressedTexImage2DARB( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + side, level, format, width, height, 0, size, data );
-	}
-	else if( glTarget == GL_TEXTURE_3D )
-	{
-		if( subImage ) pglCompressedTexSubImage3DARB( glTarget, level, 0, 0, 0, width, height, depth, format, size, data );
-		else pglCompressedTexImage3DARB( glTarget, level, format, width, height, depth, 0, size, data );
 	}
 	else // 2D or RECT
 	{
@@ -1199,9 +1161,7 @@ static void GL_UploadTextureDXT( image_ref pic, gltexture_t *tex, qboolean subIm
 	// determine format
 	inFormat = PFDesc[pic->type].glFormat;
 
-	if( ImageDXT( pic->type ))
-		tex->format = inFormat;
-	else tex->format = GL_TextureFormat( tex, &samples );
+	tex->format = inFormat;
 
 	if( !( tex->flags & TF_HAS_ALPHA ) && inFormat == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT )
 		tex->format = inFormat = GL_COMPRESSED_RGB_S3TC_DXT1_EXT; // OpenGL hint
@@ -1236,7 +1196,7 @@ static void GL_UploadTextureDXT( image_ref pic, gltexture_t *tex, qboolean subIm
 	else if( tex->flags & TF_TEXTURE_1D || pic->height <= 1 )
 	{
 		// determine target
-		tex->target = glTarget = GL_TEXTURE_1D;
+		tex->target = glTarget = GL_TEXTURE_2D;
 	}
 	else if( tex->flags & TF_TEXTURE_RECTANGLE )
 	{
@@ -1247,7 +1207,7 @@ static void GL_UploadTextureDXT( image_ref pic, gltexture_t *tex, qboolean subIm
 	else if( tex->flags & TF_TEXTURE_3D )
 	{
 		// determine target
-		tex->target = glTarget = GL_TEXTURE_3D;
+		tex->target = glTarget = GL_TEXTURE_2D;
 	}
 
 	pglBindTexture( tex->target, tex->texnum );
@@ -1370,7 +1330,7 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
 
 	// determine format
 	inFormat = PFDesc[pic->type].glFormat;
-	outFormat = GL_TextureFormat( tex, &samples );
+	outFormat = inFormat;
 	tex->format = outFormat;
 
 	// determine target
@@ -1407,7 +1367,7 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
 	else if( tex->flags & TF_TEXTURE_1D )
 	{
 		// determine target
-		tex->target = glTarget = GL_TEXTURE_1D;
+		tex->target = glTarget = GL_TEXTURE_2D;
 	}
 	else if( tex->flags & TF_TEXTURE_RECTANGLE )
 	{
@@ -1418,7 +1378,7 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
 	else if( tex->flags & TF_TEXTURE_3D )
 	{
 		// determine target
-		tex->target = glTarget = GL_TEXTURE_3D;
+		tex->target = glTarget = GL_TEXTURE_2D;
 	}
 
 	pglBindTexture( tex->target, tex->texnum );
@@ -1460,12 +1420,7 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
 				data = GL_ApplyGamma( data, tex->width * tex->height, ( tex->flags & TF_NORMALMAP ));
 		}
 
-		if( glTarget == GL_TEXTURE_1D )
-		{
-			if( subImage ) pglTexSubImage1D( tex->target, 0, 0, tex->width, inFormat, dataType, data );
-			else pglTexImage1D( tex->target, 0, outFormat, tex->width, 0, inFormat, dataType, data );
-		}
-		else if( glTarget == GL_TEXTURE_CUBE_MAP_ARB )
+		if( glTarget == GL_TEXTURE_CUBE_MAP_ARB )
 		{
             if(PFDesc[pic->type].compressed)
             {
@@ -1481,11 +1436,6 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
                 if( !GL_Support( GL_SGIS_MIPMAPS_EXT ) || ( tex->flags & TF_NORMALMAP ))
                     GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
             }
-		}
-		else if( glTarget == GL_TEXTURE_3D )
-		{
-			if( subImage ) pglTexSubImage3D( tex->target, 0, 0, 0, 0, tex->width, tex->height, pic->depth, inFormat, dataType, data );
-			else pglTexImage3D( tex->target, 0, inFormat, tex->width, tex->height, pic->depth, 0, inFormat, dataType, data );
 		}
 		else
 		{
@@ -1723,11 +1673,7 @@ int GL_CreateTexture( const char *name, int width, int height, const void *buffe
 	}
 	else if( flags & TF_TEXTURE_3D )
 	{
-		if( !GL_Support( GL_TEXTURE_3D_EXT ))
-			return 0;
-
-		r_empty->depth = r_empty->width;
-		r_empty->size = r_empty->width * r_empty->height * r_empty->depth * 4;
+		return 0;
 	}
 	else if( flags & TF_CUBEMAP )
 	{
@@ -2290,52 +2236,7 @@ R_InitAttenuationTexture3D
 */
 static image_ref R_InitAttenTexture3D( texFlags_t *flags )
 {
-	vec3_t	v = { 0, 0, 0 };
-	int	x, y, z, d, size, size2, halfsize;
-	float	intensity;
-
-	if( !GL_Support( GL_TEXTURE_3D_EXT ))
-		return NULL;
-
-	// 3d attenuation texture
-	r_image->width = 32;
-	r_image->height = 32;
-	r_image->depth = 32;
-	r_image->flags = IMAGE_HAS_COLOR;
-	r_image->type = PF_RGBA_32;
-	r_image->size = r_image->width * r_image->height * r_image->depth * 4;
-	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
-	r_image->buffer = data2D;
-
-	size = 32;
-	halfsize = size / 2;
-	intensity = halfsize * halfsize;
-	size2 = size * size;
-
-	for( x = 0; x < r_image->width; x++ )
-	{
-		for( y = 0; y < r_image->height; y++ )
-		{
-			for( z = 0; z < r_image->depth; z++ )
-			{
-				v[0] = (( x + 0.5f ) * ( 2.0f / (float)size ) - 1.0f );
-				v[1] = (( y + 0.5f ) * ( 2.0f / (float)size ) - 1.0f );
-				if( r_image->depth > 1 ) v[2] = (( z + 0.5f ) * ( 2.0f / (float)size ) - 1.0f );
-
-				intensity = 1.0f - sqrt( DotProduct( v, v ) );
-				if( intensity > 0 ) intensity = intensity * intensity * 215.5f;
-				d = bound( 0, intensity, 255 );
-
-				data2D[((z * size + y) * size + x) * 4 + 0] = d;
-				data2D[((z * size + y) * size + x) * 4 + 1] = d;
-				data2D[((z * size + y) * size + x) * 4 + 2] = d;
-			}
-		}
-	}
-
-	*flags = TF_UNCOMPRESSED|TF_NOMIPMAP|TF_CLAMP|TF_TEXTURE_3D;
-
-	return r_image;
+	return NULL;
 }
 
 static image_ref R_InitDlightTexture( texFlags_t *flags )
