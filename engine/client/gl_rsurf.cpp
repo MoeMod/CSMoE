@@ -1583,7 +1583,7 @@ void R_DrawBrushModel( cl_entity_t *e )
 		gTriApi.Color4ub( 255, 255, 255, e->curstate.renderamt );
 		break;
 	case kRenderTransColor:
-		pglDisable( GL_TEXTURE_2D );
+		//pglDisable( GL_TEXTURE_2D );
 		gTriApi.Color4ub( e->curstate.rendercolor.r, e->curstate.rendercolor.g,
 			e->curstate.rendercolor.b, e->curstate.renderamt );
 		allow_vbo = false;
@@ -1630,8 +1630,8 @@ void R_DrawBrushModel( cl_entity_t *e )
 	if( allow_vbo && !num_sorted )
 		R_DrawVBO( R_HasLightmap(), true );
 
-	if( e->curstate.rendermode == kRenderTransColor )
-		pglEnable( GL_TEXTURE_2D );
+	//if( e->curstate.rendermode == kRenderTransColor )
+	//	pglEnable( GL_TEXTURE_2D );
 
 	R_BlendLightmaps();
 	R_RenderFullbrights();

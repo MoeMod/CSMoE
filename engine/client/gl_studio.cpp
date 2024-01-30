@@ -2629,7 +2629,7 @@ static void GAME_EXPORT R_StudioDrawAbsBBox( void )
 	if( !R_StudioComputeBBox( RI.currententity, bbox ))
 		return;
 
-	pglDisable( GL_TEXTURE_2D );
+	//pglDisable( GL_TEXTURE_2D );
 	pglDisable( GL_DEPTH_TEST );
 
 	gTriApi.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );	// red bboxes for studiomodels
@@ -2652,7 +2652,7 @@ static void GAME_EXPORT R_StudioDrawAbsBBox( void )
 	}
 
 	gTriApi.End();
-	pglEnable( GL_TEXTURE_2D );
+	//pglEnable( GL_TEXTURE_2D );
 	pglEnable( GL_DEPTH_TEST );
 }
 
@@ -3279,7 +3279,7 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 		if(rendermode == kRenderNormal && RI.currententity != &clgame.viewent )
 		{
 			shadow_alpha = 1.0f - r_shadowalpha.value * 0.5f;
-			pglDisable( GL_TEXTURE_2D );
+			//pglDisable( GL_TEXTURE_2D );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 			pglEnable( GL_BLEND );
 			//pglShadeModel( GL_FLAT );
@@ -3295,7 +3295,7 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 			depthmode2 = GL_LEQUAL;
 			pglDepthFunc( depthmode2 );
 
-			pglEnable( GL_TEXTURE_2D );
+			//pglEnable( GL_TEXTURE_2D );
 			pglDisable( GL_BLEND );
 
 			gTriApi.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );

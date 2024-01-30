@@ -752,10 +752,10 @@ static void GL_SetDefaults( void )
 
 	pglClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
 
-#ifdef GL_MULTISAMPLE
-	if( gl_msaa->integer )
-		pglEnable( GL_MULTISAMPLE );
-#endif
+//#ifdef GL_MULTISAMPLE
+	//if( gl_msaa->integer )
+	//	pglEnable( GL_MULTISAMPLE );
+//#endif
 
 	pglDisable( GL_DEPTH_TEST );
 	pglDisable( GL_CULL_FACE );
@@ -785,7 +785,7 @@ static void GL_SetDefaults( void )
 		GL_SelectTexture( i );
 		//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 		pglDisable( GL_BLEND );
-		pglDisable( GL_TEXTURE_2D );
+		//pglDisable( GL_TEXTURE_2D );
 	}
 
 	GL_SelectTexture( 0 );
@@ -793,7 +793,7 @@ static void GL_SetDefaults( void )
 	//pglDisable( GL_ALPHA_TEST );
 	pglDisable( GL_POLYGON_OFFSET_FILL );
 	//pglAlphaFunc( GL_GREATER, 0.0f );
-	pglEnable( GL_TEXTURE_2D );
+	//pglEnable( GL_TEXTURE_2D );
 	//pglShadeModel( GL_FLAT );
 
 	TriPointSize( 1.2f );
@@ -910,7 +910,7 @@ void GL_InitCommands( void )
 	gl_texture_lodbias =  Cvar_Get( "gl_texture_lodbias", "0.0", CVAR_ARCHIVE, "LOD bias for mipmapped textures" );
 	gl_compress_textures = Cvar_Get( "gl_compress_textures", "0", CVAR_GLCONFIG, "compress textures to safe video memory" );
 	gl_luminance_textures = Cvar_Get( "gl_luminance_textures", "0", CVAR_GLCONFIG, "force all textures to luminance" );
-	gl_msaa = Cvar_Get( "gl_msaa", "0", CVAR_GLCONFIG, "MSAA samples. Use with caution, engine may fail with some values" );
+	gl_msaa = Cvar_Get( "gl_msaa", "0", CVAR_READ_ONLY, "MSAA samples. Use with caution, engine may fail with some values" );
 	gl_compensate_gamma_screenshots = Cvar_Get( "gl_compensate_gamma_screenshots", "0", CVAR_ARCHIVE, "allow to apply gamma value for screenshots and snapshots" );
 	gl_keeptjunctions = Cvar_Get( "gl_keeptjunctions", "1", CVAR_ARCHIVE, "disable to reduce vertexes count but removing tjuncs causes blinking pixels" );
 	gl_allow_static = Cvar_Get( "gl_allow_static", "0", CVAR_ARCHIVE, "force to drawing non-moveable brushes as part of world (save FPS)" );

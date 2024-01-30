@@ -114,11 +114,11 @@ void GL_Bind( GLint tmu, GLenum texnum )
 
 	if( glState.currentTextureTargets[tmu] != target )
 	{
-		if( glState.currentTextureTargets[tmu] != GL_NONE )
-			pglDisable( glState.currentTextureTargets[tmu] );
+		//if( glState.currentTextureTargets[tmu] != GL_NONE )
+		//	pglDisable( glState.currentTextureTargets[tmu] );
 
 		glState.currentTextureTargets[tmu] = target;
-		pglEnable( glState.currentTextureTargets[tmu] );
+		//pglEnable( glState.currentTextureTargets[tmu] );
 	}
 
 	if( glState.currentTextures[tmu] == texnum )

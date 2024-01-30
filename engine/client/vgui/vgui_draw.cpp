@@ -798,8 +798,8 @@ void GAME_EXPORT VGUI_EnableTexture( qboolean enable )
     g_bEnableTexture = enable;
     ImGui_Surface_Flush();
 #else
-	if( enable ) pglEnable( GL_TEXTURE_2D );
-	else pglDisable( GL_TEXTURE_2D );
+	//if( enable ) pglEnable( GL_TEXTURE_2D );
+	//else pglDisable( GL_TEXTURE_2D );
 #endif
 }
 

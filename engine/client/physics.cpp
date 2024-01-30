@@ -281,7 +281,7 @@ namespace physics
 
 	void CPhysicsDebugDraw::drawLine(const btVector3& from1, const btVector3& to1, const btVector3& color1)
 	{
-		pglDisable(GL_TEXTURE_2D);
+		//pglDisable(GL_TEXTURE_2D);
 		pglDisable(GL_BLEND);
 		pglDisable(GL_DEPTH_TEST);
 		pglLineWidth(1);
@@ -302,7 +302,7 @@ namespace physics
 
 		pglEnable(GL_DEPTH_TEST);
 		pglEnable(GL_BLEND);
-		pglEnable(GL_TEXTURE_2D);
+		//pglEnable(GL_TEXTURE_2D);
 	}
 
 	CPhysicsManager gPhysicsManager;

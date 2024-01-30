@@ -221,7 +221,7 @@ void GL_CleanUpTextureUnits( int last )
 		// disable upper units
 		if( glState.currentTextureTargets[i] != GL_NONE )
 		{
-			pglDisable( glState.currentTextureTargets[i] );
+			//pglDisable( glState.currentTextureTargets[i] );
 			glState.currentTextureTargets[i] = GL_NONE;
 			glState.currentTextures[i] = -1; // unbind texture
 		}
@@ -258,11 +258,11 @@ void GL_TextureTarget( uint target )
 
 	if( glState.currentTextureTargets[glState.activeTMU] != target )
 	{
-		if( glState.currentTextureTargets[glState.activeTMU] != GL_NONE )
-			pglDisable( glState.currentTextureTargets[glState.activeTMU] );
+		//if( glState.currentTextureTargets[glState.activeTMU] != GL_NONE )
+		//	pglDisable( glState.currentTextureTargets[glState.activeTMU] );
 		glState.currentTextureTargets[glState.activeTMU] = target;
-		if( target != GL_NONE )
-			pglEnable( glState.currentTextureTargets[glState.activeTMU] );
+		//if( target != GL_NONE )
+		//	pglEnable( glState.currentTextureTargets[glState.activeTMU] );
 	}
 }
 

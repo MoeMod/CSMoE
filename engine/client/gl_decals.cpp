@@ -983,8 +983,8 @@ void DrawSurfaceDecals( msurface_t *fa )
 		//	pglDisable( GL_ALPHA_TEST );
 	}
 
-	if( e->curstate.rendermode == kRenderTransColor )
-		pglEnable( GL_TEXTURE_2D );
+	//if( e->curstate.rendermode == kRenderTransColor )
+	//	pglEnable( GL_TEXTURE_2D );
 
 	if( e->curstate.rendermode == kRenderTransTexture || e->curstate.rendermode == kRenderTransAdd )
 		GL_Cull( GL_NONE );
@@ -1085,8 +1085,8 @@ void DrawSurfaceDecals( msurface_t *fa )
 	if( e->curstate.rendermode == kRenderTransTexture || e->curstate.rendermode == kRenderTransAdd )
 		GL_Cull( GL_FRONT );
 
-	if( e->curstate.rendermode == kRenderTransColor )
-		pglDisable( GL_TEXTURE_2D );
+	//if( e->curstate.rendermode == kRenderTransColor )
+	//	pglDisable( GL_TEXTURE_2D );
 
 	// restore blendfunc here
 	if( e->curstate.rendermode == kRenderTransAdd || e->curstate.rendermode == kRenderGlow )
