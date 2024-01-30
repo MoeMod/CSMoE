@@ -59,16 +59,11 @@ namespace cl {
 		}
 		static int LuaSetter(lua_State *L)
 		{
-            luash::Get(L, 1, *memptr);
+			U* memptr2 = memptr;
+            luash::Get(L, 1, *memptr2);
             return 0;
 		}
 	};
-
-    int LuaSV_SetFieldCFunction(lua_State *L, const char *mem, lua_CFunction cf)
-    {
-        lua_pushcfunction(L, cf);
-        lua_setfield(L, -2, mem);
-    }
 
 	int LuaSV_ExportCppClass(lua_State* L)
 	{
