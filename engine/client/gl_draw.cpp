@@ -159,8 +159,8 @@ void R_DrawStretchRaw( float x, float y, float w, float h, int cols, int rows, c
 		Host_Error( "R_DrawStretchRaw: size %i exceeds hardware limits\n", rows );
 
 	pglDisable( GL_BLEND );
-	pglDisable( GL_ALPHA_TEST );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	//pglDisable( GL_ALPHA_TEST );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
 	tex = R_GetTexture( tr.cinTexture );
 	GL_Bind( XASH_TEXTURE0, tr.cinTexture );

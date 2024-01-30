@@ -979,8 +979,8 @@ void DrawSurfaceDecals( msurface_t *fa )
 		pglDepthMask( GL_FALSE );
 		pglEnable( GL_BLEND );
 
-		if( e->curstate.rendermode == kRenderTransAlpha )
-			pglDisable( GL_ALPHA_TEST );
+		//if( e->curstate.rendermode == kRenderTransAlpha )
+		//	pglDisable( GL_ALPHA_TEST );
 	}
 
 	if( e->curstate.rendermode == kRenderTransColor )
@@ -1023,7 +1023,7 @@ void DrawSurfaceDecals( msurface_t *fa )
 				gTriApi.End();
 				pglStencilOp( GL_KEEP, GL_KEEP, GL_DECR );
 
-				pglEnable( GL_ALPHA_TEST );
+				//pglEnable( GL_ALPHA_TEST );
 				gTriApi.Begin( TRI_POLYGON );
 
 				for( i = 0; i < numVerts; i++ )
@@ -1033,7 +1033,7 @@ void DrawSurfaceDecals( msurface_t *fa )
 				}
 
 				gTriApi.End();
-				pglDisable( GL_ALPHA_TEST );
+				//pglDisable( GL_ALPHA_TEST );
 
 				pglColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 				pglStencilFunc( GL_EQUAL, 0, 0xFFFFFFFF );
@@ -1052,15 +1052,15 @@ void DrawSurfaceDecals( msurface_t *fa )
 			if( glt->flags & TF_HAS_ALPHA )
 			{
 				// draw transparent decals with GL_MODULATE
-				if( glt->fogParams[3] > DECAL_TRANSPARENT_THRESHOLD )
-					pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-				else pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+				//if( glt->fogParams[3] > DECAL_TRANSPARENT_THRESHOLD )
+				//	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+				//else pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 				pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 			}
 			else
 			{
 				// color decal like detail texture. Base color is 127 127 127
-				pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+				//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 				pglBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
 			}
 
@@ -1076,8 +1076,8 @@ void DrawSurfaceDecals( msurface_t *fa )
 		pglDepthMask( GL_TRUE );
 		pglDisable( GL_BLEND );
 
-		if( e->curstate.rendermode == kRenderTransAlpha )
-			pglEnable( GL_ALPHA_TEST );
+		//if( e->curstate.rendermode == kRenderTransAlpha )
+		//	pglEnable( GL_ALPHA_TEST );
 	}
 
 	pglDisable( GL_POLYGON_OFFSET_FILL );

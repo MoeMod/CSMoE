@@ -17,12 +17,12 @@ namespace xe {
 
 		if(add_cap & SprBatPass_AlphaTest)
 		{
-			pglEnable( GL_ALPHA_TEST );
-			pglAlphaFunc( GL_GREATER, 0.0f );
+			//pglEnable( GL_ALPHA_TEST );
+			//pglAlphaFunc( GL_GREATER, 0.0f );
 		}
 		else if(remove_cap & SprBatPass_AlphaTest)
 		{
-			pglDisable( GL_ALPHA_TEST );
+			//pglDisable( GL_ALPHA_TEST );
 		}
 
 		if(add_cap & SprBatPass_Blend)
@@ -71,8 +71,8 @@ namespace xe {
 		if( last_pass & SprBatPass_NoDepthTest )
 			pglEnable( GL_DEPTH_TEST );
 
-		if( last_pass & SprBatPass_AlphaTest )
-			pglDisable( GL_ALPHA_TEST );
+		//if( last_pass & SprBatPass_AlphaTest )
+		//	pglDisable( GL_ALPHA_TEST );
 
 		//if( last_pass & SprBatPass_Blend )
 		//    pglDisable( GL_BLEND );
@@ -151,7 +151,7 @@ namespace xe {
 	{
 		sprbat_current_pass = SprBatPass_Opaque;
 		// all sprites can have color
-		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 		auto iter = drawlist;
         auto end = drawlist + drawlist_num;
 		// render opaque first
@@ -182,7 +182,7 @@ namespace xe {
         drawlist_num = 0;
         pglDisable( GL_BLEND );
         pglDepthFunc( GL_LEQUAL );
-		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+		//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 		gTriApi.Color4f( 1, 1, 1, 1 );
 	}
 }

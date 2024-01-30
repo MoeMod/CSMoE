@@ -1450,8 +1450,8 @@ static void GAME_EXPORT pfnSPR_Set( HSPRITE hPic, int r, int g, int b )
 	//ImGui_Surface_SetRenderMode( kRenderNormal );
 #else
 	pglDisable( GL_BLEND );
-	pglDisable( GL_ALPHA_TEST );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	//pglDisable( GL_ALPHA_TEST );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 #endif
 }
 
@@ -1466,7 +1466,7 @@ static void GAME_EXPORT pfnSPR_Draw( int frame, int x, int y, const wrect_t *prc
 #if defined(XASH_IMGUI_SURFACE)
 	ImGui_Surface_SetRenderMode( kRenderTransAlpha );
 #else
-	pglEnable( GL_ALPHA_TEST );
+	//pglEnable( GL_ALPHA_TEST );
 #endif
 	SPR_DrawGeneric( frame, x, y, -1, -1, prc );
 }

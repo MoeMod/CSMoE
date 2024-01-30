@@ -382,8 +382,8 @@ void R_DrawSkyBox( void )
 	if( !RI.fogCustom )
 		pglDisable( GL_FOG );
 	pglDisable( GL_BLEND );
-	pglDisable( GL_ALPHA_TEST );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	//pglDisable( GL_ALPHA_TEST );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
 	if( clgame.movevars.skyangle && (clgame.movevars.skydir_x || clgame.movevars.skydir_y || clgame.movevars.skydir_z) )
 	{

@@ -298,7 +298,7 @@ namespace physics
 		gTriApi.Vertex3fv(from);
 		gTriApi.Vertex3fv(to);
 		gTriApi.End();
-		pglDisable(GL_ALPHA_TEST);
+		//pglDisable(GL_ALPHA_TEST);
 
 		pglEnable(GL_DEPTH_TEST);
 		pglEnable(GL_BLEND);

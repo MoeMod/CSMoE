@@ -783,16 +783,16 @@ static void GL_SetDefaults( void )
 			continue;
 
 		GL_SelectTexture( i );
-		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 		pglDisable( GL_BLEND );
 		pglDisable( GL_TEXTURE_2D );
 	}
 
 	GL_SelectTexture( 0 );
 	pglDisable( GL_BLEND );
-	pglDisable( GL_ALPHA_TEST );
+	//pglDisable( GL_ALPHA_TEST );
 	pglDisable( GL_POLYGON_OFFSET_FILL );
-	pglAlphaFunc( GL_GREATER, 0.0f );
+	//pglAlphaFunc( GL_GREATER, 0.0f );
 	pglEnable( GL_TEXTURE_2D );
 	//pglShadeModel( GL_FLAT );
 

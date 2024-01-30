@@ -942,7 +942,7 @@ void R_BlendLightmaps( void )
 			pglDepthFunc( GL_EQUAL );
 		}
 
-		pglDisable( GL_ALPHA_TEST );
+		//pglDisable( GL_ALPHA_TEST );
 
 		if( gl_overbright->integer == 1 )
 			gTriApi.Color4f( 1 / 1.5, 1 / 1.5, 1 / 1.5, 1.0 );
@@ -951,7 +951,7 @@ void R_BlendLightmaps( void )
 		else
 			pglBlendFunc( GL_ZERO, GL_SRC_COLOR );
 
-		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	}
 
 	// render static lightmaps first
@@ -1060,8 +1060,8 @@ void R_BlendLightmaps( void )
 			pglDepthFunc( GL_LEQUAL );
 		}
 
-		pglDisable( GL_ALPHA_TEST );
-		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+		//pglDisable( GL_ALPHA_TEST );
+		//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	}
 
 	// restore fog here
@@ -1086,9 +1086,9 @@ void R_RenderFullbrights( void )
 
 	pglEnable( GL_BLEND );
 	pglDepthMask( GL_FALSE );
-	pglDisable( GL_ALPHA_TEST );
+	//pglDisable( GL_ALPHA_TEST );
 	pglBlendFunc( GL_ONE, GL_ONE );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 	for( i = 1; i < MAX_TEXTURES; i++ )
 	{
@@ -1108,8 +1108,8 @@ void R_RenderFullbrights( void )
 
 	pglDisable( GL_BLEND );
 	pglDepthMask( GL_TRUE );
-	pglDisable( GL_ALPHA_TEST );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	//pglDisable( GL_ALPHA_TEST );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
 	draw_fullbrights = false;
 
@@ -1137,7 +1137,7 @@ void R_RenderDetails( void )
 
 	pglEnable( GL_BLEND );
 	pglBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
 
 	if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
 		pglDepthFunc( GL_EQUAL );
@@ -1161,7 +1161,7 @@ void R_RenderDetails( void )
 	}
 
 	pglDisable( GL_BLEND );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
 	if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
 		pglDepthFunc( GL_LEQUAL );
@@ -1405,9 +1405,9 @@ void R_DrawWaterSurfaces( void )
 
 	pglEnable( GL_BLEND );
 	pglDepthMask( GL_FALSE );
-	pglDisable( GL_ALPHA_TEST );
+	//pglDisable( GL_ALPHA_TEST );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	gTriApi.Color4f( 1.0f, 1.0f, 1.0f, cl.refdef.movevars->wateralpha );
 
 	for( i = 0; i < cl.worldmodel->numtextures; i++ )
@@ -1432,8 +1432,8 @@ void R_DrawWaterSurfaces( void )
 
 	pglDisable( GL_BLEND );
 	pglDepthMask( GL_TRUE );
-	pglDisable( GL_ALPHA_TEST );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	//pglDisable( GL_ALPHA_TEST );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	gTriApi.Color4ub( 255, 255, 255, 255 );
 }
 
@@ -1590,7 +1590,7 @@ void R_DrawBrushModel( cl_entity_t *e )
 		break;
 	case kRenderTransAlpha:
 		// NOTE: brushes can't change renderamt for 'Solid' mode
-		pglAlphaFunc( GL_GEQUAL, 0.5f );
+		//pglAlphaFunc( GL_GEQUAL, 0.5f );
 	default:	
 		gTriApi.Color4ub( 255, 255, 255, 255 );
 		break;

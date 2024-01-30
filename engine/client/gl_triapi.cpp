@@ -287,24 +287,24 @@ void GAME_EXPORT TriRenderMode( int mode )
 	{
 		case kRenderNormal:
 		default:	pglDisable( GL_BLEND );
-			pglDisable( GL_ALPHA_TEST );
-			pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			//pglDisable( GL_ALPHA_TEST );
+			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 			break;
 		case kRenderTransColor:
 		case kRenderTransAlpha:
 		case kRenderTransTexture:
 			// NOTE: TriAPI doesn't have 'solid' mode
 			pglEnable( GL_BLEND );
-			pglDisable( GL_ALPHA_TEST );
+			//pglDisable( GL_ALPHA_TEST );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-			pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 			break;
 		case kRenderGlow:
 		case kRenderTransAdd:
 			pglEnable( GL_BLEND );
-			pglDisable( GL_ALPHA_TEST );
+			//pglDisable( GL_ALPHA_TEST );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
-			pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 			break;
 	}
 }
@@ -418,10 +418,10 @@ void GAME_EXPORT TriEnd( void )
 	pglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 	pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 
-	pglDisable( GL_ALPHA_TEST );
+	//pglDisable( GL_ALPHA_TEST );
 #else
 	pglEnd();
-	pglDisable( GL_ALPHA_TEST );
+	//pglDisable( GL_ALPHA_TEST );
 #endif
 }
 
@@ -554,8 +554,8 @@ int GAME_EXPORT TriSpriteTexture( model_t *pSpriteModel, int frame )
 	psprite = (msprite_t *)pSpriteModel->cache.data;
 	if( psprite->texFormat == SPR_ALPHTEST )
 	{
-		pglEnable( GL_ALPHA_TEST );
-		pglAlphaFunc( GL_GREATER, 0.0f );
+		//pglEnable( GL_ALPHA_TEST );
+		//pglAlphaFunc( GL_GREATER, 0.0f );
 	}
 
 	GL_Bind( XASH_TEXTURE0, gl_texturenum );

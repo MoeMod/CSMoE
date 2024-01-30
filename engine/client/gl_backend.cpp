@@ -371,30 +371,30 @@ void GL_FrontFace( GLenum front )
 
 void GAME_EXPORT GL_SetRenderMode( int mode )
 {
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 	switch( mode )
 	{
 	case kRenderNormal:
 	default:
 		pglDisable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
+		//pglDisable( GL_ALPHA_TEST );
 		break;
 	case kRenderTransColor:
 	case kRenderTransTexture:
 		pglEnable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
+		//pglDisable( GL_ALPHA_TEST );
 		pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		break;
 	case kRenderTransAlpha:
 		pglEnable( GL_BLEND );
-		pglEnable( GL_ALPHA_TEST );
+		//pglEnable( GL_ALPHA_TEST );
 		pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		break;
 	case kRenderGlow:
 	case kRenderTransAdd:
 		pglEnable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
+		//pglDisable( GL_ALPHA_TEST );
 		pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
 		break;
 	}

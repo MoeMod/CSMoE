@@ -871,7 +871,7 @@ static void R_SetupGL( void )
     GL_Cull( GL_FRONT );
 
     pglDisable( GL_BLEND );
-    pglDisable( GL_ALPHA_TEST );
+    //pglDisable( GL_ALPHA_TEST );
 	TriColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 }
 

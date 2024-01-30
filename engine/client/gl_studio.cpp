@@ -2206,7 +2206,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		else if( g_nFaceFlags & STUDIO_NF_TRANSPARENT && R_StudioOpaque( RI.currententity ))
 		{
 			GL_SetRenderMode( kRenderTransAlpha );
-			pglAlphaFunc( GL_GREATER, 0.0f );
+			//pglAlphaFunc( GL_GREATER, 0.0f );
 			if (RI.currententity->curstate.rendermode == kRenderTransAlpha)
 				alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
 			else
@@ -2231,16 +2231,16 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 			if( g_iRenderMode == kRenderNormal )
 			{
-				if( gl_overbright_studio->integer )
-				{
-					pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );
-				}
-				else
-					pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+				//if( gl_overbright_studio->integer )
+				//{
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE );
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB );
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE );
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );
+				//}
+				//else
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 				alpha = 1.0f;
 			}
 			else alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
@@ -3141,7 +3141,7 @@ static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 	if( glState.drawTrans && g_iRenderMode != kRenderTransAdd )
 		pglDepthMask( GL_TRUE );
 
-	pglAlphaFunc( GL_GREATER, 0.0f );
+	//pglAlphaFunc( GL_GREATER, 0.0f );
 
 	// was done before, in R_DrawViewModel
 	if( g_iBackFaceCull )
@@ -3156,7 +3156,7 @@ R_StudioRestoreRenderer
 */
 static void GAME_EXPORT R_StudioRestoreRenderer( void )
 {
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	//pglShadeModel( GL_FLAT );
 
 	// restore depthmask state for sprites etc

@@ -179,8 +179,8 @@ static void SetBeamRenderMode( int rendermode )
 	}
 	else pglDisable( GL_BLEND );	// solid mode
 
-	pglDisable( GL_ALPHA_TEST );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	//pglDisable( GL_ALPHA_TEST );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 }
 
 /*

@@ -693,7 +693,7 @@ void GAME_EXPORT VGUI_SetupDrawingRect( int *pColor )
     ImGui_Surface_Flush();
 #else
 	pglEnable( GL_BLEND );
-	pglDisable( GL_ALPHA_TEST );
+	//pglDisable( GL_ALPHA_TEST );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	gTriApi.Color4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
 #endif
@@ -710,10 +710,10 @@ void GAME_EXPORT VGUI_SetupDrawingText( int *pColor )
     ImGui_Surface_Flush();
 #else
 	pglEnable( GL_BLEND );
-	pglEnable( GL_ALPHA_TEST );
-	pglAlphaFunc( GL_GREATER, 0.0f );
+	//pglEnable( GL_ALPHA_TEST );
+	//pglAlphaFunc( GL_GREATER, 0.0f );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	gTriApi.Color4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
 #endif
 }
@@ -729,10 +729,10 @@ void GAME_EXPORT VGUI_SetupDrawingImage( int *pColor )
     ImGui_Surface_Flush();
 #else
 	pglEnable( GL_BLEND );
-	pglEnable( GL_ALPHA_TEST );
-	pglAlphaFunc( GL_GREATER, 0.0f );
+	//pglEnable( GL_ALPHA_TEST );
+	//pglAlphaFunc( GL_GREATER, 0.0f );
 	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	gTriApi.Color4ub( pColor[0], pColor[1], pColor[2], 255 - pColor[3] );
 #endif
 }
