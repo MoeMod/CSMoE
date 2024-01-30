@@ -577,7 +577,7 @@ void GAME_EXPORT TriFog( const vec3_t flFogColor, float flStart, float flEnd, in
 
 	if( !bOn )
 	{
-		pglDisable( GL_FOG );
+		//pglDisable( GL_FOG );
 		RI.fogCustom = false;
 		return;
 	}
@@ -589,17 +589,17 @@ void GAME_EXPORT TriFog( const vec3_t flFogColor, float flStart, float flEnd, in
 	RI.fogStart = (flStart) ? flStart : 1.0f;
 	RI.fogEnd = (flEnd || !RI.fogDensity) ? flEnd : 0.25f / RI.fogDensity;
 
-	pglEnable(GL_FOG);
+	//pglEnable(GL_FOG);
 #if _WIN32 || TARGET_OS_OSX
-	pglFogi(GL_FOG_MODE, GL_LINEAR);
-	pglFogf(GL_FOG_START, RI.fogStart);
-	pglFogf(GL_FOG_END, RI.fogEnd);
+	//pglFogi(GL_FOG_MODE, GL_LINEAR);
+	//pglFogf(GL_FOG_START, RI.fogStart);
+	//pglFogf(GL_FOG_END, RI.fogEnd);
 #else
-	pglFogi(GL_FOG_MODE, GL_EXP);
-	pglFogf(GL_FOG_DENSITY, RI.fogDensity);
+	//pglFogi(GL_FOG_MODE, GL_EXP);
+	//pglFogf(GL_FOG_DENSITY, RI.fogDensity);
 #endif
-	pglFogfv(GL_FOG_COLOR, RI.fogColor.data());
-	pglHint(GL_FOG_HINT, GL_NICEST);
+	//pglFogfv(GL_FOG_COLOR, RI.fogColor.data());
+	//pglHint(GL_FOG_HINT, GL_NICEST);
 }
 
 /*

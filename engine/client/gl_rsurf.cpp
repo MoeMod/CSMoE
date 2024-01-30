@@ -232,7 +232,7 @@ void GL_SetupFogColorForSurfaces( void )
 
 	if( RI.currententity->curstate.rendermode == kRenderTransTexture )
 	{
-		pglFogfv( GL_FOG_COLOR, RI.fogColor.data() );
+		//pglFogfv( GL_FOG_COLOR, RI.fogColor.data() );
 		return;
 	}
 
@@ -241,14 +241,14 @@ void GL_SetupFogColorForSurfaces( void )
 	fogColor[0] = pow( RI.fogColor[0] / div, ( 1.0f / factor ));
 	fogColor[1] = pow( RI.fogColor[1] / div, ( 1.0f / factor ));
 	fogColor[2] = pow( RI.fogColor[2] / div, ( 1.0f / factor ));
-	pglFogfv( GL_FOG_COLOR, fogColor.data() );
+	//pglFogfv( GL_FOG_COLOR, fogColor.data() );
 }
 
 void GL_ResetFogColor( void )
 {
 	// restore fog here
-	if(( RI.fogEnabled || RI.fogCustom ) && !RI.refdef.onlyClientDraw )
-		pglFogfv( GL_FOG_COLOR, RI.fogColor.data() );
+	//if(( RI.fogEnabled || RI.fogCustom ) && !RI.refdef.onlyClientDraw )
+	//	pglFogfv( GL_FOG_COLOR, RI.fogColor.data() );
 }
 
 /*
@@ -1081,8 +1081,8 @@ void R_RenderFullbrights( void )
 	if( !draw_fullbrights )
 		return;
 
-	if( RI.fogEnabled && !RI.refdef.onlyClientDraw )
-		pglDisable( GL_FOG );
+	//if( RI.fogEnabled && !RI.refdef.onlyClientDraw )
+	//	pglDisable( GL_FOG );
 
 	pglEnable( GL_BLEND );
 	pglDepthMask( GL_FALSE );
@@ -1114,8 +1114,8 @@ void R_RenderFullbrights( void )
 	draw_fullbrights = false;
 
 	// restore for here
-	if( RI.fogEnabled && !RI.refdef.onlyClientDraw )
-		pglEnable( GL_FOG );
+	//if( RI.fogEnabled && !RI.refdef.onlyClientDraw )
+	//	pglEnable( GL_FOG );
 }
 
 /*
@@ -1574,8 +1574,8 @@ void R_DrawBrushModel( cl_entity_t *e )
 	switch( e->curstate.rendermode )
 	{
 	case kRenderTransAdd:
-		if( RI.fogCustom )
-			pglDisable( GL_FOG );
+		//if( RI.fogCustom )
+		//	pglDisable( GL_FOG );
 	case kRenderTransTexture:
 		need_sort = true;
 		allow_vbo = false;
@@ -1640,8 +1640,8 @@ void R_DrawBrushModel( cl_entity_t *e )
 	// restore fog here
 	if( e->curstate.rendermode == kRenderTransAdd )
 	{
-		if( RI.fogCustom )
-			pglEnable( GL_FOG );
+		//if( RI.fogCustom )
+		//	pglEnable( GL_FOG );
 	}
 
 	R_LoadIdentity();	// restore worldmatrix

@@ -1046,11 +1046,11 @@ void R_DrawFog( void )
     if( !RI.fogEnabled || RI.refdef.onlyClientDraw )
         return;
 
-    pglEnable( GL_FOG );
-    pglFogi( GL_FOG_MODE, GL_EXP );
-    pglFogf( GL_FOG_DENSITY, RI.fogDensity );
-    pglFogfv( GL_FOG_COLOR, RI.fogColor.data() );
-    pglHint( GL_FOG_HINT, GL_NICEST );
+    //pglEnable( GL_FOG );
+    //pglFogi( GL_FOG_MODE, GL_EXP );
+    //pglFogf( GL_FOG_DENSITY, RI.fogDensity );
+    //pglFogfv( GL_FOG_COLOR, RI.fogColor.data() );
+    //pglHint( GL_FOG_HINT, GL_NICEST );
 }
 
 /*
@@ -1112,8 +1112,8 @@ void R_DrawEntitiesOnList( void )
     while( pglGetError() != GL_NO_ERROR );
 
     // don't fogging translucent surfaces
-    if( !RI.fogCustom )
-        pglDisable( GL_FOG );
+    //if( !RI.fogCustom )
+    //    pglDisable( GL_FOG );
     pglDepthMask( GL_FALSE );
     glState.drawTrans = true;
 

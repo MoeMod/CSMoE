@@ -37,13 +37,13 @@ namespace xe {
 
 		if(add_cap & SprBatPass_Src_One)
 		{
-			pglDisable( GL_FOG );
+			//pglDisable( GL_FOG );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
 		}
 		else if(remove_cap & SprBatPass_Src_One)
 		{
-			if( RI.fogCustom || ( RI.fogEnabled && !glState.drawTrans ))
-				pglEnable( GL_FOG );
+			//if( RI.fogCustom || ( RI.fogEnabled && !glState.drawTrans ))
+			//	pglEnable( GL_FOG );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		}
 
@@ -77,8 +77,8 @@ namespace xe {
 		//if( last_pass & SprBatPass_Blend )
 		//    pglDisable( GL_BLEND );
 
-		if( RI.fogCustom || ( RI.fogEnabled && !glState.drawTrans ))
-			pglEnable( GL_FOG );
+		//if( RI.fogCustom || ( RI.fogEnabled && !glState.drawTrans ))
+		//	pglEnable( GL_FOG );
 
 		if( last_pass & SprBatPass_NoCull )
 			GL_Cull( GL_FRONT );
