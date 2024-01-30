@@ -134,14 +134,8 @@ Default build-depended cvar and constant values
 #define XASH_INTERNAL_GAMELIBS
 #endif
 
-#if defined XASH_NANOGL || defined XASH_WES || defined XASH_REGAL || defined XASH_GL4ES
-#ifndef XASH_GLES
-#define XASH_GLES
-#endif // XASH_GLES
-#ifndef XASH_GL_STATIC
-#define XASH_GL_STATIC
-#endif // XASH_GL_STATIC
-#endif // XASH_NANOGL || XASH_WES || XASH_REGAL
+// always use static gl
+#define XASH_GL_STATIC 1
 
 #define DEFAULT_PRIMARY_MASTER "ms.xash.su:27010"
 #define DEFAULT_SECONDARY_MASTER "ms2.xash.su:27010"

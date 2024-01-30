@@ -50,6 +50,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 static dllfunc_t opengles20_funcs[] =
 {
 #define GL_API(R, NAME, ...) { GL_CALL( NAME )	},
+#include "gl_iter.h"
 { NULL, NULL }
 };
 
@@ -235,13 +236,8 @@ void GL_SetupAttributes()
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_EGL, 1 );
 
-#ifdef XASH_NANOGL
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 1 );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
-#elif defined( XASH_WES ) || defined( XASH_REGAL ) || defined( XASH_GL4ES )
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
-#endif
 
 #elif !defined XASH_GL_STATIC
 	if( Sys_CheckParm( "-gldebug" ) && host.developer >= 1 )

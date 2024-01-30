@@ -60,7 +60,7 @@ GL_API(void, glGetProgramiv, GLhandleARB obj, GLenum pname, GLint *params)
 GL_API(void, glGetShaderInfoLog, GLhandleARB obj, GLsizei maxLength, GLsizei *length, GLcharARB *infoLog)
 GL_API(void, glGetShaderSource, GLhandleARB obj, GLsizei maxLength, GLsizei *length, GLcharARB *source)
 GL_API(void, glGetShaderiv, GLhandleARB obj, GLenum pname, GLint *params)
-const GLubyte *GL_MANGLE( glGetString)(GLenum name);
+GL_API(const GLubyte *, glGetString, GLenum name)
 GL_API(void, glGetUniformfv, GLhandleARB programObj, GLint location, GLfloat *params)
 GL_API(void, glGetUniformiv, GLhandleARB programObj, GLint location, GLint *params)
 GL_API(GLint, glGetUniformLocation, GLhandleARB programObj, const GLcharARB *name)
