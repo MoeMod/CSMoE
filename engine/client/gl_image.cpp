@@ -1017,7 +1017,8 @@ static void GL_GenerateMipmaps( byte *buffer, image_ref pic, gltexture_t *tex, G
 	if( GL_Support( GL_SGIS_MIPMAPS_EXT ) && !( tex->flags & ( TF_NORMALMAP|TF_ALPHACONTRAST )))
 	{
 		pglHint( GL_GENERATE_MIPMAP_HINT_SGIS, GL_NICEST );
-		pglTexParameteri( glTarget, GL_GENERATE_MIPMAP_SGIS, GL_TRUE );
+		pglGenerateMipmap(glTarget);
+		//pglTexParameteri( glTarget, GL_GENERATE_MIPMAP_SGIS, GL_TRUE );
 		pglGetError(); // clear error queue on mips generate
 		return; 
 	}
@@ -1429,12 +1430,9 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
             }
             else
             {
-                if( GL_Support( GL_SGIS_MIPMAPS_EXT ) && !( tex->flags & TF_NORMALMAP ))
-                    GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
                 if( subImage ) pglTexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, 0, 0, tex->width, tex->height, inFormat, dataType, data );
                 else pglTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, outFormat, tex->width, tex->height, 0, inFormat, dataType, data );
-                if( !GL_Support( GL_SGIS_MIPMAPS_EXT ) || ( tex->flags & TF_NORMALMAP ))
-                    GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
+                GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
             }
 		}
 		else
@@ -1446,12 +1444,9 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
             }
             else
             {
-                if( GL_Support( GL_SGIS_MIPMAPS_EXT ) && !( tex->flags & ( TF_NORMALMAP|TF_ALPHACONTRAST )))
-                    GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
                 if( subImage ) pglTexSubImage2D( tex->target, 0, 0, 0, tex->width, tex->height, inFormat, dataType, data );
                 else pglTexImage2D( tex->target, 0, outFormat, tex->width, tex->height, 0, inFormat, dataType, data );
-                if( !GL_Support( GL_SGIS_MIPMAPS_EXT ) || ( tex->flags & ( TF_NORMALMAP|TF_ALPHACONTRAST )))
-                    GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
+                GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
             }
 		}
 

@@ -846,6 +846,7 @@ static void R_SetupGL( void )
 //	if( RI.params & RP_MIRRORVIEW ) RI.projectionMatrix[0][0] = -RI.projectionMatrix[0][0];
 
     Matrix4x4_Concat( RI.worldviewProjectionMatrix, RI.projectionMatrix, RI.worldviewMatrix );
+	Matrix4x4_Transpose( RI.worldviewProjectionMatrixTranspose, RI.worldviewProjectionMatrix );
 
     if( RP_NORMALPASS( ))
     {
@@ -1632,6 +1633,7 @@ static void GL_SetWorldviewProjectionMatrix( const float *glmatrix )
     if( !glmatrix ) return;
 
     Matrix4x4_FromArrayFloatGL( RI.worldviewProjectionMatrix, glmatrix );
+	Matrix4x4_Transpose( RI.worldviewProjectionMatrixTranspose, RI.worldviewProjectionMatrix );
 }
 
 static const char *GL_TextureName( unsigned int texnum )

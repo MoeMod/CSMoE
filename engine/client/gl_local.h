@@ -161,6 +161,7 @@ typedef struct
 
 	matrix4x4		projectionMatrix;
 	matrix4x4		worldviewProjectionMatrix;	// worldviewMatrix * projectionMatrix
+	matrix4x4		worldviewProjectionMatrixTranspose;	// worldviewMatrix * projectionMatrix for shaders
 	int		lightstylevalue[MAX_LIGHTSTYLES];	// value 0 - 65536
 	float		lightcache[MAX_LIGHTSTYLES];
 

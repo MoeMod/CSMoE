@@ -358,26 +358,28 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
     // compile shaders for es2
     const char *vertex_shader_list[2] = { xe::GetShaderVersionString(),
             "uniform mat4 ProjMtx;\n"
-            "attribute vec2 Position;\n"
-            "attribute vec2 UV;\n"
-            "attribute vec4 Color;\n"
-            "varying vec2 Frag_UV;\n"
-            "varying vec4 Frag_Color;\n"
+            "in vec2 Position;\n"
+            "in vec2 UV;\n"
+            "in vec4 Color;\n"
+            "out vec2 vvTexCoord;\n"
+            "out vec4 vvColor;\n"
             "void main()\n"
             "{\n"
-            "    Frag_UV = UV;\n"
-            "    Frag_Color = Color;\n"
+            "    vvTexCoord = UV;\n"
+            "    vvColor = Color;\n"
             "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
             "}\n"
      };
 
-    const GLcharARB* fragment_shader_list[2] = { xe::GetShaderVersionString(),
+    const GLcharARB* fragment_shader_list[3] = { xe::GetShaderVersionString(),
+                                                 xe::GetFragmentShaderPrecision(),
             "uniform sampler2D Texture;\n"
-            "varying vec2 Frag_UV;\n"
-            "varying vec4 Frag_Color;\n"
+            "in vec2 vvTexCoord;\n"
+            "in vec4 vvColor;\n"
+            "out vec4 FragColor;\n"
             "void main()\n"
             "{\n"
-            "    gl_FragColor = Frag_Color * texture2D(Texture, Frag_UV.st);\n"
+            "    FragColor = vvColor * texture(Texture, vvTexCoord.st);\n"
             "}\n"
         };
     g_VertHandle = pglCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
@@ -386,7 +388,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
     xe::CheckShader(g_VertHandle, "vertex shader");
 
     g_FragHandle = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-    pglShaderSourceARB(g_FragHandle, 2, fragment_shader_list, NULL);
+    pglShaderSourceARB(g_FragHandle, 3, fragment_shader_list, NULL);
     pglCompileShaderARB(g_FragHandle);
     xe::CheckShader(g_FragHandle, "fragment shader");
 

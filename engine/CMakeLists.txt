@@ -37,22 +37,7 @@ else()
 	set(XASH_ENGINE xash) # Lib name
 endif()
 
-option(XASH_GLES   "Enable if Xash3D is running over GL to GLES translator." OFF)
-option(XASH_NANOGL "Use NanoGL(GLES1). Implicitly enables XASH_GLES." OFF)
-if(XASH_NANOGL)
-	set(XASH_NANOGL_SRC "${CMAKE_SOURCE_DIR}/nanogl" CACHE PATH "NanoGL path")
-endif()
-option(XASH_WES    "Use gl-wes-v2(GLES2). Implicitly enables XASH_GLES." OFF)
-if(XASH_WES)
-	set(XASH_WES_SRC "${CMAKE_SOURCE_DIR}/gl-wes-v2" CACHE PATH "GL WES path")
-endif()
-option(XASH_GL4ES    "Use gl4es(GLES2). Implicitly enables XASH_GLES." OFF)
-if(WIN32)
-	option(XASH_QINDIEGL    "Use QindieGL(D3D9). Only avaible on Win32" OFF)
-endif()
-if(XASH_QINDIEGL)
-	set(XASH_QINDIEGL_SRC "${CMAKE_SOURCE_DIR}/3rdparty/QindieGL" CACHE PATH "QindieGL path")
-endif()
+set(XASH_GLES ON)
 option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OFF)
 
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
@@ -336,72 +321,6 @@ include_directories(
 	../SourceSDK/public
 )
 
-if(XASH_NANOGL)
-	file(GLOB_RECURSE XASH_ENGINE_GLESWRAP_SOURCES ${XASH_NANOGL_SRC}/*.cpp) # NanoGL version
-	if(NOT XASH_ENGINE_GLESWRAP_SOURCES)
-		message(FATAL_ERROR "Clone both nanogl sources to engine folder!")
-	endif()
-	list(APPEND XASH_ENGINE_SOURCES ${XASH_ENGINE_GLESWRAP_SOURCES})
-
-	include_directories(${XASH_NANOGL_SRC}/ ${XASH_NANOGL_SRC}/GL/)
-	add_definitions(-DXASH_NANOGL -D__MULTITEXTURE_SUPPORT__)
-elseif(XASH_WES)
-	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES ${XASH_WES_SRC}/src/*.c) # wesgl version
-	if(NOT XASH_ENGINE_GLESWRAP_SOURCES)
-		message(FATAL_ERROR "Clone both gl-wes-v2 and nanogl sources to engine folder!")
-	endif()
-	list(APPEND XASH_ENGINE_SOURCES ${XASH_ENGINE_GLESWRAP_SOURCES})
-
-	include_directories(${XASH_NANOGL_SRC}/ ${XASH_NANOGL_SRC}/GL/ ${XASH_WES_SRC}/src/)
-	add_definitions(-DXASH_WES -DWES_MANGLE_PREPEND)
-elseif(XASH_GL4ES)
-	add_definitions(-DXASH_GL4ES)
-elseif(XASH_QINDIEGL)
-	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES
-		${XASH_QINDIEGL_SRC}/code/d3d_array.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_blend.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_clip.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_combiners.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_eval.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_extension.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_feedback.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_get.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_global.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_immediate.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_light.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_lists.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_material.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_matrix.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_matrix_stack.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_misc.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_object.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_pixels.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_state.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_stencil.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_texgen.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_texture.cpp
-		${XASH_QINDIEGL_SRC}/code/d3d_wrapper.cpp
-		${XASH_QINDIEGL_SRC}/msvc/opengl32.def
-	)
-	if(NOT XASH_ENGINE_GLESWRAP_SOURCES)
-		message(FATAL_ERROR "Clone QindieGL sources to engine folder!")
-	endif()
-
-	find_package(DirectX REQUIRED)
-	if(NOT ${DirectX9_FOUND})
-		message(FATAL_ERROR "DirectX SDK not found! Please install DirectX SDK from https://www.microsoft.com/en-us/download/details.aspx?id=6812")
-	endif()
-
-	add_library(QindieGL STATIC ${XASH_ENGINE_GLESWRAP_SOURCES})
-	target_include_directories(QindieGL PRIVATE ${DirectX9_INCLUDE_DIR})
-	target_include_directories(QindieGL PRIVATE ${XASH_QINDIEGL_SRC}/code)
-	target_include_directories(QindieGL PUBLIC ${XASH_QINDIEGL_SRC}/code/gl_headers)
-	target_compile_definitions(QindieGL PUBLIC -DXASH_QINDIEGL)
-
-	target_link_libraries(QindieGL PUBLIC ${DirectX9_LIBRARY} ${DirectX9_D3DX9_LIBRARY} ${DirectX9_DXERR_LIBRARY} legacy_stdio_definitions)
-	# install( TARGETS QindieGL DESTINATION ".")
-endif()
-
 add_definitions(-DXASH_FORCEINLINE)
 
 # ----- Conditions -----
@@ -506,16 +425,6 @@ if(XASH_ANGLE)
 	add_definitions(-DXASH_ANGLE -DXASH_GL_STATIC)
 	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-angle)
 	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-spirv_cross 3rdparty-spirv_tools 3rdparty-glslang)
-endif()
-
-if(XASH_QINDIEGL)
-	add_definitions(-DXASH_GL_STATIC -D__MULTITEXTURE_SUPPORT__)
-	target_link_libraries(${XASH_ENGINE} PRIVATE QindieGL)
-endif()
-
-if(XASH_GL4ES)
-	add_definitions(-DXASH_GL_STATIC)
-	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-gl4es)
 endif()
 
 if(XASH_CPUINFO)

@@ -187,12 +187,12 @@ namespace xe {
 					R"(
 uniform mat4 muWVP;
 uniform float uPointSize;
-attribute vec3 pos;
-attribute vec2 uv;
-attribute vec4 col;
+in vec3 pos;
+in vec2 uv;
+in vec4 col;
 
-varying vec2 vvTexCoord;
-varying vec4 vvColor;
+out vec2 vvTexCoord;
+out vec4 vvColor;
 
 void main(void)
 {
@@ -208,21 +208,23 @@ void main(void)
 			pglCompileShaderARB(this->vertex_shader);
 			xe::CheckShader(this->vertex_shader, "vertex shader");
 
-			const GLcharARB* fragment_shader_list[2] = {
+			const GLcharARB* fragment_shader_list[3] = {
 					xe::GetShaderVersionString(),
+					xe::GetFragmentShaderPrecision(),
 					R"(
 uniform sampler2D tex;
-varying vec2 vvTexCoord;
-varying vec4 vvColor;
+in vec2 vvTexCoord;
+in vec4 vvColor;
+out vec4 FragColor;
 
 void main (void)
 {
-    gl_FragColor = texture2D(tex, vvTexCoord) * vvColor;
+    FragColor = texture(tex, vvTexCoord) * vvColor;
 }
 )"
 			};
 			this->fragment_shader = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-			pglShaderSourceARB(this->fragment_shader, 2, fragment_shader_list, NULL);
+			pglShaderSourceARB(this->fragment_shader, 3, fragment_shader_list, NULL);
 			pglCompileShaderARB(this->fragment_shader);
 			xe::CheckShader(this->fragment_shader, "fragment shader");
 
@@ -251,7 +253,7 @@ void main (void)
 			pglDetachObjectARB(this->program, this->fragment_shader);
 			pglDeleteObjectARB(this->vertex_shader);
 			pglDeleteObjectARB(this->fragment_shader);
-			pglDeleteObjectARB(this->program);
+			pglDeleteProgram(this->program);
 
 			pglDeleteBuffersARB( 1, &this->vbo);
 			pglDeleteBuffersARB( 1, &this->ebo);
@@ -381,7 +383,7 @@ void GAME_EXPORT TriEnd( void )
 #if XASH_SHADER_TRIAPI
 	pglUseProgramObjectARB(xe::TriFFE.program);
 	pglUniform1iARB(xe::TriFFE.uniform.tex, 0);
-	pglUniformMatrix4fvARB(xe::TriFFE.uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
+	pglUniformMatrix4fvARB(xe::TriFFE.uniform.muWVP, 1, GL_FALSE, (const float*)&RI.worldviewProjectionMatrixTranspose);
 	pglUniform1fARB(xe::TriFFE.uniform.uPointSize, xe::TriFFE.cur_point_size);
 
 	pglBindBufferARB(GL_ARRAY_BUFFER_ARB, xe::TriFFE.vbo);

@@ -481,7 +481,7 @@ qboolean VID_ScreenShot( const char *filename, int shot_type )
 	r_shot->buffer = (byte*)Mem_Alloc( r_temppool, r_shot->size );
 
 	// get screen frame
-	//pglPixelStorei(GL_PACK_ALIGNMENT, 1);	// PANDORA, just in case
+	pglPixelStorei(GL_PACK_ALIGNMENT, 1);	// PANDORA, just in case
 	pglReadPixels( 0, 0, r_shot->width, r_shot->height, GL_RGBA, GL_UNSIGNED_BYTE, r_shot->buffer );
 	switch( shot_type )
 	{
