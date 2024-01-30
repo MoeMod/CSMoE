@@ -3128,7 +3128,7 @@ R_StudioSetupRenderer
 static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 {
 	g_iRenderMode = bound( 0, rendermode, kRenderTransAdd );
-	pglShadeModel( GL_SMOOTH );	// enable gouraud shading
+	//pglShadeModel( GL_SMOOTH );	// enable gouraud shading
 	
 	if( clgame.ds.cullMode != GL_NONE ) GL_Cull( GL_FRONT );
 	if (RI.currententity)
@@ -3157,7 +3157,7 @@ R_StudioRestoreRenderer
 static void GAME_EXPORT R_StudioRestoreRenderer( void )
 {
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	pglShadeModel( GL_FLAT );
+	//pglShadeModel( GL_FLAT );
 
 	// restore depthmask state for sprites etc
 	if( glState.drawTrans && g_iRenderMode != kRenderTransAdd )
@@ -3282,7 +3282,7 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 			pglDisable( GL_TEXTURE_2D );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 			pglEnable( GL_BLEND );
-			pglShadeModel( GL_FLAT );
+			//pglShadeModel( GL_FLAT );
 			shadow_alpha2 = 1.0f - shadow_alpha;
 
 			gTriApi.Color4f( 0.0f, 0.0f, 0.0f, shadow_alpha2 );
@@ -3299,7 +3299,7 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 			pglDisable( GL_BLEND );
 
 			gTriApi.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-			pglShadeModel( GL_SMOOTH );
+			//pglShadeModel( GL_SMOOTH );
 		}
 	}
 }

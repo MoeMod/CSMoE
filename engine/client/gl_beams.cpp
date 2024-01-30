@@ -231,12 +231,12 @@ static void CL_DrawSegsStretch(int modelIndex, float frame, int rendermode, cons
 
 	gTriApi.Color4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
 	gTriApi.TexCoord2f(0.0f, curSeg.texcoord);
-	pglNormal3fv(vAveNormal.data());
+	//pglNormal3fv(vAveNormal.data());
 	gTriApi.Vertex3fv(vPoint1);
 
 	gTriApi.Color4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
 	gTriApi.TexCoord2f(1.0f, curSeg.texcoord);
-	pglNormal3fv(vAveNormal.data());
+	//pglNormal3fv(vAveNormal.data());
 	gTriApi.Vertex3fv(vPoint2);
 
 	VectorMA(nextSeg.pos, (nextSeg.width * 0.5f), vAveNormal, vPoint1);
@@ -244,12 +244,12 @@ static void CL_DrawSegsStretch(int modelIndex, float frame, int rendermode, cons
 
 	gTriApi.Color4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
 	gTriApi.TexCoord2f(0.0f, nextSeg.texcoord);
-	pglNormal3fv(vAveNormal.data());
+	//pglNormal3fv(vAveNormal.data());
 	gTriApi.Vertex3fv(vPoint1);
 
 	gTriApi.Color4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
 	gTriApi.TexCoord2f(1.0f, nextSeg.texcoord);
-	pglNormal3fv(vAveNormal.data());
+	//pglNormal3fv(vAveNormal.data());
 	gTriApi.Vertex3fv(vPoint2);
 
 	gTriApi.End();
@@ -482,12 +482,12 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 
 			gTriApi.Color4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
 			gTriApi.TexCoord2f( 0.0f, curSeg.texcoord );
-			pglNormal3fv( vAveNormal.data() );
+			//pglNormal3fv( vAveNormal.data() );
 			gTriApi.Vertex3fv( vPoint1 );
 
 			gTriApi.Color4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
 			gTriApi.TexCoord2f( 1.0f, curSeg.texcoord );
-			pglNormal3fv( vAveNormal.data() );
+			//pglNormal3fv( vAveNormal.data() );
 			gTriApi.Vertex3fv( vPoint2);
 		}
 
@@ -503,12 +503,12 @@ static void CL_DrawSegs( int modelIndex, float frame, int rendermode, const vec3
 			// specify the points.
 			gTriApi.Color4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
 			gTriApi.TexCoord2f( 0.0f, curSeg.texcoord );
-			pglNormal3fv( vLastNormal.data() );
+			//pglNormal3fv( vLastNormal.data() );
 			gTriApi.Vertex3fv( vPoint1 );
 
 			gTriApi.Color4f( curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha );
 			gTriApi.TexCoord2f( 1.0f, curSeg.texcoord );
-			pglNormal3fv( vLastNormal.data() );
+			//pglNormal3fv( vLastNormal.data() );
 			gTriApi.Vertex3fv( vPoint2 );
 		}
 
@@ -1688,7 +1688,7 @@ void CL_DrawBeam( BEAM *pbeam )
 	VectorScale( color, ( pbeam->brightness / 255.0f ), color );
 	VectorScale( color, ( 1.0f / 255.0f ), color );
 
-	pglShadeModel( GL_SMOOTH );
+	//pglShadeModel( GL_SMOOTH );
 
 	switch( pbeam->type )
 	{
@@ -1723,7 +1723,7 @@ void CL_DrawBeam( BEAM *pbeam )
 			MsgDev( D_ERROR, "CL_DrawBeam:  Unknown beam type %i\n", pbeam->type );
 			break;
 	}
-	pglShadeModel( GL_FLAT );
+	//pglShadeModel( GL_FLAT );
 }
 
 /*

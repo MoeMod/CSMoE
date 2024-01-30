@@ -188,18 +188,10 @@ void GL_SelectTexture( GLint tmu )
 		return;
 
 	glState.activeTMU = tmu;
-#ifndef XASH_NANOGL
 	if( pglActiveTextureARB )
 	{
 		pglActiveTextureARB( tmu + GL_TEXTURE0_ARB );
 	}
-#endif
-#if !defined(XASH_NANOGL) && !defined(XASH_WES)
-	else if( pglSelectTextureSGIS )
-	{
-		pglSelectTextureSGIS( tmu + GL_TEXTURE0_SGIS );
-	}
-#endif
 }
 
 /*
@@ -309,16 +301,17 @@ void GL_TexGen( GLenum coord, GLenum mode )
 	{
 		if( !( glState.genSTEnabled[tmu] & bit ))
 		{
-			pglEnable( gen );
+			//pglEnable( gen );
 			glState.genSTEnabled[tmu] |= bit;
 		}
-		pglTexGeni( coord, GL_TEXTURE_GEN_MODE, mode );
+		// TODO : implement with es2
+		//pglTexGeni( coord, GL_TEXTURE_GEN_MODE, mode );
 	}
 	else
 	{
 		if( glState.genSTEnabled[tmu] & bit )
 		{
-			pglDisable( gen );
+			//pglDisable( gen );
 			glState.genSTEnabled[tmu] &= ~bit;
 		}
 	}
@@ -402,11 +395,7 @@ void GAME_EXPORT GL_SetRenderMode( int mode )
 	case kRenderTransAdd:
 		pglEnable( GL_BLEND );
 		pglDisable( GL_ALPHA_TEST );
-#if defined(XASH_BLEND_ES_WORKAROUND) // Problem with blending exists on every GLES configuration, not only on Android
-		pglBlendFunc( GL_ONE, GL_ONE );
-#else
 		pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
-#endif
 		break;
 	}
 }
@@ -492,7 +481,7 @@ qboolean VID_ScreenShot( const char *filename, int shot_type )
 	r_shot->buffer = (byte*)Mem_Alloc( r_temppool, r_shot->size );
 
 	// get screen frame
-	pglPixelStorei(GL_PACK_ALIGNMENT, 1);	// PANDORA, just in case
+	//pglPixelStorei(GL_PACK_ALIGNMENT, 1);	// PANDORA, just in case
 	pglReadPixels( 0, 0, r_shot->width, r_shot->height, GL_RGBA, GL_UNSIGNED_BYTE, r_shot->buffer );
 	switch( shot_type )
 	{

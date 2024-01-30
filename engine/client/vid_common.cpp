@@ -773,7 +773,7 @@ static void GL_SetDefaults( void )
 		pglStencilOp( GL_KEEP, GL_INCR, GL_INCR );
 	}
 
-	pglPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	//pglPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	pglPolygonOffset( -1.0f, -2.0f );
 
 	// properly disable multitexturing at startup
@@ -794,7 +794,7 @@ static void GL_SetDefaults( void )
 	pglDisable( GL_POLYGON_OFFSET_FILL );
 	pglAlphaFunc( GL_GREATER, 0.0f );
 	pglEnable( GL_TEXTURE_2D );
-	pglShadeModel( GL_FLAT );
+	//pglShadeModel( GL_FLAT );
 
 	TriPointSize( 1.2f );
 	pglLineWidth( 1.2f );
