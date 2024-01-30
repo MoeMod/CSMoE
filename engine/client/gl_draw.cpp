@@ -87,7 +87,7 @@ void R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, f
 
 		gTriApi.TexCoord2f( s1, t2 );
 		gTriApi.Vertex3f( x, y + h, 0  );
-	pglEnd();
+	gTriApi.End();
 }
 
 /*
@@ -159,8 +159,8 @@ void R_DrawStretchRaw( float x, float y, float w, float h, int cols, int rows, c
 		Host_Error( "R_DrawStretchRaw: size %i exceeds hardware limits\n", rows );
 
 	pglDisable( GL_BLEND );
-	pglDisable( GL_ALPHA_TEST );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	//pglDisable( GL_ALPHA_TEST );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
 	tex = R_GetTexture( tr.cinTexture );
 	GL_Bind( XASH_TEXTURE0, tr.cinTexture );
@@ -255,11 +255,6 @@ void R_Set2DMode( qboolean enable )
 
 		// set 2D virtual screen size
 		pglViewport( 0, 0, glState.width, glState.height );
-		pglMatrixMode( GL_PROJECTION );
-		pglLoadIdentity();
-		pglOrtho( 0, glState.width, glState.height, 0, -99999, 99999 );
-		pglMatrixMode( GL_MODELVIEW );
-		pglLoadIdentity();
 
 		GL_Cull( 0 );
 
@@ -276,13 +271,6 @@ void R_Set2DMode( qboolean enable )
 		pglDepthMask( GL_TRUE );
 		pglEnable( GL_DEPTH_TEST );
 		glState.in2DMode = false;
-
-		pglMatrixMode( GL_PROJECTION );
-		GL_LoadMatrix( RI.projectionMatrix );
-
-		pglMatrixMode( GL_MODELVIEW );
-		GL_LoadMatrix( RI.worldviewMatrix );
-
 	}
 }
 

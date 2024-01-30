@@ -187,12 +187,12 @@ namespace xe {
 					R"(
 uniform mat4 muWVP;
 uniform float uPointSize;
-attribute vec3 pos;
-attribute vec2 uv;
-attribute vec4 col;
+in vec3 pos;
+in vec2 uv;
+in vec4 col;
 
-varying vec2 vvTexCoord;
-varying vec4 vvColor;
+out vec2 vvTexCoord;
+out vec4 vvColor;
 
 void main(void)
 {
@@ -208,21 +208,23 @@ void main(void)
 			pglCompileShaderARB(this->vertex_shader);
 			xe::CheckShader(this->vertex_shader, "vertex shader");
 
-			const GLcharARB* fragment_shader_list[2] = {
+			const GLcharARB* fragment_shader_list[3] = {
 					xe::GetShaderVersionString(),
+					xe::GetFragmentShaderPrecision(),
 					R"(
 uniform sampler2D tex;
-varying vec2 vvTexCoord;
-varying vec4 vvColor;
+in vec2 vvTexCoord;
+in vec4 vvColor;
+out vec4 FragColor;
 
 void main (void)
 {
-    gl_FragColor = texture2D(tex, vvTexCoord) * vvColor;
+    FragColor = texture(tex, vvTexCoord) * vvColor;
 }
 )"
 			};
 			this->fragment_shader = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-			pglShaderSourceARB(this->fragment_shader, 2, fragment_shader_list, NULL);
+			pglShaderSourceARB(this->fragment_shader, 3, fragment_shader_list, NULL);
 			pglCompileShaderARB(this->fragment_shader);
 			xe::CheckShader(this->fragment_shader, "fragment shader");
 
@@ -251,7 +253,7 @@ void main (void)
 			pglDetachObjectARB(this->program, this->fragment_shader);
 			pglDeleteObjectARB(this->vertex_shader);
 			pglDeleteObjectARB(this->fragment_shader);
-			pglDeleteObjectARB(this->program);
+			pglDeleteProgram(this->program);
 
 			pglDeleteBuffersARB( 1, &this->vbo);
 			pglDeleteBuffersARB( 1, &this->ebo);
@@ -287,24 +289,24 @@ void GAME_EXPORT TriRenderMode( int mode )
 	{
 		case kRenderNormal:
 		default:	pglDisable( GL_BLEND );
-			pglDisable( GL_ALPHA_TEST );
-			pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			//pglDisable( GL_ALPHA_TEST );
+			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 			break;
 		case kRenderTransColor:
 		case kRenderTransAlpha:
 		case kRenderTransTexture:
 			// NOTE: TriAPI doesn't have 'solid' mode
 			pglEnable( GL_BLEND );
-			pglDisable( GL_ALPHA_TEST );
+			//pglDisable( GL_ALPHA_TEST );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-			pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 			break;
 		case kRenderGlow:
 		case kRenderTransAdd:
 			pglEnable( GL_BLEND );
-			pglDisable( GL_ALPHA_TEST );
+			//pglDisable( GL_ALPHA_TEST );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
-			pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 			break;
 	}
 }
@@ -381,7 +383,7 @@ void GAME_EXPORT TriEnd( void )
 #if XASH_SHADER_TRIAPI
 	pglUseProgramObjectARB(xe::TriFFE.program);
 	pglUniform1iARB(xe::TriFFE.uniform.tex, 0);
-	pglUniformMatrix4fvARB(xe::TriFFE.uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
+	pglUniformMatrix4fvARB(xe::TriFFE.uniform.muWVP, 1, GL_FALSE, (const float*)&RI.worldviewProjectionMatrixTranspose);
 	pglUniform1fARB(xe::TriFFE.uniform.uPointSize, xe::TriFFE.cur_point_size);
 
 	pglBindBufferARB(GL_ARRAY_BUFFER_ARB, xe::TriFFE.vbo);
@@ -418,10 +420,10 @@ void GAME_EXPORT TriEnd( void )
 	pglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 	pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 
-	pglDisable( GL_ALPHA_TEST );
+	//pglDisable( GL_ALPHA_TEST );
 #else
 	pglEnd();
-	pglDisable( GL_ALPHA_TEST );
+	//pglDisable( GL_ALPHA_TEST );
 #endif
 }
 
@@ -554,8 +556,8 @@ int GAME_EXPORT TriSpriteTexture( model_t *pSpriteModel, int frame )
 	psprite = (msprite_t *)pSpriteModel->cache.data;
 	if( psprite->texFormat == SPR_ALPHTEST )
 	{
-		pglEnable( GL_ALPHA_TEST );
-		pglAlphaFunc( GL_GREATER, 0.0f );
+		//pglEnable( GL_ALPHA_TEST );
+		//pglAlphaFunc( GL_GREATER, 0.0f );
 	}
 
 	GL_Bind( XASH_TEXTURE0, gl_texturenum );
@@ -577,7 +579,7 @@ void GAME_EXPORT TriFog( const vec3_t flFogColor, float flStart, float flEnd, in
 
 	if( !bOn )
 	{
-		pglDisable( GL_FOG );
+		//pglDisable( GL_FOG );
 		RI.fogCustom = false;
 		return;
 	}
@@ -589,17 +591,17 @@ void GAME_EXPORT TriFog( const vec3_t flFogColor, float flStart, float flEnd, in
 	RI.fogStart = (flStart) ? flStart : 1.0f;
 	RI.fogEnd = (flEnd || !RI.fogDensity) ? flEnd : 0.25f / RI.fogDensity;
 
-	pglEnable(GL_FOG);
+	//pglEnable(GL_FOG);
 #if _WIN32 || TARGET_OS_OSX
-	pglFogi(GL_FOG_MODE, GL_LINEAR);
-	pglFogf(GL_FOG_START, RI.fogStart);
-	pglFogf(GL_FOG_END, RI.fogEnd);
+	//pglFogi(GL_FOG_MODE, GL_LINEAR);
+	//pglFogf(GL_FOG_START, RI.fogStart);
+	//pglFogf(GL_FOG_END, RI.fogEnd);
 #else
-	pglFogi(GL_FOG_MODE, GL_EXP);
-	pglFogf(GL_FOG_DENSITY, RI.fogDensity);
+	//pglFogi(GL_FOG_MODE, GL_EXP);
+	//pglFogf(GL_FOG_DENSITY, RI.fogDensity);
 #endif
-	pglFogfv(GL_FOG_COLOR, RI.fogColor.data());
-	pglHint(GL_FOG_HINT, GL_NICEST);
+	//pglFogfv(GL_FOG_COLOR, RI.fogColor.data());
+	//pglHint(GL_FOG_HINT, GL_NICEST);
 }
 
 /*

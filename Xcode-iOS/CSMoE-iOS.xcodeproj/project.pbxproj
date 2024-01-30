@@ -26,7 +26,6 @@
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		3D0090C02788B2D200E68FC3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0090BF2788B2D200E68FC3 /* Security.framework */; };
 		3D0090E62788B7F900E68FC3 /* Bugly.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0090E52788B7F900E68FC3 /* Bugly.framework */; };
-		3D1903A82A4F51E30059FC39 /* lib3rdparty-gl4es.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DFDDBBB28C2279E00351ACE /* lib3rdparty-gl4es.a */; };
 		3D1903AA2A4F51E30059FC39 /* libboost_atomic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF9821E27F9AE940030D0B5 /* libboost_atomic.a */; };
 		3D1903AB2A4F51E30059FC39 /* libboost_chrono.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF9822027F9AE940030D0B5 /* libboost_chrono.a */; };
 		3D1903AC2A4F51E30059FC39 /* libboost_container.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF9822227F9AE940030D0B5 /* libboost_container.a */; };
@@ -714,7 +713,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D3CE8822B0015B60085839C /* libastcenc-neon-static.a in Frameworks */,
-				3D1903A82A4F51E30059FC39 /* lib3rdparty-gl4es.a in Frameworks */,
 				3D1903AA2A4F51E30059FC39 /* libboost_atomic.a in Frameworks */,
 				3D1903AB2A4F51E30059FC39 /* libboost_chrono.a in Frameworks */,
 				3D1903AC2A4F51E30059FC39 /* libboost_container.a in Frameworks */,
@@ -1645,7 +1643,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cmake -G \"Xcode\" -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../3rdparty/ios-cmake/ios.toolchain.cmake\" -DPLATFORM=OS64  -DXASH_STATIC_GAMELIB=1 -DXASH_GL4ES=1 -DXASH_GLES=1  -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
+			shellScript = "cmake -G \"Xcode\" -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../3rdparty/ios-cmake/ios.toolchain.cmake\" -DPLATFORM=OS64  -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

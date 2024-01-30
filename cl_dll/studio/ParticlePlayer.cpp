@@ -36,7 +36,6 @@
 
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
-#include <client/gl_export.h>
 #include "bonequatlru.h"
 
 #include "event_api.h"
@@ -170,7 +169,7 @@ static constexpr float ParticleRight = -1.0;
 	{
 		if (m_vecCachedSpriteJson.count(sprFile))
 		{
-			
+
 			info.vecSpriteTexName = m_vecCachedSpriteJson[sprFile];
 		}
 		else
@@ -253,7 +252,7 @@ static constexpr float ParticleRight = -1.0;
 					int iStartBone = spring["StartBone"].get<int>();
 					int iEndBone = spring["EndBone"].get<int>();
 					int iEmitPerCount = spring["ParticlesPerEmission"].get<int>();
-					
+
 					vec3_t vecDir;
 					vec3_t vecDirMin;
 					vec3_t vecDirMax;
@@ -306,8 +305,8 @@ static constexpr float ParticleRight = -1.0;
 					if (szSprite == "" || szSprite == "null")
 					{
 						PrecacheTexture(szTexture);
-					
-						Temp.pTexture = m_vecCachedTexture[szTexture];			
+
+						Temp.pTexture = m_vecCachedTexture[szTexture];
 					}
 					else
 					{
@@ -342,7 +341,7 @@ static constexpr float ParticleRight = -1.0;
 					//m_vecTempParticle.emplace_back(Temp);
 
 				}
-				
+
 				m_vecCachedParticleJson.insert(std::pair<std::string, std::vector<ParticleInfo>>(szFile, vecSpring));
 
 				for (auto iter = vecSpring.begin(); iter != vecSpring.end(); iter++)
@@ -350,7 +349,7 @@ static constexpr float ParticleRight = -1.0;
 					iter->flStartTime = gHUD.m_flTime + iter->flStartTime;
 					iter->flEndTime = gHUD.m_flTime + iter->flEndTime;
 				}
-		
+
 				m_vecTempParticle.push_back(std::pair<std::string, std::vector<ParticleInfo>>(szName, vecSpring));
 
 			}
@@ -411,7 +410,7 @@ static constexpr float ParticleRight = -1.0;
 					for (const auto& row : spring["ScaleKeyFrame"]) {
 						Scale rowData;
 						rowData.rate = row[0];
-						rowData.scale = row[1];			
+						rowData.scale = row[1];
 						vecScaleKeyFrame.push_back(rowData);
 					}
 
@@ -440,7 +439,7 @@ static constexpr float ParticleRight = -1.0;
 					if (szSprite == "" || szSprite == "null")
 					{
 						PrecacheTexture(szTexture);
-					
+
 						Temp.pTexture = m_vecCachedTexture[szTexture];
 					}
 					else
@@ -453,7 +452,7 @@ static constexpr float ParticleRight = -1.0;
 					Temp.vecStartOffsetMax = vecStartOffsetMax;
 					Temp.iEndBone = iEndBone;
 					Temp.iStartAttachment = iStartAttachment;
-					Temp.iEndAttachment = iEndAttachment;			
+					Temp.iEndAttachment = iEndAttachment;
 					Temp.flSpeed = flSpeed;
 					Temp.iEmitCount = 255;	//forever
 					Temp.flIntervalTime = flIntervalTime;
@@ -470,7 +469,7 @@ static constexpr float ParticleRight = -1.0;
 					Temp.vecColorKeyFrame = vecColorKeyFrame;
 					Temp.vecScaleKeyFrame = vecScaleKeyFrame;
 					Temp.flFrameRate = flFrameRate;
-				
+
 
 				}
 
@@ -523,7 +522,7 @@ static constexpr float ParticleRight = -1.0;
 		{
 			m_flNextTime[i] = 0;
 		}
-		
+
 	}
 	int CParticlePlayer::VidInit(void)
 	{
@@ -554,13 +553,13 @@ static constexpr float ParticleRight = -1.0;
 					info.vecAmplitude = vecAmplitude;
 					info.vecFreq = vecFreq;
 					if (szTexture != nullptr)
-					{			
+					{
 						PrecacheTexture(szTexture);
 
 						info.pTexture = m_vecCachedTexture[szTexture];
 					}
-						
-				}	
+
+				}
 			}
 		}
 	}
@@ -572,7 +571,7 @@ static constexpr float ParticleRight = -1.0;
 			if (mapParticle->first != modelName)
 			{
 				mapParticle = m_vecTempParticle.erase(mapParticle);
-			}				
+			}
 			else
 			{
 				if (mapParticle->second.empty())
@@ -653,7 +652,7 @@ static constexpr float ParticleRight = -1.0;
 								}
 
 								vec3_t savedDir = mapParticle->second[i].vecDir;
-			
+
 								if (mapParticle->second[i].vecDir.IsNaN() || mapParticle->second[i].vecDir.IsZero())
 								{
 									shootDir = (vecEnd - vecStart);
@@ -674,7 +673,7 @@ static constexpr float ParticleRight = -1.0;
 								vecDirOffset.z = RandomFloat(mapParticle->second[i].vecDirMin.z, mapParticle->second[i].vecDirMax.z);
 
 								mapParticle->second[i].vecDir = (mapParticle->second[i].vecDir + vecDirOffset).Normalize();
-							
+
 								if (!mapParticle->second[i].vecSpriteTexName.empty())
 								{
 									mapParticle->second[i].pTexture = m_vecCachedTexture[mapParticle->second[i].vecSpriteTexName[0]];
@@ -687,18 +686,18 @@ static constexpr float ParticleRight = -1.0;
 
 							m_flNextTime[mapParticle->second[i].iChannel] = gHUD.m_flTime + mapParticle->second[i].flIntervalTime;
 						}
-						
+
 						mapParticle->second[index] = mapParticle->second[i];
 						index++;
-						
-						
+
+
 					}
 				}
 				mapParticle->second.resize(index);
 				mapParticle++;
 			}
 		}
-		
+
 		if (m_vecStaticParticle.count(modelName))
 		{
 			for (ParticleInfo& info : m_vecStaticParticle[modelName])
@@ -757,7 +756,7 @@ static constexpr float ParticleRight = -1.0;
 						float savedStartTime = info.flStartTime;
 						float savedEndTime = info.flEndTime;
 						vec3_t savedDir = info.vecDir;
-					
+
 						if (info.vecDir.IsZero())
 						{
 							shootDir = (vecEnd - vecStart);
@@ -832,7 +831,7 @@ static constexpr float ParticleRight = -1.0;
 
 		for (auto iter = m_ParticleArray.begin(); iter != m_ParticleArray.end(); iter++)
 		{
-			//×ªÊÀ½ç×ø±ê
+			//×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			if (iter->second.pTexture)
 			{
 				vec3_t vecWorldOrigin;
@@ -879,10 +878,10 @@ static constexpr float ParticleRight = -1.0;
 
 					iter->second.vecOrigin = shootPos;
 				}
-				
+
 				VectorTransform(iter->second.vecOrigin, matrix, iter->second.vecWorldOrigin);
-				
-			}	
+
+			}
 		}
 
 		float vUp[3];
@@ -891,7 +890,7 @@ static constexpr float ParticleRight = -1.0;
 		float vRenderOrigin[3];
 		IEngineStudio.GetViewInfo(vRenderOrigin, vUp, vRight, vNormal);
 		vec3_t vecRenderOrigin = { vRenderOrigin[0], vRenderOrigin[1], vRenderOrigin[2], 0 };
-		//ÅÅÐòvector
+		//ï¿½ï¿½ï¿½ï¿½vector
 		std::sort(m_ParticleArray.begin(), m_ParticleArray.end(), [vecRenderOrigin](const std::pair<std::string, ParticleInfo> &a, const std::pair<std::string, ParticleInfo> &b) -> bool {
 			//auto a1 = (a.vecWorldOrigin - vecRenderOrigin).LengthSquared();
 			//auto a2 = (b.vecWorldOrigin - vecRenderOrigin).LengthSquared();  
@@ -907,13 +906,13 @@ static constexpr float ParticleRight = -1.0;
 		});
 
 
-		//²¥·Å,TGA²¥·Å±ØÐëÓÉÔ¶µ½½ü²¥·Å
+		//ï¿½ï¿½ï¿½ï¿½,TGAï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		for (auto iter = m_ParticleArray.begin(); iter != m_ParticleArray.end(); iter++)
 		{
 			float currentTime = gHUD.m_flTime - iter->second.flStartTime;
 
 			if (iter->second.pTexture)
-			{	
+			{
 				vec3_t vecRight, vecUp;
 				vec4_t vecColor;
 				float sr, cr;
@@ -950,7 +949,7 @@ static constexpr float ParticleRight = -1.0;
 				vecColor[3] = 1.0 - pColor->a;
 
 				if (!iter->second.vecSpriteTexName.empty())
-				{		
+				{
 					int frame = 0;
 					int maxframe = iter->second.vecSpriteTexName.size();
 					frame = int(iter->second.flFrameRate * currentTime);
@@ -959,7 +958,7 @@ static constexpr float ParticleRight = -1.0;
 					{
 						if (iter->second.iFlag & PARTICLE_FLAGS_SPR_LOOP)
 						{
-							frame = int(frame) % maxframe;						
+							frame = int(frame) % maxframe;
 						}
 						else
 						{
@@ -972,8 +971,8 @@ static constexpr float ParticleRight = -1.0;
 				}
 
 				DrawTGAQuad(iter->second.pTexture->texnum(), iter->second.vecWorldOrigin, vecRight, vecUp, pScale->scale, vecColor);
-		
-				
+
+
 			}
 		}
 

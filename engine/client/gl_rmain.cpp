@@ -685,8 +685,6 @@ void R_LoadIdentity( void )
     Matrix4x4_LoadIdentity( RI.objectMatrix );
     Matrix4x4_Copy( RI.modelviewMatrix, RI.worldviewMatrix );
 
-    pglMatrixMode( GL_MODELVIEW );
-    GL_LoadMatrix( RI.modelviewMatrix );
     tr.modelviewIdentity = true;
 }
 
@@ -711,8 +709,6 @@ void R_RotateForEntity( cl_entity_t *e )
     Matrix4x4_CreateFromEntity( RI.objectMatrix, e->angles, e->origin, scale );
     Matrix4x4_ConcatTransforms( RI.modelviewMatrix, RI.worldviewMatrix, RI.objectMatrix );
 
-    pglMatrixMode( GL_MODELVIEW );
-    GL_LoadMatrix( RI.modelviewMatrix );
     tr.modelviewIdentity = false;
 }
 
@@ -737,8 +733,6 @@ void R_TranslateForEntity( cl_entity_t *e )
     Matrix4x4_CreateFromEntity( RI.objectMatrix, vec3_origin, e->origin, scale );
     Matrix4x4_ConcatTransforms( RI.modelviewMatrix, RI.worldviewMatrix, RI.objectMatrix );
 
-    pglMatrixMode( GL_MODELVIEW );
-    GL_LoadMatrix( RI.modelviewMatrix );
     tr.modelviewIdentity = false;
 }
 
@@ -852,6 +846,7 @@ static void R_SetupGL( void )
 //	if( RI.params & RP_MIRRORVIEW ) RI.projectionMatrix[0][0] = -RI.projectionMatrix[0][0];
 
     Matrix4x4_Concat( RI.worldviewProjectionMatrix, RI.projectionMatrix, RI.worldviewMatrix );
+	Matrix4x4_Transpose( RI.worldviewProjectionMatrixTranspose, RI.worldviewProjectionMatrix );
 
     if( RP_NORMALPASS( ))
     {
@@ -871,33 +866,13 @@ static void R_SetupGL( void )
         pglViewport( RI.viewport[0], RI.viewport[1], RI.viewport[2], RI.viewport[3] );
     }
 
-    pglMatrixMode( GL_PROJECTION );
-    GL_LoadMatrix( RI.projectionMatrix );
-
-    pglMatrixMode( GL_MODELVIEW );
-    GL_LoadMatrix( RI.worldviewMatrix );
-
-    if( RI.params & RP_CLIPPLANE )
-    {
-        GLdouble	clip[4];
-        mplane_t	*p = &RI.clipPlane;
-
-        clip[0] = p->normal[0];
-        clip[1] = p->normal[1];
-        clip[2] = p->normal[2];
-        clip[3] = -p->dist;
-
-        pglClipPlane( GL_CLIP_PLANE0, clip );
-        pglEnable( GL_CLIP_PLANE0 );
-    }
-
     if( RI.params & RP_FLIPFRONTFACE )
         GL_FrontFace( !glState.frontFace );
 
     GL_Cull( GL_FRONT );
 
     pglDisable( GL_BLEND );
-    pglDisable( GL_ALPHA_TEST );
+    //pglDisable( GL_ALPHA_TEST );
 	TriColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 }
 
@@ -910,9 +885,6 @@ static void R_EndGL( void )
 {
     if( RI.params & RP_FLIPFRONTFACE )
         GL_FrontFace( !glState.frontFace );
-
-    if( RI.params & RP_CLIPPLANE )
-        pglDisable( GL_CLIP_PLANE0 );
 }
 
 /*
@@ -1075,11 +1047,11 @@ void R_DrawFog( void )
     if( !RI.fogEnabled || RI.refdef.onlyClientDraw )
         return;
 
-    pglEnable( GL_FOG );
-    pglFogi( GL_FOG_MODE, GL_EXP );
-    pglFogf( GL_FOG_DENSITY, RI.fogDensity );
-    pglFogfv( GL_FOG_COLOR, RI.fogColor.data() );
-    pglHint( GL_FOG_HINT, GL_NICEST );
+    //pglEnable( GL_FOG );
+    //pglFogi( GL_FOG_MODE, GL_EXP );
+    //pglFogf( GL_FOG_DENSITY, RI.fogDensity );
+    //pglFogfv( GL_FOG_COLOR, RI.fogColor.data() );
+    //pglHint( GL_FOG_HINT, GL_NICEST );
 }
 
 /*
@@ -1141,8 +1113,8 @@ void R_DrawEntitiesOnList( void )
     while( pglGetError() != GL_NO_ERROR );
 
     // don't fogging translucent surfaces
-    if( !RI.fogCustom )
-        pglDisable( GL_FOG );
+    //if( !RI.fogCustom )
+    //    pglDisable( GL_FOG );
     pglDepthMask( GL_FALSE );
     glState.drawTrans = true;
 
@@ -1314,7 +1286,7 @@ void R_BeginFrame( qboolean clearScene )
     R_Set2DMode( true );
 
     // draw buffer stuff
-    pglDrawBuffer( GL_BACK );
+    //pglDrawBuffer( GL_BACK );
 
     // texturemode stuff
     // update texture parameters
@@ -1376,13 +1348,6 @@ void R_RenderFrame( const ref_params_t *fd, qboolean drawWorld )
 
     if( gl_finish->integer && drawWorld )
         pglFinish();
-
-    if( gl_allow_mirrors->integer )
-    {
-        // render mirrors
-        R_FindMirrors( fd );
-        R_DrawMirrors ();
-    }
 
     R_RenderScene( fd );
 
@@ -1668,6 +1633,7 @@ static void GL_SetWorldviewProjectionMatrix( const float *glmatrix )
     if( !glmatrix ) return;
 
     Matrix4x4_FromArrayFloatGL( RI.worldviewProjectionMatrix, glmatrix );
+	Matrix4x4_Transpose( RI.worldviewProjectionMatrixTranspose, RI.worldviewProjectionMatrix );
 }
 
 static const char *GL_TextureName( unsigned int texnum )

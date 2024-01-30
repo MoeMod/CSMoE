@@ -63,7 +63,6 @@ typedef float GLmatrix[16];
 #define GL_CW				0x0900
 #define GL_CCW				0x0901
 #define GL_BLEND				0x0BE2
-#define GL_ALPHA_TEST			0x0BC0
 
 // shading model
 #define GL_FLAT				0x1D00
@@ -605,6 +604,12 @@ typedef float GLmatrix[16];
 #define GL_SECONDARY_COLOR_ARRAY_BUFFER_BINDING_ARB	0x889C
 #define GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING_ARB	0x889D
 
+// GL_ARB_uniform_buffer_object
+#define GL_UNIFORM_BUFFER                 0x8A11
+#define GL_UNIFORM_BUFFER_BINDING         0x8A28
+#define GL_UNIFORM_BUFFER_START           0x8A29
+#define GL_UNIFORM_BUFFER_SIZE            0x8A2A
+
 #define GL_NORMAL_MAP_ARB			0x8511
 #define GL_REFLECTION_MAP_ARB			0x8512
 #define GL_TEXTURE_CUBE_MAP_ARB		0x8513
@@ -798,10 +803,6 @@ typedef float GLmatrix[16];
 #define GL_DEPTH_BITS                     0x0D56
 #define GL_STENCIL_BITS                   0x0D57
 
-#ifdef XASH_GL_STATIC
 #include "gl_static.h"
-#else
-#include "gl_dynamic.h"
-#endif
 
 #endif//GL_EXPORT_H

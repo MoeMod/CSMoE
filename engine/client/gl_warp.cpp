@@ -379,11 +379,11 @@ void R_DrawSkyBox( void )
 	RI.isSkyVisible = true;
 
 	// don't fogging skybox (this fix old Half-Life bug)
-	if( !RI.fogCustom )
-		pglDisable( GL_FOG );
+	//if( !RI.fogCustom )
+	//	pglDisable( GL_FOG );
 	pglDisable( GL_BLEND );
-	pglDisable( GL_ALPHA_TEST );
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	//pglDisable( GL_ALPHA_TEST );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 
 	if( clgame.movevars.skyangle && (clgame.movevars.skydir_x || clgame.movevars.skydir_y || clgame.movevars.skydir_z) )
 	{
@@ -615,10 +615,10 @@ uniform float clTime;
 uniform float waveHeight;
 uniform mat4 muWVP;
 
-attribute vec3 vaPosition;
-attribute vec2 vaTexCoord;
+in vec3 vaPosition;
+in vec2 vaTexCoord;
 
-varying vec2 vvTexCoord;
+out vec2 vvTexCoord;
 void main(void)
 {
     vec3 temp = vec3(vaPosition.x, vaPosition.y, clTime);
@@ -637,21 +637,23 @@ void main(void)
     pglCompileShaderARB(g_WaterShader.vertex_shader);
     xe::CheckShader(g_WaterShader.vertex_shader, "vertex shader");
 
-    const GLcharARB* fragment_shader_list[2] = {
+    const GLcharARB* fragment_shader_list[3] = {
             xe::GetShaderVersionString(),
+            xe::GetFragmentShaderPrecision(),
 R"(
 uniform sampler2D texWater;
-varying vec2 vvTexCoord;
+in vec2 vvTexCoord;
+out vec4 FragColor;
 
 void main (void)
 {
-    gl_FragColor = texture2D(texWater, vvTexCoord);
-    gl_FragColor.a = 1.0; // TODO
+    FragColor = texture(texWater, vvTexCoord);
+    FragColor.a = 1.0; // TODO
 }
 )"
     };
     g_WaterShader.fragment_shader = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-    pglShaderSourceARB(g_WaterShader.fragment_shader, 2, fragment_shader_list, NULL);
+    pglShaderSourceARB(g_WaterShader.fragment_shader, 3, fragment_shader_list, NULL);
     pglCompileShaderARB(g_WaterShader.fragment_shader);
     xe::CheckShader(g_WaterShader.fragment_shader, "fragment shader");
 
@@ -679,7 +681,7 @@ void R_ShutdownSurfaceShader()
     pglDetachObjectARB(g_WaterShader.program, g_WaterShader.fragment_shader);
     pglDeleteObjectARB(g_WaterShader.vertex_shader);
     pglDeleteObjectARB(g_WaterShader.fragment_shader);
-    pglDeleteObjectARB(g_WaterShader.program);
+    pglDeleteProgram(g_WaterShader.program);
 
     pglDeleteBuffersARB( 1, &g_WaterShader.array_buffer);
 }
@@ -711,7 +713,7 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
     pglUniform1iARB(g_WaterShader.uniform.texWater, glState.activeTMU);
     pglUniform1fARB(g_WaterShader.uniform.clTime, cl.time);
     pglUniform1fARB(g_WaterShader.uniform.waveHeight, waveHeight);
-    pglUniformMatrix4fvARB(g_WaterShader.uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
+    pglUniformMatrix4fvARB(g_WaterShader.uniform.muWVP, 1, GL_FALSE, (const float*)&RI.worldviewProjectionMatrixTranspose);
     pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_WaterShader.array_buffer );
     pglEnableVertexAttribArrayARB(g_WaterShader.attrib.vaPosition);
     pglEnableVertexAttribArrayARB(g_WaterShader.attrib.vaTexCoord);

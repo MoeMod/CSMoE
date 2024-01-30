@@ -24,7 +24,7 @@ GNU General Public License for more details.
 
 #include "util/lru_cache.h"
 
-//#define XASH_SHADER_VAO
+#define XASH_SHADER_VAO
 
 namespace xe {
     using studiolru_key_t = std::tuple<const studiohdr_t *, const mstudiomodel_t *, int, int>; // model, submodel, mesh, flags
@@ -82,7 +82,6 @@ namespace xe {
         pglBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, MAXARRAYVERTS * 6 * sizeof(unsigned short), nullptr, GL_STATIC_DRAW_ARB);
 #ifdef XASH_SHADER_VAO
 	    EnableVA();
-	    UnbindVBO();
 	    pglBindVertexArray(0);
 #else
 	    UnbindVBO();
@@ -138,19 +137,19 @@ namespace xe {
 
 	void studiolru_vbo_cache::EnableVA() const
 	{
-		pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
-		pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
-		pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
-		pglVertexAttribPointerARB(g_pstudioshader->attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, pos));
-		pglVertexAttribPointerARB(g_pstudioshader->attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, coord));
-		pglVertexAttribPointerARB(g_pstudioshader->attrib.vaNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, norm));
+		pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.aPos);
+		pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.aTexCoord);
+		pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.aNormal);
+		pglVertexAttribPointerARB(g_pstudioshader->attrib.aPos, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, pos));
+		pglVertexAttribPointerARB(g_pstudioshader->attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, coord));
+		pglVertexAttribPointerARB(g_pstudioshader->attrib.aNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const GLvoid *)offsetof(studio_vertex_attrib_item_s, norm));
 	}
 
 	void studiolru_vbo_cache::DisableVA() const
 	{
-		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
-		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
-		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
+		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aPos);
+		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aTexCoord);
+		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aNormal);
 	}
 
     void studiolru_vbo_cache::DrawElements() const

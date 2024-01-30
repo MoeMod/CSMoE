@@ -36,7 +36,6 @@
 
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
-#include <client/gl_export.h>
 #include "bonequatlru.h"
 
 #include "event_api.h"
@@ -897,7 +896,7 @@ void CStudioModelRenderer::StudioSetupBones(void)
 
 	for (i = 0; i < m_pStudioHeader->numbones; i++)
 	{
-		//bonematrixÓÉ´ËboneµÄrotation(angles)ºÍtransform(origin)Éú³É
+		//bonematrixï¿½É´ï¿½boneï¿½ï¿½rotation(angles)ï¿½ï¿½transform(origin)ï¿½ï¿½ï¿½ï¿½
 		QuaternionMatrix(q[i], bonematrix);
 
 		bonematrix[0][3] = pos[i][0];
@@ -917,7 +916,7 @@ void CStudioModelRenderer::StudioSetupBones(void)
 
 			if (IEngineStudio.IsHardware())
 			{
-				//RotationMatrix * BoneMatrixÍê³Écurstate.anglesºÍcurstate.origin µÄ±ä»»°Ñbone±äµ½ÊÀ½ç×ø±êworld space¡£Ò²¾ÍÊÇËµrotationMatrix»á°Ñ¶¥µã±ä»»µ½ÊÀ½ç×ø±êÈ¥
+				//RotationMatrix * BoneMatrixï¿½ï¿½ï¿½curstate.anglesï¿½ï¿½curstate.origin ï¿½Ä±ä»»ï¿½ï¿½boneï¿½äµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½world spaceï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ËµrotationMatrixï¿½ï¿½Ñ¶ï¿½ï¿½ï¿½ä»»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¥
 				ConcatTransforms((*m_protationmatrix), bonematrix, (*m_pbonetransform)[i]);
 				MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
 
@@ -928,7 +927,7 @@ void CStudioModelRenderer::StudioSetupBones(void)
 			}
 			else
 			{
-				//ParentBoneMatrix * BoneMatrix°Ñbone±ä»»µ½ËûµùboneµÄ¿Õ¼ä
+				//ParentBoneMatrix * BoneMatrixï¿½ï¿½boneï¿½ä»»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½boneï¿½Ä¿Õ¼ï¿½
 				ConcatTransforms((*m_paliastransform), bonematrix, (*m_pbonetransform)[i]);
 				ConcatTransforms((*m_protationmatrix), bonematrix, (*m_plighttransform)[i]);
 			}
@@ -979,7 +978,7 @@ void CStudioModelRenderer::StudioMergeFXModelBones(model_t* m_pSubModel, studioh
 	static vec3_t pos[MAXSTUDIOBONES];
 	matrix3x4 bonematrix;
 	static vec4_t q[MAXSTUDIOBONES];
-	//m_pStudioHeaderÎªÒªÆ´ºÏµÄpÄ£ÐÍ
+	//m_pStudioHeaderÎªÒªÆ´ï¿½Ïµï¿½pÄ£ï¿½ï¿½
 	if (!m_pStudioHeader || !m_pCurrentEntity)
 		return;
 
@@ -998,7 +997,7 @@ void CStudioModelRenderer::StudioMergeFXModelBones(model_t* m_pSubModel, studioh
 	StudioCalcRotations(pos, q, pseqdesc, panim, f);
 
 	pbones = (mstudiobone_t*)((byte*)m_pStudioHeader + m_pStudioHeader->boneindex);
-	//pÄ£ÐÍµÄ¹Ø½Úµã
+	//pÄ£ï¿½ÍµÄ¹Ø½Úµï¿½
 
 	if (!strcmp(szBoneName, "null") || !strcmp(szBoneName, ""))
 	{
@@ -1006,7 +1005,7 @@ void CStudioModelRenderer::StudioMergeFXModelBones(model_t* m_pSubModel, studioh
 		{
 			for (j = 0; j < m_nCachedBones; j++)
 			{
-				//m_nCachedBoneNamesÊÇStudioSaveBones±£´æÏÂÀ´µÄÃû×Ö,Èç¹ûÒ»Ñù£¬Ò»Æð¼ÓÈë±ä»»
+				//m_nCachedBoneNamesï¿½ï¿½StudioSaveBonesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ä»»
 				if (stricmp(pbones[i].name, m_nCachedBoneNames[j]) == 0)
 				{
 					MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
@@ -1014,7 +1013,7 @@ void CStudioModelRenderer::StudioMergeFXModelBones(model_t* m_pSubModel, studioh
 					break;
 				}
 			}
-			//ÒªºÏ²¢µÄÄ£ÐÍ¶ÀÁ¢µÄ²¿·Ö£¬¼ÓÈë½øÈ¥
+			//Òªï¿½Ï²ï¿½ï¿½ï¿½Ä£ï¿½Í¶ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¥
 			if (j >= m_nCachedBones)
 			{
 				QuaternionMatrix(q[i], bonematrix);
@@ -1065,15 +1064,15 @@ void CStudioModelRenderer::StudioMergeFXModelBones(model_t* m_pSubModel, studioh
 					{
 						if (iMergeType)
 						{
-							//ÏÖÔÚµÄÐ´·¨ÊÇ×îÖÕÎ»ÖÃ=socket_boneµÄÎ»ÖÃ ¼ÓÉÏ ÌØÐ§Ä£ÐÍµÄrootµÄÎ»ÖÃ
+							//ï¿½ï¿½ï¿½Úµï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½=socket_boneï¿½ï¿½Î»ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ð§Ä£ï¿½Íµï¿½rootï¿½ï¿½Î»ï¿½ï¿½
 							ConcatTransforms(m_rgCachedBoneTransform[j], bonematrix, (*m_pbonetransform)[i]);
 						}
 						else
 						{
-							//×îÖÕÎ»ÖÃ = socket_boneµÄÎ»ÖÃ¡£copyÏàµ±ÓÚ¶ªÆúÁËÌØÐ§Ä£ÐÍrootµÄ±ä»»
+							//ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ = socket_boneï¿½ï¿½Î»ï¿½Ã¡ï¿½copyï¿½àµ±ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§Ä£ï¿½ï¿½rootï¿½Ä±ä»»
 							MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
 						}
-										
+
 						MatrixCopy((*m_pbonetransform)[i], (*m_plighttransform)[i]);
 						break;
 					}
@@ -1091,7 +1090,7 @@ void CStudioModelRenderer::StudioMergeFXModelBones(model_t* m_pSubModel, studioh
 		return;
 	}
 
-	
+
 }
 
 void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
@@ -1106,7 +1105,7 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 	static vec3_t pos[MAXSTUDIOBONES];
 	matrix3x4 bonematrix;
 	static vec4_t q[MAXSTUDIOBONES];
-	//m_pStudioHeaderÎªÒªÆ´ºÏµÄpÄ£ÐÍ
+	//m_pStudioHeaderÎªÒªÆ´ï¿½Ïµï¿½pÄ£ï¿½ï¿½
 	if( !m_pStudioHeader || !m_pCurrentEntity )
 		return;
 
@@ -1125,12 +1124,12 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 	StudioCalcRotations(pos, q, pseqdesc, panim, f);
 
 	pbones = (mstudiobone_t *)((byte *)m_pStudioHeader + m_pStudioHeader->boneindex);
-	//pÄ£ÐÍµÄ¹Ø½Úµã
+	//pÄ£ï¿½ÍµÄ¹Ø½Úµï¿½
 	for (i = 0; i < m_pStudioHeader->numbones; i++)
 	{
 		for (j = 0; j < m_nCachedBones; j++)
 		{
-			//m_nCachedBoneNamesÊÇStudioSaveBones±£´æÏÂÀ´µÄÃû×Ö,Èç¹ûÒ»Ñù£¬Ò»Æð¼ÓÈë±ä»»
+			//m_nCachedBoneNamesï¿½ï¿½StudioSaveBonesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ä»»
 			if (stricmp(pbones[i].name, m_nCachedBoneNames[j]) == 0)
 			{
 				MatrixCopy(m_rgCachedBoneTransform[j], (*m_pbonetransform)[i]);
@@ -1138,7 +1137,7 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 				break;
 			}
 		}
-		//ÒªºÏ²¢µÄÄ£ÐÍ¶ÀÁ¢µÄ²¿·Ö£¬¼ÓÈë½øÈ¥
+		//Òªï¿½Ï²ï¿½ï¿½ï¿½Ä£ï¿½Í¶ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¥
 		if (j >= m_nCachedBones)
 		{
 			QuaternionMatrix(q[i], bonematrix);
@@ -1366,13 +1365,13 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 					m_pCurrentEntity->curstate.rendercolor.r = info.r;
 					m_pCurrentEntity->curstate.rendercolor.g = info.g;
 					m_pCurrentEntity->curstate.rendercolor.b = info.b;
-			
+
 					m_fDoInterp = 1;
 
 					IEngineStudio.StudioSetHeader(m_pStudioHeader);
 
 					StudioMergeFXModelBones(weaponpart, saveheader, info.szBoneName.c_str(), info.iMergeType);
-		
+
 					for (int i = 0; i < info.vecSpriteSkin.size(); i++)
 					{
 						if (info.vecSpriteSkin[i].iTex == -1)
@@ -1383,7 +1382,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 					//AddToBmpListOnce
 					info.vecSpriteSkin[0].iTex = -1;
-					
+
 					IEngineStudio.StudioSetupLighting(&lighting);
 
 
@@ -1410,7 +1409,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 				}
 			}
 		}
-		
+
 		if (CStudioModelRenderer::s_pLeapStrikeGunPartModel && CStudioModelRenderer::s_pLeapStrikeGunViewModel && curent->model == CStudioModelRenderer::s_pLeapStrikeGunViewModel)
 		{
 			studiohdr_t* saveheader = m_pStudioHeader;
@@ -1850,14 +1849,14 @@ void CStudioModelRenderer::StudioCalcAttachments(void)
 	{
 		VectorTransform(pattachment[i].org, (*m_plighttransform)[pattachment[i].bone], m_pCurrentEntity->attachment[i]);
 	}
-	
-	//¼´ProjectionMatrix * ModelViewMatrix * bontransform[n] * attachment.origin
 
-	/*¼ÙÉèÒ»¸öÄ£ÐÍÖ»ÓÐÁ½¸öbone£¬root->bone1  ÄÇÃ´ÍêÕûµÄ±ä»»½«»áÊÇÕâÑù
+	//ï¿½ï¿½ProjectionMatrix * ModelViewMatrix * bontransform[n] * attachment.origin
+
+	/*ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ä£ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½boneï¿½ï¿½root->bone1  ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ä»»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	BoneMatrix = ProjectionMatrix * ModelViewMatrix * RotationMatrix * RootBoneMatrix * Bone1Matrix
 
-	´ËÊ±ÓÐÒ»¸ö¸½¼þ°ó¶¨µ½Bone1£¬ÄÇÃ´¸½¼þµÄÆÁÄ»×ø±ê¾ÍÊÇÕâÑù¼ÆËãµÄ
+	ï¿½ï¿½Ê±ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ó¶¨µï¿½Bone1ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	BoneMatrix * attachment.org*/
 }
@@ -1895,38 +1894,6 @@ void CStudioModelRenderer::StudioRenderModel(const vec3_t lightdir)
 	m_pCurrentEntity->curstate.rendermode = iSaveRenderMode;
 	m_pCurrentEntity->curstate.renderfx = iSaveRenderFx;
 	m_pCurrentEntity->curstate.renderamt = iSaveRenderAmt;
-}
-
-void CStudioModelRenderer::DrawOutLineBegin(int flag)
-{
-	m_pCurrentEntity->syncbase = 1.0f;
-}
-
-void CStudioModelRenderer::DrawOutLine(int flag)
-{
-	m_pCurrentEntity->syncbase = 2.0f;
-	IEngineStudio.SetForceFaceFlags(STUDIO_NF_OUTLINE);
-	StudioRenderFinal();
-}
-
-void CStudioModelRenderer::DrawOutLinePause(int flag)
-{
-	m_pCurrentEntity->syncbase = 1.0f;
-	IEngineStudio.SetForceFaceFlags(0);
-}
-
-void CStudioModelRenderer::DrawOutLineEnd(int flag)
-{
-	IEngineStudio.SetForceFaceFlags(0);//
-}
-
-BOOL CStudioModelRenderer::DrawOutLineCheck(int flag)
-{
-	if (m_pCurrentEntity->curstate.renderfx == kRenderFxGreenOutLine) return true;
-	if (m_pCurrentEntity->curstate.renderfx == kRenderFxRedOutLine) return true;
-	if (m_pCurrentEntity->curstate.renderfx == kRenderFxBlackOutLine) return true;
-
-	return false;
 }
 
 void CStudioModelRenderer::StudioRenderFinal_Software(void)

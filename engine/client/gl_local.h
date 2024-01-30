@@ -161,6 +161,7 @@ typedef struct
 
 	matrix4x4		projectionMatrix;
 	matrix4x4		worldviewProjectionMatrix;	// worldviewMatrix * projectionMatrix
+	matrix4x4		worldviewProjectionMatrixTranspose;	// worldviewMatrix * projectionMatrix for shaders
 	int		lightstylevalue[MAX_LIGHTSTYLES];	// value 0 - 65536
 	float		lightcache[MAX_LIGHTSTYLES];
 
@@ -347,14 +348,6 @@ int GL_AllocateTextureSlot(const char *name);
 void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfilter_t *filter );
 
 //
-// gl_mirror.c
-//
-void R_BeginDrawMirror( msurface_t *fa );
-void R_EndDrawMirror( void );
-void R_DrawMirrors( void );
-void R_FindMirrors( const ref_params_t *fd );
-
-//
 // gl_refrag.c
 //
 void R_StoreEfrags( efrag_t **ppefrag, int framecount );
@@ -416,7 +409,6 @@ imgfilter_t *R_FindTexFilter( const char *texname );
 //
 void R_MarkLeaves( void );
 void R_DrawWorld( void );
-void R_DrawMirrors( void );
 void R_DrawWaterSurfaces( void );
 void R_DrawBrushModel( cl_entity_t *e );
 void GL_SubdivideSurface( msurface_t *fa );
@@ -533,10 +525,6 @@ void R_NewMap( void );
 
 =======================================================================
 */
-#ifdef XASH_NANOGL
-#undef GL_TEXTURE_3D_EXT
-#undef GL_VERTEX_SHADER_EXT
-#endif
 enum
 {
 	GL_OPENGL_110 = 0,		// base

@@ -645,7 +645,7 @@ void SCR_DrawNetGraph( void )
 	if( net_graph->value < 3 )
 	{
 		GL_SetRenderMode( kRenderTransColor );
-		pglDisable( GL_TEXTURE_2D );
+		//pglDisable( GL_TEXTURE_2D );
 		gTriApi.Begin( TRI_QUADS ); // draw all the fills as a long solid sequence of quads for speedup reasons
 
 		// NOTE: fill colors without texture at this point
@@ -654,7 +654,7 @@ void SCR_DrawNetGraph( void )
 
 		gTriApi.End();
 		gTriApi.Color4ub( 255, 255, 255, 255 );
-		pglEnable( GL_TEXTURE_2D );
+		//pglEnable( GL_TEXTURE_2D );
 	}
 }
 

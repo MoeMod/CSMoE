@@ -1260,9 +1260,9 @@ void Field_DrawInputLine( int x, int y, field_t *edit )
 #else
         // overstrike cursor
 		pglEnable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
+		//pglDisable( GL_ALPHA_TEST );
 		pglBlendFunc( GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA );
-		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 		Con_DrawGenericChar( x + curPos, y, cursorChar, colorDefault );
 #endif
 	}

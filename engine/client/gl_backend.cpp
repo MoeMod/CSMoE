@@ -108,8 +108,6 @@ GL_LoadTexMatrix
 */
 void GL_LoadTexMatrix( const matrix4x4 & m )
 {
-	pglMatrixMode( GL_TEXTURE );
-	GL_LoadMatrix( m );
 	glState.texIdentityMatrix[glState.activeTMU] = false;
 }
 
@@ -120,9 +118,7 @@ GL_LoadTexMatrixExt
 */
 void GL_LoadTexMatrixExt( const float *glmatrix )
 {
-	ASSERT( glmatrix != NULL );
-	pglMatrixMode( GL_TEXTURE );
-	pglLoadMatrixf( glmatrix );
+	// fix pipeline is removed
 	glState.texIdentityMatrix[glState.activeTMU] = false;
 }
 
@@ -133,10 +129,7 @@ GL_LoadMatrix
 */
 void GL_LoadMatrix( const matrix4x4 &source )
 {
-	GLfloat	dest[16];
-
-	Matrix4x4_ToArrayFloatGL( source, dest );
-	pglLoadMatrixf( dest );
+	// fix pipeline is removed
 }
 
 /*
@@ -149,8 +142,7 @@ void GL_LoadIdentityTexMatrix( void )
 	if( glState.texIdentityMatrix[glState.activeTMU] )
 		return;
 
-	pglMatrixMode( GL_TEXTURE );
-	pglLoadIdentity();
+	// fix pipeline is removed
 	glState.texIdentityMatrix[glState.activeTMU] = true;
 }
 
@@ -196,21 +188,10 @@ void GL_SelectTexture( GLint tmu )
 		return;
 
 	glState.activeTMU = tmu;
-#ifndef XASH_NANOGL
 	if( pglActiveTextureARB )
-#endif
 	{
 		pglActiveTextureARB( tmu + GL_TEXTURE0_ARB );
-
-		if( tmu < glConfig.max_texture_coords )
-			pglClientActiveTextureARB( tmu + GL_TEXTURE0_ARB );
 	}
-#if !defined(XASH_NANOGL) && !defined(XASH_WES)
-	else if( pglSelectTextureSGIS )
-	{
-		pglSelectTextureSGIS( tmu + GL_TEXTURE0_SGIS );
-	}
-#endif
 }
 
 /*
@@ -240,7 +221,7 @@ void GL_CleanUpTextureUnits( int last )
 		// disable upper units
 		if( glState.currentTextureTargets[i] != GL_NONE )
 		{
-			pglDisable( glState.currentTextureTargets[i] );
+			//pglDisable( glState.currentTextureTargets[i] );
 			glState.currentTextureTargets[i] = GL_NONE;
 			glState.currentTextures[i] = -1; // unbind texture
 		}
@@ -259,18 +240,7 @@ GL_MultiTexCoord2f
 */
 void GL_MultiTexCoord2f( GLenum texture, GLfloat s, GLfloat t )
 {
-#ifndef XASH_NANOGL
-	if( pglMultiTexCoord2f )
-#endif
-	{
-		pglMultiTexCoord2f( texture + GL_TEXTURE0_ARB, s, t );
-	}
-#if !defined(XASH_NANOGL) && !defined(XASH_WES)
-	else if( pglMTexCoord2fSGIS )
-	{
-		pglMTexCoord2fSGIS( texture + GL_TEXTURE0_SGIS, s, t );
-	}
-#endif
+	// fix pipeline is removed
 }
 
 /*
@@ -288,11 +258,11 @@ void GL_TextureTarget( uint target )
 
 	if( glState.currentTextureTargets[glState.activeTMU] != target )
 	{
-		if( glState.currentTextureTargets[glState.activeTMU] != GL_NONE )
-			pglDisable( glState.currentTextureTargets[glState.activeTMU] );
+		//if( glState.currentTextureTargets[glState.activeTMU] != GL_NONE )
+		//	pglDisable( glState.currentTextureTargets[glState.activeTMU] );
 		glState.currentTextureTargets[glState.activeTMU] = target;
-		if( target != GL_NONE )
-			pglEnable( glState.currentTextureTargets[glState.activeTMU] );
+		//if( target != GL_NONE )
+		//	pglEnable( glState.currentTextureTargets[glState.activeTMU] );
 	}
 }
 
@@ -331,16 +301,17 @@ void GL_TexGen( GLenum coord, GLenum mode )
 	{
 		if( !( glState.genSTEnabled[tmu] & bit ))
 		{
-			pglEnable( gen );
+			//pglEnable( gen );
 			glState.genSTEnabled[tmu] |= bit;
 		}
-		pglTexGeni( coord, GL_TEXTURE_GEN_MODE, mode );
+		// TODO : implement with es2
+		//pglTexGeni( coord, GL_TEXTURE_GEN_MODE, mode );
 	}
 	else
 	{
 		if( glState.genSTEnabled[tmu] & bit )
 		{
-			pglDisable( gen );
+			//pglDisable( gen );
 			glState.genSTEnabled[tmu] &= ~bit;
 		}
 	}
@@ -364,12 +335,6 @@ void GL_SetTexCoordArrayMode( GLenum mode )
 
 	if( cmode != bit )
 	{
-		if( cmode == 1 ) pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-		else if( cmode == 2 ) pglDisable( GL_TEXTURE_CUBE_MAP_ARB );
-
-		if( bit == 1 ) pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-		else if( bit == 2 ) pglEnable( GL_TEXTURE_CUBE_MAP_ARB );
-
 		glState.texCoordArrayMode[tmu] = bit;
 	}
 }
@@ -406,35 +371,31 @@ void GL_FrontFace( GLenum front )
 
 void GAME_EXPORT GL_SetRenderMode( int mode )
 {
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 	switch( mode )
 	{
 	case kRenderNormal:
 	default:
 		pglDisable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
+		//pglDisable( GL_ALPHA_TEST );
 		break;
 	case kRenderTransColor:
 	case kRenderTransTexture:
 		pglEnable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
+		//pglDisable( GL_ALPHA_TEST );
 		pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		break;
 	case kRenderTransAlpha:
 		pglEnable( GL_BLEND );
-		pglEnable( GL_ALPHA_TEST );
+		//pglEnable( GL_ALPHA_TEST );
 		pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		break;
 	case kRenderGlow:
 	case kRenderTransAdd:
 		pglEnable( GL_BLEND );
-		pglDisable( GL_ALPHA_TEST );
-#if defined(XASH_BLEND_ES_WORKAROUND) // Problem with blending exists on every GLES configuration, not only on Android
-		pglBlendFunc( GL_ONE, GL_ONE );
-#else
+		//pglDisable( GL_ALPHA_TEST );
 		pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
-#endif
 		break;
 	}
 }

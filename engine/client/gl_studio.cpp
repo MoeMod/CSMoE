@@ -212,6 +212,7 @@ static unsigned short		g_xarrayelems[MAXARRAYVERTS*6];
 // moved to gl_studioshader.h
 studioshader_t g_studioshadervariant[MAX_STUDIOSHADERVARIANTS];
 studioshader_t *g_pstudioshader;
+studioubo_t g_pstudioubo;
 #else
 static GLfloat		g_xarrayverts[MAXARRAYVERTS][3];
 static GLfloat		g_xarraycoord[MAXARRAYVERTS][2];
@@ -295,6 +296,12 @@ void R_StudioInit( void )
     xe::StudioLru_Init();
 #endif
 
+	pglGenBuffersARB( 1, &g_pstudioubo.Matrices_ubo);
+	pglBindBufferARB(GL_UNIFORM_BUFFER, g_pstudioubo.Matrices_ubo);
+	pglBufferDataARB(GL_UNIFORM_BUFFER, sizeof(studioubo_t::Matrices), NULL, GL_DYNAMIC_DRAW_ARB);
+	pglBindBufferBase(GL_UNIFORM_BUFFER, g_pstudioubo.MatricesBindingPoint, g_pstudioubo.Matrices_ubo);
+	pglBindBufferARB(GL_UNIFORM_BUFFER, 0);
+
 	for (int i = SSV_NORMAL; i < MAX_STUDIOSHADERVARIANTS; ++i)
 	{
 		fs_offset_t length;
@@ -304,7 +311,7 @@ void R_StudioInit( void )
 		const GLcharARB* vertex_shader_list[5] = {
 				xe::GetShaderVersionString(),
 				studioshadervariant_define[i],
-				"#define MAX_BONE_REG 128 * 3\n", // hack for cso shader
+				"#define MAXSTUDIOBONES 128 * 3\n", // hack for cso shader
 				(const GLcharARB*)data
 		};
 		g_pstudioshader = &g_studioshadervariant[i];
@@ -316,13 +323,14 @@ void R_StudioInit( void )
 		xe::CheckShader(g_pstudioshader->vertex_shader, "vertex shader");
 
 		data = FS_MapFile("shader/mdlrender.fs", &length, true);
-		const GLcharARB* fragment_shader_list[3] = {
+		const GLcharARB* fragment_shader_list[4] = {
 				xe::GetShaderVersionString(),
+				xe::GetFragmentShaderPrecision(),
 				studioshadervariant_define[i],
 				(const GLcharARB*)data
 		};
 		g_pstudioshader->fragment_shader = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-		pglShaderSourceARB(g_pstudioshader->fragment_shader, 3, fragment_shader_list, NULL);
+		pglShaderSourceARB(g_pstudioshader->fragment_shader, 4, fragment_shader_list, NULL);
 		pglCompileShaderARB(g_pstudioshader->fragment_shader);
 		FS_MapFree(data, length);
 		xe::CheckShader(g_pstudioshader->fragment_shader, "fragment shader");
@@ -337,16 +345,21 @@ void R_StudioInit( void )
 		g_pstudioshader->uniform.colorMix = pglGetUniformLocationARB(g_pstudioshader->program, "colorMix");
 		g_pstudioshader->uniform.lightInfo = pglGetUniformLocationARB(g_pstudioshader->program, "lightInfo");
 		g_pstudioshader->uniform.dLightDir = pglGetUniformLocationARB(g_pstudioshader->program, "dLightDir");
-		g_pstudioshader->uniform.boneMat = pglGetUniformLocationARB(g_pstudioshader->program, "boneMat");
-		g_pstudioshader->uniform.muWVP = pglGetUniformLocationARB(g_pstudioshader->program, "muWVP");
 		g_pstudioshader->uniform.worldEye = pglGetUniformLocationARB(g_pstudioshader->program, "worldEye");
+		g_pstudioshader->uniform.fogInfo = pglGetUniformLocationARB(g_pstudioshader->program, "fogInfo");
+		g_pstudioshader->uniform.param = pglGetUniformLocationARB(g_pstudioshader->program, "param");
+		g_pstudioshader->uniform.outline = pglGetUniformLocationARB(g_pstudioshader->program, "outline");
 		g_pstudioshader->uniform.texDiffuseMap = pglGetUniformLocationARB(g_pstudioshader->program, "texDiffuseMap");
 		g_pstudioshader->uniform.texEnvMap = pglGetUniformLocationARB(g_pstudioshader->program, "texEnvMap");
 		g_pstudioshader->uniform.glowColor = pglGetUniformLocationARB(g_pstudioshader->program, "glowColor");
+		g_pstudioshader->uniform.fogColor = pglGetUniformLocationARB(g_pstudioshader->program, "fogColor");
 
-		g_pstudioshader->attrib.vaPosition = pglGetAttribLocationARB(g_pstudioshader->program, "vaPosition");
-		g_pstudioshader->attrib.vaNormal = pglGetAttribLocationARB(g_pstudioshader->program, "vaNormal");
-		g_pstudioshader->attrib.vaTexCoord = pglGetAttribLocationARB(g_pstudioshader->program, "vaTexCoord");
+		g_pstudioshader->attrib.aPos = pglGetAttribLocationARB(g_pstudioshader->program, "aPos");
+		g_pstudioshader->attrib.aNormal = pglGetAttribLocationARB(g_pstudioshader->program, "aNormal");
+		g_pstudioshader->attrib.aTexCoord = pglGetAttribLocationARB(g_pstudioshader->program, "aTexCoord");
+
+		GLuint MatricesBlockIndex = pglGetUniformBlockIndex(g_pstudioshader->program, "Matrices");
+		pglUniformBlockBinding(g_pstudioshader->program, MatricesBlockIndex, g_pstudioubo.MatricesBindingPoint);
 
 		g_pstudioshader = nullptr;
 	}
@@ -372,9 +385,11 @@ void R_StudioShutdown()
 		pglDetachObjectARB(g_pstudioshader->program, g_pstudioshader->fragment_shader);
 		pglDeleteObjectARB(g_pstudioshader->vertex_shader);
 		pglDeleteObjectARB(g_pstudioshader->fragment_shader);
-		pglDeleteObjectARB(g_pstudioshader->program);
+		pglDeleteProgram(g_pstudioshader->program);
 		g_pstudioshader = nullptr;
 	}
+
+	pglDeleteBuffersARB( 1, &g_pstudioubo.Matrices_ubo);
 #endif
 }
 
@@ -616,9 +631,7 @@ void GAME_EXPORT R_StudioPgluPerspective(GLdouble fovy, GLdouble aspect, GLdoubl
 	Matrix4x4_CreateProjection(RI.projectionMatrix, xmax, xmin, ymax, ymin, zNear, zFar);
 
 	Matrix4x4_Concat(RI.worldviewProjectionMatrix, RI.projectionMatrix, RI.worldviewMatrix);
-
-	pglMatrixMode(GL_PROJECTION);
-	GL_LoadMatrix(RI.projectionMatrix);
+	Matrix4x4_Transpose( RI.worldviewProjectionMatrixTranspose, RI.worldviewProjectionMatrix );
 }
 
 void GAME_EXPORT R_StudioGetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix)
@@ -631,6 +644,7 @@ void GAME_EXPORT R_StudioSetProjectionMatrix(matrix4x4& worldviewmatrix, matrix4
 {
 	RI.worldviewProjectionMatrix = worldviewmatrix;
 	RI.projectionMatrix = projectionmatrix;
+	Matrix4x4_Transpose( RI.worldviewProjectionMatrixTranspose, RI.worldviewProjectionMatrix );
 }
 
 /*
@@ -1669,16 +1683,16 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 #ifdef XASH_SHADER_VBO
         xe::StudioLru_Submit(startArrayElems, numArrayElems - startArrayElems, startArrayVerts, numArrayVerts - startArrayVerts);
 #else
-        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
-        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
-        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaPosition, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, pos));
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, coord));
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.vaNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, norm));
+        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.aPos);
+        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.aTexCoord);
+        pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.aNormal);
+        pglVertexAttribPointerARB(g_pstudioshader->attrib.aPos, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, pos));
+        pglVertexAttribPointerARB(g_pstudioshader->attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, coord));
+        pglVertexAttribPointerARB(g_pstudioshader->attrib.aNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, norm));
         pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const byte *)arrayelems + (startArrayElems * sizeof(unsigned short)) );
-        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaPosition);
-        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaTexCoord);
-        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.vaNormal);
+        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aPos);
+        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aTexCoord);
+        pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aNormal);
 #endif
     }
 #else
@@ -1705,14 +1719,29 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 }
 
 #ifdef XASH_SHADER
+static void R_StudioSetupUBO()
+{
+	matrix4x4 modelviewMatrixTranspose, projectionMatrixTranspose;
+	Matrix4x4_Transpose(modelviewMatrixTranspose, RI.worldviewMatrix);
+	Matrix4x4_Transpose(projectionMatrixTranspose, RI.projectionMatrix);
+	pglBindBufferARB(GL_UNIFORM_BUFFER, g_pstudioubo.Matrices_ubo);
+	pglBufferSubDataARB(GL_UNIFORM_BUFFER, offsetof(studioubo_t::Matrices, ModelView), sizeof(matrix4x4), &modelviewMatrixTranspose);
+	pglBufferSubDataARB(GL_UNIFORM_BUFFER, offsetof(studioubo_t::Matrices, Projection), sizeof(matrix4x4), &projectionMatrixTranspose);
+	pglBufferSubDataARB(GL_UNIFORM_BUFFER, offsetof(studioubo_t::Matrices, BoneMat), 3 * MAXSTUDIOBONES * 4 * sizeof(float), &g_bonestransform);
+	static_assert(sizeof(studioubo_t::Matrices::BoneMat) == 3 * MAXSTUDIOBONES * 4 * sizeof(float));
+	pglBindBufferARB(GL_UNIFORM_BUFFER, 0);
+}
+
 static void R_StudioSetupShader()
 {
 	pglUseProgramObjectARB(g_pstudioshader->program);
 	pglUniform1iARB(g_pstudioshader->uniform.texDiffuseMap, 0);
-	pglUniformMatrix4fvARB(g_pstudioshader->uniform.muWVP, 1, GL_TRUE, (const float*)&RI.worldviewProjectionMatrix);
-	pglUniform4fvARB(g_pstudioshader->uniform.boneMat, 3 * MAXSTUDIOBONES, (const float*)g_bonestransform);
 	pglUniform1iARB(g_pstudioshader->uniform.texEnvMap, 1); // pglActiveTextureARB(GL_TEXTURE1_ARB)
 	pglUniform4fvARB(g_pstudioshader->uniform.worldEye, 1, (const float*)&RI.vieworg);
+	pglUniform4fARB(g_pstudioshader->uniform.fogInfo, RI.fogDensity, RI.fogStart, RI.fogEnd, 0);
+	pglUniform4fARB(g_pstudioshader->uniform.fogColor, RI.fogColor.x, RI.fogColor.y, RI.fogColor.z, 1);
+	pglUniform4fARB(g_pstudioshader->uniform.param, 0, 0, 0, 0);
+	pglUniform4fARB(g_pstudioshader->uniform.outline, 0, 0, 0, 0);
 }
 
 static void R_StudioRestoreShader()
@@ -2206,53 +2235,10 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			gTriApi.Color4ub( clr->r, clr->g, clr->b, 255 );
 			alpha = 1.0f;
 		}
-		else if (g_nForceFaceFlags & STUDIO_NF_OUTLINE)
-		{
-			GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
-			pglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			pglLineWidth(5.0);
-			//pglEnable(GL_LINE_SMOOTH);
-			if (RI.currententity->curstate.renderfx == kRenderFxGreenOutLine) {
-				pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				RI.currententity->curstate.rendercolor.r = 100;
-				RI.currententity->curstate.rendercolor.g = 200;
-				RI.currententity->curstate.rendercolor.b = 150;
-
-				alpha = 0.5f;
-
-				pglEnable(GL_STENCIL_TEST);
-				pglStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-				pglDisable(GL_DEPTH_TEST);
-			}
-			else if (RI.currententity->curstate.renderfx == kRenderFxRedOutLine) {
-				pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				RI.currententity->curstate.rendercolor.r = 200;
-				RI.currententity->curstate.rendercolor.g = 0;
-				RI.currententity->curstate.rendercolor.b = 0;
-
-				alpha = 0.5f;
-
-				pglEnable(GL_STENCIL_TEST);
-				pglStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-				pglDisable(GL_DEPTH_TEST);
-			}
-			else {
-				pglBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-				RI.currententity->curstate.rendercolor.r = 1;
-				RI.currententity->curstate.rendercolor.g = 1;
-				RI.currententity->curstate.rendercolor.b = 1;
-
-				alpha = 1.0f;
-
-				pglEnable(GL_STENCIL_TEST);
-				pglStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-			}
-
-		}
 		else if( g_nFaceFlags & STUDIO_NF_TRANSPARENT && R_StudioOpaque( RI.currententity ))
 		{
 			GL_SetRenderMode( kRenderTransAlpha );
-			pglAlphaFunc( GL_GREATER, 0.0f );
+			//pglAlphaFunc( GL_GREATER, 0.0f );
 			if (RI.currententity->curstate.rendermode == kRenderTransAlpha)
 				alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
 			else
@@ -2277,22 +2263,22 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 			if( g_iRenderMode == kRenderNormal )
 			{
-				if( gl_overbright_studio->integer )
-				{
-					pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE );
-					pglTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );
-				}
-				else
-					pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+				//if( gl_overbright_studio->integer )
+				//{
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE );
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB );
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE );
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );
+				//}
+				//else
+					//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 				alpha = 1.0f;
 			}
 			else alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
 		}
 
-		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
+		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
 		{
 			bool bBindSpr = false;
 
@@ -2404,14 +2390,6 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			}
 		}
 
-		if (RI.currententity->syncbase == 1.0f)   //set stencil
-		{
-			pglEnable(GL_STENCIL_TEST);
-			pglStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
-
-			pglStencilMask(0xFF);  // �����޸�ģ�建��			
-			pglStencilFunc(GL_ALWAYS, 1, 0xFF); //����Ƭ�ζ�Ҫд��ģ�建��
-		}
 #ifdef XASH_SHADER
         vec3_t colormix = g_studiolight.lightcolor;
         if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
@@ -2566,6 +2544,9 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 		std::sort( g_sortedMeshes, g_sortedMeshes + m_pSubModel->nummesh, R_StudioMeshCompare );
 	}
 
+#ifdef XASH_SHADER
+	R_StudioSetupUBO();
+#endif
 	R_StudioDrawMeshes( ptexture, pskinref, scale );
 
 	// restore depthmask for next call StudioDrawPoints
@@ -2683,7 +2664,7 @@ static void GAME_EXPORT R_StudioDrawAbsBBox( void )
 	if( !R_StudioComputeBBox( RI.currententity, bbox ))
 		return;
 
-	pglDisable( GL_TEXTURE_2D );
+	//pglDisable( GL_TEXTURE_2D );
 	pglDisable( GL_DEPTH_TEST );
 
 	gTriApi.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );	// red bboxes for studiomodels
@@ -2706,7 +2687,7 @@ static void GAME_EXPORT R_StudioDrawAbsBBox( void )
 	}
 
 	gTriApi.End();
-	pglEnable( GL_TEXTURE_2D );
+	//pglEnable( GL_TEXTURE_2D );
 	pglEnable( GL_DEPTH_TEST );
 }
 
@@ -3146,29 +3127,6 @@ R_StudioSetForceFaceFlags
 void GAME_EXPORT R_StudioSetForceFaceFlags( int flags )
 {
 	g_nForceFaceFlags = flags;
-	int flag = RI.currententity->curstate.renderfx;
-	if (!(flag == kRenderFxBlackOutLine || flag == kRenderFxRedOutLine || flag == kRenderFxGreenOutLine)) return;
-	if (RI.currententity->syncbase == 1.0f && flags == 0)   //DrawOutLinePause
-	{
-		pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		pglLineWidth(1.0);
-
-		pglStencilMask(0x00); // ��ֹ�޸�ģ�建��
-		pglDisable(GL_STENCIL_TEST);
-		pglEnable(GL_DEPTH_TEST);
-	}
-	else if (RI.currententity->syncbase == 2.0f && flags == 0)   //DrawOutLineEnd
-	{
-		pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		pglLineWidth(1.0);
-
-		pglClear(GL_STENCIL_BUFFER_BIT);
-		pglStencilMask(0x00); // ��ֹ�޸�ģ�建��
-		pglDisable(GL_STENCIL_TEST);
-		pglEnable(GL_DEPTH_TEST);
-
-		RI.currententity->syncbase = 0.0f;
-	}
 }
 
 /*
@@ -3205,7 +3163,7 @@ R_StudioSetupRenderer
 static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 {
 	g_iRenderMode = bound( 0, rendermode, kRenderTransAdd );
-	pglShadeModel( GL_SMOOTH );	// enable gouraud shading
+	//pglShadeModel( GL_SMOOTH );	// enable gouraud shading
 	
 	if( clgame.ds.cullMode != GL_NONE ) GL_Cull( GL_FRONT );
 	if (RI.currententity)
@@ -3218,7 +3176,7 @@ static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 	if( glState.drawTrans && g_iRenderMode != kRenderTransAdd )
 		pglDepthMask( GL_TRUE );
 
-	pglAlphaFunc( GL_GREATER, 0.0f );
+	//pglAlphaFunc( GL_GREATER, 0.0f );
 
 	// was done before, in R_DrawViewModel
 	if( g_iBackFaceCull )
@@ -3233,8 +3191,8 @@ R_StudioRestoreRenderer
 */
 static void GAME_EXPORT R_StudioRestoreRenderer( void )
 {
-	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	pglShadeModel( GL_FLAT );
+	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	//pglShadeModel( GL_FLAT );
 
 	// restore depthmask state for sprites etc
 	if( glState.drawTrans && g_iRenderMode != kRenderTransAdd )
@@ -3356,10 +3314,10 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 		if(rendermode == kRenderNormal && RI.currententity != &clgame.viewent )
 		{
 			shadow_alpha = 1.0f - r_shadowalpha.value * 0.5f;
-			pglDisable( GL_TEXTURE_2D );
+			//pglDisable( GL_TEXTURE_2D );
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 			pglEnable( GL_BLEND );
-			pglShadeModel( GL_FLAT );
+			//pglShadeModel( GL_FLAT );
 			shadow_alpha2 = 1.0f - shadow_alpha;
 
 			gTriApi.Color4f( 0.0f, 0.0f, 0.0f, shadow_alpha2 );
@@ -3372,11 +3330,11 @@ static void GAME_EXPORT GL_StudioDrawShadow( void )
 			depthmode2 = GL_LEQUAL;
 			pglDepthFunc( depthmode2 );
 
-			pglEnable( GL_TEXTURE_2D );
+			//pglEnable( GL_TEXTURE_2D );
 			pglDisable( GL_BLEND );
 
 			gTriApi.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-			pglShadeModel( GL_SMOOTH );
+			//pglShadeModel( GL_SMOOTH );
 		}
 	}
 }

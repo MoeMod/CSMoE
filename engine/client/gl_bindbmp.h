@@ -16,8 +16,10 @@ GNU General Public License for more details.
 #pragma once
 
 #include "gl_export.h"
-#include "vector"
 #include "studio.h"
+#include <unordered_map>
+#include <vector>
+#include <string>
 
 struct BMPList
 {
