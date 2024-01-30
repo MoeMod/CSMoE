@@ -1,0 +1,7 @@
+CLASS_BEGIN(CBasePlayerAmmo, CBaseEntity)
+    ADD_OVERRIDE_VIRTUAL_FUNCTION(Spawn)
+    ADD_OVERRIDE_VIRTUAL_FUNCTION(Respawn)
+    ADD_VIRTUAL_FUNCTION(AddAmmo, CBaseEntity *)
+    ADD_MEMBER_FUNCTION(DefaultTouch, CBaseEntity *)
+    ADD_MEMBER_FUNCTION(Materialize)
+CLASS_END()

@@ -7,6 +7,7 @@ namespace luash
 	int OpenLibs(lua_State* L);
 
 	template<class T> auto Push(lua_State* L, T&&);
+    template<class T> auto PushRef(lua_State* L, T& what);
 	template<class T> auto Get(lua_State* L, int N, T& out);
 
 	template<class T> void RegisterGlobal(lua_State* L, const char* name, T&& what);

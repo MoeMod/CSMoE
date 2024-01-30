@@ -37,5 +37,6 @@ int gmsgWeapPickup = 0;
 enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
 std::map<int, ItemInfo> CBasePlayerItem::ItemInfoArray;
+AmmoInfo CBasePlayerItem::AmmoInfoArray[MAX_AMMO_SLOTS];
 
 }

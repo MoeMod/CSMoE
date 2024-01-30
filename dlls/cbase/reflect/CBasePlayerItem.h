@@ -53,4 +53,7 @@ CLASS_BEGIN(CBasePlayerItem, CBaseAnimating)
 	ADD_MEMBER_DATA(m_pPlayer)
 	ADD_MEMBER_DATA(m_pNext)
 	ADD_MEMBER_DATA(m_iId)
+
+	ADD_STATIC_MEMBER_DATA(ItemInfoArray)
+	ADD_STATIC_MEMBER_DATA(AmmoInfoArray)
 CLASS_END()

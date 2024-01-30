@@ -104,6 +104,22 @@ namespace luash
 		}
 		lua_pop(L, 1); // #0
 	}
+	template<class T> auto GetMap(lua_State* L, int N, T& v) -> decltype(typename T::value_type(), v.begin()->first, v.begin()->second, v.end(), v.clear(), void())
+	{
+		lua_pushvalue(L, N); // #1 = map
+		v.clear();
+		lua_pushnil(L); // #2 = key
+		while(lua_next(L, -2)) // #3 = value
+		{
+            typename std::remove_const<typename T::value_type::first_type>::type key;
+            typename std::remove_const<typename T::value_type::second_type>::type value;
+			Get(L, -2, key);
+			Get(L, -1, value);
+            v.emplace(std::move(key), std::move(value));
+			lua_pop(L, 1); // #2 = key
+		}
+		lua_pop(L, 2); // #0
+	}
 	namespace detail
 	{
 		template<std::size_t...I, class...Args> void GetStructImpl(lua_State* L, std::index_sequence<I...>, Args &...args)
@@ -211,6 +227,10 @@ namespace luash
 		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<4>) -> decltype(GetVector(L, N, x))
 		{
 			return GetVector(L, N, x);
+		}
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<4>) -> decltype(GetMap(L, N, x))
+		{
+			return GetMap(L, N, x);
 		}
 		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<3>) -> decltype(GetArray(L, N, x))
 		{

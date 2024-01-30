@@ -27,12 +27,20 @@
 #endif
 
 #include "cbase/reflect/CBaseEntity.h"
+#include "cbase/reflect/CBaseDelay.h"
 #include "cbase/reflect/CBaseAnimating.h"
 #include "cbase/reflect/CBaseToggle.h"
 #include "cbase/reflect/CBasePlayerItem.h"
 #include "cbase/reflect/CBasePlayerWeapon.h"
 #include "cbase/reflect/CBaseMonster.h"
 #include "cbase/reflect/CBasePlayer.h"
+#ifndef CLIENT_DLL
+#include "cbase/reflect/CPointEntity.h"
+#include "cbase/reflect/CArmoury.h"
+#include "cbase/reflect/CGrenade.h"
+#include "cbase/reflect/CBasePlayerAmmo.h"
+#include "cbase/reflect/CWeaponBox.h"
+#endif
 
 #undef CLASS_BEGIN
 #undef ADD_VIRTUAL_FUNCTION

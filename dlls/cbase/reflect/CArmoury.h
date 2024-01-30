@@ -1,0 +1,13 @@
+CLASS_BEGIN(CArmoury, CBaseEntity)
+    ADD_OVERRIDE_VIRTUAL_FUNCTION(Spawn)
+    ADD_OVERRIDE_VIRTUAL_FUNCTION(Precache)
+    ADD_OVERRIDE_VIRTUAL_FUNCTION(Restart)
+    ADD_OVERRIDE_VIRTUAL_FUNCTION(KeyValue, KeyValueData *)
+
+    ADD_MEMBER_FUNCTION(ArmouryTouch, CBaseEntity *)
+
+    ADD_MEMBER_DATA(m_iItem)
+    ADD_MEMBER_DATA(m_iCount)
+    ADD_MEMBER_DATA(m_iInitialCount)
+    ADD_MEMBER_DATA(m_bAlreadyCounted)
+CLASS_END()

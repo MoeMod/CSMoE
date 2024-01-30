@@ -2,7 +2,6 @@
 
 #include <lua.hpp>
 #include <nameof.hpp>
-#include <typeindex>
 #include <tuple>
 #include <unordered_map>
 #include "luash_class.hpp"
@@ -22,7 +21,6 @@ namespace luash
 		//virtual ~ITypeInterface() = 0;
 
 		virtual std::string_view GetTypeName() const = 0;
-		virtual std::type_index GetTypeID() const = 0;
 		virtual bool IsConst() const = 0;
 		virtual size_t GetMemberCount() const = 0;
 		virtual int Copy(lua_State* L) const = 0;
@@ -67,17 +65,9 @@ namespace luash
 	namespace detail
 	{
 		// hackme : ref type as pointer when pushed by __index to support a.b.c=2
-		template<class T> auto MetaIndexImpl2(lua_State* L, T&& arg)
-		{
-			if constexpr(IsRefType<T>::value && !std::is_array<T>::value)
-				Push(L, &arg);
-			else
-				Push(L, arg);
-			return true;
-		}
 		template<std::size_t...I, class...Args> bool MetaIndexImpl(lua_State* L, int N, std::index_sequence<I...>, Args &&...args)
 		{
-			return (... || ((I == N - 1) ? MetaIndexImpl2(L, std::forward<Args>(args)) : false));
+			return (... || ((I == N - 1) ? (PushRef(L, std::forward<Args>(args)), true) : false));
 		}
 		template<class T> bool MetaNewIndexImpl2(lua_State* L, int N, T &arg)
 		{
@@ -98,10 +88,6 @@ namespace luash
 	class TypeInterfaceDecoratorComplete : public Base
 	{
 	public:
-		std::type_index GetTypeID() const override
-		{
-			return typeid(void);
-		}
 		int NewScalar(lua_State* L) const override
 		{
 			std::string type(this->GetTypeName());
@@ -127,10 +113,6 @@ namespace luash
 	class TypeInterfaceDecoratorComplete<T, Base, true> : public Base
 	{
 	public:
-		std::type_index GetTypeID() const override
-		{
-			return typeid(typename std::remove_cv<T>::type);
-		}
 		int NewScalar(lua_State* L) const override
 		{
 			auto new_object = new T();
@@ -247,9 +229,7 @@ namespace luash
 	template<class Base>
 	class TypeInterfaceDecoratorToString<char, Base> : public TypeInterfaceDecoratorToString<const char, Base> {};
 
-	template<class T, class Base, 
-		bool = std::conjunction<IsCompleteType<typename std::remove_cv<T>::type>, std::is_aggregate<typename std::remove_cv<T>::type>>::value
-	>
+	template<class T, class Base, class = void>
 	class TypeInterfaceDecoratorIndex : public Base
 	{
 	public:
@@ -283,8 +263,11 @@ namespace luash
 		void TypeInterfaceStringIndexReplace(const ITypeInterface* ti, lua_State* L, std::string_view PathPrefix, std::string_view name);
 	}
 
+    // struct
 	template<class T, class Base>
-	class TypeInterfaceDecoratorIndex<T, Base, true> : public Base
+	class TypeInterfaceDecoratorIndex<T, Base,
+        typename std::enable_if<std::conjunction<IsCompleteType<typename std::remove_cv<T>::type>, std::is_aggregate<typename std::remove_cv<T>::type>, std::negation<std::is_array<typename std::remove_cv<T>::type>>>::value>::type
+    > : public Base
 	{
 	public:
 		size_t GetMemberCount() const override
@@ -327,7 +310,52 @@ namespace luash
 				std::string type(this->GetTypeName());
 				return luaL_error(L, "can not assign field %s[%d]", type.c_str(), N);
 			}
-			return success;
+			return 0;
+		}
+	};
+
+    // array
+	template<class T, size_t N, class Base>
+	class TypeInterfaceDecoratorIndex<T[N], Base, typename std::enable_if<IsCompleteType<T>::value>::type> : public Base
+	{
+	public:
+		size_t GetMemberCount() const override
+		{
+			return N;
+		}
+		int MetaIndex(lua_State* L) const override
+		{
+			if (lua_type(L, 2) == LUA_TSTRING)
+			{
+				if (!strcmp(lua_tostring(L, 2), "self"))
+					return this->Copy(L);
+			}
+			T* value = reinterpret_cast<T *>(lua_touserdata(L, 1));
+            int i = lua_tointeger(L, 2);
+            if(i < 0 || i >= N)
+            {
+                std::string type(this->GetTypeName());
+                return luaL_error(L, "index %d out of bound %s[%d]", i, type.c_str(), (int)N);
+            }
+            PushRef(L, value[i]);
+			return 1;
+		}
+		int MetaNewIndex(lua_State* L) const override
+		{
+			if (lua_type(L, 2) == LUA_TSTRING)
+			{
+				if (!strcmp(lua_tostring(L, 2), "self"))
+					return this->Assign(L);
+			}
+            T* value = reinterpret_cast<T *>(lua_touserdata(L, 1));
+			int i = lua_tointeger(L, 2);
+            if(i < 0 || i >= N)
+            {
+                std::string type(this->GetTypeName());
+                return luaL_error(L, "index %d out of bound %s[%d]", i, type.c_str(), (int)N);
+            }
+            Get(L, 3, value);
+			return 0;
 		}
 	};
 

@@ -57,6 +57,17 @@ namespace luash
 			lua_settable(L, -3);
 		}
 	}
+    template<class T> auto PushMap(lua_State* L, T&& v) -> decltype(begin(std::forward<T>(v))->first, begin(std::forward<T>(v))->second, end(std::forward<T>(v)), void())
+    {
+        lua_newtable(L);
+        int i = 0;
+        for(auto &&[x, y] : std::forward<T>(v))
+        {
+            Push(L, std::forward<decltype(x)>(x));
+            Push(L, std::forward<decltype(y)>(y));
+            lua_settable(L, -3);
+        }
+    }
 	namespace detail
 	{
 		template<std::size_t...I, class...Args> void PushStructImpl(lua_State* L, std::index_sequence<I...>, Args &&...args)
@@ -144,9 +155,13 @@ namespace luash
 		{
 			return PushFloat(L, x);
 		}
-		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<4>) -> decltype(PushString(L, std::forward<T>(x)))
+		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<5>) -> decltype(PushString(L, std::forward<T>(x)))
 		{
 			return PushString(L, std::forward<T>(x));
+		}
+		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<4>) -> decltype(PushMap(L, std::forward<T>(x)))
+		{
+			return PushMap(L, std::forward<T>(x));
 		}
 		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<3>) -> decltype(PushArray(L, std::forward<T>(x)))
 		{

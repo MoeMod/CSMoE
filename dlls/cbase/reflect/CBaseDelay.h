@@ -1,0 +1,12 @@
+CLASS_BEGIN(CBaseDelay, CBaseEntity)
+#ifndef CLIENT_DLL
+	ADD_MEMBER_FUNCTION(SUB_UseTargets, CBaseEntity*, USE_TYPE, float)
+	ADD_MEMBER_FUNCTION(DelayThink)
+#endif
+
+	ADD_OVERRIDE_VIRTUAL_FUNCTION(KeyValue, KeyValueData*)
+	// ADD_OVERRIDE_VIRTUAL_FUNCTION(Save, CSave&)
+	// ADD_OVERRIDE_VIRTUAL_FUNCTION(Restore, CRestore&)
+	ADD_MEMBER_DATA(m_flDelay)
+	ADD_MEMBER_DATA(m_iszKillTarget)
+CLASS_END()
