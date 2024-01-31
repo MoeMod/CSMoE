@@ -113,6 +113,9 @@ if(MSVC)
 	# MultiByte charset
 	add_compile_options(/utf-8)
 
+	#fix C1128
+	add_compile_options(-bigobj)
+
 	# fix align
 	add_definitions(-D_ENABLE_EXTENDED_ALIGNED_STORAGE)
 
