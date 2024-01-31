@@ -494,11 +494,13 @@ namespace xe {
                 pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                 pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-#ifdef XASH_GL4ES
-                // gl4es workround
-                pglTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP, 1);
-#endif
                 pglTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, 0, GL_RGBA, pic->width, pic->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pic->buffer);
+#ifdef XASH_GLES
+				if( GL_Support( GL_SGIS_MIPMAPS_EXT ) )
+				{
+					pglGenerateMipmap(GL_TEXTURE_CUBE_MAP_ARB);
+				}
+#endif
             }
             pglBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);
 

@@ -375,8 +375,6 @@ void GL_InitExtensionsGLES( void )
 	GL_CheckExtension( "GL_OES_depth_texture", NULL, "gl_depthtexture", GL_DEPTH_TEXTURE );
 #ifdef XASH_GL4ES
 	GL_SetExtension(GL_ASTC_EXT, true);
-#elif defined XASH_ANGLE
-	GL_SetExtension(GL_ASTC_EXT, false);
 #else
     GL_CheckExtension( "GL_KHR_texture_compression_astc_ldr", NULL, "gl_astc_format", GL_ASTC_EXT );
 #endif

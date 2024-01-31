@@ -1338,6 +1338,12 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
 	tex->target = glTarget = GL_TEXTURE_2D;
 	numSides = 1;
 
+	// compressed texture doesnt support mipmap
+	if(PFDesc[pic->type].compressed)
+	{
+		tex->flags |= TF_NOMIPMAP;
+	}
+
 	if( tex->flags & TF_FLOATDATA )
 		dataType = GL_FLOAT;
 
