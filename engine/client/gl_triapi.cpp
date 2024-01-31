@@ -383,7 +383,27 @@ void GAME_EXPORT TriEnd( void )
 #if XASH_SHADER_TRIAPI
 	pglUseProgramObjectARB(xe::TriFFE.program);
 	pglUniform1iARB(xe::TriFFE.uniform.tex, 0);
-	pglUniformMatrix4fvARB(xe::TriFFE.uniform.muWVP, 1, GL_FALSE, (const float*)&RI.worldviewProjectionMatrixTranspose);
+	if(glState.in2DMode)
+	{
+		float L = 0;
+		float R = glState.width;
+		float B = glState.height;
+		float T = 0;
+		float N = -99999;
+		float F = 99999;
+		const float ortho_projection[4][4] =
+				{
+						{ 2.0f/(R-L),   0.0f,         0.0f,         0.0f },
+						{ 0.0f,         2.0f/(T-B),   0.0f,         0.0f },
+						{ 0.0f,         0.0f,         2.0f/(F-N),   0.0f },
+						{ (R+L)/(L-R),  (T+B)/(B-T),  (N+F)/(N-F),  1.0f },
+				};
+		pglUniformMatrix4fvARB(xe::TriFFE.uniform.muWVP, 1, GL_FALSE, (const float*)&ortho_projection);
+	}
+	else
+	{
+		pglUniformMatrix4fvARB(xe::TriFFE.uniform.muWVP, 1, GL_FALSE, (const float*)&RI.worldviewProjectionMatrixTranspose);
+	}
 	pglUniform1fARB(xe::TriFFE.uniform.uPointSize, xe::TriFFE.cur_point_size);
 
 	pglBindBufferARB(GL_ARRAY_BUFFER_ARB, xe::TriFFE.vbo);
