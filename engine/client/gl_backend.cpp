@@ -108,7 +108,7 @@ GL_LoadTexMatrix
 */
 void GL_LoadTexMatrix( const matrix4x4 & m )
 {
-	glState.texIdentityMatrix[glState.activeTMU] = false;
+	// fix pipeline is removed
 }
 
 /*
@@ -119,7 +119,6 @@ GL_LoadTexMatrixExt
 void GL_LoadTexMatrixExt( const float *glmatrix )
 {
 	// fix pipeline is removed
-	glState.texIdentityMatrix[glState.activeTMU] = false;
 }
 
 /*
@@ -139,11 +138,7 @@ GL_LoadIdentityTexMatrix
 */
 void GL_LoadIdentityTexMatrix( void )
 {
-	if( glState.texIdentityMatrix[glState.activeTMU] )
-		return;
-
 	// fix pipeline is removed
-	glState.texIdentityMatrix[glState.activeTMU] = true;
 }
 
 
@@ -201,10 +196,7 @@ GL_DisableAllTexGens
 */
 void GL_DisableAllTexGens( void )
 {
-	GL_TexGen( GL_S, 0 );
-	GL_TexGen( GL_T, 0 );
-	GL_TexGen( GL_R, 0 );
-	GL_TexGen( GL_Q, 0 );
+	// removed in ES2
 }
 
 /*
@@ -273,48 +265,7 @@ GL_TexGen
 */
 void GL_TexGen( GLenum coord, GLenum mode )
 {
-	int	tmu = min( glConfig.max_texture_coords, glState.activeTMU );
-	int	bit, gen;
-
-	switch( coord )
-	{
-	case GL_S:
-		bit = 1;
-		gen = GL_TEXTURE_GEN_S;
-		break;
-	case GL_T:
-		bit = 2;
-		gen = GL_TEXTURE_GEN_T;
-		break;
-	case GL_R:
-		bit = 4;
-		gen = GL_TEXTURE_GEN_R;
-		break;
-	case GL_Q:
-		bit = 8;
-		gen = GL_TEXTURE_GEN_Q;
-		break;
-	default: return;
-	}
-
-	if( mode )
-	{
-		if( !( glState.genSTEnabled[tmu] & bit ))
-		{
-			//pglEnable( gen );
-			glState.genSTEnabled[tmu] |= bit;
-		}
-		// TODO : implement with es2
-		//pglTexGeni( coord, GL_TEXTURE_GEN_MODE, mode );
-	}
-	else
-	{
-		if( glState.genSTEnabled[tmu] & bit )
-		{
-			//pglDisable( gen );
-			glState.genSTEnabled[tmu] &= ~bit;
-		}
-	}
+	// removed in ES2
 }
 
 /*
@@ -324,13 +275,7 @@ GL_SetTexCoordArrayMode
 */
 void GL_SetTexCoordArrayMode( GLenum mode )
 {
-	int	tmu = min( glConfig.max_texture_coords, glState.activeTMU );
-	int cmode = glState.texCoordArrayMode[tmu];
-
-	if( cmode != mode )
-	{
-		glState.texCoordArrayMode[tmu] = mode;
-	}
+	// removed in ES2
 }
 
 /*

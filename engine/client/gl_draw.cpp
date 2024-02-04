@@ -169,7 +169,7 @@ void R_DrawStretchRaw( float x, float y, float w, float h, int cols, int rows, c
 	{
 		if( dirty )
 		{
-			pglTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, cols, rows, GL_BGRA, GL_UNSIGNED_BYTE, raw );
+			pglTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, cols, rows, GL_BGRA_EXT, GL_UNSIGNED_BYTE, raw );
 		}
 	}
 	else
@@ -178,7 +178,7 @@ void R_DrawStretchRaw( float x, float y, float w, float h, int cols, int rows, c
 		tex->height = rows;
 		if( dirty )
 		{
-			pglTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, cols, rows, 0, GL_BGRA, GL_UNSIGNED_BYTE, raw );
+			pglTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, cols, rows, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, raw );
 		}
 	}
 
@@ -237,7 +237,7 @@ void R_UploadStretchRaw( int texture, int cols, int rows, int width, int height,
 	tex->width = cols;
 	tex->height = rows;
 
-	pglTexImage2D( GL_TEXTURE_2D, 0, tex->format, cols, rows, 0, GL_BGRA, GL_UNSIGNED_BYTE, raw );
+	pglTexImage2D( GL_TEXTURE_2D, 0, tex->format, cols, rows, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, raw );
 	GL_TexFilter( tex, false );
 }
 

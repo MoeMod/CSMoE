@@ -631,9 +631,6 @@ typedef struct
 	int		activeTMU;
 	GLint		currentTextures[MAX_TEXTURE_UNITS];
 	GLuint		currentTextureTargets[MAX_TEXTURE_UNITS];
-	GLboolean		texIdentityMatrix[MAX_TEXTURE_UNITS];
-	GLint		genSTEnabled[MAX_TEXTURE_UNITS];	// 0 - disabled, OR 1 - S, OR 2 - T, OR 4 - R
-	GLint		texCoordArrayMode[MAX_TEXTURE_UNITS];	// 0 - disabled, 1 - enabled, 2 - cubemap
 
 	int		faceCull;
 	int		frontFace;

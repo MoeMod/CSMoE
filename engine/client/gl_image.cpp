@@ -403,24 +403,6 @@ void R_TextureList_f( void )
 
 		switch( image->format )
 		{
-		case GL_COMPRESSED_RGBA_ARB:
-			Msg( "CRGBA " );
-			break;
-		case GL_COMPRESSED_RGB_ARB:
-			Msg( "CRGB  " );
-			break;
-		case GL_COMPRESSED_LUMINANCE_ALPHA_ARB:
-			Msg( "CLA   " );
-			break;
-		case GL_COMPRESSED_LUMINANCE_ARB:
-			Msg( "CL    " );
-			break;
-		case GL_COMPRESSED_ALPHA_ARB:
-			Msg( "CA    " );
-			break;
-		case GL_COMPRESSED_INTENSITY_ARB:
-			Msg( "CI    " );
-			break;
 		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
 			Msg( "DXT1c " );
 			break;

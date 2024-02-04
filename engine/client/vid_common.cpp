@@ -184,13 +184,10 @@ static void GL_SetDefaultTexState( void )
 	int	i;
 
 	Q_memset( glState.currentTextures, -1, MAX_TEXTURE_UNITS * sizeof( *glState.currentTextures ));
-	Q_memset( glState.texCoordArrayMode, 0, MAX_TEXTURE_UNITS * sizeof( *glState.texCoordArrayMode ));
-	Q_memset( glState.genSTEnabled, 0, MAX_TEXTURE_UNITS * sizeof( *glState.genSTEnabled ));
 
 	for( i = 0; i < MAX_TEXTURE_UNITS; i++ )
 	{
 		glState.currentTextureTargets[i] = GL_NONE;
-		glState.texIdentityMatrix[i] = true;
 	}
 }
 
