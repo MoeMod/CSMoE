@@ -57,6 +57,15 @@ static const char* studioshadervariant_define[MAX_STUDIOSHADERVARIANTS] = {
 };
 #endif
 
+// apple suggests that use triangle strip is more efficient
+// https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/TechniquesforWorkingwithVertexData/TechniquesforWorkingwithVertexData.html#//apple_ref/doc/uid/TP40008793-CH107-SW12
+#ifdef __APPLE__
+#define XASH_PREFER_DRAW_MODE GL_TRIANGLE_STRIP
+#define XASH_USE_PRIMITIVE_RESTART
+#else
+#define XASH_PREFER_DRAW_MODE GL_TRIANGLES
+#endif
+
 enum HandType
 {
 	MALE_LONG,
@@ -1596,6 +1605,48 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 
 		for( ; i > 0; i--, ptricmds += 4 )
 		{
+#if XASH_PREFER_DRAW_MODE == GL_TRIANGLE_STRIP
+			// build in indices
+			if( vertexState++ == 0 )
+			{
+				// make a degenerate triangle to disconnect with previous mesh
+				if(numArrayElems >= 1)
+				{
+#ifdef XASH_USE_PRIMITIVE_RESTART
+					arrayelems[numArrayElems++] = -1;
+					arrayelems[numArrayElems++] = numArrayVerts;
+#else
+					int curIndex = arrayelems[numArrayElems - 1];
+					arrayelems[numArrayElems++] = curIndex;
+					arrayelems[numArrayElems++] = numArrayVerts;
+					arrayelems[numArrayElems++] = numArrayVerts;
+#endif
+				}
+				else
+				{
+					arrayelems[numArrayElems++] = numArrayVerts;
+				}
+			}
+			else if( tri_strip )
+			{
+				arrayelems[numArrayElems++] = numArrayVerts;
+			}
+			else
+			{
+#ifdef XASH_USE_PRIMITIVE_RESTART
+				arrayelems[numArrayElems++] = -1;
+				arrayelems[numArrayElems++] = numArrayVerts - ( vertexState - 1 );
+				arrayelems[numArrayElems++] = numArrayVerts - 1;
+				arrayelems[numArrayElems++] = numArrayVerts;
+#else
+				// emulate triangle fan using triangle strip
+				arrayelems[numArrayElems++] = numArrayVerts - 1;
+                arrayelems[numArrayElems++] = numArrayVerts - ( vertexState - 1 );
+				arrayelems[numArrayElems++] = numArrayVerts - 1;
+                arrayelems[numArrayElems++] = numArrayVerts;
+#endif
+			}
+#elif XASH_PREFER_DRAW_MODE == GL_TRIANGLES
 			// build in indices
 			if( vertexState++ < 3 )
 			{
@@ -1626,6 +1677,9 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
                 arrayelems[numArrayElems++] = numArrayVerts - 1;
                 arrayelems[numArrayElems++] = numArrayVerts;
 			}
+#else
+#error "unsupported draw mode"
+#endif
 
 			vec3_t av, nv;
 #ifdef XASH_SHADER
@@ -1689,7 +1743,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
         pglVertexAttribPointerARB(g_pstudioshader->attrib.aPos, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, pos));
         pglVertexAttribPointerARB(g_pstudioshader->attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, coord));
         pglVertexAttribPointerARB(g_pstudioshader->attrib.aNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, norm));
-        pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const byte *)arrayelems + (startArrayElems * sizeof(unsigned short)) );
+        pglDrawElements( XASH_PREFER_DRAW_MODE, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const byte *)arrayelems + (startArrayElems * sizeof(unsigned short)) );
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aPos);
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aTexCoord);
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aNormal);
@@ -1709,7 +1763,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
             pglColorPointer( 4, GL_UNSIGNED_BYTE, 0, g_xarraycolor );
         }
 
-        pglDrawElements( GL_TRIANGLES, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
+        pglDrawElements( XASH_PREFER_DRAW_MODE, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, &g_xarrayelems[startArrayElems] );
         pglDisableClientState( GL_VERTEX_ARRAY );
         pglDisableClientState( GL_TEXTURE_COORD_ARRAY );
         if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
@@ -2232,7 +2286,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		{
 			color24	*clr;
 			clr = &RI.currententity->curstate.rendercolor;
-			gTriApi.Color4ub( clr->r, clr->g, clr->b, 255 );
+			//gTriApi.Color4ub( clr->r, clr->g, clr->b, 255 );
 			alpha = 1.0f;
 		}
 		else if( g_nFaceFlags & STUDIO_NF_TRANSPARENT && R_StudioOpaque( RI.currententity ))
@@ -2437,6 +2491,9 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			pglUniform4fARB(g_pstudioshader->uniform.texOffset, 0, 0, 1, 1);
 		}
 #endif
+#ifdef XASH_USE_PRIMITIVE_RESTART
+		pglEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+#endif
 #ifdef XASH_SHADER_VBO
 		if(xe::TexLru_IsTextureUploaded(attr.index))
 		{
@@ -2447,10 +2504,13 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		{
 			R_StudioDrawMesh(ptricmds, s, t, alpha, scale);
 		}
-		xe::StudioLru_DrawMesh();
+		xe::StudioLru_DrawMesh(XASH_PREFER_DRAW_MODE);
 		xe::StudioLru_UnbindVBO();
 #else
 		R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
+#endif
+#ifdef XASH_USE_PRIMITIVE_RESTART
+		pglDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 #endif
 
 		if (use_cubemap)

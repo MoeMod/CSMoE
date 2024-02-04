@@ -42,7 +42,7 @@ namespace xe {
         void Unbind();
         bool HasCachedData() const;
         void Submit(int startArrayElems, int numArrayElems, int startArrayVerts, int numArrayVerts);
-        void DrawElements() const;
+        void DrawElements(int mode) const;
 
 	private:
 		void EnableVA() const;
@@ -152,14 +152,14 @@ namespace xe {
 		pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aNormal);
 	}
 
-    void studiolru_vbo_cache::DrawElements() const
+    void studiolru_vbo_cache::DrawElements(int mode) const
 	{
 #ifdef XASH_SHADER_VAO
 		pglBindVertexArray(studiovao);
 #else
 	    EnableVA();
 #endif
-        pglDrawRangeElements( GL_TRIANGLES, startVerts, numVerts, numElems, GL_UNSIGNED_SHORT, (const GLvoid *)(startElems * sizeof(unsigned short)) );
+        pglDrawRangeElements( mode, startVerts, numVerts, numElems, GL_UNSIGNED_SHORT, (const GLvoid *)(startElems * sizeof(unsigned short)) );
 #ifdef XASH_SHADER_VAO
 	    pglBindVertexArray(0);
 #else
@@ -199,9 +199,9 @@ namespace xe {
         current_studiolru_vbo->Submit(startArrayElems, numArrayElems, startArrayVerts, numArrayVerts);
     }
 
-    void StudioLru_DrawMesh()
+    void StudioLru_DrawMesh(int mode)
     {
-        current_studiolru_vbo->DrawElements();
+        current_studiolru_vbo->DrawElements(mode);
     }
 
     void StudioLru_Init()
