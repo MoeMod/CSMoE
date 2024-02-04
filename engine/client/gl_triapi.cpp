@@ -425,12 +425,17 @@ void GAME_EXPORT TriEnd( void )
 	if(xe::TriFFE.primitive_mode == TRI_POINTS)
 	{
 		mode = GL_POINTS;
+		pglEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
 	}
 	if(xe::TriFFE.primitive_mode == TRI_LINES)
 	{
 		mode = GL_LINES;
 	}
 	pglDrawElements(mode, (GLsizei)xe::TriFFE.index_buffer.size(), GL_UNSIGNED_SHORT, (void*)(intptr_t)(0));
+	if(xe::TriFFE.primitive_mode == TRI_POINTS)
+	{
+		pglDisable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
+	}
 
 	pglDisableVertexAttribArrayARB(xe::TriFFE.attrib.pos);
 	pglDisableVertexAttribArrayARB(xe::TriFFE.attrib.uv);

@@ -278,11 +278,11 @@ void GL_TexFilter( gltexture_t *tex, qboolean update )
 	}
 	else if( tex->flags & ( TF_BORDER|TF_ALPHA_BORDER ))
 	{
-		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
-		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
+		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER_ARB );
+		pglTexParameteri( tex->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER_ARB );
 
 		if( tex->target == GL_TEXTURE_CUBE_MAP_ARB )
-			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER );
+			pglTexParameteri( tex->target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER_ARB );
 
 		if( tex->flags & TF_BORDER )
 			pglTexParameterfv( tex->target, GL_TEXTURE_BORDER_COLOR, zeroClampBorder.data() );
@@ -433,6 +433,21 @@ void R_TextureList_f( void )
 		case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
 			Msg( "DXT5  " );
 			break;
+		case GL_COMPRESSED_RGBA_ASTC_4x4_KHR:
+			Msg( "ASTC4x4 " );
+			break;
+		case GL_COMPRESSED_RGBA_ASTC_6x6_KHR:
+			Msg( "ASTC6x6  " );
+			break;
+		case GL_COMPRESSED_RGBA_ASTC_8x8_KHR:
+			Msg( "ASTC8x8  " );
+			break;
+		case GL_COMPRESSED_RGBA_ASTC_10x10_KHR:
+			Msg( "ASTC10x10  " );
+			break;
+		case GL_COMPRESSED_RGBA_ASTC_12x12_KHR:
+			Msg( "ASTC12x12  " );
+			break;
 		case GL_RGBA:
 			Msg( "RGBA  " );
 			break;
@@ -448,31 +463,10 @@ void R_TextureList_f( void )
 		case GL_RGB8:
 			Msg( "RGB8  " );
 			break;
-		case GL_RGB5:
-			Msg( "RGB5  " );
-			break;
-		case GL_LUMINANCE4_ALPHA4:
-			Msg( "L4A4  " );
-			break;
 		case GL_LUMINANCE_ALPHA:
-		case GL_LUMINANCE8_ALPHA8:
-			Msg( "L8A8  " );
-			break;
-		case GL_LUMINANCE4:
-			Msg( "L4    " );
-			break;
 		case GL_LUMINANCE:
-		case GL_LUMINANCE8:
-			Msg( "L8    " );
-			break;
-		case GL_ALPHA8:
-			Msg( "A8    " );
-			break;
-		case GL_INTENSITY8:
-			Msg( "I8    " );
-			break;
 		case GL_DEPTH_COMPONENT:
-		case GL_DEPTH_COMPONENT24:
+		case GL_DEPTH_COMPONENT24_ARB:
 			Msg( "DEPTH24" );
 			break;
 		case GL_DEPTH_COMPONENT32F:
@@ -691,145 +685,6 @@ void GL_RoundImageDimensions( word *width, word *height, texFlags_t flags, qbool
 
 	*width = scaledWidth;
 	*height = scaledHeight;
-}
-
-/*
-===============
-GL_TextureFormat
-===============
-*/
-static GLenum GL_TextureFormat( gltexture_t *tex, int *samples )
-{
-	qboolean	compress;
-	GLenum	format;
-
-	// check if it should be compressed
-	if( !gl_compress_textures->integer || ( tex->flags & TF_UNCOMPRESSED ))
-		compress = false;
-	else compress = GL_Support( GL_TEXTURE_COMPRESSION_EXT );
-
-	// set texture format
-	if( tex->flags & TF_DEPTHMAP )
-	{
-		if( tex->flags & TF_FLOAT && GL_Support( GL_ARB_DEPTH_FLOAT_EXT ))
-			format = GL_DEPTH_COMPONENT32F;
-		else format = GL_DEPTH_COMPONENT24;
-		tex->flags &= ~TF_INTENSITY;
-	}
-	else if( tex->flags & TF_FLOAT && GL_Support( GL_ARB_TEXTURE_FLOAT_EXT ))
-	{
-		int	bits = glw_state.desktopBitsPixel;
-
-		switch( *samples )
-		{
-		case 1:
-			switch( bits )
-			{
-			case 16: format = GL_LUMINANCE16F_ARB; break;
-			default: format = GL_LUMINANCE32F_ARB; break;
-			}
-			break;
-		case 2:
-			switch( bits )
-			{
-			case 16: format = GL_LUMINANCE_ALPHA16F_ARB; break;
-			default: format = GL_LUMINANCE_ALPHA32F_ARB; break;
-			}
-			break;
-		case 3:
-			switch( bits )
-			{
-			case 16: format = GL_RGB16F_ARB; break;
-			default: format = GL_RGB32F_ARB; break;
-			}
-			break;		
-		case 4:
-		default:
-			switch( bits )
-			{
-			case 16: format = GL_RGBA16F_ARB; break;
-			default: format = GL_RGBA32F_ARB; break;
-			}
-			break;
-		}
-	}
-	else if( tex->flags & TF_FONT_ALPHA )
-	{
-		format = GL_ALPHA;
-	}
-	else if( compress )
-	{
-		switch( *samples )
-		{
-		case 1: format = GL_COMPRESSED_LUMINANCE_ARB; break;
-		case 2: format = GL_COMPRESSED_LUMINANCE_ALPHA_ARB; break;
-		case 3: format = GL_COMPRESSED_RGB_ARB; break;
-		case 4:
-		default: format = GL_COMPRESSED_RGBA_ARB; break;
-		}
-
-		if( tex->flags & TF_INTENSITY )
-			format = GL_COMPRESSED_INTENSITY_ARB;
-		tex->flags &= ~TF_INTENSITY;
-	}
-	else
-	{
-		int	bits = glw_state.desktopBitsPixel;
-
-		switch( *samples )
-		{
-		case 1: format = GL_LUMINANCE8; break;
-		case 2: format = GL_LUMINANCE8_ALPHA8; break;
-		case 3:
-			if( gl_luminance_textures->integer && !( tex->flags & TF_UNCOMPRESSED ) )
-			{
-				switch( bits )
-				{
-				case 16: format = GL_LUMINANCE4; break;
-				case 32: format = GL_LUMINANCE8; break;
-				default: format = GL_LUMINANCE; break;
-				}
-				*samples = 1;	// merge for right calc statistics
-			}
-			else
-			{
-				switch( bits )
-				{
-				case 16: format = GL_RGB5; break;
-				case 32: format = GL_RGB8; break;
-				default: format = GL_RGB; break;
-				}
-			}
-			break;		
-		case 4:
-		default:
-			if( gl_luminance_textures->integer && !( tex->flags & TF_UNCOMPRESSED ) )
-			{
-				switch( bits )
-				{
-				case 16: format = GL_LUMINANCE4_ALPHA4; break;
-				case 32: format = GL_LUMINANCE8_ALPHA8; break;
-				default: format = GL_LUMINANCE_ALPHA; break;
-				}
-				*samples = 2;	// merge for right calc statistics
-			}
-			else
-			{
-				switch( bits )
-				{
-				case 16: format = GL_RGBA4; break;
-				case 32: format = GL_RGBA8; break;
-				default: format = GL_RGBA; break;
-				}
-			}
-			break;
-		}
-
-		if( tex->flags & TF_INTENSITY )
-			format = GL_INTENSITY8;
-		tex->flags &= ~TF_INTENSITY;
-	}
-	return format;
 }
 
 /*
@@ -1258,7 +1113,7 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
 {
 	byte		*buf, *data;
 	const byte	*bufend;
-	GLenum		outFormat, inFormat, glTarget;
+	GLenum		inFormat, glTarget;
 	uint		i, s, numSides, offset = 0, err;
 	int		texsize = 0, img_flags = 0, samples;
 	GLint		dataType = GL_UNSIGNED_BYTE;
@@ -1331,8 +1186,7 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
 
 	// determine format
 	inFormat = PFDesc[pic->type].glFormat;
-	outFormat = inFormat;
-	tex->format = outFormat;
+	tex->format = inFormat;
 
 	// determine target
 	tex->target = glTarget = GL_TEXTURE_2D;
@@ -1437,7 +1291,7 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
             else
             {
                 if( subImage ) pglTexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, 0, 0, tex->width, tex->height, inFormat, dataType, data );
-                else pglTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, outFormat, tex->width, tex->height, 0, inFormat, dataType, data );
+                else pglTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, inFormat, tex->width, tex->height, 0, inFormat, dataType, data );
                 GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
             }
 		}
@@ -1451,7 +1305,7 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
             else
             {
                 if( subImage ) pglTexSubImage2D( tex->target, 0, 0, 0, tex->width, tex->height, inFormat, dataType, data );
-                else pglTexImage2D( tex->target, 0, outFormat, tex->width, tex->height, 0, inFormat, dataType, data );
+                else pglTexImage2D( tex->target, 0, inFormat, tex->width, tex->height, 0, inFormat, dataType, data );
                 GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
             }
 		}

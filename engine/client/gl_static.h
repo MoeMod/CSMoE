@@ -123,8 +123,8 @@ extern "C" {
 #define pglVertexAttribPointerARB GL_MANGLE(glVertexAttribPointer)
 #define pglViewport GL_MANGLE(glViewport)
 
+// ES3 draw range elements
 #define pglDrawRangeElements GL_MANGLE(glDrawRangeElements)
-#define pglDrawRangeElementsEXT GL_MANGLE(glDrawRangeElementsEXT)
 
 // ES3 UBO
 #define pglBindBufferRange GL_MANGLE(glBindBufferRange)

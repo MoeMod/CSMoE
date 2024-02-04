@@ -325,17 +325,11 @@ GL_SetTexCoordArrayMode
 void GL_SetTexCoordArrayMode( GLenum mode )
 {
 	int	tmu = min( glConfig.max_texture_coords, glState.activeTMU );
-	int	bit, cmode = glState.texCoordArrayMode[tmu];
+	int cmode = glState.texCoordArrayMode[tmu];
 
-	if( mode == GL_TEXTURE_COORD_ARRAY )
-		bit = 1;
-	else if( mode == GL_TEXTURE_CUBE_MAP_ARB )
-		bit = 2;
-	else bit = 0;
-
-	if( cmode != bit )
+	if( cmode != mode )
 	{
-		glState.texCoordArrayMode[tmu] = bit;
+		glState.texCoordArrayMode[tmu] = mode;
 	}
 }
 
