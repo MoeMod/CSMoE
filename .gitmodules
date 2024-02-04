@@ -1,15 +1,6 @@
-[submodule "nanogl"]
-	path = nanogl
-	url = https://github.com/MoeMod/nanogl
-[submodule "gl-wes-v2"]
-	path = gl-wes-v2
-	url = https://github.com/MoeMod/gl-wes-v2
 [submodule "imgui"]
 	path = imgui
 	url = https://github.com/MoeMod/imgui
-[submodule "3rdparty/QindieGL"]
-	path = 3rdparty/QindieGL
-	url = https://github.com/MoeMod/QindieGL
 [submodule "3rdparty/openssl-cmake"]
 	path = 3rdparty/openssl-cmake
 	url = https://github.com/janbar/openssl-cmake
@@ -34,9 +25,6 @@
 [submodule "3rdparty/lua-cmake"]
 	path = 3rdparty/lua-cmake
 	url = https://github.com/MoeMod/lua-cmake
-[submodule "3rdparty/gl4es"]
-	path = 3rdparty/gl4es
-	url = https://github.com/ptitSeb/gl4es
 [submodule "3rdparty/opus"]
 	path = 3rdparty/opus
 	url = https://github.com/xiph/opus
