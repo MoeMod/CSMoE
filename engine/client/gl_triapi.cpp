@@ -20,9 +20,9 @@ GNU General Public License for more details.
 #include "triangleapi.h"
 #include "gl_triapi.h"
 #include "gl_shader.h"
+#include "gl_primitive.h"
 
 #include <vector>
-#include <numeric>
 
 #define XASH_SHADER_TRIAPI 1
 
@@ -78,105 +78,24 @@ namespace xe {
 			vertex_buffer.emplace_back(TriApi_VertexData{ cur_pos, cur_uv, cur_col });
 		}
 
-		size_t genIotaIndices() {
-			index_buffer.resize(vertex_buffer.size());
-			//for (int i = 0; i < vertex_buffer.size() - 2; i+=3) {
-			//	index_buffer.emplace_back(0 + i);
-			//	index_buffer.emplace_back(1 + i);
-			//	index_buffer.emplace_back(2 + i);
-			//}
-			std::iota(index_buffer.begin(), index_buffer.end(), 0);
-			return index_buffer.size();
-		}
-
-		size_t genQuadsIndices()
-		{
-			index_buffer.clear();
-			for (int i = 0; i < vertex_buffer.size() - 3; i+=4) {
-				index_buffer.emplace_back(0 + i);
-				index_buffer.emplace_back(1 + i);
-				index_buffer.emplace_back(2 + i);
-
-				index_buffer.emplace_back(0 + i);
-				index_buffer.emplace_back(2 + i);
-				index_buffer.emplace_back(3 + i);
-			}
-			return index_buffer.size();
-		}
-
-		size_t genTriangleStripIndices()
-		{
-			index_buffer.clear();
-			for (int i = 2; i < vertex_buffer.size(); ++i) {
-				if( i & 1 )
-				{
-					// draw triangle [n-1 n-2 n]
-					index_buffer.emplace_back(i - 1);
-					index_buffer.emplace_back(i - 2);
-					index_buffer.emplace_back(i);
-				}
-				else
-				{
-					// draw triangle [n-2 n-1 n]
-					index_buffer.emplace_back(i - 2);
-					index_buffer.emplace_back(i - 1);
-					index_buffer.emplace_back(i);
-				}
-			}
-			return index_buffer.size();
-		}
-
-		size_t genTriangleFanIndices()
-		{
-			index_buffer.clear();
-			for (int i = 2; i < vertex_buffer.size(); ++i) {
-				// draw triangle [0 n-1 n]
-				index_buffer.emplace_back(0);
-				index_buffer.emplace_back(i - 1);
-				index_buffer.emplace_back(i);
-			}
-			return index_buffer.size();
-		}
-
-		size_t genQuadsStripIndices()
-		{
-			index_buffer.clear();
-			for (int i = 2; i < vertex_buffer.size() - 1; i+=2) {
-				index_buffer.emplace_back(i - 2);
-				index_buffer.emplace_back(i - 1);
-				index_buffer.emplace_back(i);
-
-				index_buffer.emplace_back(i - 2);
-				index_buffer.emplace_back(i);
-				index_buffer.emplace_back(i + 1);
-			}
-			return index_buffer.size();
-		}
-
-		size_t genPolygonIndices()
-		{
-			// TODO
-			return genTriangleFanIndices();
-		}
-
 		size_t genIndices()
 		{
 			if(primitive_mode == TRI_TRIANGLES)
-				return genIotaIndices();
+				return genIotaIndices(index_buffer, vertex_buffer.size());
 			if(primitive_mode == TRI_QUADS)
-				return genQuadsIndices();
+				return genQuadsIndices(index_buffer, vertex_buffer.size());
 			if(primitive_mode == TRI_TRIANGLE_STRIP)
-				return genTriangleStripIndices();
+				return genTriangleStripIndices(index_buffer, vertex_buffer.size());
 			if(primitive_mode == TRI_TRIANGLE_FAN)
-				return genTriangleFanIndices();
+				return genTriangleFanIndices(index_buffer, vertex_buffer.size());
 			if(primitive_mode == TRI_QUAD_STRIP)
-				return genQuadsStripIndices();
+				return genQuadsStripIndices(index_buffer, vertex_buffer.size());
 			if(primitive_mode == TRI_POLYGON)
-				return genPolygonIndices();
+				return genPolygonIndices(index_buffer, vertex_buffer.size());
 			if(primitive_mode == TRI_POINTS)
-				return genIotaIndices();
+				return genIotaIndices(index_buffer, vertex_buffer.size());
 			if(primitive_mode == TRI_LINES)
-				return genIotaIndices();
+				return genIotaIndices(index_buffer, vertex_buffer.size());
 			return 0;
 		}
 		

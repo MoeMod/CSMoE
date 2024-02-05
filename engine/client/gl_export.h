@@ -112,8 +112,7 @@ typedef float GLmatrix[16];
 #define GL_TRIANGLE_FAN			0x0006
 //#define GL_QUADS				0x0007
 //#define GL_QUAD_STRIP			0x0008
-#define GL_POLYGON				0x0009
-// TODO : remove GL_POLYGON
+//#define GL_POLYGON				0x0009
 
 // boolean
 #define GL_FALSE				0x0
