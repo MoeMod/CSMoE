@@ -84,7 +84,7 @@ namespace luash
 			return (... || ((I == N - 1) ? MetaNewIndexImpl2(L, N, args) : false));
 		}
 	}
-	template<class T, class Base, bool = IsCompleteType<typename std::remove_cv<T>::type>::value>
+	template<class T, class Base, bool = IsCompleteType<typename std::remove_cv<T>::type>::value && std::is_scalar<typename std::remove_cv<T>::type>::value >
 	class TypeInterfaceDecoratorComplete : public Base
 	{
 	public:
