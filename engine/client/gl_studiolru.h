@@ -20,16 +20,16 @@ GNU General Public License for more details.
 typedef struct studio_vertex_attrib_item_s {
     GLfloat pos[3];
     GLfloat boneIdx;
+	GLfloat norm[3];
     GLfloat coord[2];
-    GLubyte norm[3];
 } studio_vertex_attrib_item_t;
 
 namespace xe {
     void StudioLru_Init();
     void StudioLru_Shutdown();
     // return true if already has result, false if new vbo is created
-    void StudioLru_BindVBO(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags);
-    void StudioLru_UnbindVBO();
+    void StudioLru_Bind(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags);
+    void StudioLru_Unbind();
     bool StudioLru_HasCachedData();
     void StudioLru_Submit(int startArrayElems, int numArrayElems, int startArrayVerts, int numArrayVerts);
     void StudioLru_DrawMesh(int mode);

@@ -2464,7 +2464,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
             ambient = 1;
             shadeLight = 0;
         }
-        else if((g_nFaceFlags & STUDIO_NF_FLATSHADE) || true) // TODO : fix shadelight
+        else if((g_nFaceFlags & STUDIO_NF_FLATSHADE)) // TODO : fix shadelight
         {
             ambient = (g_studiolight.ambientlight + g_studiolight.shadelight * 0.8) / 255.0f;
             shadeLight = 0;
@@ -2499,13 +2499,13 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		{
 			xe::StudioLru_RemoveCachedData(m_pStudioHeader, m_pSubModel, j, !(g_nForceFaceFlags& STUDIO_NF_CHROME));
 		}
-		xe::StudioLru_BindVBO(m_pStudioHeader, m_pSubModel, j, !(g_nForceFaceFlags& STUDIO_NF_CHROME));
+		xe::StudioLru_Bind(m_pStudioHeader, m_pSubModel, j, !(g_nForceFaceFlags& STUDIO_NF_CHROME));
 		if (!xe::StudioLru_HasCachedData())
 		{
 			R_StudioDrawMesh(ptricmds, s, t, alpha, scale);
 		}
 		xe::StudioLru_DrawMesh(XASH_PREFER_DRAW_MODE);
-		xe::StudioLru_UnbindVBO();
+		xe::StudioLru_Unbind();
 #else
 		R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
 #endif

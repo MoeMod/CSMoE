@@ -113,12 +113,22 @@ namespace xe {
 
 	void studiolru_vbo_cache::Bind()
 	{
-		return BindVBO();
+#ifdef XASH_SHADER_VAO
+		pglBindVertexArray(studiovao);
+#else
+		BindVBO();
+	    EnableVA();
+#endif
 	}
 
 	void studiolru_vbo_cache::Unbind()
 	{
-		return UnbindVBO();
+#ifdef XASH_SHADER_VAO
+		pglBindVertexArray(0);
+#else
+		DisableVA();
+		UnbindVBO();
+#endif
 	}
 
     bool studiolru_vbo_cache::HasCachedData() const
@@ -154,17 +164,7 @@ namespace xe {
 
     void studiolru_vbo_cache::DrawElements(int mode) const
 	{
-#ifdef XASH_SHADER_VAO
-		pglBindVertexArray(studiovao);
-#else
-	    EnableVA();
-#endif
         pglDrawRangeElements( mode, startVerts, numVerts, numElems, GL_UNSIGNED_SHORT, (const GLvoid *)(startElems * sizeof(unsigned short)) );
-#ifdef XASH_SHADER_VAO
-	    pglBindVertexArray(0);
-#else
-	    DisableVA();
-#endif
     }
 
     static lru_cache<studiolru_key_t, std::shared_ptr<studiolru_vbo_cache>> studiovbocache(512);
@@ -175,7 +175,7 @@ namespace xe {
         return current_studiolru_vbo->HasCachedData();
     }
 
-    void StudioLru_BindVBO(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags)
+    void StudioLru_Bind(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags)
     {
         studiolru_key_t key{ studiohdr, submodel, mesh, flags };
         current_studiolru_vbo = studiovbocache.get(key).value_or(nullptr);
@@ -188,7 +188,7 @@ namespace xe {
         current_studiolru_vbo->Bind();
     }
 
-    void StudioLru_UnbindVBO()
+    void StudioLru_Unbind()
     {
         current_studiolru_vbo->Unbind();
         current_studiolru_vbo = nullptr;
