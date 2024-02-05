@@ -602,8 +602,6 @@ typedef struct watershader_s {
     } attrib;
 
     GLuint array_buffer;
-    GLuint index_buffer;
-	std::vector<unsigned short> temp_index_buffer;
 } watershader_t;
 watershader_t g_WaterShader;
 void R_InitSurfaceShader()
@@ -676,7 +674,6 @@ void main (void)
     g_WaterShader.attrib.vaTexCoord = pglGetAttribLocationARB(g_WaterShader.program, "vaTexCoord");
 
     pglGenBuffersARB( 1, &g_WaterShader.array_buffer);
-    pglGenBuffersARB( 1, &g_WaterShader.index_buffer);
 }
 
 void R_ShutdownSurfaceShader()
@@ -688,7 +685,6 @@ void R_ShutdownSurfaceShader()
     pglDeleteProgram(g_WaterShader.program);
 
     pglDeleteBuffersARB( 1, &g_WaterShader.array_buffer);
-    pglDeleteBuffersARB( 1, &g_WaterShader.index_buffer);
 }
 #endif
 
@@ -720,17 +716,14 @@ void EmitWaterPolys( glpoly_t *polys, qboolean noCull )
     pglUniform1fARB(g_WaterShader.uniform.waveHeight, waveHeight);
     pglUniformMatrix4fvARB(g_WaterShader.uniform.muWVP, 1, GL_FALSE, (const float*)&RI.worldviewProjectionMatrixTranspose);
     pglBindBufferARB( GL_ARRAY_BUFFER_ARB, g_WaterShader.array_buffer );
-    pglBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_WaterShader.index_buffer );
     pglEnableVertexAttribArrayARB(g_WaterShader.attrib.vaPosition);
     pglEnableVertexAttribArrayARB(g_WaterShader.attrib.vaTexCoord);
     pglVertexAttribPointerARB(g_WaterShader.attrib.vaPosition, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid *)offsetof(vertex_t, xyz));
     pglVertexAttribPointerARB(g_WaterShader.attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (const GLvoid *)offsetof(vertex_t, s1t1));
     for( p = polys; p; p = p->next )
     {
-	    xe::genPolygonIndices(g_WaterShader.temp_index_buffer, p->numverts);
         pglBufferDataARB( GL_ARRAY_BUFFER_ARB, p->numverts * sizeof(vertex_t), p->verts, GL_STREAM_DRAW_ARB);
-        pglBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, g_WaterShader.temp_index_buffer.size() * sizeof(unsigned short), g_WaterShader.temp_index_buffer.data(), GL_STREAM_DRAW_ARB);
-	    pglDrawElements( GL_TRIANGLES, (GLsizei)g_WaterShader.temp_index_buffer.size(), GL_UNSIGNED_SHORT, (void*)(intptr_t)(0) );
+	    pglDrawArrays( GL_TRIANGLE_FAN, 0, p->numverts );
     }
     pglDisableVertexAttribArrayARB(g_WaterShader.attrib.vaPosition);
     pglDisableVertexAttribArrayARB(g_WaterShader.attrib.vaTexCoord);
