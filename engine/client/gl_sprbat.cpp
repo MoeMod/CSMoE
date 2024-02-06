@@ -296,10 +296,7 @@ namespace xe {
 	out vec2 vvTexCoord;
 	void main(void)
 	{
-	    gl_Position = muWVP * vec4((org + scale * (
-			((1.0 - vaTexCoord.x) * frame.z + vaTexCoord.x * frame.w) * v_right +
-			((1.0 - vaTexCoord.y) * frame.x + vaTexCoord.y * frame.y) * v_up
-		)), 1.0);
+		gl_Position = muWVP * vec4(mat3(v_right, v_up, org) * vec3(scale * ((1.0 - vaTexCoord) * frame.zx + vaTexCoord * frame.wy), 1.0), 1.0);
 	    vvTexCoord = vaTexCoord;
 	}
 	)"
