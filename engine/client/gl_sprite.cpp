@@ -47,6 +47,12 @@ void R_SpriteInit( void )
 {
 	r_sprite_lerping = Cvar_Get( "r_sprite_lerping", "1", CVAR_ARCHIVE, "enables sprite animation lerping" );
 	r_sprite_lighting = Cvar_Get( "r_sprite_lighting", "1", CVAR_ARCHIVE, "enables sprite lighting (blood etc)" );
+	xe::SprBat_InitShader();
+}
+
+void R_SpriteShutdown( void )
+{
+	xe::SprBat_ShutdownShader();
 }
 
 /*

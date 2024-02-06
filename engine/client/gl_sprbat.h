@@ -18,4 +18,7 @@ namespace xe {
 
 	void SprBat_RenderDrawList();
 	void SprBat_AddDrawList( int pass, msprite_t *psprite, mspriteframe_t *frame, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color );
+
+	void SprBat_InitShader();
+	void SprBat_ShutdownShader();
 }

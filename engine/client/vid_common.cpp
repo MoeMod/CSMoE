@@ -708,6 +708,7 @@ void R_Shutdown( void )
 
     R_BspShutdown();
     R_StudioShutdown();
+	R_SpriteShutdown();
 	TriAPI_Shutdown();
 	GL_RemoveCommands();
 	R_ShutdownImages();

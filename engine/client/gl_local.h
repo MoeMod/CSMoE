@@ -424,6 +424,7 @@ void R_AddDecalVBO( decal_t *pdecal, msurface_t *surf );
 // gl_sprite.c
 //
 void R_SpriteInit( void );
+void R_SpriteShutdown( void );
 void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, size_t filesize, qboolean *loaded, uint texFlags );
 mspriteframe_t *R_GetSpriteFrame( const model_t *pModel, int frame, float yaw );
 void R_DrawSpriteModel( cl_entity_t *e );
