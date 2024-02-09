@@ -178,6 +178,8 @@ public:
 	static struct model_s* s_pLaserFistPModel;
 	static struct model_s* s_pLaserFistEXPModel;
 	static struct model_s* s_pLightningARPModel;
+	static struct model_s* s_pSoulReaperViewModel;
+	static struct model_s* s_pSoulReaperPModel;
 
 
 	struct ViewModel

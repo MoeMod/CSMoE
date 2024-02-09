@@ -1573,6 +1573,7 @@ private:
 	int m_iType;
 	int m_iTrail;
 	time_point_t m_flIgniteTime;
+	EHANDLE m_hTarget;
 };
 
 class CKnifeDGAXE_LuBu : public CBaseAnimating

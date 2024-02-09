@@ -165,6 +165,9 @@ struct model_s* CStudioModelRenderer::s_pLaserFistEXPModel;
 
 struct model_s* CStudioModelRenderer::s_pLightningARPModel;
 
+struct model_s* CStudioModelRenderer::s_pSoulReaperViewModel;
+struct model_s* CStudioModelRenderer::s_pSoulReaperPModel;
+
 
 int g_iLeapStrikeGunAnim = 0;
 float g_iLeapStrikeGunAnimTime = 0.0;
@@ -1377,7 +1380,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 						if (info.vecSpriteSkin[i].iTex == -1)
 							break;
 
-						IEngineStudio.StudioAddBindBMPList(m_pCurrentEntity, m_pStudioHeader, info.vecSpriteSkin[i].szSprName, info.vecSpriteSkin[i].iTex, info.iFlag, info.flFrameRate, info.flStartTime, info.flEndTime);
+						IEngineStudio.StudioAddBindBMPList(m_pCurrentEntity, m_pStudioHeader, info.vecSpriteSkin[i].szSprName.c_str(), info.vecSpriteSkin[i].iTex, info.iFlag, info.flFrameRate, info.flStartTime, info.flEndTime);
 					}
 
 					//AddToBmpListOnce

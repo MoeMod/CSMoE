@@ -566,6 +566,8 @@ void UTIL_TempEmit(const char* model, int iEmitCounter, int fireDelay, int life,
 void UTIL_SetPlayerPModel(int iPlayerIndex, int iWeaponID, int iState);
 void UTIL_PlayAnimation(CBaseEntity* pEntity, const char* szFile, int iAnimJsonFlag, int iAnimPostionFlag);
 void UTIL_EMIT_PV_PARTICLE(edict_t* entity, const char* texture, int channel, int emitcount, int interval, int life, int speed, int startsize, int endsize, int startbone, int endbone, int startattachment, int endattachment, Vector startboneoffset, Vector dir, Vector startcolor, Vector endcolor, int startalpha, int endalpha);
+float UTIL_AnglesRotateTo(Vector& eyePos, Vector& vAngles, Vector& goal, Vector& angles, float angle = 5.0);
+int UTIL_CalcDirectionByCrosshair(int playerIndex, float flYaw, Vector vecFinalDirection);
 }
 #else
 namespace cl {

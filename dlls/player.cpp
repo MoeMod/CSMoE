@@ -9793,6 +9793,11 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_Z4B_AK47_ANGELICBEAST:
 		case WEAPON_LIGHTNINGAR:
 		case WEAPON_Z4B_M4A1_S_TRANSFORMERS:
+		case WEAPON_SOULREAPER:
+		case WEAPON_CHAINMG:
+		case WEAPON_HALOGUN:
+		case WEAPON_SPEARGUNEX:
+		case WEAPON_Y24S1LASERMINIGUN:
 			return TRUE;
 		}
 	}

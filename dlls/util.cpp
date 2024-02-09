@@ -3108,4 +3108,77 @@ void UTIL_EMIT_PV_PARTICLE(edict_t* entity, const char* texture, int channel, in
 	MESSAGE_END();
 }
 
+/**
+ * 将一个角度朝着一个坐标旋转指定的角度(对导弹使用)
+ *
+ * 参数1:眼睛坐标
+ * 参数2:屏幕角度(角度的[0]减法为上旋,加法为下旋)
+ * 参数3:目标坐标
+ * 参数4:储存计算出来的模型角度(角度的[0]减法为下旋,加法为上旋)
+ * 参数5:指定要旋转多少度.不填则默认为5度
+ * 返回值:还需旋转多少度才能精确瞄准目标坐标
+*/
+
+float UTIL_AnglesRotateTo(Vector &eyePos, Vector &vAngles, Vector &goal, Vector &angles, float angle)
+{
+	Vector vecAim, vecRight, vecUp;
+	AngleVectors(vAngles, vecAim, vecRight, vecUp);
+
+	Vector vecIdeal = goal - eyePos;
+	float lenVecIdeal = vecIdeal.Length();
+
+	float angDiff = acos(DotProduct(vecAim, vecIdeal) / lenVecIdeal * M_PI / 180.0) ;
+
+		// 如果夹角小于等于角速度,直接精确瞄准
+	if (angDiff <= angle)
+	{
+		// 将向量转换成模型角度
+		VectorAngles(vecIdeal, angles);
+		return 0.0;
+	}
+	// 如果夹角等于180,则朝任意方向旋转指定度数
+	if (angDiff == 180.0)
+	{
+		// 将屏幕角度转换成模型角度
+		angles[0] = -vAngles[0];
+		angles[1] = vAngles[1];
+		angles[2] = vAngles[2];
+		// x或y轴旋转-angle或angle度数
+		angles[RANDOM_LONG(0, 1)] += RANDOM_LONG(0, 1) ? -angle : angle;
+		return 180.0 - angle;
+	}
+
+	// 向量A叉乘向量B得到向量C:食指表示向量A,拇指表示向量B,形成一个平面.向量C垂直立在这个平面上.其中向量A是该平面的X轴.向量C是Z轴
+	// 将向量vecIdeal视作X轴,求出Z轴向量,再求出Y轴向量
+
+	Vector vecZ, vecY;
+	vecZ = CrossProduct(vecIdeal, vecAim);	//vecIdeal作为X轴,与vecAim形成平面.得到Z轴向量
+	vecY = CrossProduct(vecZ, vecIdeal);	// vecZ与vecAim形成平面,这个平面的Z轴向量等于上一个平面的Y轴向量
+
+	// 在vecIdeal(x轴)和vecY(y轴)和vecAim在同一平面上,vecAim朝着vecIdeal方向旋转指定度数
+	angDiff -= angle;
+		// 将旋转后的角度转换成向量
+	float x = cos(angDiff * 180 / M_PI);
+	float y = sin(angDiff * 180 / M_PI);
+
+	// 更改x轴长度为x
+	vecIdeal[0] = vecIdeal[0] * x / lenVecIdeal;
+	vecIdeal[1] = vecIdeal[1] * x / lenVecIdeal;
+	vecIdeal[2] = vecIdeal[2] * x / lenVecIdeal;
+
+		// 更改y轴长度为y
+	float lenVceY = vecY.Length();
+	vecY[0] = vecY[0] * y / lenVceY;
+	vecY[1] = vecY[1] * y / lenVceY;
+	vecY[2] = vecY[2] * y / lenVceY;
+
+	// 计算出旋转后的vecAim在大世界的实际方向
+	vecAim = vecIdeal + vecY;
+		// 将向量转换为模型角度
+	VectorAngles(vecAim, angles);
+	return angDiff;
+}
+
+
+
 }

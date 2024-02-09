@@ -620,7 +620,7 @@ cl_entity_t* GAME_EXPORT pfnModCurrentEntity(cl_entity_t* ent)
 	return RI.currententity;
 }
 
-void R_StudioAddBindBMPList(cl_entity_s* ent, studiohdr_t* header, std::string sprFile, int texIndex, int flag, float framerate, float starttime, float endtime)
+void R_StudioAddBindBMPList(cl_entity_s* ent, studiohdr_t* header, const char* sprFile, int texIndex, int flag, float framerate, float starttime, float endtime)
 {
 	BindBMPManager().ReadSprInfo(ent, header, sprFile, texIndex, flag, framerate, starttime, endtime);
 }
@@ -2378,20 +2378,23 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 									{
 										//double dt = (cl.time - cl.oldtime);
 										//frame += dt * framerate;
-
-										frame = framerate * (cl.time - RI.currententity->curstate.animtime) + startFrame;
-										
-										if (frame > maxframe)
+										if (iterseq->isLoop)
 										{
-											if (iterseq->isLoop)
+											frame = framerate * cl.time + startFrame;
+
+											if (frame > maxframe)
 											{
 												frame = int(frame) % maxframe + startFrame;
-												//frame = int((frame - startFrame)) % (endFrame - startFrame) + startFrame;
-												//frame = frame - (int)frame;
-												//frame = startFrame;
 											}
-											else
+										}
+										else
+										{
+											frame = framerate * (cl.time - RI.currententity->curstate.animtime) + startFrame;
+
+											if (frame > maxframe)
+											{
 												frame = maxframe;
+											}
 										}
 									}
 

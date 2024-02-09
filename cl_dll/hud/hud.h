@@ -1077,6 +1077,8 @@ public:
 	void DrawMarkEffect(int iHealth, int iMaxHealth, int iClip, int iMaxClip);
 	void SetHeartBeat(int iHeartBeat, bool OpenScope);
 	void DrawAimParticle();
+	void DrawSoulReaperCrossHair(float flTime);
+	void SetSoulReaperAmmo(int iClip, int iMaxAmmo);
 private:
 
 	struct LockOnData
@@ -1236,6 +1238,20 @@ private:
 	UniqueTexture m_iSniperbreathing[3][3];
 
 	int m_iParticleState;
+
+	UniqueTexture m_iSoulReaper_Gauge01;	
+	UniqueTexture m_iSoulReaper_Gauge02;
+	UniqueTexture m_iSoulReaper_Gauge03;
+	UniqueTexture m_iSoulReaper_GaugeBG;
+	UniqueTexture m_iSoulReaper_Gauge01f;
+	UniqueTexture m_iSoulReaper_Gauge02f;
+	UniqueTexture m_iSoulReaper_Gauge03f;
+	UniqueTexture m_iSoulReaper_Object1;
+	UniqueTexture m_iSoulReaper_Object2;
+	UniqueTexture m_iSoulReaper_Object3;
+
+	int m_iSoulReaperClip;
+	int m_iSoulReaperMaxAmmo;
 };
 
 //

@@ -99,6 +99,53 @@ namespace sv {
 		WRITE_BYTE(0);  //speed (if>0 do slow gravity)
 		MESSAGE_END();
 
+		if (m_iType == 1)
+		{
+			//follow mode
+			UTIL_MakeVectors(pev->angles);
+
+			Vector vecSrc, vecEnd;
+			Vector2D vecAngleCheckDir = gpGlobals->v_forward.Make2D().Normalize();
+			float angCheck = cos(60.0 * 0.5 * M_PI / 180.0);
+			vecSrc = pev->origin;
+			CBaseEntity* pEntity = nullptr;
+			TraceResult tr;
+			float Dis = 4096;
+			while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, 4096)) != nullptr)
+			{
+				if (pEntity->edict() == pev->owner)
+					continue;
+
+				if (pEntity->IsDormant())
+					continue;
+
+				if (pEntity->pev->takedamage == DAMAGE_NO)
+					continue;
+
+				if (pEntity->Classify() != CLASS_PLAYER_ALLY && !pEntity->IsPlayer())
+					continue;
+
+				vecEnd = pEntity->BodyTarget(vecSrc);
+
+				if (DotProduct((vecEnd.Make2D() - vecSrc.Make2D()).Normalize(), vecAngleCheckDir) < angCheck)
+					continue;
+
+				UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+
+				if (tr.flFraction < 1.0 && tr.pHit != ENT(pEntity->pev))
+					continue;
+
+				float flDelta = (vecSrc - vecEnd).Length();
+
+				if (flDelta < Dis)
+				{
+					m_hTarget.Set(pEntity->edict());
+					Dis = flDelta;
+				}
+				
+			}
+		}
+
 		m_flIgniteTime = gpGlobals->time;
 
 		SetThink(&CAT4Rocket::FollowThink);
@@ -107,9 +154,21 @@ namespace sv {
 
 	void CAT4Rocket::FollowThink()
 	{
+		if (m_iType == 1 && m_hTarget)
+		{
+			edict_t* pEnt = m_hTarget.Get();
+			UTIL_AnglesRotateTo(pev->origin, pev->angles, pEnt->v.origin, pev->angles, 10.0);
+		}
+
 		UTIL_MakeAimVectors(pev->angles);
 
 		pev->angles = UTIL_VecToAngles(gpGlobals->v_forward);
+
+		if (m_iType == 1 && m_hTarget)
+		{
+			pev->velocity = gpGlobals->v_forward * 1000;
+		}
+
 		pev->nextthink = gpGlobals->time + 0.1s;
 	}
 

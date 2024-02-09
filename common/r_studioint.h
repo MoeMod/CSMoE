@@ -164,7 +164,7 @@ typedef struct engine_studio_api_s
 	void (*StudioPgluPerspective)(double fovy, double aspect, double zNear, double zFar);
 	void (*StudioGetProjectionMatrix)(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix);
 	void (*StudioSetProjectionMatrix)(matrix4x4& worldviewmatrix, matrix4x4& projectionmatrix);
-	void (*StudioAddBindBMPList)(cl_entity_s* ent, studiohdr_t* header, std::string sprFile, int texIndex, int flag, float framerate, float starttime, float endtime);
+	void (*StudioAddBindBMPList)(cl_entity_s* ent, studiohdr_t* header, const char* sprFile, int texIndex, int flag, float framerate, float starttime, float endtime);
 
 } engine_studio_api_t;
 

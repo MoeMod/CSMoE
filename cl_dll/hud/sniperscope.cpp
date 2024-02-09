@@ -258,6 +258,14 @@ int CHudSniperScope::VidInit()
 	m_iHeartBeat = 0;
 	m_flInScopeTime = 0.0;
 
+	R_InitTexture(m_iSoulReaper_Gauge01, "sprites/soulreaper_gauge_01.tga");	//36*4
+	R_InitTexture(m_iSoulReaper_Gauge02, "sprites/soulreaper_gauge_02.tga");
+	R_InitTexture(m_iSoulReaper_Gauge03, "sprites/soulreaper_gauge_03.tga");
+	R_InitTexture(m_iSoulReaper_GaugeBG, "sprites/soulreaper_gauge_bg.tga");	//124*8
+
+	m_iSoulReaperClip = 0;
+	m_iSoulReaperMaxAmmo = 60;
+
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
@@ -572,6 +580,11 @@ int CHudSniperScope::Draw(float flTime)
 		else if (pActiveBTEWeapon->m_iId == WEAPON_HALOGUN)
 		{
 			DrawHaloGunCrossHair(flTime);
+			return 1;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_SOULREAPER)
+		{
+			DrawSoulReaperCrossHair(flTime);
 			return 1;
 		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_BUNKERBUSTER)
@@ -1930,6 +1943,78 @@ void CHudSniperScope::DrawAimParticle()
 			g_ParticleManager.ModifyStaticParticle("PV-M4A1_S_Transformers.mdl", nullptr, 0, 255, 0.01, 0.6, 30, 1.3, 1.3, 255, 255, 1, 2, { 0, 0, 0 }, { 0, 0, 0 }, { 235, 51, 36 }, { 240, 134, 80 }, 0.8, 0.8, { 0, 0, 0 }, { 0, 0, 0 });
 		}
 	}
+}
+
+void CHudSniperScope::SetSoulReaperAmmo(int iClip, int iMaxAmmo)
+{
+	m_iSoulReaperClip = iClip;
+	m_iSoulReaperMaxAmmo = iMaxAmmo;
+}
+
+void CHudSniperScope::DrawSoulReaperCrossHair(float flTime)
+{
+	int iX = ScreenWidth / 2;
+	int iY = ScreenHeight / 2;
+
+	int iWidth, iHeight;
+
+	iHeight = m_iSoulReaper_Gauge01->h();
+	iWidth = m_iSoulReaper_Gauge01->w();
+
+	static constexpr int perGauge = 20;
+	static constexpr int offset = 4;
+	static constexpr float scale = 1.2;
+
+	int iCenter = m_iSoulReaper_GaugeBG->w() / 2 - iWidth;
+
+	//36*4
+	//124*8
+
+	int iClip = floor(float(m_iSoulReaperClip) / float(perGauge));
+	float percent = float(m_iSoulReaperClip - iClip * perGauge) / float(perGauge);
+
+
+	m_iSoulReaper_GaugeBG->FuncDraw2DQuadScaled(iX - m_iSoulReaper_GaugeBG->w() / 2, iY + m_iSoulReaper_GaugeBG->h() * offset, m_iSoulReaper_GaugeBG->w(), m_iSoulReaper_GaugeBG->h());
+
+	switch (iClip)
+	{
+	case 0:
+	{	
+		m_iSoulReaper_Gauge01->FuncDraw2DQuadScaled(iX - m_iSoulReaper_GaugeBG->w() / 2, iY + m_iSoulReaper_GaugeBG->h() * offset, iWidth * percent * scale, iHeight * scale, 0, 0, percent, 1, 255, 255, 255, 150);
+		break;
+	}
+	case 1:
+	{
+		m_iSoulReaper_Gauge01->FuncDraw2DQuadScaled(iX - m_iSoulReaper_GaugeBG->w() / 2, iY + m_iSoulReaper_GaugeBG->h() * offset, iWidth * scale, iHeight * scale);
+
+		m_iSoulReaper_Gauge02->FuncDraw2DQuadScaled(iX - iWidth / 2, iY + m_iSoulReaper_GaugeBG->h() * offset, iWidth * percent * scale, iHeight * scale, 0, 0, percent, 1, 255, 255, 255, 150);
+		break;
+
+	}
+	case 2:
+	{
+		m_iSoulReaper_Gauge01->FuncDraw2DQuadScaled(iX - m_iSoulReaper_GaugeBG->w() / 2, iY + m_iSoulReaper_GaugeBG->h() * offset, iWidth * scale, iHeight * scale);
+
+		m_iSoulReaper_Gauge02->FuncDraw2DQuadScaled(iX - iWidth / 2, iY + m_iSoulReaper_GaugeBG->h() * offset, iWidth * scale, iHeight * scale);
+
+		m_iSoulReaper_Gauge03->FuncDraw2DQuadScaled(iX + iCenter, iY + m_iSoulReaper_GaugeBG->h() * offset, iWidth * percent * scale, iHeight * scale, 0, 0, percent, 1, 255, 255, 255, 150);
+		break;
+
+	}
+	case 3:
+	{
+		m_iSoulReaper_Gauge01->FuncDraw2DQuadScaled(iX - m_iSoulReaper_GaugeBG->w() / 2, iY + m_iSoulReaper_GaugeBG->h() * offset, iWidth * scale, iHeight * scale);
+
+		m_iSoulReaper_Gauge02->FuncDraw2DQuadScaled(iX - iWidth / 2, iY + m_iSoulReaper_GaugeBG->h() * offset, iWidth * scale, iHeight * scale);
+
+		m_iSoulReaper_Gauge03->FuncDraw2DQuadScaled(iX + iCenter, iY + m_iSoulReaper_GaugeBG->h() * offset, iWidth * scale, iHeight * scale);
+		break;
+
+	}
+	default:
+		break;
+	}
+
 }
 
 void CHudSniperScope::Shutdown()

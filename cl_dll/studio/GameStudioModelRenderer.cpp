@@ -2826,6 +2826,11 @@ int R_StudioDrawModel(int flags)
 				g_PetrolBoomerMuzzle = NULL;
 			}
 		}
+
+		if (CStudioModelRenderer::s_pSoulReaperViewModel && curent->model == CStudioModelRenderer::s_pSoulReaperViewModel)
+		{
+			curent->curstate.effects |= EF_NOCULL;
+		}
 	}
 
 	return iReturn;

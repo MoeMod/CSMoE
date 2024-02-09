@@ -365,6 +365,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "y23s3buffm249",	WEAPON_Y23S3BUFFM249 },
 	{ "magicmg",	WEAPON_MAGICMG },
 	{ "pkm",	WEAPON_PKM },
+	{ "chainmg",	WEAPON_CHAINMG },
+	{ "y24s1laserminigun",	WEAPON_Y24S1LASERMINIGUN },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -409,6 +411,9 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "at4ex",	WEAPON_AT4EX },
 	{ "rpg7",	WEAPON_RPG7 },
 	{ "bazooka",	WEAPON_BAZOOKA },
+	{ "halogun",	WEAPON_HALOGUN },
+	{ "soulreaper",	WEAPON_SOULREAPER },
+	{ "speargunex",	WEAPON_SPEARGUNEX },
 
 	{ NULL,		WEAPON_NONE }
 };
@@ -881,6 +886,8 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "y23s3buffm249",	WEAPONCLASS_MACHINEGUN },
 	{ "magicmg",	WEAPONCLASS_MACHINEGUN },
 	{ "pkm",	WEAPONCLASS_MACHINEGUN },
+	{ "chainmg",	WEAPONCLASS_MACHINEGUN },
+	{ "y24s1laserminigun",	WEAPONCLASS_MACHINEGUN },
 
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsawm",	WEAPONCLASS_EQUIPMENT },
@@ -920,6 +927,10 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "at4ex",	WEAPONCLASS_EQUIPMENT },
 	{ "rpg7",	WEAPONCLASS_EQUIPMENT },
 	{ "bazooka",	WEAPONCLASS_EQUIPMENT },
+	{ "halogun",	WEAPONCLASS_EQUIPMENT },
+	{ "soulreaper",	WEAPONCLASS_EQUIPMENT },
+	{ "speargunex",	WEAPONCLASS_EQUIPMENT },
+
 
 	{ "syringe",	WEAPONCLASS_EQUIPMENT },
 	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
@@ -1282,6 +1293,11 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_Z4B_MA5B:
 	case WEAPON_Z4B_AK47_ANGELICBEAST:
 	case WEAPON_Z4B_M4A1_S_TRANSFORMERS:
+	case WEAPON_HALOGUN:
+	case WEAPON_SOULREAPER:
+	case WEAPON_CHAINMG:
+	case WEAPON_Y24S1LASERMINIGUN:
+	case WEAPON_SPEARGUNEX:
 		return true;
 	default:
 		break;

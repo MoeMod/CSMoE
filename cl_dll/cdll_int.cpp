@@ -315,6 +315,11 @@ int DLLEXPORT HUD_VidInit( void )
 
 	CStudioModelRenderer::s_pLightningARPModel = IEngineStudio.Mod_ForName("models/p_lightningar_b.mdl", FALSE);
 
+	CStudioModelRenderer::s_pSoulReaperViewModel = IEngineStudio.Mod_ForName("models/v_soulreaper.mdl", FALSE);
+	CStudioModelRenderer::s_pSoulReaperPModel = IEngineStudio.Mod_ForName("models/p_soulreaper.mdl", FALSE);
+
+	
+
 	//VGui_Startup();
 
 	g_ParticleManager.ResetData();

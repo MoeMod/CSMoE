@@ -898,6 +898,13 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		g_ParticleManager.ClearPrecache();
 		break;
 	}
+	case 55:
+	{
+		arg1 = reader.ReadByte();
+		arg2 = reader.ReadByte();
+		m_SniperScope.SetSoulReaperAmmo(arg1, arg2);
+		break;
+	}
 	case 78:	// play sound
 	{
 		int idx = reader.ReadShort();
