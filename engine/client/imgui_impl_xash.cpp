@@ -73,6 +73,7 @@ extern "C" mempool_t *imgui_pool = nullptr;
 #ifdef XASH_SHADER
 static GLuint       g_ShaderHandle = 0, g_VertHandle = 0, g_FragHandle = 0;
 static GLint        g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;                                // Uniforms location
+static GLint        g_UniformHasColor = 0;                                // Uniforms location
 static GLuint       g_AttribLocationVtxPos = 0, g_AttribLocationVtxUV = 0, g_AttribLocationVtxColor = 0; // Vertex attributes location
 static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
 #endif
@@ -181,6 +182,10 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
             else
             {
                 GL_Bind( XASH_TEXTURE0, (ptrdiff_t)pcmd->TextureId );
+                if(gltexture_t *tex = R_GetTexture((ptrdiff_t)pcmd->TextureId))
+                {
+                    pglUniform1iARB(g_UniformHasColor, tex->format != GL_ALPHA);
+                }
                 // removed for performance
                 //pglScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
                 pglDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
@@ -374,12 +379,15 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
     const GLcharARB* fragment_shader_list[3] = { xe::GetShaderVersionString(),
                                                  xe::GetFragmentShaderPrecision(),
             "uniform sampler2D Texture;\n"
+            "uniform bool HasColor;\n"
             "in vec2 vvTexCoord;\n"
             "in vec4 vvColor;\n"
             "out vec4 FragColor;\n"
             "void main()\n"
             "{\n"
-            "    FragColor = vvColor * texture(Texture, vvTexCoord.st);\n"
+            "    vec4 TexColor = texture(Texture, vvTexCoord.st);\n"
+            "    if(!HasColor) TexColor = vec4(1.0, 1.0, 1.0, TexColor.w);\n"
+            "    FragColor = vvColor * TexColor;\n"
             "}\n"
         };
     g_VertHandle = pglCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
@@ -399,6 +407,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
     xe::CheckProgram(g_ShaderHandle, "shader program");
 
     g_AttribLocationTex = pglGetUniformLocationARB(g_ShaderHandle, "Texture");
+    g_UniformHasColor = pglGetUniformLocationARB(g_ShaderHandle, "HasColor");
     g_AttribLocationProjMtx = pglGetUniformLocationARB(g_ShaderHandle, "ProjMtx");
     g_AttribLocationVtxPos = (GLuint)pglGetAttribLocationARB(g_ShaderHandle, "Position");
     g_AttribLocationVtxUV = (GLuint)pglGetAttribLocationARB(g_ShaderHandle, "UV");
@@ -415,11 +424,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	int width, height, bytes_per_pixel;
     ImGuiFreeType::BuildFontAtlas(io.Fonts);
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
-#ifdef XASH_SHADER
-    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytes_per_pixel);
-#else
     io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bytes_per_pixel);
-#endif
 
 	// Upload texture to graphics system
 	//GLint last_texture;
@@ -439,17 +444,8 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	r_image->flags = IMAGE_HAS_ALPHA | IMAGE_TEMP;
 	r_image->buffer = (byte *)pixels;
 
-#ifdef XASH_SHADER
-    r_image->type = PF_RGBA_32;
-    r_image->flags |= IMAGE_HAS_COLOR;
-#endif
-
 	//pglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-#ifdef XASH_SHADER
-	auto i = GL_LoadTextureInternal( "*imgui_font", r_image, (texFlags_t)(TF_FONT), false );
-#else
 	auto i = GL_LoadTextureInternal( "*imgui_font", r_image, (texFlags_t)(TF_FONT | TF_FONT_ALPHA), false );
-#endif
 	g_FontTexture = i;
 	//GL_Bind(XASH_TEXTURE0, i);
 	//pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
