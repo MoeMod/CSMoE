@@ -204,30 +204,7 @@ set rendermode
 */
 void GAME_EXPORT TriRenderMode( int mode )
 {
-	switch( mode )
-	{
-		case kRenderNormal:
-		default:	pglDisable( GL_BLEND );
-			//pglDisable( GL_ALPHA_TEST );
-			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-			break;
-		case kRenderTransColor:
-		case kRenderTransAlpha:
-		case kRenderTransTexture:
-			// NOTE: TriAPI doesn't have 'solid' mode
-			pglEnable( GL_BLEND );
-			//pglDisable( GL_ALPHA_TEST );
-			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-			break;
-		case kRenderGlow:
-		case kRenderTransAdd:
-			pglEnable( GL_BLEND );
-			//pglDisable( GL_ALPHA_TEST );
-			pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
-			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-			break;
-	}
+    GL_SetRenderMode( mode );
 }
 
 /*

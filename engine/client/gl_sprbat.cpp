@@ -92,7 +92,13 @@ namespace xe {
 		if(add_cap & SprBatPass_Src_One)
 		{
 			//pglDisable( GL_FOG );
+#ifdef XASH_GLES
+            // HACK : gl4es handles glBlendFunc( GL_SRC_ALPHA, GL_ONE ) as glBlendFunc( GL_ONE, GL_ONE )
+            // special case, as seen in Xash3D, but it breaks torus_trooper, so behind a parameter
+            pglBlendFunc( GL_ONE, GL_ONE );
+#else
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
+#endif
 		}
 		else if(remove_cap & SprBatPass_Src_One)
 		{

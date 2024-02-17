@@ -334,7 +334,13 @@ void GAME_EXPORT GL_SetRenderMode( int mode )
 	case kRenderTransAdd:
 		pglEnable( GL_BLEND );
 		//pglDisable( GL_ALPHA_TEST );
+#ifdef XASH_GLES
+        // HACK : gl4es handles glBlendFunc( GL_SRC_ALPHA, GL_ONE ) as glBlendFunc( GL_ONE, GL_ONE )
+        // special case, as seen in Xash3D, but it breaks torus_trooper, so behind a parameter
+        pglBlendFunc( GL_ONE, GL_ONE );
+#else
 		pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
+#endif
 		break;
 	}
 }

@@ -174,13 +174,13 @@ static void SetBeamRenderMode( int rendermode )
 {
 	if( rendermode == kRenderTransAdd )
 	{
-		pglEnable( GL_BLEND );
-		pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
+        GL_SetRenderMode(kRenderTransAdd);
 	}
-	else pglDisable( GL_BLEND );	// solid mode
-
-	//pglDisable( GL_ALPHA_TEST );
-	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	else
+    {
+        // solid mode
+        GL_SetRenderMode(kRenderNormal);
+    }
 }
 
 /*

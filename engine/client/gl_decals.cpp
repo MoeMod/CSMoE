@@ -1090,7 +1090,7 @@ void DrawSurfaceDecals( msurface_t *fa )
 
 	// restore blendfunc here
 	if( e->curstate.rendermode == kRenderTransAdd || e->curstate.rendermode == kRenderGlow )
-		pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
+        GL_SetRenderMode( e->curstate.rendermode );
 }
 
 /*
