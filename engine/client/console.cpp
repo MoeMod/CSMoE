@@ -1809,10 +1809,9 @@ void Con_DrawVersion( void )
     y = scr_height->integer - height;
     ImGui_Console_AddGenericString(scr_width->integer - width, y, curbuild, color);
 
-    Q_snprintf(curbuild, MAX_STRING, "CPU: %s (%.1f GB)\nGPU: %s%s",
-               Cpu_GetName(),
-               (ram + 0.5) / 1024.0,
+    Q_snprintf(curbuild, MAX_STRING, "Renderer: %s%s%s",
                glConfig.renderer_string,
+               GL_Support(GL_S3TC_EXT) ? "(DXTC)" : "",
                GL_Support(GL_ASTC_EXT) ? "(ASTC)" : "");
 	ImGui_Console_DrawStringLen(curbuild, &width, &height);
     y -= height;

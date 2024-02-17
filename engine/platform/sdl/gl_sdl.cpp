@@ -378,6 +378,7 @@ void GL_InitExtensionsGLES( void )
 #else
     GL_CheckExtension( "GL_KHR_texture_compression_astc_ldr", NULL, "gl_astc_format", GL_ASTC_EXT );
 #endif
+    GL_CheckExtension( "GL_EXT_texture_compression_s3tc", NULL, "gl_s3tc_format", GL_S3TC_EXT );
 
 	glConfig.texRectangle = glConfig.max_2d_rectangle_size = 0; // no rectangle
 
