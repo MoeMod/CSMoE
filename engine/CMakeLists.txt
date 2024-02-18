@@ -254,6 +254,7 @@ set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_menu_server.cpp
 	client/imgui_menu_update.cpp
 	client/imgui_menu_msgbox.cpp
+	client/imgui_hlmv.cpp
 )
 
 set(XASH_ENGINE_VGUI2_SOURCES

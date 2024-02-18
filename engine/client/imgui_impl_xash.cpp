@@ -27,6 +27,7 @@ GNU General Public License for more details.
 #include "imgui_console.h"
 #include "imgui_imewindow.h"
 #include "imgui_sprview.h"
+#include "imgui_hlmv.h"
 #include "imgui_connectprogress.h"
 #include "imgui_menu_server.h"
 #include "imgui_menu_update.h"
@@ -661,6 +662,7 @@ qboolean ImGui_ImplGL_Init(void)
 	ImGui_Console_Init();
 	ImGui_ImeWindow_Init();
 	ImGui_SprView_Init();
+	ImGui_HLMV_Init();
 	ImGui_ConnectProgress_Init();
 	ui::ImGui_Server_Init();
     ui::Update_Initiate();
@@ -901,6 +903,7 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui_ConnectProgress_OnGUI();
 	ImGui_ImeWindow_OnGUI();
 	ImGui_SprView_OnGUI();
+	ImGui_HLMV_OnGUI();
 	ui::ImGui_Server_OnGui();
     ui::Update_OnGui();
     ui::MsgBox_OnGui();
