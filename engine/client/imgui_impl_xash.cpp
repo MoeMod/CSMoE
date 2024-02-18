@@ -149,8 +149,8 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
     // MoeMod warning : very expensive!
 	//pglShadeModel(GL_SMOOTH);
-	g_imguiRenderMode = kRenderNormal;
-	GL_SetRenderMode(kRenderNormal);
+	g_imguiRenderMode = kRenderTransTexture;
+	GL_SetRenderMode(kRenderTransTexture);
 	// Render command lists
 
 #ifdef XASH_SHADER
@@ -176,7 +176,10 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
                 // User callback, registered via ImDrawList::AddCallback()
                 // (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset render state.)
                 if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
+                {
                     ImGui_ImplOpenGL3_SetupRenderState(draw_data, fb_width, fb_height);
+                    GL_SetRenderMode(g_imguiRenderMode);
+                }
                 else
                     pcmd->UserCallback(cmd_list, pcmd);
             }
@@ -188,11 +191,12 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
                     pglUniform1iARB(g_UniformHasColor, tex->format != GL_ALPHA);
                 }
                 // removed for performance
-                //pglScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+                GL_Scissor(true, (int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
                 pglDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
             }
         }
     }
+    GL_Scissor(false, 0, 0, 0, 0);
     ImGui_ImplOpenGL3_ResetRenderState(draw_data, fb_width, fb_height);
 #else
     pglEnableClientState(GL_VERTEX_ARRAY);

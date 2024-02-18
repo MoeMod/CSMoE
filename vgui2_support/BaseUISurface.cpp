@@ -218,7 +218,9 @@ void BaseUISurface::PushMakeCurrent(vgui2::VPANEL panel, bool useInsets) {
 
 	SetupPaintState(paintState);
 #ifdef XASH_IMGUI_SURFACE
-    ImGui_Surface_EnableScissor(paintState.iScissorLeft, paintState.iScissorTop, paintState.iScissorRight - paintState.iScissorLeft, paintState.iScissorBottom - paintState.iScissorTop);
+    float x = paintState.iScissorLeft, y = paintState.iScissorTop, w = paintState.iScissorRight - paintState.iScissorLeft, h = paintState.iScissorBottom - paintState.iScissorTop;
+    SPR_AdjustSize(&x, &y, &w, &h);
+    ImGui_Surface_EnableScissor(x, y, w, h);
 #endif
 }
 
