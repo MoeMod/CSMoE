@@ -22,6 +22,7 @@ GNU General Public License for more details.
 #include "imgui_utils.h"
 #include "imgui_hlmv.h"
 #include "ImGuiFileDialog/ImGuiFileDialog.h"
+#include "studio.h"
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -34,6 +35,19 @@ class ImGui_HLMV
 	GLuint texture = 0;
 	ref_params_t refdef;
 	cl_entity_t  hlmvent;
+	vec3_t vieworg;
+	bool is_paused = false;
+
+	enum class TabItems
+	{
+		ModelDisplay,
+		BodyParts,
+		Textures,
+		Sequences,
+		WeaponOrigin,
+		Max,
+	};
+	TabItems SelectedTab;
 public:
 	int frameWidth = 800, frameHeight = 600;
 
@@ -45,8 +59,8 @@ public:
 		hlmvent.index = 0;
 		hlmvent.curstate.body = 0;
 		hlmvent.curstate.number = 1;	// IMPORTANT: always set playerindex to 1
-		hlmvent.curstate.animtime = cl.time;	// start animation
-		hlmvent.curstate.sequence = 1;
+		hlmvent.curstate.animtime = Sys_DoubleTime();	// start animation
+		hlmvent.curstate.sequence = 0;
 		hlmvent.curstate.scale = 1.0f;
 		hlmvent.curstate.frame = 0.0f;
 		hlmvent.curstate.framerate = 1.0f;
@@ -59,9 +73,6 @@ public:
 		hlmvent.latched.prevcontroller[1] = 127;
 		hlmvent.latched.prevcontroller[2] = 127;
 		hlmvent.latched.prevcontroller[3] = 127;
-		hlmvent.origin[0] = hlmvent.curstate.origin[0] = 45.0f / tan( DEG2RAD( refdef.fov_y / 2.0f ));
-		hlmvent.origin[2] = hlmvent.curstate.origin[2] = 2.0f;
-		hlmvent.angles[1] = hlmvent.curstate.angles[1] = 180.0f;
 
 		hlmvent.player = false; // yes, draw me as playermodel
 		hlmvent.model = Mod_ForName( abs_path.c_str(), false );
@@ -82,8 +93,21 @@ public:
         refdef.viewport[2] = w;
         refdef.viewport[3] = h;
 
+	    refdef.time = host.newtime;
+	    cl.refdef.frametime = host.frametime;
+
         refdef.fov_x = 90.0f; // this is a final fov value
         refdef.fov_y = V_CalcFov( &cl.refdef.fov_x, w, h );
+	    if(SelectedTab == TabItems::WeaponOrigin)
+	    {
+		    refdef.vieworg = { -vieworg.x - 0.03f, vieworg.y - 0.02f, vieworg.z + 1.0172f };
+		    refdef.viewangles = { 0.0f, 0.0f, 0.0f };
+	    }
+	    else
+	    {
+		    refdef.vieworg = { 45.0f, 0.0f, 2.0f };
+		    refdef.viewangles = { 0.0f, 180.0f, 0.0f };
+	    }
     }
 
 	void CloseFile()
@@ -105,11 +129,147 @@ public:
 		//GL_SetRenderMode(kRenderNormal);
 		if( Mod_Extradata( hlmvent.model ) )
 		{
+			float save_framerate = hlmvent.curstate.framerate;
+			if(is_paused)
+			{
+				hlmvent.curstate.framerate = 0;
+			}
+
 			R_ClearScene();
 			CL_AddVisibleEntity(&hlmvent, ET_NORMAL);
 			R_RenderFrame( &refdef, false );
+
+			CheckLoopPlay();
+
+			if(is_paused)
+			{
+				hlmvent.curstate.framerate = save_framerate;
+			}
 		}
 	}
+
+	void SetFrame(float n)
+	{
+		hlmvent.curstate.animtime = Sys_DoubleTime();
+		hlmvent.curstate.frame = n;
+	}
+
+	float GetFrame()
+	{
+		if(is_paused)
+		{
+			return hlmvent.curstate.frame;
+		}
+
+		auto studiohdr = (const studiohdr_t *)Mod_Extradata( hlmvent.model );
+		auto pseqdesc = (const mstudioseqdesc_t *)((const byte *)studiohdr + studiohdr->seqindex) + hlmvent.curstate.sequence;
+
+		extern float R_StudioEstimateFrame( cl_entity_t *e, mstudioseqdesc_t *pseqdesc );
+		float frame = R_StudioEstimateFrame(&hlmvent, (mstudioseqdesc_t *)pseqdesc);
+		return frame;
+	}
+
+	void CheckLoopPlay()
+	{
+		auto studiohdr = (const studiohdr_t *)Mod_Extradata( hlmvent.model );
+		auto pseqdesc = (const mstudioseqdesc_t *)((const byte *)studiohdr + studiohdr->seqindex) + hlmvent.curstate.sequence;
+
+		double dfdt = (RI.refdef.time - hlmvent.curstate.animtime) * hlmvent.curstate.framerate * pseqdesc->fps;
+		double f = (hlmvent.curstate.frame * (pseqdesc->numframes - 1)) / 256.0;
+
+		if(f + dfdt >= pseqdesc->numframes)
+		{
+			SetFrame(0);
+		}
+	}
+
+	void OnGUI_Stub()
+	{
+
+	}
+
+	void OnGUI_WeaponOrigin()
+	{
+		auto studiohdr = (const studiohdr_t *)Mod_Extradata( hlmvent.model );
+		auto pseqdesc = (const mstudioseqdesc_t *)((const byte *)studiohdr + studiohdr->seqindex) + hlmvent.curstate.sequence;
+		ImGui::BeginGroup();
+		{
+			ImGui::BeginGroup();
+			{
+				bool sequence_changed = ImGui::Combo("Sequence", &hlmvent.curstate.sequence, [](void* data, int idx, const char** out_text) -> bool {
+					auto studiohdr = (const studiohdr_t *)data;
+					auto pseqdesc = (const mstudioseqdesc_t *)((const byte *)studiohdr + studiohdr->seqindex) + idx;
+					*out_text = pseqdesc->label;
+					return true;
+				}, (void *)studiohdr, studiohdr->numseq);
+				if(sequence_changed)
+				{
+					SetFrame(0);
+				}
+
+				float fps = hlmvent.curstate.framerate * pseqdesc->fps;
+				if(ImGui::DragFloat("Speed", &fps, 1.0, 0.0, 120.0, "%.2f fps", ImGuiSliderFlags_Logarithmic))
+				{
+					hlmvent.curstate.framerate = fps / pseqdesc->fps;
+				}
+
+				int frame = GetFrame();
+				if(ImGui::DragInt("Frame", &frame, 1, 0, pseqdesc->numframes - 1))
+				{
+					SetFrame(frame);
+				}
+
+				if(ImGui::Checkbox("Pause", &is_paused))
+				{
+					SetFrame(frame);
+				}
+			}
+			ImGui::EndGroup();
+		}
+		ImGui::EndGroup();
+		ImGui::SameLine();
+		ImGui::Text(
+				"Sequence#: %d\n"
+				"Frames: %d\n"
+				"FPS: %d\n"
+				"Blends: %d\n"
+				"# of events: %d\n",
+				hlmvent.curstate.sequence,
+				pseqdesc->numframes,
+				(int)pseqdesc->fps,
+				pseqdesc->numblends,
+				pseqdesc->numevents
+		);
+	}
+
+	// Center
+
+	void OnGUI_DrawTexture()
+	{
+
+	}
+
+	void OnGUI_DrawModel()
+	{
+		// draw model
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		auto mins = window->DC.CursorPos;
+		auto size = ImGui::CalcItemSize(ImVec2(-1, -1), 0, 0);
+		ImRect bb(mins, ImVec2(mins.x + size.x, mins.y + size.y));
+		ImGui::ItemSize(bb);
+		if(ImGui::ItemAdd(bb, 0))
+		{
+			UpdateRefdef(mins.x, mins.y, size.x, size.y);
+			auto drawlist = window->DrawList;
+			drawlist->AddRectFilled(bb.Min, bb.Max, ImColor(0.5f, 0.75f, 0.75f, 1.0f));
+			drawlist->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd){
+				ImGUI_HLMV_DrawModel();
+			}, this);
+			drawlist->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
+		}
+	}
+
+	// All
 
 	void OnGUI(void)
 	{
@@ -158,24 +318,47 @@ public:
 				ImGui::EndMenuBar();
 			}
 
-			ImGuiWindow* window = ImGui::GetCurrentWindow();
-			auto mins = window->DC.CursorPos;
-			auto size = ImGui::CalcItemSize(ImVec2(-1, -1), 0, 0);
-			ImRect bb(mins, ImVec2(mins.x + size.x, mins.y + size.y));
-			ImGui::ItemSize(bb);
-			if (ImGui::ItemAdd(bb, 0))
+			if(ImGui::BeginTabBar("HLMV TAB"))
 			{
-                UpdateRefdef(mins.x, mins.y, size.x, size.y);
-                ImGuiWindow* window = ImGui::GetCurrentWindow();
-                auto drawlist = window->DrawList;
-				drawlist->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd){
-					ImGUI_HLMV_DrawModel();
-				}, this);
-				drawlist->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
+				const char *TabNames[] = {
+						"Model Display",
+						"Body Parts",
+						"Textures",
+						"Sequences",
+						"Weapon Origin"
+				};
+				for(int i = 0; i < (int)TabItems::Max; ++i)
+				{
+					if(ImGui::BeginTabItem(TabNames[i]))
+					{
+						SelectedTab = (TabItems)i;
+
+						void (ImGui_HLMV::*TabHandlers[])() = {
+								&ImGui_HLMV::OnGUI_Stub,
+								&ImGui_HLMV::OnGUI_Stub,
+								&ImGui_HLMV::OnGUI_Stub,
+								&ImGui_HLMV::OnGUI_Stub,
+								&ImGui_HLMV::OnGUI_WeaponOrigin,
+						};
+						(this->*TabHandlers[(int)SelectedTab])();
+
+						ImGui::EndTabItem();
+					}
+				}
+			}
+			ImGui::EndTabBar();
+
+			if(SelectedTab == TabItems::Textures)
+			{
+				OnGUI_DrawTexture();
+			}
+			else
+			{
+				OnGUI_DrawModel();
 			}
 
-			ImGui::End();
 		}
+		ImGui::End();
 
 		if (igfd::ImGuiFileDialog::Instance()->FileDialog("HLMV - Open"))
 		{

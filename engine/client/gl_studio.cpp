@@ -704,9 +704,19 @@ pfnGetEngineTimes
 */
 static void GAME_EXPORT pfnGetEngineTimes( int *framecount, double *current, double *old )
 {
-	if( framecount ) *framecount = tr.framecount;
-	if( current ) *current = cl.time;
-	if( old ) *old = cl.oldtime;
+	// hack : use host time when client is not active to support hlmv
+	if(CL_Active())
+	{
+		if( framecount ) *framecount = tr.framecount;
+		if( current ) *current = cl.time;
+		if( old ) *old = cl.oldtime;
+	}
+	else
+	{
+		if( framecount ) *framecount = host.framecount;
+		if( current ) *current = host.newtime;
+		if( old ) *old = host.oldtime;
+	}
 }
 
 /*

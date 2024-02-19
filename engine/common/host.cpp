@@ -351,10 +351,8 @@ aborts the current host frame and goes on with the next one
 void Host_Frame( float time );
 void Host_RunFrame()
 {
-	static double	oldtime, newtime;
-
-	if( !oldtime )
-		oldtime = Sys_DoubleTime();
+	if( !host.oldtime )
+		host.oldtime = Sys_DoubleTime();
 
 #if XASH_INPUT == INPUT_SDL
 	SDLash_RunEvents();
@@ -362,11 +360,11 @@ void Host_RunFrame()
 	Android_RunEvents();
 #endif
 
-	newtime = Sys_DoubleTime ();
+	host.newtime = Sys_DoubleTime ();
 
-	Host_Frame( newtime - oldtime );
+	Host_Frame( host.newtime - host.oldtime );
 
-	oldtime = newtime;
+	host.oldtime = host.newtime;
 #ifdef __EMSCRIPTEN__
 #ifdef EMSCRIPTEN_ASYNC
 	emscripten_sleep(1);
