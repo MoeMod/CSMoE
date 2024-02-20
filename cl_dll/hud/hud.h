@@ -56,11 +56,7 @@ enum
 
 extern wrect_t nullrc;
 
-extern wrect_t nullrc;
 extern bool g_bFirstBlood;
-extern float g_fLastAssist[MAX_CLIENTS + 1][MAX_CLIENTS + 1];
-extern int g_iDefuser, g_iPlanter, g_CWcount[MAX_CLIENTS + 1][3];
-extern int g_lastsoldier[2];
 
 class CClientSprite;
 
@@ -438,6 +434,7 @@ struct extra_player_info_t
 	byte os;
 	int m_uiWeaponPaintType;
 	int m_uiKnifePaintType;
+	int maxhealth;
 };
 
 struct team_info_t
@@ -453,18 +450,6 @@ struct team_info_t
 	int teamnumber;
 };
 
-struct RoundPlayerInfo
-{
-	int kill[2];
-	int assist;
-	float assisttime[3][MAX_PLAYERS + 1];
-	float totaldmg[MAX_PLAYERS + 1];
-	int revenge;
-
-	int iHealth;
-	int iMaxHealth;
-};
-
 struct hostage_info_t
 {
 	vec3_t origin;
@@ -477,7 +462,6 @@ struct hostage_info_t
 
 extern hud_player_info_t	g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
 extern extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];   // additional player info sent directly to the client dll
-extern RoundPlayerInfo      g_PlayerExtraInfoEx[MAX_PLAYERS + 1];
 extern team_info_t			g_TeamInfo[MAX_TEAMS+1];
 extern hostage_info_t		g_HostageInfo[MAX_HOSTAGES+1];
 extern int					g_IsSpectator[MAX_PLAYERS+1];

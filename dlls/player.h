@@ -831,9 +831,6 @@ public:
 	std::map<uint32_t, PlayerItemData> m_ItemData;
 	time_point_t m_flCloaking;
 
-	std::vector <float> m_iVecOldHealth;
-	std::vector <int> m_iVecHitgroup;
-	float m_flOldHealth = 0.0;
 	float m_flZombieHealth;
 	float m_flZombieArmor;
 	int m_iSlotBuyTime[MAX_ITEM_TYPES];

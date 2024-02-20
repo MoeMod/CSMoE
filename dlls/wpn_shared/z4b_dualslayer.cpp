@@ -39,7 +39,7 @@ class CKnifeDualSlayer: public LinkWeaponTemplate<CKnifeDualSlayer,
 {
 public:
 	static constexpr const char *ClassName = "z4b_dualslayer";
-	static constexpr const char *V_Model = "models/z4b/v_dualslayer.mdl";
+	static constexpr const char *V_Model = "models/z4b/PV-MasterHero.mdl";
 	static constexpr const char *P_Model = "models/null.mdl";
 	static constexpr const char *W_Model = "models/w_knife.mdl";
 
@@ -61,8 +61,11 @@ public:
 		ANIM_SLASH1,
 		ANIM_SLASH2,
 		ANIM_RUN,
-		ANIM_SKILL,
 		ANIM_STAB2_HIT,
+		ANIM_SKILL,
+		ANIM_SKILL_ENHANCE,
+		ANIM_SKILL3,
+		ANIM_SKILL4,
 	};
 
 	enum dualslayer_effect_state_e
@@ -259,14 +262,26 @@ void CKnifeDualSlayer::ItemPostFrame()
 
 #ifndef CLIENT_DLL
 			UTIL_PlayAnimation(m_pPlayer, "MasterHero_Retina", 0, POSITIONFLAG_FULLSCREEN);
+
+			if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+			{
+				strcpy(m_pPlayer->m_szCustomSequence, "crouch_shoot_Lknife");
+			}
+			else
+				strcpy(m_pPlayer->m_szCustomSequence, "ref_shoot_Lknife");
+			m_pPlayer->pev->frame = 0;
+			m_pPlayer->ResetSequenceInfo();
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.87s;
 #endif
 			m_flEffectTime = gpGlobals->time;
 			m_iEffectState = EFFECT_ZOOMIN;
 			DelaySkillAttack();
-			m_tNextThink = gpGlobals->time + 0.1s;
+			m_tNextThink = gpGlobals->time + 1.0s;
 			m_iThinkType = 5;
 			break;
 		case 5:
+			//CreateEnt
+			DelaySkillAttack();
 			m_tNextThink = invalid_time_point;
 			m_iThinkType = 0;
 			break;
@@ -305,8 +320,8 @@ void CKnifeDualSlayer::Reload()
 
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHeroSkill.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		SendWeaponAnim(ANIM_SKILL, UseDecrement() != FALSE);
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3.3s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.3s;
 		m_flEffectTime = gpGlobals->time;
 		m_iEffectState = EFFECT_ZOOMOUT;
 		ResetRunIdle();

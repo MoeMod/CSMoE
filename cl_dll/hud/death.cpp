@@ -32,9 +32,6 @@ float color[3];
 
 bool g_bFirstBlood = true;
 
-float g_fLastAssist[MAX_CLIENTS + 1][MAX_CLIENTS + 1];
-int g_iDefuser, g_iPlanter, g_CWcount[MAX_CLIENTS + 1][3];
-int g_lastsoldier[2];
 
 DECLARE_MESSAGE( m_DeathNotice, DeathMsg )
 
@@ -600,17 +597,6 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 		bool bSpecialKill = false;
 		bool local = idx == killer ? true : false;
 
-		if (killer != victim)
-		{
-			if (gHUD.IsZombieMod())
-			{
-				if (g_PlayerExtraInfo[victim].teamnumber == 1)
-				{
-					memset(g_PlayerExtraInfoEx[victim].assisttime, 0, sizeof(g_PlayerExtraInfoEx[victim].assisttime));
-					memset(g_PlayerExtraInfoEx[victim].totaldmg, 0, sizeof(g_PlayerExtraInfoEx[victim].totaldmg));
-				}
-			}
-		}
 		if (g_bFirstBlood)
 		{
 			g_bFirstBlood = false;
@@ -618,12 +604,6 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 			if (local)
 				NewAlarm().SetAlarm(ALARM_FIRSTBLOOD);
 		}
-
-		if (local && g_PlayerExtraInfoEx[killer].revenge == victim)
-			NewAlarm().SetAlarm(ALARM_PAYBACK);
-
-		g_PlayerExtraInfoEx[killer].revenge = 0;
-		g_PlayerExtraInfoEx[victim].revenge = killer;
 
 		if (killer == idx && victim != idx)
 		{
@@ -1085,27 +1065,6 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 		i = MAX_DEATHNOTICES - 1;
 	}
 
-	int iAssistant = 0;
-	hud_player_info_t hPlayer;
-
-	char szKiller[64], szVictim[64], szAssistant[64];
-	memset(szKiller, 0, sizeof(szKiller));
-	memset(szVictim, 0, sizeof(szVictim));
-	memset(szAssistant, 0, sizeof(szAssistant));
-
-	if (killer)
-	{
-		gEngfuncs.pfnGetPlayerInfo(killer, &hPlayer);
-		strcpy(szKiller, hPlayer.name);
-	}
-	// Get the Victim's name
-	// If victim is -1, the killer killed a specific, non-player object (like a sentrygun)
-	if (((char)victim) != -1)
-	{
-		gEngfuncs.pfnGetPlayerInfo(victim, &hPlayer);
-		strcpy(szVictim, hPlayer.name);
-	}
-
 	//if (gViewPort)
 		//gViewPort->GetAllPlayersInfo();
 	gHUD.m_Scoreboard.GetAllPlayersInfo();
@@ -1211,210 +1170,6 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 			ConsolePrint( rgDeathNoticeList[i].szKiller );
 			ConsolePrint( " killed " );
 			ConsolePrint( rgDeathNoticeList[i].szVictim );
-
-			float fDamageHighest = 0.0f;
-			bool local = false;
-
-			for (int j = 0; j < MAX_CLIENTS + 1; j++)
-			{
-				if (j == killer)
-					continue;
-				if ((g_PlayerExtraInfo[j].teamnumber == g_PlayerExtraInfo[victim].teamnumber || g_PlayerExtraInfo[j].teamnumber != g_PlayerExtraInfo[killer].teamnumber))
-					continue;
-
-				local = idx == j ? true : false;
-
-				if (g_PlayerExtraInfoEx[j].assisttime[0][victim] > gHUD.m_flTime)
-				{
-					if (g_PlayerExtraInfoEx[j].totaldmg[victim] > fDamageHighest)
-					{
-						iAssistant = j;
-						fDamageHighest = g_PlayerExtraInfoEx[j].totaldmg[victim];
-					}
-
-
-					if (gHUD.IsZombieMod() && local)
-					{
-
-					}
-
-					g_PlayerExtraInfoEx[j].assist++;
-
-					if (g_PlayerExtraInfoEx[j].assist >= 5)
-					{
-						g_PlayerExtraInfoEx[j].assist = 0;
-
-						if (local)
-							NewAlarm().SetAlarm(ALARM_SUPPORTER);
-					}
-					else if (local && !NewAlarm().IsPlaying(ALARM_KINGMAKER, false))
-						NewAlarm().SetAlarm(ALARM_ASSIST);
-				}
-				g_PlayerExtraInfoEx[j].totaldmg[victim] = 0.0f;
-
-				if (gHUD.IsZombieMod() && g_PlayerExtraInfo[j].zombie)
-				{
-					for (int k = 1; k <= 2; k++)
-					{
-						int target = k == 1 ? victim : killer;
-						if (g_PlayerExtraInfoEx[j].assisttime[k][target] > gHUD.m_flTime)
-						{
-							gEngfuncs.pfnGetPlayerInfo(j, &hPlayer); // Disable default assist system
-							strcpy(szAssistant, hPlayer.name);
-
-							if (local)
-							{
-								//if (g_PlayerExtraInfo[killer].zombie && !g_PlayerExtraInfo[victim].zombie)
-								if (g_PlayerExtraInfo[killer].zombie && !g_PlayerExtraInfo[victim].zombie)
-								{
-									NewAlarm().SetAlarm(ALARM_ZOMBIEBOMB);
-									//g_ZombieScore.assist_infection++;
-								}
-							}
-							//g_PlayerInfoEx[i].assisttime[k][target] = 0.0f;
-						}
-					}
-				}
-			}
-			if (iAssistant)
-			{
-				gEngfuncs.pfnGetPlayerInfo(iAssistant, &hPlayer);
-				strcpy(szAssistant, hPlayer.name);
-			}
-
-			if (szAssistant[0])
-			{
-				char szTemp[64];
-				sprintf(szTemp, "%s + %s", szKiller, szAssistant);
-				strncpy(rgDeathNoticeList[i].szKiller, szTemp, MAX_PLAYER_NAME_LENGTH);
-				rgDeathNoticeList[i].szKiller[MAX_PLAYER_NAME_LENGTH - 1] = 0;
-			}
-			//Extra Alarm
-			int first = 0, back = 0, kingmaker = 1;
-			int count[2]{};
-			for (int i = 0; i < MAX_CLIENTS + 1; i++)
-			{
-				if (g_PlayerExtraInfo[i].teamnumber == g_PlayerExtraInfo[victim].teamnumber || gHUD.m_iModRunning == MOD_DM)
-				{
-					if (!((g_PlayerInfoList[first].name && g_PlayerInfoList[first].name[0] != 0)))
-						first = i;
-
-					if (!((g_PlayerInfoList[back].name && g_PlayerInfoList[back].name[0] != 0)))
-						back = i;
-
-					if (g_PlayerExtraInfo[i].frags < g_PlayerExtraInfo[back].frags)
-						back = i;
-
-					if (g_PlayerExtraInfo[i].frags > g_PlayerExtraInfo[first].frags)
-						first = i;
-				}
-				else if (gHUD.m_iModRunning == MOD_DM || g_PlayerExtraInfo[i].teamnumber == g_PlayerExtraInfo[killer].teamnumber)
-				{
-					if (g_PlayerExtraInfo[i].frags > g_PlayerExtraInfo[killer].frags + 1)
-						kingmaker = 0;
-				}
-			}
-			for (int i = 0; i < MAX_CLIENTS + 1; i++)
-			{
-				if (!((g_PlayerInfoList[i].name && g_PlayerInfoList[i].name[0] != 0)))
-					continue;
-
-				if (!g_PlayerExtraInfo[i].dead)
-					count[(g_PlayerExtraInfo[i].teamnumber == 2)]++;
-
-				if (i == victim || i == killer)
-					continue;
-
-				if (g_PlayerExtraInfo[i].teamnumber != g_PlayerExtraInfo[killer].teamnumber && gHUD.m_iModRunning != MOD_DM)
-					continue;
-
-				if (g_fLastAssist[victim][i] > gHUD.m_flTime && !g_PlayerExtraInfo[i].dead)
-				{
-					//if(idx == killer)
-					NewAlarm().SetAlarm(ALARM_SAVIOR);
-					g_fLastAssist[victim][i] = 0.0;
-				}
-				if (g_fLastAssist[i][victim] > gHUD.m_flTime)
-				{
-					if (first == victim && g_PlayerExtraInfo[first].frags)
-						if (idx == i)
-							NewAlarm().SetAlarm(ALARM_INVISHAND);
-					if (kingmaker)
-						if (idx == i)
-							NewAlarm().SetAlarm(ALARM_KINGMAKER);
-
-					//if (gHUD.m_iModRunning != MOD_DM && gHUD.m_iModRunning != MOD_TD)
-						//UpdateFrags(i, 1);
-
-					g_fLastAssist[i][victim] = 0.0;
-				}
-			}
-			if (first == victim && g_PlayerExtraInfo[first].frags != g_PlayerExtraInfo[back].frags)
-				if (idx == killer)
-					NewAlarm().SetAlarm(ALARM_KINGMURDER);
-
-			if (back == victim && g_PlayerExtraInfo[first].frags != g_PlayerExtraInfo[back].frags)
-				if (idx == killer)
-					NewAlarm().SetAlarm(ALARM_BACKMARKER);
-			switch (g_CWcount[killer][0])
-			{
-			case 0:
-			{
-				g_CWcount[killer][0] = 1;
-				if (g_CWcount[killer][1] >= 5 || g_CWcount[killer][2] >= 3)
-					if (idx == killer)
-						NewAlarm().SetAlarm(ALARM_WELCOME);
-			}
-			case 1:
-			{
-				if (g_CWcount[killer][1] >= 3 || g_CWcount[killer][2] >= 2)
-					if (idx == killer)
-						NewAlarm().SetAlarm(ALARM_COMEBACK);
-			}
-			}
-			for (int j = 1; j <= 2; j++)
-				g_CWcount[killer][j] = 0;
-
-			if (!g_PlayerExtraInfo[victim].dead)
-			{
-				if (g_PlayerExtraInfo[victim].has_c4) // m_bHasC4
-					if (idx == killer)
-						NewAlarm().SetAlarm(ALARM_C4MANKILL);
-			}
-			if ((gHUD.m_Scoreboard.m_iTeamAlive_CT - 1) == 1 || (gHUD.m_Scoreboard.m_iTeamAlive_T - 1) == 1)
-			{
-				for (int i = 0; i < MAX_CLIENTS + 1; i++)
-				{
-					if (!((g_PlayerInfoList[i].name && g_PlayerInfoList[i].name[0] != 0)))
-						continue;
-
-					if (((gHUD.m_Scoreboard.m_iTeamAlive_T - 1) == 1 && g_PlayerExtraInfo[i].teamnumber == 1 && g_lastsoldier[0]) || ((gHUD.m_Scoreboard.m_iTeamAlive_CT - 1 == 1) && g_PlayerExtraInfo[i].teamnumber == 2 && !g_lastsoldier[1]))
-					{
-						if (idx == i)
-							NewAlarm().SetAlarm(ALARM_LASTSOLDIER);
-						g_lastsoldier[g_PlayerExtraInfo[i].teamnumber - 1] = 1;
-						break;
-					}
-				}
-			}
-			if ((gHUD.m_Scoreboard.m_iTeamAlive_CT) == 1 || (gHUD.m_Scoreboard.m_iTeamAlive_T) == 1)
-			{
-				if ((gHUD.m_Scoreboard.m_iTeamAlive_CT) == 1 && g_PlayerExtraInfo[killer].teamnumber == TERRORIST)
-				{
-					if (!g_PlayerExtraInfo[killer].dead && idx == killer)
-						NewAlarm().SetAlarm(ALARM_THELAST);
-				}
-				else if ((gHUD.m_Scoreboard.m_iTeamAlive_T ) == 1 && g_PlayerExtraInfo[killer].teamnumber == CT)
-				{
-					if (!g_PlayerExtraInfo[killer].dead && idx == killer)
-						NewAlarm().SetAlarm(ALARM_THELAST);
-				}
-			}
-
-			if (victim == idx)
-			{
-				gHUD.m_ZB2.m_flAliveTime = 0.0f;
-			}
 		}
 
 		if ( *killedwith && (*killedwith > 13 ) && strncmp( killedwith, "d_world", sizeof(killedwith) ) && !rgDeathNoticeList[i].bTeamKill )

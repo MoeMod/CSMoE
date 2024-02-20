@@ -2126,7 +2126,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 					}
 					else
 					{
-						frame = int(iter->flFrameRate * (cl.time - RI.currententity->curstate.animtime));
+						frame = int(iter->flFrameRate * cl.time);
 
 						if (frame >= maxframe)
 						{
@@ -2483,7 +2483,6 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		if (!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_lockongun_lcd.bmp") ||
 			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$20_winggun_gold.bmp") ||
 			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_winggun_laser01.bmp") ||
-			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "sgfx_jy_aura_31_00.bmp") ||
 			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_winggun_laser02.bmp"))
 		{
 			pglUniform4fARB(g_pstudioshader->uniform.texOffset, cl.time, 0, 1, 1);

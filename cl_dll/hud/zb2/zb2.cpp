@@ -208,7 +208,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 	{
 		int idx = buf.ReadByte();
 		float flMaxHealth = buf.ReadShort();
-		g_PlayerExtraInfoEx[idx].iMaxHealth = flMaxHealth;
+		g_PlayerExtraInfo[idx].maxhealth = flMaxHealth;
 		break;
 	}
 	case ZB2_MESSAGE_TRAP:
@@ -596,7 +596,7 @@ void CHudZB2::DrawDmgIndicator()
             gHUD.m_DrawFontText.DrawFontText("Default", 16, iX, iY + iTextHeight, IsZombie ? 146 : 99, IsZombie ? 75 : 116, IsZombie ? 81 : 146, 255, gHUD.m_DeathInfo.UTF8ToUnicode(SzName));
         }
 
-		float flPercent; flPercent = (flTopRecordData[iImage] / g_flDamageInAll);
+		float flPercent; flPercent = (flTopRecordData[iImage] / g_flDamageInAll);	//g_flDamageInAll is 0 ???
 		char SzData[64]; sprintf(SzData, "%.1f K(%d%%)", flTopRecordData[iImage] / 1000.0, (int)(flPercent * 100.0));
 
 		int iWideBar = 120, iHeightBar = 12;
@@ -643,7 +643,7 @@ void CHudZB2::DrawBuffHealthBar()
 
 			if (hPlayer.name)
 			{
-				float percent = g_PlayerExtraInfo[m_iLowHealthPlayer].health / (float)g_PlayerExtraInfoEx[m_iLowHealthPlayer].iMaxHealth;
+				float percent = g_PlayerExtraInfo[m_iLowHealthPlayer].health / (float)g_PlayerExtraInfo[m_iLowHealthPlayer].maxhealth;
 				if (percent > 0.2f)
 					continue;
 
@@ -816,10 +816,10 @@ void CHudZB2::SendAlarmState(int iType, float flValue, int iValue2)
 	if (!iType)
 	{
 		m_flAliveTime = 0.0;
-		for (int i = 0; i < MAX_CLIENTS + 1; i++)
+	/*	for (int i = 0; i < MAX_CLIENTS + 1; i++)
 		{
 			g_fLastAssist[(int)flValue][i] = 0.0;
-		}
+		}*/
 	}
 	else
 	{
@@ -841,7 +841,7 @@ void CHudZB2::SendAlarmState(int iType, float flValue, int iValue2)
 		}
 		case 3:
 		{
-			g_fLastAssist[(int)flValue][gEngfuncs.GetLocalPlayer()->index] = gHUD.m_flTime + 5.0f;
+			//g_fLastAssist[(int)flValue][gEngfuncs.GetLocalPlayer()->index] = gHUD.m_flTime + 5.0f;
 			break;
 		}
 		case 4:
@@ -864,7 +864,7 @@ void CHudZB2::SendAlarmState(int iType, float flValue, int iValue2)
 		}
 		case 7:
 		{
-			g_PlayerExtraInfoEx[iValue2].assisttime[1][(int)flValue] = gHUD.m_flTime + 5.0f;
+			//g_PlayerExtraInfoEx[iValue2].assisttime[1][(int)flValue] = gHUD.m_flTime + 5.0f;
 			break;
 		}
 		case 8:

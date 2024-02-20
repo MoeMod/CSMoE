@@ -569,14 +569,8 @@ namespace cl {
 				if (!(g_PlayerInfoList[i].name && g_PlayerInfoList[i].name[0] != 0))
 					continue;
 
-				g_CWcount[i][1] = 0;
-				g_CWcount[i][2] += 1;
 
 			}
-
-			g_iPlanter = g_iDefuser = 0;
-			g_lastsoldier[0] = 0;
-			g_lastsoldier[1] = 0;
 
 			g_flDamageInAll = 0;
 			gHUD.m_ZB2.m_flAliveTime = 0.0;
