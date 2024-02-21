@@ -27,6 +27,7 @@ GNU General Public License for more details.
 #include "imgui_console.h"
 #include "imgui_imewindow.h"
 #include "imgui_sprview.h"
+#include "imgui_hlmv.h"
 #include "imgui_connectprogress.h"
 #include "imgui_menu_server.h"
 #include "imgui_menu_update.h"
@@ -148,8 +149,8 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
     // MoeMod warning : very expensive!
 	//pglShadeModel(GL_SMOOTH);
-	g_imguiRenderMode = kRenderNormal;
-	GL_SetRenderMode(kRenderNormal);
+	g_imguiRenderMode = kRenderTransTexture;
+	GL_SetRenderMode(kRenderTransTexture);
 	// Render command lists
 
 #ifdef XASH_SHADER
@@ -175,7 +176,10 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
                 // User callback, registered via ImDrawList::AddCallback()
                 // (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset render state.)
                 if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
+                {
                     ImGui_ImplOpenGL3_SetupRenderState(draw_data, fb_width, fb_height);
+                    GL_SetRenderMode(g_imguiRenderMode);
+                }
                 else
                     pcmd->UserCallback(cmd_list, pcmd);
             }
@@ -187,11 +191,12 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
                     pglUniform1iARB(g_UniformHasColor, tex->format != GL_ALPHA);
                 }
                 // removed for performance
-                //pglScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+                GL_Scissor(true, (int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
                 pglDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
             }
         }
     }
+    GL_Scissor(false, 0, 0, 0, 0);
     ImGui_ImplOpenGL3_ResetRenderState(draw_data, fb_width, fb_height);
 #else
     pglEnableClientState(GL_VERTEX_ARRAY);
@@ -661,6 +666,7 @@ qboolean ImGui_ImplGL_Init(void)
 	ImGui_Console_Init();
 	ImGui_ImeWindow_Init();
 	ImGui_SprView_Init();
+	ImGui_HLMV_Init();
 	ImGui_ConnectProgress_Init();
 	ui::ImGui_Server_Init();
     ui::Update_Initiate();
@@ -697,31 +703,31 @@ void ImGui_ImplGL_SetColors(ImGuiStyle* style)
 	colors[ImGuiCol_Border]                 = ImVec4(0.00f, 0.00f, 0.00f, 0.30f);
 	colors[ImGuiCol_BorderShadow]           = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 	colors[ImGuiCol_FrameBg]                = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-	colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.48f, 0.61f, 0.88f, 0.40f); //
-	colors[ImGuiCol_FrameBgActive]          = ImVec4(0.48f, 0.61f, 0.88f, 0.67f); //
-	colors[ImGuiCol_TitleBg]                = ImVec4(0.92f, 0.93f, 1.00f, 1.00f); // !
-	colors[ImGuiCol_TitleBgActive]          = ImVec4(0.83f, 0.87f, 0.99f, 1.00f); // !
+	colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.48f, 0.88f, 0.61f, 0.40f); //
+	colors[ImGuiCol_FrameBgActive]          = ImVec4(0.48f, 0.88f, 0.61f, 0.67f); //
+	colors[ImGuiCol_TitleBg]                = ImVec4(0.92f, 1.00f, 0.93f, 1.00f); // !
+	colors[ImGuiCol_TitleBgActive]          = ImVec4(0.83f, 0.99f, 0.87f, 1.00f); // !
 	colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
 	colors[ImGuiCol_MenuBarBg]              = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
 	colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
 	colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.69f, 0.69f, 0.69f, 0.80f);
 	colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.49f, 0.49f, 0.49f, 0.80f);
 	colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
-	colors[ImGuiCol_CheckMark]              = ImVec4(0.48f, 0.61f, 0.88f, 1.00f); //
-	colors[ImGuiCol_SliderGrab]             = ImVec4(0.48f, 0.61f, 0.88f, 0.78f); //
-	colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.35f, 0.47f, 0.71f, 1.00f); //
-	colors[ImGuiCol_Button]                 = ImVec4(0.48f, 0.61f, 0.88f, 0.40f); //
-	colors[ImGuiCol_ButtonHovered]          = ImVec4(0.48f, 0.61f, 0.88f, 1.00f); //
-	colors[ImGuiCol_ButtonActive]           = ImVec4(0.35f, 0.47f, 0.71f, 1.00f); //
-	colors[ImGuiCol_Header]                 = ImVec4(0.48f, 0.61f, 0.88f, 0.31f); //
-	colors[ImGuiCol_HeaderHovered]          = ImVec4(0.48f, 0.61f, 0.88f, 0.80f); //
-	colors[ImGuiCol_HeaderActive]           = ImVec4(0.48f, 0.61f, 0.88f, 1.00f); //
+	colors[ImGuiCol_CheckMark]              = ImVec4(0.48f, 0.88f, 0.61f, 1.00f); //
+	colors[ImGuiCol_SliderGrab]             = ImVec4(0.48f, 0.88f, 0.61f, 0.78f); //
+	colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.35f, 0.71f, 0.47f, 1.00f); //
+	colors[ImGuiCol_Button]                 = ImVec4(0.48f, 0.88f, 0.61f, 0.40f); //
+	colors[ImGuiCol_ButtonHovered]          = ImVec4(0.48f, 0.88f, 0.61f, 1.00f); //
+	colors[ImGuiCol_ButtonActive]           = ImVec4(0.35f, 0.71f, 0.47f, 1.00f); //
+	colors[ImGuiCol_Header]                 = ImVec4(0.48f, 0.88f, 0.61f, 0.31f); //
+	colors[ImGuiCol_HeaderHovered]          = ImVec4(0.48f, 0.88f, 0.61f, 0.80f); //
+	colors[ImGuiCol_HeaderActive]           = ImVec4(0.48f, 0.88f, 0.61f, 1.00f); //
 	colors[ImGuiCol_Separator]              = ImVec4(0.39f, 0.39f, 0.39f, 0.62f);
 	colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.14f, 0.44f, 0.80f, 0.78f);
 	colors[ImGuiCol_SeparatorActive]        = ImVec4(0.14f, 0.44f, 0.80f, 1.00f);
 	colors[ImGuiCol_ResizeGrip]             = ImVec4(0.80f, 0.80f, 0.80f, 0.56f);
-	colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.48f, 0.61f, 0.88f, 0.67f); //
-	colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.48f, 0.61f, 0.88f, 0.95f); //
+	colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.48f, 0.88f, 0.61f, 0.67f); //
+	colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.48f, 0.88f, 0.61f, 0.95f); //
 	colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.90f);
 	colors[ImGuiCol_TabHovered]             = colors[ImGuiCol_HeaderHovered];
 	colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
@@ -729,10 +735,10 @@ void ImGui_ImplGL_SetColors(ImGuiStyle* style)
 	colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40f);
 	colors[ImGuiCol_PlotLines]              = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
 	colors[ImGuiCol_PlotLinesHovered]       = ImVec4(0.35f, 0.43f, 1.00f, 1.00f); // !!
-	colors[ImGuiCol_PlotHistogram]          = ImVec4(0.35f, 0.47f, 0.71f, 1.00f); // !!
-	colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(0.25f, 0.45f, 0.88f, 1.00f); // !!
-	colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.48f, 0.61f, 0.88f, 0.35f); //
-	colors[ImGuiCol_DragDropTarget]         = ImVec4(0.48f, 0.61f, 0.88f, 0.95f); //
+	colors[ImGuiCol_PlotHistogram]          = ImVec4(0.35f, 0.71f, 0.47f, 1.00f); // !!
+	colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(0.25f, 0.88f, 0.45f, 1.00f); // !!
+	colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.48f, 0.88f, 0.61f, 0.35f); //
+	colors[ImGuiCol_DragDropTarget]         = ImVec4(0.48f, 0.88f, 0.61f, 0.95f); //
 	colors[ImGuiCol_NavHighlight]           = colors[ImGuiCol_HeaderHovered];
 	colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(0.70f, 0.70f, 0.70f, 0.70f);
 	colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.20f, 0.20f, 0.20f, 0.20f);
@@ -901,6 +907,7 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui_ConnectProgress_OnGUI();
 	ImGui_ImeWindow_OnGUI();
 	ImGui_SprView_OnGUI();
+	ImGui_HLMV_OnGUI();
 	ui::ImGui_Server_OnGui();
     ui::Update_OnGui();
     ui::MsgBox_OnGui();

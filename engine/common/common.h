@@ -368,6 +368,8 @@ typedef struct host_parm_s
 	int		argc;
 	const char	**argv;
 
+	double	oldtime, newtime;
+
 	double		realtime;		// host.curtime
 	double		frametime;	// time between engine frames
 	double		realframetime;	// for some system events, e.g. console animations
