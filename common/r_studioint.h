@@ -155,6 +155,10 @@ typedef struct engine_studio_api_s
 	void (*StudioSetCullState)(int iCull);
 	void (*StudioRenderShadow)(int iSprite, const vec3_t p1, const vec3_t p2, const vec3_t p3, const vec3_t p4);
 
+	// xash3d extension
+	void (*StudioDrawAttachments)(void);
+	void (*StudioDrawEyePosition)(void);
+
 	bool (*StudioSetupBones_Pre)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
 	void (*StudioSetupBones_Post)(struct cl_entity_s* ent, studiohdr_t* pstudiohdr);
 

@@ -205,6 +205,10 @@ set rendermode
 void GAME_EXPORT TriRenderMode( int mode )
 {
     GL_SetRenderMode( mode );
+	if(mode == kRenderNormal)
+		pglDepthMask(GL_TRUE);
+	if(mode == kRenderTransAlpha || mode == kRenderTransAdd || mode == kRenderGlow)
+		pglDepthMask(GL_FALSE);
 }
 
 /*

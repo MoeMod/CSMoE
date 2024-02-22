@@ -2641,6 +2641,7 @@ static void GAME_EXPORT R_StudioDrawHulls( void )
 	else alpha = 1.0f;
 
 	GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
+	pglDisable( GL_DEPTH_TEST ); // CSMoE added : allow additive
 
 	for( i = 0; i < m_pStudioHeader->numhitboxes; i++ )
 	{
@@ -2715,6 +2716,7 @@ static void GAME_EXPORT R_StudioDrawHulls( void )
 		gTriApi.Vertex3fv( v2[5] );
 		gTriApi.End( );			
 	}
+	pglEnable( GL_DEPTH_TEST ); // CSMoE added : allow additive
 }
 
 /*
@@ -2739,6 +2741,7 @@ static void GAME_EXPORT R_StudioDrawAbsBBox( void )
 	pglDisable( GL_DEPTH_TEST );
 
 	gTriApi.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );	// red bboxes for studiomodels
+	TriRenderMode( kRenderTransAdd );
 	gTriApi.Begin( TRI_LINES );
 
 	for( i = 0; i < 2; i += 1 )
@@ -2758,6 +2761,7 @@ static void GAME_EXPORT R_StudioDrawAbsBBox( void )
 	}
 
 	gTriApi.End();
+	TriRenderMode( kRenderNormal );
 	//pglEnable( GL_TEXTURE_2D );
 	pglEnable( GL_DEPTH_TEST );
 }
@@ -2775,6 +2779,7 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 	int		i;
 
 	GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
+	pglDisable( GL_DEPTH_TEST ); // CSMoE added : allow additive
 
 	for( i = 0; i < m_pStudioHeader->numbones; i++ )
 	{
@@ -2813,6 +2818,7 @@ static void GAME_EXPORT R_StudioDrawBones( void )
 			gTriApi.End();
 		}
 	}
+	pglEnable( GL_DEPTH_TEST ); // CSMoE added : allow additive
 }
 
 static void R_StudioDrawAttachments( void )
@@ -2854,6 +2860,18 @@ static void R_StudioDrawAttachments( void )
 		gTriApi.End();
 	}
 
+	pglEnable( GL_DEPTH_TEST );
+}
+
+static void GAME_EXPORT R_StudioDrawEyePosition( void )
+{
+	GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
+	pglDisable( GL_DEPTH_TEST );
+	TriPointSize(7.0f);
+	TriColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	TriBegin(TRI_POINTS);
+	TriVertex3f(m_pStudioHeader->eyeposition[0], m_pStudioHeader->eyeposition[1], m_pStudioHeader->eyeposition[2]);
+	TriEnd();
 	pglEnable( GL_DEPTH_TEST );
 }
 
@@ -3159,7 +3177,10 @@ static void GAME_EXPORT R_StudioClientEvents( void )
 	pevent = (mstudioevent_t *)((byte *)m_pStudioHeader + pseqdesc->eventindex);
 
 	// no events for this animation or gamepaused
-	if( pseqdesc->numevents == 0 || cl.time == cl.oldtime )
+	// support for HLMV
+	double time, oldtime;
+	pfnGetEngineTimes( nullptr, &time, &oldtime );
+	if( pseqdesc->numevents == 0 || time == oldtime )
 		return;
 
 	f = R_StudioEstimateFrame( e, pseqdesc );	// get start offset
@@ -4034,6 +4055,8 @@ static engine_studio_api_t gStudioAPI =
 	R_StudioSetRenderamt,
 	R_StudioSetCullState,
 	R_StudioRenderShadow,
+	R_StudioDrawAttachments,
+	R_StudioDrawEyePosition,
 	StudioSetupBones_Pre,
 	StudioSetupBones_Post,
 	pfnModCurrentEntity,

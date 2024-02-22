@@ -1975,6 +1975,40 @@ void CStudioModelRenderer::StudioRenderFinal_Hardware(void)
 		gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
 	}
 
+	// hack : xash3d extensions for HLMV
+	if (m_pCvarDrawEntities->value == 5)
+	{
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+		IEngineStudio.StudioDrawAbsBBox( );
+		gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
+	}
+
+	if (m_pCvarDrawEntities->value == 6)
+	{
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+		IEngineStudio.StudioDrawAttachments( );
+		gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
+	}
+
+	if (m_pCvarDrawEntities->value == 7)
+	{
+		// TODO : lightspot
+	}
+
+	if (m_pCvarDrawEntities->value == 8)
+	{
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+		IEngineStudio.StudioDrawBones();
+		gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
+	}
+
+	if (m_pCvarDrawEntities->value == 9)
+	{
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+		IEngineStudio.StudioDrawEyePosition( );
+		gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
+	}
+
 	IEngineStudio.RestoreRenderer();
 }
 

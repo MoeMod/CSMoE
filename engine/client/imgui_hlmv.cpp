@@ -1,5 +1,5 @@
 /*
-imgui_hlmv.h
+imgui_hlmv.cpp
 Copyright (C) 2024 Moemod Hymei
 
 This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ GNU General Public License for more details.
 #include "ImGuiFileDialog/ImGuiFileDialog.h"
 #include "studio.h"
 #include "gl_texlru.h"
+#include "gl_triapi.h"
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -37,6 +38,8 @@ class ImGui_HLMV
 	ref_params_t refdef;
 	cl_entity_t  hlmvent;
 	vec3_t vieworg;
+	vec3_t trans;
+	vec3_t rot;
 	float viewfov = 90;
 	float viewaspect = 0; // TODO
 	int current_event = 0;
@@ -53,6 +56,7 @@ class ImGui_HLMV
 	bool is_show_all_meshes = true; // TODO : no UI
 	bool is_draw_crosshair = false;
 	bool is_draw_guidelines = false;
+	bool is_show_ground = false; // TODO : not implemented
 
 	enum class TabItems
 	{
@@ -97,6 +101,8 @@ public:
 		hlmvent.curstate.frame = 0.0f;
 		hlmvent.curstate.framerate = 1.0f;
 		hlmvent.curstate.effects |= EF_FULLBRIGHT;
+		hlmvent.curstate.rendermode = kRenderTransTexture;
+		hlmvent.curstate.renderamt = 255;
 		hlmvent.curstate.controller[0] = 0;
 		hlmvent.curstate.controller[1] = 0;
 		hlmvent.curstate.controller[2] = 0;
@@ -133,8 +139,8 @@ public:
 	    }
 	    else
 	    {
-		    refdef.vieworg = { 45.0f, 0.0f, 2.0f };
-		    refdef.viewangles = { 0.0f, 180.0f, 0.0f };
+		    refdef.vieworg = { 45.0f + trans.x, 0.0f + trans.y, 2.0f + trans.z };
+		    refdef.viewangles = { 0.0f + rot.x, 180.0f + rot.y, 0.0f + rot.z };
 	    }
     }
 
@@ -183,9 +189,30 @@ public:
 		}
 	}
 
+	void DrawGround()
+	{
+		if(is_show_ground)
+		{
+			GL_Cull(GL_NONE);
+			TriRenderMode(kRenderTransTexture);
+			TriColor4f(0.85f, 0.85f, 0.85f, 0.69f);
+			GL_Bind( XASH_TEXTURE0, tr.whiteTexture );
+			TriBegin(TRI_TRIANGLE_STRIP);
+			TriTexCoord2f(1.0f, 0.0f);
+			TriVertex3f(100.0f, 100.0f, 0.0f);
+			TriTexCoord2f(1.0f, 1.0f);
+			TriVertex3f(100.0f, 100.0f, 0.0f);
+			TriTexCoord2f(0.0f, 0.0f);
+			TriVertex3f(-100.0f, 100.0f, 0.0f);
+			TriTexCoord2f(0.0f, 1.0f);
+			TriVertex3f(-100.0f, -100.0f, 0.0f);
+			TriEnd();
+		}
+	}
+
 	void SetFrame(float n)
 	{
-		hlmvent.curstate.animtime = Sys_DoubleTime();
+		hlmvent.curstate.animtime = host.newtime;
 		hlmvent.curstate.frame = n;
 	}
 
@@ -259,7 +286,7 @@ public:
 		}
 
 		int frame = GetFrame();
-		if(ImGui::DragInt("Frame", &frame, 1, 0, pseqdesc->numframes - 1), "%d", ImGuiSliderFlags_ClampOnInput)
+		if(ImGui::DragInt("Frame", &frame, 1, 0, pseqdesc->numframes - 1, "%d", ImGuiSliderFlags_ClampOnInput))
 		{
 			SetFrame(frame);
 		}
@@ -270,14 +297,38 @@ public:
 		}
 	}
 
-	void OnGUI_Stub()
+	void OnGUI_ModelDisplay()
 	{
-
-	}
-
-	void UpdateBody()
-	{
-
+		// TODO : render mode
+		float opacity = hlmvent.curstate.renderamt / 255.0f * 100.0f;
+		if(ImGui::DragFloat("Opacity", &opacity, 1, 0, 100, "%.0f%%", ImGuiSliderFlags_ClampOnInput))
+		{
+			hlmvent.curstate.renderamt = opacity / 100.0f * 255.0f;
+		}
+		ImGui::Separator();
+		int r_drawentities = Cvar_VariableInteger("r_drawentities");
+		bool is_show_hitbox = r_drawentities == 4;
+		bool is_show_bones = r_drawentities == 8;
+		bool is_show_attachments = r_drawentities == 6;
+		bool is_show_eyepos = r_drawentities == 9;
+		if(ImGui::Checkbox("Show Hit Boxes", &is_show_hitbox))
+		{
+			Cvar_Set("r_drawentities", is_show_hitbox ? "4" : "1");
+		}
+		if(ImGui::Checkbox("Show Bones", &is_show_bones))
+		{
+			Cvar_Set("r_drawentities", is_show_bones ? "8" : "1");
+		}
+		if(ImGui::Checkbox("Show Attachments", &is_show_attachments))
+		{
+			Cvar_Set("r_drawentities", is_show_attachments ? "6" : "1");
+		}
+		if(ImGui::Checkbox("Show Eye Position", &is_show_eyepos))
+		{
+			Cvar_Set("r_drawentities", is_show_eyepos ? "9" : "1");
+		}
+		ImGui::Separator();
+		//ImGui::Checkbox("Show Ground", &is_show_ground); // TODO : implement it
 	}
 
 	void OnGUI_BodyParts()
@@ -489,8 +540,6 @@ public:
 				ImGui::EndCombo();
 			}
 
-			ImGui::Checkbox("Play Sound", &is_play_sound);
-
 			if(current_event < pseqdesc->numevents)
 			{
 				mstudioevent_t *pevent = (mstudioevent_t *) ((byte *)studiohdr + pseqdesc->eventindex) + current_event;
@@ -671,8 +720,41 @@ public:
 		auto size = ImGui::CalcItemSize(ImVec2(-1, -1), 0, 0);
 		ImRect bb(mins, ImVec2(mins.x + size.x, mins.y + size.y));
 		ImGui::ItemSize(bb);
-		if(ImGui::ItemAdd(bb, 0))
+		ImGuiID id = window->GetID("hlmv viewport");
+		if(ImGui::ItemAdd(bb, id))
 		{
+			const bool hovered = ImGui::ItemHoverable(bb, id);
+			const bool focus_requested = ImGui::FocusableItemRegister(window, id);
+			const bool left_clicked = (hovered && ImGui::GetIO().MouseClicked[0]);
+			const bool right_clicked = (hovered && ImGui::GetIO().MouseClicked[1]);
+			if (focus_requested || left_clicked || right_clicked)
+			{
+				ImGui::SetActiveID(id, window);
+				ImGui::SetFocusID(id, window);
+				ImGui::FocusWindow(window);
+			}
+			if (ImGui::GetActiveID() == id)
+			{
+				if (ImGui::GetCurrentContext()->ActiveIdSource == ImGuiInputSource_Mouse && ImGui::IsMousePosValid() && ImGui::GetIO().MouseDown[0])
+				{
+					rot[1] += ImGui::GetIO().MouseDelta[ImGuiAxis_X];
+					rot[0] += ImGui::GetIO().MouseDelta[ImGuiAxis_Y];
+				}
+				else if (ImGui::GetCurrentContext()->ActiveIdSource == ImGuiInputSource_Mouse && ImGui::IsMousePosValid() && ImGui::GetIO().MouseDown[1])
+				{
+					trans[1] -= ImGui::GetIO().MouseDelta[ImGuiAxis_X];
+					trans[2] += ImGui::GetIO().MouseDelta[ImGuiAxis_Y];
+				}
+				else
+				{
+					ImGui::ClearActiveID();
+				}
+			}
+			if(hovered)
+			{
+				trans[0] += ImGui::GetIO().MouseWheel;
+			}
+
 			UpdateRefdef(mins.x, mins.y, size.x, size.y);
 			auto drawlist = window->DrawList;
 			drawlist->AddRectFilled(bb.Min, bb.Max, ImColor(0.5f, 0.75f, 0.75f, 1.0f));
@@ -779,7 +861,7 @@ public:
 						SelectedTab = (TabItems)i;
 
 						void (ImGui_HLMV::*TabHandlers[])() = {
-								&ImGui_HLMV::OnGUI_Stub,
+								&ImGui_HLMV::OnGUI_ModelDisplay,
 								&ImGui_HLMV::OnGUI_BodyParts,
 								&ImGui_HLMV::OnGUI_Textures,
 								&ImGui_HLMV::OnGUI_Sequences,
