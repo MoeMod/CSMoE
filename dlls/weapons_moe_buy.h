@@ -416,6 +416,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_CHAINMG , "weapon_chainmg",  "【黯火】M134",    10000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG , 14 },
 	{ WEAPON_SOULREAPER , "weapon_soulreaper",  "碧魄苍龙",    6100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP , 30 },
 	{ WEAPON_LEAPSTRIKEGUN, "weapon_leapstrikegun",	 "次元裁决",			  2300,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL ,20 },
+	{ WEAPON_M134HERO, "weapon_m134hero",      "英雄M134",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG ,10 },
+
 #endif
 };
 

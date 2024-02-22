@@ -66,6 +66,7 @@ void CM134::Precache(void)
 	PRECACHE_MODEL("models/shell762_m134.mdl");
 	PRECACHE_MODEL("models/shell762_m134_01.mdl");
 	m_usFireM134 = PRECACHE_EVENT(1, "events/m134.sc");
+	m_usM134FireAfter = PRECACHE_EVENT(1, "events/m134heroFA.sc");
 }
 
 int CM134::GetItemInfo(ItemInfo *p)
@@ -108,6 +109,7 @@ void CM134::PrimaryAttack(void)
 void CM134::ItemPostFrame()
 {
 	m_iButton = m_pPlayer->pev->button;
+	int flags;
 
 	if (m_iButton & IN_ATTACK && m_pPlayer->m_bCanShoot)
 	{
@@ -119,6 +121,14 @@ void CM134::ItemPostFrame()
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 			m_iM134State = WPNSTATE_M134_IDLE;
 			m_pPlayer->pev->button = m_iButton & ~IN_ATTACK;
+
+#ifdef CLIENT_WEAPONS
+			flags = FEV_NOTHOST;
+#else
+			flags = 0;
+#endif
+			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usM134FireAfter, 0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, FALSE);
+
 		}
 		if (m_iM134State == WPNSTATE_M134_IDLE)
 		{
@@ -172,6 +182,14 @@ void CM134::ItemPostFrame()
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 			m_iM134State = WPNSTATE_M134_SPIN_DOWN;
 			m_pPlayer->pev->button = m_iButton & ~IN_ATTACK;
+
+#ifdef CLIENT_WEAPONS
+			flags = FEV_NOTHOST;
+#else
+			flags = 0;
+#endif
+			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usM134FireAfter, 0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, FALSE, FALSE);
+
 		}
 
 		if (m_iM134State == WPNSTATE_M134_SPIN_DOWN && m_flNextPrimaryAttack <= 0.0s)

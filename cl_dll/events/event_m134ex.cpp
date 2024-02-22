@@ -27,6 +27,13 @@
 */
 #include "events.h"
 
+
+namespace cl {
+
+	extern float g_flTimeM134FireAfter;
+
+}
+
 namespace cl::event::m134ex {
 
 enum m134ex_e
@@ -65,7 +72,21 @@ void EV_FireM134ex(event_args_s *args)
 	{
 
 		++g_iShotsFired;
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(M134_SHOOT, 2);
+
+		if (gHUD.m_flTime >= g_flTimeM134FireAfter)
+		{
+			if (gHUD.m_flTime > g_flTimeM134FireAfter + 1.0)
+			{
+				g_flTimeM134FireAfter = gHUD.m_flTime;
+
+				gEngfuncs.pEventAPI->EV_WeaponAnimation(M134_SHOOT, 2);
+			}
+		}
+		else
+		{
+			g_flTimeM134FireAfter = gHUD.m_flTime;
+		}
+
 		EV_MuzzleFlash();
 		if( !gHUD.cl_righthand->value )
 		{

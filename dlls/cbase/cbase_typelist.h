@@ -458,6 +458,7 @@ TL_ADD(CLightningSMG)
 TL_ADD(CM4A1_S_Transformers)
 TL_ADD(CSoulReaper)
 TL_ADD(CChainMG)
+TL_ADD(CM134hero)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -884,7 +885,10 @@ TL_ADD(CCannonFireBall)
 TL_ADD(CAK47_AngelicBeastGrenade)
 TL_ADD(CLightningARElectroField)
 TL_ADD(CLightningSMGElectroMissile)
-
+TL_ADD(CChainMG_ShadowChainMG)
+TL_ADD(CChainMG_ShadowMP5)
+TL_ADD(CChainMG_ShadowAT4)
+TL_ADD(CChainMG_ShadowAT4Rocket)
 #endif
 
 TL_END(AllEntityTypeList)

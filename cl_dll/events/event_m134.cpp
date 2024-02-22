@@ -26,13 +26,14 @@
 *
 */
 #include "events.h"
-/*#include "studio.h"
-#include "r_studioint.h"
-#include <string>*/
+
+namespace cl {
+
+	extern float g_flTimeM134FireAfter;
+
+}
 
 namespace cl::event::m134 {
-
-//extern engine_studio_api_t IEngineStudio;
 
 enum m134_e
 {
@@ -74,45 +75,21 @@ void EV_FireM134(event_args_s *args)
 	{
 
 		++g_iShotsFired;
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(M134_SHOOT, 2);
-
-		/*struct model_s* pModel_1 = IEngineStudio.Mod_ForName("sprites/muzzleflash6.spr", false);
-		struct model_s* pModel_2 = IEngineStudio.Mod_ForName("sprites/muzzleflash7.spr", false);
-		if (pModel_1)
+		
+		if (gHUD.m_flTime >= g_flTimeM134FireAfter)
 		{
-			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel_1);
+			if (gHUD.m_flTime > g_flTimeM134FireAfter + 1.0)
+			{
+				g_flTimeM134FireAfter = gHUD.m_flTime;
 
-			pEnt->entity.curstate.frame = 0;
-			pEnt->entity.curstate.framerate = 30.0;
-
-			pEnt->entity.curstate.scale = 0.1;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.baseline.origin = Vector(0, 0, 0);
-			pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-			pEnt->entity.curstate.solid = SOLID_NOT;
-
-			pEnt->die = gHUD.m_flTime + 0.01;
-			pEnt->flags |= FTENT_SPRANIMATE;
+				gEngfuncs.pEventAPI->EV_WeaponAnimation(M134_SHOOT, 2);
+			}
+		}
+		else
+		{
+			g_flTimeM134FireAfter = gHUD.m_flTime;
 		}
 
-		if (pModel_2)
-		{
-			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel_2);
-
-			pEnt->entity.curstate.frame = 0;
-			pEnt->entity.curstate.framerate = 30.0;
-
-			pEnt->entity.curstate.scale = 0.1;
-			pEnt->entity.curstate.rendermode = kRenderTransAdd;
-			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.baseline.origin = Vector(0, 0, 0);
-			pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-			pEnt->entity.curstate.solid = SOLID_NOT;
-
-			pEnt->die = gHUD.m_flTime + 0.01;
-			pEnt->flags |= FTENT_SPRANIMATE;
-		}*/
 		EV_MuzzleFlash();
 		if( !gHUD.cl_righthand->value )
 		{

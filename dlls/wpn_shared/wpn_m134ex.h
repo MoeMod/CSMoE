@@ -66,6 +66,7 @@ public:
 
 private:
 	unsigned short m_usFireM134ex;
+	unsigned short m_usM134FireAfter;
 };
 
 }

@@ -253,7 +253,7 @@ ConstSprList s_ModelLeapStrikeGun = {
 	"v_leapstrikegun.mdl",
 	{
 		{
-			0,
+			4,
 			"sprites/leapstrikegun_v_ef.spr",
 			30,
 			{
@@ -263,7 +263,7 @@ ConstSprList s_ModelLeapStrikeGun = {
 			}
 		},
 		{
-			4,
+			3,
 			"sprites/ef_leapstrikegun_vmuzzle.spr",
 			30,
 			{
@@ -466,6 +466,193 @@ ConstSprList s_ModelBuffClass23S3CT = {
 	}
 };
 
+ConstSprList s_ModelSoulReaperShootC02 = {
+	"ef_soulreaper_shoot_c02.mdl",
+	{
+		{
+			0,
+			"sprites/ef_soulreaper_shoot_c.spr",
+			15,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+			}
+		},
+	}
+};
+
+ConstSprList s_ModelSoulReaperShootC = {
+	"ef_soulreaper_shoot_c.mdl",
+	{
+		{
+			0,
+			"sprites/ef_soulreaper_shoot_c.spr",
+			15,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+			}
+		},
+	}
+};
+
+ConstSprList s_ModelSoulReaperSkill = {
+	"ef_soulreaper_skill.mdl",
+	{
+		{
+			0,
+			"sprites/ef_soulreaper_skill.spr",
+			30,
+			{
+				{ 0, false, true, 1.0, 0, 0, 0 },
+			}
+		},
+	}
+};
+
+ConstSprList s_ModelPSoulReaper = {
+	"p_soulreaper.mdl",
+	{
+		{
+			1,
+			"sprites/ef_soulreaper_skill.spr",
+			30,
+			{
+				{ 2, false, true, 1.0, 0, 0, 0 },
+			}
+		},
+	}
+};
+
+ConstSprList s_ModelSoulReaperAmode = {
+	"ef_soulreaper_Amode.mdl",
+	{
+		{
+			0,
+			"sprites/ef_soulreaper_p.spr",
+			30,
+			{
+				{ 0, false, true, 1.0, 0, 0, 0 },
+			}
+		},
+	}
+};
+
+ConstSprList s_ModelSoulReaperCmode = {
+	"ef_soulreaper_Cmode.mdl",
+	{
+		{
+			0,
+			"sprites/ef_soulreaper_p.spr",
+			30,
+			{
+				{ 0, false, true, 1.0, 0, 0, 0 },
+			}
+		},
+	}
+};
+
+ConstSprList s_ModelVSoulReaper = {
+	"v_soulreaper.mdl",
+	{
+		{
+			2,
+			"sprites/ef_soulreaper_green01.spr",
+			30,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+				{ 1, true, false, 1.0, 0, 0, 0 },
+				{ 2, true, false, 1.0, 0, 0, 0 },
+				{ 3, true, false, 1.0, 0, 0, 0 },
+				{ 4, true, false, 1.0, 0, 0, 0 },
+				{ 9, true, false, 1.0, 0, 0, 0 },
+			}
+		},
+		{
+			3,
+			"sprites/ef_soulreaper_green02.spr",
+			30,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+				{ 1, true, false, 1.0, 0, 0, 0 },
+				{ 2, true, false, 1.0, 0, 0, 0 },
+				{ 3, true, false, 1.0, 0, 0, 0 },
+				{ 4, true, false, 1.0, 0, 0, 0 },
+				{ 9, true, false, 1.0, 0, 0, 0 },
+			}
+		},
+		{
+			5,
+			"sprites/ef_soulreaper_sphere_c.spr",
+			30,
+			{
+				{ 5, false, false, 1.0, 45, 88, 0 },
+				{ 6, false, false, 1.0, 45, 88, 0 },
+				{ 7, false, false, 1.0, 45, 88, 0 },
+				{ 8, false, true, 1.0, 0, 88, 0 },
+			}
+		},
+		{
+			8,
+			"sprites/ef_soulreaper_blue01.spr",
+			30,
+			{
+				{ 5, true, false, 1.0, 0, 0, 0 },
+				{ 6, true, false, 1.0, 0, 0, 0 },
+				{ 7, true, false, 1.0, 0, 0, 0 },
+				{ 8, true, false, 1.0, 0, 0, 0 },
+			}
+		},
+		{
+			9,
+			"sprites/ef_soulreaper_blue02.spr",
+			30,
+			{
+				{ 5, true, false, 1.0, 0, 0, 0 },
+				{ 6, true, false, 1.0, 0, 0, 0 },
+				{ 7, true, false, 1.0, 0, 0, 0 },
+				{ 8, true, false, 1.0, 0, 0, 0 },
+			}
+		},
+		{
+			10,
+			"sprites/ef_soulreaper_cmode.spr",
+			30,
+			{
+				{ 5, true, false, 1.0, 0, 0, 0 },
+				{ 6, true, false, 1.0, 0, 0, 0 },
+				{ 7, true, false, 1.0, 0, 0, 0 },
+				{ 8, true, false, 1.0, 0, 0, 0 },
+			}
+		},
+		{
+			11,
+			"sprites/ef_soulreaper_amode.spr",
+			30,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+				{ 1, true, false, 1.0, 0, 0, 0 },
+				{ 2, true, false, 1.0, 0, 0, 0 },
+				{ 3, true, false, 1.0, 0, 0, 0 },
+				{ 4, true, false, 1.0, 0, 0, 0 },
+				{ 9, true, false, 1.0, 0, 0, 0 },
+			}
+		},
+	}
+};
+
+ConstSprList s_ModelVChainMG = {
+	"v_chainmg.mdl",
+	{
+		{
+			0,
+			"sprites/ef_chainmg_v01.spr",
+			30,
+			{
+				{ 3, false, true, 1.0, 0, 0, 4 },
+				{ 4, false, true, 1.0, 0, 5, 9 },
+			}
+		},
+	}
+};
 // ConstSprList s_ModelM82A1AngelicBeast = {
 // 	"PV-M82A1_AngelicBeast.mdl",
 // 	"FXBASE.bmp",
@@ -517,6 +704,14 @@ void CBindSprManager::Vidinit(void)
 	LoadSpr(&s_ModelLinkAttackSGPart);
 	LoadSpr(&s_ModelY23S3BuffM249);
 	LoadSpr(&s_ModelBuffClass23S3CT);
+	LoadSpr(&s_ModelSoulReaperShootC02);
+	LoadSpr(&s_ModelSoulReaperShootC);
+	LoadSpr(&s_ModelSoulReaperSkill);
+	LoadSpr(&s_ModelPSoulReaper);
+	LoadSpr(&s_ModelSoulReaperAmode);
+	LoadSpr(&s_ModelSoulReaperCmode);
+	LoadSpr(&s_ModelVSoulReaper);
+	LoadSpr(&s_ModelVChainMG);
 	//LoadSpr(&s_ModelM82A1AngelicBeast);
 }
 

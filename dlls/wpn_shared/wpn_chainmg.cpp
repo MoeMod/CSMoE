@@ -19,193 +19,79 @@ GNU General Public License for more details.
 #include "player.h"
 #include "weapons.h"
 #include "weapons/knifeattack.h"
-#include "weapons/WeaponTemplate.hpp"
+#include "wpn_chainmg.h"
+
 
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
 #endif
-    class CChainMG : public LinkWeaponTemplate< CChainMG,
-            TGeneralData,
-            BuildTGetItemInfoFromCSW<WEAPON_M249>::template type,
-            TPrecacheEvent,
-            TDeployDefault,
-            TReloadDefault,
-            TGetDamageDefault,
-            TPrimaryAttackRifle
-    >
+   
+    LINK_ENTITY_TO_CLASS(weapon_chainmg, CChainMG)
+
+    void CChainMG::Spawn()
     {
-    public:
-    static constexpr const auto &DefaultReloadTime = 5.0s;
-    static constexpr const char *V_Model = "models/v_chainmg.mdl";
-    static constexpr const char *P_Model = "models/p_chainmg.mdl";
-    static constexpr const char *W_Model = "models/w_chainmg.mdl";
-    static constexpr const char *EventFile = "events/m249.sc";
-    static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
-    static constexpr const char *ClassName = "weapon_chainmg";
-    static constexpr const char *AnimExtension = "chainmg";
-    static constexpr int MaxClip = 300;
-	enum
-	{
-		ANIM_IDLE1 = 0,
-        ANIM_DRAW,
-        ANIM_RELOAD,
-        ANIM_SHOOT,
-        ANIM_FIRE_AFTER,
-        ANIM_FIRE_CHANGE,
-        ANIM_IDLE_CHANGE,
-	};
+        Base::Spawn();
+    }
 
-    static constexpr int SPMax = 100;
-    static constexpr int SPCost = 50;
-    static constexpr const auto& SPChargingTime = 0.32s;
-    static constexpr const auto& SPChargingTimeZombie = 0.32s;
-    static constexpr const auto& SPChargingTimeScenario = 0.32s;
-    static constexpr const auto& SPCycleTime = 0.32s;
-
-    static constexpr float IdleEffectSize = 50.0;   //???
-    static constexpr float ShadowShootRadius = 20.0;
-    static constexpr int ShadowCountLimit = 3;
-
-    static constexpr float ShadowKnockbackGround = 0.0;
-    static constexpr float ShadowKnockbackJump = 0.0;
-    static constexpr float ShadowKnockbackJumpForward = 0.0;
-    static constexpr float ShadowKnockbackDucking = 0.0;
-    static constexpr float ShadowVelocityModifier = 0.0;
-
-    static constexpr const auto& ShadowModelLifeTime = 0.32s;
-    static constexpr const auto& ShadowModelFadeInTime = 0.32s;
-    static constexpr const auto& ShadowModelFadeOutTime = 0.32s;
-
-    static constexpr float ShadowModelFadeInStartAlpha = 10.0;
-    static constexpr float ShadowModelBaseAlpha = 160.0;
-    static constexpr float ShadowModelFadeOutEndAlpha = 10.0;
-    static constexpr float ShadowModelOffsetLength = 50.0;
-    static constexpr float ShadowModelNoTargetOffsetLength = -50.0;
-    static constexpr float ShadowModelNoTargetDirection = 1.0;
-    static constexpr float ShadowModelNoTargetAngle = 180.0;
-    static constexpr float ShadowShowEffect1Scale = 0.8;
-    static constexpr float ShadowShowEffect1ZOffset = 30.0;
-    static constexpr float ShadowShowEffect2Scale = 1.5;
-    static constexpr float ShadowShowEffect2ZOffset = 130.0;
-
-    static constexpr float ShadowMP5Damage = 2.0;
-    static constexpr float ShadowMP5DamageZombie = 190.0;
-    static constexpr float ShadowMP5DamageScenario = 410.0;
-
-    static constexpr const auto& ShadowMP5EnableDelay = 1.0s;
-    static constexpr const auto& ShadowMP5LifeTime = 2.4s;
-    static constexpr const auto& ShadowMP5CycleTime = 0.6s;
-    static constexpr const auto& ShadowMP5FixDuration = 0.1s;
-    static constexpr float ShadowMP5EnableFixSpeed = 150.0;
-
-    static constexpr float ShadowChainMGDamage = 3.0;
-    static constexpr float ShadowChainMGDamageZombie = 200.0;
-    static constexpr float ShadowChainMGDamageScenario = 430.0;
-
-    static constexpr const auto& ShadowChainMGEnableDelay = 1.0s;
-    static constexpr const auto& ShadowChainMGLifeTime = 2.4s;
-    static constexpr const auto& ShadowChainMGCycleTime = 0.06s;
-    static constexpr const auto& ShadowChainMGFixDuration = 0.1s;
-    static constexpr float ShadowChainMGFixSpeed = 150.0;
-
-    static constexpr float ShadowAT4DirectDamage = 20.0;
-    static constexpr float ShadowAT4DirectDamageZombie = 2000.0;
-    static constexpr float ShadowAT4DirectDamageScenario = 9300.0;
-
-    static constexpr float ShadowAT4ExplodeDamage = 20.0;
-    static constexpr float ShadowAT4ExplodeDamageZombie = 6800.0;
-    static constexpr float ShadowAT4ExplodeDamageScenario = 9300.0;
-
-    static constexpr const auto& ShadowAT4EnableDelay = 1.0s;
-    static constexpr float ShadowAT4SpawnAngle = 45.0;
-    static constexpr float ShadowAT4SpawnDist = 3.0;
-    static constexpr float ShadowAT4ExplodeRadius = 5.0;
-
-    static constexpr const auto& ShadowAT4FixDuration = 1.25s;
-    static constexpr float ShadowAT4FixSpeed = 70.0;
-    static constexpr float ShadowAT4FixGravity = 100.0;
-    static constexpr float ShadowAT4RocketSpeed = 2000.0;
-
-    static constexpr float PlayerMaxSpeed = 230;
-    static constexpr float ArmorRatioModifier = 1.5f;
-	static constexpr float PrimaryAttackWalkingMiniumSpeed = 0;
-    static constexpr const auto &SpreadCalcNotOnGround = 0.2*A + 0.03;
-    static constexpr const auto &SpreadCalcWalking = 0.04*A + 0.02;
-    static constexpr const auto &SpreadCalcDefault = 0.01*A;
-
-	static constexpr const auto& CycleTime = 0.6s;
-    static constexpr int DamageDefault = 38;
-    static constexpr int DamageZB = 230;
-    static constexpr int DamageZBS = 585;
-    static constexpr float AccuracyDefault = 0.2;
-    static constexpr float AccuracyLimit = 1.2;
-    static constexpr float AccuracyDiv = 200.0;
-    static constexpr float AccuracyAdd = 0.3;
-    static constexpr float RangeMod = 0.99;
-    static constexpr auto BulletType = BULLET_PLAYER_556MM;
-    /*static constexpr*/ int Penetration = 3;
-    KnockbackData KnockBack = { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f };
-
-	KickBackData KickBackWalking = { 1.1, 0.5, 0.3, 0.06, 4.0, 3.0, 8 };
-	KickBackData KickBackNotOnGround = { 1.8, 0.65, 0.45, 0.125, 5.0, 3.5, 8 };
-	KickBackData KickBackDucking = { 0.75, 0.325, 0.25, 0.025, 3.5, 2.5, 9 };
-	KickBackData KickBackDefault = { 0.8, 0.35, 0.3, 0.03, 3.75, 3.0, 9 };
-
-    void Precache(void)
+    void CChainMG::Precache(void)
     {
+        PRECACHE_MODEL("sprites/muzzleflash364.spr");
+        PRECACHE_MODEL("sprites/muzzleflash365.spr");
+
+        m_iSkillModelIndex[0] = PRECACHE_MODEL("sprites/ef_chainsr_skill.spr");
+        m_iSkillModelIndex[1] = PRECACHE_MODEL("sprites/ef_chainsr_skill2.spr");
+
         Base::Precache();
-        PRECACHE_SOUND("weapons/chainmg_hit1.wav");
-        PRECACHE_SOUND("weapons/chainmg_hit2.wav");
-        PRECACHE_SOUND("weapons/chainmg_shoot3.wav");
-        PRECACHE_SOUND("weapons/chainmg_shoot4.wav");
     }
 
-
-    int GetItemInfo(ItemInfo* p) override
+    void CChainMG::WeaponIdle(void)
     {
-        p->pszName = STRING(pev->classname);
-        p->pszAmmo1 = "chainmg";
-        p->iMaxAmmo1 = 300;
-        p->pszAmmo2 = NULL;
-        p->iMaxAmmo2 = -1;
-        p->iMaxClip = MaxClip;
-        p->iSlot = 0;
-        p->iPosition = 1;
-        p->iId = m_iId = WEAPON_CHAINMG;
-        p->iFlags = 0;
-        p->iWeight = M249_WEIGHT;
-        return 1;
-    }
+        ResetEmptySound();
+        m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
 
-    bool HasSecondaryAttack() override { return true; }
-#ifndef CLIENT_DLL
-    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_chainmg" , 60 }; }
+        if (m_iLastAnim == ANIM_SHOOT)
+        {       
+            SendWeaponAnim(ANIM_FIRE_AFTER, UseDecrement() != FALSE);
+            m_iLastAnim = ANIM_FIRE_AFTER;
+            
+            m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
+            int flags;
+#ifdef CLIENT_WEAPONS
+            flags = FEV_NOTHOST;
+#else
+            flags = 0;
 #endif
-    float GetArmorRatioModifier() override { return 1.5; }
-    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_SPEED, 6, 3, 140 }; }
-
-
-    float GetMaxSpeed(void)
-    {
-        switch (m_pPlayer->pev->weaponanim)
-        {
-        case ANIM_SHOOT:
-        case ANIM_FIRE_CHANGE:
-            return 60;
-        case ANIM_RELOAD:
-            return 80;
-        default:
-            return PlayerMaxSpeed;
+            PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 2.0, 0.0, 0, 0, FALSE, FALSE);    //FireAfter
         }
+
+        if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
+            return;
+
+        m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
+
+       
+        SendWeaponAnim(ANIM_IDLE1, UseDecrement() != FALSE);
+        m_iLastAnim = ANIM_IDLE1;
     }
 
-    void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+    void CChainMG::Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
         if (m_iClip <= 0)
         {
             SendWeaponAnim(ANIM_FIRE_AFTER, UseDecrement() != FALSE);
+            m_iLastAnim = ANIM_FIRE_AFTER;
+            m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
+            int flags;
+#ifdef CLIENT_WEAPONS
+            flags = FEV_NOTHOST;
+#else
+            flags = 0;
+#endif
+            PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 2.0, 0.0, 0, 0, FALSE, FALSE);    //FireAfter
+
 
             if (m_fFireOnEmpty)
             {
@@ -221,11 +107,6 @@ namespace sv {
 
             return;
         }
-
-        SendWeaponAnim(ANIM_SHOOT, UseDecrement() != FALSE);
-
-        if (m_pPlayer->pev->weaponanim != ANIM_SHOOT)
-            return;
 
         m_flAccuracy = (m_iShotsFired * m_iShotsFired * m_iShotsFired) / AccuracyDiv + AccuracyAdd;
 
@@ -257,6 +138,8 @@ namespace sv {
 
         PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
+        m_iLastAnim = ANIM_SHOOT;
+
 #ifndef CLIENT_DLL
         if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
@@ -271,34 +154,182 @@ namespace sv {
             KickBack(0.2, 0.05, 0.035, 0.015, 2.0, 1.25, 0);
     }
 
-    void WeaponIdle(void)
+    void CChainMG::SecondaryAttack(void)
     {
+        m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
+        m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
-    }
-
-
-    float GetSecondaryAttackDamage() const
-    {
-        float flDamage = 50;
 #ifndef CLIENT_DLL
-        if (g_pModRunning->DamageTrack() == DT_ZB)
-            flDamage = 1150;
-        else if (g_pModRunning->DamageTrack() == DT_ZBS)
-            flDamage = 600;
-#endif
-        return flDamage;
-    }
+        m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
-    void SecondaryAttack(void)
-    {
-#ifndef CLIENT_DLL
-        m_pPlayer->SetAnimation(PLAYER_ATTACK2);
+        m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
+        m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
+     
+        CreateEnt(ShadowAT4SpawnAngle);
+        CreateEnt(-ShadowAT4SpawnAngle);
 #endif
-       
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
     }
-    		 	
-};
-LINK_ENTITY_TO_CLASS(weapon_chainmg, CChainMG)
+
+#ifndef CLIENT_DLL
+    void CChainMG::CreateEnt(float fYaw)
+    {
+        UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+  
+        float sinA = sin(fYaw * M_PI / 180);
+        float cosA = cos(fYaw * M_PI / 180);
+        Vector vecSpawnDir = gpGlobals->v_forward * cosA + gpGlobals->v_right * sinA;
+        vecSpawnDir.z = 0;
+
+        Vector vecSpawnSrc = m_pPlayer->pev->origin + vecSpawnDir * ShadowAT4SpawnDist * 39.37;
+        vecSpawnSrc.z -= m_pPlayer->pev->flags & FL_DUCKING ? 16 : 32;
+
+        sinA = sin(-fYaw * M_PI / 180);
+        cosA = cos(-fYaw * M_PI / 180);
+        Vector vecDir = gpGlobals->v_forward * cosA + gpGlobals->v_right * sinA;
+        vecDir.z = 0;
+        Vector vecAngle;
+        VectorAngles(vecDir, vecAngle);
+
+        Vector vecForward = gpGlobals->v_forward;
+  
+        MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, vecSpawnSrc);
+        WRITE_BYTE(TE_TEMPSPRITE);
+        WRITE_COORD(vecSpawnSrc.x);
+        WRITE_COORD(vecSpawnSrc.y);
+        WRITE_COORD(vecSpawnSrc.z);
+        WRITE_SHORT(m_iSkillModelIndex[0]);
+        WRITE_BYTE(15);
+        WRITE_BYTE(255);
+        WRITE_BYTE(30);
+        MESSAGE_END();
+
+        MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, vecSpawnSrc);
+        WRITE_BYTE(TE_TEMPSPRITE);
+        WRITE_COORD(vecSpawnSrc.x);
+        WRITE_COORD(vecSpawnSrc.y);
+        WRITE_COORD(vecSpawnSrc.z);
+        WRITE_SHORT(m_iSkillModelIndex[1]);
+        WRITE_BYTE(15);
+        WRITE_BYTE(255);
+        WRITE_BYTE(10);
+        MESSAGE_END();
+
+        UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/chainsr_smoke.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+        TraceResult tr;
+        Vector vecStart = m_pPlayer->GetGunPosition();
+
+        UTIL_TraceLine(vecStart, vecStart + vecForward * 8192, dont_ignore_monsters, m_pPlayer->edict(), &tr);
+
+
+        CChainMG_ShadowAT4* pShadow = static_cast<CChainMG_ShadowAT4*>(CBaseEntity::Create("chainmg_shadowat4", vecSpawnSrc, vecAngle, ENT(m_pPlayer->pev)));
+        if (pShadow)
+        {
+            pShadow->Init(m_pPlayer, this, tr.vecEndPos, m_pPlayer->pev->flags & FL_DUCKING ? 3 : 1);
+        }
+    }
+#endif
+
+    void CChainMG::WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+    {
+#ifndef CLIENT_DLL
+        ShadowSearchForEnemy(pVictim, pVictim->pev->origin, 0, flDamage, pVictim->m_LastHitGroup);
+#endif
+
+    }
+
+    void CChainMG::ShadowSearchForEnemy(CBaseEntity* pIgnored, Vector vecOrigin, int iType, float flDamage, int iLastHitGroup)
+    {
+#ifndef CLIENT_DLL
+        float flMinDistance = ShadowShootRadius * 39.37;
+
+        CBaseEntity* iIdDetected = NULL;
+        CBaseEntity* pEntity = NULL;
+
+        while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecOrigin, flMinDistance)) != NULL)
+        {
+            if (pEntity->IsDormant())
+                continue;
+
+            if (pEntity->Classify() != CLASS_PLAYER_ALLY && !pEntity->IsPlayer())
+            {
+                if (!FClassnameIs(pEntity->pev, "monster_entity"))
+                    continue;
+            }
+
+            if (pEntity->pev->takedamage == DAMAGE_NO)
+                continue;
+
+            if (pEntity == m_pPlayer)
+                continue;
+
+            if (pEntity == pIgnored)
+                continue;
+
+            //¶ÓÓÑ²»´¥·¢¼ì²â
+            if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) == GR_TEAMMATE)
+                continue;
+
+            if (UTIL_IsWallBetweenEntity(pEntity, pIgnored))
+                continue;
+
+            //iIdDetected = pEntity;
+
+            float flDistance = (pEntity->pev->origin - vecOrigin).Length();
+            if (flMinDistance > flDistance)
+            {
+                flMinDistance = flDistance;
+                iIdDetected = pEntity;
+            }
+        }
+
+        Vector vecDir = (vecOrigin - (iIdDetected ? (iIdDetected->pev->origin) : vecOrigin));
+        Vector vecTemp;
+        Vector vecScale;
+        if (vecDir.Length())
+        {
+            vecDir = vecDir.Normalize();
+            vecTemp = vecDir;
+
+            VectorScale(vecTemp, -32, vecScale);
+            VectorAdd(vecOrigin, vecScale, vecOrigin);
+        }
+
+        MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, vecOrigin);
+        WRITE_BYTE(TE_TEMPSPRITE);
+        WRITE_COORD(vecOrigin.x);
+        WRITE_COORD(vecOrigin.y);
+        WRITE_COORD(vecOrigin.z);
+        WRITE_SHORT(m_iSkillModelIndex[0]);
+        WRITE_BYTE(15);
+        WRITE_BYTE(255);
+        WRITE_BYTE(30);
+        MESSAGE_END();
+
+        MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+        WRITE_BYTE(TE_TEMPSPRITE);
+        WRITE_COORD(vecOrigin.x);
+        WRITE_COORD(vecOrigin.y);
+        WRITE_COORD(vecOrigin.z);
+        WRITE_SHORT(m_iSkillModelIndex[1]);
+        WRITE_BYTE(15);
+        WRITE_BYTE(255);
+        WRITE_BYTE(10);
+        MESSAGE_END();
+
+        UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/chainsr_smoke.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+        CChainMG_ShadowChainMG* pShadow = static_cast<CChainMG_ShadowChainMG*>(CBaseEntity::Create("chainmg_shadowchainmg", vecOrigin, g_vecZero, ENT(m_pPlayer->pev)));
+        if (pShadow)
+        {
+            pShadow->Init(m_pPlayer, this, iIdDetected, iLastHitGroup);
+        }
+  
+        //if (iIdDetected)
+        //	ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "Nearest Enemy Searched : %s [Distance:%s m]", STRING(iIdDetected->pev->netname), std::to_string((flMinDistance / 39.37)).c_str());
+#endif
+    }
+ 
 }

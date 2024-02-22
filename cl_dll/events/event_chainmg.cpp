@@ -27,7 +27,37 @@
 */
 #include "events.h"
 
+namespace cl {
+
+	extern float g_flTimeM134FireAfter;
+
+}
+
 namespace cl::event::chainmg {
+
+
+TEMPENTITY* g_Muzz364 = nullptr;
+TEMPENTITY* g_Muzz365 = nullptr;
+
+
+void EV_ChainMGFireAfter(struct event_args_s* args)
+{
+	if (EV_IsLocal(args->entindex))
+	{
+		g_flTimeM134FireAfter = 0.0f;
+		if (g_Muzz364)
+		{
+			g_Muzz364->die = gHUD.m_flTime;
+			g_Muzz364 = nullptr;
+		}
+
+		if (g_Muzz365)
+		{
+			g_Muzz365->die = gHUD.m_flTime;
+			g_Muzz365 = nullptr;
+		}
+	}
+}
 
 enum chainmg_e
 {
@@ -39,6 +69,20 @@ enum chainmg_e
 	ANIM_FIRE_CHANGE,
 	ANIM_IDLE_CHANGE,
 };
+
+void ResetMuzz(struct tempent_s* ent, float frametime, float currenttime)
+{
+	cl_entity_t* parent = gEngfuncs.GetEntityByIndex(ent->entity.curstate.aiment);
+
+	if (ent->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
+	{
+		ent->entity.curstate.renderamt = 0;
+		ent->die = currenttime;
+		g_Muzz364 = nullptr;
+		g_Muzz365 = nullptr;
+	}
+
+}
 
 void EV_FireChainMG(event_args_s *args)
 {
@@ -64,11 +108,56 @@ void EV_FireChainMG(event_args_s *args)
 
 	ent = gEngfuncs.GetViewModel();
 
+	if (args->fparam1 == 2.0)
+	{
+		EV_ChainMGFireAfter(args);
+		return;
+	}
+
 	if ( EV_IsLocal( args->entindex ) )
 	{
 		++g_iShotsFired;
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT, 2);
+		
+		if (gHUD.m_flTime >= g_flTimeM134FireAfter)
+		{
+			if (gHUD.m_flTime > g_flTimeM134FireAfter + 1.0)
+			{
+				g_flTimeM134FireAfter = gHUD.m_flTime;
+
+				gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT , 2);
+
+
+				int iMuzz364 = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/muzzleflash364.spr");
+				int iMuzz365 = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/muzzleflash365.spr");
+
+				if (!g_Muzz364)
+				{
+					g_Muzz364 = gEngfuncs.pEfxAPI->R_AttachTentToModel(idx, 0, 99, iMuzz364, 10, 255, kRenderTransAdd, 0.08, 3, FTENT_SPRANIMATE | FTENT_PERSIST | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM, 0);
+					if (g_Muzz364)
+					{
+						g_Muzz364->callback = ResetMuzz;
+					}
+				}
+							
+				if (!g_Muzz365)
+				{
+					g_Muzz365 = gEngfuncs.pEfxAPI->R_AttachTentToModel(idx, 3, 99, iMuzz365, 10, 255, kRenderTransAdd, 0.08, 3, FTENT_SPRANIMATE | FTENT_PERSIST | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM, 0);
+					if (g_Muzz365)
+					{
+						g_Muzz365->callback = ResetMuzz;
+					}
+				}
+					
+			}
+		}
+		else
+		{
+			g_flTimeM134FireAfter = gHUD.m_flTime;
+		}
+
 		EV_MuzzleFlash();
+
+		
 		
 	}
 	

@@ -367,6 +367,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "pkm",	WEAPON_PKM },
 	{ "chainmg",	WEAPON_CHAINMG },
 	{ "y24s1laserminigun",	WEAPON_Y24S1LASERMINIGUN },
+	{ "m134hero",	WEAPON_M134HERO },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -888,6 +889,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "pkm",	WEAPONCLASS_MACHINEGUN },
 	{ "chainmg",	WEAPONCLASS_MACHINEGUN },
 	{ "y24s1laserminigun",	WEAPONCLASS_MACHINEGUN },
+	{ "m134hero",	WEAPONCLASS_MACHINEGUN },
 
 	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
 	{ "chainsawm",	WEAPONCLASS_EQUIPMENT },
@@ -1298,6 +1300,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_CHAINMG:
 	case WEAPON_Y24S1LASERMINIGUN:
 	case WEAPON_SPEARGUNEX:
+	case WEAPON_M134HERO:
 		return true;
 	default:
 		break;

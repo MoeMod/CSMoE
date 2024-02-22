@@ -332,3 +332,5 @@ HOOK_EVENT(lightningsmg, FireLightningSMG);
 HOOK_EVENT(m4a1_s_transformers, FireM4A1_S_Transformers);
 HOOK_EVENT(soulreaper, FireSoulReaper);
 HOOK_EVENT(chainmg, FireChainMG);
+HOOK_EVENT(m134hero, FireM134Hero);
+HOOK_EVENT(m134heroFA, M134HeroFireAfter);

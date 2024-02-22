@@ -606,6 +606,7 @@ void CPlayerModStrategy_Default::UpdateClientData(int sendweapons, clientdata_s 
 
 int CPlayerModStrategy_Default::DeathCallBack(CBasePlayer* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
+	//if 1 avoid death
 	CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 	
 	CBasePlayerWeapon* pActiveWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
@@ -656,7 +657,53 @@ int CPlayerModStrategy_Default::DeathCallBack(CBasePlayer* pVictim, entvars_t* p
 	}
 
 
-	
+	//Killer DoDamage
+	if (pevInflictor)
+	{
+		if (pevInflictor == pevAttacker)
+		{	
+			// If the inflictor is the killer, then it must be their current weapon doing the damage
+			CBasePlayer* pAttackPlayer = dynamic_cast<CBasePlayer*>(CBaseEntity::Instance(pevAttacker));
+
+			if (pAttackPlayer != NULL && pAttackPlayer->m_pActiveItem != NULL)
+			{
+				CBasePlayerWeapon* pAttackWeapon = (CBasePlayerWeapon*)pAttackPlayer->m_pActiveItem;
+
+				if (pAttackWeapon)
+				{
+					if (pAttackWeapon->m_iId == WEAPON_CHAINMG)
+					{
+						pAttackWeapon->WpnDeathCallBack(pVictim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+					}
+				}
+			}	
+		}
+		else
+		{
+			//entity kill
+			CBaseEntity* pInflictor = CBaseEntity::Instance(pevInflictor);		
+			CBasePlayer* pAttackPlayer = dynamic_cast<CBasePlayer*>(CBaseEntity::Instance(pevAttacker));
+
+			if (pInflictor && pAttackPlayer)
+			{
+				int iId = pInflictor->GetWeaponsId();
+
+				if (pInflictor->pev->owner == pAttackPlayer->edict())
+				{
+					if (iId == WEAPON_CHAINMG)
+					{
+						CBasePlayerWeapon* pPrimaryWeapon = (CBasePlayerWeapon*)pAttackPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+						if (pPrimaryWeapon)
+						{
+							pPrimaryWeapon->WpnDeathCallBack(pVictim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 

@@ -278,6 +278,7 @@ set(HLDLL_SRCS
 	./dgaxelubu.cpp
 	./player/player_emotion.cpp
 	./dartbomb.cpp
+	./chainshadows.cpp
 
 	)
 
@@ -717,6 +718,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_m4a1_s_transformers.cpp
 	../dlls/wpn_shared/wpn_soulreaper.cpp
 	../dlls/wpn_shared/wpn_chainmg.cpp
+	../dlls/wpn_shared/wpn_m134hero.cpp
 	)
 
 set(PM_SRCS

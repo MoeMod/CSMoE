@@ -1646,6 +1646,150 @@ private:
 	int m_iArrowModel[2];
 };
 
+class CChainMG;
+class CChainMG_ShadowChainMG : public CBaseAnimating
+{
+public:
+
+	enum shadowchainmg_effect_state_e
+	{
+		EFFECT_NONE,
+		EFFECT_FADEIN,
+		EFFECT_FADEOUT
+	};
+
+	void Spawn(void);
+	void Precache(void);
+	void EXPORT ShadowThink();
+	void DoSingleDamage(CBaseEntity* pEnemy);
+	void Init(CBasePlayer* pOwner, CChainMG* pWeapon, CBaseEntity* pEnemy, int iLastHitGroup);
+
+
+private:
+	int GetWeaponsId(void) { return WEAPON_CHAINMG; }
+	float GetShadowChainMGDamage() const;
+	float GetArmorRatioModifier() override { return 1.5; }
+	KnockbackData GetKnockBackData() override;
+
+	void EF_Appear();
+	void EF_Hide();
+	void RemoveShadow();
+
+	CBasePlayer* m_pOwner;
+	CChainMG* m_pWeapon;
+
+	int m_pLastHitGroup;
+	CBaseEntity* m_pEnemy;
+	time_point_t m_flDamageTime;
+	time_point_t m_flEffectTime;
+	time_point_t m_flRemoveTime;
+	duration_t m_flFadeInTime;
+	duration_t m_flFadeOutTime;
+	int m_iEffectState;
+};
+
+class CChainMG_ShadowMP5 : public CBaseAnimating
+{
+public:
+
+	enum shadowmp5_effect_state_e
+	{
+		EFFECT_NONE,
+		EFFECT_FADEIN,
+		EFFECT_FADEOUT
+	};
+
+	void Spawn(void);
+	void Precache(void);
+	void EXPORT ShadowThink();
+	void DoSingleDamage(CBaseEntity* pEnemy);
+	void Init(CBasePlayer* pOwner, CChainMG* pWeapon, CBaseEntity* pEnemy, int iLastHitGroup);
+
+
+private:
+	int GetWeaponsId(void) { return WEAPON_CHAINMG; }
+	float GetShadowMP5Damage() const;
+	float GetArmorRatioModifier() override { return 1.5; }
+	KnockbackData GetKnockBackData() override;
+
+	void EF_Appear();
+	void EF_Hide();
+	void RemoveShadow();
+
+	CBasePlayer* m_pOwner;
+	CChainMG* m_pWeapon;
+
+	int m_pLastHitGroup;
+	CBaseEntity* m_pEnemy;
+	time_point_t m_flDamageTime;
+	time_point_t m_flEffectTime;
+	time_point_t m_flRemoveTime;
+	duration_t m_flFadeInTime;
+	duration_t m_flFadeOutTime;
+	int m_iEffectState;
+};
+
+class CChainMG_ShadowAT4 : public CBaseAnimating
+{
+public:
+
+	enum shadowchainmp5_effect_state_e
+	{
+		EFFECT_NONE,
+		EFFECT_FADEIN,
+		EFFECT_FADEOUT
+	};
+
+	void Spawn(void);
+	void Precache(void);
+	void EXPORT ShadowThink();
+	void Init(CBasePlayer* pOwner, CChainMG* pWeapon, Vector vecPredictOrigin, int iAnim);
+
+
+private:
+	int GetWeaponsId(void) { return WEAPON_CHAINMG; }
+	float GetShadowAT4Damage() const;
+	float GetArmorRatioModifier() override { return 1.5; }
+	KnockbackData GetKnockBackData() override;
+
+	void EF_Appear();
+	void EF_Hide();
+	void RemoveShadow();
+
+	CBasePlayer* m_pOwner;
+	CChainMG* m_pWeapon;
+
+	int m_pLastHitGroup;
+	time_point_t m_flDamageTime;
+	time_point_t m_flEffectTime;
+	time_point_t m_flRemoveTime;
+	duration_t m_flFadeInTime;
+	duration_t m_flFadeOutTime;
+	int m_iEffectState;
+};
+
+
+class CChainMG_ShadowAT4Rocket : public CGrenade
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	int GetWeaponsId(void);
+
+public:
+	void EXPORT FollowThink(void);
+	void EXPORT IgniteThink(void);
+	void EXPORT RocketTouch(CBaseEntity* pOther);
+
+private:
+	float GetDirectDamage();
+	float GetExplodeDamage();
+
+	int m_iTrail;
+	time_point_t m_flIgniteTime;
+};
+
+
 #if 0
 class CGuillotineexAmmo : public CBaseAnimating
 {
