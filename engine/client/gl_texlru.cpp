@@ -24,6 +24,7 @@ GNU General Public License for more details.
 #include <unordered_set>
 
 #include "util/lru_cache.h"
+#include "imagelib.h"
 
 namespace xe {
     struct texlru_src_external_s {
@@ -41,13 +42,19 @@ namespace xe {
         const dsprite_t *psprite;
         const dspriteframe_t *texture;
     };
+    struct texlru_src_dds_s {
+        std::string path;
+	    const dsprite_t *psprite;
+	    const dds_t *pin;
+		int size;
+    };
     struct texlru_src_skybox_s {
         std::string skyname;
     };
     struct texlru_extdata_s {
         int texnum;
         imgfilter_t *filter;
-        std::variant<texlru_src_external_s, texlru_src_internal_s, texlru_src_spr_s, texlru_src_skybox_s> src;
+        std::variant<texlru_src_external_s, texlru_src_internal_s, texlru_src_spr_s, texlru_src_dds_s, texlru_src_skybox_s> src;
     };
 
     std::unordered_map<const mstudiotexture_t *, TextureAttr> g_textureAttrMap;
@@ -211,6 +218,19 @@ namespace xe {
 
         // add to lru
         tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ texnum, filter, texlru_src_spr_s{ name, psprite, frame } });
+
+        return texnum;
+    }
+
+    int TexLru_LoadTextureDDS(const char *name, const dsprite_t *psprite, const dds_t *pin, int filesize, int flags, imgfilter_t *filter)
+    {
+        gltexture_t* tex;
+        int texnum;
+        if(!TexLru_LoadTexture(name, flags, filter, tex, texnum))
+            return texnum;
+
+        // add to lru
+        tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ texnum, filter, texlru_src_dds_s{ name, psprite, pin, filesize } });
 
         return texnum;
     }
@@ -444,6 +464,31 @@ namespace xe {
             tex->texType = TEX_SPRITE;
 
             MsgDev(D_INFO, "TexLru : load SPR texture %s\n", src.path.c_str());
+            return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
+        }
+        std::shared_ptr<gltexture_t> operator()(texlru_src_dds_s &src) const
+        {
+            int flags = tex->flags;
+	        auto pic = FS_LoadImage( src.path.c_str(), (const byte*)src.pin, src.size );
+	        if( !pic )
+	        {
+		        MsgDev(D_ERROR, "TexLru : fail to load sprite texture %s\n", src.path.c_str());
+		        return {}; // couldn't loading image
+	        }
+
+	        // force upload texture as RGB or RGBA (detail textures requires this)
+	        if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
+
+	        GL_UploadTexture( pic, tex, false, filter );
+	        GL_TexFilter( tex, false ); // update texture filter, wrap etc
+
+	        if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
+		        pic = nullptr; // release source texture
+
+            // set spr type
+            tex->texType = TEX_SPRITE;
+
+            MsgDev(D_INFO, "TexLru : load DDS texture %s\n", src.path.c_str());
             return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
         }
         std::shared_ptr<gltexture_t> operator()(texlru_src_skybox_s &src) const

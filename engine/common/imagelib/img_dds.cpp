@@ -14,6 +14,9 @@ GNU General Public License for more details.
 */
 
 #include "imagelib.h"
+#ifndef XASH_DEDICATED
+#include "gl_local.h"
+#endif
 
 qboolean Image_CheckDXT3Alpha( dds_t *hdr, byte *fin )
 {
@@ -171,7 +174,7 @@ size_t Image_DXTGetLinearSize( int type, int width, int height, int depth )
 	return 0;
 }
 
-size_t Image_DXTCalcMipmapSize( dds_t *hdr ) 
+size_t Image_DXTCalcMipmapSize( const dds_t *hdr )
 {
 	size_t	buffsize = 0;
 	int	i, width, height;
@@ -187,14 +190,19 @@ size_t Image_DXTCalcMipmapSize( dds_t *hdr )
 	return buffsize;
 }
 
-uint Image_DXTCalcSize( const char *name, dds_t *hdr, size_t filesize ) 
+uint Image_DXTCalcSize( const dds_t *hdr )
 {
 	size_t buffsize = 0;
 	int w = image.width;
 	int h = image.height;
 	int d = image.depth;
 
-	if( hdr->dsCaps.dwCaps2 & DDS_CUBEMAP ) 
+	if( hdr->dwFlags & ( DDS_LINEARSIZE ))
+	{
+		// just in case (no need, really)
+		buffsize = hdr->dwLinearSize;
+	}
+	else if( hdr->dsCaps.dwCaps2 & DDS_CUBEMAP )
 	{
 		// cubemap w*h always match for all sides
 		buffsize = Image_DXTCalcMipmapSize( hdr ) * 6;
@@ -204,21 +212,10 @@ uint Image_DXTCalcSize( const char *name, dds_t *hdr, size_t filesize )
 		// if mipcount > 1
 		buffsize = Image_DXTCalcMipmapSize( hdr );
 	}
-	else if( hdr->dwFlags & ( DDS_LINEARSIZE|DDS_PITCH ))
-	{
-		// just in case (no need, really)
-		buffsize = hdr->dwLinearSize;
-	}
 	else 
 	{
 		// pretty solution for microsoft bug
 		buffsize = Image_DXTCalcMipmapSize( hdr );
-	}
-
-	if( filesize != buffsize ) // main check
-	{
-		MsgDev( D_WARN, "Image_LoadDDS: (%s) probably corrupted(%i should be %i)\n", name, buffsize, filesize );
-		return false;
 	}
 
 	return buffsize;
@@ -238,7 +235,7 @@ void Image_DXTAdjustVolume( dds_t *hdr )
 Image_LoadDDS
 =============
 */
-qboolean Image_LoadDDS( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadDDS_HW( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
 	dds_t	header;
 	byte	*fin;
@@ -278,16 +275,19 @@ qboolean Image_LoadDDS( imglib_t& image, const char *name, const byte *buffer, s
 	Image_DXTGetPixelFormat( &header ); // and image type too :)
 	Image_DXTAdjustVolume( &header );
 
-	if( !Image_CheckFlag( image, IL_DDS_HARDWARE ) && ( image.type == PF_DXT1 || image.type == PF_DXT3 || image.type == PF_DXT5 ))
-		return false; // silently rejected
-
 	if( image.type == PF_UNKNOWN ) 
 	{
 		MsgDev( D_WARN, "Image_LoadDDS: (%s) has unrecognized type\n", name );
 		return false;
 	}
 
-	image.size = Image_DXTCalcSize( name, &header, filesize - 128 ); 
+	auto buffsize = Image_DXTCalcSize( &header );
+	if( filesize != buffsize + sizeof(dds_t) ) // main check
+	{
+		MsgDev( D_WARN, "Image_LoadDDS: (%s) probably corrupted(%i should be %i)\n", name, buffsize, filesize );
+		return false;
+	}
+	image.size = buffsize;
 	if( image.size == 0 ) return false; // just in case
 	fin = (byte *)(buffer + sizeof( dds_t ));
 
@@ -318,7 +318,22 @@ qboolean Image_LoadDDS( imglib_t& image, const char *name, const byte *buffer, s
 	// dds files will be uncompressed on a render. requires minimal of info for set this
 	image.rgba = (byte*)Mem_Alloc( host.imagepool, image.size );
     Mem_VirtualCopy( image.rgba, fin, image.size );
-	image.flags |= IMAGE_DDS_FORMAT;
 
 	return true;
+}
+
+qboolean Image_LoadDDS_SW( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
+{
+	// TODO : not implemented
+	return false;
+}
+
+qboolean Image_LoadDDS( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
+{
+#ifndef XASH_DEDICATED
+	if(GL_Support(GL_S3TC_EXT) > 0)
+		return Image_LoadDDS_HW(image, name, buffer, filesize);
+	else
+#endif
+		return Image_LoadDDS_SW(image, name, buffer, filesize);
 }

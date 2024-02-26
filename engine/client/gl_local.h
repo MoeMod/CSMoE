@@ -326,7 +326,6 @@ void R_SetTextureParameters( void );
 size_t R_TextureNum();
 gltexture_t *R_GetTexture( GLenum texnum );
 void GL_SetTextureType( GLenum texnum, GLenum type );
-int GL_LoadTexture_DDS(const char* name, GLvoid* data, int type, int size, int w, int h);
 int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, imgfilter_t *filter );
 int GL_LoadTextureInternal( const char *name, image_ref pic, texFlags_t flags, qboolean update );
 byte *GL_ResampleTexture( const byte *source, int in_w, int in_h, int out_w, int out_h, qboolean isNormalMap );

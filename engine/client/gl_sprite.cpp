@@ -25,6 +25,7 @@ GNU General Public License for more details.
 #include "cl_tent.h"
 #include "gl_texlru.h"
 #include "gl_sprbat.h"
+#include "imagelib.h"
 
 // it's a Valve default value for LoadMapSprite (probably must be power of two)
 #define MAPSPRITE_SIZE	128
@@ -55,169 +56,50 @@ void R_SpriteShutdown( void )
 	xe::SprBat_ShutdownShader();
 }
 
-/*
-====================
-R_SpriteLoadFrame_DDS
-
-upload a single frame
-====================
-*/
-#define DDPF_ALPHAPIXELS    0x000001
-#define DDPF_ALPHA            0x000002
-#define DDPF_FOURCC            0x000004
-#define DDPF_RGB            0x000040
-#define DDPF_YUV            0x000200
-#define DDPF_LUMINANCE        0x020000
-
-#define D3DFMT_DXT1    (('D'<<0)|('X'<<8)|('T'<<16)|('1'<<24))
-#define D3DFMT_DXT3    (('D'<<0)|('X'<<8)|('T'<<16)|('3'<<24))
-#define D3DFMT_DXT5    (('D'<<0)|('X'<<8)|('T'<<16)|('5'<<24))
-
-#define SIZE_OF_DXT1(width, height)    ( max(1, ( (width + 3) >> 2 ) ) * max(1, ( (height + 3) >> 2 ) ) * 8 )
-#define SIZE_OF_DXT2(width, height)    ( max(1, ( (width + 3) >> 2 ) ) * max(1, ( (height + 3) >> 2 ) ) * 16 )
-
-
-#define DDSD_CAPS            0x000001
-#define DDSD_HEIGHT            0x000002
-#define DDSD_WIDTH            0x000004
-#define DDSD_PITCH            0x000008
-#define DDSD_PIXELFORMAT    0x001000
-#define DDSD_MIPMAPCOUNT    0x020000
-#define DDSD_LINEARSIZE        0x080000
-#define DDSD_DEPTH            0x800000
-
-static const byte *R_SpriteLoadFrame_DDS( model_t *mod, const byte *pin, mspriteframe_t **ppframe, int num )
+static const byte *R_SpriteLoadFrame_DDS( model_t *mod, const dsprite_t *psprite, const byte *pin, mspriteframe_t **ppframe, int num )
 {
-	typedef struct
-	{
-		DWORD    dwSize;
-		DWORD    dwFlags;
-		DWORD    dwFourCC;
-		DWORD    dwRGBBitCount;
-		DWORD    dwRBitMask;
-		DWORD    dwGBitMask;
-		DWORD    dwBBitMask;
-		DWORD    dwABitMask;
-	} DDS_PIXELFORMAT;
-
-	typedef struct
-	{
-		DWORD            dwSize;
-		DWORD            dwFlags;
-		DWORD            dwHeight;
-		DWORD            dwWidth;
-		DWORD            dwPitchOrLinearSize;
-		DWORD            dwDepth;
-		DWORD            dwMipMapCount;
-		DWORD            dwReserved1[11];
-		DDS_PIXELFORMAT    ddspf;
-		DWORD            dwCaps;
-		DWORD            dwCaps2;
-		DWORD            dwCaps3;
-		DWORD            dwCaps4;
-		DWORD            dwReserved2;
-	} DDS_HEADER;
-
-	typedef struct
-	{
-		DWORD        dwMagic;
-		DDS_HEADER    Header;
-	} DDS_FILEHEADER;
-
-	DDS_FILEHEADER* header;
-	DWORD            compressFormat;
-	GLuint            texnum;
-	GLvoid* data;
-	GLsizei            imageSize;
-
-	header = (DDS_FILEHEADER*)pin;
-
-	if (header->dwMagic != 0x20534444) {
-		printf("bad dds file\n");
-		return 0;
-	}
-
-	if (header->Header.dwSize != 124) {
-		printf("bad header size\n");
-		return 0;
-	}
-
-	if (!(header->Header.dwFlags & DDSD_LINEARSIZE)) {
-		printf("bad file type\n");
-		return 0;
-	}
-
-	if (!(header->Header.ddspf.dwFlags & DDPF_FOURCC)) {
-		printf("bad pixel format\n");
-		return 0;
-	}
-
-	compressFormat = header->Header.ddspf.dwFourCC;
-
-	if (compressFormat != D3DFMT_DXT1 &&
-		compressFormat != D3DFMT_DXT3 &&
-		compressFormat != D3DFMT_DXT5) {
-		printf("bad compress format\n");
-		return 0;
-	}
-
-	int type = 0;
-	switch (compressFormat)
-	{
-	case D3DFMT_DXT1:
-		type = 1;
-		imageSize = SIZE_OF_DXT1(header->Header.dwWidth, header->Header.dwHeight);
-		break;
-	case D3DFMT_DXT3:
-		type = 2;
-		imageSize = SIZE_OF_DXT2(header->Header.dwWidth, header->Header.dwHeight);
-		break;
-	case D3DFMT_DXT5:
-		type = 3;
-		imageSize = SIZE_OF_DXT2(header->Header.dwWidth, header->Header.dwHeight);
-		break;
-	}
-
-
-	data = (GLvoid*)(header + 1);    // header data skipped
-
-	////////////////////////////
-
 	mspriteframe_t	*pspriteframe;
 	char		texname[128], sprname[128];
 	qboolean		load_external = false;
 	int		gl_texturenum = 0;
+	const dds_t *header = (const dds_t *)pin;
+	int imageSize = Image_DXTCalcSize(header);
 
 	// build unique frame name
+#if XASH_ASTC
+	Q_snprintf(texname, sizeof(texname), "ddc/%s/%s_%i%i.astc", mod->name, group_suffix, num / 10, num % 10);
+	if (GL_Support(GL_ASTC_EXT) > 0 && FS_FileExists(texname, true)) // it's a HUD sprite
+	{
+		gl_texturenum = xe::TexLru_LoadTextureExternal(texname, r_texFlags, NULL);
+		if(auto tex = R_GetTexture(gl_texturenum)) tex->texType = TEX_SPRITE;
+	}
+	else
+#endif
 	if( mod->flags & 256 ) // it's a HUD sprite
 	{
-		Q_snprintf( texname, sizeof( texname ), "#HUD/%s_%s_%i%i.spr", mod->name, group_suffix, num / 10, num % 10 );
-		gl_texturenum = GL_LoadTexture( texname, pin, imageSize, r_texFlags, NULL );
+		Q_snprintf( texname, sizeof( texname ), "#HUD/%s_%s_%i%i.dds", mod->name, group_suffix, num / 10, num % 10 );
+		gl_texturenum = xe::TexLru_LoadTextureDDS(texname, psprite, (const dds_t *)pin, sizeof(dds_t) + imageSize, r_texFlags, NULL);
 	}
 	else
 	{
-		if( !load_external )
-		{
-			Q_snprintf( texname, sizeof( texname ), "#%s_%s_%i%i.dds", mod->name, group_suffix, num / 10, num % 10 );
-			gl_texturenum = GL_LoadTexture_DDS(texname, data, type, imageSize, header->Header.dwWidth, header->Header.dwHeight);
-		}
-		else MsgDev( D_NOTE, "loading HQ: %s\n", texname );
+		Q_snprintf( texname, sizeof( texname ), "#%s_%s_%i%i.dds", mod->name, group_suffix, num / 10, num % 10 );
+		gl_texturenum = xe::TexLru_LoadTextureDDS(texname, psprite, (const dds_t *)pin, sizeof(dds_t) + imageSize, r_texFlags, NULL);
 	}
 
 	// setup frame description
 	pspriteframe = (mspriteframe_t *)Mem_ZeroAlloc( mod->mempool, sizeof( mspriteframe_t ));
-	pspriteframe->width = header->Header.dwWidth;
-	pspriteframe->height = header->Header.dwHeight;
-	pspriteframe->up = 0.5 * header->Header.dwHeight;
-	pspriteframe->left = -0.5 * header->Header.dwWidth;
-	pspriteframe->down = -0.5 * header->Header.dwHeight;
-	pspriteframe->right = 0.5 * header->Header.dwWidth;
+	pspriteframe->width = header->dwWidth;
+	pspriteframe->height = header->dwHeight;
+	pspriteframe->up = 0.5 * header->dwHeight;
+	pspriteframe->left = -0.5 * header->dwWidth;
+	pspriteframe->down = -0.5 * header->dwHeight;
+	pspriteframe->right = 0.5 * header->dwWidth;
 	pspriteframe->gl_texturenum = gl_texturenum;
 	*ppframe = pspriteframe;
 
 	GL_SetTextureType( pspriteframe->gl_texturenum, TEX_SPRITE );
 
-	return ( pin + sizeof(DDS_FILEHEADER) + imageSize);
+	return ( pin + sizeof(dds_t) + imageSize);
 }
 
 static const byte* R_SpriteLoadFrame(model_t* mod, const dsprite_t *psprite, const byte* pin, mspriteframe_t** ppframe, int num)
@@ -428,7 +310,7 @@ void Mod_LoadSpriteModel( model_t *mod, const byte *buffer, size_t filesize, qbo
 	{
 		if (is_dds_mode) {
 			Q_strncpy(group_suffix, "one", sizeof(group_suffix));
-			buffer = R_SpriteLoadFrame_DDS(mod, buffer, &psprite->frames[i].frameptr, i);
+			buffer = R_SpriteLoadFrame_DDS(mod, pin, buffer, &psprite->frames[i].frameptr, i);
 		}
 		else {
 			frametype_t frametype = (frametype_t)*buffer;

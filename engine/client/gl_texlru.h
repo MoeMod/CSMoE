@@ -19,6 +19,8 @@ GNU General Public License for more details.
 #include "studio.h"
 #include "sprite.h"
 
+typedef struct dds_s dds_t;
+
 namespace xe {
 
     struct TextureAttr
@@ -32,6 +34,7 @@ namespace xe {
     int TexLru_LoadTextureExternal(const char *name, int flags, imgfilter_t *filter);
 	int TexLru_LoadTextureInternal(const char *name, const char *model_name, const studiohdr_t *phdr, const mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter);
     int TexLru_LoadTextureSPR(const char *name, const dsprite_t *psprite, const byte *buf, const dspriteframe_t *frame, int flags, imgfilter_t *filter);
+    int TexLru_LoadTextureDDS(const char *name, const dsprite_t *psprite, const dds_t *pin, int filesize, int flags, imgfilter_t *filter);
     int TexLru_LoadTextureSkybox(const char *name, int flags, imgfilter_t *filter);
 
     const TextureAttr &TexLru_GetAttr(const mstudiotexture_t *ptexture);
