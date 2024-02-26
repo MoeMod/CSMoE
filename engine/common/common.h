@@ -530,8 +530,6 @@ typically expanded to rgba buffer
 NOTE: number at end of pixelformat name it's a total bitscount e.g. PF_RGB_24 == PF_RGB_888
 ========================================================================
 */
-#define ImageDXT( type ) (type == PF_DXT1 || type == PF_DXT3 || type == PF_DXT5)
-
 typedef enum
 {
 	PF_UNKNOWN = 0,

@@ -1350,7 +1350,7 @@ void GL_ProcessTexture( int texnum, float gamma, int topColor, int bottomColor )
 		return;
 	}
 
-	if( ImageDXT( image->original->type ))
+	if( PFDesc[image->original->type].compressed )
 	{
 		MsgDev( D_ERROR, "GL_ProcessTexture: can't process compressed texture %s\n", image->name );
 		return;

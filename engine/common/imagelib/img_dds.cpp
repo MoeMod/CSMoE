@@ -197,17 +197,26 @@ uint Image_DXTCalcSize( const dds_t *hdr )
 	int h = image.height;
 	int d = image.depth;
 
-	if( hdr->dwFlags & ( DDS_LINEARSIZE ))
+    uint linearSize = hdr->dwLinearSize;
+    uint flags = hdr->dwFlags;
+
+    if( hdr->dwDepth > 1 )
+    {
+        linearSize = Image_DXTGetLinearSize( image.type, hdr->dwWidth, hdr->dwHeight, hdr->dwDepth );
+        flags |= DDS_LINEARSIZE;
+    }
+
+	if( flags & ( DDS_LINEARSIZE ))
 	{
 		// just in case (no need, really)
-		buffsize = hdr->dwLinearSize;
+		buffsize = linearSize;
 	}
 	else if( hdr->dsCaps.dwCaps2 & DDS_CUBEMAP )
 	{
 		// cubemap w*h always match for all sides
 		buffsize = Image_DXTCalcMipmapSize( hdr ) * 6;
 	}
-	else if( hdr->dwFlags & DDS_MIPMAPCOUNT )
+	else if( flags & DDS_MIPMAPCOUNT )
 	{
 		// if mipcount > 1
 		buffsize = Image_DXTCalcMipmapSize( hdr );
@@ -219,15 +228,6 @@ uint Image_DXTCalcSize( const dds_t *hdr )
 	}
 
 	return buffsize;
-}
-
-void Image_DXTAdjustVolume( dds_t *hdr )
-{
-	if( hdr->dwDepth <= 1 )
-		return;
-
-	hdr->dwLinearSize = Image_DXTGetLinearSize( image.type, hdr->dwWidth, hdr->dwHeight, hdr->dwDepth );
-	hdr->dwFlags |= DDS_LINEARSIZE;
 }
 
 /*
@@ -273,7 +273,6 @@ qboolean Image_LoadDDS_HW( imglib_t& image, const char *name, const byte *buffer
 	if( !Image_ValidSize( image, name )) return false;
 
 	Image_DXTGetPixelFormat( &header ); // and image type too :)
-	Image_DXTAdjustVolume( &header );
 
 	if( image.type == PF_UNKNOWN ) 
 	{
@@ -287,11 +286,11 @@ qboolean Image_LoadDDS_HW( imglib_t& image, const char *name, const byte *buffer
 		MsgDev( D_WARN, "Image_LoadDDS: (%s) probably corrupted(%i should be %i)\n", name, buffsize, filesize );
 		return false;
 	}
-	image.size = buffsize;
-	if( image.size == 0 ) return false; // just in case
+	if( buffsize == 0 ) return false; // just in case
 	fin = (byte *)(buffer + sizeof( dds_t ));
 
 	// copy an encode method
+    image.size = buffsize;
 	image.encode = (word)header.dwReserved1[0];
 
 	switch( image.encode )
@@ -322,10 +321,318 @@ qboolean Image_LoadDDS_HW( imglib_t& image, const char *name, const byte *buffer
 	return true;
 }
 
+uint32_t PackRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    return ((r << 24) | (g << 16) | (b << 8) | a);
+}
+
+void DecompressBlockDXT1(unsigned int x, unsigned int y, unsigned int width, const byte *blockStorage, byte *out_rgba)
+{
+    unsigned short color0 = *reinterpret_cast<const unsigned short *>(blockStorage);
+    unsigned short color1 = *reinterpret_cast<const unsigned short *>(blockStorage + 2);
+
+    unsigned int temp;
+
+    temp = (color0 >> 11) * 255 + 16;
+    unsigned char r0 = (unsigned char)((temp/32 + temp)/32);
+    temp = ((color0 & 0x07E0) >> 5) * 255 + 32;
+    unsigned char g0 = (unsigned char)((temp/64 + temp)/64);
+    temp = (color0 & 0x001F) * 255 + 16;
+    unsigned char b0 = (unsigned char)((temp/32 + temp)/32);
+
+    temp = (color1 >> 11) * 255 + 16;
+    unsigned char r1 = (unsigned char)((temp/32 + temp)/32);
+    temp = ((color1 & 0x07E0) >> 5) * 255 + 32;
+    unsigned char g1 = (unsigned char)((temp/64 + temp)/64);
+    temp = (color1 & 0x001F) * 255 + 16;
+    unsigned char b1 = (unsigned char)((temp/32 + temp)/32);
+
+    unsigned int code = *reinterpret_cast<const unsigned int *>(blockStorage + 4);
+
+    for (int j=0; j < 4; j++)
+    {
+        for (int i=0; i < 4; i++)
+        {
+            uint32_t finalColor = 0;
+            unsigned char positionCode = (code >>  2*(4*j+i)) & 0x03;
+
+            if (color0 > color1)
+            {
+                switch (positionCode)
+                {
+                    case 0:
+                        finalColor = PackRGBA(r0, g0, b0, 255);
+                        break;
+                    case 1:
+                        finalColor = PackRGBA(r1, g1, b1, 255);
+                        break;
+                    case 2:
+                        finalColor = PackRGBA((2*r0+r1)/3, (2*g0+g1)/3, (2*b0+b1)/3, 255);
+                        break;
+                    case 3:
+                        finalColor = PackRGBA((r0+2*r1)/3, (g0+2*g1)/3, (b0+2*b1)/3, 255);
+                        break;
+                }
+            }
+            else
+            {
+                switch (positionCode)
+                {
+                    case 0:
+                        finalColor = PackRGBA(r0, g0, b0, 255);
+                        break;
+                    case 1:
+                        finalColor = PackRGBA(r1, g1, b1, 255);
+                        break;
+                    case 2:
+                        finalColor = PackRGBA((r0+r1)/2, (g0+g1)/2, (b0+b1)/2, 255);
+                        break;
+                    case 3:
+                        finalColor = PackRGBA(0, 0, 0, 255);
+                        break;
+                }
+            }
+
+            if (x + i < width)
+            {
+                auto image = (uint32_t *)out_rgba;
+                image[(y + j)*width + (x + i)] = finalColor;
+            }
+        }
+    }
+}
+
+void BlockDecompressImageDXT1(unsigned int width, unsigned int height, const byte *blockStorage, byte *out_rgba)
+{
+    unsigned int blockCountX = (width + 3) / 4;
+    unsigned int blockCountY = (height + 3) / 4;
+    unsigned int blockWidth = (width < 4) ? width : 4;
+    unsigned int blockHeight = (height < 4) ? height : 4;
+
+    for (unsigned int j = 0; j < blockCountY; j++)
+    {
+        for (unsigned int i = 0; i < blockCountX; i++) DecompressBlockDXT1(i*4, j*4, width, blockStorage + i * 8, out_rgba);
+        blockStorage += blockCountX * 8;
+    }
+}
+
+void DecompressBlockDXT5(unsigned int x, unsigned int y, unsigned int width, const byte *blockStorage, byte *out_rgba)
+{
+    unsigned char alpha0 = *reinterpret_cast<const unsigned char *>(blockStorage);
+    unsigned char alpha1 = *reinterpret_cast<const unsigned char *>(blockStorage + 1);
+
+    const unsigned char *bits = blockStorage + 2;
+    unsigned int alphaCode1 = bits[2] | (bits[3] << 8) | (bits[4] << 16) | (bits[5] << 24);
+    unsigned short alphaCode2 = bits[0] | (bits[1] << 8);
+
+    unsigned short color0 = *reinterpret_cast<const unsigned short *>(blockStorage + 8);
+    unsigned short color1 = *reinterpret_cast<const unsigned short *>(blockStorage + 10);
+
+    unsigned int temp;
+
+    temp = (color0 >> 11) * 255 + 16;
+    unsigned char r0 = (unsigned char)((temp/32 + temp)/32);
+    temp = ((color0 & 0x07E0) >> 5) * 255 + 32;
+    unsigned char g0 = (unsigned char)((temp/64 + temp)/64);
+    temp = (color0 & 0x001F) * 255 + 16;
+    unsigned char b0 = (unsigned char)((temp/32 + temp)/32);
+
+    temp = (color1 >> 11) * 255 + 16;
+    unsigned char r1 = (unsigned char)((temp/32 + temp)/32);
+    temp = ((color1 & 0x07E0) >> 5) * 255 + 32;
+    unsigned char g1 = (unsigned char)((temp/64 + temp)/64);
+    temp = (color1 & 0x001F) * 255 + 16;
+    unsigned char b1 = (unsigned char)((temp/32 + temp)/32);
+
+    unsigned int code = *reinterpret_cast<const unsigned int *>(blockStorage + 12);
+
+    for (int j=0; j < 4; j++)
+    {
+        for (int i=0; i < 4; i++)
+        {
+            int alphaCodeIndex = 3*(4*j+i);
+            int alphaCode;
+
+            if (alphaCodeIndex <= 12)
+            {
+                alphaCode = (alphaCode2 >> alphaCodeIndex) & 0x07;
+            }
+            else if (alphaCodeIndex == 15)
+            {
+                alphaCode = (alphaCode2 >> 15) | ((alphaCode1 << 1) & 0x06);
+            }
+            else // alphaCodeIndex >= 18 && alphaCodeIndex <= 45
+            {
+                alphaCode = (alphaCode1 >> (alphaCodeIndex - 16)) & 0x07;
+            }
+
+            unsigned char finalAlpha;
+            if (alphaCode == 0)
+            {
+                finalAlpha = alpha0;
+            }
+            else if (alphaCode == 1)
+            {
+                finalAlpha = alpha1;
+            }
+            else
+            {
+                if (alpha0 > alpha1)
+                {
+                    finalAlpha = ((8-alphaCode)*alpha0 + (alphaCode-1)*alpha1)/7;
+                }
+                else
+                {
+                    if (alphaCode == 6)
+                        finalAlpha = 0;
+                    else if (alphaCode == 7)
+                        finalAlpha = 255;
+                    else
+                        finalAlpha = ((6-alphaCode)*alpha0 + (alphaCode-1)*alpha1)/5;
+                }
+            }
+
+            unsigned char colorCode = (code >> 2*(4*j+i)) & 0x03;
+
+            uint32_t finalColor;
+            switch (colorCode)
+            {
+                case 0:
+                    finalColor = PackRGBA(r0, g0, b0, finalAlpha);
+                    break;
+                case 1:
+                    finalColor = PackRGBA(r1, g1, b1, finalAlpha);
+                    break;
+                case 2:
+                    finalColor = PackRGBA((2*r0+r1)/3, (2*g0+g1)/3, (2*b0+b1)/3, finalAlpha);
+                    break;
+                case 3:
+                    finalColor = PackRGBA((r0+2*r1)/3, (g0+2*g1)/3, (b0+2*b1)/3, finalAlpha);
+                    break;
+            }
+
+            if (x + i < width)
+            {
+                auto image = (uint32_t *)out_rgba;
+                image[(y + j)*width + (x + i)] = finalColor;
+            }
+        }
+    }
+}
+
+void BlockDecompressImageDXT5(unsigned int width, unsigned int height, const byte *blockStorage, byte *out_rgba)
+{
+    unsigned int blockCountX = (width + 3) / 4;
+    unsigned int blockCountY = (height + 3) / 4;
+    unsigned int blockWidth = (width < 4) ? width : 4;
+    unsigned int blockHeight = (height < 4) ? height : 4;
+
+    for (unsigned int j = 0; j < blockCountY; j++)
+    {
+        for (unsigned int i = 0; i < blockCountX; i++) DecompressBlockDXT5(i*4, j*4, width, blockStorage + i * 16, out_rgba);
+        blockStorage += blockCountX * 16;
+    }
+}
+
 qboolean Image_LoadDDS_SW( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
 {
-	// TODO : not implemented
-	return false;
+    dds_t	header;
+    byte	*fin;
+
+    if( filesize < sizeof( dds_t ))
+    {
+        MsgDev( D_ERROR, "Image_LoadDDS: file (%s) have invalid size\n", name );
+        return false;
+    }
+
+    Q_memcpy( &header, buffer, sizeof( dds_t ));
+
+    if( header.dwIdent != DDSHEADER )
+        return false; // it's not a dds file, just skip it
+
+    if( header.dwSize != sizeof( dds_t ) - sizeof( uint )) // size of the structure (minus MagicNum)
+    {
+        MsgDev( D_ERROR, "Image_LoadDDS: (%s) have corrupted header\n", name );
+        return false;
+    }
+
+    if( header.dsPixelFormat.dwSize != sizeof( dds_pixf_t )) // size of the structure
+    {
+        MsgDev( D_ERROR, "Image_LoadDDS: (%s) have corrupt pixelformat header\n", name );
+        return false;
+    }
+
+    image.width = header.dwWidth;
+    image.height = header.dwHeight;
+
+    if( header.dwFlags & DDS_DEPTH )
+        image.depth = header.dwDepth;
+    else image.depth = 1;
+
+    if( !Image_ValidSize( image, name )) return false;
+
+    Image_DXTGetPixelFormat( &header ); // and image type too :)
+
+    if( image.type == PF_UNKNOWN )
+    {
+        MsgDev( D_WARN, "Image_LoadDDS: (%s) has unrecognized type\n", name );
+        return false;
+    }
+
+    auto buffsize = Image_DXTCalcSize( &header );
+    if( filesize != buffsize + sizeof(dds_t) ) // main check
+    {
+        MsgDev( D_WARN, "Image_LoadDDS: (%s) probably corrupted(%i should be %i)\n", name, buffsize, filesize );
+        return false;
+    }
+    if( buffsize == 0 ) return false; // just in case
+    fin = (byte *)(buffer + sizeof( dds_t ));
+
+    // copy an encode method
+    image.size = buffsize;
+    image.encode = (word)header.dwReserved1[0];
+
+    switch( image.encode )
+    {
+        case DXT_ENCODE_COLOR_YCoCg:
+            image.flags |= IMAGE_HAS_COLOR;
+            break;
+        case DXT_ENCODE_NORMAL_AG_ORTHO:
+        case DXT_ENCODE_NORMAL_AG_STEREO:
+        case DXT_ENCODE_NORMAL_AG_PARABOLOID:
+        case DXT_ENCODE_NORMAL_AG_QUARTIC:
+        case DXT_ENCODE_NORMAL_AG_AZIMUTHAL:
+            image.flags |= IMAGE_HAS_COLOR;
+            break;
+        default:	// check for real alpha-pixels
+            if( image.type == PF_DXT3 && Image_CheckDXT3Alpha( &header, fin ))
+                image.flags |= IMAGE_HAS_ALPHA;
+            else if( image.type == PF_DXT5 && Image_CheckDXT5Alpha( &header, fin ))
+                image.flags |= IMAGE_HAS_ALPHA;
+            image.flags |= IMAGE_HAS_COLOR;
+            break;
+    }
+
+    // software decoding
+    if( image.type == PF_DXT1 )
+    {
+        image.size = image.width * image.height * 4;
+        image.type = PF_RGBA_32;
+        image.rgba = (byte*)Mem_Alloc( host.imagepool, image.size );
+        BlockDecompressImageDXT1(image.width, image.height, fin, image.rgba);
+        return true;
+    }
+    if( image.type == PF_DXT5 )
+    {
+        image.size = image.width * image.height * 4;
+        image.type = PF_RGBA_32;
+        image.rgba = (byte*)Mem_Alloc( host.imagepool, image.size );
+        BlockDecompressImageDXT5(image.width, image.height, fin, image.rgba);
+        return true;
+    }
+
+    // unsupported
+    return false;
 }
 
 qboolean Image_LoadDDS( imglib_t& image, const char *name, const byte *buffer, size_t filesize )
