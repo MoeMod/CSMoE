@@ -20,8 +20,8 @@ GNU General Public License for more details.
 typedef struct studio_vertex_attrib_item_s {
     GLfloat pos[3];
     GLfloat boneIdx;
-	GLfloat norm[3];
-    GLfloat coord[2];
+	GLhalf norm[3];
+    GLshort coord[2];
 } studio_vertex_attrib_item_t;
 
 namespace xe {

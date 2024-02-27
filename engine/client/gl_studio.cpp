@@ -224,7 +224,7 @@ studioshader_t *g_pstudioshader;
 studioubo_t g_pstudioubo;
 #else
 static GLfloat		g_xarrayverts[MAXARRAYVERTS][3];
-static GLfloat		g_xarraycoord[MAXARRAYVERTS][2];
+static GLhalf		g_xarraycoord[MAXARRAYVERTS][2];
 static GLubyte		g_xarraycolor[MAXARRAYVERTS][4];
 static unsigned short		g_xarrayelems[MAXARRAYVERTS*6];
 static vec3_t		g_lightvalues[MAXSTUDIOVERTS];
@@ -1511,30 +1511,44 @@ R_StudioDrawMesh
 
 ===============
 */
-static void (*R_MeshUVFunc())(const short* ptricmds, GLfloat (&uv)[2], float s, float t)
+#ifdef XASH_SHADER
+// *s *t is handled in shader
+static void (*R_MeshUVFunc())(const short* ptricmds, GLshort (&uv)[2])
 {
 	if (g_nFaceFlags & STUDIO_NF_CHROME || (g_nForceFaceFlags & STUDIO_NF_CHROME))
 	{
-		return [](const short* ptricmds, GLfloat (&uv)[2], float s, float t) {
-			uv[0] = g_chrome[ptricmds[1]][0] * s;
-			uv[1] = g_chrome[ptricmds[1]][1] * t;
-		};
-	}
-	else if (g_nFaceFlags & STUDIO_NF_UV_COORDS)
-	{
-		return [](const short* ptricmds, GLfloat (&uv)[2], float s, float t) {
-			uv[0] = HalfToFloat(ptricmds[2]);
-			uv[1] = HalfToFloat(ptricmds[3]);
+		return [](const short* ptricmds, GLshort (&uv)[2]) {
+			uv[0] = static_cast<short>(g_chrome[ptricmds[1]][0]);
+			uv[1] = static_cast<short>(g_chrome[ptricmds[1]][1]);
 		};
 	}
 	else [[likely]]
 	{
-		return [](const short* ptricmds, GLfloat (&uv)[2], float s, float t) {
-			uv[0] = ptricmds[2] * s;
-			uv[1] = ptricmds[3] * t;
+		return [](const short* ptricmds, GLshort (&uv)[2]) {
+			uv[0] = ptricmds[2];
+			uv[1] = ptricmds[3];
 		};
 	}
 }
+#else
+static void (*R_MeshUVFunc())(const short* ptricmds, GLhalf (&uv)[2], float s, float t)
+{
+	if (g_nFaceFlags & STUDIO_NF_CHROME || (g_nForceFaceFlags & STUDIO_NF_CHROME))
+	{
+		return [](const short* ptricmds, GLhalf (&uv)[2], float s, float t) {
+			uv[0] = FloatToHalf(g_chrome[ptricmds[1]][0] * s);
+			uv[1] = FloatToHalf(g_chrome[ptricmds[1]][1] * t);
+		};
+	}
+	else [[likely]]
+	{
+		return [](const short* ptricmds, GLhalf (&uv)[2], float s, float t) {
+			uv[0] = FloatToHalf(ptricmds[2] * s);
+			uv[1] = FloatToHalf(ptricmds[3] * t);
+		};
+	}
+}
+#endif
 
 #ifdef XASH_SHADER
 // done in shader
@@ -1717,10 +1731,14 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 			ASSERT( numArrayVerts < MAXARRAYVERTS );
 #ifdef XASH_SHADER
             {
-                R_MeshUV(ptricmds, vboattrs[numArrayVerts].coord, s, t);
-                VectorCopy(av, vboattrs[numArrayVerts].pos); // store off vertex
-                vboattrs[numArrayVerts].boneIdx = pvertbone[ptricmds[0]];
-                VectorCopy(nv, vboattrs[numArrayVerts].norm); // store off vertex
+                R_MeshUV(ptricmds, vboattrs[numArrayVerts].coord);
+	            vboattrs[numArrayVerts].pos[0] = av[0];
+	            vboattrs[numArrayVerts].pos[1] = av[1];
+	            vboattrs[numArrayVerts].pos[2] = av[2];
+	            vboattrs[numArrayVerts].boneIdx = static_cast<float>(pvertbone[ptricmds[0]]);
+	            vboattrs[numArrayVerts].norm[0] = FloatToHalf(nv[0]);
+	            vboattrs[numArrayVerts].norm[1] = FloatToHalf(nv[1]);
+	            vboattrs[numArrayVerts].norm[2] = FloatToHalf(nv[2]);
             }
 #else
             {
@@ -1751,8 +1769,8 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
         pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.aTexCoord);
         pglEnableVertexAttribArrayARB(g_pstudioshader->attrib.aNormal);
         pglVertexAttribPointerARB(g_pstudioshader->attrib.aPos, 3 + 1, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, pos));
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, coord));
-        pglVertexAttribPointerARB(g_pstudioshader->attrib.aNormal, 3, GL_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, norm));
+        pglVertexAttribPointerARB(g_pstudioshader->attrib.aTexCoord, 2, GL_SHORT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, coord));
+        pglVertexAttribPointerARB(g_pstudioshader->attrib.aNormal, 3, GL_HALF_FLOAT, GL_FALSE, sizeof(studio_vertex_attrib_item_t), (const byte *)vboattrs + offsetof(studio_vertex_attrib_item_t, norm));
         pglDrawElements( XASH_PREFER_DRAW_MODE, g_nNumArrayElems - startArrayElems, GL_UNSIGNED_SHORT, (const byte *)arrayelems + (startArrayElems * sizeof(unsigned short)) );
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aPos);
         pglDisableVertexAttribArrayARB(g_pstudioshader->attrib.aTexCoord);
@@ -1765,7 +1783,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
         pglVertexPointer( 3, GL_FLOAT, 0, g_xarrayverts );
 
         pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-        pglTexCoordPointer( 2, GL_FLOAT, 0, g_xarraycoord );
+        pglTexCoordPointer( 2, GL_HALF_FLOAT, 0, g_xarraycoord );
 
         if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) )
         {
@@ -1859,8 +1877,6 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		bool bBindTex = false;
 		int texnum = 0;
 		int flags = 0;
-		if (ptexture->flags & STUDIO_NF_NORMALMAP)
-			flags |= (TF_NORMALMAP);
 
 		if (Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "#M_L.bmp") ||
 			Q_stristr(ptexture[pskinref[pmesh->skinref]].name, "cso_highq_hand__long_512.bmp"))
@@ -2495,11 +2511,11 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_winggun_laser01.bmp") ||
 			!Q_stricmp(ptexture[pskinref[pmesh->skinref]].name, "$0b_winggun_laser02.bmp"))
 		{
-			pglUniform4fARB(g_pstudioshader->uniform.texOffset, cl.time, 0, 1, 1);
+			pglUniform4fARB(g_pstudioshader->uniform.texOffset, cl.time * s, 0 * t, s, t);
 		}
 		else
 		{
-			pglUniform4fARB(g_pstudioshader->uniform.texOffset, 0, 0, 1, 1);
+			pglUniform4fARB(g_pstudioshader->uniform.texOffset, 0, 0, s, t);
 		}
 #endif
 #ifdef XASH_USE_PRIMITIVE_RESTART
@@ -3609,9 +3625,6 @@ static void R_StudioLoadTexture( model_t *mod, const studiohdr_t *phdr, const ms
 	imgfilter_t	*filter = NULL;
 	texture_t		*tx = NULL;
     int	gl_texturenum = 0;
-
-	if( ptexture->flags & STUDIO_NF_NORMALMAP )
-		flags |= (TF_NORMALMAP);
 
 #if 0 // Useless feature in CSMoE, removed for optimization
 	// store some textures for remapping

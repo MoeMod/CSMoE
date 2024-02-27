@@ -837,7 +837,6 @@ enum
 	kRenderGlow,		// src*a+dest -- No Z buffer checks
 	kRenderTransAlpha,		// src*srca+dest*(1-srca)
 	kRenderTransAdd,		// src*a+dest
-	kRenderWorldGlow		// Same as kRenderGlow but not fixed size in screen space
 };
 
 enum

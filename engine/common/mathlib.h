@@ -149,8 +149,8 @@ bool Vector2IsNull(const Type& v)
 
 float rsqrt(float number);
 float anglemod(const float a);
-word FloatToHalf(float v);
-float HalfToFloat(word h);
+half FloatToHalf(float v);
+float HalfToFloat(half h);
 int SignbitsForPlane(const vec3_t normal);
 int NearestPOW(int value, qboolean roundDown);
 void SinCos(float radians, float* sine, float* cosine);

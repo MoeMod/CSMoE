@@ -33,7 +33,8 @@ float anglemod( const float a )
 	return (360.0f/65536) * ((int)(a*(65536/360.0f)) & 65535);
 }
 
-word FloatToHalf( float v )
+// TODO : simd optimize for half
+half FloatToHalf( float v )
 {
 	unsigned int	i = *((unsigned int *)&v);
 	unsigned int	e = (i >> 23) & 0x00ff;
@@ -46,13 +47,13 @@ word FloatToHalf( float v )
 
 	h |= (i >> 16) & 0xc000;
 
-	return h;
+	return (half)h;
 }
 
-float HalfToFloat( word h )
+float HalfToFloat( half h )
 {
-	unsigned int	f = (h << 16) & 0x80000000;
-	unsigned int	em = h & 0x7fff;
+	unsigned int	f = ((unsigned short)h << 16) & 0x80000000;
+	unsigned int	em = (unsigned short)h & 0x7fff;
 
 	if( em > 0x03ff )
 	{

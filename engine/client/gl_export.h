@@ -40,6 +40,7 @@ typedef int GLsizeiptrARB;
 typedef char GLcharARB;
 typedef uint GLhandleARB;
 typedef float GLmatrix[16];
+typedef word GLhalf;
 
 // deprecated texture env mode
 #define GL_ADD				0x0104
@@ -126,6 +127,7 @@ typedef float GLmatrix[16];
 #define GL_INT				0x1404
 #define GL_UNSIGNED_INT			0x1405
 #define GL_FLOAT				0x1406
+#define GL_HALF_FLOAT                     0x140B
 
 // cull face
 #define GL_NONE				0

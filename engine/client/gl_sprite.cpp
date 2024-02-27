@@ -854,12 +854,9 @@ static float R_SpriteGlowBlend( vec3_t origin, int rendermode, int renderfx, int
 	brightness = GLARE_FALLOFF / ( dist * dist );
 	brightness = bound( 0.01f, brightness, 1.0f );
 
-	if( rendermode != kRenderWorldGlow )
-	{
-		// make the glow fixed size in screen space, taking into consideration the scale setting.
-		if( *pscale == 0.0f ) *pscale = 1.0f;
-		*pscale *= dist * ( 1.0f / bound( 100.0f, r_flaresize->value, 300.0f ));
-	}
+	// make the glow fixed size in screen space, taking into consideration the scale setting.
+	if( *pscale == 0.0f ) *pscale = 1.0f;
+	*pscale *= dist * ( 1.0f / bound( 100.0f, r_flaresize->value, 300.0f ));
 
 	return brightness;
 }
@@ -873,7 +870,7 @@ Do occlusion test for glow-sprites
 */
 qboolean R_SpriteOccluded( cl_entity_t *e, vec3_t origin, int *alpha, float *pscale )
 {
-	if( e->curstate.rendermode == kRenderGlow || e->curstate.rendermode == kRenderWorldGlow )
+	if( e->curstate.rendermode == kRenderGlow )
 	{
 		float	blend = 1.0f;
 		vec3_t	v;
@@ -1012,7 +1009,6 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		pass &= ~xe::SprBatPass_AlphaTest;
 		break;
 	case kRenderGlow:
-	case kRenderWorldGlow:
 		pass |= xe::SprBatPass_Blend | xe::SprBatPass_Src_One;
 		pass |= xe::SprBatPass_NoDepthTest;
 		break;

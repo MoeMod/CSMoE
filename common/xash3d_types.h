@@ -56,6 +56,9 @@ typedef float		time_point_t;
 typedef float		duration_t;
 #endif
 
+// TODO : half float support
+typedef unsigned short half;
+
 #undef true
 #undef false
 
