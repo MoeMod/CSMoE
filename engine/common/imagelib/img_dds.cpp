@@ -20,80 +20,119 @@ GNU General Public License for more details.
 
 qboolean Image_CheckDXT3Alpha( dds_t *hdr, byte *fin )
 {
-	uint	bitmask;
-	word	sAlpha;
-	byte	*alpha; 
-	int	x, y, i, j; 
+	auto width = hdr->dwWidth;
+	auto height = hdr->dwHeight;
+	unsigned int blockCountX = (width + 3) / 4;
+	unsigned int blockCountY = (height + 3) / 4;
 
-	// analyze quad 4x4
-	for( y = 0; y < hdr->dwHeight; y += 4 )
+	for (unsigned int x = 0; x < blockCountY * 4; x+=4)
 	{
-		for( x = 0; x < hdr->dwWidth; x += 4 )
+		for (unsigned int y = 0; y < blockCountX * 4; y+=4)
 		{
-			alpha = fin;
-			fin += 8;
-			bitmask = ((uint *)fin)[1];
-			fin += 8;
+			auto blockStorage = fin + blockCountX * y*4 + x*4;
 
-			for( j = 0; j < 4; j++ )
+			for (int j=0; j < 4; j++)
 			{
-				sAlpha = alpha[2*j] + 256 * alpha[2*j+1];
-
-				for( i = 0; i < 4; i++ )
+				for (int i=0; i < 4; i++)
 				{
-					if((( x + i ) < hdr->dwWidth ) && (( y + j ) < hdr->dwHeight ))
+					word *alphaPtr = (word *)blockStorage;
+					word alphaLine = alphaPtr[j];
+					unsigned int alphaCode = (alphaLine >> i * 4) & 0x0F;
+					unsigned char finalAlpha = alphaCode << 4;
+
+					if (x + i < width)
 					{
-						if( sAlpha == 0 )
+						// valid pixel
+						if (finalAlpha != 255)
+						{
 							return true;
+						}
 					}
-					sAlpha >>= 4;
 				}
 			}
 		}
 	}
-
 	return false;
 }
 
 qboolean Image_CheckDXT5Alpha( dds_t *hdr, byte *fin )
 {
-	uint	bits, bitmask;
-	byte	*alphamask; 
-	int	x, y, i, j; 
+	auto width = hdr->dwWidth;
+	auto height = hdr->dwHeight;
+	unsigned int blockCountX = (width + 3) / 4;
+	unsigned int blockCountY = (height + 3) / 4;
 
-	// analyze quad 4x4
-	for( y = 0; y < hdr->dwHeight; y += 4 )
+	for (unsigned int x = 0; x < blockCountY * 4; x+=4)
 	{
-		for( x = 0; x < hdr->dwWidth; x += 4 )
+		for (unsigned int y = 0; y < blockCountX * 4; y+=4)
 		{
-			if( y >= hdr->dwHeight || x >= hdr->dwWidth )
-				break;
+			auto blockStorage = fin + blockCountX * y*4 + x*4;
 
-			alphamask = fin + 2;
-			fin += 8;
+			unsigned char alpha0 = *reinterpret_cast<const unsigned char *>(blockStorage);
+			unsigned char alpha1 = *reinterpret_cast<const unsigned char *>(blockStorage + 1);
 
-			bitmask = ((uint *)fin)[1];
-			fin += 8;
+			const unsigned char *bits = fin + 2;
+			unsigned int alphaCode1 = bits[2] | (bits[3] << 8) | (bits[4] << 16) | (bits[5] << 24);
+			unsigned short alphaCode2 = bits[0] | (bits[1] << 8);
 
-			// last three bytes
-			bits = (alphamask[3]) | (alphamask[4] << 8) | (alphamask[5] << 16);
-
-			for( j = 2; j < 4; j++ )
+			for (int j=0; j < 4; j++)
 			{
-				for( i = 0; i < 4; i++ )
+				for (int i=0; i < 4; i++)
 				{
-					// only put pixels out < width or height
-					if((( x + i ) < hdr->dwWidth ) && (( y + j ) < hdr->dwHeight ))
+					int alphaCodeIndex = 3*(4*j+i);
+					int alphaCode;
+
+					if (alphaCodeIndex <= 12)
 					{
-						if( bits & 0x07 )
-							return true;
+						alphaCode = (alphaCode2 >> alphaCodeIndex) & 0x07;
 					}
-					bits >>= 3;
+					else if (alphaCodeIndex == 15)
+					{
+						alphaCode = (alphaCode2 >> 15) | ((alphaCode1 << 1) & 0x06);
+					}
+					else // alphaCodeIndex >= 18 && alphaCodeIndex <= 45
+					{
+						alphaCode = (alphaCode1 >> (alphaCodeIndex - 16)) & 0x07;
+					}
+
+					unsigned char finalAlpha;
+					if (alphaCode == 0)
+					{
+						finalAlpha = alpha0;
+					}
+					else if (alphaCode == 1)
+					{
+						finalAlpha = alpha1;
+					}
+					else
+					{
+						if (alpha0 > alpha1)
+						{
+							finalAlpha = ((8-alphaCode)*alpha0 + (alphaCode-1)*alpha1)/7;
+						}
+						else
+						{
+							if (alphaCode == 6)
+								finalAlpha = 0;
+							else if (alphaCode == 7)
+								finalAlpha = 255;
+							else
+								finalAlpha = ((6-alphaCode)*alpha0 + (alphaCode-1)*alpha1)/5;
+						}
+					}
+
+					if (x + i < width)
+					{
+						// valid pixel
+						if (finalAlpha != 255)
+						{
+							return true;
+						}
+					}
 				}
 			}
 		}
 	}
-
 	return false;
 }
 		
@@ -406,14 +445,84 @@ void BlockDecompressImageDXT1(unsigned int width, unsigned int height, const byt
 {
     unsigned int blockCountX = (width + 3) / 4;
     unsigned int blockCountY = (height + 3) / 4;
-    unsigned int blockWidth = (width < 4) ? width : 4;
-    unsigned int blockHeight = (height < 4) ? height : 4;
 
     for (unsigned int j = 0; j < blockCountY; j++)
     {
         for (unsigned int i = 0; i < blockCountX; i++) DecompressBlockDXT1(i*4, j*4, width, blockStorage + i * 8, out_rgba);
         blockStorage += blockCountX * 8;
     }
+}
+
+void DecompressBlockDXT3(unsigned int x, unsigned int y, unsigned int width, const byte *blockStorage, byte *out_rgba)
+{
+	unsigned short color0 = *reinterpret_cast<const unsigned short *>(blockStorage + 8);
+	unsigned short color1 = *reinterpret_cast<const unsigned short *>(blockStorage + 10);
+
+	unsigned int temp;
+
+	temp = (color0 >> 11) * 255 + 16;
+	unsigned char r0 = (unsigned char)((temp/32 + temp)/32);
+	temp = ((color0 & 0x07E0) >> 5) * 255 + 32;
+	unsigned char g0 = (unsigned char)((temp/64 + temp)/64);
+	temp = (color0 & 0x001F) * 255 + 16;
+	unsigned char b0 = (unsigned char)((temp/32 + temp)/32);
+
+	temp = (color1 >> 11) * 255 + 16;
+	unsigned char r1 = (unsigned char)((temp/32 + temp)/32);
+	temp = ((color1 & 0x07E0) >> 5) * 255 + 32;
+	unsigned char g1 = (unsigned char)((temp/64 + temp)/64);
+	temp = (color1 & 0x001F) * 255 + 16;
+	unsigned char b1 = (unsigned char)((temp/32 + temp)/32);
+
+	unsigned int code = *reinterpret_cast<const unsigned int *>(blockStorage + 12);
+
+	for (int j=0; j < 4; j++)
+	{
+		for (int i=0; i < 4; i++)
+		{
+			word *alphaPtr = (word *)blockStorage;
+			word alphaLine = alphaPtr[j];
+			unsigned int alphaCode = (alphaLine >> i * 4) & 0x0F;
+			unsigned char finalAlpha = alphaCode << 4;
+
+			unsigned char colorCode = (code >> 2*(4*j+i)) & 0x03;
+
+			uint32_t finalColor;
+			switch (colorCode)
+			{
+				case 0:
+					finalColor = PackRGBA(r0, g0, b0, finalAlpha);
+					break;
+				case 1:
+					finalColor = PackRGBA(r1, g1, b1, finalAlpha);
+					break;
+				case 2:
+					finalColor = PackRGBA((2*r0+r1)/3, (2*g0+g1)/3, (2*b0+b1)/3, finalAlpha);
+					break;
+				case 3:
+					finalColor = PackRGBA((r0+2*r1)/3, (g0+2*g1)/3, (b0+2*b1)/3, finalAlpha);
+					break;
+			}
+
+			if (x + i < width)
+			{
+				auto image = (uint32_t *)out_rgba;
+				image[(y + j)*width + (x + i)] = finalColor;
+			}
+		}
+	}
+}
+
+void BlockDecompressImageDXT3(unsigned int width, unsigned int height, const byte *blockStorage, byte *out_rgba)
+{
+	unsigned int blockCountX = (width + 3) / 4;
+	unsigned int blockCountY = (height + 3) / 4;
+
+	for (unsigned int j = 0; j < blockCountY; j++)
+	{
+		for (unsigned int i = 0; i < blockCountX; i++) DecompressBlockDXT3(i*4, j*4, width, blockStorage + i * 16, out_rgba);
+		blockStorage += blockCountX * 16;
+	}
 }
 
 void DecompressBlockDXT5(unsigned int x, unsigned int y, unsigned int width, const byte *blockStorage, byte *out_rgba)
@@ -524,8 +633,6 @@ void BlockDecompressImageDXT5(unsigned int width, unsigned int height, const byt
 {
     unsigned int blockCountX = (width + 3) / 4;
     unsigned int blockCountY = (height + 3) / 4;
-    unsigned int blockWidth = (width < 4) ? width : 4;
-    unsigned int blockHeight = (height < 4) ? height : 4;
 
     for (unsigned int j = 0; j < blockCountY; j++)
     {
@@ -620,6 +727,14 @@ qboolean Image_LoadDDS_SW( imglib_t& image, const char *name, const byte *buffer
         image.type = PF_RGBA_32;
         image.rgba = (byte*)Mem_Alloc( host.imagepool, image.size );
         BlockDecompressImageDXT1(image.width, image.height, fin, image.rgba);
+        return true;
+    }
+    if( image.type == PF_DXT3 )
+    {
+        image.size = image.width * image.height * 4;
+        image.type = PF_RGBA_32;
+        image.rgba = (byte*)Mem_Alloc( host.imagepool, image.size );
+	    BlockDecompressImageDXT3(image.width, image.height, fin, image.rgba);
         return true;
     }
     if( image.type == PF_DXT5 )
