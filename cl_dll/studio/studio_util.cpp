@@ -155,7 +155,7 @@ void XASH_VECTORCALL VectorTransform (const vec3_t in1, cmatrix3x4 in2, vec3_t_r
 #if defined(XASH_SIMD) && U_VECTOR_NEON
     float32x4x4_t in_t;
     memcpy(&in_t, &in2, sizeof(in2));
-    //memset(&in_t.val[3], 0, sizeof(in_t.val[3]));
+    memset(&in_t.val[3], 0, sizeof(in_t.val[3]));
     in_t = vld4q_f32((const float *)&in_t);
 
     out = in_t.val[3];
