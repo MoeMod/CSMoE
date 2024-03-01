@@ -4,8 +4,8 @@
     android:installLocation="auto"
     android:versionCode="3013"
     android:versionName="v22-citrus">
-    <!-- OpenGL ES 1.0 -->
-    <uses-feature android:glEsVersion="0x00020000" android:required="true" /> <!-- Permissions -->
+    <!-- OpenGL ES 3.0 -->
+    <uses-feature android:glEsVersion="0x00030000" android:required="true" /> <!-- Permissions -->
     <supports-gl-texture android:name="GL_KHR_texture_compression_astc_ldr" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
