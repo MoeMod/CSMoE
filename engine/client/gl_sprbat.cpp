@@ -81,17 +81,21 @@ namespace xe {
 			//pglDisable( GL_ALPHA_TEST );
 		}
 
-		if(add_cap & SprBatPass_Blend)
+		if ( !(last_pass & SprBatPass_Blend) && (pass & SprBatPass_Blend) )
 		{
 			pglEnable( GL_BLEND );
-			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		}
-		else if(remove_cap & SprBatPass_Blend)
+		if ( (last_pass & SprBatPass_Blend) && !(pass & SprBatPass_Blend) )
 		{
-			pglDisable( GL_BLEND );
+			pglDisable(GL_BLEND);
 		}
 
-		if(add_cap & SprBatPass_Src_One)
+		if (add_cap & SprBatPass_AlphaBlend)
+		{
+			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		}
+
+		if(add_cap & SprBatPass_Additive)
 		{
 			//pglDisable( GL_FOG );
 #ifdef XASH_GLES
@@ -101,12 +105,6 @@ namespace xe {
 #else
 			pglBlendFunc( GL_SRC_ALPHA, GL_ONE );
 #endif
-		}
-		else if(remove_cap & SprBatPass_Src_One)
-		{
-			//if( RI.fogCustom || ( RI.fogEnabled && !glState.drawTrans ))
-			//	pglEnable( GL_FOG );
-			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		}
 
 		if(add_cap & SprBatPass_NoDepthTest)
@@ -249,7 +247,7 @@ namespace xe {
 		iter = mid;
 		// render alpha test
 		mid = std::stable_partition(iter, end, [](const DrawData & a){
-			return (a.pass & SprBatPass_AlphaTest) && !(a.pass & SprBatPass_Blend);
+			return (a.pass & SprBatPass_AlphaTest);
 		});
 #ifdef XASH_SHADER
 		if(iter != mid)

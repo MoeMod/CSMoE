@@ -6,11 +6,14 @@ namespace xe {
 		SprBatPass_Opaque = 0,
 		SprBatPass_NoDepthTest = 1 << 0,
 		SprBatPass_NoCull = 1 << 1,
-		SprBatPass_Src_One = 1 << 2,
+		SprBatPass_AlphaTest = 1 << 2,
 
-		SprBatPass_AlphaTest = 1 << 3,
-		SprBatPass_Blend = 1 << 4,
+		// kRenderTransAlpha, kRenderTransTexture, kRenderTransAlpha
+		SprBatPass_AlphaBlend = 1 << 3,
+		// kRenderTransAdd, kRenderGlow
+		SprBatPass_Additive = 1 << 4,
 	};
+	constexpr auto SprBatPass_Blend = SprBatPass_AlphaBlend | SprBatPass_Additive;
 
 	void SprBat_SetupRenderState(int pass, int last_pass = 0);
 	void SprBat_RestoreRenderState(int last_pass);

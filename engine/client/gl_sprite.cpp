@@ -994,7 +994,7 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		pass |= xe::SprBatPass_AlphaTest;
 
 	if( psprite->texFormat == SPR_INDEXALPHA )
-		pass |= xe::SprBatPass_Blend;
+		pass |= xe::SprBatPass_AlphaBlend;
 
 	// select properly rendermode
 	switch( e->curstate.rendermode )
@@ -1002,23 +1002,20 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	case kRenderTransAlpha:
 	case kRenderTransColor:
 	case kRenderTransTexture:
-		pass |= xe::SprBatPass_Blend;
+		pass |= xe::SprBatPass_AlphaBlend;
 		break;
 	case kRenderTransAdd:
-		pass |= xe::SprBatPass_Blend | xe::SprBatPass_Src_One;
+		pass |= xe::SprBatPass_Additive;
 		pass &= ~xe::SprBatPass_AlphaTest;
 		break;
 	case kRenderGlow:
-		pass |= xe::SprBatPass_Blend | xe::SprBatPass_Src_One;
+		pass |= xe::SprBatPass_Additive;
 		pass |= xe::SprBatPass_NoDepthTest;
 		break;
 	case kRenderNormal:
 	default:
 		break;
 	}
-
-	if (psprite->synctype == 233)
-		pass |= xe::SprBatPass_Blend | xe::SprBatPass_Src_One;
 
 	if( psprite->facecull == SPR_CULL_NONE )
 		pass |= xe::SprBatPass_NoCull;
@@ -1077,6 +1074,23 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	}
 
 	flAlpha = (float)alpha * ( 1.0f / 255.0f );
+
+
+	if (psprite->synctype == 233)
+	{
+		pass &= ~(xe::SprBatPass_Additive | xe::SprBatPass_AlphaBlend);
+		if (gltexture_t* tex = R_GetTexture(frame->gl_texturenum))
+		{
+			if (tex->flags & TF_HAS_ALPHA)
+			{
+				pass |= xe::SprBatPass_AlphaBlend;
+			}
+			else
+			{
+				pass |= xe::SprBatPass_Additive;
+			}
+		}
+	}
 
 	if( oldframe == frame )
 	{
