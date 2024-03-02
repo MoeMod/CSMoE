@@ -307,7 +307,7 @@ void R_StudioInit( void )
 
 	pglGenBuffersARB( 1, &g_pstudioubo.Matrices_ubo);
 	pglBindBufferARB(GL_UNIFORM_BUFFER, g_pstudioubo.Matrices_ubo);
-	pglBufferDataARB(GL_UNIFORM_BUFFER, sizeof(studioubo_t::Matrices), NULL, GL_DYNAMIC_DRAW_ARB);
+	pglBufferDataARB(GL_UNIFORM_BUFFER, sizeof(studioubo_t::Matrices), NULL, GL_STREAM_DRAW_ARB);
 	pglBindBufferBase(GL_UNIFORM_BUFFER, g_pstudioubo.MatricesBindingPoint, g_pstudioubo.Matrices_ubo);
 	pglBindBufferARB(GL_UNIFORM_BUFFER, 0);
 
@@ -1843,11 +1843,6 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 	int		j;
 	mstudiomesh_t	*pmesh;
 
-#ifdef XASH_SHADER
-	g_pstudioshader = &g_studioshadervariant[SSV_NORMAL];
-	R_StudioSetupShader();
-#endif
-
 	for( j = 0; j < m_pSubModel->nummesh; j++ )
 	{
 		float	s, t, alpha;
@@ -1859,7 +1854,8 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		//handtexture system start
 		int id;
 		int type = TATTOO_NONE;
-
+#if 0
+        // TODO : 优化一下，卡死了这里
 		if (CL_GetLocalPlayer()->curstate.iuser1 == OBS_IN_EYE)
 		{
 			id = CL_GetLocalPlayer()->curstate.iuser2;
@@ -1870,6 +1866,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			id = CL_GetLocalPlayer()->index;
 			type = atoi(LocalPlayerInfo_ValueForKey("tattoo"));
 		}
+#endif
 
 
 		ModelName ClassID = ModelName(pStudioDraw->StudioGetPlayerClassID(id));
@@ -2546,10 +2543,6 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		}
 
 	}
-#ifdef XASH_SHADER
-	g_pstudioshader = nullptr;
-	R_StudioRestoreShader();
-#endif
 }
 
 /*
@@ -2631,9 +2624,6 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 		std::sort( g_sortedMeshes, g_sortedMeshes + m_pSubModel->nummesh, R_StudioMeshCompare );
 	}
 
-#ifdef XASH_SHADER
-	R_StudioSetupUBO();
-#endif
 	R_StudioDrawMeshes( ptexture, pskinref, scale );
 
 	// restore depthmask for next call StudioDrawPoints
@@ -3289,6 +3279,12 @@ static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 	// was done before, in R_DrawViewModel
 	if( g_iBackFaceCull )
 		GL_FrontFace( !glState.frontFace );
+
+#ifdef XASH_SHADER
+    R_StudioSetupUBO();
+    g_pstudioshader = &g_studioshadervariant[SSV_NORMAL];
+    R_StudioSetupShader();
+#endif
 }
 
 /*
@@ -3299,6 +3295,10 @@ R_StudioRestoreRenderer
 */
 static void GAME_EXPORT R_StudioRestoreRenderer( void )
 {
+#ifdef XASH_SHADER
+    g_pstudioshader = nullptr;
+    R_StudioRestoreShader();
+#endif
 	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	//pglShadeModel( GL_FLAT );
 
