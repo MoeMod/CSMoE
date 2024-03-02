@@ -206,6 +206,13 @@ extern "C" {
 #define pglGenVertexArrays GL_MANGLE(glGenVertexArrays)
 #define pglIsVertexArray GL_MANGLE(glIsVertexArray)
 
+// ES 3.0 3D Texture & Array Texture
+#define pglTexImage3D GL_MANGLE(glTexImage3D)
+#define pglTexSubImage3D GL_MANGLE(glTexSubImage3D)
+#define pglTexStorage3D GL_MANGLE(glTexStorage3D)
+#define pglCopyTexSubImage3D GL_MANGLE(glCopyTexSubImage3D)
+#define pglFramebufferTextureLayer GL_MANGLE(glFramebufferTextureLayer)
+
 #endif
 
 #endif // GL_STATIC_H
