@@ -46,6 +46,7 @@ namespace xe {
     //void TexLru_CreateAttr(const mspriteframe_t *pspriteframe, int gl_texturenum);
     void TexLru_FreeTexture(const mstudiotexture_t *ptexture);
     bool TexLru_Upload(int texnum);
+    void TexLru_Upload(const msprite_t *psprite, const mspriteframe_t *pspriteframe);
 
     void TexLru_Free( int texnum );
 	void TexLru_Shrink();

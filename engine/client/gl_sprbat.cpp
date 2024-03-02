@@ -39,7 +39,7 @@ namespace xe {
 			GLint vaTexCoord; // vec2
 		} attrib;
 		GLuint array_buffer[XASH_VBO_BUFFER_COUNT];
-        int array_buffer_cur;
+        int array_buffer_cur = 0;
 	} sprshader_t;
 	sprshader_t g_SprShaderVariant[MAX_SPRBAT_SHAEDR_VARIANTS];
 	sprshader_t *g_pSprShader = nullptr;
@@ -144,15 +144,14 @@ namespace xe {
 			GL_Cull( GL_FRONT );
 	}
 
-	void SprBat_DrawSpriteQuad( msprite_t *psprite, mspriteframe_t *frame, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color )
+	void SprBat_DrawSpriteQuad( vec4_t frame, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color )
 	{
-		xe::TexLru_Bind(psprite, frame);
 #ifdef XASH_SHADER
 		pglUniform3fvARB(g_pSprShader->uniform.v_up, 1, v_up.data());
 		pglUniform3fvARB(g_pSprShader->uniform.v_right, 1, v_right.data());
 		pglUniformMatrix4fvARB(g_pSprShader->uniform.muWVP, 1, GL_FALSE,(const float *) &RI.worldviewProjectionMatrixTranspose);
 		pglUniform1iARB(g_pSprShader->uniform.texSprite, glState.activeTMU);
-		pglUniform4fARB(g_pSprShader->uniform.frame, frame->up, frame->down, frame->left, frame->right);
+		pglUniform4fvARB(g_pSprShader->uniform.frame, 1, frame.data());
 		pglUniform3fvARB(g_pSprShader->uniform.org, 1, org.data());
 		pglUniform4fvARB(g_pSprShader->uniform.color, 1, color.data());
 		pglUniform1fARB(g_pSprShader->uniform.scale, scale);
@@ -174,20 +173,20 @@ namespace xe {
 
 		gTriApi.Begin( TRI_QUADS );
 		gTriApi.TexCoord2f( 0.0f, 1.0f );
-		VectorMA( org, frame->down * scale, v_up, point );
-		VectorMA( point, frame->left * scale, v_right, point );
+		VectorMA( org, frame[1] * scale, v_up, point );
+		VectorMA( point, frame[2] * scale, v_right, point );
 		gTriApi.Vertex3fv( point );
 		gTriApi.TexCoord2f( 0.0f, 0.0f );
-		VectorMA( org, frame->up * scale, v_up, point );
-		VectorMA( point, frame->left * scale, v_right, point );
+		VectorMA( org, frame[0] * scale, v_up, point );
+		VectorMA( point, frame[2] * scale, v_right, point );
 		gTriApi.Vertex3fv( point );
 		gTriApi.TexCoord2f( 1.0f, 0.0f );
-		VectorMA( org, frame->up * scale, v_up, point );
-		VectorMA( point, frame->right * scale, v_right, point );
+		VectorMA( org, frame[0] * scale, v_up, point );
+		VectorMA( point, frame[3] * scale, v_right, point );
 		gTriApi.Vertex3fv( point);
 		gTriApi.TexCoord2f( 1.0f, 1.0f );
-		VectorMA( org, frame->down * scale, v_up, point );
-		VectorMA( point, frame->right * scale, v_right, point );
+		VectorMA( org, frame[1] * scale, v_up, point );
+		VectorMA( point, frame[3] * scale, v_right, point );
 		gTriApi.Vertex3fv( point );
 		gTriApi.End();
 #endif
@@ -196,8 +195,8 @@ namespace xe {
 	struct DrawData
 	{
 		int pass;
-		msprite_t *psprite;
-		mspriteframe_t *frame;
+		int gl_texturenum;
+		vec4_t frame;
 		float scale;
 		vec3_t org, v_right, v_up;
 		vec4_t color;
@@ -211,21 +210,30 @@ namespace xe {
 	{
 		SprBat_SetupRenderState(data.pass, sprbat_current_pass);
         sprbat_current_pass = data.pass;
-		SprBat_DrawSpriteQuad(data.psprite, data.frame, data.org, data.v_right, data.v_up, data.scale, data.color);
+        GL_Bind(XASH_TEXTURE0, data.gl_texturenum);
+		SprBat_DrawSpriteQuad(data.frame, data.org, data.v_right, data.v_up, data.scale, data.color);
 	}
 
 	bool SprBat_DrawDataCompare(const DrawData &a, const DrawData &b)
 	{
-		return std::tie(a.pass, a.frame->gl_texturenum) < std::tie(b.pass, b.frame->gl_texturenum);
+		return std::tie(a.pass, a.gl_texturenum) < std::tie(b.pass, b.gl_texturenum);
 	}
 
 	void SprBat_AddDrawList( int pass, msprite_t *psprite, mspriteframe_t *frame, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color )
 	{
         if(drawlist_num >= drawlist_maxnum)
             return;
-		DrawData data{ pass, psprite, frame, scale, org, v_right, v_up, color };
-		drawlist[drawlist_num++] = data;
+        xe::TexLru_Upload(psprite, frame);
+        return SprBat_AddDrawListCustom(pass, frame->gl_texturenum, vec4_t(frame->up, frame->down, frame->left, frame->right), org, v_right, v_up, scale, color);
 	}
+
+    void SprBat_AddDrawListCustom( int pass, int gl_texturenum, vec4_t frame, vec3_t org, vec3_t v_right, vec3_t v_up, float scale, vec4_t color )
+    {
+        if(drawlist_num >= drawlist_maxnum)
+            return;
+        DrawData data{ pass, gl_texturenum, frame, scale, org, v_right, v_up, color };
+        drawlist[drawlist_num++] = data;
+    }
 
 	void SprBat_RenderDrawList()
 	{
@@ -390,11 +398,7 @@ namespace xe {
 			pglDeleteObjectARB(g_pSprShader->vertex_shader);
 			pglDeleteObjectARB(g_pSprShader->fragment_shader);
 			pglDeleteProgram(g_pSprShader->program);
-
-            for(int j = 0; j < XASH_VBO_BUFFER_COUNT; ++j)
-            {
-                pglDeleteBuffersARB(1, &g_pSprShader->array_buffer[j]);
-            }
+            pglDeleteBuffersARB(XASH_VBO_BUFFER_COUNT, g_pSprShader->array_buffer);
 		}
 #endif
 	}

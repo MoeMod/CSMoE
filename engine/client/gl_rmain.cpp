@@ -1159,9 +1159,9 @@ void R_DrawEntitiesOnList( void )
 
     if( !RI.refdef.onlyClientDraw )
     {
-	    xe::SprBat_RenderDrawList();
         CL_DrawBeams( true );
         CL_DrawParticles();
+        xe::SprBat_RenderDrawList();
     }
 
     // NOTE: some mods with custom renderer may generate glErrors

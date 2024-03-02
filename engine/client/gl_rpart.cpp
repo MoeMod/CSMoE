@@ -24,6 +24,8 @@ GNU General Public License for more details.
 #include "triangleapi.h"
 #include "cl_tent.h"
 #include "studio.h"
+#include "gl_sprbat.h"
+
 extern triangleapi_t gTriApi;
 
 /*
@@ -405,7 +407,6 @@ void CL_UpdateParticle( particle_t *p, float ft )
 	float	grav = ft * clgame.movevars.gravity * 0.05f;
 	float	size = 1.5f;
 	int	i, iRamp, alpha = 255;
-	vec3_t	right, up;
 	rgb_t	color;
 
 	r_stats.c_particle_count++;
@@ -494,34 +495,13 @@ void CL_UpdateParticle( particle_t *p, float ft )
 	if( size < 20.0f ) size = 1.0f;
 	else size = 1.0f + size * 0.004f;
 #endif
- 	// scale the axes by radius
-	VectorScale( RI.vright, size, right );
-	VectorScale( RI.vup, size, up );
 
 	p->color = bound( 0, p->color, 255 );
-	VectorSet( color, clgame.palette[p->color][0], clgame.palette[p->color][1], clgame.palette[p->color][2] );
-
-	GL_SetRenderMode( kRenderTransTexture );
-	gTriApi.Color4ub( color[0], color[1], color[2], alpha );
-
-	if( r_oldparticles->integer == 1 )
-		GL_Bind( XASH_TEXTURE0, cls.oldParticleImage );
-	else
-		GL_Bind( XASH_TEXTURE0, cls.particleImage );
 
 	// add the 4 corner vertices.
-	gTriApi.Begin( TRI_QUADS );
-
-	gTriApi.TexCoord2f( 0.0f, 1.0f );
-	gTriApi.Vertex3f( p->org[0] - right[0] + up[0], p->org[1] - right[1] + up[1], p->org[2] - right[2] + up[2] );
-	gTriApi.TexCoord2f( 0.0f, 0.0f );
-	gTriApi.Vertex3f( p->org[0] + right[0] + up[0], p->org[1] + right[1] + up[1], p->org[2] + right[2] + up[2] );
-	gTriApi.TexCoord2f( 1.0f, 0.0f );
-	gTriApi.Vertex3f( p->org[0] + right[0] - up[0], p->org[1] + right[1] - up[1], p->org[2] + right[2] - up[2] );
-	gTriApi.TexCoord2f( 1.0f, 1.0f );
-	gTriApi.Vertex3f( p->org[0] - right[0] - up[0], p->org[1] - right[1] - up[1], p->org[2] - right[2] - up[2] );
-
-	gTriApi.End();
+    xe::SprBat_AddDrawListCustom( xe::SprBatPass_Blend, r_oldparticles->integer == 1 ? cls.oldParticleImage : cls.particleImage,
+                                  vec4_t(-1, 1, -1, 1), p->org, RI.vright, RI.vup, size,
+                                  vec4_t(clgame.palette[p->color][0] / 255.0f, clgame.palette[p->color][1] / 255.0f, clgame.palette[p->color][2] / 255.0f, alpha / 255.0f));
 
 	if( p->type != pt_clientcustom )
 	{
@@ -1402,48 +1382,6 @@ static qboolean CL_CullTracer( const vec3_t start, const vec3_t end )
 	return R_CullBox( mins, maxs, RI.clipFlags );
 }
 
-/*
-================
-CL_TracerComputeVerts
-
-compute four vertexes in screen space
-================
-*/
-qboolean CL_TracerComputeVerts( const vec3_t start, const vec3_t delta, float width, vec3_t *pVerts )
-{
-	vec3_t	end, screenStart, screenEnd;
-	vec3_t	tmp, tmp2, normal;
-
-	VectorAdd( start, delta, end );
-
-	// clip the tracer
-	if( CL_CullTracer( start, end ))
-		return false;
-
-	// transform point into the screen space
-	TriWorldToScreen( start, screenStart );
-	TriWorldToScreen( end, screenEnd );
-
-	VectorSubtract( screenStart, screenEnd, tmp );	
-	tmp[2] = 0; // we don't need Z, we're in screen space
-
-	VectorNormalize( tmp );
-
-	// build point along noraml line (normal is -y, x)
-	VectorScale( RI.vup, tmp[0], normal );
-	VectorScale( RI.vright, -tmp[1], tmp2 );
-	VectorSubtract( normal, tmp2, normal );
-
-	// compute four vertexes
-	VectorScale( normal, width, tmp );
-	VectorSubtract( start, tmp, pVerts[0] ); 
-	VectorAdd( start, tmp, pVerts[1] ); 
-	VectorAdd( pVerts[0], delta, pVerts[2] ); 
-	VectorAdd( pVerts[1], delta, pVerts[3] ); 
-
-	return true;
-}
-
 
 /*
 ================
@@ -1457,8 +1395,24 @@ void CL_DrawTracer( vec3_t start, vec3_t delta, float width, rgb_t color, int al
 	// Clip the tracer
 	vec3_t	verts[4];
 
-	if ( !CL_TracerComputeVerts( start, delta, width, verts ))
-		return;
+    vec3_t	end, screenStart, screenEnd;
+    vec3_t	screenNormal, normal;
+
+    VectorAdd( start, delta, end );
+
+    // clip the tracer
+    if( CL_CullTracer( start, end ))
+        return;
+
+    // transform point into the screen space
+    TriWorldToScreen( start, screenStart );
+    TriWorldToScreen( end, screenEnd );
+    VectorSubtract( screenStart, screenEnd, screenNormal );
+    screenNormal[2] = 0; // we don't need Z, we're in screen space
+    VectorNormalize( screenNormal );
+
+    // build point along noraml line (normal is -y, x)
+    normal = RI.vup * screenNormal[0] + RI.vright * screenNormal[1];
 
 	// NOTE: Gotta get the winding right so it's not backface culled
 	// (we need to turn of backface culling for these bad boys)
@@ -1471,16 +1425,16 @@ void CL_DrawTracer( vec3_t start, vec3_t delta, float width, rgb_t color, int al
 	gTriApi.Begin( TRI_QUADS );
 
 	gTriApi.TexCoord2f( 0.0f, endV );
-	gTriApi.Vertex3fv( verts[2]);
+	gTriApi.Vertex3fv( start - normal * width + delta );
 
 	gTriApi.TexCoord2f( 1.0f, endV );
-	gTriApi.Vertex3fv( verts[3]);
+	gTriApi.Vertex3fv( start + normal * width + delta );
 
 	gTriApi.TexCoord2f( 1.0f, startV );
-	gTriApi.Vertex3fv( verts[1] );
+	gTriApi.Vertex3fv( start + normal * width );
 
 	gTriApi.TexCoord2f( 0.0f, startV );
-	gTriApi.Vertex3fv( verts[0] );
+	gTriApi.Vertex3fv( start - normal * width );
 
 	gTriApi.End();
 }

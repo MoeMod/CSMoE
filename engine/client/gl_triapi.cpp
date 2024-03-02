@@ -25,6 +25,7 @@ GNU General Public License for more details.
 #include <vector>
 
 #define XASH_SHADER_TRIAPI 1
+#define XASH_VBO_BUFFER_COUNT 32
 
 /*
 =================
@@ -60,8 +61,9 @@ namespace xe {
 			GLint col;
 		} attrib;
 
-		GLuint vbo;
-		GLuint ebo;
+		GLuint vbo[XASH_VBO_BUFFER_COUNT];
+		GLuint ebo[XASH_VBO_BUFFER_COUNT];
+        int cur_index = 0;
 
 		GLhandleARB vertex_shader;
 		GLhandleARB fragment_shader;
@@ -162,8 +164,8 @@ void main (void)
 			this->attrib.uv = pglGetAttribLocationARB(this->program, "uv");
 			this->attrib.col = pglGetAttribLocationARB(this->program, "col");
 
-			pglGenBuffersARB( 1, &this->vbo);
-			pglGenBuffersARB( 1, &this->ebo);
+			pglGenBuffersARB( XASH_VBO_BUFFER_COUNT, this->vbo);
+			pglGenBuffersARB( XASH_VBO_BUFFER_COUNT, this->ebo);
 		}
 
 		void ShutdownShader()
@@ -174,8 +176,8 @@ void main (void)
 			pglDeleteObjectARB(this->fragment_shader);
 			pglDeleteProgram(this->program);
 
-			pglDeleteBuffersARB( 1, &this->vbo);
-			pglDeleteBuffersARB( 1, &this->ebo);
+			pglDeleteBuffersARB( XASH_VBO_BUFFER_COUNT, this->vbo);
+			pglDeleteBuffersARB( XASH_VBO_BUFFER_COUNT, this->ebo);
 		}
 	} TriFFE;
 }
@@ -306,8 +308,10 @@ void GAME_EXPORT TriEnd( void )
 	}
 	pglUniform1fARB(xe::TriFFE.uniform.uPointSize, xe::TriFFE.cur_point_size);
 
-	pglBindBufferARB(GL_ARRAY_BUFFER_ARB, xe::TriFFE.vbo);
-	pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, xe::TriFFE.ebo);
+    int j = xe::TriFFE.cur_index++;
+    xe::TriFFE.cur_index %= XASH_VBO_BUFFER_COUNT;
+	pglBindBufferARB(GL_ARRAY_BUFFER_ARB, xe::TriFFE.vbo[j]);
+	pglBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, xe::TriFFE.ebo[j]);
 
 	pglEnableVertexAttribArrayARB(xe::TriFFE.attrib.pos);
 	pglEnableVertexAttribArrayARB(xe::TriFFE.attrib.uv);
