@@ -648,13 +648,6 @@
 			remoteGlobalIDString = AB980332CB1C4FDD9D81D36C;
 			remoteInfo = xash;
 		};
-		3DFDDBBA28C2279E00351ACE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 065FBDED999B461CB2FC1EA5;
-			remoteInfo = "3rdparty-gl4es";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -903,7 +896,6 @@
 		3DF981D927F9AE940030D0B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3DFDDBBB28C2279E00351ACE /* lib3rdparty-gl4es.a */,
 				3DF9821E27F9AE940030D0B5 /* libboost_atomic.a */,
 				3DF9822027F9AE940030D0B5 /* libboost_chrono.a */,
 				3DF9822227F9AE940030D0B5 /* libboost_container.a */,
@@ -1586,13 +1578,6 @@
 			fileType = archive.ar;
 			path = libxash.a;
 			remoteRef = 3DF9828D27F9AE940030D0B5 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3DFDDBBB28C2279E00351ACE /* lib3rdparty-gl4es.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "lib3rdparty-gl4es.a";
-			remoteRef = 3DFDDBBA28C2279E00351ACE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

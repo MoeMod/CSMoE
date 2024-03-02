@@ -512,7 +512,7 @@ endif()
 
 if(ANDROID)
 	target_link_libraries(${XASH_ENGINE} PUBLIC -ldl -llog -landroid -lEGL -lGLESv3)
-elseif(NOT WIN32)
+elseif(NOT WIN32 AND NOT APPLE)
 	if(NOT HAIKU)
 		target_link_libraries(${XASH_ENGINE} PUBLIC -lm -lpthread)
 	else()
