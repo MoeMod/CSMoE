@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include "mod_local.h"
 #include "mathlib.h"
 #include <triangleapi.h>
+#include "gl_shader.h"
 extern triangleapi_t gTriApi;
 			
 typedef struct
@@ -49,7 +50,7 @@ static gllightmapstate_t	gl_lms;
 static void LM_UploadBlock( qboolean dynamic );
 
 static qboolean R_AddSurfToVBO( msurface_t *surf, qboolean buildlightmaps );
-static void R_DrawVBO( qboolean drawlightmaps, qboolean drawtextures );
+static void R_DrawVBO( cl_entity_t *e, qboolean drawlightmaps, qboolean drawtextures );
 
 byte *Mod_GetCurrentVis( void )
 {
@@ -1628,7 +1629,7 @@ void R_DrawBrushModel( cl_entity_t *e )
 	GL_ResetFogColor();
 
 	if( allow_vbo && !num_sorted )
-		R_DrawVBO( R_HasLightmap(), true );
+		R_DrawVBO( e, R_HasLightmap(), true );
 
 	//if( e->curstate.rendermode == kRenderTransColor )
 	//	pglEnable( GL_TEXTURE_2D );
@@ -1725,29 +1726,1250 @@ void R_DrawStaticBrushes( void )
 	}
 }
 
-qboolean R_AddSurfToVBO(msurface_t* surf, qboolean buildlightmap)
+/*
+==============================
+
+VBO
+
+==============================
+*/
+/*
+Bulld arrays (vboarray_t) for all map geometry on map load.
+Store index base for every surface (vbosurfdata_t) to build index arrays
+For each texture build index arrays (vbotexture_t) every frame.
+*/
+// vertex attribs
+typedef struct vbovertex_s
 {
-	return false;
+    vec3_c pos;
+    vec2_t gl_tc;
+    vec2_t lm_tc;
+    vec2_t dt_tc;
+    vec4_t color;
+} vbovertex_t;
+
+// store indexes for each texture
+typedef struct vbotexture_s
+{
+    unsigned short *indexarray; // index array (generated instead of texture chains)
+    uint curindex; // counter for index array
+    uint len; // maximum index array length
+    struct vbotexture_s *next; // if cannot fit into one array, allocate new one, as every array has own index space
+    msurface_t *dlightchain; // list of dlight surfaces
+    struct vboarray_s *vboarray; // debug
+    uint lightmaptexturenum;
+} vbotexture_t;
+
+// array list
+typedef struct vboarray_s
+{
+    uint glindex; // glGenBuffers
+    int array_len; // allocation length
+    vbovertex_t *array; // vertex attrib array
+    struct vboarray_s *next; // split by 65536 vertices
+} vboarray_t;
+
+// every surface is linked to vbo texture
+typedef struct vbosurfdata_s
+{
+    vbotexture_t *vbotexture;
+    uint texturenum;
+    uint startindex;
+} vbosurfdata_t;
+
+typedef struct vbodecal_s
+{
+    int numVerts;
+} vbodecal_t;
+
+#define DECAL_VERTS_MAX 32
+#define DECAL_VERTS_CUT 8
+
+typedef struct vbodecaldata_s
+{
+    vbodecal_t decals[MAX_RENDER_DECALS];
+    vbovertex_t decalarray[MAX_RENDER_DECALS * DECAL_VERTS_CUT];
+    uint decalvbo;
+    msurface_t **lm;
+} vbodecaldata_t;
+
+// gl_decals.c
+extern decal_t	gDecalPool[MAX_RENDER_DECALS];
+
+struct vbo_static_s
+{
+    // quickly free all allocations on map change
+    mempool_t *mempool;
+
+    // arays
+    vbodecaldata_t *decaldata; // array
+    vbotexture_t *textures; // array
+    vbosurfdata_t *surfdata; // array
+    vboarray_t *arraylist; // linked list
+
+    // separate areay for dlights (build during draw)
+    unsigned short *dlight_index; // array
+    vec2_t *dlight_tc; // array
+    unsigned int dlight_vbo;
+    vbovertex_t decal_dlight[MAX_RENDER_DECALS * DECAL_VERTS_MAX];
+    unsigned int decal_dlight_vbo;
+    int decal_numverts[MAX_RENDER_DECALS * DECAL_VERTS_MAX];
+    unsigned int decal_dynamic_vbo;
+
+    // prevent draining cpu on empty cycles
+    int minlightmap;
+    int maxlightmap;
+    int mintexture;
+    int maxtexture;
+
+    // never skip array splits
+    int minarraysplit_tex;
+    int maxarraysplit_tex;
+    int minarraysplit_lm;
+    int maxarraysplit_lm;
+} vbos;
+
+typedef struct watershader_s {
+    GLuint program;
+    GLuint vertex_shader;
+    GLuint fragment_shader;
+    struct {
+        GLint Switch;
+        GLint ModelView;
+        GLint Projection;
+        GLint RenderColor;
+        GLint FogParam;
+        GLint TexDiffusemap;
+        GLint TexLightmap;
+        GLint TexDetail;
+        GLint FilterParam;
+    } uniform;
+    struct {
+        GLint aPos;
+        GLint aTexCoord;
+        GLint aLightmapCoord;
+        GLint aDetailCoord;
+        GLint aColor;
+    } attrib;
+} watershader_t;
+watershader_t g_BspShader;
+
+void R_InitBspShader()
+{
+    fs_offset_t length;
+    const byte* data;
+
+    data = FS_MapFile("shader/bsprender.vs", &length, true);
+    const GLcharARB* vertex_shader_list[7] = {
+            xe::GetShaderVersionString(),
+            "#define SWITCH_DECAL 0x01\n",
+            "#define SWITCH_FOG 0x02\n",
+            "#define SWITCH_DETAIL 0x04\n",
+            "#define SWITCH_LIGHTMAP 0x08\n",
+            "#define SWITCH_WIREFRAME 0x10\n",
+            (const GLcharARB*)data
+    };
+    g_BspShader.vertex_shader = pglCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+    pglShaderSourceARB(g_BspShader.vertex_shader, 7, vertex_shader_list, NULL);
+    pglCompileShaderARB(g_BspShader.vertex_shader);
+    xe::CheckShader(g_BspShader.vertex_shader, "vertex shader");
+
+    data = FS_MapFile("shader/bsprender.fs", &length, true);
+    const GLcharARB* fragment_shader_list[8] = {
+            xe::GetShaderVersionString(),
+            xe::GetFragmentShaderPrecision(),
+            "#define SWITCH_DECAL 0x01\n",
+            "#define SWITCH_FOG 0x02\n",
+            "#define SWITCH_DETAIL 0x04\n",
+            "#define SWITCH_LIGHTMAP 0x08\n",
+            "#define SWITCH_WIREFRAME 0x10\n",
+            (const GLcharARB*)data
+    };
+    g_BspShader.fragment_shader = pglCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+    pglShaderSourceARB(g_BspShader.fragment_shader, 8, fragment_shader_list, NULL);
+    pglCompileShaderARB(g_BspShader.fragment_shader);
+    xe::CheckShader(g_BspShader.fragment_shader, "fragment shader");
+
+    g_BspShader.program = pglCreateProgramObjectARB();
+    pglAttachObjectARB(g_BspShader.program, g_BspShader.vertex_shader);
+    pglAttachObjectARB(g_BspShader.program, g_BspShader.fragment_shader);
+    pglLinkProgramARB(g_BspShader.program);
+    xe::CheckProgram(g_BspShader.program, "shader program");
+
+    g_BspShader.uniform.Switch = pglGetUniformLocationARB(g_BspShader.program, "Switch");
+    g_BspShader.uniform.ModelView = pglGetUniformLocationARB(g_BspShader.program, "ModelView");
+    g_BspShader.uniform.Projection = pglGetUniformLocationARB(g_BspShader.program, "Projection");
+    g_BspShader.uniform.RenderColor = pglGetUniformLocationARB(g_BspShader.program, "RenderColor");
+    g_BspShader.uniform.FogParam = pglGetUniformLocationARB(g_BspShader.program, "FogParam");
+    g_BspShader.uniform.TexDiffusemap = pglGetUniformLocationARB(g_BspShader.program, "TexDiffusemap");
+    g_BspShader.uniform.TexLightmap = pglGetUniformLocationARB(g_BspShader.program, "TexLightmap");
+    g_BspShader.uniform.TexDetail = pglGetUniformLocationARB(g_BspShader.program, "TexDetail");
+    g_BspShader.uniform.FilterParam = pglGetUniformLocationARB(g_BspShader.program, "FilterParam");
+
+    g_BspShader.attrib.aPos = pglGetAttribLocationARB(g_BspShader.program, "aPos");
+    g_BspShader.attrib.aTexCoord = pglGetAttribLocationARB(g_BspShader.program, "aTexCoord");
+    g_BspShader.attrib.aLightmapCoord = pglGetAttribLocationARB(g_BspShader.program, "aLightmapCoord");
+    g_BspShader.attrib.aDetailCoord = pglGetAttribLocationARB(g_BspShader.program, "aDetailCoord");
+    g_BspShader.attrib.aColor = pglGetAttribLocationARB(g_BspShader.program, "aColor");
 }
 
-void R_DrawVBO(qboolean drawlightmaps, qboolean drawtextures)
+void R_ShutdownBspShader()
 {
-	
+    pglDetachObjectARB(g_BspShader.program, g_BspShader.vertex_shader);
+    pglDetachObjectARB(g_BspShader.program, g_BspShader.fragment_shader);
+    pglDeleteObjectARB(g_BspShader.vertex_shader);
+    pglDeleteObjectARB(g_BspShader.fragment_shader);
+    pglDeleteProgram(g_BspShader.program);
 }
 
-void R_ClearVBO()
-{
-	
-}
+/*
+===================
+R_GenerateVBO
 
-void R_AddDecalVBO(decal_t* pdecal, msurface_t* surf)
-{
-	
-}
-
+Allocate memory for arrays, fill it with vertex attribs and upload to GPU
+===================
+*/
 void R_GenerateVBO()
 {
-	
+    int numtextures = cl.worldmodel->numtextures;
+    int numlightmaps = gl_lms.current_lightmap_texture;
+    int k, len = 0;
+    vboarray_t *vbo;
+    uint maxindex = 0;
+
+    R_ClearVBO();
+
+    Cvar_FullSet( "r_vbo", "1", CVAR_READ_ONLY );
+    Cvar_FullSet( "r_bump", "0", CVAR_READ_ONLY );
+
+    vbos.mempool = Mem_AllocPool("Render VBO Zone");
+
+    vbos.minarraysplit_tex = INT_MAX;
+    vbos.maxarraysplit_tex = 0;
+    vbos.minarraysplit_lm = MAXLIGHTMAPS;
+    vbos.maxarraysplit_lm = 0;
+    vbos.minlightmap = MAX_LIGHTMAPS;
+    vbos.maxlightmap = 0;
+    vbos.mintexture = INT_MAX;
+    vbos.maxtexture = 0;
+
+    vbos.textures = (vbotexture_t*)Mem_ZeroAlloc( vbos.mempool, numtextures * numlightmaps * sizeof( vbotexture_t ) );
+    vbos.surfdata = (vbosurfdata_t*)Mem_ZeroAlloc( vbos.mempool, cl.worldmodel->numsurfaces * sizeof( vbosurfdata_t ) );
+    vbos.arraylist = vbo = (vboarray_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vboarray_t ) );
+    vbos.decaldata = (vbodecaldata_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vbodecaldata_t ) );
+    vbos.decaldata->lm = (msurface_t**)Mem_ZeroAlloc( vbos.mempool, sizeof( msurface_t* ) * numlightmaps );
+
+    // count array lengths
+    for( k = 0; k < numlightmaps; k++ )
+    {
+        int j;
+
+        for( j = 0; j < numtextures; j++ )
+        {
+            int i;
+            vbotexture_t *vbotex = &vbos.textures[k * numtextures + j];
+
+            for( i = 0; i < cl.worldmodel->numsurfaces; i++ )
+            {
+                msurface_t *surf = &cl.worldmodel->surfaces[i];
+
+                if( surf->flags & ( SURF_DRAWSKY | SURF_DRAWTURB | SURF_CONVEYOR | SURF_REFLECT ) )
+                    continue;
+
+                if( surf->lightmaptexturenum != k )
+                    continue;
+
+                if( R_TextureRandomTiling( surf->texinfo->texture, i ) != cl.worldmodel->textures[j] )
+                    continue;
+
+                if( vbo->array_len + surf->polys->numverts > USHRT_MAX )
+                {
+                    // generate new array and new vbotexture node
+                    vbo->array = (vbovertex_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vbovertex_t ) * vbo->array_len );
+                    MsgDev( D_NOTE, "R_GenerateVBOs: allocated array of %d verts, texture %d\n", vbo->array_len, j );
+                    vbo->next = (vboarray_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vboarray_t ) );
+                    vbo = vbo->next;
+                    vbotex->next = (vbotexture_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vbotexture_t ) );
+                    vbotex = vbotex->next;
+
+                    // never skip this textures and lightmaps
+                    if( vbos.minarraysplit_tex > j )
+                        vbos.minarraysplit_tex = j;
+                    if( vbos.minarraysplit_lm > k )
+                        vbos.minarraysplit_lm = k;
+                    if( vbos.maxarraysplit_tex < j + 1 )
+                        vbos.maxarraysplit_tex = j + 1;
+                    if( vbos.maxarraysplit_lm < k + 1 )
+                        vbos.maxarraysplit_lm = k + 1;
+                }
+                vbos.surfdata[i].vbotexture = vbotex;
+                vbos.surfdata[i].startindex = vbo->array_len;
+                vbos.surfdata[i].texturenum = j;
+                vbo->array_len += surf->polys->numverts;
+                vbotex->len += 3 * (surf->polys->numverts - 2);	// 3 indices for n-2 vertices on each face - see R_AddSurfToVBO().
+                vbotex->vboarray = vbo;
+            }
+        }
+    }
+
+    // allocate last array
+    vbo->array = (vbovertex_t*)Mem_Alloc( vbos.mempool, sizeof( vbovertex_t ) * vbo->array_len );
+    MsgDev( D_NOTE, "R_GenerateVBOs: allocated array of %d verts\n", vbo->array_len );
+
+    // switch to list begin
+    vbo = vbos.arraylist;
+
+    // fill and upload
+    for( k = 0; k < numlightmaps; k++ )
+    {
+        int j;
+
+        for( j = 0; j < numtextures; j++ )
+        {
+            int i;
+            vbotexture_t *vbotex = &vbos.textures[k * numtextures + j];
+
+            // preallocate index arrays
+            vbotex->indexarray = (unsigned short*)Mem_Alloc( vbos.mempool, sizeof( unsigned short ) * vbotex->len );
+            vbotex->lightmaptexturenum = k;
+
+            if( maxindex < vbotex->len )
+                maxindex = vbotex->len;
+
+            for( i = 0; i < cl.worldmodel->numsurfaces; i++ )
+            {
+                msurface_t *surf = &cl.worldmodel->surfaces[i];
+                int l;
+
+                if( surf->flags & ( SURF_DRAWSKY | SURF_DRAWTURB | SURF_CONVEYOR | SURF_REFLECT ) )
+                    continue;
+
+                if( surf->lightmaptexturenum != k )
+                    continue;
+
+                if( R_TextureRandomTiling( surf->texinfo->texture, i ) != cl.worldmodel->textures[j] )
+                    continue;
+
+                // switch to next array
+                if( len + surf->polys->numverts > USHRT_MAX )
+                {
+                    // upload last generated array
+                    pglGenBuffersARB( 1, &vbo->glindex );
+                    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
+                    pglBufferDataARB( GL_ARRAY_BUFFER_ARB, vbo->array_len * sizeof( vbovertex_t ), vbo->array, GL_STATIC_DRAW_ARB );
+
+                    ASSERT( len == vbo->array_len );
+
+                    vbo = vbo->next;
+                    vbotex = vbotex->next;
+                    vbotex->indexarray = (unsigned short*)Mem_Alloc( vbos.mempool, sizeof( unsigned short ) * vbotex->len );
+                    vbotex->lightmaptexturenum = k;
+
+                    // calculate limits for dlights
+                    if( maxindex < vbotex->len )
+                        maxindex = vbotex->len;
+
+                    len = 0;
+                }
+
+                // fill vbovertex_t
+                for( l = 0; l < surf->polys->numverts; l++ )
+                {
+                    vbo->array[len + l].pos = surf->polys->verts[l].xyz;
+                    vbo->array[len + l].gl_tc = surf->polys->verts[l].s1t1;
+                    vbo->array[len + l].lm_tc = surf->polys->verts[l].s2t2;
+                    if( cl.worldmodel->textures[j]->dt_texturenum )
+					{
+						gltexture_t *glt = R_GetTexture( cl.worldmodel->textures[j]->gl_texturenum );
+						vbo->array[len + l].dt_tc[0] = surf->polys->verts[l].s1t1[0] * glt->xscale;
+						vbo->array[len + l].dt_tc[1] = surf->polys->verts[l].s1t1[1] * glt->yscale;
+					}
+                    vbo->array[len + l].color = { 1, 1, 1, 1 };
+                }
+
+                len += surf->polys->numverts;
+
+            }
+        }
+    }
+    ASSERT( len == vbo->array_len );
+
+    // upload last array
+    pglGenBuffersARB( 1, &vbo->glindex );
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
+    pglBufferDataARB( GL_ARRAY_BUFFER_ARB, vbo->array_len * sizeof( vbovertex_t ), vbo->array, GL_STATIC_DRAW_ARB );
+
+    // prepare decal array
+    pglGenBuffersARB( 1, &vbos.decaldata->decalvbo );
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decaldata->decalvbo );
+    pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * DECAL_VERTS_CUT * MAX_RENDER_DECALS, vbos.decaldata->decalarray, GL_STATIC_DRAW_ARB );
+
+    pglGenBuffersARB( 1, &vbos.decal_dynamic_vbo );
+
+    // preallocate dlight arrays
+    vbos.dlight_index = (unsigned short*)Mem_Alloc( vbos.mempool, maxindex * sizeof( unsigned short ) * 6 );
+
+    // select maximum possible length for dlight
+    vbos.dlight_tc = (vec2_t*)Mem_Alloc( vbos.mempool, sizeof( vec2_t ) * (int)(vbos.arraylist->next?USHRT_MAX + 1:vbos.arraylist->array_len + 1) );
+
+    if( r_vbo_dlightmode->integer == 1 )
+    {
+        pglGenBuffersARB( 1, &vbos.dlight_vbo );
+        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dlight_vbo );
+        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vec2_t ) * (int)(vbos.arraylist->next?USHRT_MAX + 1:vbos.arraylist->array_len + 1) , vbos.dlight_tc, GL_DYNAMIC_DRAW_ARB );
+        pglGenBuffersARB( 1, &vbos.decal_dlight_vbo );
+        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decal_dlight_vbo );
+        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbos.decal_dlight ), vbos.decal_dlight, GL_DYNAMIC_DRAW_ARB );
+    }
+
+
+    // reset state
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+}
+
+/*
+==============
+R_AddDecalVBO
+
+generate decal mesh and put it to array
+==============
+*/
+void R_AddDecalVBO( decal_t *pdecal, msurface_t *surf )
+{
+    int numVerts, i;
+    vertex_t *v;
+    int decalindex = pdecal - &gDecalPool[0];
+
+    if( !vbos.decaldata )
+        return;
+
+    v = R_DecalSetupVerts( pdecal, surf, pdecal->texture, &numVerts );
+
+    if( numVerts > DECAL_VERTS_CUT )
+    {
+        // use client arrays
+        vbos.decaldata->decals[decalindex].numVerts = -1;
+        return;
+    }
+
+    for( i = 0; i < numVerts; i++ )
+    {
+        //Q_memcpy( &vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i], &v[i], VERTEXSIZE * 4 );
+        vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].pos = v[i].xyz;
+        vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].gl_tc = v[i].s1t1;
+        vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].lm_tc = v[i].s2t2;
+        vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].dt_tc = {};
+        vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].color = { 1, 1, 1, 1 };
+    }
+
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decaldata->decalvbo );
+    pglBufferSubDataARB( GL_ARRAY_BUFFER_ARB, decalindex * sizeof( vbovertex_t ) * DECAL_VERTS_CUT, sizeof( vbovertex_t ) * numVerts, &vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT] );
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+
+    vbos.decaldata->decals[decalindex].numVerts = numVerts;
+}
+
+/*
+=============
+R_ClearVBO
+
+free all vbo data
+=============
+*/
+void R_ClearVBO()
+{
+    vboarray_t *vbo;
+
+    for( vbo = vbos.arraylist; vbo; vbo = vbo->next )
+        pglDeleteBuffersARB( 1, &vbo->glindex );
+
+    vbos.arraylist = NULL;
+
+    if( vbos.decaldata )
+        pglDeleteBuffersARB( 1, &vbos.decaldata->decalvbo );
+
+    if( vbos.decal_dynamic_vbo )
+        pglDeleteBuffersARB( 1, &vbos.decal_dynamic_vbo );
+
+    if( vbos.dlight_vbo )
+        pglDeleteBuffersARB( 1, &vbos.dlight_vbo );
+
+    if( vbos.decal_dlight_vbo )
+        pglDeleteBuffersARB( 1, &vbos.decal_dlight_vbo );
+    vbos.decal_dlight_vbo = vbos.dlight_vbo = 0;
+
+    vbos.decaldata = NULL;
+    Mem_FreePool( &vbos.mempool );
+}
+
+/*
+====================
+
+MULTITEXTURE HELPERS
+
+====================
+*/
+
+struct multitexturestate_s
+{
+    int tmu_gl; // texture tmu
+    int tmu_lm; // lightmap tmu
+    int tmu_dt; // detail tmu
+    qboolean diffuse_enabled;
+    qboolean details_enabled; // current texture has details
+    qboolean lightmap_enabled; // draw lightmap
+} mtst;
+
+/*
+==============
+R_SetDecalMode
+
+When drawing decal, disable or restore bump and details
+set tmu to lightmap when enabled
+==============
+*/
+static void R_SetDecalMode( qboolean enable )
+{
+    // order is important to correctly rearrange TMUs
+    if( enable )
+    {
+        // disable detail texture if enabled
+        // TODO : State &= !SWITCH_DETAIL;
+    }
+    else
+    {
+        // TODO : State |= SWITCH_DETAIL;
+        //pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+        //pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t, dt_tc ) );
+    }
+
+}
+
+/*
+==============
+R_SetupVBOTexture
+
+setup multitexture mode before drawing VBOs
+if tex is NULL, load texture by number
+==============
+*/
+static texture_t *R_SetupVBOTexture( texture_t *tex, int number )
+{
+    if( !mtst.diffuse_enabled )
+    {
+        return tex;
+    }
+
+    if( !tex )
+        tex = R_TextureAnim( cl.worldmodel->textures[number] );
+
+    if( r_detailtextures->integer && tex->dt_texturenum )
+    {
+        mtst.details_enabled = true;
+        GL_Bind( mtst.tmu_dt, tex->dt_texturenum );
+    }
+    else
+    {
+        mtst.details_enabled = false;
+    }
+
+    GL_Bind( mtst.tmu_gl, r_lightmap->integer?tr.whiteTexture:tex->gl_texturenum );
+
+    return tex;
+}
+
+/*
+=====================
+R_DrawLightmappedVBO
+
+Draw array for given vbotexture_t. build and draw dynamic lightmaps if present
+=====================
+*/
+#if 0 // TODO : dlight support
+static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture_t *texture, int lightmap, qboolean skiplighting )
+{
+    //Msg( "%d %d %d\n", vbo->array_len, vbotex->len, lightmap );
+    if( skiplighting )
+    {
+        vbotex->dlightchain = NULL;
+        return;
+    }
+    // draw dlights and dlighted decals
+    if( vbotex->dlightchain )
+    {
+        unsigned short *dlightarray = vbos.dlight_index; // preallocated array
+        unsigned int dlightindex = 0;
+        msurface_t *surf, *newsurf;
+        int decalcount = 0;
+
+        if( host.features & ENGINE_LARGE_LIGHTMAPS )
+            GL_Bind( mtst.tmu_lm, tr.dlightTexture2 );
+        else GL_Bind( mtst.tmu_lm, tr.dlightTexture );
+
+        // replace lightmap texcoord array by dlight array
+        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dlight_vbo );
+        pglTexCoordPointer( 2, GL_FLOAT, sizeof( vec2_t ), 0 );
+
+        // clear the block
+        LM_InitBlock();
+
+        // accumulate indexes for every dlighted surface until dlight block full
+        for( surf = newsurf = vbotex->dlightchain; surf; surf = surf->lightmapchain )
+        {
+            int	smax, tmax;
+            byte	*base;
+            uint indexbase = vbos.surfdata[((char*)surf - (char*)cl.worldmodel->surfaces) / sizeof( *surf )].startindex;
+            uint index;
+            mextrasurf_t *info; // this stores current dlight offset
+            decal_t *pdecal;
+
+            smax = ( surf->extents[0] / LM_SAMPLE_SIZE ) + 1;
+            tmax = ( surf->extents[1] / LM_SAMPLE_SIZE ) + 1;
+            info = SURF_INFO( surf, RI.currentmodel );
+
+            // find space for this surface and get offsets
+            if( LM_AllocBlock( smax, tmax, &info->dlight_s, &info->dlight_t ))
+            {
+                base = gl_lms.lightmap_buffer;
+                base += ( info->dlight_t * BLOCK_SIZE + info->dlight_s ) * 4;
+
+                R_BuildLightMap( surf, base, BLOCK_SIZE * 4, true );
+            }
+            else
+            {
+                // out of free block space. Draw all generated index array and clear it
+                // upload already generated block
+                LM_UploadDynamicBlock();
+                pglDrawRangeElements( GL_TRIANGLES, 0, vbo->array_len, dlightindex, GL_UNSIGNED_SHORT, dlightarray );
+
+#if 0 // TODO : decal
+                // draw decals that lighted with this lightmap
+                if( decalcount )
+                {
+                    msurface_t *decalsurf;
+                    int decali = 0;
+
+                    pglDepthMask( GL_FALSE );
+                    pglEnable( GL_BLEND );
+                    pglEnable( GL_POLYGON_OFFSET_FILL );
+                    //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
+                    //    pglDisable( GL_ALPHA_TEST );
+                    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decal_dlight_vbo );
+                    R_SetDecalMode( true );
+
+                    pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, lm_tc ) );
+                    GL_SelectTexture( mtst.tmu_gl );
+                    pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, gl_tc ) );
+                    pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, pos ) );
+
+                    for( decalsurf = newsurf; ( decali < decalcount ) && ( decalsurf != surf ); decalsurf = decalsurf->lightmapchain )
+                    {
+                        for( pdecal = decalsurf->pdecals; pdecal; pdecal = pdecal->pnext )
+                        {
+                            gltexture_t *glt;
+
+                            if( !pdecal->texture )
+                                continue;
+
+                            glt = R_GetTexture( pdecal->texture );
+
+                            GL_Bind( mtst.tmu_gl, pdecal->texture );
+
+                            // normal HL decal with alpha-channel
+                            if( glt->flags & TF_HAS_ALPHA )
+                            {
+                                // draw transparent decals with GL_MODULATE
+                                //if( glt->fogParams[3] > 230 )
+                                //    pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+                                //else pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+                                pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+                            }
+                            else
+                            {
+                                // color decal like detail texture. Base color is 127 127 127
+                                //pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+                                pglBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
+                            }
+
+                            pglDrawArrays( GL_TRIANGLE_FAN, decali * DECAL_VERTS_MAX, vbos.decal_numverts[decali] );
+                            decali++;
+                        }
+                        newsurf = surf;
+
+                    }
+
+                    // restore states pointers for next dynamic lightmap
+                    //pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+                    pglDepthMask( GL_TRUE );
+                    pglDisable( GL_BLEND );
+                    pglDisable( GL_POLYGON_OFFSET_FILL );
+                    //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
+                    //    pglEnable( GL_ALPHA_TEST );
+                    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dlight_vbo );
+                    R_SetDecalMode( false );
+                    GL_SelectTexture( mtst.tmu_lm );
+                    pglTexCoordPointer( 2, GL_FLOAT, sizeof( vec2_t ), 0 );
+
+                    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
+                    pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t,pos) );
+                    R_SetupVBOTexture( texture, 0 );
+                    pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t, gl_tc ) );
+
+                    decalcount = 0;
+                }
+#endif
+                // clear the block
+                LM_InitBlock();
+                dlightindex = 0;
+
+                // try upload the block now
+                if( !LM_AllocBlock( smax, tmax, &info->dlight_s, &info->dlight_t ))
+                    Host_Error( "AllocBlock: full\n" );
+
+                base = gl_lms.lightmap_buffer;
+                base += ( info->dlight_t * BLOCK_SIZE + info->dlight_s ) * 4;
+
+                R_BuildLightMap( surf, base, BLOCK_SIZE * 4, true );
+            }
+
+            // build index and texcoords arrays
+            vbos.dlight_tc[indexbase][0] = surf->polys->verts[0].s2t2[0] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
+            vbos.dlight_tc[indexbase][1] = surf->polys->verts[0].s2t2[1] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
+            vbos.dlight_tc[indexbase + 1][0] = surf->polys->verts[1].s2t2[0] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
+            vbos.dlight_tc[indexbase + 1][1] = surf->polys->verts[1].s2t2[1] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
+
+            for( index = indexbase + 2; index < indexbase + surf->polys->numverts; index++ )
+            {
+                dlightarray[dlightindex++] = indexbase;
+                dlightarray[dlightindex++] = index - 1;
+                dlightarray[dlightindex++] = index;
+                vbos.dlight_tc[index][0] = surf->polys->verts[index - indexbase].s2t2[0] - ( surf->light_s - info->dlight_s ) * ( 1.0f / (float)BLOCK_SIZE );
+                vbos.dlight_tc[index][1] = surf->polys->verts[index - indexbase].s2t2[1] - ( surf->light_t - info->dlight_t ) * ( 1.0f / (float)BLOCK_SIZE );
+            }
+
+            pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dlight_vbo );
+            pglBufferSubDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vec2_t ) * indexbase, sizeof( vec2_t )* surf->polys->numverts, vbos.dlight_tc + indexbase );
+
+            // if surface has decals, build decal array
+            for( pdecal = surf->pdecals; pdecal; pdecal = pdecal->pnext )
+            {
+                int decalindex = pdecal - &gDecalPool[0];
+                int numVerts = vbos.decaldata->decals[decalindex].numVerts;
+                int i;
+
+                if( numVerts == -1 )
+                {
+                    // build decal array
+                    vertex_t *v = R_DecalSetupVerts( pdecal, surf, pdecal->texture, &numVerts );
+
+                    for( i = 0; i < numVerts; i++ )
+                    {
+                        vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].pos = v[i].xyz;
+                        vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc = v[i].s1t1;
+                        vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc = v[i].s2t2 -
+                                                                                    vec2_t( ( surf->light_s - info->dlight_s ), ( surf->light_t - info->dlight_t ) ) * ( 1.0f / (float)BLOCK_SIZE );
+                    }
+                }
+                else
+                {
+                    // copy from vbo
+                    for( i = 0; i < numVerts; i++ )
+                    {
+                        VectorCopy( vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].pos, vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].pos );
+                        vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].gl_tc;
+                        vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].lm_tc -
+                                                                                    vec2_t ( ( surf->light_s - info->dlight_s ), ( surf->light_t - info->dlight_t ) ) * ( 1.0f / (float)BLOCK_SIZE );
+                    }
+                }
+
+                pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decal_dlight_vbo );
+                pglBufferSubDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * decalcount * DECAL_VERTS_MAX, sizeof( vbovertex_t )* numVerts, vbos.decal_dlight + decalcount * DECAL_VERTS_MAX );
+
+                vbos.decal_numverts[decalcount] = numVerts;
+                decalcount++;
+            }
+            //info->dlight_s = info->dlight_t = 0;
+        }
+
+        if( dlightindex )
+        {
+            // update block
+            LM_UploadDynamicBlock();
+
+            // draw remaining array
+            pglDrawRangeElements( GL_TRIANGLES, 0, vbo->array_len, dlightindex, GL_UNSIGNED_SHORT, dlightarray );
+
+            // draw remaining decals
+            if( decalcount )
+            {
+                msurface_t *decalsurf;
+                int decali = 0;
+
+                pglDepthMask( GL_FALSE );
+                pglEnable( GL_BLEND );
+                pglEnable( GL_POLYGON_OFFSET_FILL );
+                //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
+                //    pglDisable( GL_ALPHA_TEST );
+                pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decal_dlight_vbo );
+                R_SetDecalMode( true );
+
+                pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, lm_tc ) );
+                GL_SelectTexture( mtst.tmu_gl );
+                pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, gl_tc ) );
+                pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, pos ) );
+
+                for( decalsurf = newsurf; decali < decalcount && decalsurf; decalsurf = decalsurf->lightmapchain )
+                {
+                    decal_t *pdecal;
+
+                    for( pdecal = decalsurf->pdecals; pdecal; pdecal = pdecal->pnext )
+                    {
+                        gltexture_t *glt;
+
+                        if( !pdecal->texture )
+                            continue;
+
+                        glt = R_GetTexture( pdecal->texture );
+
+                        GL_Bind( mtst.tmu_gl, pdecal->texture );
+
+                        // normal HL decal with alpha-channel
+                        if( glt->flags & TF_HAS_ALPHA )
+                        {
+                            // draw transparent decals with GL_MODULATE
+                            //if( glt->fogParams[3] > 230 )
+                            //    pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+                            //else pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+                            pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+                        }
+                        else
+                        {
+                            // color decal like detail texture. Base color is 127 127 127
+                            //pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+                            pglBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
+                        }
+
+                        pglDrawArrays( GL_TRIANGLE_FAN, decali * DECAL_VERTS_MAX, vbos.decal_numverts[decali] );
+
+                        decali++;
+                    }
+
+                }
+
+                // reset states
+                //pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+                pglDepthMask( GL_TRUE );
+                pglDisable( GL_BLEND );
+                pglDisable( GL_POLYGON_OFFSET_FILL );
+                //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
+                //    pglEnable( GL_ALPHA_TEST );
+                pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
+                R_SetDecalMode( false );
+                pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t,pos) );
+                R_SetupVBOTexture( texture, 0 );
+                pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t, gl_tc ) );
+            }
+        }
+
+        // restore static lightmap
+        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
+        GL_Bind( mtst.tmu_lm, tr.lightmapTextures[lightmap] );
+        pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t, lm_tc ) );
+
+        // prepare to next frame
+        vbotex->dlightchain = NULL;
+    }
+}
+#endif
+
+/*
+=====================
+R_DrawVBO
+
+Draw generated index arrays
+=====================
+*/
+void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
+{
+    int numtextures = cl.worldmodel->numtextures;
+    int numlightmaps =  gl_lms.current_lightmap_texture;
+    int k;
+
+    if( !r_vbo->integer )
+        return;
+
+    // setup multitexture
+    mtst.tmu_gl = XASH_TEXTURE0;
+    mtst.tmu_lm = XASH_TEXTURE1;
+    mtst.tmu_dt = XASH_TEXTURE2;
+    mtst.diffuse_enabled = !!drawtextures;
+    mtst.details_enabled = false; // TODO : check if has detail
+    mtst.lightmap_enabled = !!drawlightmap;
+
+    pglUseProgramObjectARB(g_BspShader.program);
+    matrix4x4 modelviewMatrixTranspose, projectionMatrixTranspose;
+    Matrix4x4_Transpose(modelviewMatrixTranspose, RI.worldviewMatrix);
+    Matrix4x4_Transpose(projectionMatrixTranspose, RI.projectionMatrix);
+    pglUniformMatrix4fvARB(g_BspShader.uniform.ModelView, 1, GL_FALSE, (const float*)&modelviewMatrixTranspose);
+    pglUniformMatrix4fvARB(g_BspShader.uniform.Projection, 1, GL_FALSE, (const float*)&projectionMatrixTranspose);
+    if(e->curstate.rendermode == kRenderTransAdd || e->curstate.rendermode == kRenderTransTexture || e->curstate.rendermode == kRenderGlow)
+        pglUniform4fARB(g_BspShader.uniform.RenderColor, 1, 1, 1, e->curstate.renderamt);
+    else if(e->curstate.rendermode == kRenderTransColor)
+        pglUniform4fARB(g_BspShader.uniform.RenderColor, e->curstate.rendercolor.r, e->curstate.rendercolor.g, e->curstate.rendercolor.b, e->curstate.renderamt);
+    else
+        pglUniform4fARB(g_BspShader.uniform.RenderColor, 1, 1, 1, 1);
+    pglUniform4fARB(g_BspShader.uniform.FogParam, 0, RI.fogDensity, RI.fogStart, RI.fogEnd);
+    pglUniform1iARB(g_BspShader.uniform.TexDiffusemap, mtst.tmu_gl);
+    pglUniform1iARB(g_BspShader.uniform.TexLightmap, mtst.tmu_lm);
+    pglUniform1iARB(g_BspShader.uniform.TexDetail, mtst.tmu_dt);
+
+    // setup limits
+    if( vbos.minlightmap > vbos.minarraysplit_lm )
+        vbos.minlightmap = vbos.minarraysplit_lm;
+    if( vbos.maxlightmap < vbos.maxarraysplit_lm )
+        vbos.maxlightmap = vbos.maxarraysplit_lm;
+    if( vbos.maxlightmap > numlightmaps )
+        vbos.maxlightmap = numlightmaps;
+    if( vbos.mintexture > vbos.minarraysplit_tex )
+        vbos.mintexture = vbos.minarraysplit_tex;
+    if( vbos.maxtexture < vbos.maxarraysplit_tex )
+        vbos.maxtexture = vbos.maxarraysplit_tex;
+    if( vbos.maxtexture > numtextures )
+        vbos.maxtexture = numtextures;
+
+    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aPos);
+    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aTexCoord);
+    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aLightmapCoord);
+    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aDetailCoord);
+    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aColor);
+
+    for( k = vbos.minlightmap; k < vbos.maxlightmap; k++ )
+    {
+        if( drawlightmap )
+        {
+            GL_Bind( mtst.tmu_lm, tr.lightmapTextures[k] );
+        }
+
+        for( int j = vbos.mintexture; j < vbos.maxtexture; j++ )
+        {
+            vbotexture_t *vbotex = &vbos.textures[k * numtextures + j];
+            texture_t *tex = NULL;
+            if( !vbotex->vboarray )
+                continue;
+
+            // setup multitexture
+            if( drawtextures )
+            {
+                tex = R_SetupVBOTexture( tex, j );
+            }
+
+            if( drawlightmap )
+            {
+                GL_Bind( mtst.tmu_lm, tr.lightmapTextures[k] );
+            }
+
+            // if we need to switch to next array (only if map has >65536 vertices)
+            do
+            {
+                vboarray_t *vbo = vbotex->vboarray;
+
+                // bind new vertex and index arrays
+                pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
+                pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+                pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+                pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
+                pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+                pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
+
+                int Switch = 0;
+                if(mtst.details_enabled)
+                    Switch |= 0x04; // SWITCH_DETAIL
+                if(mtst.lightmap_enabled)
+                    Switch |= 0x08; // SWITCH_LIGHTMAP
+                if(RI.fogEnabled)
+                    Switch |= 0x02; // SWITCH_FOG
+                pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
+
+                // draw new array
+                if( vbotex->curindex )
+                {
+                    pglDrawRangeElements( GL_TRIANGLES, 0, vbo->array_len, vbotex->curindex, GL_UNSIGNED_SHORT, vbotex->indexarray );
+                    // prepare to next frame
+                    vbotex->curindex = 0;
+                }
+
+                if( vbotex->dlightchain )
+                {
+#if 0 // TODO : dlight
+                    R_DrawLightmappedVBO( vbo, vbotex, tex, k, !drawlightmap );
+#endif
+                }
+
+                vbotex = vbotex->next;
+                vbo = vbo->next;
+            } while( vbotex );
+        }
+
+        if( drawtextures && drawlightmap && vbos.decaldata->lm[k] )
+        {
+            // prepare for decal draw
+            pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decaldata->decalvbo );
+            pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+            pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+            pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
+            pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+            pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
+
+            int Switch = 0;
+            if(mtst.lightmap_enabled)
+                Switch |= 0x08; // SWITCH_LIGHTMAP
+            if(RI.fogEnabled)
+                Switch |= 0x02; // SWITCH_FOG
+            Switch |= 0x01; // SWITCH_DECAL
+            pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
+
+            pglDepthMask( GL_FALSE );
+            pglEnable( GL_BLEND );
+            pglEnable( GL_POLYGON_OFFSET_FILL );
+
+            //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
+            //    pglDisable( GL_ALPHA_TEST );
+
+            // all surfaces having decals and this lightmap
+            for( msurface_t *lightmapchain = vbos.decaldata->lm[k]; lightmapchain; lightmapchain = lightmapchain->lightmapchain )
+            {
+                // all decals of surface
+                for( decal_t *pdecal = lightmapchain->pdecals; pdecal; pdecal = pdecal->pnext )
+                {
+                    gltexture_t *glt;
+                    int decalindex = pdecal - &gDecalPool[0];
+
+                    if( !pdecal->texture )
+                        continue;
+
+                    glt = R_GetTexture( pdecal->texture );
+
+                    GL_Bind( mtst.tmu_gl, pdecal->texture );
+
+                    // normal HL decal with alpha-channel
+                    if( glt->flags & TF_HAS_ALPHA )
+                    {
+                        // draw transparent decals with GL_MODULATE
+                        pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+                    }
+                    else
+                    {
+                        // color decal like detail texture. Base color is 127 127 127
+                        pglBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
+                    }
+
+                    if( vbos.decaldata->decals[decalindex].numVerts == -1 )
+                    {
+                        // to many verts to keep in sparse array, so build it now
+                        int numVerts;
+                        vertex_t *v = R_DecalSetupVerts( pdecal, lightmapchain, pdecal->texture, &numVerts );
+
+                        std::vector<vbovertex_t> dynamic_vbo(numVerts);
+                        for(int i = 0; i < numVerts; ++i)
+                        {
+                            dynamic_vbo[i].pos = v->xyz;
+                            dynamic_vbo[i].gl_tc = v->s1t1;
+                            dynamic_vbo[i].lm_tc = v->s2t2;
+                            dynamic_vbo[i].dt_tc = {};
+                            dynamic_vbo[i].color = { 1, 1, 1, 1 };
+                        }
+
+                        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decal_dynamic_vbo );
+                        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * numVerts, dynamic_vbo.data(), GL_STREAM_DRAW_ARB );
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
+                        pglDrawArrays( GL_TRIANGLE_FAN, 0, numVerts );
+
+                        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decaldata->decalvbo );
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+                        pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
+                    }
+                    else // just draw VBO
+                        pglDrawArrays( GL_TRIANGLE_FAN, decalindex * DECAL_VERTS_CUT, vbos.decaldata->decals[decalindex].numVerts );
+                }
+            }
+
+            // prepare for next frame
+            vbos.decaldata->lm[k] = NULL;
+
+            // prepare for next texture
+            pglDepthMask( GL_TRUE );
+            pglDisable( GL_BLEND );
+            pglDisable( GL_POLYGON_OFFSET_FILL );
+
+            //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
+            //    pglEnable( GL_ALPHA_TEST );
+        }
+        if( !drawtextures || !drawlightmap )
+            vbos.decaldata->lm[k] = NULL;
+    }
+    // ASSERT( !vbo->next );
+
+    // restore states
+    vbos.minlightmap = MAX_LIGHTMAPS;
+    vbos.maxlightmap = 0;
+    vbos.mintexture = INT_MAX;
+    vbos.maxtexture = 0;
+
+    //pglDisableClientState( GL_VERTEX_ARRAY );
+    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aColor);
+    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aDetailCoord);
+    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aLightmapCoord);
+    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aTexCoord);
+    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aPos);
+    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+}
+
+/*
+================
+R_CheckLightMap
+
+update surface's lightmap if needed and return true if it is dynamic
+================
+*/
+static qboolean R_CheckLightMap( msurface_t *fa )
+{
+    int maps;
+    qboolean is_dynamic = false;
+
+    // check for lightmap modification
+    for( maps = 0; maps < MAXLIGHTMAPS && fa->styles[maps] != 255; maps++ )
+    {
+        if( RI.lightstylevalue[fa->styles[maps]] != fa->cached_light[maps] )
+        {
+            is_dynamic = true;
+            break;
+        }
+    }
+
+    // already up to date
+    if( !is_dynamic && ( fa->dlightframe != tr.framecount || maps == MAX_LIGHTMAPS ) )
+        return false;
+
+    // build lightmap
+    if(( fa->styles[maps] >= 32 || fa->styles[maps] == 0 ) && ( fa->dlightframe != tr.framecount ))
+    {
+        byte	temp[132*132*4];
+        int	smax, tmax;
+
+        smax = ( fa->extents[0] / LM_SAMPLE_SIZE ) + 1;
+        tmax = ( fa->extents[1] / LM_SAMPLE_SIZE ) + 1;
+
+        if( smax < 132 && tmax < 132 )
+        {
+            if( tr.deluxemap )
+            {
+                R_BuildDeluxeMap( fa, temp, smax * 4 );
+
+                GL_Bind( XASH_TEXTURE0, tr.deluxemapTextures[fa->lightmaptexturenum] );
+#ifdef XASH_WES
+                pglTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE );
+#endif
+
+                pglTexSubImage2D( GL_TEXTURE_2D, 0, fa->light_s, fa->light_t, smax, tmax,
+                                  GL_RGBA, GL_UNSIGNED_BYTE, temp );
+            }
+
+            R_BuildLightMap( fa, temp, smax * 4, true );
+        }
+        else
+        {
+            smax = min( smax, 132 );
+            tmax = min( tmax, 132 );
+            Host_MapDesignError( "R_RenderBrushPoly: bad surface extents: %d %d", fa->extents[0], fa->extents[1] );
+            Q_memset( temp, 255, sizeof( temp ) );
+        }
+
+        R_SetCacheState( fa );
+#ifdef XASH_WES
+        GL_Bind( XASH_TEXTURE1, tr.lightmapTextures[fa->lightmaptexturenum] );
+
+		pglTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE );
+#else
+        GL_Bind( XASH_TEXTURE0, tr.lightmapTextures[fa->lightmaptexturenum] );
+#endif
+
+        pglTexSubImage2D( GL_TEXTURE_2D, 0, fa->light_s, fa->light_t, smax, tmax,
+                          GL_RGBA, GL_UNSIGNED_BYTE, temp );
+#ifdef XASH_WES
+        GL_SelectTexture( XASH_TEXTURE0 );
+#endif
+    }
+        // add to dynamic chain
+    else
+        return true;
+
+    // updated
+    return false;
+}
+
+qboolean R_AddSurfToVBO( msurface_t *surf, qboolean buildlightmap )
+{
+    if( r_vbo->integer && vbos.surfdata[surf - cl.worldmodel->surfaces].vbotexture )
+    {
+        // find vbotexture_t assotiated with this surface
+        int idx = surf - cl.worldmodel->surfaces;
+        vbotexture_t *vbotex = vbos.surfdata[idx].vbotexture;
+        int texturenum = vbos.surfdata[idx].texturenum;
+
+        if( !surf->polys )
+            return true;
+
+        if( vbos.maxlightmap < surf->lightmaptexturenum + 1 )
+            vbos.maxlightmap = surf->lightmaptexturenum + 1;
+        if( vbos.minlightmap > surf->lightmaptexturenum )
+            vbos.minlightmap = surf->lightmaptexturenum;
+        if( vbos.maxtexture < texturenum + 1 )
+            vbos.maxtexture = texturenum + 1;
+        if( vbos.mintexture > texturenum )
+            vbos.mintexture = texturenum;
+
+        buildlightmap &= !r_fullbright->integer && !!cl.worldmodel->lightdata;
+
+        if( buildlightmap && R_CheckLightMap( surf ) )
+        {
+            // every vbotex has own lightmap chain (as we sorted if by textures to use multitexture)
+            surf->lightmapchain = vbotex->dlightchain;
+            vbotex->dlightchain = surf;
+        }
+        else
+        {
+            uint indexbase = vbos.surfdata[idx].startindex;
+            uint index;
+
+            // GL_TRIANGLE_FAN: 0 1 2 0 2 3 0 3 4 ...
+            for( index = indexbase + 2; index < indexbase + surf->polys->numverts; index++ )
+            {
+                // Make sure we don't overflow the index array.
+                if ( vbotex->curindex + 2 < vbotex->len )
+                {
+                    vbotex->indexarray[vbotex->curindex++] = indexbase;
+                    vbotex->indexarray[vbotex->curindex++] = index - 1;
+                    vbotex->indexarray[vbotex->curindex++] = index;
+                }
+            }
+
+            // if surface has decals, add it to decal lightmapchain
+            if( surf->pdecals )
+            {
+                surf->lightmapchain = vbos.decaldata->lm[vbotex->lightmaptexturenum];
+                vbos.decaldata->lm[vbotex->lightmaptexturenum] = surf;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 /*
@@ -2020,9 +3242,7 @@ void R_DrawWorld( void )
 
 	R_DrawStaticBrushes();
 
-#ifndef XASH_QINDIEGL
-	R_DrawVBO( !r_fullbright->integer && !!cl.worldmodel->lightdata, true );
-#endif
+	R_DrawVBO( RI.currententity, !r_fullbright->integer && !!cl.worldmodel->lightdata, true );
 
 	R_DrawTextureChains();
 

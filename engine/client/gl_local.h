@@ -419,6 +419,9 @@ void GL_ResetFogColor( void );
 void R_GenerateVBO();
 void R_ClearVBO();
 void R_AddDecalVBO( decal_t *pdecal, msurface_t *surf );
+void R_InitBspShader();
+void R_ShutdownBspShader();
+
 //
 // gl_sprite.c
 //
@@ -452,8 +455,8 @@ void EmitSkyLayers( msurface_t *fa );
 void EmitSkyPolys( msurface_t *fa );
 void EmitWaterPolys( glpoly_t *polys, qboolean noCull );
 void R_DrawSkyChain( msurface_t *s );
-void R_BspInit();
-void R_BspShutdown();
+void R_InitSurfaceShader();
+void R_ShutdownSurfaceShader();
 
 //
 // gl_rstrobe.c

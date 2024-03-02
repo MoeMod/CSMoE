@@ -866,17 +866,4 @@ void EmitSkyLayers( msurface_t *fa )
 	pglDisable( GL_BLEND );
 }
 
-void R_BspInit()
-{
-#ifdef XASH_SHADER
-    R_InitSurfaceShader();
-#endif
-}
-void R_BspShutdown()
-{
-#ifdef XASH_SHADER
-    R_ShutdownSurfaceShader();
-#endif
-}
-
 #endif // XASH_DEDICATED

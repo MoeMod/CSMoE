@@ -579,9 +579,9 @@ register VBO cvars and get default value
 */
 static void R_CheckVBO( void )
 {
-	r_vbo = Cvar_Get( "r_vbo", "0", CVAR_READ_ONLY, "draw world using VBO" );
+	r_vbo = Cvar_Get( "r_vbo", "1", CVAR_READ_ONLY, "draw world using VBO" );
 	r_bump = Cvar_Get( "r_bump", "0", CVAR_READ_ONLY, "enable bump-mapping (r_vbo required)" );
-	r_vbo_dlightmode = Cvar_Get( "r_vbo_dlightmode", "1", CVAR_ARCHIVE, "vbo dlight rendering mode(0-1)" );
+	r_vbo_dlightmode = Cvar_Get( "r_vbo_dlightmode", "1", CVAR_READ_ONLY, "vbo dlight rendering mode(0-1)" );
 }
 
 static int GetCommandLineIntegerValue(const char* argName)
@@ -673,7 +673,8 @@ qboolean R_Init( void )
 	TriAPI_Init();
 	R_SpriteInit();
 	R_StudioInit();
-    R_BspInit();
+    R_InitBspShader();
+    R_InitSurfaceShader();
 
 	R_Strobe_Init();
 
@@ -706,7 +707,8 @@ void R_Shutdown( void )
 	}
 	Q_memset( clgame.sprites, 0, sizeof( clgame.sprites ));
 
-    R_BspShutdown();
+    R_ShutdownSurfaceShader();
+    R_ShutdownBspShader();
     R_StudioShutdown();
 	R_SpriteShutdown();
 	TriAPI_Shutdown();

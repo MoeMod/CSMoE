@@ -45,6 +45,6 @@ namespace xe {
     }
 	inline const char *GetFragmentShaderPrecision()
 	{
-		return "precision highp float;\n";
+		return "precision highp float;\nprecision highp int;\n";
 	}
 }
