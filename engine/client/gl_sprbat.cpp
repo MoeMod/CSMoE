@@ -20,7 +20,6 @@ namespace xe {
 			"",
 			"#define SPRBAT_ALPHA_TEST\n"
 	};
-#define XASH_VBO_BUFFER_COUNT 32
 	typedef struct sprshader_s {
 		GLuint program;
 		GLuint vertex_shader;
@@ -36,10 +35,8 @@ namespace xe {
 			GLint scale;
 		} uniform;
 		struct {
-			GLint vaTexCoord; // vec2
+
 		} attrib;
-		GLuint array_buffer[XASH_VBO_BUFFER_COUNT];
-        int array_buffer_cur = 0;
 	} sprshader_t;
 	sprshader_t g_SprShaderVariant[MAX_SPRBAT_SHAEDR_VARIANTS];
 	sprshader_t *g_pSprShader = nullptr;
@@ -156,14 +153,7 @@ namespace xe {
 		pglUniform4fvARB(g_pSprShader->uniform.color, 1, color.data());
 		pglUniform1fARB(g_pSprShader->uniform.scale, scale);
 
-        int j = g_pSprShader->array_buffer_cur++;
-        g_pSprShader->array_buffer_cur %= XASH_VBO_BUFFER_COUNT;
-		pglBindBufferARB(GL_ARRAY_BUFFER_ARB, g_pSprShader->array_buffer[j]);
-		pglEnableVertexAttribArrayARB(g_pSprShader->attrib.vaTexCoord);
-		pglVertexAttribPointerARB(g_pSprShader->attrib.vaTexCoord, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
-		pglDrawArrays(GL_TRIANGLE_FAN, 0, 6);
-		pglDisableVertexAttribArrayARB(g_pSprShader->attrib.vaTexCoord);
-		pglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+		pglDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 #else
 		gTriApi.Color4f(color[0], color[1], color[2], color[3]);
 
@@ -300,8 +290,6 @@ namespace xe {
 					xe::GetShaderVersionString(),
 					sprbatshadervariant_define[i],
 					R"(
-	in vec2 vaTexCoord;
-
 	uniform vec4 frame;
 	uniform vec3 v_up;
 	uniform vec3 v_right;
@@ -312,6 +300,7 @@ namespace xe {
 	out vec2 vvTexCoord;
 	void main(void)
 	{
+        vec2 vaTexCoord = vec2(float(gl_VertexID / 2 % 2), float((gl_VertexID + 1) / 2 % 2));
 		gl_Position = muWVP * vec4(mat3(v_right, v_up, org) * vec3(scale * ((1.0 - vaTexCoord) * frame.zx + vaTexCoord * frame.wy), 1.0), 1.0);
 	    vvTexCoord = vaTexCoord;
 	}
@@ -362,26 +351,6 @@ namespace xe {
 			g_pSprShader->uniform.org = pglGetUniformLocationARB(g_pSprShader->program, "org");
 			g_pSprShader->uniform.color = pglGetUniformLocationARB(g_pSprShader->program, "color");
 			g_pSprShader->uniform.scale = pglGetUniformLocationARB(g_pSprShader->program, "scale");
-
-			g_pSprShader->attrib.vaTexCoord = pglGetAttribLocationARB(g_pSprShader->program, "vaTexCoord");
-
-			pglGenBuffersARB(XASH_VBO_BUFFER_COUNT, g_pSprShader->array_buffer);
-            // 0 1 2 0 2 3
-            const float QuadVertexTexCoords[] = {
-                    0, 1,
-                    0, 0,
-                    1, 0,
-                    0, 1,
-                    1, 0,
-                    1, 1,
-            };
-            static_assert(sizeof(QuadVertexTexCoords) == 6 * 2 * sizeof(float));
-            for(int j = 0; j < XASH_VBO_BUFFER_COUNT; ++j)
-            {
-                pglBindBufferARB(GL_ARRAY_BUFFER_ARB, g_pSprShader->array_buffer[j]);
-                pglBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(QuadVertexTexCoords), QuadVertexTexCoords, GL_STATIC_DRAW_ARB);
-            }
-            pglBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		}
 		g_pSprShader = nullptr;
 #endif
@@ -398,7 +367,6 @@ namespace xe {
 			pglDeleteObjectARB(g_pSprShader->vertex_shader);
 			pglDeleteObjectARB(g_pSprShader->fragment_shader);
 			pglDeleteProgram(g_pSprShader->program);
-            pglDeleteBuffersARB(XASH_VBO_BUFFER_COUNT, g_pSprShader->array_buffer);
 		}
 #endif
 	}
