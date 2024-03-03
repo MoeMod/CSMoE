@@ -63,6 +63,20 @@ namespace xe {
         int numVerts;
     };
 
+    struct studiolru_ubo_cache
+    {
+    public:
+        studiolru_ubo_cache();
+        ~studiolru_ubo_cache();
+        studiolru_ubo_cache(const studiolru_ubo_cache &) = delete;
+        studiolru_ubo_cache(studiolru_ubo_cache &&) = delete;
+        studiolru_ubo_cache &operator=(const studiolru_ubo_cache &) = delete;
+        studiolru_ubo_cache &operator=(studiolru_ubo_cache &&) = delete;
+
+    public:
+        studioubo_t ubo;
+    };
+
     studiolru_vbo_cache::studiolru_vbo_cache(const char *debugname)
     {
         name = debugname;
@@ -169,6 +183,7 @@ namespace xe {
 
     static lru_cache<studiolru_key_t, std::shared_ptr<studiolru_vbo_cache>> studiovbocache(512);
     static std::shared_ptr<studiolru_vbo_cache> current_studiolru_vbo;
+    static lru_cache<const void *, std::shared_ptr<studiolru_ubo_cache>> studioubocache(64);
 
     bool StudioLru_HasCachedData()
     {
@@ -221,6 +236,7 @@ namespace xe {
         while( studiovbocache.size() >= 64 ){
             // cache is full, evict the least recently used item
             studiovbocache.evict();
+            studioubocache.evict();
         }
     }
 
@@ -229,4 +245,30 @@ namespace xe {
         studiolru_key_t key{ studiohdr, submodel, mesh, flags };
         studiovbocache.remove(key);
     }
+
+    studiolru_ubo_cache::studiolru_ubo_cache()
+    {
+        pglGenBuffersARB( 1, &ubo.Matrices_ubo);
+        pglBindBufferARB(GL_UNIFORM_BUFFER, ubo.Matrices_ubo);
+        pglBufferDataARB(GL_UNIFORM_BUFFER, sizeof(studioubo_t::Matrices), NULL, GL_STREAM_DRAW_ARB);
+        pglBindBufferARB(GL_UNIFORM_BUFFER, 0);
+    }
+
+    studiolru_ubo_cache::~studiolru_ubo_cache()
+    {
+        pglDeleteBuffersARB( 1, &ubo.Matrices_ubo);
+    }
+
+    studioubo_t *StudioLru_GetUBO(const void *key)
+    {
+        auto pubo = studioubocache.get(key).value_or(nullptr);
+        if(!pubo)
+        {
+            pubo = std::make_shared<studiolru_ubo_cache>();
+            studioubocache.insert(key, pubo);
+        }
+        return &pubo->ubo;
+    }
+
+
 }

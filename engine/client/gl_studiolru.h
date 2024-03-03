@@ -24,6 +24,8 @@ typedef struct studio_vertex_attrib_item_s {
     GLshort coord[2];
 } studio_vertex_attrib_item_t;
 
+typedef struct studioubo_s studioubo_t;
+
 namespace xe {
     void StudioLru_Init();
     void StudioLru_Shutdown();
@@ -35,4 +37,5 @@ namespace xe {
     void StudioLru_DrawMesh(int mode);
     void StudioLru_Shrink();
     void StudioLru_RemoveCachedData(const studiohdr_t *studiohdr, const mstudiomodel_t *submodel, int mesh, int flags);
+    studioubo_t *StudioLru_GetUBO(const void *key);
 }

@@ -221,7 +221,7 @@ static unsigned short		g_xarrayelems[MAXARRAYVERTS*6];
 // moved to gl_studioshader.h
 studioshader_t g_studioshadervariant[MAX_STUDIOSHADERVARIANTS];
 studioshader_t *g_pstudioshader;
-studioubo_t g_pstudioubo;
+studioubo_t *g_pstudioubo;
 #else
 static GLfloat		g_xarrayverts[MAXARRAYVERTS][3];
 static GLhalf		g_xarraycoord[MAXARRAYVERTS][2];
@@ -305,12 +305,6 @@ void R_StudioInit( void )
     xe::StudioLru_Init();
 #endif
 
-	pglGenBuffersARB( 1, &g_pstudioubo.Matrices_ubo);
-	pglBindBufferARB(GL_UNIFORM_BUFFER, g_pstudioubo.Matrices_ubo);
-	pglBufferDataARB(GL_UNIFORM_BUFFER, sizeof(studioubo_t::Matrices), NULL, GL_STREAM_DRAW_ARB);
-	pglBindBufferBase(GL_UNIFORM_BUFFER, g_pstudioubo.MatricesBindingPoint, g_pstudioubo.Matrices_ubo);
-	pglBindBufferARB(GL_UNIFORM_BUFFER, 0);
-
 	for (int i = SSV_NORMAL; i < MAX_STUDIOSHADERVARIANTS; ++i)
 	{
 		fs_offset_t length;
@@ -368,7 +362,7 @@ void R_StudioInit( void )
 		g_pstudioshader->attrib.aTexCoord = pglGetAttribLocationARB(g_pstudioshader->program, "aTexCoord");
 
 		GLuint MatricesBlockIndex = pglGetUniformBlockIndex(g_pstudioshader->program, "Matrices");
-		pglUniformBlockBinding(g_pstudioshader->program, MatricesBlockIndex, g_pstudioubo.MatricesBindingPoint);
+		pglUniformBlockBinding(g_pstudioshader->program, MatricesBlockIndex, studioubo_t::MatricesBindingPoint);
 
 		g_pstudioshader = nullptr;
 	}
@@ -397,8 +391,6 @@ void R_StudioShutdown()
 		pglDeleteProgram(g_pstudioshader->program);
 		g_pstudioshader = nullptr;
 	}
-
-	pglDeleteBuffersARB( 1, &g_pstudioubo.Matrices_ubo);
 #endif
 }
 
@@ -1806,11 +1798,12 @@ static void R_StudioSetupUBO()
 	matrix4x4 modelviewMatrixTranspose, projectionMatrixTranspose;
 	Matrix4x4_Transpose(modelviewMatrixTranspose, RI.worldviewMatrix);
 	Matrix4x4_Transpose(projectionMatrixTranspose, RI.projectionMatrix);
-	pglBindBufferARB(GL_UNIFORM_BUFFER, g_pstudioubo.Matrices_ubo);
+	pglBindBufferARB(GL_UNIFORM_BUFFER, g_pstudioubo->Matrices_ubo);
 	pglBufferSubDataARB(GL_UNIFORM_BUFFER, offsetof(studioubo_t::Matrices, ModelView), sizeof(matrix4x4), &modelviewMatrixTranspose);
 	pglBufferSubDataARB(GL_UNIFORM_BUFFER, offsetof(studioubo_t::Matrices, Projection), sizeof(matrix4x4), &projectionMatrixTranspose);
 	pglBufferSubDataARB(GL_UNIFORM_BUFFER, offsetof(studioubo_t::Matrices, BoneMat), 3 * MAXSTUDIOBONES * 4 * sizeof(float), &g_bonestransform);
 	static_assert(sizeof(studioubo_t::Matrices::BoneMat) == 3 * MAXSTUDIOBONES * 4 * sizeof(float));
+    pglBindBufferBase(GL_UNIFORM_BUFFER, studioubo_t::MatricesBindingPoint, g_pstudioubo->Matrices_ubo);
 	pglBindBufferARB(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -3281,6 +3274,9 @@ static void GAME_EXPORT R_StudioSetupRenderer( int rendermode )
 		GL_FrontFace( !glState.frontFace );
 
 #ifdef XASH_SHADER
+    // Hack Update UBO here
+    // prevent UBO update buffer mutex
+    g_pstudioubo = xe::StudioLru_GetUBO(RI.currententity);
     R_StudioSetupUBO();
     g_pstudioshader = &g_studioshadervariant[SSV_NORMAL];
     R_StudioSetupShader();
