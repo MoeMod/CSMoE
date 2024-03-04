@@ -18,67 +18,240 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-
 #include "weapons/WeaponTemplate.hpp"
+#ifndef CLIENT_DLL
+#include "gamemode/mod_zb1.h"
+#endif
 
-
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
 
 #ifndef CLIENT_DLL
-namespace sv {
-    class CLightningSMGElectroMissile : public CBaseAnimating
+    class CLightningSMGElectroField : public CBaseAnimating
     {
     public:
-        float GetArmorRatioModifier() { return 1.5; }
+        float GetArmorRatioModifier() { return 0.9; }
         int GetWeaponsId(void) { return WEAPON_LIGHTNINGSMG; }
-
-        float GetMissileExpDamageRadius() const
-        {
-            float flRadius = 2.0f;
-            if (g_pModRunning->DamageTrack() == DT_ZB)
-                flRadius = 3.0f;
-            else if (g_pModRunning->DamageTrack() == DT_ZBS)
-                flRadius = 4.0f;
-            return flRadius * 39.37;
-        }
-
-        float GetMissileChaseRadius() const
-        {
-            float flRadius = 3.0f;
-            if (g_pModRunning->DamageTrack() == DT_ZB)
-                flRadius = 4.0f;
-            else if (g_pModRunning->DamageTrack() == DT_ZBS)
-                flRadius = 5.0f;
-            return flRadius * 39.37;
-        }
-
-        duration_t GetBModeCoolTime() const
-        {
-            duration_t BModeCoolTime = 0.7s;
-            if (g_pModRunning->DamageTrack() == DT_ZB)
-                BModeCoolTime = 0.3s;
-            else if (g_pModRunning->DamageTrack() == DT_ZBS)
-                BModeCoolTime = 0.3s;
-            return BModeCoolTime;
-        }
-
 
         void Spawn() override
         {
             Precache();
 
-            SetThink(&CLightningSMGElectroMissile::FollowThink);
-            
-            SET_MODEL(this->edict(), "sprites/ef_lightningsmg_missile.spr");
+            SetThink(&CLightningSMGElectroField::ElectroFieldThink);
+
+            SET_MODEL(this->edict(), "models/ef_lightningsmg.mdl");
 
             pev->rendermode = kRenderTransAdd;
             pev->renderamt = 255;
             pev->framerate = 1.0;
-            pev->solid = SOLID_BBOX;
-            pev->movetype = MOVETYPE_FLYMISSILE;
+            pev->solid = SOLID_NOT;
+            pev->movetype = MOVETYPE_NOCLIP;
+            pev->nextthink = gpGlobals->time + 0.1s;
+ 
+            m_flRemoveTime = gpGlobals->time + 3.0s;
+            m_flFieldFadeoutTime = invalid_time_point;
+            UTIL_SetOrigin(pev, pev->origin);
+            UTIL_SetSize(pev, Vector(-1.0, -1.0, -1.0), Vector(1.0, 1.0, 1.0));
+        }
+
+        void Precache() override
+        {
+            PRECACHE_MODEL("models/ef_lightningsmg.mdl");
+  
+        }
+
+        void Attack()
+        {
+            TraceResult tr;
+            float flDamage;
+            CBaseEntity* pList[100];
+            Vector vecStart;
+
+            vecStart = pev->origin + Vector(0.0, 0.0, 1.0);
+
+            const float flRange = FieldRadius * 39.37;
+            int iCount = UTIL_EntitiesInBox(pList, 100, vecStart - Vector(flRange, flRange, flRange), vecStart + Vector(flRange, flRange, flRange), FL_CLIENT | FL_MONSTER);
+
+            if (g_pModRunning->DamageTrack() == DT_ZBS)
+            {
+                flDamage = FieldTickDamage_Scenario;
+            }
+            else if (g_pModRunning->DamageTrack() == DT_ZB)
+            {
+                flDamage = FieldTickDamage_Zombie;
+            }
+            else
+            {
+                flDamage = FieldTickDamage;
+            }
+
+            CBasePlayer* pOwner = (CBasePlayer*)CBaseEntity::Instance(pev->owner);
+
+            if (pOwner)
+            {
+                if (pOwner->IsPlayer() && pOwner->m_bIsZombie)
+                    flDamage = 0.0;
+
+                for (int i = 0; i < iCount; i++)
+                {
+                    CBaseEntity* pEntity = pList[i];
+
+                    if (pEntity == this)
+                        continue;
+
+                    if (pEntity->pev->takedamage == DAMAGE_NO)
+                        continue;
+
+                    if (pEntity->edict() == pev->owner)
+                        continue;
+
+                    if (g_pGameRules->PlayerRelationship(pOwner, pEntity) == GR_TEAMMATE)
+                        continue;
+
+                    UTIL_TraceLine(vecStart, pEntity->BodyTarget(vecStart), dont_ignore_monsters, edict(), &tr);
+
+                    if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+                        continue;
+
+                    pEntity->TakeDamage(pev, VARS(pev->owner), flDamage, DMG_GENERIC);
+
+                    if (pEntity->IsPlayer())
+                    {
+                        CBasePlayer* player = dynamic_cast<CBasePlayer*>(pEntity);
+
+                        if (player->m_bIsZombie)
+                        {
+                            auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+                            if (strategy)
+                            {
+                                strategy->SetStunSpeedTime(FieldExpFixedMoveDuration, FieldFixedMoveSpeed);
+                            }
+                        }
+                        else
+                        {
+                            player->m_tLockBuffTime = gpGlobals->time + FieldExpFixedMoveDuration;
+                            player->m_flLockSpeed = FieldFixedMoveSpeed;
+                            player->ResetMaxSpeed();                        
+                        }
+                    }
+                }
+            }
+        }
+
+        void EXPORT ElectroFieldThink()
+        {
+            pev->nextthink = gpGlobals->time + 0.1s;
+
+            if (m_flFieldFadeoutTime != invalid_time_point)
+            {
+                duration_t interval = gpGlobals->time - m_flFieldFadeoutTime;
+
+                if (interval > FieldFadeoutTime)
+                {
+                    m_flFieldFadeoutTime = invalid_time_point;
+                    pev->nextthink = invalid_time_point;
+                    SetThink(nullptr);
+                    UTIL_Remove(this);
+                }
+                else
+                {
+                    pev->rendermode = kRenderTransAlpha;
+                    pev->renderamt = (1.0 - interval / FieldFadeoutTime) * FieldAmt;
+                }
+            }
+
+            if (m_flNextAttackTime < gpGlobals->time)
+            {           
+                Attack();
+
+                m_flNextAttackTime = gpGlobals->time + FieldTick;
+            }
+
+            if (m_flRemoveTime != invalid_time_point && m_flRemoveTime < gpGlobals->time)
+            {
+                m_flFieldFadeoutTime = gpGlobals->time;
+                m_flRemoveTime = invalid_time_point;
+            }
+        }
+
+        KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.6f }; }
+
+       
+        static constexpr float FieldTickDamage = 9.0;
+        static constexpr float FieldTickDamage_Zombie = 300.0;
+        static constexpr float FieldTickDamage_Scenario = 450.0;
+        static constexpr auto FieldTick = 0.3s;
+        static constexpr auto FieldExpFixedMoveDuration = 1.0s;
+        static constexpr float FieldFixedMoveSpeed = 150.0;
+        //static constexpr float FieldFixedMoveGravity = 0.0;
+        static constexpr float FieldRadius = 6.0;
+        static constexpr float FieldAmt = 100.0;
+        static constexpr float FieldScale = 1.25;
+        static constexpr auto FieldFadeoutTime = 1.25s;
+
+        time_point_t m_flRemoveTime;
+        time_point_t m_flNextAttackTime;
+        time_point_t m_flFieldFadeoutTime;
+    };
+    LINK_ENTITY_TO_CLASS(lightningsmg_electro_field, CLightningSMGElectroField)
+
+    class CLightningSMGElectroMissile : public CBaseAnimating
+    {
+    public:
+        float GetArmorRatioModifier() { return 0.9; }
+        int GetWeaponsId(void) { return WEAPON_LIGHTNINGSMG; }
+
+        float GetMissileExpDamageRadius() const
+        {
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                return MissileExpDamageRadiusZombie * 39.37;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                return MissileExpDamageRadiusScenario * 39.37;
+            return MissileExpDamageRadius * 39.37;
+        }
+
+        float GetMissileChaseRadius() const
+        {
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                return MissileChaseRadiusZombie * 39.37;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                return MissileChaseRadiusScenario * 39.37;
+            return MissileChaseRadius * 39.37;
+        }
+
+        float GetMissileDamage() const
+        {
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                return MissileDamageZombie;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                return MissileDamageScenario;
+            return MissileDamage;
+        }
+
+        void Spawn() override
+        {
+            Precache();
+
+            SetThink(&CLightningSMGElectroMissile::MissileThink);
+
+            SET_MODEL(this->edict(), "sprites/ef_lightningsmg_missile.spr");
+
+            pev->rendermode = kRenderTransAdd;
+            pev->renderamt = GlobeAmt;
+            pev->framerate = GlobeFramerate;
+            pev->scale = GlobeScale;
+
+            pev->solid = SOLID_NOT;
+            pev->movetype = MOVETYPE_NOCLIP;
+           
             pev->nextthink = gpGlobals->time + 0.1s;
 
             m_flMaxFrames = float(MODEL_FRAMES(pev->modelindex) - 1);
-            m_flRemoveTime = gpGlobals->time + 3.0s;
+            m_flRemoveTime = gpGlobals->time + MissileLife;
+            m_flFieldFadeoutTime = invalid_time_point;
 
             UTIL_SetOrigin(pev, pev->origin);
             UTIL_SetSize(pev, Vector(-1.0, -1.0, -1.0), Vector(1.0, 1.0, 1.0));
@@ -100,109 +273,299 @@ namespace sv {
             RadiusDamage();
         }
 
+        bool CheckEnt(CBaseEntity * pEnt)
+        {
+            CBaseEntity* pMissile = nullptr;
+            while ((pMissile = UTIL_FindEntityByClassname(pMissile, "lightningsmg_electro_missile")) != NULL)
+            {
+                CLightningSMGElectroMissile* missile = dynamic_ent_cast<CLightningSMGElectroMissile*>(pMissile);
+                if (missile == nullptr)
+                    continue;
+
+                if (missile->pev->iuser2 == pev->iuser2)
+                {
+                    //find same batch
+                    if (!missile->m_hTarget)
+                        return true;
+
+                    if (missile->m_hTarget->entindex() == pEnt->entindex())
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        void FindTarget()
+        {
+            if (m_hTarget)
+                return;
+
+            Vector vecSrc, vecEnd;
+
+            vecSrc = pev->origin;
+            CBaseEntity* pEntity = nullptr;
+            
+            TraceResult tr;
+            float Dis = GetMissileChaseRadius();
+            while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, Dis)) != nullptr)
+            {
+            	if (pEntity->edict() == pev->owner)
+            		continue;
+
+            	if (pEntity->IsDormant())
+            		continue;
+
+            	if (pEntity->pev->takedamage == DAMAGE_NO)
+            		continue;
+
+            	if (pEntity->Classify() != CLASS_PLAYER_ALLY && !pEntity->IsPlayer())
+            		continue;
+
+                if (!CheckEnt(pEntity))
+                    continue;
+
+            	vecEnd = pEntity->BodyTarget(vecSrc);
+
+            	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+
+            	if (tr.flFraction < 1.0 && tr.pHit != ENT(pEntity->pev))
+            		continue;
+
+            	float flDelta = (vecSrc - vecEnd).Length();
+
+            	if (flDelta < Dis)
+            	{
+            		m_hTarget.Set(pEntity->edict());
+            		Dis = flDelta;
+            	}
+
+            }
+
+            if (m_hTarget)
+            {
+                m_iType = 2;    //chasemode
+
+                pev->solid = SOLID_NOT;
+                pev->movetype = MOVETYPE_NOCLIP;
+            }
+                
+
+        }
+
         void RadiusDamage()
         {
+            Vector vecSrc = pev->origin;
+
+            MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+            WRITE_BYTE(TE_TEMPSPRITE);
+            WRITE_COORD(vecSrc.x);
+            WRITE_COORD(vecSrc.y);
+            WRITE_COORD(vecSrc.z);
+            WRITE_SHORT(m_iSprExplo);
+            WRITE_BYTE(GlobeExpScale * 10);
+            WRITE_BYTE(GlobeExpAmt);
+            WRITE_BYTE(30);
+            MESSAGE_END();
+
             UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/lightningsmg-2_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-
-            CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
-            CBasePlayer* pAttackePlayer = nullptr;
-            if (pAttacker && pAttacker->IsPlayer())
-                pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
-
-            if (!pAttackePlayer)
-                return;
 
             TraceResult tr;
             CBaseEntity* pEntity = NULL;
-            Vector vecEnd;
+            CBasePlayer* pOwner = (CBasePlayer*)CBaseEntity::Instance(pev->owner);
 
             float flRadius = GetMissileExpDamageRadius();
-            while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, flRadius)) != NULL)
-            {
-                if (pEntity->edict() == pev->owner)
-                    continue;
+            float flDamage = GetMissileDamage();
+            if (pOwner)
+            {  
+                while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+                {
+                    if (pEntity->pev->takedamage == DAMAGE_NO)
+                        continue;
 
-                if (pEntity->IsDormant())
-                    continue;
+                    if (pEntity->pev->health <= 0)
+                        continue;
 
-                if (pEntity->pev->takedamage == DAMAGE_NO)
-                    continue;
+                    if (ENT(pEntity->pev) == pev->owner)
+                        continue;
 
-                if (pEntity->Classify() == CLASS_NONE)
-                    continue;
+                    if (g_pGameRules->PlayerRelationship(pOwner, pEntity) == GR_TEAMMATE)
+                        continue;
 
-                if (g_pGameRules->PlayerRelationship(pAttackePlayer, pEntity) == GR_TEAMMATE)
-                    continue;
+                    UTIL_TraceLine(vecSrc, pEntity->BodyTarget(vecSrc), dont_ignore_monsters, edict(), &tr);
 
-                vecEnd = pEntity->BodyTarget(pev->origin);
+                    if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+                        continue;
 
-                UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
+                    pEntity->m_LastHitGroup = HITGROUP_CHEST;
+                    pEntity->TakeDamage(pev, pOwner->pev, flDamage, DMG_GENERIC);
 
-                if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
-                    continue;
+                    if (pEntity->IsPlayer())
+                    {
+                        CBasePlayer* player = dynamic_cast<CBasePlayer*>(pEntity);
 
-                pEntity->m_LastHitGroup = HITGROUP_CHEST;
-                pEntity->TakeDamage(pev, pAttackePlayer->pev, m_flRadiusDamage, DMG_BULLET);
+                        if (player->m_bIsZombie)
+                        {
+                            auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+                            if (strategy)
+                            {
+                                strategy->SetStunSpeedTime(MissileFixedMoveDuration, MissileFixedMoveSpeed);
+                            }
+                        }
+                        else
+                        {
+                            player->m_tLockBuffTime = gpGlobals->time + MissileFixedMoveDuration;
+                            player->m_flLockSpeed = MissileFixedMoveSpeed;
+                            player->ResetMaxSpeed();
+                        }
+                    }
+                }
             }
+
+            SetThink(nullptr);
+            UTIL_Remove(this);
 
         }
 
-        void FadeOut()
+        void EXPORT MissileThink()
         {
-            if (pev->renderamt > 10)
-            {
-                pev->renderamt -= 40.0f;
-                pev->nextthink = gpGlobals->time + 0.1s;
-            }
-            else
-            {
-                pev->renderamt = 0.0f;
-                pev->nextthink = gpGlobals->time + 0.01s;
-                SetThink(&CLightningSMGElectroMissile::SUB_Remove);
-            }
-        }
+            pev->nextthink = gpGlobals->time + 0.01s;
 
-        void EXPORT FollowThink()
-        {
+            FindTarget();
+            
+            if (m_hTarget)
+            {
+                Vector vecBody;
+                Vector vecIdeal = m_hTarget->BodyTarget(vecBody) - pev->origin;
+
+                pev->velocity = vecIdeal.Normalize() * MissileChaseSpeed;
+
+                if (vecIdeal.Length() <= MissileExpRadius * 39.37)
+                {
+                    RadiusDamage();
+                    return;
+                }
+            }
+
+            if (m_flFieldFadeoutTime != invalid_time_point)
+            {
+                duration_t interval = gpGlobals->time - m_flFieldFadeoutTime;
+
+                if (interval > FieldFadeoutTime)
+                {
+                    m_flFieldFadeoutTime = invalid_time_point;
+                    pev->nextthink = invalid_time_point;
+                    SetThink(nullptr);
+                    UTIL_Remove(this);
+                }
+                else
+                {
+                    pev->renderamt = (1.0 - interval / FieldFadeoutTime) * GlobeAmt;
+                }
+            }
+
             pev->frame += pev->framerate * gpGlobals->frametime / 1s;
 
             if (pev->frame > m_flMaxFrames)
                 pev->frame = fmod(pev->frame, m_flMaxFrames);
-
-            pev->nextthink = gpGlobals->time + 0.01s;
-
-            if (m_flRemoveTime < gpGlobals->time)
+       
+            if (m_iType == 0)
             {
-                SetThink(&CLightningSMGElectroMissile::FadeOut);
+                Vector vecA = CrossProduct(m_vecNormal, {1, 0, 0} );
+                if (vecA.IsZero())
+                {
+                    vecA = CrossProduct(m_vecNormal, { 0, 1, 0 });
+                }
+
+                Vector vecB = CrossProduct(m_vecNormal, vecA);
+                vecB = vecB.Normalize();
+                vecA = vecA.Normalize();
+
+                pev->origin.x = m_vecCenter.x + m_flRadius * vecA.x * cos(pev->fuser1 * M_PI / 180.0) + m_flRadius * vecB.x * sin(pev->fuser1 * M_PI / 180.0);
+                pev->origin.y = m_vecCenter.y + m_flRadius * vecA.y * cos(pev->fuser1 * M_PI / 180.0) + m_flRadius * vecB.y * sin(pev->fuser1 * M_PI / 180.0);
+                pev->origin.z = m_vecCenter.z + m_flRadius * vecA.z * cos(pev->fuser1 * M_PI / 180.0) + m_flRadius * vecB.z * sin(pev->fuser1 * M_PI / 180.0);
+
+                pev->fuser1 += 5.0;
+            }
+
+            if (m_flRemoveTime != invalid_time_point && m_flRemoveTime < gpGlobals->time)
+            {
+                m_flFieldFadeoutTime = gpGlobals->time;
+                m_flRemoveTime = invalid_time_point;
             }
         }
 
-        void Init(Vector vecVelocity, float flExplodeDamage, int type)
+        void Init(Vector vecVelocity, int type, Vector vecCenter)
         {
-            std::tie(m_flRadiusDamage, m_iType) = std::make_tuple(flExplodeDamage, type);
-            pev->velocity = std::move(vecVelocity);
-            SetTouch(&CLightningSMGElectroMissile::OnTouch);
+            m_iType = type;
+
+            pev->fuser1 = RANDOM_LONG(-180, 180);
+
+            if (m_iType == 1)
+            {
+                pev->solid = SOLID_BBOX;
+                pev->movetype = MOVETYPE_FLYMISSILE;
+
+                SetTouch(&CLightningSMGElectroMissile::OnTouch);
+
+                pev->velocity = std::move(vecVelocity);
+            }
+            else
+            {
+                m_vecCenter = vecCenter;
+                m_vecCenter.z += 60;
+                m_flRadius = 120.0;
+            }        
         }
 
         KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.6f }; }
 
+        static constexpr float GlobeAngularVel = 250.0;
+        static constexpr float GlobeAmt = 200.0;
+        static constexpr int GlobeExpAmt = 200;
+        static constexpr float GlobeExpScale = 1.5;
+        static constexpr float GlobeScale = 0.3;
+        static constexpr float GlobeFramerate = 2.0;
+
+        //static constexpr float MissileSize = 0.0;
+        static constexpr auto MissileLife = 3.0s;  
+        static constexpr float MissileChaseSpeed = 1000.0;
+        static constexpr float MissileExpDamageRadius = 2.0;
+        static constexpr float MissileExpDamageRadiusZombie = 3.0;
+        static constexpr float MissileExpDamageRadiusScenario = 4.0;
+        static constexpr float MissileExpRadius = 1.0;
+        //static constexpr float MissileExpRadiusZombie = 1.0;
+        //static constexpr float MissileExpRadiusScenario = 1.0;
+        static constexpr float MissileChaseRadius = 3.0;
+        static constexpr float MissileChaseRadiusZombie = 4.0;
+        static constexpr float MissileChaseRadiusScenario = 5.0;
+        static constexpr float MissleChaseAngleAccel = 360.0;
+
+        static constexpr float MissileDamage = 25.0;
+        static constexpr float MissileDamageZombie = 1800.0;
+        static constexpr float MissileDamageScenario = 350.0;
+
+        static constexpr float MissileFixedMoveSpeed = 150.0;
+       // static constexpr float MissileFixedMoveGravity = 0.0;
+        static constexpr auto MissileFixedMoveDuration = 1.0s;
+        static constexpr float MissileShootPos = 15.0;
+        static constexpr auto FieldFadeoutTime = 1.25s;
+
         time_point_t m_flRemoveTime;
+        time_point_t m_flFieldFadeoutTime;
+        Vector m_vecCenter;
+        float m_flRadius;
         float m_flRadiusDamage;
         float m_flMaxFrames;
+        Vector m_vecNormal;
         int m_iSprExplo;
         int m_iType;
-        int m_iOrder;
+        EHANDLE m_hTarget;
 
     };
     LINK_ENTITY_TO_CLASS(lightningsmg_electro_missile, CLightningSMGElectroMissile)
-}
 #endif
 
-#ifdef CLIENT_DLL
-namespace cl {
-#else
-namespace sv {
-#endif
     class CLightningSMG : public LinkWeaponTemplate< CLightningSMG,
             TGeneralData,
             BuildTGetItemInfoFromCSW<WEAPON_P90>::template type,
@@ -214,8 +577,8 @@ namespace sv {
     >
     {
     public:
-	static constexpr const auto& DefaultDeployTime = 0.52s;
-    static constexpr const auto &DefaultReloadTime = 5.0s;
+	static constexpr const auto& DefaultDeployTime = 0.53s;
+    static constexpr const auto &DefaultReloadTime = 2.33s;
     static constexpr const char *V_Model = "models/v_lightningsmg.mdl";
     static constexpr const char *P_Model = "models/p_lightningsmg_a.mdl";
     static constexpr const char *W_Model = "models/w_lightningsmg.mdl";
@@ -261,38 +624,42 @@ namespace sv {
     static constexpr float AccuracyDefault = 0.0;
     static constexpr float AccuracyMax = 0.7;
 
+    static constexpr int ChargingCount = 35;
+    static constexpr int ChargingCountForBuffClass23s5 = 30;
+    static constexpr int MaxChargeCount = 3;
+
+    static constexpr auto SecondaryCycleTime = 0.7s;
+    static constexpr auto SecondaryChargingTime = 0.5s;
+
+    static constexpr float FieldExpDamage = 25.0;
+    static constexpr float FieldExpDamage_Zombie = 1800.0;
+    static constexpr float FieldExpDamage_Scenario = 350.0;
+    static constexpr float FieldExpRadius = 3.0;
+    static constexpr float FieldExpFixedMoveSpeed = 100.0;
+    static constexpr float FieldExpFixedMoveGravity = 100.0;
+
+    static constexpr int GlobeCount = 3;
+  
+ 
+    static constexpr float MissileSpeed = 1000.0;
+    static constexpr auto MissileShootDelay = 0.3s;
+    
     KnockbackData KnockBack = { 250.0f, 200.0f, 250.0f, 90.0f, 0.7f };
 
 
     time_point_t m_flTimeCheckCharge;
     int m_iModelIndex;
     int m_iChargeState;
-    int m_iDefaultAmmo2;
     int m_iChargeShotsFired;
-    int m_iTargetShotsFired;
 
 	void Spawn()
 	{
-        m_iDefaultAmmo2 = 0;
         m_iChargeState = 0;
         m_flTimeCheckCharge = invalid_time_point;
         m_iChargeShotsFired = 0;
-        m_iTargetShotsFired = 35;
         m_iModelIndex = 0;
         Base::Spawn();
 	}
-
-    float GetRadiusDamage() const
-    {
-        float flDamage = 25.0f;
-#ifndef CLIENT_DLL
-        if (g_pModRunning->DamageTrack() == DT_ZB)
-            flDamage = 1800.0f;
-        else if (g_pModRunning->DamageTrack() == DT_ZBS)
-            flDamage = 350.0f;
-#endif
-        return flDamage;
-    }
 
     void Precache(void)
     {
@@ -309,7 +676,7 @@ namespace sv {
         p->pszName = STRING(pev->classname);
         p->pszAmmo1 = "lightningsmg";
         p->iMaxAmmo1 = 90;
-        p->pszAmmo2 = NULL;
+        p->pszAmmo2 = "lightningsmg2";
         p->iMaxAmmo2 = -1;
         p->iMaxClip = 80;
         p->iSlot = 0;
@@ -355,11 +722,11 @@ namespace sv {
 
 	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
 	{
-		if (m_iDefaultAmmo2)
+		if (pev->iuser2)
 		{
-			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iDefaultAmmo2;
-			m_iDefaultAmmo2 = 0;
+			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = pev->iuser2;
 		}
+        
 		return CBasePlayerWeapon::ExtractAmmo(pWeapon);
 	}
 
@@ -369,9 +736,7 @@ namespace sv {
         m_bDelayFire = false;
         pev->iuser1 = 0;
 
-        int iAnim = ANIM_DRAW + m_iWeaponState;
-
-        if(DefaultDeploy(V_Model, P_Model, iAnim, "carbine", UseDecrement() != FALSE))
+        if(DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "mp5", UseDecrement() != FALSE))
         {
             SetSubModel();
             return TRUE;
@@ -408,9 +773,10 @@ namespace sv {
         m_iClip--;
         m_iChargeShotsFired++;
 
-        if (m_iChargeShotsFired > m_iTargetShotsFired && m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < 3)
+        if (m_iChargeShotsFired > (m_pPlayer->m_iModelName == MODEL_BUFFCLASS23S5TR ? ChargingCountForBuffClass23s5 : ChargingCount) && pev->iuser2 < MaxChargeCount)
         {
-            m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
+            pev->iuser2++;
+            
             SetSubModel();
 #ifndef CLIENT_DLL
             MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
@@ -419,6 +785,8 @@ namespace sv {
             MESSAGE_END();
 #endif
             m_iChargeShotsFired = 0;
+
+            m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = pev->iuser2;
         }
 
         m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
@@ -461,6 +829,18 @@ namespace sv {
 
     void FireMissile()
     {
+        pev->iuser1++;
+
+        pev->nextthink = gpGlobals->time + MissileShootDelay;
+
+        if (pev->iuser1 > GlobeCount)
+        {
+            SetThink(nullptr);
+
+            pev->iuser1 = 0;
+            return;
+        }
+
 #ifndef CLIENT_DLL
         UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
@@ -472,27 +852,70 @@ namespace sv {
         CLightningSMGElectroMissile* pEnt = static_cast<CLightningSMGElectroMissile*>(CBaseEntity::Create("lightningsmg_electro_missile", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
         if (pEnt)
         {
-            pEnt->Init(vecProjDir * 1000, GetRadiusDamage(), 1);
-            pEnt->m_iOrder = pev->iuser1;
-
+            pEnt->Init(vecProjDir * MissileSpeed, 1, g_vecZero);
         }
 #endif
 
-        pev->iuser1++;
+    }
 
-        pev->nextthink = gpGlobals->time + 0.3s;
+    // 生成随机单位向量
+    Vector generateUnitVector3D() {
+        Vector vecOut;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<double> dis(0, 2 * M_PI);
+        std::uniform_real_distribution<double> disTheta(-M_PI / 2, M_PI / 2);
 
-        if (pev->iuser1 > 2)
-        {
-            SetThink(nullptr);
+        double phi = dis(gen);
+        double theta = disTheta(gen);
 
-            pev->iuser1 = 0;
-        }
+        vecOut.x = std::cos(phi) * std::cos(theta);
+        vecOut.y = std::sin(phi) * std::cos(theta);
+        vecOut.z = std::sin(theta);
 
+        return vecOut;
+    }
+
+    // 生成与给定向量垂直且夹角不太小的单位向量
+    Vector generatePerpendicularUnitVector(Vector vecIn, double minAngle, double maxAngle) {
+        Vector vecOut;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<double> dis(minAngle, maxAngle);
+
+        double phi = std::atan2(vecIn.y, vecIn.x);
+        double theta = std::asin(vecIn.z);
+
+        double newPhi = phi + M_PI / 2; // 与给定向量垂直
+        double newTheta = dis(gen);
+
+        vecOut.x = std::cos(newPhi) * std::cos(newTheta);
+        vecOut.y = std::sin(newPhi) * std::cos(newTheta);
+        vecOut.z = std::sin(newTheta);
+
+        return vecOut;
     }
 
     void OnAttack2Released()
     {
+#ifndef CLIENT_DLL
+        Vector vecFiledSrc = m_pPlayer->pev->origin;
+        Vector vecAngle = m_pPlayer->pev->v_angle;
+        vecAngle.x = vecAngle.z = 0;
+
+        if (m_pPlayer->pev->flags & FL_DUCKING)
+        {
+            vecFiledSrc.z -= 16;
+        }
+        else
+        {
+            vecFiledSrc.z -= 32;
+        }
+
+        CLightningSMGElectroField* pEnt = static_cast<CLightningSMGElectroField*>(CBaseEntity::Create("lightningsmg_electro_field", vecFiledSrc, vecAngle, ENT(m_pPlayer->pev)));
+
+#endif
+
         if (m_iChargeState > 1)
         {
             SetThink(&CLightningSMG::FireMissile);
@@ -502,6 +925,12 @@ namespace sv {
         else
         {
 #ifndef CLIENT_DLL
+            Vector vecNormal[3];
+            vecNormal[0] = generateUnitVector3D();
+            vecNormal[1] = generatePerpendicularUnitVector(vecNormal[0], M_PI / 6, M_PI / 3);
+            vecNormal[2] = generatePerpendicularUnitVector(vecNormal[0], 0, M_PI / 3);
+  
+            int randomID = RandomInt(0, 99);
             for (int i = 0; i < 3; i++)
             {
                 Vector vecSrc = m_pPlayer->pev->origin;
@@ -513,13 +942,15 @@ namespace sv {
                 CLightningSMGElectroMissile* pEnt = static_cast<CLightningSMGElectroMissile*>(CBaseEntity::Create("lightningsmg_electro_missile", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
                 if (pEnt)
                 {
-                    pEnt->Init(g_vecZero, GetRadiusDamage(), 0);
-                    pEnt->m_iOrder = i;
+                    pEnt->Init(g_vecZero, 0, vecFiledSrc);
+                    pEnt->pev->fuser2 = i * 1.0;
+                    pEnt->m_vecNormal = vecNormal[i];
                 }
             }    
 #endif
 
         }
+
 
         m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
@@ -528,7 +959,8 @@ namespace sv {
         m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
         m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
-        m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
+        pev->iuser2--;
+        m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = pev->iuser2;
 
         SetSubModel();
 
@@ -605,6 +1037,11 @@ namespace sv {
         ResetEmptySound();
         m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
 
+        if (m_iChargeState && !(m_pPlayer->pev->button & IN_ATTACK2))
+        {
+            OnAttack2Released();
+        }
+
         if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
             return;
 
@@ -617,9 +1054,7 @@ namespace sv {
         if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
             return;
 
-        int iAnim = m_iWeaponState + ANIM_RELOAD;
-
-        if (DefaultReload(MaxClip, iAnim, DefaultReloadTime))
+        if (DefaultReload(MaxClip, ANIM_RELOAD, DefaultReloadTime))
         {
 #ifndef CLIENT_DLL
             m_pPlayer->SetAnimation(PLAYER_RELOAD);

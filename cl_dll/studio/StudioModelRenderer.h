@@ -180,7 +180,9 @@ public:
 	static struct model_s* s_pLightningARPModel;
 	static struct model_s* s_pSoulReaperViewModel;
 	static struct model_s* s_pSoulReaperPModel;
-
+	static struct model_s* s_pSpearGunEXViewModel;
+	static struct model_s* s_pY24S1LaserMiniGunAPModel;
+	static struct model_s* s_pY24S1LaserMiniGunBPModel;
 
 	struct ViewModel
 	{

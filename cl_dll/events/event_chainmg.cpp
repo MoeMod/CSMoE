@@ -132,7 +132,7 @@ void EV_FireChainMG(event_args_s *args)
 
 				if (!g_Muzz364)
 				{
-					g_Muzz364 = gEngfuncs.pEfxAPI->R_AttachTentToModel(idx, 0, 99, iMuzz364, 10, 255, kRenderTransAdd, 0.08, 3, FTENT_SPRANIMATE | FTENT_PERSIST | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM, 0);
+					g_Muzz364 = gEngfuncs.pEfxAPI->R_AttachTentToModel(idx, 0, 99, iMuzz364, 10, 255, kRenderTransTexture, 0.08, 4, FTENT_SPRANIMATE | FTENT_PERSIST | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM, 0);
 					if (g_Muzz364)
 					{
 						g_Muzz364->callback = ResetMuzz;
@@ -141,7 +141,7 @@ void EV_FireChainMG(event_args_s *args)
 							
 				if (!g_Muzz365)
 				{
-					g_Muzz365 = gEngfuncs.pEfxAPI->R_AttachTentToModel(idx, 3, 99, iMuzz365, 10, 255, kRenderTransAdd, 0.08, 3, FTENT_SPRANIMATE | FTENT_PERSIST | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM, 0);
+					g_Muzz365 = gEngfuncs.pEfxAPI->R_AttachTentToModel(idx, 3, 99, iMuzz365, 10, 255, kRenderTransTexture, 0.08, 4, FTENT_SPRANIMATE | FTENT_PERSIST | FTENT_SPRANIMATELOOP | FTENT_CLIENTCUSTOM, 0);
 					if (g_Muzz365)
 					{
 						g_Muzz365->callback = ResetMuzz;

@@ -30,8 +30,6 @@ public:
 	void InitSiFiAmmoStyleList(CLabeledCommandComboBox* cb);
 	void InitHudStyleList(CLabeledCommandComboBox* cb);
 	void InitAlarmStyleList(CLabeledCommandComboBox* cb);
-	void InitTexlruList(CLabeledCommandComboBox* cb);
-	void InitHudScaleList(CLabeledCommandComboBox* cb);
 	void InitQZSoundList(CLabeledCommandComboBox* cb);
 	void InitAutoAnimList(CLabeledCommandComboBox* cb);
 
@@ -47,9 +45,9 @@ private:
 	CLabeledCommandComboBox* m_pSiFiAmmoType;
 	CLabeledCommandComboBox* m_pHudStyle;
 	CLabeledCommandComboBox* m_pAlarmStyle;
-	CLabeledCommandComboBox* m_pTexlru;
 	CLabeledCommandComboBox* m_pHudScale;
 	CCvarSlider* m_pGammaSlider;
+	CCvarSlider* m_pHudScaleSlider;
 	CLabeledCommandComboBox* m_pQZSound;
 	CLabeledCommandComboBox* m_pAutoAim;
 	//CCvarToggleCheckButton* m_pQZSound;

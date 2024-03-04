@@ -31,11 +31,8 @@ COptionsSubMoeSettings::COptionsSubMoeSettings(vgui2::Panel *parent) : PropertyP
 	m_pAlarmStyle = new CLabeledCommandComboBox(this, "AlarmStyleComboBox");
 	InitAlarmStyleList(m_pAlarmStyle);
 
-	m_pTexlru = new CLabeledCommandComboBox(this, "TexlruComboBox");
-	InitTexlruList(m_pTexlru);
-
-	m_pHudScale = new CLabeledCommandComboBox(this, "HudScaleComboBox");
-	InitHudScaleList(m_pHudScale);
+	m_pHudScaleSlider = new CCvarSlider(this, "CSMoE_HudScale", "#CSMoE_HudScale",
+		1.0f, 3.0f, "hud_scale");
 
 	m_pGammaSlider = new CCvarSlider(this, "GameUI_Brightness", "#GameUI_Brightness",
 		1.0f, 10.0f, "gamma");
@@ -135,31 +132,6 @@ void COptionsSubMoeSettings::InitFloatingDamageTypeList(CLabeledCommandComboBox*
 }
 
 
-void COptionsSubMoeSettings::InitHudScaleList(CLabeledCommandComboBox* cb)
-{
-	if (cb == NULL)
-		return;
-
-	cb->Reset();
-
-	const char* value = engine->pfnGetCvarString("hud_scale");
-	const char* optionName[9] = { "100%", "125%", "150%", "175%", "200%", "225%", "250%", "275%", "300%" };
-	const char* optionValue[9] = { "hud_scale 1", "hud_scale 1.25", "hud_scale 1.5", "hud_scale 1.75", "hud_scale 2", "hud_scale 2.25", "hud_scale 2.5", "hud_scale 2.75", "hud_scale 3" };
-
-	int iSelected = -1;
-	for (int i = 0; i < 9; i++)
-	{
-		cb->AddItem(optionName[i], optionValue[i]);
-		if (iSelected == -1)
-			if (!Q_strcmp(optionValue[i] + 10, value))
-				iSelected = i;
-	}
-	if (iSelected == -1)
-		iSelected = 0;
-
-	cb->SetInitialItem(iSelected);
-}
-
 void COptionsSubMoeSettings::InitSiFiAmmoStyleList(CLabeledCommandComboBox* cb)
 {
 	if (cb == NULL)
@@ -229,30 +201,6 @@ void COptionsSubMoeSettings::InitAlarmStyleList(CLabeledCommandComboBox* cb)
 
 	cb->SetInitialItem(initialType);
 }
-void COptionsSubMoeSettings::InitTexlruList(CLabeledCommandComboBox* cb)
-{
-	if (cb == NULL)
-		return;
-
-	cb->Reset();
-
-	const char* value = engine->pfnGetCvarString("r_texlru");
-	const char* optionName[6] = { "#Texture_Unlimited", "64", "128", "256", "512", "1024" };
-	const char* optionValue[6] = { "r_texlru 0", "r_texlru 64", "r_texlru 128", "r_texlru 256", "r_texlru 512", "r_texlru 1024" };
-
-	int iSelected = -1;
-	for (int i = 0; i < 6; i++)
-	{
-		cb->AddItem(optionName[i], optionValue[i]);
-		if (iSelected == -1)
-			if (!Q_strcmp(optionValue[i] + 9, value))
-				iSelected = i;
-	}
-	if (iSelected == -1)
-		iSelected = 0;
-
-	cb->SetInitialItem(iSelected);
-}
 
 void COptionsSubMoeSettings::RemapDamage(void)
 {
@@ -301,9 +249,8 @@ void COptionsSubMoeSettings::OnResetData()
 	m_pSiFiAmmoType->Reset();
 	m_pHudStyle->Reset();
 	m_pAlarmStyle->Reset();
-	m_pTexlru->Reset();
-	m_pHudScale->Reset();
 	m_pGammaSlider->Reset();
+	m_pHudScaleSlider->Reset();
 	m_pQZSound->Reset();
 	m_pAutoAim->Reset();
 }
@@ -322,14 +269,11 @@ void COptionsSubMoeSettings::OnApplyChanges()
 	if (m_pAlarmStyle)
 		m_pAlarmStyle->ApplyChanges();
 
-	if (m_pTexlru)
-		m_pTexlru->ApplyChanges();
-
-	if (m_pHudScale)
-		m_pHudScale->ApplyChanges();
-
 	if(m_pGammaSlider)
 		m_pGammaSlider->ApplyChanges();
+
+	if (m_pHudScaleSlider)
+		m_pHudScaleSlider->ApplyChanges();
 
 	if (m_pQZSound)
 		m_pQZSound->ApplyChanges();

@@ -771,7 +771,7 @@ CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 	menu->AddMenuItem("#CSO_Bulletin_Notice", "#MOE_InventoryMenu", "OpenInventoryMenu", this, nullptr);
 	menu->AddMenuItem("#CSO_Bulletin_Notice", "#CSO_Bulletin_Notice", "OpenCSBTEBulletin", this, nullptr);
 	menu->AddMenuItem("#LOGIN_TITLE", "#LOGIN_TITLE", "MoeLogin", this, nullptr);
-	menu->AddMenuItem("#GameUI_CSMoESettings", "#GameUI_CSMoESettings", "OpenMoeSettings", this, nullptr);
+	menu->AddMenuItem("#GameUI_TouchSettings", "#GameUI_TouchSettings", "OpenMoeSettings", this, nullptr);
     menu->AddMenuItem("#GameUI_Console", "#GameUI_Console", "OpenConsole", this, nullptr);
 	
 	for (KeyValues *dat = datafile->GetFirstSubKey(); dat != NULL; dat = dat->GetNextKey())

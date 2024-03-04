@@ -32,11 +32,6 @@ namespace sv {
 
 LINK_ENTITY_TO_CLASS(weapon_speargun, CSpearGun)
 
-float UTIL_QuickRandomFloat(float low, float high)
-{
-	return rand() * (1.0 / 32767) * (high - low) + low;
-}
-
 int CSpearGun::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);

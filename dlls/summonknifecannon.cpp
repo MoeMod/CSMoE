@@ -13,24 +13,6 @@ namespace sv {
 	LINK_ENTITY_TO_CLASS(summonknife_cannon, CSummonKnifeCannon);
 
 
-	float UTIL_QuickRandomFloat(float low, float high);
-
-	static Vector CalcCrowdForceDir(CBaseEntity* pPushing, CBaseEntity* pBehind)
-	{
-		Vector vecPushingDir = pPushing->pev->velocity.Normalize();
-		Vector vecDir = (pBehind->pev->origin - pPushing->pev->origin).Normalize();
-		float dot = DotProduct(vecPushingDir, vecDir);
-
-		if (dot < 0)
-			return g_vecZero;
-
-		if (dot > cos(25 * M_PI / 180))
-			return vecPushingDir;
-
-		return vecDir;
-	}
-
-
 	CSummonKnifeCannon* CSummonKnifeCannon::Create(void)
 	{
 		edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("summonknife_cannon"));

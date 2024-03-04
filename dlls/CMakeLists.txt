@@ -279,6 +279,7 @@ set(HLDLL_SRCS
 	./player/player_emotion.cpp
 	./dartbomb.cpp
 	./chainshadows.cpp
+	./spearexammo.cpp
 
 	)
 
@@ -719,6 +720,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_soulreaper.cpp
 	../dlls/wpn_shared/wpn_chainmg.cpp
 	../dlls/wpn_shared/wpn_m134hero.cpp
+	../dlls/wpn_shared/wpn_speargunex.cpp
+	../dlls/wpn_shared/wpn_y24s1laserminigun.cpp
 	)
 
 set(PM_SRCS

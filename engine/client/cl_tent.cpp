@@ -966,6 +966,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	float scale = 0.2f, life = 0.01f, framerate = 20.0f, angle;
 	bool animate = false, animateLoop = false, randomFrame = false;
 
+	int rendermode = kRenderTransAdd;
 	char szOptions[64];
 	Q_strncpy(szOptions, type, sizeof(szOptions));
 	char* pOptions = szOptions;
@@ -1024,6 +1025,10 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 			case 'X':
 				iAttachment = atoi(value);
 				break;
+			case 'O':
+				//buffsg552ex first dds spr
+				rendermode = (index > 205) ? (atoi(value) ? kRenderTransAdd : kRenderTransTexture) : kRenderTransAdd;
+				break;
 			default:
 				break;
 			}
@@ -1058,7 +1063,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 		}
 	}
 
-	pTemp->entity.curstate.rendermode = kRenderTransAdd;
+	pTemp->entity.curstate.rendermode = rendermode;
 	pTemp->entity.curstate.renderamt = 255;
 	pTemp->entity.curstate.framerate = framerate;
 	pTemp->entity.curstate.renderfx = 0;

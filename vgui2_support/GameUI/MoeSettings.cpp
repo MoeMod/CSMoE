@@ -12,7 +12,6 @@
 #include "vgui/IVGui.h"
 
 #include "OptionsSubButtonSettings.h"
-#include "OptionsSubMoeSettings.h"
 #include "OptionsSubTouch.h"
 #include "ModInfo.h"
 
@@ -28,17 +27,14 @@ CMoeSettings::CMoeSettings(vgui2::Panel *parent) : PropertyDialog(parent, "Optio
 	SetBounds(offset, offset,
 		600, 400);
 	SetSizeable(false);
-	SetTitle("#GameUI_CSMoESettings", true);
+	SetTitle("#GameUI_TouchSettings", true);
 
-	m_pOptionsSubMoeSettings = NULL;
 	m_pOptionsSubButtonSettings = NULL;
 	m_pOptionsSubTouch = NULL;
 
-	m_pOptionsSubMoeSettings = new COptionsSubMoeSettings(this);
 	m_pOptionsSubButtonSettings = new COptionsSubButtonSettings(this);
 	m_pOptionsSubTouch = new COptionsSubTouch(this);
 
-	AddPage(m_pOptionsSubMoeSettings, "#GameUI_CSMoESettings");
 	AddPage(m_pOptionsSubButtonSettings, "#GameUI_TouchSettings");
 	AddPage(m_pOptionsSubTouch, "#GameUI_Touch");
 

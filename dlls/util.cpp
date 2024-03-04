@@ -3119,7 +3119,7 @@ void UTIL_EMIT_PV_PARTICLE(edict_t* entity, const char* texture, int channel, in
  * 返回值:还需旋转多少度才能精确瞄准目标坐标
 */
 
-float UTIL_AnglesRotateTo(Vector &eyePos, Vector &vAngles, Vector &goal, Vector &angles, float angle)
+float UTIL_AnglesRotateTo(Vector eyePos, Vector vAngles, Vector goal, Vector &angles, float angle)
 {
 	Vector vecAim, vecRight, vecUp;
 	AngleVectors(vAngles, vecAim, vecRight, vecUp);
@@ -3127,7 +3127,7 @@ float UTIL_AnglesRotateTo(Vector &eyePos, Vector &vAngles, Vector &goal, Vector 
 	Vector vecIdeal = goal - eyePos;
 	float lenVecIdeal = vecIdeal.Length();
 
-	float angDiff = acos(DotProduct(vecAim, vecIdeal) / lenVecIdeal * M_PI / 180.0) ;
+	float angDiff = acos((DotProduct(vecAim, vecIdeal) / lenVecIdeal)) * 180.0 / M_PI;
 
 		// 如果夹角小于等于角速度,直接精确瞄准
 	if (angDiff <= angle)
@@ -3158,8 +3158,8 @@ float UTIL_AnglesRotateTo(Vector &eyePos, Vector &vAngles, Vector &goal, Vector 
 	// 在vecIdeal(x轴)和vecY(y轴)和vecAim在同一平面上,vecAim朝着vecIdeal方向旋转指定度数
 	angDiff -= angle;
 		// 将旋转后的角度转换成向量
-	float x = cos(angDiff * 180 / M_PI);
-	float y = sin(angDiff * 180 / M_PI);
+	float x = cos(angDiff * M_PI / 180);
+	float y = sin(angDiff * M_PI / 180);
 
 	// 更改x轴长度为x
 	vecIdeal[0] = vecIdeal[0] * x / lenVecIdeal;
@@ -3179,6 +3179,86 @@ float UTIL_AnglesRotateTo(Vector &eyePos, Vector &vAngles, Vector &goal, Vector 
 	return angDiff;
 }
 
+float UTIL_QuickRandomFloat(float low, float high)
+{
+	return rand() * (1.0 / 32767) * (high - low) + low;
+}
 
+Vector UTIL_CalcCrowdForceDir(CBaseEntity* pPushing, CBaseEntity* pBehind)
+{
+	Vector vecPushingDir = pPushing->pev->velocity.Normalize();
+	Vector vecDir = (pBehind->pev->origin - pPushing->pev->origin).Normalize();
+	float dot = DotProduct(vecPushingDir, vecDir);
+
+	if (dot < 0)
+		return g_vecZero;
+
+	if (dot > cos(25 * M_PI / 180))
+		return vecPushingDir;
+
+	return vecDir;
+}
+
+int UTIL_MissileCalcDirection(Vector vecVector1, Vector vecVector2, float maxangle, Vector& vecResultVector)
+{
+	// 0 can't find
+	// 1 = current direction, 2 = target direction
+
+	if (!maxangle)
+		return 0;
+
+	Vector vecDir, vecDir2;
+
+	vecDir = vecVector1.Normalize();
+	vecDir2 = vecVector2.Normalize();
+
+	float c = DotProduct(vecDir, vecDir2);
+
+	if (c >= cos(maxangle * M_PI / 180.0))
+	{
+		//角度够小，直接选择dir2
+		vecResultVector = vecDir2;
+		return 0;
+	}
+
+	float c2 = sqrt((c + 1.0) / 2.0);
+	float t, t2, t3, value, s;
+	Vector vecSub;
+
+	if (cos(maxangle * M_PI / 180.0) >= c2)
+	{
+		t = sqrt(1.0 / (c2 * c2) - 1.0);
+		t2 = tan(maxangle * M_PI / 180.0);
+		t3 = (t - t2) / (1.0 + t * t2);
+
+		value = c2 * t3;
+		s = sqrt(1.0 - c * c);
+
+		vecSub = vecDir2 - vecDir;
+		vecSub = vecSub * (s - value) / (2.0 * s);
+		vecSub = vecSub + vecDir;
+	}
+	else
+	{
+		t = sqrt(1.0 / (c2 * c2) - 1.0);
+		t2 = tan(maxangle * M_PI / 180.0);
+		t3 = (t2 - t) / (1.0 + t * t2);
+
+		value = c2 * t3;
+		s = sqrt(1.0 - c * c);
+
+		vecSub = vecDir2 - vecDir;
+		vecSub = vecSub * (s + value) / (2.0 * s);
+		vecSub = vecSub + vecDir;
+	}
+
+	float fLen = vecSub.Length();
+
+	if (fLen < 0.01)
+		return 0;
+
+	vecResultVector = vecSub.Normalize();
+	return 1;
+}
 
 }

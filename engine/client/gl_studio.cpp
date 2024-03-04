@@ -1847,7 +1847,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		//handtexture system start
 		int id;
 		int type = TATTOO_NONE;
-#if 0
+#if 1
         // TODO : 优化一下，卡死了这里
 		if (CL_GetLocalPlayer()->curstate.iuser1 == OBS_IN_EYE)
 		{
@@ -2418,6 +2418,18 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 									if (pspriteframe->gl_texturenum)
 									{
+										auto psprite = (msprite_t*)pModel->cache.data;
+										if (psprite->synctype == 233)
+										{
+											if (gltexture_t* tex = R_GetTexture(index))
+											{
+												if (tex->flags & TF_HAS_ALPHA)
+												{
+													GL_SetRenderMode(kRenderTransTexture);
+												}
+											}								
+										}
+
 										xe::TexLru_BindReplace(&ptexture[pskinref[pmesh->skinref]], index);
 										extern std::set<model_t*> persist_models;
 										persist_models.insert(pModel);

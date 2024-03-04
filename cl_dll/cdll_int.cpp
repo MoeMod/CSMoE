@@ -318,6 +318,11 @@ int DLLEXPORT HUD_VidInit( void )
 	CStudioModelRenderer::s_pSoulReaperViewModel = IEngineStudio.Mod_ForName("models/v_soulreaper.mdl", FALSE);
 	CStudioModelRenderer::s_pSoulReaperPModel = IEngineStudio.Mod_ForName("models/p_soulreaper.mdl", FALSE);
 
+	CStudioModelRenderer::s_pSpearGunEXViewModel = IEngineStudio.Mod_ForName("models/v_speargunex.mdl", FALSE);
+
+	CStudioModelRenderer::s_pY24S1LaserMiniGunAPModel = IEngineStudio.Mod_ForName("models/p_y24s1laserminigunA.mdl", FALSE);
+	CStudioModelRenderer::s_pY24S1LaserMiniGunBPModel = IEngineStudio.Mod_ForName("models/p_y24s1laserminigunB.mdl", FALSE);
+
 	
 
 	//VGui_Startup();

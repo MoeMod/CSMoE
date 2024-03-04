@@ -167,6 +167,10 @@ struct model_s* CStudioModelRenderer::s_pLightningARPModel;
 
 struct model_s* CStudioModelRenderer::s_pSoulReaperViewModel;
 struct model_s* CStudioModelRenderer::s_pSoulReaperPModel;
+struct model_s* CStudioModelRenderer::s_pSpearGunEXViewModel;
+
+struct model_s* CStudioModelRenderer::s_pY24S1LaserMiniGunAPModel;
+struct model_s* CStudioModelRenderer::s_pY24S1LaserMiniGunBPModel;
 
 
 int g_iLeapStrikeGunAnim = 0;

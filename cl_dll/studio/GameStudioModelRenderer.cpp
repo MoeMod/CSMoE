@@ -1207,6 +1207,18 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 						m_pCurrentEntity->curstate.sequence = 0;
 				}
 
+				if (CStudioModelRenderer::s_pY24S1LaserMiniGunAPModel && pweaponmodel == CStudioModelRenderer::s_pY24S1LaserMiniGunAPModel)
+				{
+					m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+					m_pCurrentEntity->curstate.framerate = 1.0;
+				}
+
+				if (CStudioModelRenderer::s_pY24S1LaserMiniGunBPModel && pweaponmodel == CStudioModelRenderer::s_pY24S1LaserMiniGunBPModel)
+				{
+					m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
+					m_pCurrentEntity->curstate.framerate = 1.0;
+				}
+
 				if (CStudioModelRenderer::s_pLaserMiniGunAPModel && pweaponmodel == CStudioModelRenderer::s_pLaserMiniGunAPModel)
 				{
 					m_pCurrentEntity->curstate.animtime = gHUD.m_flTime;
@@ -2827,7 +2839,8 @@ int R_StudioDrawModel(int flags)
 			}
 		}
 
-		if (CStudioModelRenderer::s_pSoulReaperViewModel && curent->model == CStudioModelRenderer::s_pSoulReaperViewModel)
+		if ((CStudioModelRenderer::s_pSoulReaperViewModel && curent->model == CStudioModelRenderer::s_pSoulReaperViewModel) ||
+			(CStudioModelRenderer::s_pSpearGunEXViewModel && curent->model == CStudioModelRenderer::s_pSpearGunEXViewModel))
 		{
 			curent->curstate.effects |= EF_NOCULL;
 		}

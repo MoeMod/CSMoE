@@ -1789,6 +1789,49 @@ private:
 	time_point_t m_flIgniteTime;
 };
 
+class CSpearEX : public CSpear
+{
+public:
+	float GetArmorRatioModifier() { return 1.85; }
+	int GetWeaponsId(void) { return WEAPON_SPEARGUNEX; }
+	static CSpearEX* Create(int iType = 0);
+
+public:
+	void CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind);
+	void Spawn(void);
+	void Precache(void);
+
+	BOOL GetKickRate(float& flGround, float& flAir, float& flAirStrafing, float& flDucking, float& flVelocityModifier)
+	{
+		flGround = flAir = flAirStrafing = flDucking = 0.0;
+
+		flVelocityModifier = 1.0;
+
+		return TRUE;
+	}
+
+public:
+	void EXPORT IgniteThink(void);
+	void EXPORT FollowThink(void);
+	void EXPORT SpearTouch(CBaseEntity* pOther);
+
+public:
+	void Update(void);
+	void MaterialSound(void);
+
+	void HitDamage(CBaseEntity* pOther);
+	void AddPlayerToCrowd(CBaseMonster* pPlayer);
+
+public:
+	void Explode(duration_t flTimeRemove, bool bDetonate);
+
+public:
+	int m_iExplodeSprite;
+	time_point_t m_flTimeNextAutoAim;
+	EHANDLE m_hTarget;
+	
+};
+
 
 #if 0
 class CGuillotineexAmmo : public CBaseAnimating

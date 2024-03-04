@@ -4,7 +4,6 @@
 #include "player.h"
 #include "weapons.h"
 #include "gamemode/zbs/monster_entity.h"
-#include "wpn_shared/wpn_speargun.h"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
@@ -12,46 +11,6 @@
 namespace sv {
 
 	LINK_ENTITY_TO_CLASS(spear, CSpear);
-
-
-	float UTIL_QuickRandomFloat(float low, float high);
-
-	static Vector CalcCrowdForceDir(CBaseEntity* pPushing, CBaseEntity* pBehind)
-	{
-		Vector vecPushingDir = pPushing->pev->velocity.Normalize();
-		Vector vecDir = (pBehind->pev->origin - pPushing->pev->origin).Normalize();
-		float dot = DotProduct(vecPushingDir, vecDir);
-
-		if (dot < 0)
-			return g_vecZero;
-
-		if (dot > cos(25 * M_PI / 180))
-			return vecPushingDir;
-
-		return vecDir;
-	}
-
-
-	CSpear* CSpear::Create(int iType)
-	{
-		edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("spear"));
-
-		if (FNullEnt(pent))
-		{
-			ALERT(at_console, "NULL Ent in Create!\n");
-			return NULL;
-		}
-
-		CSpear* pSpear = (CSpear*)Instance(pent);
-		if (pSpear)
-		{
-			pSpear->pev->classname = MAKE_STRING("spear");
-			pSpear->m_iType = iType;
-			pSpear->Spawn();
-		}
-
-		return pSpear;	
-	}
 
 	void CSpear::AddPlayerToCrowd(CBaseMonster* pPlayer)
 	{
@@ -298,7 +257,7 @@ namespace sv {
 		{
 			if ((entityBehind->IsPlayer() || entityBehind->Classify() == CLASS_PLAYER_ALLY) && g_pGameRules->PlayerRelationship(m_pOwner, entityPushing) != GR_TEAMMATE)
 			{
-				Vector vecDir = CalcCrowdForceDir(entityPushing, entityBehind);
+				Vector vecDir = UTIL_CalcCrowdForceDir(entityPushing, entityBehind);
 
 				if (vecDir.x || vecDir.y || vecDir.z)
 				{
@@ -385,7 +344,7 @@ namespace sv {
 
 				if (pPlayer->m_flNextSpearPush > gpGlobals->time && gpGlobals->time > pPlayer->m_flNextSpearPush)
 				{
-					Vector vecDir = CalcCrowdForceDir(entityPushing, entityBehind);
+					Vector vecDir = UTIL_CalcCrowdForceDir(entityPushing, entityBehind);
 					vecDir.z = 0;
 
 					if (vecDir.x || vecDir.y || vecDir.z)
@@ -407,7 +366,7 @@ namespace sv {
 
 				if (pPlayer->m_flNextSpearPush > gpGlobals->time && gpGlobals->time > pPlayer->m_flNextSpearPush)
 				{
-					Vector vecDir = CalcCrowdForceDir(entityPushing, entityBehind);
+					Vector vecDir = UTIL_CalcCrowdForceDir(entityPushing, entityBehind);
 					vecDir.z = 0;
 
 					if (vecDir.x || vecDir.y || vecDir.z)
@@ -738,4 +697,26 @@ namespace sv {
 			
 		}
 	}
+
+	CSpear* CSpear::Create(int iType)
+	{
+		edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("spear"));
+
+		if (FNullEnt(pent))
+		{
+			ALERT(at_console, "NULL Ent in Create!\n");
+			return NULL;
+		}
+
+		CSpear* pSpear = (CSpear*)Instance(pent);
+		if (pSpear)
+		{
+			pSpear->pev->classname = MAKE_STRING("spear");
+			pSpear->m_iType = iType;
+			pSpear->Spawn();
+		}
+
+		return pSpear;
+	}
+
 }
