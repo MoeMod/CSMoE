@@ -26,8 +26,6 @@ GNU General Public License for more details.
 #include "studio.h"
 #include "gl_sprbat.h"
 
-extern triangleapi_t gTriApi;
-
 /*
 ==============================================================
 
@@ -60,6 +58,7 @@ static int boxpnt[6][4] =
 { 7, 6, 4, 5 }, // -Z
 };
 
+static float gTracerSize[11] = { 1.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 static rgb_t gTracerColors[] =
 {
 { 255, 255, 255 },		// White
@@ -98,6 +97,7 @@ convar_t		*tracerlength;
 convar_t		*traceroffset;
 
 particle_t	*cl_active_particles;
+particle_t	*cl_active_tracers;
 particle_t	*cl_free_particles;
 particle_t	*cl_particles = NULL;	// particle pool
 static vec3_t	cl_avelocities[NUMVERTEXNORMALS];
@@ -193,6 +193,7 @@ void CL_ClearParticles( void )
 
 	cl_free_particles = cl_particles;
 	cl_active_particles = NULL;
+	cl_active_tracers = NULL;
 
 	for( i = 0; i < GI->max_particles - 1; i++ )
 		cl_particles[i].next = &cl_particles[i+1];
@@ -276,119 +277,40 @@ particle_t *GAME_EXPORT CL_AllocParticle( void (*callback)( particle_t*, float )
 	return p;
 }
 
-static void CL_SparkTracerDraw( particle_t *p, float frametime )
+/*
+================
+CL_AllocTracer
+
+can return NULL if particles is out
+================
+*/
+particle_t *CL_AllocTracer( const vec3_t org, const vec3_t vel, float life )
 {
-	float	lifePerc = p->die - cl.time;
-	float	grav = frametime * clgame.movevars.gravity * 0.05f;
-	float	length, width;
-	int	alpha = 255;
-	vec3_t	delta;
+	particle_t	*p;
 
-	VectorScale( p->vel, p->ramp, delta );
-	length = VectorLength( delta );
-	width = ( length < TRACER_WIDTH ) ? length : TRACER_WIDTH;
-	if( lifePerc < 0.5f ) alpha = (lifePerc * 2) * 255;
+	// never alloc particles when we not in game
+	if( !CL_IsInGame( ) ) return NULL;
 
-	CL_DrawTracer( p->org, delta, width, clgame.palette[p->color], alpha, 0.0f, 0.8f );
-
-	p->vel[2] -= grav * 8; // use vox gravity
-	VectorMA( p->org, frametime, p->vel, p->org );
-}
-
-static void CL_TracerImplosion( particle_t *p, float frametime )
-{
-	float	lifePerc = p->die - cl.time;
-	float	length;
-	int	alpha = 255;
-	vec3_t	delta;
-
-	VectorScale( p->vel, p->ramp, delta );
-	length = VectorLength( delta );
-	if( lifePerc < 0.5f ) alpha = (lifePerc * 2) * 255;
-
-	CL_DrawTracer( p->org, delta, 1.5f, clgame.palette[p->color], alpha, 0.0f, 0.8f );
-
-	VectorMA( p->org, frametime, p->vel, p->org );
-}
-
-static void CL_BulletTracerDraw( particle_t *p, float frametime )
-{
-	vec3_t	lineDir, viewDir, cross;
-	vec3_t	vecEnd, vecStart, vecDir;
-	float	sDistance, eDistance, totalDist;
-	float	dDistance, dTotal, fOffset;
-	int	alpha = (int)(traceralpha->value * 255);
-	float	width = 3.0f, life, frac, length;
-	vec3_t	tmp;
-
-	// calculate distance
-	VectorCopy( p->vel, vecDir );
-	totalDist = vecDir.NormalizeInPlace();
-
-	length = p->ramp; // ramp used as length
-
-	// calculate fraction
-	life = ( totalDist + length ) / ( max( 1.0f, tracerspeed->value ));
-	frac = life - ( p->die - cl.time ) + frametime;
-
-	// calculate our distance along our path
-	sDistance = tracerspeed->value * frac;
-	eDistance = sDistance - length;
-	
-	// clip to start
-	sDistance = max( 0.0f, sDistance );
-	eDistance = max( 0.0f, eDistance );
-
-	if(( sDistance == 0.0f ) && ( eDistance == 0.0f ))
-		return;
-
-	// clip it
-	if( totalDist != 0.0f )
+	if( !cl_free_particles )
 	{
-		sDistance = min( sDistance, totalDist );
-		eDistance = min( eDistance, totalDist );
+		return NULL;
 	}
 
-	// get our delta to calculate the tc offset
-	dDistance	= fabs( sDistance - eDistance );
-	dTotal = ( length != 0.0f ) ? length : 0.01f;
-	fOffset = ( dDistance / dTotal );
+	p = cl_free_particles;
+	cl_free_particles = p->next;
+	p->next = cl_active_tracers;
+	cl_active_tracers = p;
 
-	// find our points along our path
-	VectorMA( p->org, sDistance, vecDir, vecEnd );
-	VectorMA( p->org, eDistance, vecDir, vecStart );
+	// clear old particle
+	p->type = pt_static;
+	VectorCopy( org, p->org );
+	VectorCopy( vel, p->vel );
+	p->die = cl.time + life;
+	p->ramp = tracerlength->value;
+	p->color = 4; // select custom color
+	p->packedColor = (int)(traceralpha->value * 255); // alpha
 
-	// setup our info for drawing the line
-	VectorSubtract( vecEnd, vecStart, lineDir );
-	VectorSubtract( vecEnd, RI.vieworg, viewDir );
-	
-	CrossProduct( lineDir, viewDir, cross );
-	VectorNormalize( cross );
-
-	GL_SetRenderMode( kRenderTransTexture );
-
-	GL_Bind( XASH_TEXTURE0, cls.particleImage );
-	gTriApi.Begin( TRI_QUADS );
-
-	gTriApi.Color4ub( clgame.palette[p->color][0], clgame.palette[p->color][1], clgame.palette[p->color][2], alpha );
-
-	VectorMA( vecStart, -width, cross, tmp );	
-	gTriApi.TexCoord2f( 1.0f, 0.0f );
-	gTriApi.Vertex3fv( tmp );
-
-	VectorMA( vecStart, width, cross, tmp );
-	gTriApi.TexCoord2f( 0.0f, 0.0f );
-	gTriApi.Vertex3fv( tmp);
-
-	VectorMA( vecEnd, width, cross, tmp );
-	gTriApi.TexCoord2f( 0.0f, fOffset );
-	gTriApi.Vertex3fv( tmp );
-
-	VectorMA( vecEnd, -width, cross, tmp );
-	gTriApi.TexCoord2f( 1.0f, fOffset );
-	gTriApi.Vertex3fv( tmp );
-
-	gTriApi.End();
+	return p;
 }
 
 /*
@@ -510,46 +432,24 @@ void CL_UpdateParticle( particle_t *p, float ft )
 	}
 }
 
-void CL_DrawParticles( void )
+static void CL_FreeDeadParticles( particle_t **ppparticles )
 {
 	particle_t	*p, *kill;
-	float		frametime;
-	static int	framecount = -1;
-
-	if( !cl_draw_particles->integer )
-		return;
-
-	// don't evaluate particles when executed many times
-	// at same frame e.g. mirror rendering
-	if( framecount != tr.realframecount )
-	{
-		frametime = cl.time - cl.oldtime;
-		framecount = tr.realframecount;
-	}
-	else frametime = 0.0f;
-
-	if( tracerred->modified || tracergreen->modified || tracerblue->modified )
-	{
-		gTracerColors[4][0] = (byte)(tracerred->value * 255);
-		gTracerColors[4][1] = (byte)(tracergreen->value * 255);
-		gTracerColors[4][2] = (byte)(tracerblue->value * 255);
-		tracerred->modified = tracergreen->modified = tracerblue->modified = false;
-	}
 
 	while( 1 ) 
 	{
 		// free time-expired particles
-		kill = cl_active_particles;
+		kill = *ppparticles;
 		if( kill && kill->die < cl.time )
 		{
-			cl_active_particles = kill->next;
+			*ppparticles = kill->next;
 			CL_FreeParticle( kill );
 			continue;
 		}
 		break;
 	}
 
-	for( p = cl_active_particles; p; p = p->next )
+	for( p = *ppparticles; p; p = p->next )
 	{
 		while( 1 )
 		{
@@ -562,7 +462,14 @@ void CL_DrawParticles( void )
 			}
 			break;
 		}
+	}
+}
 
+static void CL_DrawParticles( float frametime, particle_t **ppparticles )
+{
+	particle_t	*p;
+	for( p = *ppparticles; p; p = p->next )
+	{
 		CL_UpdateParticle( p, frametime );
 	}
 }
@@ -1229,68 +1136,39 @@ CL_BulletImpactParticles
 
 ===============
 */
-void GAME_EXPORT CL_BulletImpactParticles( const vec3_t org )
+void GAME_EXPORT CL_BulletImpactParticles( const vec3_t pos )
 {
+	int		i, quantity;
+	int		color;
+	float		dist;
+	vec3_t		dir;
 	particle_t	*p;
-	vec3_t		pos, dir;
-	float		vel;
-	int		i, j;
 
-	// do sparks
-	// randomize position
-	pos[0] = org[0] + Com_RandomFloat( -2.0f, 2.0f );
-	pos[1] = org[1] + Com_RandomFloat( -2.0f, 2.0f );
-	pos[2] = org[2] + Com_RandomFloat( -2.0f, 2.0f );
+	VectorSubtract( pos, RI.vieworg, dir );
+	dist = VectorLength( dir );
+	if( dist > 1000.0f ) dist = 1000.0f;
 
-	// create a 8 random spakle tracers
-	for( i = 0; i < 8; i++ )
+	quantity = (1000.0f - dist) / 100.0f;
+	if( quantity == 0 ) quantity = 1;
+
+	color = 3 - ((30 * quantity) / 100 );
+	CL_SparkStreaks( pos, 2, -200, 200 );
+
+	for( i = 0; i < quantity * 4; i++ )
 	{
-		dir[0] = Com_RandomFloat( -1.0f, 1.0f );
-		dir[1] = Com_RandomFloat( -1.0f, 1.0f );
-		dir[2] = Com_RandomFloat( -1.0f, 1.0f );
-		vel = Com_RandomFloat( SPARK_ELECTRIC_MINSPEED, SPARK_ELECTRIC_MAXSPEED );
+		p = CL_AllocParticle( NULL );
+		if( !p ) return;
 
-		CL_SparkleTracer( pos, dir, vel );
-	}
+		VectorCopy( pos, p->org);
 
-	if (r_oldparticles->integer == 1)
-	{ 
-		for (i = 0; i < 12; i++)
-		{
-			int greyColors;
-			p = CL_AllocParticle(NULL);
-			if (!p) return;
+		p->vel[0] = Com_RandomFloat( -1.0f, 1.0f );
+		p->vel[1] = Com_RandomFloat( -1.0f, 1.0f );
+		p->vel[2] = Com_RandomFloat( -1.0f, 1.0f );
+		VectorScale( p->vel, Com_RandomFloat( 50.0f, 100.0f ), p->vel );
 
-			p->die += 1.0f;
-			// Randomly make each particle one of three colors: dark grey, medium grey or light grey.
-			greyColors = (rand() % 3 + 1) * 32;
-			p->color = CL_LookupColor(greyColors, greyColors, greyColors);
-
-			p->type = pt_grav;
-			for (j = 0; j < 3; j++)
-			{
-				p->org[j] = org[j] + Com_RandomFloat(-2.0f, 3.0f);
-				p->vel[j] = Com_RandomFloat(-70.0f, 70.0f);
-			}
-		}
-	}
-	else
-	{
-		for (i = 0; i < 12; i++)
-		{
-			p = CL_AllocParticle(NULL);
-			if (!p) return;
-
-			p->die += 1.0f;
-			p->color = 0; // black
-
-			p->type = pt_grav;
-			for (j = 0; j < 3; j++)
-			{
-				p->org[j] = org[j] + Com_RandomFloat(-2.0f, 3.0f);
-				p->vel[j] = Com_RandomFloat(-70.0f, 70.0f);
-			}
-		}
+		p->die = cl.time + 0.5;
+		p->color = 3 - color;
+		p->type = pt_grav;
 	}
 }
 
@@ -1316,6 +1194,34 @@ void GAME_EXPORT CL_FlickerParticles( const vec3_t org )
 		for( j = 0; j < 3; j++ )
 			p->org[j] = org[j] + Com_RandomFloat( -32.0f, 32.0f );
 		p->vel[2] = Com_RandomFloat( 64.0f, 100.0f );
+	}
+}
+
+/*
+===============
+CL_StreakSplash
+
+create a splash of streaks
+===============
+*/
+void GAME_EXPORT CL_StreakSplash( const vec3_t pos, const vec3_t dir, int color, int count, float speed, int velocityMin, int velocityMax )
+{
+	particle_t	*p;
+	int		i;
+
+	for( i = 0; i < count; i++ )
+	{
+		vec3_t	vel;
+		vel[0] = (dir[0] * speed) + Com_RandomFloat( velocityMin, velocityMax );
+		vel[1] = (dir[1] * speed) + Com_RandomFloat( velocityMin, velocityMax );
+		vel[2] = (dir[2] * speed) + Com_RandomFloat( velocityMin, velocityMax );
+
+		p = CL_AllocTracer( pos, vel, Com_RandomFloat( 0.1f, 0.5f ));
+		if( !p ) return;
+
+		p->type = pt_grav;
+		p->color = color;
+		p->ramp = 1.0f;
 	}
 }
 
@@ -1352,7 +1258,7 @@ CL_CullTracer
 check tracer bbox
 ================
 */
-static qboolean CL_CullTracer( const vec3_t start, const vec3_t end )
+static qboolean CL_CullTracer( particle_t *p, const vec3_t start, const vec3_t end )
 {
 	vec3_t	mins, maxs;
 	int	i;
@@ -1374,123 +1280,12 @@ static qboolean CL_CullTracer( const vec3_t start, const vec3_t end )
 		// don't let it be zero sized
 		if( mins[i] == maxs[i] )
 		{
-			maxs[i] += 1.0f;
+			maxs[i] += gTracerSize[p->type] * 2.0f;
 		}
 	}
 
 	// check bbox
 	return R_CullBox( mins, maxs, RI.clipFlags );
-}
-
-
-/*
-================
-CL_DrawTracer
-
-draws a single tracer
-================
-*/
-void CL_DrawTracer( vec3_t start, vec3_t delta, float width, rgb_t color, int alpha, float startV, float endV )
-{
-	// Clip the tracer
-	vec3_t	verts[4];
-
-    vec3_t	end, screenStart, screenEnd;
-    vec3_t	screenNormal, normal;
-
-    VectorAdd( start, delta, end );
-
-    // clip the tracer
-    if( CL_CullTracer( start, end ))
-        return;
-
-    // transform point into the screen space
-    TriWorldToScreen( start, screenStart );
-    TriWorldToScreen( end, screenEnd );
-    VectorSubtract( screenStart, screenEnd, screenNormal );
-    screenNormal[2] = 0; // we don't need Z, we're in screen space
-    VectorNormalize( screenNormal );
-
-    // build point along noraml line (normal is -y, x)
-    normal = RI.vup * screenNormal[0] + RI.vright * screenNormal[1];
-
-	// NOTE: Gotta get the winding right so it's not backface culled
-	// (we need to turn of backface culling for these bad boys)
-
-	GL_SetRenderMode( kRenderTransAdd );
-
-	gTriApi.Color4ub( color[0], color[1], color[2], alpha );
-
-	GL_Bind( XASH_TEXTURE0, cls.particleImage );
-	gTriApi.Begin( TRI_QUADS );
-
-	gTriApi.TexCoord2f( 0.0f, endV );
-	gTriApi.Vertex3fv( start - normal * width + delta );
-
-	gTriApi.TexCoord2f( 1.0f, endV );
-	gTriApi.Vertex3fv( start + normal * width + delta );
-
-	gTriApi.TexCoord2f( 1.0f, startV );
-	gTriApi.Vertex3fv( start + normal * width );
-
-	gTriApi.TexCoord2f( 0.0f, startV );
-	gTriApi.Vertex3fv( start - normal * width );
-
-	gTriApi.End();
-}
-
-/*
-===============
-CL_SparkleTracer
-
-===============
-*/
-void CL_SparkleTracer( const vec3_t pos, const vec3_t dir, float vel )
-{
-	particle_t	*p;
-	byte		*color;
-
-	p = CL_AllocParticle( CL_SparkTracerDraw );
-	if( !p ) return;
-
-	color = gTracerColors[5];	// Yellow-Orange
-	VectorCopy( pos, p->org );
-	p->die += Com_RandomFloat( 0.45f, 0.7f );
-	p->color = CL_LookupColor( color[0], color[1], color[2] );
-	p->ramp = Com_RandomFloat( 0.07f, 0.08f );	// ramp used as tracer length
-	p->type = pt_tracer;
-	VectorScale( dir, vel, p->vel );
-}
-
-/*
-===============
-CL_StreakTracer
-
-===============
-*/
-void CL_StreakTracer( const vec3_t pos, const vec3_t velocity, int colorIndex )
-{
-	particle_t	*p;
-	byte		*color;
-
-	p = CL_AllocParticle( CL_SparkTracerDraw );
-	if( !p ) return;
-
-	if( colorIndex > ( sizeof( gTracerColors ) / sizeof( gTracerColors[0] )))
-	{
-		p->color = bound( 0, colorIndex, 255 );
-	}
-	else
-	{ 
-		color = gTracerColors[colorIndex];
-		p->color = CL_LookupColor( color[0], color[1], color[2] );
-	}
-
-	p->die += Com_RandomFloat( 0.5f, 1.0f );
-	VectorCopy( velocity, p->vel );
-	VectorCopy( pos, p->org );
-	p->ramp = Com_RandomFloat( 0.05f, 0.08f );
-	p->type = pt_tracer;
 }
 
 /*
@@ -1501,32 +1296,23 @@ CL_TracerEffect
 */
 void GAME_EXPORT CL_TracerEffect( const vec3_t start, const vec3_t end )
 {
-	particle_t	*p;
-	byte		*color;
-	vec3_t		dir;
-	float		life, dist;
+	vec3_t	pos, vel, dir;
+	float	len, speed;
+	float	offset;
 
-	p = CL_AllocParticle( CL_BulletTracerDraw );
-	if( !p ) return;
+	speed = max( tracerspeed->value, 3.0f );
 
-	// get out shot direction and length
 	VectorSubtract( end, start, dir );
-	VectorCopy( dir, p->vel );
+	len = VectorLength( dir );
+	if( len == 0.0f ) return;
 
-	dist = dir.NormalizeInPlace();
+	VectorScale( dir, 1.0f / len, dir ); // normalize
+	offset = Com_RandomFloat( -10.0f, 9.0f ) + traceroffset->value;
+	VectorScale( dir, offset, vel );
+	VectorAdd( start, vel, pos );
+	VectorScale( dir, speed, vel );
 
-	// don't make small tracers
-	if( dist <= traceroffset->value )
-		return;
-
-	p->ramp = Com_RandomFloat( 200.0f, 256.0f ) * tracerlength->value;
-
-	color = gTracerColors[4];
-	life = ( dist + p->ramp ) / ( max( 1.0f, tracerspeed->value ));
-	p->color = CL_LookupColor( color[0], color[1], color[2] );
-	VectorCopy( start, p->org );
-	p->type = pt_tracer;
-	p->die += life;
+	CL_AllocTracer( pos, vel, len / speed );
 }
 
 /*
@@ -1537,29 +1323,18 @@ CL_UserTracerParticle
 */
 void GAME_EXPORT CL_UserTracerParticle(const vec3_t org, const vec3_t vel, float life, int colorIndex, float length, byte deathcontext, void (*deathfunc)(particle_t* p))
 {
-	particle_t* p;
-	byte* color;
+	particle_t	*p;
 
-	p = CL_AllocParticle(CL_BulletTracerDraw);
-	if (!p) return;
+	if( colorIndex < 0 )
+		return;
 
-	if (colorIndex > (sizeof(gTracerColors) / sizeof(gTracerColors[0])))
+	if(( p = CL_AllocTracer( org, vel, life )) != NULL )
 	{
-		p->color = bound(0, colorIndex, 255);
+		p->context = deathcontext;
+		p->deathfunc = deathfunc;
+		p->color = colorIndex;
+		p->ramp = length;
 	}
-	else
-	{
-		color = gTracerColors[colorIndex];
-		p->color = CL_LookupColor(color[0], color[1], color[2]);
-	}
-
-	VectorCopy(org, p->org);
-	VectorCopy(vel, p->vel);
-	p->ramp = length; // ramp used as length
-	p->context = deathcontext;
-	p->deathfunc = deathfunc;
-	p->type = pt_tracer;
-	p->die += life;
 }
 
 /*
@@ -1571,22 +1346,7 @@ allow more customization
 */
 particle_t *GAME_EXPORT CL_TracerParticles( const vec3_t org, const vec3_t vel, float life )
 {
-	particle_t	*p;
-	byte		*color;
-
-	p = CL_AllocParticle( CL_BulletTracerDraw );
-	if( !p ) return NULL;
-
-	p->ramp = Com_RandomFloat( 200.0f, 256.0f ) * tracerlength->value;
-
-	color = gTracerColors[4];
-	p->color = CL_LookupColor( color[0], color[1], color[2] );
-	VectorCopy( org, p->org );
-	VectorCopy( vel, p->vel );
-	p->type = pt_tracer;
-	p->die += life;
-
-	return p;
+	return CL_AllocTracer( org, vel, life );
 }
 
 /*
@@ -1596,30 +1356,49 @@ CL_SparkShower
 Creates 8 random tracers
 ===============
 */
-void GAME_EXPORT CL_SparkShower( const vec3_t org )
+void GAME_EXPORT CL_SparkShower( const vec3_t pos )
 {
-	vec3_t	pos, dir;
-	model_t	*pmodel;
-	float	vel;
-	int	i;
+	TEMPENTITY	*pTemp;
 
-	// randomize position
-	pos[0] = org[0] + Com_RandomFloat( -2.0f, 2.0f );
-	pos[1] = org[1] + Com_RandomFloat( -2.0f, 2.0f );
-	pos[2] = org[2] + Com_RandomFloat( -2.0f, 2.0f );
+	pTemp = CL_TempEntAllocNoModel( pos );
+	if( !pTemp ) return;
 
-	pmodel = Mod_Handle( CL_FindModelIndex( "sprites/richo1.spr" ));
-	CL_RicochetSprite( pos, pmodel, 0.0f, Com_RandomFloat( 0.4, 0.6f ));
+	pTemp->entity.baseline.origin[0] = Com_RandomFloat( -300.0f, 300.0f );
+	pTemp->entity.baseline.origin[1] = Com_RandomFloat( -300.0f, 300.0f );
+	pTemp->entity.baseline.origin[2] = Com_RandomFloat( -200.0f, 200.0f );
 
-	// create a 8 random spakle tracers
-	for( i = 0; i < 8; i++ )
+	pTemp->flags |= FTENT_SLOWGRAVITY | FTENT_COLLIDEWORLD | FTENT_SPARKSHOWER;
+
+	pTemp->entity.curstate.framerate = Com_RandomFloat( 0.5f, 1.5f );
+	pTemp->entity.curstate.scale = cl.time;
+	pTemp->die = cl.time + 0.5;
+}
+
+/*
+===============
+CL_SparkStreaks
+
+Create a sparks like streaks
+===============
+*/
+void GAME_EXPORT CL_SparkStreaks( const vec3_t pos, int count, int velocityMin, int velocityMax )
+{
+	particle_t	*p;
+	vec3_t		vel;
+	int		i;
+
+	for( i = 0; i<count; i++ )
 	{
-		dir[0] = Com_RandomFloat( -1.0f, 1.0f );
-		dir[1] = Com_RandomFloat( -1.0f, 1.0f );
-		dir[2] = Com_RandomFloat( -1.0f, 1.0f );
-		vel = Com_RandomFloat( SPARK_ELECTRIC_MINSPEED, SPARK_ELECTRIC_MAXSPEED );
+		vel[0] = Com_RandomFloat( velocityMin, velocityMax );
+		vel[1] = Com_RandomFloat( velocityMin, velocityMax );
+		vel[2] = Com_RandomFloat( velocityMin, velocityMax );
 
-		CL_SparkleTracer( pos, dir, vel );
+		p = CL_AllocTracer( pos, vel, Com_RandomFloat( 0.1f, 0.5f ));
+		if( !p ) return;
+
+		p->color = 5;
+		p->type = pt_grav;
+		p->ramp = 0.5f;
 	}
 }
 
@@ -1631,41 +1410,166 @@ CL_Implosion
 */
 void GAME_EXPORT CL_Implosion( const vec3_t end, float radius, int count, float life )
 {
+	float		dist = ( radius / 100.0f );
+	vec3_t		start, temp, vel;
+	float		factor;
 	particle_t	*p;
-	float		vel, radius2;
-	vec3_t		dir, m_vecPos;
-	int		i, colorIndex;
+	int		i;
 
-	colorIndex = CL_LookupColor( gTracerColors[5][0], gTracerColors[5][1], gTracerColors[5][2] );
+	if( life <= 0.0f ) life = 0.1f; // to avoid divide by zero
+	factor = -1.0 / life;
 
-	for( i = 0; i < count; i++ )
+	for ( i = 0; i < count; i++ )
 	{
-		p = CL_AllocParticle( CL_TracerImplosion );
-		if( !p ) return;
+		temp[0] = dist * Com_RandomFloat( -100.0f, 100.0f );
+		temp[1] = dist * Com_RandomFloat( -100.0f, 100.0f );
+		temp[2] = dist * Com_RandomFloat( 0.0f, 100.0f );
+		VectorScale( temp, factor, vel );
+		VectorAdd( temp, end, start );
 
-		dir[0] = Com_RandomFloat( -1.0f, 1.0f );
-		dir[1] = Com_RandomFloat( -1.0f, 1.0f );
-		dir[2] = Com_RandomFloat( -1.0f, 1.0f );
+		if(( p = CL_AllocTracer( start, vel, life )) == NULL )
+			return;
 
-		radius2 = Com_RandomFloat( radius * 0.9f, radius * 1.1f );
-
-		VectorNormalize( dir );
-		VectorMA( end, -radius2, dir, m_vecPos );
-
-		// velocity based on how far particle has to travel away from org
-		if( life ) vel = (radius2 / life);
-		else vel = Com_RandomFloat( radius2 * 0.5f, radius2 * 1.5f );
-
-		VectorCopy( m_vecPos, p->org );
-		p->color = colorIndex;
-		p->ramp = (vel / radius2) * 0.1f; // length based on velocity
-		p->ramp = bound( 0.1f, p->ramp, 1.0f );
-		p->type = pt_tracer;
-		VectorScale( dir, vel, p->vel );
-
-		// die right when you get there
-		p->die += ( life != 0.0f ) ? life : ( radius2 / vel );
+		p->type = pt_explode;
 	}
+}
+
+static void CL_DrawTracers( float frametime, particle_t **ppparticles )
+{
+	if( !cl_draw_particles->integer )
+		return;
+
+	float		scale, atten, gravity;
+	vec3_t		screenLast, screen;
+	vec3_t		start, end, delta;
+	particle_t	*p;
+
+	// update tracer color if this is changed
+	if( tracerred->modified || tracergreen->modified || tracerblue->modified )
+	{
+		gTracerColors[4][0] = (byte)(tracerred->value * 255);
+		gTracerColors[4][1] = (byte)(tracergreen->value * 255);
+		gTracerColors[4][2] = (byte)(tracerblue->value * 255);
+		tracerred->modified = tracergreen->modified = tracerblue->modified = false;
+	}
+
+	if( !cl_active_tracers )
+		return;	// nothing to draw?
+
+	GL_Bind( XASH_TEXTURE0, cls.particleImage );
+
+	GL_SetRenderMode( kRenderTransAdd );
+	pglDepthMask( GL_FALSE );
+
+	gravity = frametime * clgame.movevars.gravity;
+	scale = 1.0 - (frametime * 0.9);
+	if( scale < 0.0f ) scale = 0.0f;
+
+	TriBegin( TRI_QUADS );
+
+	for( p = cl_active_tracers; p; p = p->next )
+	{
+		atten = (p->die - cl.time);
+		if( atten > 0.1f ) atten = 0.1f;
+
+		VectorScale( p->vel, ( p->ramp * atten ), delta );
+		VectorAdd( p->org, delta, end );
+		VectorCopy( p->org, start );
+
+		if( !CL_CullTracer( p, start, end ))
+		{
+			vec3_t	verts[4], tmp2;
+			vec3_t	tmp, normal;
+
+			// Transform point into screen space
+			TriWorldToScreen( start, screen );
+			TriWorldToScreen( end, screenLast );
+
+			// build world-space normal to screen-space direction vector
+			VectorSubtract( screen, screenLast, tmp );
+
+			// we don't need Z, we're in screen space
+			tmp[2] = 0;
+			VectorNormalize( tmp );
+
+			// build point along noraml line (normal is -y, x)
+			VectorScale( RI.cull_vup, tmp[0] * gTracerSize[p->type], normal );
+			VectorScale( RI.cull_vright, -tmp[1] * gTracerSize[p->type], tmp2 );
+			VectorSubtract( normal, tmp2, normal );
+
+			// compute four vertexes
+			VectorSubtract( start, normal, verts[0] );
+			VectorAdd( start, normal, verts[1] );
+			VectorAdd( verts[0], delta, verts[2] );
+			VectorAdd( verts[1], delta, verts[3] );
+
+			int colorIndex = 0;
+			if( ( p->color > ( sizeof( gTracerColors ) / sizeof( gTracerColors[0] ))) )
+			{
+				colorIndex = bound( 0, p->color, 255 );
+			}
+			else
+			{
+				byte *color = gTracerColors[p->color];
+				colorIndex = CL_LookupColor( color[0], color[1], color[2] );
+			}
+
+			TriColor4ub( clgame.palette[colorIndex][0], clgame.palette[colorIndex][1], clgame.palette[colorIndex][2], p->packedColor );
+
+			TriTexCoord2f( 0.0f, 0.8f );
+			TriVertex3fv( verts[2] );
+			TriTexCoord2f( 1.0f, 0.8f );
+			TriVertex3fv( verts[3] );
+			TriTexCoord2f( 1.0f, 0.0f );
+			TriVertex3fv( verts[1] );
+			TriTexCoord2f( 0.0f, 0.0f );
+			TriVertex3fv( verts[0] );
+		}
+
+		// evaluate position
+		VectorMA( p->org, frametime, p->vel, p->org );
+
+		if( p->type == pt_grav )
+		{
+			p->vel[0] *= scale;
+			p->vel[1] *= scale;
+			p->vel[2] -= gravity;
+
+			p->packedColor = 255 * (p->die - cl.time) * 2;
+			if( p->packedColor > 255 ) p->packedColor = 255;
+		}
+		else if( p->type == pt_slowgrav )
+		{
+			p->vel[2] = gravity * 0.05f;
+		}
+	}
+	TriEnd();
+
+	pglDepthMask( GL_TRUE );
+}
+
+void CL_DrawParticles( void )
+{
+	float		frametime;
+	static int	framecount = -1;
+
+	if( !cl_draw_particles->integer )
+		return;
+
+	// don't evaluate particles when executed many times
+	// at same frame e.g. mirror rendering
+	if( framecount != tr.realframecount )
+	{
+		frametime = cl.time - cl.oldtime;
+		framecount = tr.realframecount;
+	}
+	else frametime = 0.0f;
+
+	CL_FreeDeadParticles( &cl_active_particles );
+	CL_FreeDeadParticles( &cl_active_particles );
+
+	CL_DrawParticles( frametime, &cl_active_particles );
+	CL_DrawTracers( frametime, &cl_active_particles );
 }
 
 /*

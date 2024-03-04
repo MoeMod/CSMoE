@@ -20,7 +20,6 @@ GNU General Public License for more details.
 #define SPARK_ELECTRIC_MAXSPEED	100.0f
 
 // EfxAPI
-void CL_DrawTracer( vec3_t start, vec3_t delta, float width, rgb_t color, int alpha, float startV, float endV );
 struct particle_s *CL_AllocParticle( void (*callback)( struct particle_s*, float ));
 void CL_Explosion( const vec3_t pos, int model, float scale, float framerate, int flags );
 void CL_ParticleExplosion( const vec3_t org );

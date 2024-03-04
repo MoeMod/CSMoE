@@ -2188,88 +2188,9 @@ Create a custom sparkle effect
 */
 void GAME_EXPORT CL_SparkEffect( const vec3_t pos, int count, int velocityMin, int velocityMax )
 {
-	vec3_t	m_vecDir;
-	model_t	*pmodel;
-	float	vel;
-	int	i;
-
-	pmodel = Mod_Handle( CL_FindModelIndex( "sprites/richo1.spr" ));
+	model_t	*pmodel = Mod_Handle( CL_FindModelIndex( "sprites/richo1.spr" ));
 	CL_RicochetSprite( pos, pmodel, 0.0f, Com_RandomFloat( 0.4f, 0.6f ));
-
-	for( i = 0; i < Com_RandomLong( 1, count ); i++ )
-	{
-		m_vecDir[0] = Com_RandomFloat( velocityMin, velocityMax );
-		m_vecDir[1] = Com_RandomFloat( velocityMin, velocityMax );
-		m_vecDir[2] = Com_RandomFloat( velocityMin, velocityMax );
-		vel = m_vecDir.NormalizeInPlace();
-
-		CL_SparkleTracer( pos, m_vecDir, vel );
-	}
-}
-
-/*
-===============
-CL_StreakSplash
-
-Create a streak tracers
-===============
-*/
-void GAME_EXPORT CL_StreakSplash( const vec3_t pos, const vec3_t dir, int color, int count, float speed, int velMin, int velMax )
-{
-	int	i;
-
-	for( i = 0; i < count; i++ )
-	{
-		vec3_t	vel;
-
-		vel[0] = (dir[0] * speed) + Com_RandomFloat( velMin, velMax );
-		vel[1] = (dir[1] * speed) + Com_RandomFloat( velMin, velMax );
-		vel[2] = (dir[2] * speed) + Com_RandomFloat( velMin, velMax );
-
-		CL_StreakTracer( pos, vel, color );
-	}
-}
-
-/*
-===============
-CL_StreakSplash
-
-Create a sparks like streaks
-===============
-*/
-void GAME_EXPORT CL_SparkStreaks( const vec3_t pos, int count, int velocityMin, int velocityMax )
-{
-	particle_t	*p;
-	float		speed;
-	int		i, j;
-
-	for( i = 0; i < count; i++ )
-	{
-		vec3_t	vel;
-
-		vel[0] = Com_RandomFloat( velocityMin, velocityMax );
-		vel[1] = Com_RandomFloat( velocityMin, velocityMax );
-		vel[2] = Com_RandomFloat( velocityMin, velocityMax );
-		speed = vel.NormalizeInPlace();
-
-		CL_SparkleTracer( pos, vel, speed );
-	}
-
-	for( i = 0; i < 12; i++ )
-	{
-		p = CL_AllocParticle( NULL );
-		if( !p ) return;
-
-		p->die += 1.0f;
-		p->color = 0; // black
-
-		p->type = pt_grav;
-		for( j = 0; j < 3; j++ )
-		{
-			p->org[j] = pos[j] + Com_RandomFloat( -2.0f, 3.0f );
-			p->vel[j] = Com_RandomFloat( velocityMin, velocityMax );
-		}
-	}
+	CL_SparkStreaks( pos, count, velocityMin, velocityMax );
 }
 
 /*
@@ -2501,7 +2422,7 @@ void TempParticleCallBack(TEMPENTITY* ent, float frametime, float currenttime)
 	if (appearTime > cl.time || !appearTime)
 		return;
 
-	if (emitPos <= 0 && emitCount != -1)	//-1 拖尾，跟随实体引爆消失TODO, > 0释放若干个，礼花发射器 或 地上的火焰跟随attachment
+	if (emitPos <= 0 && emitCount != -1)	//-1 锟斤拷尾锟斤拷锟斤拷锟斤拷实锟斤拷锟斤拷锟斤拷锟斤拷失TODO, > 0锟酵凤拷锟斤拷锟缴革拷锟斤拷锟今花凤拷锟斤拷锟斤拷 锟斤拷 锟斤拷锟较的伙拷锟斤拷锟斤拷锟絘ttachment
 		return;
 
 	if (emitPos > 0)
@@ -2559,7 +2480,7 @@ void TempParticleCallBack(TEMPENTITY* ent, float frametime, float currenttime)
 
 	if (emitCount != emitPos && emitCount > 0)
 	{
-		//保证子实体不再产生新的，礼花发射器，保证子实体全是母实体生成
+		//锟斤拷证锟斤拷实锟藉不锟劫诧拷锟斤拷锟铰的ｏ拷锟今花凤拷锟斤拷锟斤拷锟斤拷锟斤拷证锟斤拷实锟斤拷全锟斤拷母实锟斤拷锟斤拷锟斤拷
 		emitPos = 0;
 	}
 
