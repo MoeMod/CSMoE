@@ -1814,6 +1814,7 @@ struct vbo_static_s
     vbovertex_t decal_dlight[MAX_RENDER_DECALS * DECAL_VERTS_MAX];
     unsigned int decal_dlight_vbo;
     int decal_numverts[MAX_RENDER_DECALS * DECAL_VERTS_MAX];
+	vbovertex_t decal_dynamic[MAX_RENDER_DECALS * DECAL_VERTS_MAX];
     unsigned int decal_dynamic_vbo;
 
     // prevent draining cpu on empty cycles
@@ -2222,31 +2223,6 @@ struct multitexturestate_s
 
 /*
 ==============
-R_SetDecalMode
-
-When drawing decal, disable or restore bump and details
-set tmu to lightmap when enabled
-==============
-*/
-static void R_SetDecalMode( qboolean enable )
-{
-    // order is important to correctly rearrange TMUs
-    if( enable )
-    {
-        // disable detail texture if enabled
-        // TODO : State &= !SWITCH_DETAIL;
-    }
-    else
-    {
-        // TODO : State |= SWITCH_DETAIL;
-        //pglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-        //pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t, dt_tc ) );
-    }
-
-}
-
-/*
-==============
 R_SetupVBOTexture
 
 setup multitexture mode before drawing VBOs
@@ -2285,7 +2261,6 @@ R_DrawLightmappedVBO
 Draw array for given vbotexture_t. build and draw dynamic lightmaps if present
 =====================
 */
-#if 0 // TODO : dlight support
 static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture_t *texture, int lightmap, qboolean skiplighting )
 {
     //Msg( "%d %d %d\n", vbo->array_len, vbotex->len, lightmap );
@@ -2305,10 +2280,6 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
         if( host.features & ENGINE_LARGE_LIGHTMAPS )
             GL_Bind( mtst.tmu_lm, tr.dlightTexture2 );
         else GL_Bind( mtst.tmu_lm, tr.dlightTexture );
-
-        // replace lightmap texcoord array by dlight array
-        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dlight_vbo );
-        pglTexCoordPointer( 2, GL_FLOAT, sizeof( vec2_t ), 0 );
 
         // clear the block
         LM_InitBlock();
@@ -2337,17 +2308,33 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
             }
             else
             {
+	            // replace lightmap texcoord array by dlight array
+	            pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dlight_vbo );
+	            pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof( vec2_t ), 0);
+
+	            pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
+	            pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+	            pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+	            pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+	            pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
+	            R_SetupVBOTexture( texture, 0 );
+
+	            int Switch = (mtst.lightmap_enabled ? 0x08 : 0) | (mtst.details_enabled ? 0x04 : 0) | (RI.fogEnabled ? 0x02 : 0); // SWITCH_LIGHTMAP | SWITCH_DETAIL | SWITCH_FOG
+	            pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
+
                 // out of free block space. Draw all generated index array and clear it
                 // upload already generated block
                 LM_UploadDynamicBlock();
                 pglDrawRangeElements( GL_TRIANGLES, 0, vbo->array_len, dlightindex, GL_UNSIGNED_SHORT, dlightarray );
 
-#if 0 // TODO : decal
                 // draw decals that lighted with this lightmap
                 if( decalcount )
                 {
                     msurface_t *decalsurf;
                     int decali = 0;
+
+	                int Switch = (mtst.lightmap_enabled ? 0x08 : 0) | (RI.fogEnabled ? 0x02 : 0) | (0x01); // SWITCH_LIGHTMAP | SWITCH_FOG | SWITCH_DECAL
+                    pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
 
                     pglDepthMask( GL_FALSE );
                     pglEnable( GL_BLEND );
@@ -2355,12 +2342,13 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
                     //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
                     //    pglDisable( GL_ALPHA_TEST );
                     pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decal_dlight_vbo );
-                    R_SetDecalMode( true );
 
-                    pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, lm_tc ) );
-                    GL_SelectTexture( mtst.tmu_gl );
-                    pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, gl_tc ) );
-                    pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, pos ) );
+	                // prepare for decal draw
+	                pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+	                pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+	                pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
+	                pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+	                pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
 
                     for( decalsurf = newsurf; ( decali < decalcount ) && ( decalsurf != surf ); decalsurf = decalsurf->lightmapchain )
                     {
@@ -2405,19 +2393,11 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
                     pglDisable( GL_POLYGON_OFFSET_FILL );
                     //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
                     //    pglEnable( GL_ALPHA_TEST );
-                    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dlight_vbo );
-                    R_SetDecalMode( false );
-                    GL_SelectTexture( mtst.tmu_lm );
-                    pglTexCoordPointer( 2, GL_FLOAT, sizeof( vec2_t ), 0 );
-
-                    pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
-                    pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t,pos) );
                     R_SetupVBOTexture( texture, 0 );
-                    pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t, gl_tc ) );
 
                     decalcount = 0;
                 }
-#endif
+
                 // clear the block
                 LM_InitBlock();
                 dlightindex = 0;
@@ -2468,6 +2448,8 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
                         vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc = v[i].s1t1;
                         vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc = v[i].s2t2 -
                                                                                     vec2_t( ( surf->light_s - info->dlight_s ), ( surf->light_t - info->dlight_t ) ) * ( 1.0f / (float)BLOCK_SIZE );
+	                    vbos.decal_dlight[decalcount * DECAL_VERTS_CUT + i].dt_tc = {};
+	                    vbos.decal_dlight[decalcount * DECAL_VERTS_CUT + i].color = { 1, 1, 1, 1 };
                     }
                 }
                 else
@@ -2475,10 +2457,12 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
                     // copy from vbo
                     for( i = 0; i < numVerts; i++ )
                     {
-                        VectorCopy( vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].pos, vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].pos );
+	                    vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].pos = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].pos;
                         vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].gl_tc = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].gl_tc;
                         vbos.decal_dlight[decalcount * DECAL_VERTS_MAX + i].lm_tc = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].lm_tc -
                                                                                     vec2_t ( ( surf->light_s - info->dlight_s ), ( surf->light_t - info->dlight_t ) ) * ( 1.0f / (float)BLOCK_SIZE );
+	                    vbos.decal_dlight[decalcount * DECAL_VERTS_CUT + i].dt_tc = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].dt_tc;
+	                    vbos.decal_dlight[decalcount * DECAL_VERTS_CUT + i].color = vbos.decaldata->decalarray[decalindex * DECAL_VERTS_CUT + i].color;
                     }
                 }
 
@@ -2496,6 +2480,19 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
             // update block
             LM_UploadDynamicBlock();
 
+	        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dlight_vbo );
+	        pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof( vec2_t ), 0);
+
+	        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
+	        pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+	        pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+	        pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+	        pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
+	        R_SetupVBOTexture( texture, 0 );
+
+	        int Switch = (mtst.lightmap_enabled ? 0x08 : 0) | (mtst.details_enabled ? 0x04 : 0) | (RI.fogEnabled ? 0x02 : 0); // SWITCH_LIGHTMAP | SWITCH_DETAIL | SWITCH_FOG
+	        pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
+
             // draw remaining array
             pglDrawRangeElements( GL_TRIANGLES, 0, vbo->array_len, dlightindex, GL_UNSIGNED_SHORT, dlightarray );
 
@@ -2511,12 +2508,15 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
                 //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
                 //    pglDisable( GL_ALPHA_TEST );
                 pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decal_dlight_vbo );
-                R_SetDecalMode( true );
 
-                pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, lm_tc ) );
-                GL_SelectTexture( mtst.tmu_gl );
-                pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, gl_tc ) );
-                pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (const GLvoid*)offsetof( vbovertex_t, pos ) );
+	            int Switch = (mtst.lightmap_enabled ? 0x08 : 0) | (RI.fogEnabled ? 0x02 : 0) | (0x01); // SWITCH_LIGHTMAP | SWITCH_FOG | SWITCH_DECAL
+                pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
+
+                pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+                pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+                pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
+                pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+                pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
 
                 for( decalsurf = newsurf; decali < decalcount && decalsurf; decalsurf = decalsurf->lightmapchain )
                 {
@@ -2563,24 +2563,17 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
                 pglDisable( GL_POLYGON_OFFSET_FILL );
                 //if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
                 //    pglEnable( GL_ALPHA_TEST );
-                pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
-                R_SetDecalMode( false );
-                pglVertexPointer( 3, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t,pos) );
                 R_SetupVBOTexture( texture, 0 );
-                pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t, gl_tc ) );
             }
         }
 
         // restore static lightmap
-        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbo->glindex );
         GL_Bind( mtst.tmu_lm, tr.lightmapTextures[lightmap] );
-        pglTexCoordPointer( 2, GL_FLOAT, sizeof( vbovertex_t ), (void*)offsetof(vbovertex_t, lm_tc ) );
 
         // prepare to next frame
         vbotex->dlightchain = NULL;
     }
 }
-#endif
 
 /*
 =====================
@@ -2619,6 +2612,7 @@ void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
     else
         pglUniform4fARB(g_BspShader.uniform.RenderColor, 1, 1, 1, 1);
     pglUniform4fARB(g_BspShader.uniform.FogParam, 0, RI.fogDensity, RI.fogStart, RI.fogEnd);
+    pglUniform4fARB(g_BspShader.uniform.FilterParam, 0, 1, 1, 1);
     pglUniform1iARB(g_BspShader.uniform.TexDiffusemap, mtst.tmu_gl);
     pglUniform1iARB(g_BspShader.uniform.TexLightmap, mtst.tmu_lm);
     pglUniform1iARB(g_BspShader.uniform.TexDetail, mtst.tmu_dt);
@@ -2681,13 +2675,7 @@ void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
                 pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
                 pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
 
-                int Switch = 0;
-                if(mtst.details_enabled)
-                    Switch |= 0x04; // SWITCH_DETAIL
-                if(mtst.lightmap_enabled)
-                    Switch |= 0x08; // SWITCH_LIGHTMAP
-                if(RI.fogEnabled)
-                    Switch |= 0x02; // SWITCH_FOG
+	            int Switch = (mtst.lightmap_enabled ? 0x08 : 0) | (mtst.details_enabled ? 0x04 : 0) | (RI.fogEnabled ? 0x02 : 0); // SWITCH_LIGHTMAP | SWITCH_DETAIL | SWITCH_FOG
                 pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
 
                 // draw new array
@@ -2700,9 +2688,7 @@ void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
 
                 if( vbotex->dlightchain )
                 {
-#if 0 // TODO : dlight
                     R_DrawLightmappedVBO( vbo, vbotex, tex, k, !drawlightmap );
-#endif
                 }
 
                 vbotex = vbotex->next;
@@ -2720,12 +2706,7 @@ void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
             pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
             pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
 
-            int Switch = 0;
-            if(mtst.lightmap_enabled)
-                Switch |= 0x08; // SWITCH_LIGHTMAP
-            if(RI.fogEnabled)
-                Switch |= 0x02; // SWITCH_FOG
-            Switch |= 0x01; // SWITCH_DECAL
+	        int Switch = (mtst.lightmap_enabled ? 0x08 : 0) | (RI.fogEnabled ? 0x02 : 0) | (0x01); // SWITCH_LIGHTMAP | SWITCH_FOG | SWITCH_DECAL
             pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
 
             pglDepthMask( GL_FALSE );
@@ -2769,18 +2750,17 @@ void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
                         int numVerts;
                         vertex_t *v = R_DecalSetupVerts( pdecal, lightmapchain, pdecal->texture, &numVerts );
 
-                        std::vector<vbovertex_t> dynamic_vbo(numVerts);
                         for(int i = 0; i < numVerts; ++i)
                         {
-                            dynamic_vbo[i].pos = v->xyz;
-                            dynamic_vbo[i].gl_tc = v->s1t1;
-                            dynamic_vbo[i].lm_tc = v->s2t2;
-                            dynamic_vbo[i].dt_tc = {};
-                            dynamic_vbo[i].color = { 1, 1, 1, 1 };
+	                        vbos.decal_dynamic[i].pos = v->xyz;
+	                        vbos.decal_dynamic[i].gl_tc = v->s1t1;
+	                        vbos.decal_dynamic[i].lm_tc = v->s2t2;
+	                        vbos.decal_dynamic[i].dt_tc = {};
+	                        vbos.decal_dynamic[i].color = { 1, 1, 1, 1 };
                         }
 
                         pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decal_dynamic_vbo );
-                        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * numVerts, dynamic_vbo.data(), GL_STREAM_DRAW_ARB );
+                        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * numVerts, vbos.decal_dynamic, GL_STREAM_DRAW_ARB );
                         pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
                         pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
                         pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
