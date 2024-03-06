@@ -943,7 +943,7 @@ vertex_t *R_DecalSetupVerts( decal_t *pDecal, msurface_t *surf, int texture, int
 	return v;
 }
 
-void DrawSingleDecal( decal_t *pDecal, msurface_t *fa )
+void DrawSingleDecalLegacy( decal_t *pDecal, msurface_t *fa )
 {
 	vertex_t	*v;
 	int	i, numVerts;
@@ -964,7 +964,7 @@ void DrawSingleDecal( decal_t *pDecal, msurface_t *fa )
 	gTriApi.End();
 }
 
-void DrawSurfaceDecals( msurface_t *fa )
+void DrawSurfaceDecalsLegacy( msurface_t *fa )
 {
 	decal_t		*p;
 	cl_entity_t	*e;
@@ -1064,7 +1064,7 @@ void DrawSurfaceDecals( msurface_t *fa )
 				pglBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
 			}
 
-			DrawSingleDecal( p, fa );
+			DrawSingleDecalLegacy( p, fa );
 		}
 	}
 

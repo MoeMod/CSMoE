@@ -306,9 +306,9 @@ qboolean R_CullSurface( msurface_t *surf, uint clipflags );
 //
 // gl_decals.c
 //
-void DrawSurfaceDecals( msurface_t *fa );
+void DrawSurfaceDecalsLegacy( msurface_t *fa );
 vertex_t *R_DecalSetupVerts( decal_t *pDecal, msurface_t *surf, int texture, int *outCount );
-void DrawSingleDecal( decal_t *pDecal, msurface_t *fa );
+void DrawSingleDecalLegacy( decal_t *pDecal, msurface_t *fa );
 void R_EntityRemoveDecals( model_t *mod );
 void R_ClearDecals( void );
 

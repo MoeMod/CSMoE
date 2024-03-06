@@ -29,7 +29,6 @@ typedef struct
 	int		allocated[BLOCK_SIZE_MAX];
 	int		current_lightmap_texture;
 	msurface_t	*dynamic_surfaces;
-	msurface_t	*lightmap_surfaces[MAX_LIGHTMAPS];
 	byte		lightmap_buffer[BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*4];
 	byte		deluxemap_buffer[BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*4];
 } gllightmapstate_t;
@@ -40,17 +39,41 @@ static vec2_t		world_orthohalf;
 static byte		visbytes[MAX_MAP_LEAFS/8];
 static uint		r_blocklights[BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*3];
 static int		r_blockdeluxe[BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*3];
-static glpoly_t		*fullbright_polys[MAX_TEXTURES];
-static qboolean		draw_fullbrights = false;
-static mextrasurf_t		*detail_surfaces[MAX_TEXTURES];
-static qboolean		draw_details = false;
 static msurface_t		*skychain = NULL;
 static gllightmapstate_t	gl_lms;
+static vec4_t    r_bsprendercolor;
 
 static void LM_UploadBlock( qboolean dynamic );
 
 static qboolean R_AddSurfToVBO( msurface_t *surf, qboolean buildlightmaps );
 static void R_DrawVBO( cl_entity_t *e, qboolean drawlightmaps, qboolean drawtextures );
+static texture_t *R_SetupVBOTexture( texture_t *tex, int number );
+static qboolean R_HasLightmap( void );
+static void R_SetupBspShader( void );
+static void R_RestoreBspShader( void );
+static void DrawGLPoly( glpoly_t *p, texture_t *t, float sOffset, float tOffset );
+static void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset );
+static qboolean R_CheckLightMap( msurface_t *fa );
+static void DrawSingleDecal( decal_t *pDecal, msurface_t *fa );
+static void DrawSurfaceDecals( msurface_t *fa );
+
+/*
+====================
+
+MULTITEXTURE HELPERS
+
+====================
+*/
+
+struct multitexturestate_s
+{
+	int tmu_gl; // texture tmu
+	int tmu_lm; // lightmap tmu
+	int tmu_dt; // detail tmu
+	qboolean diffuse_enabled;
+	qboolean details_enabled; // current texture has details
+	qboolean lightmap_enabled; // draw lightmap
+} mtst;
 
 byte *Mod_GetCurrentVis( void )
 {
@@ -802,106 +825,6 @@ static void R_BuildDeluxeMap( msurface_t *surf, byte *dest, int stride )
 
 /*
 ================
-DrawGLPoly
-================
-*/
-void DrawGLPoly( glpoly_t *p, float xScale, float yScale )
-{
-	float		sOffset, sy;
-	float		tOffset, cy;
-	cl_entity_t	*e = RI.currententity;
-	int		i, hasScale = false;
-	
-	if( !p )
-		return;
-
-	// special hack for non-lightmapped surfaces
-	if( p->flags & SURF_DRAWTILED )
-		GL_ResetFogColor();
-
-	if( p->flags & SURF_CONVEYOR )
-	{
-		gltexture_t	*texture;
-		float		flConveyorSpeed;
-		float		flRate, flAngle;
-
-		flConveyorSpeed = (e->curstate.rendercolor.g<<8|e->curstate.rendercolor.b) / 16.0f;
-		if( e->curstate.rendercolor.r ) flConveyorSpeed = -flConveyorSpeed;
-		texture = R_GetTexture( glState.currentTextures[glState.activeTMU] );
-
-		flRate = fabs( flConveyorSpeed ) / (float)texture->srcWidth;
-		flAngle = ( flConveyorSpeed >= 0 ) ? 180 : 0;
-
-		SinCos( flAngle * ( M_PI / 180.0f ), &sy, &cy );
-		sOffset = RI.refdef.time * cy * flRate;
-		tOffset = RI.refdef.time * sy * flRate;
-	
-		// make sure that we are positive
-		if( sOffset < 0.0f ) sOffset += 1.0f + -(int)sOffset;
-		if( tOffset < 0.0f ) tOffset += 1.0f + -(int)tOffset;
-
-		// make sure that we are in a [0,1] range
-		sOffset = sOffset - (int)sOffset;
-		tOffset = tOffset - (int)tOffset;
-	}
-	else
-	{
-		sOffset = tOffset = 0.0f;
-	}
-
-	if( xScale != 0.0f && yScale != 0.0f )
-		hasScale = true;
-
-	gTriApi.Begin( TRI_POLYGON );
-
-	for( i = 0; i < p->numverts; i++ )
-	{
-		if( hasScale )
-			gTriApi.TexCoord2f(( p->verts[i].s1t1[0] + sOffset ) * xScale, ( p->verts[i].s1t1[1] + tOffset ) * yScale );
-		else gTriApi.TexCoord2f( p->verts[i].s1t1[0] + sOffset, p->verts[i].s1t1[1] + tOffset );
-
-		gTriApi.Vertex3fv( p->verts[i].xyz );
-	}
-
-	gTriApi.End();
-
-	// special hack for non-lightmapped surfaces
-	if( p->flags & SURF_DRAWTILED )
-		GL_SetupFogColorForSurfaces();
-}
-
-/*
-================
-DrawGLPolyChain
-
-Render lightmaps
-================
-*/
-void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
-{
-	qboolean	dynamic = true;
-
-	if( soffset == 0.0f && toffset == 0.0f )
-		dynamic = false;
-
-	for( ; p != NULL; p = p->chain )
-	{
-		int	i;
-
-		gTriApi.Begin( TRI_POLYGON );
-
-		for( i = 0; i < p->numverts; i++ )
-		{
-			if( !dynamic ) gTriApi.TexCoord2f( p->verts[i].s2t2[0], p->verts[i].s2t2[1] );
-			else gTriApi.TexCoord2f( p->verts[i].s2t2[0] - soffset, p->verts[i].s2t2[1] - toffset );
-			gTriApi.Vertex3fv( p->verts[i].xyz );
-		}
-		gTriApi.End ();
-	}
-}
-
-/*
-================
 R_BlendLightmaps
 ================
 */
@@ -953,20 +876,6 @@ void R_BlendLightmaps( void )
 			pglBlendFunc( GL_ZERO, GL_SRC_COLOR );
 
 		//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-	}
-
-	// render static lightmaps first
-	for( i = 0; i < MAX_LIGHTMAPS; i++ )
-	{
-		if( gl_lms.lightmap_surfaces[i] )
-		{
-			GL_Bind( XASH_TEXTURE0, tr.lightmapTextures[i] );
-
-			for( surf = gl_lms.lightmap_surfaces[i]; surf != NULL; surf = surf->lightmapchain )
-			{
-				if( surf->polys ) DrawGLPolyChain( surf->polys, 0.0f, 0.0f );
-			}
-		}
 	}
 
 	// render dynamic lightmaps
@@ -1071,110 +980,6 @@ void R_BlendLightmaps( void )
 
 /*
 ================
-R_RenderFullbrights
-================
-*/
-void R_RenderFullbrights( void )
-{
-	glpoly_t	*p;
-	int	i;
-
-	if( !draw_fullbrights )
-		return;
-
-	//if( RI.fogEnabled && !RI.refdef.onlyClientDraw )
-	//	pglDisable( GL_FOG );
-
-	pglEnable( GL_BLEND );
-	pglDepthMask( GL_FALSE );
-	//pglDisable( GL_ALPHA_TEST );
-	pglBlendFunc( GL_ONE, GL_ONE );
-	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-	for( i = 1; i < MAX_TEXTURES; i++ )
-	{
-		if( !fullbright_polys[i] )
-			continue;
-		GL_Bind( XASH_TEXTURE0, i );
-
-		for( p = fullbright_polys[i]; p; p = p->next )
-		{
-			if( p->flags & SURF_DRAWTURB )
-				EmitWaterPolys( p, ( p->flags & SURF_NOCULL ));
-			else DrawGLPoly( p, 0.0f, 0.0f );
-		}
-
-		fullbright_polys[i] = NULL;		
-	}
-
-	pglDisable( GL_BLEND );
-	pglDepthMask( GL_TRUE );
-	//pglDisable( GL_ALPHA_TEST );
-	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-
-	draw_fullbrights = false;
-
-	// restore for here
-	//if( RI.fogEnabled && !RI.refdef.onlyClientDraw )
-	//	pglEnable( GL_FOG );
-}
-
-/*
-================
-R_RenderDetails
-================
-*/
-void R_RenderDetails( void )
-{
-	gltexture_t	*glt;
-	mextrasurf_t	*es, *p;
-	msurface_t	*fa;
-	int		i;
-
-	if( !draw_details )
-		return;
-
-	GL_SetupFogColorForSurfaces();
-
-	pglEnable( GL_BLEND );
-	pglBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
-	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-
-	if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
-		pglDepthFunc( GL_EQUAL );
-
-	for( i = 1; i < MAX_TEXTURES; i++ )
-	{
-		es = detail_surfaces[i];
-		if( !es ) continue;
-
-		GL_Bind( XASH_TEXTURE0, i );
-
-		for( p = es; p; p = p->detailchain )
-		{
-			fa = INFO_SURF( p, RI.currentmodel );
-			glt = R_GetTexture( fa->texinfo->texture->gl_texturenum ); // get texture scale
-			DrawGLPoly( fa->polys, glt->xscale, glt->yscale );
-		}
-
-		detail_surfaces[i] = NULL;
-		es->detailchain = NULL;		
-	}
-
-	pglDisable( GL_BLEND );
-	//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-
-	if( RI.currententity->curstate.rendermode == kRenderTransAlpha )
-		pglDepthFunc( GL_LEQUAL );
-
-	draw_details = false;
-
-	// restore fog here
-	GL_ResetFogColor();
-}
-
-/*
-================
 R_RenderBrushPoly
 ================
 */
@@ -1197,10 +1002,29 @@ void R_RenderBrushPoly( msurface_t *fa )
 		}
 		return;
 	}
-		
-	t = R_TextureAnimation( fa->texinfo->texture, fa - RI.currententity->model->surfaces );
+	// setup multitexture
+	mtst.tmu_gl = XASH_TEXTURE0;
+	mtst.tmu_lm = XASH_TEXTURE1;
+	mtst.tmu_dt = XASH_TEXTURE2;
+	mtst.diffuse_enabled = true;
+	mtst.details_enabled = false; // TODO : check if has detail
+	mtst.lightmap_enabled = R_HasLightmap();
 
-	GL_Bind( XASH_TEXTURE0, t->gl_texturenum );
+	if( R_CheckLightMap( fa ) )
+	{
+		// draw dynamic lightmap
+		fa->lightmapchain = gl_lms.dynamic_surfaces;
+		gl_lms.dynamic_surfaces = fa;
+
+		// skip static one
+		mtst.lightmap_enabled = false;
+	}
+	t = R_TextureAnimation( fa->texinfo->texture, fa - RI.currententity->model->surfaces );
+	R_SetupVBOTexture( t, 0 );
+	if( mtst.lightmap_enabled )
+	{
+		GL_Bind( mtst.tmu_lm, tr.lightmapTextures[fa->lightmaptexturenum] );
+	}
 
 	if( fa->flags & SURF_DRAWTURB )
 	{	
@@ -1210,125 +1034,49 @@ void R_RenderBrushPoly( msurface_t *fa )
 		return;
 	}
 
-	if( t->fb_texturenum )
-	{
-		// HACKHACK: store fullbrights in poly->next (only for non-water surfaces)
-		fa->polys->next = fullbright_polys[t->fb_texturenum];
-		fullbright_polys[t->fb_texturenum] = fa->polys;
-		draw_fullbrights = true;
-	}
-
-	if( r_detailtextures->integer )
-	{
-		mextrasurf_t *es = SURF_INFO( fa, RI.currentmodel );
-
-		if( RI.fogEnabled || RI.fogCustom )
-		{
-			// don't apply detail textures for windows in the fog
-			if( RI.currententity->curstate.rendermode != kRenderTransTexture )
-			{
-				if( t->dt_texturenum )
-				{
-					es->detailchain = detail_surfaces[t->dt_texturenum];
-					detail_surfaces[t->dt_texturenum] = es;
-				}
-				else
-				{
-					// draw stub detail texture for underwater surfaces
-					es->detailchain = detail_surfaces[tr.grayTexture];
-					detail_surfaces[tr.grayTexture] = es;
-				}
-				draw_details = true;
-			}
-		}
-		else if( t->dt_texturenum )
-		{
-			es->detailchain = detail_surfaces[t->dt_texturenum];
-			detail_surfaces[t->dt_texturenum] = es;
-			draw_details = true;
-		}
-	}
-
-	DrawGLPoly( fa->polys, 0.0f, 0.0f );
-	DrawSurfaceDecals( fa );
-
-	// NOTE: draw mirror through in mirror show dummy lightmapped texture
-	if( fa->flags & SURF_REFLECT && RP_NORMALPASS() && r_lighting_extended->integer )
-		return; // no lightmaps for mirror
-
+	// special hack for non-lightmapped surfaces
 	if( fa->flags & SURF_DRAWTILED )
-		return; // no lightmaps anyway
+		GL_ResetFogColor();
 
-	// check for lightmap modification
-	for( maps = 0; maps < MAXLIGHTMAPS && fa->styles[maps] != 255; maps++ )
+	float sOffset = 0.0f, tOffset = 0.0f;
+	if( fa->flags & SURF_CONVEYOR )
 	{
-		if( RI.lightstylevalue[fa->styles[maps]] != fa->cached_light[maps] )
-			goto dynamic;
+		gltexture_t	*texture;
+		float		flConveyorSpeed;
+		float		flRate, flAngle;
+
+		flConveyorSpeed = (RI.currententity->curstate.rendercolor.g<<8|RI.currententity->curstate.rendercolor.b) / 16.0f;
+		if( RI.currententity->curstate.rendercolor.r ) flConveyorSpeed = -flConveyorSpeed;
+		texture = R_GetTexture( glState.currentTextures[glState.activeTMU] );
+
+		flRate = fabs( flConveyorSpeed ) / (float)texture->srcWidth;
+		flAngle = ( flConveyorSpeed >= 0 ) ? 180 : 0;
+
+		float sy, cy;
+		SinCos( flAngle * ( M_PI / 180.0f ), &sy, &cy );
+		sOffset = RI.refdef.time * cy * flRate;
+		tOffset = RI.refdef.time * sy * flRate;
+
+		// make sure that we are positive
+		if( sOffset < 0.0f ) sOffset += 1.0f + -(int)sOffset;
+		if( tOffset < 0.0f ) tOffset += 1.0f + -(int)tOffset;
+
+		// make sure that we are in a [0,1] range
+		sOffset = sOffset - (int)sOffset;
+		tOffset = tOffset - (int)tOffset;
 	}
 
-	if( maps == MAXLIGHTMAPS )
-		maps--;
+	R_SetupBspShader();
+	DrawGLPoly( fa->polys, t, sOffset, tOffset );
+	//DrawSurfaceDecals( fa );
+	R_RestoreBspShader();
+	pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
 
-	// dynamic this frame or dynamic previously
-	if( fa->dlightframe == tr.framecount )
-	{
-dynamic:
-		// NOTE: at this point we have only valid textures
-		if( r_dynamic->integer ) is_dynamic = true;
-	}
+	// special hack for non-lightmapped surfaces
+	if( fa->flags & SURF_DRAWTILED )
+		GL_SetupFogColorForSurfaces();
 
-	if( is_dynamic )
-	{
-		if(( fa->styles[maps] >= 32 || fa->styles[maps] == 0 ) && ( fa->dlightframe != tr.framecount ))
-		{
-			byte	temp[132*132*4];
-			int	smax, tmax;
-
-			smax = ( fa->extents[0] / LM_SAMPLE_SIZE ) + 1;
-			tmax = ( fa->extents[1] / LM_SAMPLE_SIZE ) + 1;
-
-			if( smax < 132 && tmax < 132 )
-			{
-				if( tr.deluxemap )
-				{
-					R_BuildDeluxeMap( fa, temp, smax * 4 );
-
-					GL_Bind( XASH_TEXTURE0, tr.deluxemapTextures[fa->lightmaptexturenum] );
-
-					pglTexSubImage2D( GL_TEXTURE_2D, 0, fa->light_s, fa->light_t, smax, tmax,
-						GL_RGBA, GL_UNSIGNED_BYTE, temp );
-				}
-
-				R_BuildLightMap( fa, temp, smax * 4, true );
-			}
-			else
-			{
-				smax = min( smax, 132 );
-				tmax = min( tmax, 132 );
-				Host_MapDesignError( "R_RenderBrushPoly: bad surface extents: %d %d", fa->extents[0], fa->extents[1] );
-				Q_memset( temp, 255, sizeof( temp ) );
-			}
-			R_SetCacheState( fa );
-
-			GL_Bind( XASH_TEXTURE0, tr.lightmapTextures[fa->lightmaptexturenum] );
-
-			pglTexSubImage2D( GL_TEXTURE_2D, 0, fa->light_s, fa->light_t, smax, tmax,
-				GL_RGBA, GL_UNSIGNED_BYTE, temp );
-
-			fa->lightmapchain = gl_lms.lightmap_surfaces[fa->lightmaptexturenum];
-			gl_lms.lightmap_surfaces[fa->lightmaptexturenum] = fa;
-		}
-		else
-		{
-			fa->lightmapchain = gl_lms.dynamic_surfaces;
-			gl_lms.dynamic_surfaces = fa;
-		}
-	}
-	else
-	{
-		fa->lightmapchain = gl_lms.lightmap_surfaces[fa->lightmaptexturenum];
-		gl_lms.lightmap_surfaces[fa->lightmaptexturenum] = fa;
-	}
+	DrawSurfaceDecalsLegacy( fa );
 }
 
 /*
@@ -1344,6 +1092,7 @@ void R_DrawTextureChains( void )
 
 	// make sure what color is reset
 	gTriApi.Color4ub( 255, 255, 255, 255 );
+	r_bsprendercolor = { 1, 1, 1, 1 };
 	R_LoadIdentity();	// set identity matrix
 
 	GL_SetupFogColorForSurfaces();
@@ -1464,7 +1213,7 @@ static bool R_SurfaceCompare( msurface_t	*surf1, msurface_t	*surf2 )
 	return len1 > len2;
 }
 
-_inline qboolean R_HasLightmap( void )
+static qboolean R_HasLightmap( void )
 {
 	if( r_fullbright->integer || !cl.worldmodel->lightdata )
 		return false;
@@ -1540,7 +1289,6 @@ void R_DrawBrushModel( cl_entity_t *e )
 	if( R_CullBox( mins, maxs, RI.clipFlags ))
 		return;
 
-	Q_memset( gl_lms.lightmap_surfaces, 0, sizeof( gl_lms.lightmap_surfaces ));
 	gl_lms.dynamic_surfaces = NULL;
 
 	if( rotated ) R_RotateForEntity( e );
@@ -1582,11 +1330,13 @@ void R_DrawBrushModel( cl_entity_t *e )
 		allow_vbo = false;
 	case kRenderGlow:
 		gTriApi.Color4ub( 255, 255, 255, e->curstate.renderamt );
+		r_bsprendercolor = { 1, 1, 1, e->curstate.renderamt / 255.0f };
 		break;
 	case kRenderTransColor:
 		//pglDisable( GL_TEXTURE_2D );
 		gTriApi.Color4ub( e->curstate.rendercolor.r, e->curstate.rendercolor.g,
 			e->curstate.rendercolor.b, e->curstate.renderamt );
+		r_bsprendercolor = { e->curstate.rendercolor.r / 255.0f, e->curstate.rendercolor.g / 255.0f, e->curstate.rendercolor.b / 255.0f, e->curstate.renderamt / 255.0f };
 		allow_vbo = false;
 		break;
 	case kRenderTransAlpha:
@@ -1594,6 +1344,7 @@ void R_DrawBrushModel( cl_entity_t *e )
 		//pglAlphaFunc( GL_GEQUAL, 0.5f );
 	default:	
 		gTriApi.Color4ub( 255, 255, 255, 255 );
+		r_bsprendercolor = { 1, 1, 1, 1 };
 		break;
 	}
 
@@ -1635,8 +1386,6 @@ void R_DrawBrushModel( cl_entity_t *e )
 	//	pglEnable( GL_TEXTURE_2D );
 
 	R_BlendLightmaps();
-	R_RenderFullbrights();
-	R_RenderDetails();
 
 	// restore fog here
 	if( e->curstate.rendermode == kRenderTransAdd )
@@ -1814,8 +1563,8 @@ struct vbo_static_s
     vbovertex_t decal_dlight[MAX_RENDER_DECALS * DECAL_VERTS_MAX];
     unsigned int decal_dlight_vbo;
     int decal_numverts[MAX_RENDER_DECALS * DECAL_VERTS_MAX];
-	vbovertex_t decal_dynamic[MAX_RENDER_DECALS * DECAL_VERTS_MAX];
-    unsigned int decal_dynamic_vbo;
+	vbovertex_t va_dynamic[MAX_RENDER_DECALS * DECAL_VERTS_MAX];
+    unsigned int dynamic_vbo;
 
     // prevent draining cpu on empty cycles
     int minlightmap;
@@ -2105,7 +1854,7 @@ void R_GenerateVBO()
     pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decaldata->decalvbo );
     pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * DECAL_VERTS_CUT * MAX_RENDER_DECALS, vbos.decaldata->decalarray, GL_STATIC_DRAW_ARB );
 
-    pglGenBuffersARB( 1, &vbos.decal_dynamic_vbo );
+    pglGenBuffersARB( 1, &vbos.dynamic_vbo );
 
     // preallocate dlight arrays
     vbos.dlight_index = (unsigned short*)Mem_Alloc( vbos.mempool, maxindex * sizeof( unsigned short ) * 6 );
@@ -2189,8 +1938,8 @@ void R_ClearVBO()
     if( vbos.decaldata )
         pglDeleteBuffersARB( 1, &vbos.decaldata->decalvbo );
 
-    if( vbos.decal_dynamic_vbo )
-        pglDeleteBuffersARB( 1, &vbos.decal_dynamic_vbo );
+    if( vbos.dynamic_vbo )
+        pglDeleteBuffersARB( 1, &vbos.dynamic_vbo );
 
     if( vbos.dlight_vbo )
         pglDeleteBuffersARB( 1, &vbos.dlight_vbo );
@@ -2203,23 +1952,6 @@ void R_ClearVBO()
     Mem_FreePool( &vbos.mempool );
 }
 
-/*
-====================
-
-MULTITEXTURE HELPERS
-
-====================
-*/
-
-struct multitexturestate_s
-{
-    int tmu_gl; // texture tmu
-    int tmu_lm; // lightmap tmu
-    int tmu_dt; // detail tmu
-    qboolean diffuse_enabled;
-    qboolean details_enabled; // current texture has details
-    qboolean lightmap_enabled; // draw lightmap
-} mtst;
 
 /*
 ==============
@@ -2575,6 +2307,38 @@ static void R_DrawLightmappedVBO( vboarray_t *vbo, vbotexture_t *vbotex, texture
     }
 }
 
+static void R_SetupBspShader()
+{
+	pglUseProgramObjectARB(g_BspShader.program);
+	matrix4x4 modelviewMatrixTranspose, projectionMatrixTranspose;
+	Matrix4x4_Transpose(modelviewMatrixTranspose, RI.worldviewMatrix);
+	Matrix4x4_Transpose(projectionMatrixTranspose, RI.projectionMatrix);
+	pglUniformMatrix4fvARB(g_BspShader.uniform.ModelView, 1, GL_FALSE, (const float*)&modelviewMatrixTranspose);
+	pglUniformMatrix4fvARB(g_BspShader.uniform.Projection, 1, GL_FALSE, (const float*)&projectionMatrixTranspose);
+	pglUniform4fvARB(g_BspShader.uniform.RenderColor, 1, r_bsprendercolor.data());
+	pglUniform4fARB(g_BspShader.uniform.FogParam, 0, RI.fogDensity, RI.fogStart, RI.fogEnd);
+	pglUniform4fARB(g_BspShader.uniform.FilterParam, 0, 1, 1, 1);
+	pglUniform1iARB(g_BspShader.uniform.TexDiffusemap, mtst.tmu_gl);
+	pglUniform1iARB(g_BspShader.uniform.TexLightmap, mtst.tmu_lm);
+	pglUniform1iARB(g_BspShader.uniform.TexDetail, mtst.tmu_dt);
+
+	pglEnableVertexAttribArrayARB(g_BspShader.attrib.aPos);
+	pglEnableVertexAttribArrayARB(g_BspShader.attrib.aTexCoord);
+	pglEnableVertexAttribArrayARB(g_BspShader.attrib.aLightmapCoord);
+	pglEnableVertexAttribArrayARB(g_BspShader.attrib.aDetailCoord);
+	pglEnableVertexAttribArrayARB(g_BspShader.attrib.aColor);
+}
+
+static void R_RestoreBspShader()
+{
+	pglDisableVertexAttribArrayARB(g_BspShader.attrib.aColor);
+	pglDisableVertexAttribArrayARB(g_BspShader.attrib.aDetailCoord);
+	pglDisableVertexAttribArrayARB(g_BspShader.attrib.aLightmapCoord);
+	pglDisableVertexAttribArrayARB(g_BspShader.attrib.aTexCoord);
+	pglDisableVertexAttribArrayARB(g_BspShader.attrib.aPos);
+	pglUseProgramObjectARB(0);
+}
+
 /*
 =====================
 R_DrawVBO
@@ -2599,23 +2363,7 @@ void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
     mtst.details_enabled = false; // TODO : check if has detail
     mtst.lightmap_enabled = !!drawlightmap;
 
-    pglUseProgramObjectARB(g_BspShader.program);
-    matrix4x4 modelviewMatrixTranspose, projectionMatrixTranspose;
-    Matrix4x4_Transpose(modelviewMatrixTranspose, RI.worldviewMatrix);
-    Matrix4x4_Transpose(projectionMatrixTranspose, RI.projectionMatrix);
-    pglUniformMatrix4fvARB(g_BspShader.uniform.ModelView, 1, GL_FALSE, (const float*)&modelviewMatrixTranspose);
-    pglUniformMatrix4fvARB(g_BspShader.uniform.Projection, 1, GL_FALSE, (const float*)&projectionMatrixTranspose);
-    if(e->curstate.rendermode == kRenderTransAdd || e->curstate.rendermode == kRenderTransTexture || e->curstate.rendermode == kRenderGlow)
-        pglUniform4fARB(g_BspShader.uniform.RenderColor, 1, 1, 1, e->curstate.renderamt);
-    else if(e->curstate.rendermode == kRenderTransColor)
-        pglUniform4fARB(g_BspShader.uniform.RenderColor, e->curstate.rendercolor.r, e->curstate.rendercolor.g, e->curstate.rendercolor.b, e->curstate.renderamt);
-    else
-        pglUniform4fARB(g_BspShader.uniform.RenderColor, 1, 1, 1, 1);
-    pglUniform4fARB(g_BspShader.uniform.FogParam, 0, RI.fogDensity, RI.fogStart, RI.fogEnd);
-    pglUniform4fARB(g_BspShader.uniform.FilterParam, 0, 1, 1, 1);
-    pglUniform1iARB(g_BspShader.uniform.TexDiffusemap, mtst.tmu_gl);
-    pglUniform1iARB(g_BspShader.uniform.TexLightmap, mtst.tmu_lm);
-    pglUniform1iARB(g_BspShader.uniform.TexDetail, mtst.tmu_dt);
+	R_SetupBspShader();
 
     // setup limits
     if( vbos.minlightmap > vbos.minarraysplit_lm )
@@ -2630,12 +2378,6 @@ void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
         vbos.maxtexture = vbos.maxarraysplit_tex;
     if( vbos.maxtexture > numtextures )
         vbos.maxtexture = numtextures;
-
-    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aPos);
-    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aTexCoord);
-    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aLightmapCoord);
-    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aDetailCoord);
-    pglEnableVertexAttribArrayARB(g_BspShader.attrib.aColor);
 
     for( k = vbos.minlightmap; k < vbos.maxlightmap; k++ )
     {
@@ -2746,27 +2488,7 @@ void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
 
                     if( vbos.decaldata->decals[decalindex].numVerts == -1 )
                     {
-                        // to many verts to keep in sparse array, so build it now
-                        int numVerts;
-                        vertex_t *v = R_DecalSetupVerts( pdecal, lightmapchain, pdecal->texture, &numVerts );
-
-                        for(int i = 0; i < numVerts; ++i)
-                        {
-	                        vbos.decal_dynamic[i].pos = v->xyz;
-	                        vbos.decal_dynamic[i].gl_tc = v->s1t1;
-	                        vbos.decal_dynamic[i].lm_tc = v->s2t2;
-	                        vbos.decal_dynamic[i].dt_tc = {};
-	                        vbos.decal_dynamic[i].color = { 1, 1, 1, 1 };
-                        }
-
-                        pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decal_dynamic_vbo );
-                        pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * numVerts, vbos.decal_dynamic, GL_STREAM_DRAW_ARB );
-                        pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
-                        pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
-                        pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
-                        pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
-                        pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
-                        pglDrawArrays( GL_TRIANGLE_FAN, 0, numVerts );
+	                    DrawSingleDecal( pdecal, lightmapchain );
 
                         pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.decaldata->decalvbo );
                         pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
@@ -2803,12 +2525,181 @@ void R_DrawVBO( cl_entity_t *e, qboolean drawlightmap, qboolean drawtextures )
     vbos.maxtexture = 0;
 
     //pglDisableClientState( GL_VERTEX_ARRAY );
-    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aColor);
-    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aDetailCoord);
-    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aLightmapCoord);
-    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aTexCoord);
-    pglDisableVertexAttribArrayARB(g_BspShader.attrib.aPos);
+	R_RestoreBspShader();
     pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+}
+
+/*
+================
+DrawGLPoly
+================
+*/
+static void DrawGLPoly( glpoly_t *p, texture_t *t, float sOffset, float tOffset )
+{
+	int Switch = (mtst.lightmap_enabled ? 0x08 : 0) | (mtst.details_enabled ? 0x04 : 0) | (RI.fogEnabled ? 0x02 : 0); // SWITCH_LIGHTMAP | SWITCH_DETAIL | SWITCH_FOG
+	pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
+
+	for(int i = 0; i < p->numverts; ++i)
+	{
+		vbos.va_dynamic[i].pos = p->verts[i].xyz;
+		vbos.va_dynamic[i].gl_tc = p->verts[i].s1t1 + vec2_t{ sOffset, tOffset };
+		vbos.va_dynamic[i].lm_tc = p->verts[i].s2t2;
+
+		if( t->dt_texturenum )
+		{
+			gltexture_t *glt = R_GetTexture( t->gl_texturenum );
+			vbos.va_dynamic[i].dt_tc[0] = ( p->verts[i].s1t1[0] + sOffset) * glt->xscale;
+			vbos.va_dynamic[i].dt_tc[1] = ( p->verts[i].s1t1[1] + tOffset) * glt->yscale;
+		}
+		vbos.va_dynamic[i].color = { 1, 1, 1, 1 };
+	}
+
+	pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dynamic_vbo );
+	pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * p->numverts, vbos.va_dynamic, GL_STREAM_DRAW_ARB );
+	pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+	pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+	pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
+	pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+	pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
+	pglDrawArrays( GL_TRIANGLE_FAN, 0, p->numverts );
+}
+
+/*
+================
+DrawGLPolyChain
+
+Render lightmaps
+================
+*/
+static void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
+{
+	qboolean	dynamic = true;
+
+	if( soffset == 0.0f && toffset == 0.0f )
+		dynamic = false;
+
+	for( ; p != NULL; p = p->chain )
+	{
+		int	i;
+
+		gTriApi.Begin( TRI_POLYGON );
+
+		for( i = 0; i < p->numverts; i++ )
+		{
+			if( !dynamic ) gTriApi.TexCoord2f( p->verts[i].s2t2[0], p->verts[i].s2t2[1] );
+			else gTriApi.TexCoord2f( p->verts[i].s2t2[0] - soffset, p->verts[i].s2t2[1] - toffset );
+			gTriApi.Vertex3fv( p->verts[i].xyz );
+		}
+		gTriApi.End ();
+	}
+}
+
+static void DrawSingleDecal( decal_t *pDecal, msurface_t *fa )
+{
+	// to many verts to keep in sparse array, so build it now
+	int numVerts;
+	vertex_t *v = R_DecalSetupVerts( pDecal, fa, pDecal->texture, &numVerts );
+
+	if( !numVerts ) return;
+
+	for(int i = 0; i < numVerts; ++i)
+	{
+		vbos.va_dynamic[i].pos = v->xyz;
+		vbos.va_dynamic[i].gl_tc = v->s1t1;
+		vbos.va_dynamic[i].lm_tc = v->s2t2;
+		vbos.va_dynamic[i].dt_tc = {};
+		vbos.va_dynamic[i].color = { 1, 1, 1, 1 };
+	}
+
+	pglBindBufferARB( GL_ARRAY_BUFFER_ARB, vbos.dynamic_vbo );
+	pglBufferDataARB( GL_ARRAY_BUFFER_ARB, sizeof( vbovertex_t ) * numVerts, vbos.va_dynamic, GL_STREAM_DRAW_ARB );
+	pglVertexAttribPointerARB(g_BspShader.attrib.aPos, 3, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t,pos));
+	pglVertexAttribPointerARB(g_BspShader.attrib.aTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, gl_tc));
+	pglVertexAttribPointerARB(g_BspShader.attrib.aLightmapCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, lm_tc));
+	pglVertexAttribPointerARB(g_BspShader.attrib.aDetailCoord, 2, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, dt_tc));
+	pglVertexAttribPointerARB(g_BspShader.attrib.aColor, 4, GL_FLOAT, GL_FALSE, sizeof(vbovertex_t), (const GLvoid *)offsetof(vbovertex_t, color));
+	pglDrawArrays( GL_TRIANGLE_FAN, 0, numVerts );
+}
+
+static void DrawSurfaceDecals( msurface_t *fa )
+{
+	decal_t		*p;
+	cl_entity_t	*e;
+
+	if( !fa->pdecals ) return;
+
+	e = RI.currententity;
+	ASSERT( e != NULL );
+
+	int Switch = (mtst.lightmap_enabled ? 0x08 : 0) | (RI.fogEnabled ? 0x02 : 0) | (0x01); // SWITCH_LIGHTMAP | SWITCH_FOG | SWITCH_DECAL
+	pglUniform1iARB(g_BspShader.uniform.Switch, Switch);
+
+	if( e->curstate.rendermode == kRenderNormal || e->curstate.rendermode == kRenderTransAlpha )
+	{
+		pglDepthMask( GL_FALSE );
+		pglEnable( GL_BLEND );
+
+		//if( e->curstate.rendermode == kRenderTransAlpha )
+		//	pglDisable( GL_ALPHA_TEST );
+	}
+
+	//if( e->curstate.rendermode == kRenderTransColor )
+	//	pglEnable( GL_TEXTURE_2D );
+
+	if( e->curstate.rendermode == kRenderTransTexture || e->curstate.rendermode == kRenderTransAdd )
+		GL_Cull( GL_NONE );
+
+	pglEnable( GL_POLYGON_OFFSET_FILL );
+	pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+	for( p = fa->pdecals; p; p = p->pnext )
+	{
+		if( !p->texture )
+			continue;
+
+		gltexture_t *glt = R_GetTexture( p->texture );
+
+		GL_Bind( mtst.tmu_gl, p->texture );
+
+		// normal HL decal with alpha-channel
+		if( glt->flags & TF_HAS_ALPHA )
+		{
+			// draw transparent decals with GL_MODULATE
+			//if( glt->fogParams[3] > DECAL_TRANSPARENT_THRESHOLD )
+			//	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+			//else pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+			pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		}
+		else
+		{
+			// color decal like detail texture. Base color is 127 127 127
+			//pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+			pglBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
+		}
+
+		DrawSingleDecal( p, fa );
+	}
+
+	if( e->curstate.rendermode == kRenderNormal || e->curstate.rendermode == kRenderTransAlpha )
+	{
+		pglDepthMask( GL_TRUE );
+		pglDisable( GL_BLEND );
+
+		//if( e->curstate.rendermode == kRenderTransAlpha )
+		//	pglEnable( GL_ALPHA_TEST );
+	}
+
+	pglDisable( GL_POLYGON_OFFSET_FILL );
+
+	if( e->curstate.rendermode == kRenderTransTexture || e->curstate.rendermode == kRenderTransAdd )
+		GL_Cull( GL_FRONT );
+
+	//if( e->curstate.rendermode == kRenderTransColor )
+	//	pglDisable( GL_TEXTURE_2D );
+
+	// restore blendfunc here
+	if( e->curstate.rendermode == kRenderTransAdd || e->curstate.rendermode == kRenderGlow )
+		GL_SetRenderMode( e->curstate.rendermode );
 }
 
 /*
@@ -3198,9 +3089,6 @@ void R_DrawWorld( void )
 		return;
 
 	VectorCopy( RI.cullorigin, tr.modelorg );
-	Q_memset( gl_lms.lightmap_surfaces, 0, sizeof( gl_lms.lightmap_surfaces ));
-	Q_memset( fullbright_polys, 0, sizeof( fullbright_polys ));
-	Q_memset( detail_surfaces, 0, sizeof( detail_surfaces ));
 
 	RI.currentWaveHeight = RI.waveHeight;
 	GL_SetRenderMode( kRenderNormal );
@@ -3228,9 +3116,6 @@ void R_DrawWorld( void )
 
 
 	R_BlendLightmaps();
-
-	R_RenderFullbrights();
-	R_RenderDetails();
 
 	if( skychain )
 		R_DrawSkyBox();
