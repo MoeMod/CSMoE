@@ -1068,15 +1068,13 @@ void R_RenderBrushPoly( msurface_t *fa )
 
 	R_SetupBspShader();
 	DrawGLPoly( fa->polys, t, sOffset, tOffset );
-	//DrawSurfaceDecals( fa );
+	DrawSurfaceDecals( fa );
 	R_RestoreBspShader();
 	pglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
 
 	// special hack for non-lightmapped surfaces
 	if( fa->flags & SURF_DRAWTILED )
 		GL_SetupFogColorForSurfaces();
-
-	DrawSurfaceDecalsLegacy( fa );
 }
 
 /*
@@ -2604,9 +2602,9 @@ static void DrawSingleDecal( decal_t *pDecal, msurface_t *fa )
 
 	for(int i = 0; i < numVerts; ++i)
 	{
-		vbos.va_dynamic[i].pos = v->xyz;
-		vbos.va_dynamic[i].gl_tc = v->s1t1;
-		vbos.va_dynamic[i].lm_tc = v->s2t2;
+		vbos.va_dynamic[i].pos = v[i].xyz;
+		vbos.va_dynamic[i].gl_tc = v[i].s1t1;
+		vbos.va_dynamic[i].lm_tc = v[i].s2t2;
 		vbos.va_dynamic[i].dt_tc = {};
 		vbos.va_dynamic[i].color = { 1, 1, 1, 1 };
 	}

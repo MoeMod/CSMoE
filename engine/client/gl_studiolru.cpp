@@ -24,7 +24,7 @@ GNU General Public License for more details.
 
 #include "util/lru_cache.h"
 
-#define XASH_SHADER_VAO
+//#define XASH_SHADER_VAO
 
 namespace xe {
     using studiolru_key_t = std::tuple<const studiohdr_t *, const mstudiomodel_t *, int, int>; // model, submodel, mesh, flags
