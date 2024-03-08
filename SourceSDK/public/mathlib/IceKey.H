@@ -46,6 +46,12 @@ class IceKey {
 	void		decrypt (const unsigned char *ciphertext,
 					unsigned char *plaintext) const;
 
+	void		encrypt32 (const unsigned char *plaintext,
+					unsigned char *ciphertext) const;
+
+	void		decrypt32 (const unsigned char *ciphertext,
+					unsigned char *plaintext) const;
+
 	int		keySize () const;
 
 	int		blockSize () const;

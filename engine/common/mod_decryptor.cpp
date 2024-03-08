@@ -36,6 +36,14 @@ void DecryptChunk(byte *pData, size_t uDataSize)
 
 	size_t uCount = (uDataSize + 7) >> 3;
 
+	// MoeMod add : try to apply SIMD
+	while (uCount > 4)
+	{
+		g_Decryptor.decrypt32(pData, pData);
+		pData += 32;
+		uCount-=4;
+	}
+
 	while (uCount)
 	{
 		g_Decryptor.decrypt(pData, pData);
