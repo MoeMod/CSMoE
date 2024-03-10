@@ -896,6 +896,7 @@ TL_ADD(CChainMG_ShadowAT4Rocket)
 TL_ADD(CSpearEX)
 TL_ADD(CY24S1LasermingunCharge)
 TL_ADD(CY24S1LasermingunRange)
+TL_ADD(CSoulReaperBModeProj)
 #endif
 
 TL_END(AllEntityTypeList)

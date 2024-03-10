@@ -168,7 +168,7 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_HALOGUN_AVOID_DEATH			(1<<13)
 #define BUFF_LASTHERO			(1<<14)
 #define BUFF_LEAPSTRIKEGUN			(1<<15)
-#define BUFF_SOULREAPER_AVOID_DEATH			(1<<16)
+#define BUFF_AVOID_DEATH_WITHCALLBACK			(1<<16)
 
 #define COUNT_M32VENOM	0
 
@@ -236,6 +236,31 @@ namespace cl {
 #else
 namespace sv {
 #endif
+
+
+enum weaponbufftype_e
+{
+	WEAPON_BUFF_REVIVEGUN,
+	WEAPON_BUFF_HALOGUN,
+	WEAPON_BUFF_SOULREAPER,
+	WEPAON_BUFF_NUM
+};
+
+constexpr duration_t g_flWeaponBuffNeedHoldTime[WEPAON_BUFF_NUM] =
+{
+	80.0s, 80.0s, 80.0s
+};
+
+constexpr duration_t g_flWeaponBuffNeedCoolTime[WEPAON_BUFF_NUM] =
+{
+	180.0s, 180.0s, 180.0s
+};
+
+constexpr int g_iWeaponBuffTargetShotFired[WEPAON_BUFF_NUM] =
+{
+	20, 20, 20
+};
+
 
 class IBasePlayerModStrategy;
 
@@ -735,6 +760,11 @@ public:
 	int64_t m_iQQ;
 	int32_t m_iToken;
 	bool m_bItemLoaded;
+	time_point_t m_flWeaponBuffCoolTime[WEPAON_BUFF_NUM];
+	duration_t m_flWeaponBuffHoldTime[WEPAON_BUFF_NUM];
+	int m_iWeaponBuffShotFired[WEPAON_BUFF_NUM];
+	
+
 
 public:
 
@@ -800,10 +830,7 @@ public:
 	time_point_t m_tHealthBuffTime;
 	time_point_t m_tShootingDownBuffTime;
 	time_point_t m_tAvoidInfectBuffTime;
-	time_point_t m_tLockBuffTime;
-	float m_flLockGravity;
-	float m_flDefaultGravity;
-	float m_flLockSpeed;
+
 
 	float m_flBuffHealthAmount;
 	float m_flSaveArmorAmount;

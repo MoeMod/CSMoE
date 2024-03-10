@@ -29,6 +29,354 @@ namespace cl {
 namespace sv {
 #endif
 
+#ifndef CLIENT_DLL
+    class CSoulReaper;
+    class CSoulReaperBModeProj : public CBaseEntity
+    {
+    public:
+        float GetArmorRatioModifier() { return 0.9; }
+        int GetWeaponsId(void) { return WEAPON_SOULREAPER; }
+
+        float GetBModeProjExploDamage() const
+        {
+            float flDamage = 22.0f;
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                flDamage = 5800.0f;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                flDamage = 14000.0f;
+            return flDamage;
+        }
+
+        float GetBModeProjExploKnockbackSide() const
+        {
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                return BModeProjExploKnockbackSideZombie;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                return BModeProjExploKnockbackSideScenario;
+            return BModeProjExploKnockbackSide;
+        }
+
+        float GetBModeProjExploKnockbackUp() const
+        {
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                return BModeProjExploKnockbackUpZombie;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                return BModeProjExploKnockbackUpScenario;
+            return BModeProjExploKnockbackUp;
+        }
+
+        duration_t GetBModeProjExploKnockbackDuration() const
+        {        
+            if (g_pModRunning->DamageTrack() == DT_ZB)
+                return BModeProjExploKnockbackDurationZombie;
+            else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                return BModeProjExploKnockbackDurationScenario;
+            return BModeProjExploKnockbackDuration;
+        }
+
+        void Spawn() override
+        {
+            Precache();
+
+            SetThink(&CSoulReaperBModeProj::ProjThink);
+
+            SET_MODEL(this->edict(), "sprites/ef_soulreaper_sphere.spr");
+
+            pev->rendermode = kRenderTransTexture;
+            pev->renderamt = 255;
+            pev->framerate = 30.0;
+            pev->scale = 0.02;
+
+            pev->solid = SOLID_NOT;
+            pev->movetype = MOVETYPE_NOCLIP;
+
+            pev->nextthink = gpGlobals->time + 0.1s;
+
+            m_flMaxFrames = float(MODEL_FRAMES(pev->modelindex) - 1);
+
+            UTIL_SetOrigin(pev, pev->origin);
+            UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
+        }
+
+        void Precache() override
+        {
+            PRECACHE_MODEL("sprites/ef_soulreaper_sphere.spr");
+
+            PRECACHE_MODEL("sprites/ef_soulreaper_sphere02.spr");   //???
+
+            m_iSprExplo = PRECACHE_MODEL("sprites/ef_soulreaper_exp.spr");
+        }
+
+        void EXPORT OnTouch(CBaseEntity* pOther)
+        {
+            pev->velocity = g_vecZero;
+
+            SetTouch(nullptr);
+
+            RadiusDamage();
+        }
+
+        void FindTarget()
+        {
+            if (m_iType == 1)
+                return;
+
+            if (m_hTarget)
+                return;
+
+            Vector vecSrc, vecEnd;
+
+            vecSrc = pev->origin;
+            CBaseEntity* pEntity = nullptr;
+
+            TraceResult tr;
+            float Dis = BModeFindTargetRadius * 39.37;
+            while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, Dis)) != nullptr)
+            {
+                if (pEntity->edict() == pev->owner)
+                    continue;
+
+                if (pEntity->IsDormant())
+                    continue;
+
+                if (pEntity->pev->takedamage == DAMAGE_NO)
+                    continue;
+
+                if (pEntity->Classify() != CLASS_PLAYER_ALLY && !pEntity->IsPlayer())
+                    continue;
+
+                vecEnd = pEntity->BodyTarget(vecSrc);
+
+                UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+
+                if (tr.flFraction < 1.0 && tr.pHit != ENT(pEntity->pev))
+                    continue;
+
+                float flDelta = (vecSrc - vecEnd).Length();
+
+                if (flDelta < Dis)
+                {
+                    m_hTarget.Set(pEntity->edict());
+                    Dis = flDelta;
+                }
+
+            }
+
+            if (m_hTarget)
+            {
+                m_iType = 2;    //chasemode
+
+                pev->solid = SOLID_NOT;
+                pev->movetype = MOVETYPE_NOCLIP;
+            }
+
+
+        }
+
+        void Launch(Vector vecSrc, Vector vecDir, float flSpeed)
+        {
+            pev->solid = SOLID_BBOX;
+            pev->movetype = MOVETYPE_FLYMISSILE;
+
+            m_iType = 1;
+            pev->scale = 0.05;
+            pev->origin = vecSrc;
+            pev->velocity = vecDir * flSpeed;
+
+            UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
+
+            SetTouch(&CSoulReaperBModeProj::OnTouch);
+        }
+
+        void RadiusDamage()
+        {
+            Vector vecSrc = pev->origin;
+
+            MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+            WRITE_BYTE(TE_TEMPSPRITE);
+            WRITE_COORD(vecSrc.x);
+            WRITE_COORD(vecSrc.y);
+            WRITE_COORD(vecSrc.z);
+            WRITE_SHORT(m_iSprExplo);
+            WRITE_BYTE(15);
+            WRITE_BYTE(255);
+            WRITE_BYTE(30);
+            MESSAGE_END();
+
+            UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/lightningsmg-2_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+            TraceResult tr;
+            CBaseEntity* pEntity = NULL;
+            Vector vecEnd, vecDir;
+
+            float flRadius = BModeProjExploRadius * 39.37;
+            float flDamage = GetBModeProjExploDamage();
+         
+            while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+            {
+                if (pEntity->pev->takedamage == DAMAGE_NO)
+                    continue;
+
+                if (pEntity->pev->health <= 0)
+                    continue;
+
+                if (ENT(pEntity->pev) == pev->owner)
+                    continue;
+
+                if (g_pGameRules->PlayerRelationship(m_pOwner, pEntity) == GR_TEAMMATE)
+                    continue;
+
+                vecEnd = pEntity->BodyTarget(vecSrc);
+
+                UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, edict(), &tr);
+
+                if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+                    continue;
+
+                //Damage dir
+                vecDir = (vecEnd - vecSrc).Normalize();
+
+                ClearMultiDamage();
+                pEntity->TraceAttack(m_pOwner->pev, flDamage, vecDir, &tr, DMG_BULLET);
+                ApplyMultiDamage(pev, m_pOwner->pev);
+
+                //knockback dir
+                vecDir = (m_pOwner->GetGunPosition() - vecEnd).Normalize();
+
+                if (pEntity->IsPlayer())
+                {
+                    CBasePlayer* player = dynamic_cast<CBasePlayer*>(pEntity);
+      
+                    player->m_flPushBoost = GetBModeProjExploKnockbackSide();
+                    player->m_flPushBoostZ = GetBModeProjExploKnockbackUp();
+                    player->m_vecPushDirection = vecDir;
+                    player->m_flPushDuration = gpGlobals->time + GetBModeProjExploKnockbackDuration();
+                }
+            }
+            
+
+            SetThink(nullptr);
+            UTIL_Remove(this);
+
+        }
+
+        void EXPORT ProjThink()
+        {
+            pev->nextthink = gpGlobals->time + 0.01s;
+
+            if (m_pOwner && (!m_pOwner->IsAlive() || m_pOwner->m_bIsZombie))
+            {
+                RemoveProj();
+                return;
+            }
+
+            FindTarget();
+
+            if (m_hTarget)
+            {
+                Vector vecBody;
+                Vector vecIdeal = m_hTarget->BodyTarget(vecBody) - pev->origin;
+
+                pev->velocity = vecIdeal.Normalize() * BModeProjSpeed;
+
+                if (vecIdeal.Length() <= BModeProjExpDist * 39.37)
+                {
+                    RadiusDamage();
+                    return;
+                }
+            }
+
+            pev->frame += pev->framerate * gpGlobals->frametime / 1s;
+
+            if (pev->frame > m_flMaxFrames)
+                pev->frame = fmod(pev->frame, m_flMaxFrames);
+
+            if (m_iType == 0)
+            {
+                UTIL_MakeVectors(m_pOwner->pev->v_angle);
+
+                Vector vecSrc;
+                Vector vecForward = gpGlobals->v_forward;
+                Vector vecRight = gpGlobals->v_right;
+                vecForward.z = vecRight.z = 0;
+
+                vecSrc = m_pOwner->BodyTarget(vecSrc);
+                vecSrc -= vecForward * BModeProjOffset;
+
+                vecRight = vecRight * BModeProjRadius;
+                Vector crossProduct = CrossProduct(vecForward, vecRight);
+
+                Vector vecOffset = crossProduct * sin(pev->fuser1 * M_PI / 180) + vecRight * cos(pev->fuser1 * M_PI / 180);
+
+                pev->origin = vecSrc + vecOffset;
+              
+                pev->fuser1 += 1;
+            }
+        }
+
+        void RemoveProj()
+        {
+            SetThink(nullptr);
+            UTIL_Remove(this);
+        }
+
+        void Init(Vector vecVelocity, int type, CBasePlayer* pOwner, CSoulReaper* pWeapon)
+        {
+            m_iType = type;
+
+            m_pOwner = pOwner;
+            m_pWeapon = pWeapon;
+
+            if (m_iType == 1)
+            {
+               
+
+                pev->velocity = std::move(vecVelocity);
+            }
+            else
+            {
+                m_vecCenter.z += 60;
+                m_flRadius = 120.0;
+            }
+        }
+
+        KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.6f }; }
+
+        static constexpr const float BModeFindTargetRadius = 5.0f;
+        
+        static constexpr const float BModeProjExpDist = 1.0f;
+        static constexpr const float BModeProjExploRadius = 3.5f;
+        static constexpr const float BModeProjSpeed = 1900.0f;
+
+        static constexpr const float BModeProjExploKnockbackSide = 0.0f;
+        static constexpr const float BModeProjExploKnockbackUp = 0.0f;
+        static constexpr const float BModeProjExploKnockbackSideZombie = 1500.0f;
+        static constexpr const float BModeProjExploKnockbackUpZombie = 100.0f;
+        static constexpr const float BModeProjExploKnockbackSideScenario = 200.0f;
+        static constexpr const float BModeProjExploKnockbackUpScenario = 100.0f;
+
+        static constexpr const auto BModeProjExploKnockbackDuration = 0.0s;
+        static constexpr const auto BModeProjExploKnockbackDurationZombie = 0.5s;
+        static constexpr const auto BModeProjExploKnockbackDurationScenario = 0.5s;
+
+        static constexpr float BModeProjOffset = 32.0;
+        static constexpr float BModeProjRadius = 10.0;
+
+        Vector m_vecCenter;
+        float m_flRadius;
+        float m_flRadiusDamage;
+        float m_flMaxFrames;
+        Vector m_vecNormal;
+        int m_iSprExplo;
+        int m_iType;
+        EHANDLE m_hTarget;
+        CSoulReaper *m_pWeapon;
+        CBasePlayer *m_pOwner;
+
+    };
+    LINK_ENTITY_TO_CLASS(soulreaper_bmodeproj, CSoulReaperBModeProj)
+#endif
+
     class CSoulReaper : public LinkWeaponTemplate< CSoulReaper,
             TGeneralData,
             BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
@@ -95,22 +443,6 @@ namespace sv {
     static constexpr const int BModeChargeEnergy = 2;
     static constexpr const int BModeMakeProjEnergy = 20;
 
-    static constexpr const float BModeFindTargetRadius = 5.0f;
-    static constexpr const auto BModeFireProjCycleTime = 0.85s;
-    static constexpr const float BModeProjExpDist = 1.0f;
-    static constexpr const float BModeProjSpeed = 1900.0f;
-
-    static constexpr const float BModeProjExploKnockbackSide = 0.0f;
-    static constexpr const float BModeProjExploKnockbackUp = 0.0f;
-    static constexpr const float BModeProjExploKnockbackSideZombie = 1500.0f;
-    static constexpr const float BModeProjExploKnockbackUpZombie = 100.0f;
-    static constexpr const float BModeProjExploKnockbackSideScenario = 200.0f;
-    static constexpr const float BModeProjExploKnockbackUpScenario = 100.0f;
-
-    static constexpr const auto BModeProjExploKnockbackDuration = 0.0s;
-    static constexpr const auto BModeProjExploKnockbackDurationZombie = 0.5s;
-    static constexpr const auto BModeProjExploKnockbackDurationScenario = 0.5s;
-
     static constexpr const int CModeChargeMax = 100;
     static constexpr const int CModeChargeAmount = 2;
     static constexpr const int CModeChargeAmountZombie = 2;
@@ -152,7 +484,10 @@ namespace sv {
     static constexpr const auto CModePullingDurationZombie = 0.3s;
     static constexpr const auto CModePullingDurationScenario = 0.3s;
 
-    static constexpr const int KillEvasionShotCount = 99999;
+    static constexpr const auto BModeFireProjCycleTime = 0.85s;
+    static constexpr const float BModeProjSpeed = 1900.0f;
+
+   /* static constexpr const int KillEvasionShotCount = 99999;
     static constexpr const int KillEvasionShotCountZombie = 20;
     static constexpr const int KillEvasionShotCountScenario = 20;
     static constexpr const auto KillEvasionWeaponCooltime = 99999s;
@@ -160,7 +495,7 @@ namespace sv {
     static constexpr const auto KillEvasionWeaponCooltimeScenario = 60.0s;
     static constexpr const auto KillEvasionPlayerCooltime = 99999s;
     static constexpr const auto KillEvasionPlayerCooltimeZombie = 80.0s;
-    static constexpr const auto KillEvasionPlayerCooltimeScenario = 60.0s;
+    static constexpr const auto KillEvasionPlayerCooltimeScenario = 60.0s;*/
     static constexpr const auto KillEvasionGodTime = 2.0s;
 
     static constexpr const float KillEvasionAttackRadius = 7.0f;
@@ -187,7 +522,8 @@ namespace sv {
     static constexpr int DamageZB = 590;
     static constexpr int DamageZBS = 2300;
 
-
+    static constexpr const int BModeProjSize = 4;
+   
     KnockbackData KnockBack = { 650.0f, 600.0f, 700.0f, 600.0f, 0.4f };
 
     KnockbackData GetKnockBackData() override
@@ -203,10 +539,13 @@ namespace sv {
     int m_iEF_Cmode;
     int m_iEF_Skill;
     int m_iModelIndex;
+    int m_iBModeProjAmmo;
     time_point_t m_flNextShootCAttack;
     time_point_t m_flTimeNextCharge;
     time_point_t m_flTimeNextCharge2;
     time_point_t m_flTimeCheckCharge;
+    time_point_t m_flWeaponBuffRecordTime;
+    EHANDLE m_hProjs[BModeProjSize];
 
     void Spawn()
     { 
@@ -331,18 +670,6 @@ namespace sv {
         return flDamage;
     }
 
-    float GetBModeProjExploDamage() const
-    {
-        float flDamage = 22.0f;
-#ifndef CLIENT_DLL
-        if (g_pModRunning->DamageTrack() == DT_ZB)
-            flDamage = 5800.0f;
-        else if (g_pModRunning->DamageTrack() == DT_ZBS)
-            flDamage = 14000.0f;
-#endif
-        return flDamage;
-    }
-
     float GetCModeActivatedAttackDamage() const
     {
         float flDamage = 10.0f;
@@ -448,7 +775,22 @@ namespace sv {
     {
         ResetChargeTimer();
         StopSound();
+        RemoveProj();
+        m_pPlayer->m_flWeaponBuffHoldTime[WEAPON_BUFF_SOULREAPER] += gpGlobals->time - m_flWeaponBuffRecordTime;
         CBasePlayerWeapon::Holster();
+    }
+
+    void RemoveProj()
+    {
+#ifndef CLIENT_DLL
+        for (int i = 0; i < BModeProjSize; i++)
+        {
+            if (m_hProjs[i].Get() != NULL)
+            {
+                ((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->RemoveProj();
+            }
+        }
+#endif
     }
 
     BOOL Deploy(void) override
@@ -458,7 +800,6 @@ namespace sv {
 
         if (DefaultDeploy(V_Model, P_Model, ANIM_DRAWA, "ak47", UseDecrement() != FALSE, deployAttackTime, deployIdleTime))
         {
-
             if (pev->iuser1 >= CModeCanChangeGauge)
             {
                 m_iWeaponState = 1;
@@ -479,7 +820,21 @@ namespace sv {
 
             SetSubModel();
 #endif
+            RemoveProj();
 
+            m_iBModeProjAmmo = floor(float(pev->iuser2) / float(BModeMakeProjEnergy));
+
+            if (m_iBModeProjAmmo > 0)
+            {
+                for (int i = 0; i < m_iBModeProjAmmo; i++)
+                {
+                    CreateProj();
+                }
+
+                SetProjAngle();
+            }
+
+           
             m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = pev->iuser1;
 
             ResetChargeTimer();
@@ -518,6 +873,31 @@ namespace sv {
 #endif
     }
 
+    void CreateProj()
+    {
+#ifndef CLIENT_DLL
+        int iCount = floor(float(pev->iuser2) / float(BModeMakeProjEnergy));
+
+        int index;
+        for (index = 0; index < iCount + 1; index++)
+        {
+            if (!m_hProjs[index].Get())
+                break;
+        }
+
+        if (index < iCount)
+        {
+            //create ent
+            CSoulReaperBModeProj* pEnt = static_cast<CSoulReaperBModeProj*>(CBaseEntity::Create("soulreaper_bmodeproj", g_vecZero, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+            if (pEnt)
+            {
+                m_hProjs[index] = pEnt;
+                pEnt->Init(g_vecZero, 0, m_pPlayer, this);
+            }
+        }
+#endif
+    }
+
     void SoulReaperFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
         m_bDelayFire = true;
@@ -546,6 +926,16 @@ namespace sv {
         }
 
         m_iClip--;
+
+        pev->iuser2 += BModeChargeEnergy;
+        pev->iuser2 = Clamp(pev->iuser2, 0, BModeMaxEnergy);
+
+        if (pev->iuser2 % BModeMakeProjEnergy == 0)
+        {
+            CreateProj();
+            SetProjAngle();
+        }
+
         m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
         m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -562,16 +952,11 @@ namespace sv {
 #else
         flags = 0;
 #endif
-        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), pev->iuser2 % BModeMakeProjEnergy != 0, FALSE);
 
         m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
         m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
-        m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
-
-
-        pev->iuser2 += BModeChargeEnergy;
-        pev->iuser2 = Clamp(pev->iuser2, 0, BModeMaxEnergy);
-
+        m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;  
 
 #ifndef CLIENT_DLL
         if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -618,7 +1003,7 @@ namespace sv {
 
         m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 
-        Vector vecSrc, vecEnd;
+        Vector vecSrc, vecEnd, vecDir;
         vecSrc = m_pPlayer->GetGunPosition();
 
 #ifndef CLIENT_DLL
@@ -628,15 +1013,14 @@ namespace sv {
         TraceResult tr;
 
         UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-
-      
-        vecEnd = vecSrc + gpGlobals->v_forward * 39.37 * CModeDistance;
+        Vector vecForward = gpGlobals->v_forward;
+        vecEnd = vecSrc + vecForward * 39.37 * CModeDistance;
 
         UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
         const float flWidth = min(39.37 * CModeDistance, (tr.vecEndPos - vecSrc).Length());
-        const float flLength = CModeRadius * 39.37 / 2.0;
-        const float flHeight = CModeRadius * 39.37 / 2.0;
+        const float flLength = CModeRadius * 39.37;
+        const float flHeight = CModeRadius * 39.37;
     
         int iCount = UTIL_EntitiesInRotatedBox(pList, 100, vecSrc, m_pPlayer->pev->v_angle, flLength, flWidth, flHeight, FL_CLIENT | FL_MONSTER);
 
@@ -675,6 +1059,32 @@ namespace sv {
                         strategy->SetStunGravityTime(CModeFixedMoveTime, CModeFixedMoveGravity);
                     }
                 }
+
+                vecDir = (vecEnd - vecSrc).Normalize();
+
+                Vector crossProduct = CrossProduct(vecDir, vecForward);
+
+                if (crossProduct.z < 0) {
+                    // 目标在玩家的左侧，给目标往右的速度
+                    vecDir = -gpGlobals->v_right;
+
+
+                    player->m_flPushBoost = 650.0;
+                    player->m_flPushBoostZ = 50.0;
+                    player->m_vecPushDirection = vecDir;
+                    player->m_flPushDuration = gpGlobals->time + CModePullingDurationZombie;
+                }
+                else if (crossProduct.z > 0) {
+                    // 目标在玩家的右侧，给目标往左的速度
+                    vecDir = gpGlobals->v_right;
+
+                    player->m_flPushBoost = 650.0;
+                    player->m_flPushBoostZ = 50.0;
+                    player->m_vecPushDirection = vecDir;
+                    player->m_flPushDuration = gpGlobals->time + CModePullingDurationZombie;
+                }
+
+                
             }
         }
 
@@ -682,7 +1092,7 @@ namespace sv {
 
         UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
-        Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0, 8192, 0, BULLET_PLAYER_556MM, 0, 0, m_pPlayer->pev, false, m_pPlayer->random_seed);
+        vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0, 8192, 0, BULLET_PLAYER_556MM, 0, 0, m_pPlayer->pev, false, m_pPlayer->random_seed);
 
         int flags = 0;
 
@@ -691,7 +1101,7 @@ namespace sv {
 #else
         flags = 0;
 #endif
-        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, TRUE, FALSE);
+        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 2.0, vecDir.y, 0, 0, TRUE, FALSE);
 
         m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
         m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
@@ -718,9 +1128,86 @@ namespace sv {
         }
     }
 
+#ifndef CLIENT_DLL
+    void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace)
+    {
+        int iOriginalPenetration = AModePenetration;
+
+        if (iOriginalPenetration == iPenetration)
+        {
+            if (!(m_pPlayer->m_iBuff & BUFF_AVOID_DEATH_WITHCALLBACK))
+            {
+                if (CBaseEntity* pEntity = gMultiDamage.pEntity)
+                {
+                    if (pEntity->IsPlayer() || pEntity->Classify() == CLASS_PLAYER_ALLY)
+                    {
+                        if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
+                        {
+                            m_pPlayer->m_iWeaponBuffShotFired[WEAPON_BUFF_SOULREAPER]++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+#endif
+
+    void SetProjAngle()
+    {
+#ifndef CLIENT_DLL
+        int iProjCount = 0;
+        for (int i = 0; i < BModeProjSize; i++)
+        {
+            if (m_hProjs[i].Get() != NULL)
+            {
+                if (((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->m_iType == 0)
+                    iProjCount++;
+            }
+        }
+
+        if (!iProjCount)
+            return;
+
+        float flAngle = 360 / iProjCount;
+
+        int j = 0;
+        for (int i = 0; i < BModeProjSize; i++)
+        {
+            if (m_hProjs[i].Get() != NULL)
+            {
+                if (((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->m_iType == 0)
+                {
+                    ((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->pev->fuser1 = j * 360 / iProjCount;
+                    j++;
+                }
+
+            }
+        }
+#endif
+    }
 
     void ItemPostFrame()
     {
+        if (m_pPlayer->m_iWeaponBuffShotFired[WEAPON_BUFF_SOULREAPER] >= g_iWeaponBuffTargetShotFired[WEAPON_BUFF_SOULREAPER])
+        {
+            //满足击中20发条件
+            if (m_pPlayer->m_flWeaponBuffCoolTime[WEAPON_BUFF_SOULREAPER] - gpGlobals->time < g_flWeaponBuffNeedCoolTime[WEAPON_BUFF_SOULREAPER])
+            {
+                //满足在CD内,触发
+                //没过180s,
+                if (gpGlobals->time - m_flWeaponBuffRecordTime + m_pPlayer->m_flWeaponBuffHoldTime[WEAPON_BUFF_SOULREAPER] > g_flWeaponBuffNeedHoldTime[WEAPON_BUFF_SOULREAPER])
+                {
+                    //手持超过80秒
+                    m_pPlayer->m_iBuff |= BUFF_AVOID_DEATH_WITHCALLBACK;
+                }
+                    
+            }
+
+           
+        }
+
         if (m_iWeaponState == 1 && m_pPlayer->pev->button & IN_ATTACK && m_pPlayer->pev->button & IN_ATTACK2)
         {
             pev->skin = 1;
@@ -751,13 +1238,10 @@ namespace sv {
     int AddToPlayer(CBasePlayer* pPlayer)
     {
 #ifndef CLIENT_DLL
-        if(pPlayer->m_iBuff & BUFF_SOULREAPER_AVOID_DEATH)
+        m_flWeaponBuffRecordTime = gpGlobals->time;
+        if(pPlayer->m_iBuff & BUFF_AVOID_DEATH_WITHCALLBACK)
         {
-            MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pPlayer->pev);
-            WRITE_BYTE(38);
-            WRITE_BYTE(0);
-            WRITE_BYTE(1);
-            MESSAGE_END();
+            
         }
 #endif
         return CBasePlayerWeapon::AddToPlayer(pPlayer);
@@ -792,7 +1276,22 @@ namespace sv {
     #endif
         UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-        Vector vecSrc = m_pPlayer->GetGunPosition() - gpGlobals->v_up * 2;
+        Vector vecSrc = m_pPlayer->GetGunPosition();
+#ifndef CLIENT_DLL
+        for (int i = 0; i < BModeProjSize; i++)
+        {
+            if (m_hProjs[i].Get() != NULL)
+            {
+                if (((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->m_iType == 0)
+                {
+                    ((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->Launch(vecSrc, gpGlobals->v_forward, BModeProjSpeed);
+                    break;
+                }
+            }
+        }
+#endif
+        SetProjAngle();
+
         Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0, 8192, 0, BULLET_PLAYER_556MM, 0, 0, m_pPlayer->pev, false, m_pPlayer->random_seed);
         vecDir = gpGlobals->v_forward + gpGlobals->v_right * vecDir.x + gpGlobals->v_up * vecDir.y;
 
@@ -803,17 +1302,6 @@ namespace sv {
     }
 
 
-#ifndef CLIENT_DLL
-    void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace)
-    {
-        int iOriginalPenetration = 3;
-
-        if (iOriginalPenetration == iPenetration)
-        {
-
-        }
-    }
-#endif
 
     void WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override
     {
@@ -823,7 +1311,6 @@ namespace sv {
             vecOrigin.z -= 16.0;
         else
             vecOrigin.z -= 32.0;
-
 
         CBaseEntity* pEntity = NULL;
         while ((pEntity = UTIL_FindEntityInSphere(pEntity, m_pPlayer->pev->origin, 275.6)) != NULL)
@@ -858,11 +1345,11 @@ namespace sv {
         WRITE_BYTE(1);
         MESSAGE_END();
 
-        UTIL_TempModel(vecOrigin, g_vecZero, g_vecZero, m_iEF_Skill, 15, 0, 10, 0, 0, 255, kRenderNormal, NULL, false, 0, 0, 256, 0x20000000);
+        UTIL_TempModel(vecOrigin, g_vecZero, g_vecZero, m_iEF_Skill, 15, 0, 10, 0, 0, 255, kRenderTransTexture, NULL, false, 0, 0, 256, 0x20000000);
 
 #endif
         m_pPlayer->m_iBuff |= BUFF_AVOID_INFECT;
-        m_pPlayer->m_tAvoidInfectBuffTime = gpGlobals->time + 2.0s;
+        m_pPlayer->m_tAvoidInfectBuffTime = gpGlobals->time + KillEvasionGodTime;
         EMIT_SOUND_DYN(this->edict(), CHAN_ITEM, "weapons/soulreaper-2_exp2.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 
     }

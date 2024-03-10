@@ -146,6 +146,16 @@ public:
 	EHANDLE m_hSpearAttached;
 #endif
 	time_point_t m_flNextSpearPush;
+	//push buff
+	time_point_t m_flPushDuration;
+	Vector m_vecPushDirection;
+	float m_flPushBoost;
+	float m_flPushBoostZ;
+
+	time_point_t m_tLockBuffTime;
+	float m_flLockGravity;
+	float m_flDefaultGravity;
+	float m_flLockSpeed;
 };
 
 }

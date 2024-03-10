@@ -36,6 +36,18 @@ namespace cl {
 
 namespace cl::event::soulreaper {
 
+
+void ResetMuzz(struct tempent_s* ent, float frametime, float currenttime)
+{
+	cl_entity_t* parent = gEngfuncs.GetEntityByIndex(ent->entity.curstate.aiment);
+
+	if (ent->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
+	{
+		ent->entity.curstate.renderamt = 0;
+		ent->die = currenttime;
+	}
+}
+
 enum soulreaper_e
 {
 	ANIM_IDLEA = 0,
@@ -80,7 +92,7 @@ void EV_FireSoulReaper(event_args_s *args)
 
 	EV_GetGunPosition(args, vecSrc, origin);
 
-	if (!args->bparam2 && args->bparam1)
+	if (args->fparam1 == 2.0 && args->bparam1)
 	{
 		if (EV_IsLocal(idx))
 		{
@@ -163,9 +175,17 @@ void EV_FireSoulReaper(event_args_s *args)
 	{
 		EV_MuzzleFlash();
 		if (!args->bparam2)
-		{
-		
-				gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOTA, 2);
+		{		
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOTA, 2);
+
+			if (!args->bparam1)
+			{
+				int iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_soulreaper_bmode.spr");
+
+				TEMPENTITY* pBModeModel = gEngfuncs.pEfxAPI->R_AttachTentToModel(ent->index, 3, 1.0, iModelIndex, 30, 255, kRenderTransTexture, 0.05, 32, FTENT_CLIENTCUSTOM, EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL);
+				if (pBModeModel)
+					pBModeModel->callback = ResetMuzz;
+			}
 		}
 		else
 		{

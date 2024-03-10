@@ -5782,6 +5782,21 @@ void CBasePlayer::UpdatePlayerSound()
 
 void CBasePlayer::CheckZombieModeBuff(void)
 {
+	if ((m_flPushBoost > 0.0f || m_flPushBoostZ > 0.0f) && !m_vecPushDirection.IsZero() && m_flPushDuration > gpGlobals->time)
+	{
+		pev->velocity = m_vecPushDirection.Normalize() * m_flPushBoost;
+
+		if (m_flPushBoostZ > pev->velocity.z)
+			pev->velocity.z = m_flPushBoostZ;
+	}
+	else
+	{
+		m_vecPushDirection = g_vecZero;
+		m_flPushBoost = 0.0f;
+		m_flPushBoostZ = 0.0f;
+		m_flPushDuration = invalid_time_point;
+	}
+
 	if (m_flLockSpeed > 0.0f && m_tLockBuffTime < gpGlobals->time)
 	{
 		m_flLockSpeed = 0.0f;
@@ -6205,6 +6220,20 @@ void CBasePlayer::Spawn()
 	m_tLockBuffTime = invalid_time_point;
 	m_flLockSpeed = 0.0f;
 	m_flLockGravity = 0.0f;
+
+	m_flPushDuration = invalid_time_point;
+	m_flPushBoost = 0.0f;
+	m_flPushBoostZ = 0.0f;
+	m_vecPushDirection = g_vecZero;
+
+
+	for (int i = 0; i < WEPAON_BUFF_NUM; i++)
+	{
+		m_flWeaponBuffCoolTime[i] = invalid_time_point;
+		m_flWeaponBuffHoldTime[i] = 0s;
+		m_iWeaponBuffShotFired[i] = 0;
+	}
+
 
 	m_tAvoidInfectBuffTime = invalid_time_point;
 	m_tShootingDownBuffTime = invalid_time_point;
