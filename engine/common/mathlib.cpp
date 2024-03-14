@@ -33,9 +33,13 @@ float anglemod( const float a )
 	return (360.0f/65536) * ((int)(a*(65536/360.0f)) & 65535);
 }
 
-// TODO : simd optimize for half
 half FloatToHalf( float v )
 {
+#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(_M_ARM) || defined(_M_ARM64)
+	float32x4_t vv = vdupq_n_f32(v);
+	float16x4_t vvh = vcvt_f16_f32(vv);
+	return vget_lane_f16(vvh, 0);
+#else
 	unsigned int	i = *((unsigned int *)&v);
 	unsigned int	e = (i >> 23) & 0x00ff;
 	unsigned int	m = i & 0x007fffff;
@@ -48,10 +52,16 @@ half FloatToHalf( float v )
 	h |= (i >> 16) & 0xc000;
 
 	return (half)h;
+#endif
 }
 
 float HalfToFloat( half h )
 {
+#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(_M_ARM) || defined(_M_ARM64)
+	float16x4_t vvh = vdup_n_f16(h);
+	float32x4_t vv = vcvt_f32_f16(vvh);
+	return vgetq_lane_f32(vv, 0);
+#else
 	unsigned int	f = ((unsigned short)h << 16) & 0x80000000;
 	unsigned int	em = (unsigned short)h & 0x7fff;
 
@@ -79,6 +89,35 @@ float HalfToFloat( half h )
 	}
 
 	return *((float *)&f);
+#endif
+}
+
+void FloatToHalfX4(const float *in, half *out)
+{
+#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(_M_ARM) || defined(_M_ARM64)
+	float32x4_t vv = vld1q_f32(in);
+	float16x4_t vvh = vcvt_f16_f32(vv);
+	vst1_f16((float16_t *)out, vvh);
+#else
+	out[0] = FloatToHalf(in[0]);
+	out[1] = FloatToHalf(in[1]);
+	out[2] = FloatToHalf(in[2]);
+	out[3] = FloatToHalf(in[3]);
+#endif
+}
+
+void HalfToFloatX4(const half *in, float *out)
+{
+#if defined(__ARM_NEON) || defined(__ARM_NEON__) || defined(_M_ARM) || defined(_M_ARM64)
+	float16x4_t vvh = vld1_f16((const float16_t *)in);
+	float32x4_t vv = vcvt_f32_f16(vvh);
+	vst1q_f32(out, vv);
+#else
+	out[0] = HalfToFloat(in[0]);
+	out[1] = HalfToFloat(in[1]);
+	out[2] = HalfToFloat(in[2]);
+	out[3] = HalfToFloat(in[3]);
+#endif
 }
 
 /*

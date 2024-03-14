@@ -151,6 +151,8 @@ float rsqrt(float number);
 float anglemod(const float a);
 half FloatToHalf(float v);
 float HalfToFloat(half h);
+void FloatToHalfX4(const float *in, half *out);
+void HalfToFloatX4(const half *in, float *out);
 int SignbitsForPlane(const vec3_t normal);
 int NearestPOW(int value, qboolean roundDown);
 void SinCos(float radians, float* sine, float* cosine);
