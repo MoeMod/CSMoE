@@ -336,20 +336,23 @@ ice_f_x4 (
 	uint32x4_t	al, ar;		/* Salted expanded 40-bit values */
 
 	/* Left half expansion */
-	tl = ((p >> 16) & 0x3ff) | (((p >> 14) | (p << 18)) & 0xffc00);
+	//tl = ((p >> 16) & 0x3ff) | (((p >> 14) | (p << 18)) & 0xffc00);
+    tl = vorrq_u32(vandq_u32(vshrq_n_u32(p, 16), vdupq_n_u32((1<<10) - (1<<0))), vandq_u32(vorrq_u32(vshrq_n_u32(p, 14), vshlq_n_u32(p, 18)), vdupq_n_u32((1<<20) - (1<<10))));
 
 	/* Right half expansion */
-	tr = (p & 0x3ff) | ((p << 2) & 0xffc00);
+	//tr = (p & 0x3ff) | ((p << 2) & 0xffc00);
+    tr = vorrq_u32(vandq_u32(p, vdupq_n_u32((1<<10) - (1<<0))), vandq_u32(vshlq_n_u32(p, 2), vdupq_n_u32((1<<20) - (1<<10))));
 
 	/* Perform the salt permutation */
 	// al = (tr & sk->val[2]) | (tl & ~sk->val[2]);
 	// ar = (tl & sk->val[2]) | (tr & ~sk->val[2]);
-	al = sk->val[2] & (tl ^ tr);
-	ar = al ^ tr;
-	al ^= tl;
+    al = vbslq_u32(vdupq_n_u32(sk->val[2]), tr, tl);
+    ar = vbslq_u32(vdupq_n_u32(sk->val[2]), tl, tr);
 
-	al ^= sk->val[0];		/* XOR with the subkey */
-	ar ^= sk->val[1];
+	//al ^= sk->val[0];		/* XOR with the subkey */
+	//ar ^= sk->val[1];
+    al = veorq_u32(al, vdupq_n_u32(sk->val[0]));
+    ar = veorq_u32(ar, vdupq_n_u32(sk->val[1]));
 
 	/* S-box lookup and permutation */
 	uint32x4_t result = vdupq_n_u32(0);

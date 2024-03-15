@@ -362,7 +362,7 @@ qboolean Image_LoadDDS_HW( imglib_t& image, const char *name, const byte *buffer
 
 uint32_t PackRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
-    return ((r << 24) | (g << 16) | (b << 8) | a);
+    return ((a << 24) | (b << 16) | (g << 8) | r);
 }
 
 void DecompressBlockDXT1(unsigned int x, unsigned int y, unsigned int width, const byte *blockStorage, byte *out_rgba)
