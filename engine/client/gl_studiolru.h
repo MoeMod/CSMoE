@@ -21,6 +21,7 @@ typedef struct studio_vertex_attrib_item_s {
     GLfloat pos[3];
     GLfloat boneIdx;
 	GLhalf norm[3];
+	GLhalf norm_padding;
     GLshort coord[2];
 } studio_vertex_attrib_item_t;
 

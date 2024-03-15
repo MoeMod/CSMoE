@@ -1729,9 +1729,7 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 	            vboattrs[numArrayVerts].pos[2] = av[2];
 	            vboattrs[numArrayVerts].boneIdx = static_cast<float>(pvertbone[ptricmds[0]]);
 #ifdef XASH_SIMD
-				GLhalf norm[4];
-	            FloatToHalfX4(nv.data(), norm);
-				memcpy(vboattrs[numArrayVerts].norm, norm, sizeof(GLhalf) * 3);
+	            FloatToHalfX4(nv.data(), vboattrs[numArrayVerts].norm); // norm has padding
 #else
 	            vboattrs[numArrayVerts].norm[0] = FloatToHalf(nv[0]);
 	            vboattrs[numArrayVerts].norm[1] = FloatToHalf(nv[1]);

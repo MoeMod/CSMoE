@@ -87,34 +87,19 @@ namespace xe {
             attr.width = gltex->width;
             attr.height = gltex->height;
         }
+
+	    int width = 0, height = 0;
+	    const char *psharp = strchr(ptexture->name, '#');
+	    if(psharp && sscanf(psharp + 1, "%3d%3d", &width, &height) == 2)
+	    {
+		    attr.width = width;
+		    attr.height = height;
+	    }
     }
 
     void TexLru_CreateAttr(const mstudiotexture_t *ptexture, int gl_texturenum)
     {
         TextureAttr attr = { ptexture->flags, ptexture->width, ptexture->height, gl_texturenum };
-
-        if ( ptexture->name[0] == '$' )
-        {
-            attr.flags |= STUDIO_NF_FULLBRIGHT;
-
-            if (ptexture->name[1] == '0' && ptexture->name[2] == 'b')
-            {
-                attr.flags |= STUDIO_NF_ADDITIVE;
-            }
-
-            if (ptexture->name[1] == '0' && ptexture->name[2] == 'a')
-            {
-                attr.flags |= STUDIO_NF_ADDITIVE;
-            }
-        }
-
-        gltexture_t *gltex = R_GetTexture(gl_texturenum);
-        if (gltex)
-        {
-            attr.index = gl_texturenum;
-            attr.width = gltex->width;
-            attr.height = gltex->height;
-        }
 #if 1
         auto [iter, succ] = g_textureAttrMap.emplace(ptexture, attr);
         if (!succ)
@@ -306,7 +291,7 @@ namespace xe {
         pglBindTexture( image->target, image->texnum );
         pglTexImage2D( image->target, 0, image->format, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2D);
         pglBindTexture( image->target, 0 );
-        MsgDev(D_INFO, "TexLru : swap out texture %s\n", image->name);
+	    MsgDev(D_INFO, "TexLru : swap out texture %s\n", image->name);
 
         return 0;
     }
@@ -565,7 +550,7 @@ namespace xe {
             return false; // unknown texture
 
         if (textureCache.contains_and_make_first((GLuint)texnum)) {
-            return true; // already present
+            return false; // already present
         }
 
         textureCache.set_capacity(r_texlru->integer);
@@ -757,7 +742,7 @@ namespace xe {
     void TexLru_BindReplace(const mstudiotexture_t* ptexture, int texnum)
     {
         auto iter = g_textureAttrMap.find(ptexture);
-        if (iter != g_textureAttrMap.end())
+        if (iter == g_textureAttrMap.end())
             g_textureReplaceMap.emplace(ptexture, iter->second.index);
 
         // set size for external texture

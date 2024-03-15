@@ -390,8 +390,8 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
             "out vec4 FragColor;\n"
             "void main()\n"
             "{\n"
-            "    vec4 TexColor = texture(Texture, vvTexCoord.st);\n"
-            "    if(!HasColor) TexColor = vec4(1.0, 1.0, 1.0, TexColor.w);\n"
+            "    vec4 TexColor = texture(Texture, vvTexCoord);\n"
+            "    TexColor = HasColor ? TexColor : vec4(1.0, 1.0, 1.0, TexColor.w);\n"
             "    FragColor = vvColor * TexColor;\n"
             "}\n"
         };
