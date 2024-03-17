@@ -1208,7 +1208,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_M3DRAGONEX
 					|| pWeapon->m_iId == WEAPON_LEAPSTRIKEGUN
 					|| pWeapon->m_iId == WEAPON_Y23S3BUFFM249
-					|| pWeapon->m_iId == WEAPON_LINKATTACKSG)
+					|| pWeapon->m_iId == WEAPON_LINKATTACKSG
+					|| pWeapon->m_iId == WEAPON_JUMPSPIRIT)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}

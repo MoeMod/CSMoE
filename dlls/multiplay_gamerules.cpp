@@ -4257,6 +4257,8 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "swordbombard";
 					else if (!Q_strcmp(killer_weapon_name, "knifedvhammer_spike"))
 						killer_weapon_name = "dvhammer";
+					else if (!Q_strcmp(killer_weapon_name, "dualslayer_projectile"))
+						killer_weapon_name = "z4b_dualslayer";
 					else if (!Q_strcmp(killer_weapon_name, "knifedgaxe_lubu"))
 					{
 						if(pInflictor->pev->iuser1)
@@ -4436,6 +4438,8 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer* pVictim, entvars_t* pKiller, e
 						killer_weapon_name = "chainmg";
 					else if (iId == WEAPON_SPEARGUNEX)
 						killer_weapon_name = "speargunex";
+					else if (iId == WEAPON_JUMPSPIRIT)
+						killer_weapon_name = "jumpspirit";
 					else
 						killer_weapon_name = STRING(pevInflictor->classname);
 				}

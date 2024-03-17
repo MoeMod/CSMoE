@@ -31,6 +31,172 @@ namespace cl {
 namespace sv {
 #endif
 
+#ifndef CLIENT_DLL
+	class CDualSlayerProjectile : public CBaseAnimating
+	{
+	public:
+		float GetArmorRatioModifier() { return 1.5; }
+		int GetWeaponsId(void) { return WEAPON_KNIFE; }
+		void Spawn() override
+		{
+			Precache();
+
+			SetThink(&CDualSlayerProjectile::ProjectileThink);
+			SetTouch(&CDualSlayerProjectile::ProjectileTouch);
+
+			if (GetDamage() > 6000)
+				SET_MODEL(this->edict(), "models/z4b/ef_dualslayer2.mdl");
+			else
+				SET_MODEL(this->edict(), "models/z4b/ef_dualslayer1.mdl");
+
+			pev->rendermode = kRenderTransAdd;
+			pev->renderfx = kRenderFxNone;
+			pev->renderamt = 255;
+			pev->framerate = 30;
+			pev->scale = 1.0;
+			pev->solid = SOLID_BBOX;
+			pev->movetype = MOVETYPE_FLYMISSILE;
+			pev->nextthink = gpGlobals->time + 0.1s;
+
+			UTIL_SetOrigin(pev, pev->origin);
+			UTIL_SetSize(pev, Vector(-8.0, -8.0, -4.0), Vector(8.0, 8.0, 4.0));
+			m_fLaunchTime = gpGlobals->time + 5.0s;
+		}
+
+		void Precache() override
+		{
+			PRECACHE_MODEL("models/z4b/ef_dualslayer1.mdl");
+			PRECACHE_MODEL("models/z4b/ef_dualslayer2.mdl");
+			m_iSprExplo = PRECACHE_MODEL("sprites/ef_dualslayer.spr");
+		}
+
+		float GetDamage() const
+		{
+			float flDamage = 80;
+#ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 3605 + (g_pGameRules->m_iTotalRoundsPlayed * 400);
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage *= 5.5f;
+#endif
+			return flDamage;
+		}
+
+		void EXPORT ProjectileThink()
+		{
+			if (!IsInWorld() || m_fLaunchTime < gpGlobals->time)
+			{
+				SetThink(NULL);
+				SetTouch(NULL);
+
+				UTIL_Remove(this);
+				return;
+			}
+
+			pev->nextthink = gpGlobals->time + 0.1s;
+		}
+
+		void EXPORT ProjectileTouch(CBaseEntity* pOther)
+		{
+			if (!pOther)
+				return;
+
+			if(pOther->edict() == pev->owner)
+				return;
+
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_TEMPSPRITE);
+			WRITE_COORD(pOther->pev->origin.x);
+			WRITE_COORD(pOther->pev->origin.y);
+			WRITE_COORD(pOther->pev->origin.z);
+			WRITE_SHORT(m_iSprExplo);
+			WRITE_BYTE(10);
+			WRITE_BYTE(255);
+			WRITE_BYTE(10);
+			MESSAGE_END();
+
+			UTIL_EMIT_SOUND(ENT(this->pev), CHAN_ITEM, "CK_WPN/WEAPON/NanoGrenade/NanoGrenade_BOOM.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	
+			CBasePlayer* pOwner = (CBasePlayer*)GET_PRIVATE(pev->owner);
+
+			if (!pOwner || FNullEnt(pOwner->edict()) || !pOwner->IsPlayer() || pOwner->m_bIsZombie)
+			{
+				SetTouch(NULL);
+				SetThink(NULL);
+
+				UTIL_Remove(this);
+				return;
+			}
+
+			TraceResult tr;
+			Vector vecDir, vecEnd;
+			CBaseEntity* pEntity = NULL;
+			float flRadius = 4 * 39.37;
+			while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, flRadius)) != NULL)
+			{
+				if (pEntity->edict() == pev->owner)
+					continue;
+
+				if (pEntity->IsDormant())
+					continue;
+
+				if (pEntity->pev->takedamage == DAMAGE_NO)
+					continue;
+
+				if (pEntity->Classify() == CLASS_NONE)
+					continue;
+
+				if (g_pGameRules->PlayerRelationship(pOwner, pEntity) == GR_TEAMMATE)
+					continue;
+
+				vecEnd = pEntity->BodyTarget(pev->origin);
+
+				UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
+
+				if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+					continue;
+
+				pEntity->TakeDamage(pev, pOwner->pev, GetDamage(), DMG_BULLET | DMG_NEVERGIB);
+		
+				if (pEntity->IsPlayer())
+				{
+					CBasePlayer* player = dynamic_cast<CBasePlayer*>(pEntity);
+
+					vecDir = (player->pev->origin - pOwner->GetGunPosition()).Normalize();
+					vecDir.z = 0;
+
+					player->m_flPushBoost = 500;
+					player->m_flPushBoostZ = 200;
+					player->m_vecPushDirection = vecDir;
+					player->m_flPushDuration = gpGlobals->time + 0.5s;
+
+					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+					WRITE_BYTE(TE_TEMPSPRITE);
+					WRITE_COORD(pEntity->pev->origin.x);
+					WRITE_COORD(pEntity->pev->origin.y);
+					WRITE_COORD(pEntity->pev->origin.z - 16);
+					WRITE_SHORT(m_iSprExplo);
+					WRITE_BYTE(8);
+					WRITE_BYTE(255);
+					WRITE_BYTE(10);
+					MESSAGE_END();
+				}	
+			}
+
+			SetThink(nullptr);
+			SetTouch(nullptr);
+			UTIL_Remove(this);
+		}
+
+		KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.3f }; }
+
+		time_point_t m_fLaunchTime;
+		int m_iSprExplo;
+
+	};
+	LINK_ENTITY_TO_CLASS(dualslayer_projectile, CDualSlayerProjectile)
+#endif
+
 class CKnifeDualSlayer: public LinkWeaponTemplate<CKnifeDualSlayer,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type,
@@ -79,14 +245,14 @@ public:
 	{
 		Base::Precache();
 
-		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_Attack_1.wav");
+		/*PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_Attack_1.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_Attack_2.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_Attack_3.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_HIT.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_STAB.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_SWING.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHeroSkill.wav");
-		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHeroSkill_Hit.wav");
+		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHeroSkill_Hit.wav");*/
 		m_iSkillEffect = PRECACHE_MODEL("sprites/ef_dualslayer.spr");
 	}
 
@@ -109,6 +275,8 @@ public:
 		}
 		if (m_iClip >= 100)
 			m_iClip = 100;
+
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHero_Select.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
 
 		return Base::Deploy();
 	}
@@ -280,7 +448,23 @@ void CKnifeDualSlayer::ItemPostFrame()
 			m_iThinkType = 5;
 			break;
 		case 5:
-			//CreateEnt
+
+			UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHero_Attack_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
+
+			UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+			m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
+
+#ifndef CLIENT_DLL
+			Vector vecProjDir = gpGlobals->v_forward;
+			Vector vecAngle = vecProjDir;
+			vecAngle = UTIL_VecToAngles(vecAngle);
+
+			CDualSlayerProjectile* pEnt = static_cast<CDualSlayerProjectile*>(CBaseEntity::Create("dualslayer_projectile", m_pPlayer->GetGunPosition() + vecProjDir * 2.0 , vecAngle, ENT(m_pPlayer->pev)));
+			if (pEnt)
+			{
+				pEnt->pev->velocity = vecProjDir * 1200.0f;
+			}
+#endif
 			DelaySkillAttack();
 			m_tNextThink = invalid_time_point;
 			m_iThinkType = 0;
@@ -318,8 +502,9 @@ void CKnifeDualSlayer::Reload()
 		m_iThinkType = 1;
 		m_tNextThink = gpGlobals->time + 0.7s;
 
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHeroSkill.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-		SendWeaponAnim(ANIM_SKILL, UseDecrement() != FALSE);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHeroSkill.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+		SendWeaponAnim(ANIM_SKILL_ENHANCE, UseDecrement() != FALSE);
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3.3s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.3s;
 		m_flEffectTime = gpGlobals->time;
@@ -356,9 +541,9 @@ void CKnifeDualSlayer::PrimaryAttack(void)
 	m_iSwing = 0;
 	SendWeaponAnim(pev->iuser1++ ? ANIM_SLASH1 : ANIM_SLASH2, UseDecrement() != FALSE);
 	if (pev->iuser1)
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHero_Attack_1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHero_Attack_1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	else
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHero_Attack_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHero_Attack_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	pev->iuser1 %= 2;
 	SetThink(&CKnifeDualSlayer::DelayPrimaryAttack);
 	pev->nextthink = gpGlobals->time + 0.09s;
@@ -373,7 +558,7 @@ void CKnifeDualSlayer::SecondaryAttack(void)
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 	SendWeaponAnim(RANDOM_LONG(0, 1)? ANIM_STAB1:ANIM_STAB2, UseDecrement() != FALSE);
-	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHero_Attack_3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualSlayer/MasterHero_Attack_3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	SetThink(&CKnifeDualSlayer::DelaySecondaryAttack);
 	pev->nextthink = gpGlobals->time + 1.1s;
 
@@ -390,13 +575,13 @@ void CKnifeDualSlayer::DelaySkillAttack()
 	{
 	case HIT_PLAYER:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/dualslayer/MasterHeroSkill_Hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/DualKukri/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_STATIC, "CK_WPN/WEAPON/DualSlayer/MasterHeroSkill_Hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualSlayer/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	case HIT_WALL:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/dualslayer/MasterHero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualSlayer/MasterHero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	}
@@ -410,13 +595,13 @@ void CKnifeDualSlayer::DelayPrimaryAttack()
 	{
 	case HIT_PLAYER:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/dualslayer/MasterHero_HIT.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/dualslayer/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_STATIC, "CK_WPN/WEAPON/DualSlayer/MasterHeroSkill_Hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualSlayer/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	case HIT_WALL:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/dualslayer/MasterHero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualSlayer/MasterHero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	}
@@ -443,13 +628,14 @@ void CKnifeDualSlayer::DelaySecondaryAttack()
 	case HIT_PLAYER:
 	{
 		SendWeaponAnim(ANIM_STAB2_HIT, UseDecrement() != FALSE);
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/dualslayer/MasterHero_HIT.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/dualslayer/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_STATIC, "CK_WPN/WEAPON/DualSlayer/MasterHero_HIT.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualSlayer/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	case HIT_WALL:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/dualslayer/MasterHero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		UTIL_EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualSlayer/MasterHero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	}

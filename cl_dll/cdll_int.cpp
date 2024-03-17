@@ -330,6 +330,9 @@ int DLLEXPORT HUD_VidInit( void )
 	g_ParticleManager.ResetData();
 	g_ModelFXManager.ResetData();
 
+	IEngineStudio.StudioBindBMPResetData();
+	IEngineStudio.StudioBindSPRResetData();
+
 	return 1;
 }
 

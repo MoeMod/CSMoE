@@ -617,6 +617,16 @@ void R_StudioAddBindBMPList(cl_entity_s* ent, studiohdr_t* header, const char* s
 	BindBMPManager().ReadSprInfo(ent, header, sprFile, texIndex, flag, framerate, starttime, endtime);
 }
 
+void R_StudioBindBMPResetData()
+{
+	BindBMPManager().Vidinit();
+}
+
+void R_StudioBindSPRResetData()
+{
+	BindSprManager().Vidinit();
+}
+
 void GAME_EXPORT R_StudioPgluPerspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
 {
 	//相当于重写 设置新的投影矩阵
@@ -4088,7 +4098,10 @@ static engine_studio_api_t gStudioAPI =
 	R_StudioPgluPerspective,
 	R_StudioGetProjectionMatrix,
 	R_StudioSetProjectionMatrix,
-	R_StudioAddBindBMPList
+	R_StudioAddBindBMPList,
+	R_StudioBindBMPResetData,
+	R_StudioBindSPRResetData
+	
 };
 
 static r_studio_interface_t gStudioDraw =

@@ -598,6 +598,7 @@ public:
 			|| m_iId == WEAPON_FIRECRACKER
 			|| m_iId == WEAPON_LEAPSTRIKEGUN
 			|| m_iId == WEAPON_Z4B_DEAGLEEL
+			|| m_iId == WEAPON_JUMPSPIRIT
 			);
 	}
 	void SetPlayerShieldAnim();

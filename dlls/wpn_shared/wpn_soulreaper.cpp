@@ -29,11 +29,383 @@ namespace cl {
 namespace sv {
 #endif
 
-#ifndef CLIENT_DLL
-    class CSoulReaper;
-    class CSoulReaperBModeProj : public CBaseEntity
-    {
+    class CSoulReaperBModeProj;
+    class CSoulReaper : public LinkWeaponTemplate< CSoulReaper,
+        TGeneralData,
+        BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
+        TPrecacheEvent,
+        TGetDamageDefault
+        >
+        {
     public:
+
+            static constexpr const char* V_Model = "models/v_soulreaper.mdl";
+            static constexpr const char* P_Model = "models/p_soulreaper.mdl";
+            static constexpr const char* W_Model = "models/w_soulreaper.mdl";
+            static constexpr const char* EventFile = "events/soulreaper.sc";
+            static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
+            static constexpr const char* ClassName = "weapon_soulreaper";
+            static constexpr int MaxClip = 80;
+            enum
+            {
+                ANIM_IDLEA = 0,
+                ANIM_SHOOTA,
+                ANIM_RELOADA,
+                ANIM_DRAWA,
+                ANIM_SHOOTBA,
+                ANIM_SHOOTBC,
+                ANIM_IDLEC,
+                ANIM_SHOOTC,
+                ANIM_RELOADC,
+                ANIM_CHANGECA,
+            };
+
+            enum soulreaper_bodygroup_e
+            {
+                GROUP_WEAPON1,
+                GROUP_WEAPON2,
+                GROUP_WEAPON3,
+                GROUP_WEAPON4,
+                GROUP_STONE,
+                GROUP_HANDS,
+            };
+
+            static constexpr const auto AModeReloadTime = 2.0s;
+            static constexpr const auto AModeCycleTime = 0.185s;
+
+            static constexpr const auto deployAttackTime = 0.1s;
+            static constexpr const auto deployIdleTime = 1.0s;
+
+            static constexpr const float AModeAccuracy = 0.1f;
+            static constexpr const float AModeAccuracyDiv = 240.0f;
+            static constexpr const float AModeAccuracyAdd = 0.3f;
+            static constexpr const float AModeAccuracyLimit = 0.8f;
+            static constexpr const float AModeSpreadJump = 0.2f;
+            static constexpr const float AModeSpreadStand = 0.01f;
+            static constexpr const float AModeDistance = 8192.0f;
+            static constexpr const int AModePenetration = 3;
+            static constexpr const float AModeRangeMod = 0.97f;
+            static constexpr const float AModeFanAttackMeter = 9.0f;
+            static constexpr const float AModeFanAttackAngle = 120.0f;
+
+            static constexpr const auto BModeToAModeDelay = 0.2s;
+            static constexpr const auto BModeToBModeDelay = 0.6s;
+            static constexpr const auto BModeToCModeDelay = 1.0s;
+
+            static constexpr const int BModeMaxEnergy = 60;
+            static constexpr const int BModeChargeEnergy = 2;
+            static constexpr const int BModeMakeProjEnergy = 20;
+
+            static constexpr const int CModeChargeMax = 100;
+            static constexpr const int CModeChargeAmount = 2;
+            static constexpr const int CModeChargeAmountZombie = 2;
+            static constexpr const int CModeChargeAmountScenario = 2;
+
+            static constexpr const int CModeChargeAmountWhenKill = 4;
+            static constexpr const int CModeChargeAmountWhenKillZombie = 4;
+            static constexpr const int CModeChargeAmountWhenKillScenario = 1;
+            static constexpr const int CModeChargeAmountWhenAssist = 2;
+            static constexpr const int CModeChargeAmountWhenAssistZombie = 2;
+            static constexpr const int CModeChargeAmountWhenAssistScenario = 1;
+
+            static constexpr const auto CModeChargeInterval = 0.1s;//0.67s;
+            static constexpr const auto CModeChargeIntervalZombie = 0.67s;
+            static constexpr const auto CModeChargeIntervalScenario = 0.67s;
+            static constexpr const auto CModeChargeDelay = 1.0s;
+            static constexpr const auto CModeConsumeInterval = 0.054s;
+            static constexpr const int CModeCanChangeGauge = 30;
+            static constexpr const int CModeChangeUseGauge = 20;
+
+            static constexpr const auto CModeReloadTime = 2.0s;
+            static constexpr const auto CModeCycleTime = 1.15s;
+
+            static constexpr const float CModeActivatedAttackRadius = 6.0f;
+            static constexpr const float CModeActivatedAttackKnockbackSide = 0.0f;
+            static constexpr const float CModeActivatedAttackKnockbackUp = 0.0f;
+            static constexpr const float CModeActivatedAttackKnockbackSideZombie = 1700.0f;
+            static constexpr const float CModeActivatedAttackKnockbackUpZombie = 100.0f;
+            static constexpr const float CModeActivatedAttackKnockbackSideScenario = 200.0f;
+            static constexpr const float CModeActivatedAttackKnockbackUpScenario = 100.0f;
+            static constexpr const auto CModeActivatedAttackKnockbackDuration = 0.25s;
+
+            static constexpr const float CModeDistance = 51.0f;
+            static constexpr const float CModeRadius = 4.0f;
+            static constexpr const auto CModeFixedMoveTime = 2.0s;
+            static constexpr const float CModeFixedMoveSpeed = 50.0f;
+            static constexpr const float CModeFixedMoveGravity = 2.0f;
+            static constexpr const auto CModePullingDuration = 0.0s;
+            static constexpr const auto CModePullingDurationZombie = 0.3s;
+            static constexpr const auto CModePullingDurationScenario = 0.3s;
+
+            static constexpr const auto BModeFireProjCycleTime = 0.85s;
+            static constexpr const float BModeProjSpeed = 1900.0f;
+
+            /* static constexpr const int KillEvasionShotCount = 99999;
+             static constexpr const int KillEvasionShotCountZombie = 20;
+             static constexpr const int KillEvasionShotCountScenario = 20;
+             static constexpr const auto KillEvasionWeaponCooltime = 99999s;
+             static constexpr const auto KillEvasionWeaponCooltimeZombie = 80.0s;
+             static constexpr const auto KillEvasionWeaponCooltimeScenario = 60.0s;
+             static constexpr const auto KillEvasionPlayerCooltime = 99999s;
+             static constexpr const auto KillEvasionPlayerCooltimeZombie = 80.0s;
+             static constexpr const auto KillEvasionPlayerCooltimeScenario = 60.0s;*/
+            static constexpr const auto KillEvasionGodTime = 2.0s;
+
+            static constexpr const float KillEvasionAttackRadius = 7.0f;
+            static constexpr const float KillEvasionKnockbackSide = 0.0f;
+            static constexpr const float KillEvasionKnockbackSideZombie = 1700.0f;
+            static constexpr const float KillEvasionKnockbackSideScenario = 500.0f;
+            static constexpr const float KillEvasionKnockbackUp = 0.0f;
+            static constexpr const float KillEvasionKnockbackUpZombie = 150.0f;
+            static constexpr const float KillEvasionKnockbackUpScenario = 100.0f;
+            static constexpr const auto KillEvasionFixedMoveDuration = 2.5s;
+            static constexpr const float KillEvasionFixedMoveSpeed = 50.0f;
+            static constexpr const float KillEvasionFixedMoveGravity = 2.0f;
+            static constexpr const float KillEvasionAttackHeal = 0.0f;
+            static constexpr const float KillEvasionAttackHealZombie = 300.0f;
+            static constexpr const float KillEvasionAttackHealScenario = 200.0f;
+            static constexpr const float KillEvasionAttackHealMax = 0.0f;
+            static constexpr const float KillEvasionAttackHealMaxZombie = 1200.0f;
+            static constexpr const float KillEvasionAttackHealMaxScenario = 2000.0f;
+
+            static constexpr float PlayerMaxSpeed = 245;
+            static constexpr float ArmorRatioModifier = 1.6f;
+
+            static constexpr int DamageDefault = 26;
+            static constexpr int DamageZB = 590;
+            static constexpr int DamageZBS = 2300;
+
+            static constexpr const int BModeProjSize = 4;
+
+            KnockbackData KnockBack = { 650.0f, 600.0f, 700.0f, 600.0f, 0.4f };
+
+            KnockbackData GetKnockBackData() override
+            {
+                return { 650.0f, 600.0f, 700.0f, 600.0f, 0.4f };
+            }
+
+            int m_iExpIndex;
+            int m_iHitIndex[2];
+            int m_iChargeShotFired;
+            int m_iSkillShotFired;
+            int m_iEF_Amode;
+            int m_iEF_Cmode;
+            int m_iEF_Skill;
+            int m_iModelIndex;
+            int m_iBModeProjAmmo;
+            time_point_t m_flNextShootCAttack;
+            time_point_t m_flTimeNextCharge;
+            time_point_t m_flTimeNextCharge2;
+            time_point_t m_flTimeCheckCharge;
+            time_point_t m_flWeaponBuffRecordTime;
+            time_point_t m_flNextShootBAttack;
+            EHANDLE m_hProjs[BModeProjSize];
+
+            void Spawn()
+            {
+                m_iSkillShotFired = 0;
+                m_iChargeShotFired = 0;
+                pev->iuser2 = pev->iuser1 = 0;
+                pev->iuser1 = 10;
+                m_flNextShootBAttack = invalid_time_point;
+                ResetChargeTimer();
+                Base::Spawn();
+            }
+
+            int GetItemInfo(ItemInfo* p)
+            {
+                p->pszName = STRING(pev->classname);
+                p->pszAmmo1 = "soulreaper";
+                p->iMaxAmmo1 = 200;
+                p->pszAmmo2 = "soulreaper_c";
+                p->iMaxAmmo2 = CModeChargeMax;
+                p->iMaxClip = MaxClip;
+                p->iSlot = 0;
+                p->iPosition = 1;
+                p->iId = m_iId = WEAPON_SOULREAPER;
+                p->iFlags = 0;
+                p->iWeight = 20;
+
+                return 1;
+            }
+
+            int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
+            {
+                if (pev->iuser1)
+                {
+                    if (m_pPlayer)
+                        m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = pev->iuser1;
+                    pev->iuser1 = 0;
+                }
+                return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+            }
+
+            float GetArmorRatioModifier() override { return 1.6; }
+
+    #ifndef CLIENT_DLL
+            WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_soulreaper" , 200 }; }
+    #endif
+            WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR, 4, 3, 0 }; }
+
+    #ifndef CLIENT_DLL
+            void SetSubModel()
+            {
+                pev->modelindex = m_iModelIndex;
+
+                int iSubModel;
+
+                if (m_iWeaponState == 2)
+                    iSubModel = 1;
+                else
+                    iSubModel = 0;
+
+                if (GetBodygroup(GROUP_STONE) != iSubModel)
+                {
+                    SetBodygroup(GROUP_STONE, iSubModel);
+                }
+
+                int hands = 0;
+
+                if (m_pPlayer && m_pPlayer->m_bIsFemale)
+                    hands = 1;
+
+                SetBodygroup(GROUP_HANDS, hands);
+
+                pev->modelindex = 0;
+            }
+    #endif
+
+            void Precache(void) override
+            {
+                m_iModelIndex = PRECACHE_MODEL(V_Model);
+
+                m_iEF_Amode = PRECACHE_MODEL("models/ef_soulreaper_Amode.mdl");
+                m_iEF_Cmode = PRECACHE_MODEL("models/ef_soulreaper_Cmode.mdl");
+                m_iEF_Skill = PRECACHE_MODEL("models/ef_soulreaper_skill.mdl");
+
+                PRECACHE_MODEL("models/ef_soulreaper_shoot_c.mdl");
+                PRECACHE_MODEL("models/ef_soulreaper_shoot_c02.mdl");
+
+                PRECACHE_MODEL("sprites/ef_soulreaper_amode.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_bmode.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_charging.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_cmode.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_sphere_c.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_blue01.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_blue02.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_exp.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_green01.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_green02.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_laser.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_shoot_c.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_skill.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_sphere.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_sphere02.spr");
+                PRECACHE_MODEL("sprites/ef_soulreaper_p.spr");
+
+                PRECACHE_MODEL("sprites/muzzleflash356.spr");
+                PRECACHE_MODEL("sprites/muzzleflash357.spr");
+                PRECACHE_MODEL("sprites/muzzleflash358.spr");
+                PRECACHE_MODEL("sprites/muzzleflash359.spr");
+                PRECACHE_MODEL("sprites/muzzleflash360.spr");
+                PRECACHE_MODEL("sprites/muzzleflash361.spr");
+                PRECACHE_MODEL("sprites/muzzleflash362.spr");
+                return Base::Precache();
+            }
+
+            float GetAModeFanAttackDamage() const
+            {
+                float flDamage = 6.0f;
+    #ifndef CLIENT_DLL
+                if (g_pModRunning->DamageTrack() == DT_ZB)
+                    flDamage = 240.0f;
+                else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                    flDamage = 1024.0f;
+    #endif
+                return flDamage;
+            }
+
+            float GetCModeActivatedAttackDamage() const
+            {
+                float flDamage = 10.0f;
+    #ifndef CLIENT_DLL
+                if (g_pModRunning->DamageTrack() == DT_ZB)
+                    flDamage = 1200.0f;
+                else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                    flDamage = 2400.0f;
+    #endif
+                return flDamage;
+            }
+
+            float GetCModeDamage() const
+            {
+                float flDamage = 32.0f;
+    #ifndef CLIENT_DLL
+                if (g_pModRunning->DamageTrack() == DT_ZB)
+                    flDamage = 11263.0f;
+                else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                    flDamage = 30400.0f;
+    #endif
+                return flDamage;
+            }
+
+            float GetKillEvasionDamage() const
+            {
+                float flDamage = 0.0f;
+    #ifndef CLIENT_DLL
+                if (g_pModRunning->DamageTrack() == DT_ZB)
+                    flDamage = 5200.0f;
+                else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                    flDamage = 16000.0f;
+    #endif
+                return flDamage;
+            }
+
+            duration_t GetChargeTime()
+            {
+                duration_t flTime = CModeChargeInterval;
+    #ifndef CLIENT_DLL
+                if (g_pModRunning->DamageTrack() == DT_ZB)
+                    flTime = CModeChargeIntervalZombie;
+                else if (g_pModRunning->DamageTrack() == DT_ZBS)
+                    flTime = CModeChargeIntervalScenario;
+    #endif
+                return flTime;
+            }
+
+            int AddToPlayer(CBasePlayer* pPlayer) override;
+            void Holster(int skiplocal) override;
+            void PrimaryAttack(void) override;
+            void SecondaryAttack() override;
+            BOOL Deploy(void) override;
+            void Reload(void) override;
+            void WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+            void WeaponIdle(void) override;
+            void ItemPostFrame(void) override;
+
+            void ResetChargeTimer();
+            void ChargeAmmo();  
+            void RemoveProj();     
+            void StopSound();
+            void CreateProj();
+            void SoulReaperFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
+            void SoulReaperFireC(duration_t flCycleTime);   
+            void ConsumeAmmo();
+#ifndef CLIENT_DLL
+            void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace);
+#endif  
+            void SetProjAngle();
+        
+        };
+
+
+    LINK_ENTITY_TO_CLASS(weapon_soulreaper, CSoulReaper)
+
+
+#ifndef CLIENT_DLL
+     class CSoulReaperBModeProj : public CBaseEntity
+    {
+        public:
         float GetArmorRatioModifier() { return 0.9; }
         int GetWeaponsId(void) { return WEAPON_SOULREAPER; }
 
@@ -66,7 +438,7 @@ namespace sv {
         }
 
         duration_t GetBModeProjExploKnockbackDuration() const
-        {        
+        {
             if (g_pModRunning->DamageTrack() == DT_ZB)
                 return BModeProjExploKnockbackDurationZombie;
             else if (g_pModRunning->DamageTrack() == DT_ZBS)
@@ -121,6 +493,9 @@ namespace sv {
             if (m_iType == 1)
                 return;
 
+            if (m_pWeapon->m_flNextShootBAttack > gpGlobals->time)
+                return;
+
             if (m_hTarget)
                 return;
 
@@ -168,6 +543,12 @@ namespace sv {
 
                 pev->solid = SOLID_NOT;
                 pev->movetype = MOVETYPE_NOCLIP;
+
+                m_pWeapon->m_flNextShootBAttack = gpGlobals->time + BModeFireProjCycleTime;
+
+                m_pWeapon->ConsumeAmmo();
+                m_pWeapon->SetProjAngle();
+
             }
 
 
@@ -211,7 +592,7 @@ namespace sv {
 
             float flRadius = BModeProjExploRadius * 39.37;
             float flDamage = GetBModeProjExploDamage();
-         
+
             while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
             {
                 if (pEntity->pev->takedamage == DAMAGE_NO)
@@ -241,19 +622,19 @@ namespace sv {
                 ApplyMultiDamage(pev, m_pOwner->pev);
 
                 //knockback dir
-                vecDir = (m_pOwner->GetGunPosition() - vecEnd).Normalize();
+                vecDir = (vecEnd - m_pOwner->GetGunPosition()).Normalize();
 
                 if (pEntity->IsPlayer())
                 {
                     CBasePlayer* player = dynamic_cast<CBasePlayer*>(pEntity);
-      
+
                     player->m_flPushBoost = GetBModeProjExploKnockbackSide();
                     player->m_flPushBoostZ = GetBModeProjExploKnockbackUp();
                     player->m_vecPushDirection = vecDir;
                     player->m_flPushDuration = gpGlobals->time + GetBModeProjExploKnockbackDuration();
                 }
             }
-            
+
 
             SetThink(nullptr);
             UTIL_Remove(this);
@@ -309,7 +690,7 @@ namespace sv {
                 Vector vecOffset = crossProduct * sin(pev->fuser1 * M_PI / 180) + vecRight * cos(pev->fuser1 * M_PI / 180);
 
                 pev->origin = vecSrc + vecOffset;
-              
+
                 pev->fuser1 += 1;
             }
         }
@@ -329,7 +710,7 @@ namespace sv {
 
             if (m_iType == 1)
             {
-               
+
 
                 pev->velocity = std::move(vecVelocity);
             }
@@ -343,24 +724,27 @@ namespace sv {
         KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.6f }; }
 
         static constexpr const float BModeFindTargetRadius = 5.0f;
-        
+
         static constexpr const float BModeProjExpDist = 1.0f;
         static constexpr const float BModeProjExploRadius = 3.5f;
         static constexpr const float BModeProjSpeed = 1900.0f;
 
-        static constexpr const float BModeProjExploKnockbackSide = 0.0f;
-        static constexpr const float BModeProjExploKnockbackUp = 0.0f;
+        static constexpr const float BModeProjExploKnockbackSide = 1500.0f;
+        static constexpr const float BModeProjExploKnockbackUp = 100.0f;
         static constexpr const float BModeProjExploKnockbackSideZombie = 1500.0f;
         static constexpr const float BModeProjExploKnockbackUpZombie = 100.0f;
         static constexpr const float BModeProjExploKnockbackSideScenario = 200.0f;
         static constexpr const float BModeProjExploKnockbackUpScenario = 100.0f;
 
-        static constexpr const auto BModeProjExploKnockbackDuration = 0.0s;
+        static constexpr const auto BModeProjExploKnockbackDuration = 0.5s;
         static constexpr const auto BModeProjExploKnockbackDurationZombie = 0.5s;
         static constexpr const auto BModeProjExploKnockbackDurationScenario = 0.5s;
 
         static constexpr float BModeProjOffset = 32.0;
         static constexpr float BModeProjRadius = 10.0;
+
+        static constexpr const auto BModeFireProjCycleTime = 0.85s;
+        static constexpr const int BModeMakeProjEnergy = 20;
 
         Vector m_vecCenter;
         float m_flRadius;
@@ -370,361 +754,20 @@ namespace sv {
         int m_iSprExplo;
         int m_iType;
         EHANDLE m_hTarget;
-        CSoulReaper *m_pWeapon;
-        CBasePlayer *m_pOwner;
+        CSoulReaper* m_pWeapon;
+        CBasePlayer* m_pOwner;
 
     };
     LINK_ENTITY_TO_CLASS(soulreaper_bmodeproj, CSoulReaperBModeProj)
 #endif
 
-    class CSoulReaper : public LinkWeaponTemplate< CSoulReaper,
-            TGeneralData,
-            BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
-            TPrecacheEvent,
-            TGetDamageDefault
-    >
-    {
-    public:
-  
-    static constexpr const char *V_Model = "models/v_soulreaper.mdl";
-    static constexpr const char *P_Model = "models/p_soulreaper.mdl";
-    static constexpr const char *W_Model = "models/w_soulreaper.mdl";
-    static constexpr const char *EventFile = "events/soulreaper.sc";
-    static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
-    static constexpr const char *ClassName = "weapon_soulreaper";
-    static constexpr int MaxClip = 80;
-    enum
-    {
-        ANIM_IDLEA = 0,
-        ANIM_SHOOTA,
-        ANIM_RELOADA,
-        ANIM_DRAWA,
-        ANIM_SHOOTBA,
-        ANIM_SHOOTBC,
-        ANIM_IDLEC,
-        ANIM_SHOOTC,
-        ANIM_RELOADC,
-        ANIM_CHANGECA,
-	};
-
-    enum soulreaper_bodygroup_e
-    {
-        GROUP_WEAPON1,
-        GROUP_WEAPON2,
-        GROUP_WEAPON3,
-        GROUP_WEAPON4,
-        GROUP_STONE,
-        GROUP_HANDS,
-    };
-
-    static constexpr const auto AModeReloadTime = 2.0s;
-    static constexpr const auto AModeCycleTime = 0.185s;
-
-    static constexpr const auto deployAttackTime = 0.1s;
-    static constexpr const auto deployIdleTime = 1.0s;
-
-    static constexpr const float AModeAccuracy = 0.1f;
-    static constexpr const float AModeAccuracyDiv = 240.0f;
-    static constexpr const float AModeAccuracyAdd = 0.3f;
-    static constexpr const float AModeAccuracyLimit = 0.8f;
-    static constexpr const float AModeSpreadJump = 0.2f;
-    static constexpr const float AModeSpreadStand = 0.01f;
-    static constexpr const float AModeDistance = 8192.0f;
-    static constexpr const int AModePenetration = 3;
-    static constexpr const float AModeRangeMod = 0.97f;
-    static constexpr const float AModeFanAttackMeter = 9.0f;
-    static constexpr const float AModeFanAttackAngle = 120.0f;
-
-    static constexpr const auto BModeToAModeDelay = 0.2s;
-    static constexpr const auto BModeToBModeDelay = 0.6s;
-    static constexpr const auto BModeToCModeDelay = 1.0s;
-
-    static constexpr const int BModeMaxEnergy = 60;
-    static constexpr const int BModeChargeEnergy = 2;
-    static constexpr const int BModeMakeProjEnergy = 20;
-
-    static constexpr const int CModeChargeMax = 100;
-    static constexpr const int CModeChargeAmount = 2;
-    static constexpr const int CModeChargeAmountZombie = 2;
-    static constexpr const int CModeChargeAmountScenario = 2;
-
-    static constexpr const int CModeChargeAmountWhenKill = 4;
-    static constexpr const int CModeChargeAmountWhenKillZombie = 4;
-    static constexpr const int CModeChargeAmountWhenKillScenario = 1;
-    static constexpr const int CModeChargeAmountWhenAssist = 2;
-    static constexpr const int CModeChargeAmountWhenAssistZombie = 2;
-    static constexpr const int CModeChargeAmountWhenAssistScenario = 1;
-
-    static constexpr const auto CModeChargeInterval = 0.1s;//0.67s;
-    static constexpr const auto CModeChargeIntervalZombie = 0.67s;
-    static constexpr const auto CModeChargeIntervalScenario = 0.67s;
-    static constexpr const auto CModeChargeDelay = 1.0s;
-    static constexpr const auto CModeConsumeInterval = 0.054s;
-    static constexpr const int CModeCanChangeGauge = 30;
-    static constexpr const int CModeChangeUseGauge = 20;
-
-    static constexpr const auto CModeReloadTime = 2.0s;
-    static constexpr const auto CModeCycleTime = 1.15s;
-
-    static constexpr const float CModeActivatedAttackRadius = 6.0f;
-    static constexpr const float CModeActivatedAttackKnockbackSide = 0.0f;
-    static constexpr const float CModeActivatedAttackKnockbackUp = 0.0f;
-    static constexpr const float CModeActivatedAttackKnockbackSideZombie = 1700.0f;
-    static constexpr const float CModeActivatedAttackKnockbackUpZombie = 100.0f;
-    static constexpr const float CModeActivatedAttackKnockbackSideScenario = 200.0f;
-    static constexpr const float CModeActivatedAttackKnockbackUpScenario = 100.0f;
-    static constexpr const auto CModeActivatedAttackKnockbackDuration = 0.25s;
-
-    static constexpr const float CModeDistance = 51.0f;
-    static constexpr const float CModeRadius = 4.0f;
-    static constexpr const auto CModeFixedMoveTime = 2.0s;
-    static constexpr const float CModeFixedMoveSpeed = 50.0f;
-    static constexpr const float CModeFixedMoveGravity = 2.0f;
-    static constexpr const auto CModePullingDuration = 0.0s;
-    static constexpr const auto CModePullingDurationZombie = 0.3s;
-    static constexpr const auto CModePullingDurationScenario = 0.3s;
-
-    static constexpr const auto BModeFireProjCycleTime = 0.85s;
-    static constexpr const float BModeProjSpeed = 1900.0f;
-
-   /* static constexpr const int KillEvasionShotCount = 99999;
-    static constexpr const int KillEvasionShotCountZombie = 20;
-    static constexpr const int KillEvasionShotCountScenario = 20;
-    static constexpr const auto KillEvasionWeaponCooltime = 99999s;
-    static constexpr const auto KillEvasionWeaponCooltimeZombie = 80.0s;
-    static constexpr const auto KillEvasionWeaponCooltimeScenario = 60.0s;
-    static constexpr const auto KillEvasionPlayerCooltime = 99999s;
-    static constexpr const auto KillEvasionPlayerCooltimeZombie = 80.0s;
-    static constexpr const auto KillEvasionPlayerCooltimeScenario = 60.0s;*/
-    static constexpr const auto KillEvasionGodTime = 2.0s;
-
-    static constexpr const float KillEvasionAttackRadius = 7.0f;
-    static constexpr const float KillEvasionKnockbackSide = 0.0f;
-    static constexpr const float KillEvasionKnockbackSideZombie = 1700.0f;
-    static constexpr const float KillEvasionKnockbackSideScenario = 500.0f;
-    static constexpr const float KillEvasionKnockbackUp = 0.0f;
-    static constexpr const float KillEvasionKnockbackUpZombie = 150.0f;
-    static constexpr const float KillEvasionKnockbackUpScenario = 100.0f;
-    static constexpr const auto KillEvasionFixedMoveDuration = 2.5s;
-    static constexpr const float KillEvasionFixedMoveSpeed = 50.0f;
-    static constexpr const float KillEvasionFixedMoveGravity = 2.0f;
-    static constexpr const float KillEvasionAttackHeal = 0.0f;
-    static constexpr const float KillEvasionAttackHealZombie = 300.0f;
-    static constexpr const float KillEvasionAttackHealScenario = 200.0f;
-    static constexpr const float KillEvasionAttackHealMax = 0.0f;
-    static constexpr const float KillEvasionAttackHealMaxZombie = 1200.0f;
-    static constexpr const float KillEvasionAttackHealMaxScenario = 2000.0f;
-
-    static constexpr float PlayerMaxSpeed = 245;
-    static constexpr float ArmorRatioModifier = 1.6f;
-
-    static constexpr int DamageDefault = 26;
-    static constexpr int DamageZB = 590;
-    static constexpr int DamageZBS = 2300;
-
-    static constexpr const int BModeProjSize = 4;
-   
-    KnockbackData KnockBack = { 650.0f, 600.0f, 700.0f, 600.0f, 0.4f };
-
-    KnockbackData GetKnockBackData() override
-    {
-        return { 650.0f, 600.0f, 700.0f, 600.0f, 0.4f };
-    }
-
-    int m_iExpIndex;
-    int m_iHitIndex[2];
-    int m_iChargeShotFired;
-    int m_iSkillShotFired;
-    int m_iEF_Amode;
-    int m_iEF_Cmode;
-    int m_iEF_Skill;
-    int m_iModelIndex;
-    int m_iBModeProjAmmo;
-    time_point_t m_flNextShootCAttack;
-    time_point_t m_flTimeNextCharge;
-    time_point_t m_flTimeNextCharge2;
-    time_point_t m_flTimeCheckCharge;
-    time_point_t m_flWeaponBuffRecordTime;
-    EHANDLE m_hProjs[BModeProjSize];
-
-    void Spawn()
-    { 
-        m_iSkillShotFired = 0;
-        m_iChargeShotFired = 0;
-        pev->iuser2 = pev->iuser1 = 0;
-        pev->iuser1 = 10;
-        ResetChargeTimer();
-        Base::Spawn();
-    }
-
-    int GetItemInfo(ItemInfo* p)
-    {
-        p->pszName = STRING(pev->classname);
-        p->pszAmmo1 = "soulreaper";
-        p->iMaxAmmo1 = 200;
-        p->pszAmmo2 = "soulreaper_c";
-        p->iMaxAmmo2 = CModeChargeMax;
-        p->iMaxClip = MaxClip;
-        p->iSlot = 0;
-        p->iPosition = 1;
-        p->iId = m_iId = WEAPON_SOULREAPER;
-        p->iFlags = 0;
-        p->iWeight = 20;
-
-        return 1;
-    }
-
-    int ExtractAmmo(CBasePlayerWeapon* pWeapon) override
-    {
-        if (pev->iuser1)
-        {
-            if (m_pPlayer)
-                m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = pev->iuser1;
-            pev->iuser1 = 0;
-        }
-        return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-    }
-
-    float GetArmorRatioModifier() override { return 1.6; }
-
-#ifndef CLIENT_DLL
-    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_soulreaper" , 200 }; }
-#endif
-    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR, 4, 3, 0 }; }
-
-#ifndef CLIENT_DLL
-    void SetSubModel()
-    {
-        pev->modelindex = m_iModelIndex;
-
-        int iSubModel;
-
-        if (m_iWeaponState == 2)
-            iSubModel = 1;
-        else
-            iSubModel = 0;
-
-        if (GetBodygroup(GROUP_STONE) != iSubModel)
-        {
-            SetBodygroup(GROUP_STONE, iSubModel);
-        }
-
-        int hands = 0;
-
-        if (m_pPlayer && m_pPlayer->m_bIsFemale)
-            hands = 1;
-
-        SetBodygroup(GROUP_HANDS, hands);
-
-        pev->modelindex = 0;
-    }
-#endif
-
-    void Precache(void) override
-    {
-        m_iModelIndex = PRECACHE_MODEL(V_Model);
-
-        m_iEF_Amode = PRECACHE_MODEL("models/ef_soulreaper_Amode.mdl");
-        m_iEF_Cmode = PRECACHE_MODEL("models/ef_soulreaper_Cmode.mdl");
-        m_iEF_Skill = PRECACHE_MODEL("models/ef_soulreaper_skill.mdl");
-
-        PRECACHE_MODEL("models/ef_soulreaper_shoot_c.mdl");
-        PRECACHE_MODEL("models/ef_soulreaper_shoot_c02.mdl");
-     
-        PRECACHE_MODEL("sprites/ef_soulreaper_amode.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_bmode.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_charging.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_cmode.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_sphere_c.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_blue01.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_blue02.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_exp.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_green01.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_green02.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_laser.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_shoot_c.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_skill.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_sphere.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_sphere02.spr");
-        PRECACHE_MODEL("sprites/ef_soulreaper_p.spr");
-        
-        PRECACHE_MODEL("sprites/muzzleflash356.spr");
-        PRECACHE_MODEL("sprites/muzzleflash357.spr");
-        PRECACHE_MODEL("sprites/muzzleflash358.spr");
-        PRECACHE_MODEL("sprites/muzzleflash359.spr");
-        PRECACHE_MODEL("sprites/muzzleflash360.spr");
-        PRECACHE_MODEL("sprites/muzzleflash361.spr");
-        PRECACHE_MODEL("sprites/muzzleflash362.spr");
-        return Base::Precache();
-    }
-
-    float GetAModeFanAttackDamage() const
-    {
-        float flDamage = 6.0f;
-#ifndef CLIENT_DLL
-        if (g_pModRunning->DamageTrack() == DT_ZB)
-            flDamage = 240.0f;
-        else if (g_pModRunning->DamageTrack() == DT_ZBS)
-            flDamage = 1024.0f;
-#endif
-        return flDamage;
-    }
-
-    float GetCModeActivatedAttackDamage() const
-    {
-        float flDamage = 10.0f;
-#ifndef CLIENT_DLL
-        if (g_pModRunning->DamageTrack() == DT_ZB)
-            flDamage = 1200.0f;
-        else if (g_pModRunning->DamageTrack() == DT_ZBS)
-            flDamage = 2400.0f;
-#endif
-        return flDamage;
-    }
-
-    float GetCModeDamage() const
-    {
-        float flDamage = 32.0f;
-#ifndef CLIENT_DLL
-        if (g_pModRunning->DamageTrack() == DT_ZB)
-            flDamage = 11263.0f;
-        else if (g_pModRunning->DamageTrack() == DT_ZBS)
-            flDamage = 30400.0f;
-#endif
-        return flDamage;
-    }
-
-    float GetKillEvasionDamage() const
-    {
-        float flDamage = 0.0f;
-#ifndef CLIENT_DLL
-        if (g_pModRunning->DamageTrack() == DT_ZB)
-            flDamage = 5200.0f;
-        else if (g_pModRunning->DamageTrack() == DT_ZBS)
-            flDamage = 16000.0f;
-#endif
-        return flDamage;
-    }
-
-    duration_t GetChargeTime()
-    {
-        duration_t flTime = CModeChargeInterval;
-#ifndef CLIENT_DLL
-        if (g_pModRunning->DamageTrack() == DT_ZB)
-            flTime = CModeChargeIntervalZombie;
-        else if (g_pModRunning->DamageTrack() == DT_ZBS)
-            flTime = CModeChargeIntervalScenario;
-#endif
-        return flTime;
-    }
-
-    void ResetChargeTimer()
+    void CSoulReaper::ResetChargeTimer()
     {
         if (m_iWeaponState != 2 && pev->iuser1 != CModeChargeMax && m_flTimeNextCharge == invalid_time_point)
             m_flTimeNextCharge = gpGlobals->time + GetChargeTime();
     }
 
-    void ChargeAmmo()
+    void CSoulReaper::ChargeAmmo()
     {
         if (m_flTimeNextCharge != invalid_time_point && m_flTimeNextCharge <= gpGlobals->time)
         {
@@ -771,7 +814,7 @@ namespace sv {
         
     }
 
-    void Holster(int skiplocal)
+    void CSoulReaper::Holster(int skiplocal)
     {
         ResetChargeTimer();
         StopSound();
@@ -780,20 +823,21 @@ namespace sv {
         CBasePlayerWeapon::Holster();
     }
 
-    void RemoveProj()
+    void CSoulReaper::RemoveProj()
     {
 #ifndef CLIENT_DLL
         for (int i = 0; i < BModeProjSize; i++)
         {
             if (m_hProjs[i].Get() != NULL)
             {
-                ((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->RemoveProj();
+                if(((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->m_iType == 0)
+                    ((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->RemoveProj();
             }
         }
 #endif
     }
 
-    BOOL Deploy(void) override
+    BOOL CSoulReaper::Deploy(void)
     {
         m_iShotsFired = 0;
         m_flAccuracy = AModeAccuracy;
@@ -845,7 +889,7 @@ namespace sv {
         return FALSE;
     }
 
-    void PrimaryAttack(void) override
+    void CSoulReaper::PrimaryAttack(void)
     {
         if (m_iWeaponState == 2)
         {
@@ -861,7 +905,7 @@ namespace sv {
      
     }
 
-    void StopSound()
+    void CSoulReaper::StopSound()
     {
 #ifndef CLIENT_DLL
         MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->edict());
@@ -873,7 +917,7 @@ namespace sv {
 #endif
     }
 
-    void CreateProj()
+    void CSoulReaper::CreateProj()
     {
 #ifndef CLIENT_DLL
         int iCount = floor(float(pev->iuser2) / float(BModeMakeProjEnergy));
@@ -898,7 +942,7 @@ namespace sv {
 #endif
     }
 
-    void SoulReaperFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+    void CSoulReaper::SoulReaperFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
         m_bDelayFire = true;
         m_iShotsFired++;
@@ -927,15 +971,23 @@ namespace sv {
 
         m_iClip--;
 
-        pev->iuser2 += BModeChargeEnergy;
-        pev->iuser2 = Clamp(pev->iuser2, 0, BModeMaxEnergy);
+        m_iBModeProjAmmo = floor(float(pev->iuser2) / float(BModeMakeProjEnergy));
+        bool bCreateProj = false;
 
-        if (pev->iuser2 % BModeMakeProjEnergy == 0)
+        if (m_iBModeProjAmmo < BModeProjSize - 1)
         {
-            CreateProj();
-            SetProjAngle();
-        }
+            pev->iuser2 += BModeChargeEnergy;
+            pev->iuser2 = Clamp(pev->iuser2, 0, BModeMaxEnergy);
 
+            if (pev->iuser2 % BModeMakeProjEnergy == 0)
+            {
+                CreateProj();
+                SetProjAngle();
+                bCreateProj = true;
+            }
+
+        }
+       
         m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
         m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -945,20 +997,13 @@ namespace sv {
 
         Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, AModeDistance, AModePenetration, BULLET_PLAYER_762MM, GetDamage(), AModeRangeMod, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
-        int flags = 0;
-
-#ifdef CLIENT_WEAPONS
-        flags = FEV_NOTHOST;
-#else
-        flags = 0;
-#endif
-        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), pev->iuser2 % BModeMakeProjEnergy != 0, FALSE);
-
         m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
         m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;  
 
 #ifndef CLIENT_DLL
+        PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), !bCreateProj, FALSE);
+
         if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
             m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 
@@ -996,7 +1041,7 @@ namespace sv {
             KickBack(0.775, 0.425, 0.2, 0.03, 3.0, 2.75, 9);
     }
 
-    void SoulReaperFireC(duration_t flCycleTime)
+    void CSoulReaper::SoulReaperFireC(duration_t flCycleTime)
     {
         if (pev->iuser1 <= 0)
             return;
@@ -1088,21 +1133,15 @@ namespace sv {
             }
         }
 
-#endif
+
 
         UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
         vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0, 8192, 0, BULLET_PLAYER_556MM, 0, 0, m_pPlayer->pev, false, m_pPlayer->random_seed);
 
-        int flags = 0;
+        PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 2.0, vecDir.y, 0, 0, TRUE, FALSE);
 
-#ifdef CLIENT_WEAPONS
-        flags = FEV_NOTHOST;
-#else
-        flags = 0;
 #endif
-        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 2.0, vecDir.y, 0, 0, TRUE, FALSE);
-
         m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
         m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
@@ -1113,7 +1152,7 @@ namespace sv {
     }
 
 
-    void Reload(void)
+    void CSoulReaper::Reload(void)
     {
         if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
             return;
@@ -1129,7 +1168,7 @@ namespace sv {
     }
 
 #ifndef CLIENT_DLL
-    void FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace)
+    void CSoulReaper::FireBullet3CallBack(int iPenetration, Vector vecDir, TraceResult* pTrace)
     {
         int iOriginalPenetration = AModePenetration;
 
@@ -1150,11 +1189,9 @@ namespace sv {
             }
         }
     }
-
-
 #endif
 
-    void SetProjAngle()
+    void CSoulReaper::SetProjAngle()
     {
 #ifndef CLIENT_DLL
         int iProjCount = 0;
@@ -1179,7 +1216,7 @@ namespace sv {
             {
                 if (((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->m_iType == 0)
                 {
-                    ((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->pev->fuser1 = j * 360 / iProjCount;
+                    ((CSoulReaperBModeProj*)((CBaseEntity*)m_hProjs[i]))->pev->fuser1 = j * 360.0 / float(iProjCount);
                     j++;
                 }
 
@@ -1188,7 +1225,7 @@ namespace sv {
 #endif
     }
 
-    void ItemPostFrame()
+    void CSoulReaper::ItemPostFrame()
     {
         if (m_pPlayer->m_iWeaponBuffShotFired[WEAPON_BUFF_SOULREAPER] >= g_iWeaponBuffTargetShotFired[WEAPON_BUFF_SOULREAPER])
         {
@@ -1235,7 +1272,7 @@ namespace sv {
         return CBasePlayerWeapon::ItemPostFrame();
     }
 
-    int AddToPlayer(CBasePlayer* pPlayer)
+    int CSoulReaper::AddToPlayer(CBasePlayer* pPlayer)
     {
 #ifndef CLIENT_DLL
         m_flWeaponBuffRecordTime = gpGlobals->time;
@@ -1247,9 +1284,22 @@ namespace sv {
         return CBasePlayerWeapon::AddToPlayer(pPlayer);
     }
 
+    void CSoulReaper::ConsumeAmmo()
+    {
+        pev->iuser2 -= BModeMakeProjEnergy;
+        pev->iuser2 = Clamp(pev->iuser2, 0, BModeMaxEnergy);
 
+#ifndef CLIENT_DLL
+        MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+        WRITE_BYTE(55);
+        WRITE_BYTE(pev->iuser2);
+        WRITE_BYTE(BModeMaxEnergy);
+        MESSAGE_END();
+#endif
 
-    void SecondaryAttack()
+    }
+
+    void CSoulReaper::SecondaryAttack()
     {
         if (pev->iuser2 < BModeMakeProjEnergy)
         {
@@ -1257,27 +1307,13 @@ namespace sv {
             return;
         }
           
-        pev->iuser2 -= BModeMakeProjEnergy;
-        pev->iuser2 = Clamp(pev->iuser2, 0, BModeMaxEnergy);
-    #ifndef CLIENT_DLL
-        MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
-        WRITE_BYTE(55);
-        WRITE_BYTE(pev->iuser2);
-        WRITE_BYTE(BModeMaxEnergy);
-        MESSAGE_END();
-    #endif
+        ConsumeAmmo();
 
-        int flags = 0;
-
-    #ifdef CLIENT_WEAPONS
-        flags = FEV_NOTHOST;
-    #else
-        flags = 0;
-    #endif
         UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-        Vector vecSrc = m_pPlayer->GetGunPosition();
 #ifndef CLIENT_DLL
+        Vector vecSrc = m_pPlayer->GetGunPosition();
+
         for (int i = 0; i < BModeProjSize; i++)
         {
             if (m_hProjs[i].Get() != NULL)
@@ -1289,21 +1325,21 @@ namespace sv {
                 }
             }
         }
-#endif
+
         SetProjAngle();
 
         Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0, 8192, 0, BULLET_PLAYER_556MM, 0, 0, m_pPlayer->pev, false, m_pPlayer->random_seed);
         vecDir = gpGlobals->v_forward + gpGlobals->v_right * vecDir.x + gpGlobals->v_up * vecDir.y;
 
-        PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), m_iWeaponState != 0, TRUE);
-
+        PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), m_iWeaponState != 0, TRUE);
+#endif
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + BModeFireProjCycleTime;
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + BModeFireProjCycleTime;
     }
 
 
 
-    void WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override
+    void CSoulReaper::WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
     {
 #ifndef CLIENT_DLL
         Vector vecOrigin = m_pPlayer->pev->origin;
@@ -1354,7 +1390,7 @@ namespace sv {
 
     }
 
-    void WeaponIdle(void)
+    void CSoulReaper::WeaponIdle(void)
     {
         ResetEmptySound();
         m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
@@ -1373,8 +1409,6 @@ namespace sv {
         SendWeaponAnim(m_iWeaponState == 2 ? ANIM_IDLEC : ANIM_IDLEA, UseDecrement() != FALSE);
     }
 
-};
-LINK_ENTITY_TO_CLASS(weapon_soulreaper, CSoulReaper)
 
 
 }

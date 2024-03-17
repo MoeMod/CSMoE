@@ -653,28 +653,163 @@ ConstSprList s_ModelVChainMG = {
 		},
 	}
 };
-// ConstSprList s_ModelM82A1AngelicBeast = {
-// 	"PV-M82A1_AngelicBeast.mdl",
-// 	"FXBASE.bmp",
-// 	"sprites/v_m82a1angelicbeast.spr",
-// 	30.0,
-// 	{
-// 		{ 0, true, false, 1.0, 0, 0, 0 },
-// 		{ 1, true, false, 1.0, 0, 0, 0 },
-// 		{ 2, true, false, 1.0, 0, 0, 0 },
-// 		{ 3, true, false, 1.0, 0, 0, 0 },
-// 		{ 4, true, false, 1.0, 0, 0, 0 },
-// 		{ 5, true, false, 1.0, 0, 0, 0 },
-// 		{ 6, true, false, 1.0, 0, 0, 0 },
-// 		{ 7, true, false, 1.0, 0, 0, 0 },
-// 		{ 8, true, false, 1.0, 0, 0, 0 },
-// 		{ 9, true, false, 1.0, 0, 0, 0 },
-// 		{ 10, true, false, 1.0, 0, 0, 0 },
-// 		{ 11, true, false, 1.0, 0, 0, 0 },
-// 	}
-// };
 
 
+ConstSprList s_ModelVJumpSpirit = {
+	"v_jumpspirit.mdl",
+	{
+		{
+			0,
+			"sprites/ef_jumpspirit_body.spr",
+			30,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+				{ 1, true, false, 1.0, 0, 0, 0 },
+				{ 2, true, false, 1.0, 0, 0, 0 },
+				{ 3, true, false, 1.0, 0, 0, 0 },
+				{ 4, true, false, 1.0, 0, 0, 0 },
+				{ 5, true, false, 1.0, 0, 0, 0 },
+				{ 6, true, false, 1.0, 0, 0, 0 },
+				{ 7, true, false, 1.0, 0, 0, 0 }
+			}
+		},
+		{
+			2,
+			"sprites/ef_jumpspirit_wind.spr",
+			30,
+			{
+				{ 4, false, false, 1.0, 10, 40, 0 },
+			}
+		},
+		{
+			3,
+			"sprites/ef_jumpspirit_cristal.spr",
+			30.0,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+				{ 1, true, false, 1.0, 0, 0, 0 },
+				{ 2, true, false, 1.0, 0, 0, 0 },
+				{ 3, true, false, 1.0, 0, 0, 0 },
+				{ 4, true, false, 1.0, 0, 0, 0 },
+				{ 5, true, false, 1.0, 0, 0, 0 },
+				{ 6, true, false, 1.0, 0, 0, 0 },
+				{ 7, true, false, 1.0, 0, 0, 0 }
+			}
+		},
+		{
+			4,
+			"sprites/ef_jumpspirit_jump.spr",
+			30.0,
+			{
+				{ 4, false, false, 1.0, 0, 25, 0 },
+				{ 7, false, false, 1.0, 25, 55, 0 }
+			}
+		}
+	},
+};
+
+
+ConstSprList s_ModelJumpSpiritSummon = {
+	"ef_jumpspirit_summon.mdl",
+	{
+		{
+			0,
+			"sprites/ef_jumpspirit_summon.spr",
+			30,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+				{ 1, true, false, 1.0, 0, 0, 0 },
+			}
+		},
+		{
+			1,
+			"sprites/ef_jumpspirit_star.spr",
+			30,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+				{ 1, true, false, 1.0, 0, 0, 0 },
+			}
+		}
+	}
+};
+
+
+ConstSprList s_ModelJumpSpiritProjectile = {
+	"ef_jumpspirit_projectile.mdl",
+	{
+		{
+			0,
+			"sprites/ef_jumpspirit_summon.spr",
+			80,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 }
+			}
+		},
+		{
+			1,
+			"sprites/ef_jumpspirit_star.spr",
+			80,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 }
+			}
+		},
+		{
+			2,
+			"sprites/ef_jumpspirit_wind.spr",
+			80,
+			{
+				{ 7, false, false, 1.0, 0, 29, 0 }
+			}
+		}
+	}
+};
+
+ConstSprList s_ModelJumpSpiritJump = {
+	"ef_jumpspirit_jump.mdl",
+	{
+		{
+			1,
+			"sprites/ef_jumpspirit_wind.spr",
+			30,
+			{
+				{ 7, false, false, 1.0, 0, 29, 0 }
+			}
+		}
+	}
+};
+
+
+ConstSprList s_ModelJumpSpiritField = {
+	"ef_jumpspirit_field.mdl",
+	{
+		{
+			0,
+			"sprites/ef_jumpspirit_summon.spr",
+			30,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+				{ 1, true, false, 1.0, 0, 0, 0 }
+			}
+		},
+		{
+			5,
+			"sprites/ef_jumpspirit_summon_field.spr",
+			30,
+			{
+				{ 1, true, false, 1.0, 0, 0, 0 }
+			}
+		},
+		{
+			6,
+			"sprites/ef_jumpspirit_star.spr",
+			30,
+			{
+				{ 0, true, false, 1.0, 0, 0, 0 },
+				{ 1, true, false, 1.0, 0, 0, 0 }
+			}
+		}
+	}
+};
 std::vector<SprList> g_vecBindSprList;
 
 static CBindSprManager g_SprBindManager;
@@ -712,6 +847,11 @@ void CBindSprManager::Vidinit(void)
 	LoadSpr(&s_ModelSoulReaperCmode);
 	LoadSpr(&s_ModelVSoulReaper);
 	LoadSpr(&s_ModelVChainMG);
+	LoadSpr(&s_ModelVJumpSpirit);
+	LoadSpr(&s_ModelJumpSpiritSummon);
+	LoadSpr(&s_ModelJumpSpiritProjectile);
+	LoadSpr(&s_ModelJumpSpiritJump);
+	LoadSpr(&s_ModelJumpSpiritField);
 	//LoadSpr(&s_ModelM82A1AngelicBeast);
 }
 

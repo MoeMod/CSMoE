@@ -419,6 +419,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_M134HERO, "weapon_m134hero",      "英雄M134",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG ,10 },
 	{ WEAPON_SPEARGUNEX, "weapon_speargunex",         "巡星重爆弩",           6750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP ,19 },
 	{ WEAPON_Y24S1LASERMINIGUN, "weapon_y24s1laserminigun",         "超能战士•火神炮",    6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG ,12 },
+	{ WEAPON_JUMPSPIRIT, "weapon_jumpspirit",	 "【青鸾】迅风轮",			  2150,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL ,14 },
 
 #endif
 };

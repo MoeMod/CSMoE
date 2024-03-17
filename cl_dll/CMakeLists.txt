@@ -507,6 +507,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m134hero.cpp
 	../dlls/wpn_shared/wpn_speargunex.cpp
 	../dlls/wpn_shared/wpn_y24s1laserminigun.cpp
+	../dlls/wpn_shared/wpn_jumpspirit.cpp
 	)
 
 set (HUD_SRCS

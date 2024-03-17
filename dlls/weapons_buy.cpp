@@ -149,7 +149,8 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "y23s1dartpistol",	WEAPON_Y23S1DARTPISTOL },
 	{ "leapstrikegun",	WEAPON_LEAPSTRIKEGUN },
 	{ "z4b_deagleel",	WEAPON_Z4B_DEAGLEEL },
-
+	{ "jumpspirit",	WEAPON_JUMPSPIRIT },
+	
 	{ "balrog11",	WEAPON_BALROG11 },
 	{ "balrog11b",	WEAPON_BALROG11B },
 	{ "balrog11wc",	WEAPON_BALROG11WC },
@@ -666,7 +667,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "dartpistol",	WEAPONCLASS_PISTOL },
 	{ "y23s1dartpistol",	WEAPONCLASS_PISTOL },
 	{ "leapstrikegun",	WEAPONCLASS_PISTOL },
-
+	{ "jumpspirit",	WEAPONCLASS_PISTOL },
 
 	{ "balrog11",	WEAPONCLASS_SHOTGUN },
 	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
@@ -1378,6 +1379,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_Y23S1DARTPISTOL:
 	case WEAPON_LEAPSTRIKEGUN:
 	case WEAPON_Z4B_DEAGLEEL:
+	case WEAPON_JUMPSPIRIT:
 		return true;
 	default:
 		break;

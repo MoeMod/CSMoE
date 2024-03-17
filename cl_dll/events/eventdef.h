@@ -336,3 +336,4 @@ HOOK_EVENT(m134hero, FireM134Hero);
 HOOK_EVENT(m134heroFA, M134HeroFireAfter);
 HOOK_EVENT(speargunex, FireSpearGunEX);
 HOOK_EVENT(y24s1laserminigun, FireY24S1LaserMiniGun);
+HOOK_EVENT(jumpspirit, FireJumpSpirit);

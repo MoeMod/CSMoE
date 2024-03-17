@@ -79,7 +79,7 @@ void EV_FireLeapStrikeGun( event_args_t *args )
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1 , ANIM_SHOOT2), 2 );
 	}
 
-	PLAY_EVENT_SOUND("weapons/bufffiveseven-1.wav");
+	PLAY_EVENT_SOUND("weapons/leapstrikegun-1.wav");
 
 	EV_GetGunPosition(args, vecSrc, origin);
 	Vector vSpread(args->fparam1, args->fparam2, 0.0f);
