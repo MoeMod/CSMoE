@@ -467,6 +467,7 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 	{
 		if( !VID_CreateWindow( width, height, fullscreen ) )
 			return rserr_invalid_mode;
+		return rserr_ok;
 	}
 #ifndef XASH_NOMODESWITCH
 	else if( fullscreen )
