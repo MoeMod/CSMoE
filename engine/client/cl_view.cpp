@@ -456,7 +456,11 @@ void V_PostRender( void )
 		Con_DrawConsole();
 #ifdef XASH_VGUI2
         extern void VGui2_Paint();
-        VGui2_Paint();
+		// hack : dont draw vgui2 when touch is enabled.
+		if(!touch_in_menu->integer)
+		{
+			VGui2_Paint();
+		}
 #endif
 #ifdef XASH_IMGUI
 		ImGui_ImplGL_Menu_OnGUI();
