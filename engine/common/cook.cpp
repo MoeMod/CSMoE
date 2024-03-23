@@ -289,6 +289,7 @@ namespace xe {
             if(matchpattern(FS_FileWithoutPath(filename), pattern, true))
             {
                 out(filename);
+	            Msg("Cook: Add %s\n", filename);
             }
             else if(!Q_stricmp(t->filenames[i], va("%s/.", start_dir)))
             {

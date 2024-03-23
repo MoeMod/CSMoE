@@ -638,7 +638,7 @@ void Touch_SetCommand_f( void )
 }
 void Touch_ReloadConfig_f( void )
 {
-	touch.state = state_none;
+	//touch.state = state_none;
 	if( auto button = touch.edit.lock() )
         button->finger = -1;
 	if( auto button = touch.selection.lock() )
@@ -1116,6 +1116,13 @@ float Touch_DrawCharacter( float x, float y, int number, float size )
 
 float Touch_DrawText( float x1, float y1, float x2, float y2, const char *s, byte *color, float size )
 {
+#if XASH_IMGUI_SURFACE
+	ImGui_Surface_DrawConsoleString(TO_SCRN_X(x1), TO_SCRN_Y(y1), s,
+	                                color[0] * ( (float)color[3] /255.0f ),
+	                                color[1] * ( (float)color[3] /255.0f ),
+	                                color[2] * ( (float)color[3] /255.0f ),
+	                                255 );
+#else
 	float x = x1;
 	float maxy = y2;
 	float maxx;
@@ -1127,16 +1134,6 @@ float Touch_DrawText( float x1, float y1, float x2, float y2, const char *s, byt
 	if( !cls.creditsFont.valid )
 		return GRID_X * 2;
 	Con_UtfProcessChar( 0 );
-
-#if XASH_IMGUI_SURFACE
-	ImGui_Surface_SetRenderMode( kRenderTransAdd );
-	ImGui_Surface_DrawConsoleString(x1, y1, s,
-									color[0] * ( (float)color[3] /255.0f ),
-									color[1] * ( (float)color[3] /255.0f ),
-	                                color[2] * ( (float)color[3] /255.0f ),
-									255 );
-	ImGui_Surface_SetRenderMode( kRenderTransTexture );
-#else
 	GL_SetRenderMode( kRenderTransAdd );
 
 	// text is additive and alpha does not work
@@ -1976,7 +1973,10 @@ void Touch_KeyEvent( int key, int down )
 	//if( touch_enable->integer )
 	//	return;
 
-	if( !touch.clientonly )
+	if( !touch.initialized || (!touch_enable->integer && !touch.clientonly) )
+		return;
+
+	if( cls.key_dest != key_game && touch_in_menu->integer == 0 )
 		return;
 
 	CL_GetMousePosition( &xi, &yi );

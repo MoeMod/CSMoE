@@ -24,6 +24,7 @@ typedef enum
 } touchEventType;
 
 extern convar_t *touch_enable;
+extern convar_t *touch_in_menu;
 
 // touch.c
 void Touch_Draw( void );

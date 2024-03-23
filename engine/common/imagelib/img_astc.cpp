@@ -311,7 +311,7 @@ astcenc_context *Image_SaveASTC_CreateContext(int thread_num)
     status = astcenc_config_init(profile, save_block_x, save_block_y, save_block_z, quality, 0, &config);
     if (status != ASTCENC_SUCCESS)
     {
-        MsgDev( D_WARN, "Image_SaveASTC: Codec config init failed: %s\n", astcenc_get_error_string(status));
+        //MsgDev( D_WARN, "Image_SaveASTC: Codec config init failed: %s\n", astcenc_get_error_string(status));
         return nullptr;
     }
 
@@ -319,7 +319,7 @@ astcenc_context *Image_SaveASTC_CreateContext(int thread_num)
     status = astcenc_context_alloc(&config, thread_count_w, &context);
     if (status != ASTCENC_SUCCESS)
     {
-        MsgDev( D_WARN, "Image_SaveASTC: Codec context alloc failed: %s\n", astcenc_get_error_string(status));
+        //MsgDev( D_WARN, "Image_SaveASTC: Codec context alloc failed: %s\n", astcenc_get_error_string(status));
         return nullptr;
     }
     return context;
@@ -355,7 +355,7 @@ std::vector<byte> Image_SaveASTC_Worker(astcenc_context* context, byte *rgba, in
     status = astcenc_compress_image(context, &image, &swizzle, comp_data, comp_len, thread_id);
     if (status != ASTCENC_SUCCESS)
     {
-        MsgDev( D_WARN, "Image_SaveASTC: Codec compress failed: %s\n", astcenc_get_error_string(status));
+        //MsgDev( D_WARN, "Image_SaveASTC: Codec compress failed: %s\n", astcenc_get_error_string(status));
         return {};
     }
 
