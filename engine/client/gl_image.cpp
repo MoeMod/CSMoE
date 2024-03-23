@@ -760,31 +760,6 @@ byte *GL_ResampleTexture( const byte *source, int inWidth, int inHeight, int out
 
 /*
 =================
-GL_ApplyGamma
-
-Assume input buffer is RGBA
-=================
-*/
-byte *GL_ApplyGamma( const byte *source, int pixels, qboolean isNormalMap )
-{
-	byte	*in = (byte *)source;
-	byte	*out = (byte *)source;
-	int	i;
-
-	if( !isNormalMap )
-	{
-		for( i = 0; i < pixels; i++, in += 4 )
-		{
-			in[0] = TextureToGamma( in[0] );
-			in[1] = TextureToGamma( in[1] );
-			in[2] = TextureToGamma( in[2] );
-		}
-	}
-	return out;
-}
-
-/*
-=================
 GL_BuildMipMap
 
 Operates in place, quartering the size of the texture
@@ -1079,12 +1054,6 @@ void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfi
 		else
 		{
 			data = GL_ResampleTexture( buf, tex->srcWidth, tex->srcHeight, tex->width, tex->height, ( tex->flags & TF_NORMALMAP ));
-		}
-
-		if(!( tex->flags & TF_NOMIPMAP ) && !( tex->flags & TF_SKYSIDE ) && !( tex->flags & TF_TEXTURE_3D ))
-		{
-			if(!PFDesc[pic->type].compressed)
-				data = GL_ApplyGamma( data, tex->width * tex->height, ( tex->flags & TF_NORMALMAP ));
 		}
 
 		if( glTarget == GL_TEXTURE_CUBE_MAP_ARB )
@@ -1686,14 +1655,15 @@ static image_ref R_InitSolidColorTexture( texFlags_t *flags, int color )
 	// solid color texture
 	r_image->width = r_image->height = 1;
 	r_image->flags = IMAGE_HAS_COLOR;
-	r_image->type = PF_RGB_24;
-	r_image->size = r_image->width * r_image->height * 3;
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
 	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
 	r_image->buffer = data2D;
 
 	*flags = TF_NOMIPMAP|TF_NOPICMIP|TF_UNCOMPRESSED;
 
 	data2D[0] = data2D[1] = data2D[2] = color;
+	data2D[3] = 255;
 	return r_image;
 }
 
