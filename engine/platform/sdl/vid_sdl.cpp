@@ -234,6 +234,8 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 #ifdef XASH_ANGLE
 #ifdef __APPLE__
     Uint32 wndFlags = SDL_WINDOW_METAL;
+#elif defined _WIN32
+    Uint32 wndFlags = 0;
 #else
 	Uint32 wndFlags = SDL_WINDOW_VULKAN;
 #endif
