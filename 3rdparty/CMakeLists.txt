@@ -15,9 +15,8 @@ if(XASH_ANGLE)
 	set(VIDEO_OPENGLES OFF CACHE BOOL "" FORCE) # use opengl es2 instead
 endif()
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
-set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
-set(LIBC ON CACHE BOOL "" FORCE) # win10 arm dont have dx8
-set(HIDAPI OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
+set(SDL_LIBC ON CACHE BOOL "" FORCE) # win10 arm dont have dx8
+set(SDL_HIDAPI OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
 set(SDL_CMAKE_DEBUG_POSTFIX "" CACHE STRING "" FORCE)
 add_subdirectory(sdl2 EXCLUDE_FROM_ALL)
 target_link_libraries(3rdparty-sdl2 INTERFACE SDL2-static)
