@@ -72,6 +72,7 @@ namespace sv {
     void CJumpSpiritBird::Precache(void)
     {
         PRECACHE_MODEL("models/ef_jumpspirit_summon.mdl");
+        m_iBeamIndex = PRECACHE_MODEL("sprites/ef_laserfist_laser.spr");
 
     }
 
@@ -92,7 +93,7 @@ namespace sv {
 
         vecSrc = pev->origin;
         CBaseEntity* pEntity = nullptr;
-
+        m_vecTarget.clear();
         TraceResult tr;
         float Dis = (m_pWeapon->m_flTimeAModeFullCharge < gpGlobals->time ? SentryModeRadius : (SentryModeRadius + SentryModeRadiusMod)) * 39.37;
         while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, Dis)) != nullptr)
@@ -118,13 +119,17 @@ namespace sv {
 
             float flDelta = (vecSrc - vecEnd).Length();
 
-            if (flDelta < Dis)
-            {
-                m_hTarget.Set(pEntity->edict());
-                Dis = flDelta;
-            }
+            EHANDLE eh;
+            eh.Set(pEntity->edict());
+
+            m_vecTarget.push_back(std::make_pair(flDelta, eh));
 
         }
+
+        if (m_vecTarget.empty())
+            return;
+
+        std::sort(m_vecTarget.begin(), m_vecTarget.end(), [](const std::pair<float, CBaseEntity*>& a, const std::pair<float, CBaseEntity*>& b) {return a.first < b.first; });
     }
 
     void CJumpSpiritBird::BirdThink(void)
@@ -136,41 +141,54 @@ namespace sv {
             RemoveBird();
         }
 
-        UTIL_SetOrigin(pev, m_pOwner->pev->origin + Vector(0, 0, 15));
+        UTIL_SetOrigin(pev, m_pOwner->pev->origin + Vector(0, 0, 2));
 
         pev->angles = m_pOwner->pev->angles;
         pev->angles.x = 0;
 
         if (m_flNextAttack < gpGlobals->time)
         {          
-            m_hTarget = NULL;
             FindTarget();
 
-            CBaseEntity* pTarget = m_hTarget;
-
-            if (!m_hTarget.Get() || !pTarget)
+            if (m_vecTarget.empty())
                 return;
 
-            TraceResult tr;
-
-            Vector vecEnd = pTarget->BodyTarget(pev->origin);
-
-            UTIL_TraceLine(pev->origin, vecEnd, dont_ignore_monsters, pev->owner, &tr);
-
-            ClearMultiDamage();
-
-            pTarget->TraceAttack(m_pOwner->pev, pev->dmg, pev->velocity.Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
-
-            ApplyMultiDamage(pev, m_pOwner->pev);
-
-            if (m_pWeapon->m_flTimeAModeFullCharge < gpGlobals->time)
+            for (int i = 0; i < m_vecTarget.size(); i++)
             {
-                m_flNextAttack = gpGlobals->time + SentryModeInterval;
+                if (i >= SentryModeMaxTarget)
+                    break;
+
+                CBaseEntity* pTarget = m_vecTarget.at(i).second;
+
+                if (!m_vecTarget.at(i).second.Get() || !pTarget)
+                    continue;
+
+                TraceResult tr;
+
+                Vector vecEnd = pTarget->BodyTarget(pev->origin);
+
+                UTIL_TraceLine(pev->origin, vecEnd, dont_ignore_monsters, pev->owner, &tr);
+
+                ClearMultiDamage();
+
+                pTarget->TraceAttack(m_pOwner->pev, pev->dmg, pev->velocity.Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+
+                ApplyMultiDamage(pev, m_pOwner->pev);
+
+                if (m_pWeapon->m_flTimeAModeFullCharge < gpGlobals->time)
+                {
+                    m_flNextAttack = gpGlobals->time + SentryModeInterval;
+                }
+                else
+                {
+                    m_flNextAttack = gpGlobals->time + SentryModeIntervalMod;
+                }
+
+                Vector vecStart = pev->origin;
+                vecStart.z += 50;
+
+                UTIL_BeamTracer(vecStart, vecEnd, m_iBeamIndex, 0, 0, 50, 0, 10, 255, 255, 255, 40, 20, 255, 0);
             }
-            else
-            {
-                m_flNextAttack = gpGlobals->time + SentryModeIntervalMod;
-            }   
         }
      
     }
@@ -206,6 +224,7 @@ namespace sv {
     {
         PRECACHE_MODEL("models/ef_jumpspirit_projectile.mdl");
 
+        m_iBeamIndex = PRECACHE_MODEL("sprites/ef_laserfist_laser.spr");
         m_iJumpFXIndex = PRECACHE_MODEL("models/ef_jumpspirit_jump.mdl");
     }
 
@@ -230,6 +249,7 @@ namespace sv {
         CBaseEntity* pEntity = nullptr;
 
         TraceResult tr;
+        m_vecTarget.clear();
         float Dis = (m_pWeapon->m_flTimeAModeFullCharge < gpGlobals->time ? SentryModeRadius : (SentryModeRadius + SentryModeRadiusMod)) * 39.37;
         while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, Dis)) != nullptr)
         {
@@ -254,13 +274,18 @@ namespace sv {
 
             float flDelta = (vecSrc - vecEnd).Length();
 
-            if (flDelta < Dis)
-            {
-                m_hTarget.Set(pEntity->edict());
-                Dis = flDelta;
-            }
+            EHANDLE eh;
+            eh.Set(pEntity->edict());
+
+            m_vecTarget.push_back(std::make_pair(flDelta, eh));
 
         }
+
+        if (m_vecTarget.empty())
+            return;
+
+        std::sort(m_vecTarget.begin(), m_vecTarget.end(), [](const std::pair<float, CBaseEntity*>& a, const std::pair<float, CBaseEntity*>& b) {return a.first < b.first; });
+      
     }
 
     bool CJumpSpiritField::CheckEntInBox()
@@ -356,33 +381,46 @@ namespace sv {
        
         if (m_flNextAttack < gpGlobals->time)
         {
-            m_hTarget = NULL;
             FindTarget();
 
-            CBaseEntity* pTarget = m_hTarget;
-
-            if (!m_hTarget.Get() || !pTarget)
+            if (m_vecTarget.empty())
                 return;
 
-            TraceResult tr;
-
-            Vector vecEnd = pTarget->BodyTarget(pev->origin);
-
-            UTIL_TraceLine(pev->origin, vecEnd, dont_ignore_monsters, pev->owner, &tr);
-
-            ClearMultiDamage();
-
-            pTarget->TraceAttack(m_pOwner->pev, pev->dmg, pev->velocity.Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
-
-            ApplyMultiDamage(pev, m_pOwner->pev);
-
-            if (m_pWeapon->m_flTimeAModeFullCharge < gpGlobals->time)
+            for (int i = 0; i < m_vecTarget.size(); i++)
             {
-                m_flNextAttack = gpGlobals->time + SentryModeInterval;
-            }
-            else
-            {
-                m_flNextAttack = gpGlobals->time + SentryModeIntervalMod;
+                if (i >= SentryModeMaxTarget)
+                    break;
+
+                CBaseEntity* pTarget = m_vecTarget.at(i).second;
+
+                if (!m_vecTarget.at(i).second.Get() || !pTarget)
+                    continue;
+
+                TraceResult tr;
+
+                Vector vecEnd = pTarget->BodyTarget(pev->origin);
+
+                UTIL_TraceLine(pev->origin, vecEnd, dont_ignore_monsters, pev->owner, &tr);
+
+                ClearMultiDamage();
+
+                pTarget->TraceAttack(m_pOwner->pev, pev->dmg, pev->velocity.Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+
+                ApplyMultiDamage(pev, m_pOwner->pev);
+
+                Vector vecStart = pev->origin;
+                vecStart.z += 50;
+
+                UTIL_BeamTracer(vecStart, vecEnd, m_iBeamIndex, 0, 0, 50, 0, 10, 255, 255, 255, 40, 20, 255, 0);
+
+                if (m_pWeapon->m_flTimeAModeFullCharge < gpGlobals->time)
+                {
+                    m_flNextAttack = gpGlobals->time + SentryModeInterval;
+                }
+                else
+                {
+                    m_flNextAttack = gpGlobals->time + SentryModeIntervalMod;
+                }
             }
         }
     }
@@ -545,8 +583,8 @@ namespace sv {
             Vector vecForward = gpGlobals->v_forward;
             vecForward.z = 0;
             Vector vecAngle = UTIL_VecToAngles(vecForward);
-
-            CJumpSpiritField* pField = (CJumpSpiritField*)CBaseEntity::Create("jumpspirit_field", pev->origin, vecAngle, pev->owner);
+            vecForward = pev->velocity.Normalize();
+            CJumpSpiritField* pField = (CJumpSpiritField*)CBaseEntity::Create("jumpspirit_field", pev->origin - vecForward * 5, vecAngle, pev->owner);
 
             if (pField)
             {

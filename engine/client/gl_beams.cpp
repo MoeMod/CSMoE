@@ -1443,9 +1443,19 @@ void CL_UpdateBeam( BEAM *pbeam, float frametime )
 			break;
 		case TE_BEAMPOINTS_TRACER:
 		{
-			float timepassd = (1.0 - ((pbeam->die - float(cl.time)) / pbeam->extra));	//life
-			vec3_t vecSrc = pbeam->source + timepassd * pbeam->delta;
-			vec3_t vecEnd = vecSrc + pbeam->delta.Normalize() * pbeam->extra2;	//length
+			pmtrace_t tr;
+
+			vec3_t vecSrc = pbeam->source + pbeam->speed * pbeam->delta;
+			vec3_t vecEnd = vecSrc + pbeam->delta;	//length
+
+			CL_SetTraceHull(0);
+			CL_PlayerTrace(vecSrc, vecEnd, PM_NORMAL, -1, &tr);
+
+			if (tr.fraction < 1.0)
+			{
+				pbeam->die = cl.time;
+				return;
+			}
 
 			VectorCopy(vecSrc, pbeam->source);
 			VectorCopy(vecEnd, pbeam->target);
@@ -2063,7 +2073,12 @@ BEAM* GAME_EXPORT CL_BeamPoints_Tracer(const vec3_t start, const vec3_t end, int
 	pBeam->speed = speed;
 	BeamNormalizeColor(pBeam, r, g, b, brightness);
 
-	VectorSubtract(pBeam->target, pBeam->source, pBeam->delta);
+	vec3_t vecDir;
+	VectorSubtract(pBeam->target, pBeam->source, vecDir);
+	VectorCopy(vecDir.Normalize(), pBeam->delta);
+
+	pBeam->delta *= length;
+	
 
 	if (pBeam->amplitude >= 0.50f)
 		pBeam->segments = VectorLength(pBeam->delta) * 0.25f + 3; // one per 4 pixels

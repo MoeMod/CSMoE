@@ -2840,6 +2840,32 @@ void UTIL_AdvancedBeamPoints(Vector vecSrc, Vector vecEnd, int life, int r, int 
 }
 
 
+void UTIL_BeamTracer(Vector vecSrc, Vector vecEnd, int beamindex, int startframe, int framerate, int life, int noise, int speed, int r, int g, int b, int width, int length, int brightness, int flags)
+{
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSrc);
+	WRITE_BYTE(TE_BEAMPOINTS_TRACER);
+	WRITE_COORD(vecSrc.x);
+	WRITE_COORD(vecSrc.y);
+	WRITE_COORD(vecSrc.z);
+	WRITE_COORD(vecEnd.x);
+	WRITE_COORD(vecEnd.y);
+	WRITE_COORD(vecEnd.z);
+	WRITE_SHORT(beamindex);
+	WRITE_BYTE(startframe);
+	WRITE_BYTE(framerate);
+	WRITE_BYTE(life);
+	WRITE_BYTE(width);
+	WRITE_BYTE(noise);
+	WRITE_BYTE(r);
+	WRITE_BYTE(g);
+	WRITE_BYTE(b);
+	WRITE_BYTE(brightness);
+	WRITE_BYTE(speed);
+	WRITE_BYTE(flags);
+	WRITE_SHORT(length);
+	MESSAGE_END();
+}
+
 void UTIL_BeamPointsStretch(Vector vecSrc, Vector vecEnd, int beamindex, int framerate, int life, int r, int g, int b, int width, int brightness, int flags)
 {
 	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSrc);

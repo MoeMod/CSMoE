@@ -462,6 +462,7 @@ TL_ADD(CM134hero)
 TL_ADD(CSpearGunEX)
 TL_ADD(CY24S1LaserMiniGun)
 TL_ADD(CJumpSpirit)
+TL_ADD(CDivineTitanEx)
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
 TL_ADD(CEnvSound)
@@ -903,6 +904,9 @@ TL_ADD(CJumpSpiritProjectile)
 TL_ADD(CJumpSpiritField)
 TL_ADD(CJumpSpiritBird)
 TL_ADD(CDualSlayerProjectile)
+TL_ADD(CDivineTitanExGrenade)
+TL_ADD(CDivineTitanExMissile)
+TL_ADD(CDivineTitanExDrone)
 #endif
 
 TL_END(AllEntityTypeList)

@@ -1595,7 +1595,8 @@ void CBasePlayer::PackDeadPlayerItems()
 						pWeapon->m_iGrenadeID == GRENADE_SBMINE ||
 						pWeapon->m_iGrenadeID == GRENADE_CLAYMORE ||
 						pWeapon->m_iGrenadeID == GRENADE_BUNKERBUSTER ||
-						pWeapon->m_iGrenadeID == GRENADE_SFTURRET)
+						pWeapon->m_iGrenadeID == GRENADE_SFTURRET ||
+						pWeapon->m_iGrenadeID == GRENADE_DIVINETITANEX)
 					{
 						pPlayerItem = pPlayerItem->m_pNext;
 						continue;

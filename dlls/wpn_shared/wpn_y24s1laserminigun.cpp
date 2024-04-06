@@ -406,10 +406,10 @@ namespace sv {
     static constexpr const char *V_Model = "models/v_y24s1laserminigun.mdl";
     static constexpr const char *P_Model = "models/p_y24s1laserminigunA.mdl";
 	static constexpr const char* P_Model_2 = "models/p_y24s1laserminigunB.mdl";
-    static constexpr const char *W_Model = "models/w_laserminigun.mdl";
-    static constexpr const char *EventFile = "events/laserminigun.sc";
+    static constexpr const char *W_Model = "models/w_y24s1laserminigun.mdl";
+    static constexpr const char *EventFile = "events/y24s1laserminigun.sc";
     static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
-    static constexpr const char *ClassName = "weapon_laserminigun";
+    static constexpr const char *ClassName = "weapon_y24s1laserminigun";
     static constexpr const char *AnimExtension = "m249";
     static constexpr int MaxClip = 200;
 	enum

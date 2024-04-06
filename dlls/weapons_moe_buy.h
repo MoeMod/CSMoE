@@ -420,7 +420,10 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfoLocal[] = {
 	{ WEAPON_SPEARGUNEX, "weapon_speargunex",         "巡星重爆弩",           6750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP ,19 },
 	{ WEAPON_Y24S1LASERMINIGUN, "weapon_y24s1laserminigun",         "超能战士•火神炮",    6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG ,12 },
 	{ WEAPON_JUMPSPIRIT, "weapon_jumpspirit",	 "【青鸾】迅风轮",			  2150,  PISTOL_SLOT,         UNASSIGNED, BUY_PISTOL ,14 },
+	{ WEAPON_LASERFISTEX, "weapon_laserfistex",         "【无限】机械臂铠MK2",           10000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
 
+	{ WEAPON_LASERFIST, "weapon_laserfist",         "【无限】机械臂铠",           10000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SMG },
+	{ GRENADE_DIVINETITANEX, "weapon_divinetitanex",      "圣翼皓印EX",    9000, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 #endif
 };
 

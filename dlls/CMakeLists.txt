@@ -723,6 +723,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_speargunex.cpp
 	../dlls/wpn_shared/wpn_y24s1laserminigun.cpp
 	../dlls/wpn_shared/wpn_jumpspirit.cpp
+	../dlls/wpn_shared/wpn_divinetitanex.cpp
 	)
 
 set(PM_SRCS

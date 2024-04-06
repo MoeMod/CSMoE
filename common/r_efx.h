@@ -111,6 +111,7 @@ color24 gTracerColors[] =
 #define PARTICLE_GRAVITY				(1<<16)
 #define PARTICLE_SLOWGRAVITY				(1<<17)
 #define PARTICLE_ROTATE				(1<<18)
+#define PARTICLE_EMIT_PARENT_ONLY				(1<<19)
 
 typedef struct tempent_s	TEMPENTITY;
 typedef struct tempent_s

@@ -2417,6 +2417,11 @@ void R_TempParticle(sizebuf_t* msg)
 
 void TempParticleCallBack(TEMPENTITY* ent, float frametime, float currenttime)
 {
+	//three type of Temp Particle
+	//1.FGLauncher parent particle emit other body particle
+	//2. PetrolBoomer parent particle emit attached to ent
+	//3. follow ent
+
 	float scaleSpeed = ent->entity.curstate.fuser2;
 	ent->entity.curstate.scale += scaleSpeed;
 
@@ -2427,7 +2432,7 @@ void TempParticleCallBack(TEMPENTITY* ent, float frametime, float currenttime)
 	if (appearTime > cl.time || !appearTime)
 		return;
 
-	if (emitPos <= 0 && emitCount != -1)	//-1 ��β������ʵ��������ʧTODO, > 0�ͷ����ɸ����񻨷����� �� ���ϵĻ������attachment
+	if (emitPos <= 0 && emitCount != -1)	//-1 follow ent
 		return;
 
 	if (emitPos > 0)
@@ -2478,17 +2483,29 @@ void TempParticleCallBack(TEMPENTITY* ent, float frametime, float currenttime)
 	float spinSpeed = ent->entity.baseline.angles.x;
 	float velocityVariance = ent->entity.curstate.vuser4.z;
 
-	ent->entity.curstate.iuser1 = emitCount;
-	ent->entity.curstate.iuser2 = emitPos;
+	
 	ent->entity.curstate.fuser4 = cl.time + fireDelay;
 	pos = ent->entity.curstate.vuser1;
 
-	if (emitCount != emitPos && emitCount > 0)
+	if (flags & PARTICLE_EMIT_PARENT_ONLY)
+	{	
+		if (emitCount != emitPos && emitCount > 0)
+		{
+			//ensure body ent don't emit, eg:fglauncher
+			emitPos = 0;
+		}
+	}
+	else
 	{
-		//��֤��ʵ�岻�ٲ����µģ��񻨷���������֤��ʵ��ȫ��ĸʵ������
-		emitPos = 0;
+		//copy of parent ent every ent has same set
+		emitCount = ent->entity.curstate.iuser1;
+		emitPos = ent->entity.curstate.iuser2;
 	}
 
+	ent->entity.curstate.iuser1 = emitCount;
+	ent->entity.curstate.iuser2 = emitPos;
+
+	
 	CL_TempParticle(modelname, pos, velocity, color, life, framerate, brightness, rendermode, entity, fadeSpeed, fadeInSpeed, scale, frameMax, flags, emitCount, emitPos, fireDelay, attachment, spinSpeed, velocityVariance, scaleSpeed);
 }
 
@@ -2514,15 +2531,25 @@ TEMPENTITY* GAME_EXPORT CL_TempParticle(const char* modelname, const vec3_t pos,
 
 	if (entity > 0)
 	{
-		pTemp->flags |= FTENT_PLYRATTACHMENT;
 		pTemp->clientIndex = entity;
-		pTemp->tentOffset = pos;
 
 		cl_entity_t* ent = CL_GetEntityByIndex(entity);
 
 		if (!ent)
 		{
 			MsgDev(D_INFO, "No Client %d!\n", entity);
+		}
+		else
+		{
+			if (flags & PARTICLE_FOLLOWATTACHMENT)
+			{
+				pTemp->flags |= FTENT_PLYRATTACHMENT;
+				pTemp->tentOffset = pos;
+			}
+			else
+			{
+				VectorCopy(ent->origin, pTemp->entity.origin);
+			}
 		}
 	}
 

@@ -24,14 +24,15 @@ namespace cl {
 namespace sv {
 #endif
 
-    static constexpr float BirdKnockbackRadius = 3.5;
+    static constexpr float BirdKnockbackRadius = 2.5;
     static constexpr duration_t BirdKnockbackDuration = 0.5s;
     static constexpr float BirdKnockbackUp = 200.0;
     static constexpr float BirdKnockbackSide = 1510.0;
     static constexpr float SentryModeRadiusMod = 0.4;
     static constexpr duration_t SentryModeInterval = 0.5s;
     static constexpr duration_t SentryModeIntervalMod = 0.1s;
-    static constexpr float SentryModeRadius = 5.4;
+    static constexpr float SentryModeRadius = 7.0;
+    static constexpr int SentryModeMaxTarget = 3;
 
 
     static constexpr float BirdSpeed = 900.0;
@@ -61,8 +62,9 @@ namespace sv {
         CJumpSpirit* m_pWeapon;
 
     private:
+        int m_iBeamIndex;
         float m_flRadius;
-        EHANDLE m_hTarget;
+        std::vector<std::pair<float, EHANDLE>> m_vecTarget;
         time_point_t m_flNextAttack;
 
     };
@@ -97,9 +99,10 @@ namespace sv {
 #endif
             return 420.0f;
         }
+        std::vector<std::pair<float, EHANDLE>> m_vecTarget;
     private:
-        float m_flRadius;
-        EHANDLE m_hTarget;
+        int m_iBeamIndex;
+        float m_flRadius;  
         time_point_t m_flNextAttack;
         time_point_t m_fLaunchTime;
         int m_iJumpFXIndex;
@@ -145,7 +148,7 @@ namespace sv {
         static constexpr const char* ClassName = "weapon_jumpspirit";
         static constexpr const char* AnimExtension = "onehanded";
         static constexpr int MaxClip = 50;
-        static constexpr float PlayerMaxSpeed = 265;
+        static constexpr float PlayerMaxSpeed = 270;
 
         KnockbackData KnockBack = { 750.0f, 500.0f, 650.0f, 550.0f, 0.75f };
         enum
@@ -256,7 +259,7 @@ namespace sv {
             return 194.0f;
         }
 
-        static constexpr float BirdSentryRadius = 5.4;
+        static constexpr float BirdSentryRadius = 7.0;
         static constexpr duration_t BirdSentryInterval = 2.0s;
 
         static constexpr duration_t AModeEnergyChargeInterval = 0.5s;

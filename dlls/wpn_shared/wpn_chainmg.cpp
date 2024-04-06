@@ -32,6 +32,7 @@ namespace sv {
 
     void CChainMG::Spawn()
     {
+        ResetChargeTimer();
         Base::Spawn();
     }
 
@@ -44,6 +45,110 @@ namespace sv {
         m_iSkillModelIndex[1] = PRECACHE_MODEL("sprites/ef_chainsr_skill2.spr");
 
         Base::Precache();
+    }
+
+    int CChainMG::ExtractAmmo(CBasePlayerWeapon* pWeapon)
+    {
+        if (m_iSwing)
+        {
+            if (m_pPlayer)
+                m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iSwing;
+        }
+        return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+    }
+
+    BOOL CChainMG::Deploy()
+    {
+        m_flNextReload = invalid_time_point;
+
+        ResetChargeTimer();
+
+        if (Base::Deploy())
+        {
+            m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75s;
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    duration_t CChainMG::GetSPChargingTime()
+    {
+#ifndef CLIENT_DLL
+        if (g_pModRunning->DamageTrack() == DT_ZB)
+            return 0.32s;
+        else if (g_pModRunning->DamageTrack() == DT_ZBS)
+            return 0.32s;
+#endif
+        return 0.32s;
+    }
+
+    void CChainMG::ResetChargeTimer()
+    {
+        if (m_iSwing != SPMax && m_flTimeNextCharge == invalid_time_point)
+            m_flTimeNextCharge = gpGlobals->time + GetSPChargingTime();
+    }
+
+    void CChainMG::Reload()
+    {
+        if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+            return;
+
+        if (DefaultReload(MaxClip, ANIM_RELOAD, DefaultReloadTime, 1))
+        {
+#ifndef CLIENT_DLL         
+            m_pPlayer->SetAnimation(PLAYER_RELOAD);
+#endif
+            m_flNextReload = gpGlobals->time + DefaultReloadTime;
+            m_flAccuracy = AccuracyDefault;
+        }
+    }
+
+    void CChainMG::ItemPostFrame()
+    {
+        if (m_fInReload && m_flNextReload != invalid_time_point && m_flNextReload < gpGlobals->time)
+        {
+            // complete the reload.
+            int j = Q_min(MaxClip - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+#ifndef CLIENT_DLL
+            j = m_pPlayer->m_pModStrategy->AdjustDefaultReloadClip(this, j);
+#endif
+
+            // Add them to the clip
+            m_iClip += j;
+            m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+#ifndef CLIENT_DLL
+            m_pPlayer->TabulateAmmo();
+#endif
+            m_fInReload = FALSE;
+            m_flNextReload = invalid_time_point;
+
+        }
+
+        if (m_flTimeNextCharge != invalid_time_point && m_flTimeNextCharge <= gpGlobals->time)
+        {
+            m_iSwing += int((gpGlobals->time - m_flTimeNextCharge) / GetSPChargingTime()) + 1.0;
+
+            m_flTimeNextCharge = gpGlobals->time + GetSPChargingTime();
+
+            if (m_iSwing >= SPMax)
+                m_iSwing = SPMax;
+
+            if (m_iSwing == SPMax)
+                m_flTimeNextCharge = invalid_time_point;
+
+            m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iSwing;
+        }
+
+        if (m_fInReload)
+            return;
+
+        return CBasePlayerWeapon::ItemPostFrame();
+    }
+
+    void CChainMG::Holster(int skiplocal)
+    {
+        ResetChargeTimer();
+        CBasePlayerWeapon::Holster();
     }
 
     void CChainMG::WeaponIdle(void)
@@ -156,6 +261,11 @@ namespace sv {
 
     void CChainMG::SecondaryAttack(void)
     {
+        if (m_iSwing < SPCost)
+            return;
+
+        m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iSwing -= SPCost;
+
         m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
         m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
@@ -168,6 +278,11 @@ namespace sv {
         CreateEnt(ShadowAT4SpawnAngle);
         CreateEnt(-ShadowAT4SpawnAngle);
 #endif
+        UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_ITEM, "weapons/chainsr_smoke.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
+
+        UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/chainmg_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+        ResetChargeTimer();
         m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
         m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
     }
@@ -194,7 +309,7 @@ namespace sv {
 
         Vector vecForward = gpGlobals->v_forward;
   
-        MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, vecSpawnSrc);
+        MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSpawnSrc);
         WRITE_BYTE(TE_TEMPSPRITE);
         WRITE_COORD(vecSpawnSrc.x);
         WRITE_COORD(vecSpawnSrc.y);
@@ -205,7 +320,7 @@ namespace sv {
         WRITE_BYTE(30);
         MESSAGE_END();
 
-        MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, vecSpawnSrc);
+        MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSpawnSrc);
         WRITE_BYTE(TE_TEMPSPRITE);
         WRITE_COORD(vecSpawnSrc.x);
         WRITE_COORD(vecSpawnSrc.y);
@@ -215,9 +330,7 @@ namespace sv {
         WRITE_BYTE(255);
         WRITE_BYTE(10);
         MESSAGE_END();
-
-        UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/chainsr_smoke.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-
+   
         TraceResult tr;
         Vector vecStart = m_pPlayer->GetGunPosition();
 
@@ -296,28 +409,6 @@ namespace sv {
             VectorScale(vecTemp, -32, vecScale);
             VectorAdd(vecOrigin, vecScale, vecOrigin);
         }
-
-        MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, vecOrigin);
-        WRITE_BYTE(TE_TEMPSPRITE);
-        WRITE_COORD(vecOrigin.x);
-        WRITE_COORD(vecOrigin.y);
-        WRITE_COORD(vecOrigin.z);
-        WRITE_SHORT(m_iSkillModelIndex[0]);
-        WRITE_BYTE(15);
-        WRITE_BYTE(255);
-        WRITE_BYTE(30);
-        MESSAGE_END();
-
-        MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
-        WRITE_BYTE(TE_TEMPSPRITE);
-        WRITE_COORD(vecOrigin.x);
-        WRITE_COORD(vecOrigin.y);
-        WRITE_COORD(vecOrigin.z);
-        WRITE_SHORT(m_iSkillModelIndex[1]);
-        WRITE_BYTE(15);
-        WRITE_BYTE(255);
-        WRITE_BYTE(10);
-        MESSAGE_END();
 
         UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/chainsr_smoke.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 

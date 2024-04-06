@@ -78,9 +78,9 @@ void CSpearGunEX::Spawn(void)
 	m_iShotsFired = 0;
 	m_bDelayFire = false;
 
-	m_iDefaultAmmo = 30;
+	m_iDefaultAmmo = 150;
 
-	m_flTimeCheckCharge = invalid_time_point;
+	m_flTimeCheckSound = m_flTimeCheckCharge = invalid_time_point;
 }
 
 void CSpearGunEX::Precache(void)
@@ -166,7 +166,7 @@ void CSpearGunEX::SpearGunFire()
 	float flCrowdForce;
 	float flCrowdBoostVel;
 
-	if (m_iWeaponState > 2)
+	if (m_iWeaponState > 3)
 	{
 		iType = 2;
 		flSpearSpeed = ChargingShotSpeed;
@@ -380,18 +380,7 @@ void CSpearGunEX::PrimaryAttack(void)
 
 void CSpearGunEX::OnAttack2Released()
 {
-	if (m_iWeaponState > 2)
-	{
-		SpearGunFire();
-	}
-	else if (m_iWeaponState > 1)
-	{
-		SpearGunFire();
-	}
-	else
-	{
-		PrimaryAttack();
-	}
+	PrimaryAttack();
 
 	m_iWeaponState = 0;
 }
@@ -408,37 +397,59 @@ void CSpearGunEX::SecondaryAttack(void)
 			{
 				SendWeaponAnim(SPEARGUNEX_CHARGE_LOOP);
 
+				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/speargunex_spin1_1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
+
 				m_iWeaponState = 2;
-				m_flTimeCheckCharge = gpGlobals->time + SecondaryChargingTime;
+				m_flTimeCheckCharge = gpGlobals->time + 0.06s;
+				m_flTimeCheckSound = gpGlobals->time + SecondaryChargingTime;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
 				break;
 			}
 			case 2:
 			{
+				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/speargunex_spin1_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
+		
+				m_flTimeCheckCharge = gpGlobals->time + 1.0s;
+
+				if (m_flTimeCheckSound < gpGlobals->time)
+				{
+					m_iWeaponState = 3;
+					m_flTimeCheckCharge = gpGlobals->time;
+				}
+			
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
+				break;
+
+
+			}
+			case 3:
+			{
 				SendWeaponAnim(SPEARGUNEX_CHARGE_FINISH);
 				pev->skin = 1;
 
-				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/lightningar_idle3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
+				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/speargunex_spin2_1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
 
-				m_iWeaponState = 3;
+				m_iWeaponState = 4;
 				m_flTimeCheckCharge = gpGlobals->time + 0.53s;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 				break;
 			}
-			case 3:
+			case 4:
 			{
 				SendWeaponAnim(SPEARGUNEX_CHARGE_FINISH_LOOP);
 
-				m_iWeaponState = 4;
+				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/speargunex_spin2_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
+
+				m_iWeaponState = 5;
 				m_flTimeCheckCharge = gpGlobals->time + 0.53s;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 9999.0s;		
 				break;
 			}
-			case 4:
+			case 5:
 			{
-				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/lightningar_idle3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
+				UTIL_EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/speargunex_spin2_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM, 1);
 
-				m_flTimeCheckCharge = gpGlobals->time + 4.0s;
+				m_flTimeCheckCharge = gpGlobals->time + 0.53s;
 				break;
 			}
 

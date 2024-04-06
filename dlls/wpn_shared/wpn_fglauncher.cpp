@@ -157,7 +157,7 @@ namespace sv {
 		WRITE_SHORT(this->entindex());
 		MESSAGE_END();
 
-		int flags = PARTICLE_ANIMATE | PARTICLE_COLLIDEKILL | PARTICLE_ROTATE;
+		int flags = PARTICLE_ANIMATE | PARTICLE_COLLIDEKILL | PARTICLE_ROTATE | PARTICLE_EMIT_PARENT_ONLY;
 		TraceResult tr;
 		Vector vecParticleVel;
 

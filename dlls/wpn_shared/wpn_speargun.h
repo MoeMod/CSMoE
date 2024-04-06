@@ -230,5 +230,6 @@ private:
 	int iShellOn;
 	time_point_t m_flTimeReloadSpear;
 	time_point_t m_flTimeCheckCharge;
+	time_point_t m_flTimeCheckSound;
 };
 }

@@ -377,13 +377,12 @@ namespace sv {
 		}
 		else
 		{
-			//TraceWidth
 			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 			WRITE_BYTE(TE_BEAMFOLLOW);
 			WRITE_SHORT(entindex());
 			WRITE_SHORT(m_iBeamModelIndex);
-			WRITE_BYTE(TraceLife * 2);
-			WRITE_BYTE(1);
+			WRITE_BYTE(TraceLife);
+			WRITE_BYTE(TraceWidth);
 			WRITE_BYTE(TraceColorR);
 			WRITE_BYTE(TraceColorG);
 			WRITE_BYTE(TraceColorB);
@@ -625,7 +624,7 @@ namespace sv {
 		m_iExplodeSprite = PRECACHE_MODEL("sprites/ef_speargun_explo.spr");
 
 
-		m_iBeamModelIndex = PRECACHE_MODEL("sprites/white.spr");
+		m_iBeamModelIndex = PRECACHE_MODEL("sprites/smoke.spr");
 	}
 
 	void CSpearEX::HitDamage(CBaseEntity* pOther)

@@ -132,7 +132,7 @@ struct HUDLIST {
 #include "newhud/NewFontManager.h"
 #include "hud_centertips.h"
 #include "weapons_const.h"
-#include "weapons_moe_buy.h"
+#include "player/player_const.h"
 #include "hud_zecounter.h"
 
 

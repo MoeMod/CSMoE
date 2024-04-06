@@ -517,6 +517,7 @@ DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
 	{ "weapon_sfturret", GRENADE_SFTURRET },
 	{ "weapon_ignitebomb", GRENADE_IGNITEBOMB },
 	{ "z4b_icegrenade", GRENADE_ICEGRENADE },
+	{ "weapon_divinetitanex", GRENADE_DIVINETITANEX },
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =

@@ -185,7 +185,7 @@ void EV_FireLaserFist(event_args_s *args)
 
 		vecBeamEnd = vecStart + (forward + right * args->fparam1 + up * args->fparam2) * 50;
 
-		BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Tracer(vecStart, vecBeamEnd, iModelLaser, 0.2, 3, 50.0f, 0.0f, 255.0f, 360.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+		BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Tracer(vecStart, vecBeamEnd, iModelLaser, 5.0, 8.0, 60.0f, 0.0f, 255.0f, 1.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 
 		Vector vSpread(args->fparam1, args->fparam2, 0.0f);
 		EV_HLDM_FireBullets(idx,

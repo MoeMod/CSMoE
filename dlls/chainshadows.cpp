@@ -28,7 +28,7 @@ namespace sv {
 	static constexpr float ShadowChainMGDamageZombie = 200.0;
 	static constexpr float ShadowChainMGDamageScenario = 430.0;
 
-	//static constexpr const auto& ShadowChainMGEnableDelay = 1.0s;
+	static constexpr const auto& ShadowChainMGEnableDelay = 1.0s;
 	static constexpr const auto& ShadowChainMGLifeTime = 2.4s;
 	static constexpr const auto& ShadowChainMGCycleTime = 0.06s;
 	static constexpr const auto& ShadowChainMGFixDuration = 0.1s;
@@ -87,10 +87,10 @@ namespace sv {
 		m_pLastHitGroup = iLastHitGroup;
 		m_iEffectState = EFFECT_FADEIN;
 		m_flEffectTime = gpGlobals->time;
-		m_flRemoveTime = gpGlobals->time + ShadowChainMGLifeTime;
+		m_flRemoveTime = gpGlobals->time + ShadowChainMGLifeTime + ShadowChainMGEnableDelay;
 		m_flDamageTime = gpGlobals->time;
 		SetThink(&CChainMG_ShadowChainMG::ShadowThink);
-		pev->nextthink = gpGlobals->time + 0.1s;
+		pev->nextthink = gpGlobals->time + ShadowChainMGEnableDelay;
 	}
 
 	void CChainMG_ShadowChainMG::Spawn(void)
@@ -121,11 +121,45 @@ namespace sv {
 	void CChainMG_ShadowChainMG::Precache(void)
 	{
 		PRECACHE_MODEL("models/ef_chainmg_summon_chainmg.mdl");
+	
+		m_iSkillModelIndex[0] = PRECACHE_MODEL("sprites/ef_chainsr_skill.spr");
+		m_iSkillModelIndex[1] = PRECACHE_MODEL("sprites/ef_chainsr_skill2.spr");
 	}
 
 	void CChainMG_ShadowChainMG::EF_Appear(void)
 	{
 		duration_t interval = gpGlobals->time - m_flEffectTime;
+
+		if (!pev->iuser1)
+		{
+			Vector vecOrigin = pev->origin;
+
+			pev->iuser1 = 1;
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_TEMPSPRITE);
+			WRITE_COORD(vecOrigin.x);
+			WRITE_COORD(vecOrigin.y);
+			WRITE_COORD(vecOrigin.z);
+			WRITE_SHORT(m_iSkillModelIndex[0]);
+			WRITE_BYTE(15);
+			WRITE_BYTE(255);
+			WRITE_BYTE(30);
+			MESSAGE_END();
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_TEMPSPRITE);
+			WRITE_COORD(vecOrigin.x);
+			WRITE_COORD(vecOrigin.y);
+			WRITE_COORD(vecOrigin.z);
+			WRITE_SHORT(m_iSkillModelIndex[1]);
+			WRITE_BYTE(15);
+			WRITE_BYTE(255);
+			WRITE_BYTE(10);
+			MESSAGE_END();
+
+			UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/chainsr_smoke.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		}
 
 		if (interval > m_flFadeInTime)
 		{
@@ -210,12 +244,11 @@ namespace sv {
 
 	void CChainMG_ShadowChainMG::DoSingleDamage(CBaseEntity* pEnemy)
 	{
-		pev->frame = 0;
-		pev->sequence = 1;
-
-		ResetSequenceInfo();
-
-		UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/chainsr-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		if (!pEnemy->IsAlive())
+		{
+			RemoveShadow();
+			return;
+		}
 
 		TraceResult tr;
 		Vector vecStart = pev->origin;
@@ -225,6 +258,13 @@ namespace sv {
 
 		if (tr.flFraction < 1.0 && tr.pHit != pEnemy->edict())
 			return;
+
+		pev->frame = 0;
+		pev->sequence = 1;
+
+		ResetSequenceInfo();
+
+		UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/chainmg-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 		ClearMultiDamage();
 		tr.iHitgroup = m_pLastHitGroup;
@@ -317,10 +357,10 @@ namespace sv {
 		m_pLastHitGroup = iLastHitGroup;
 		m_iEffectState = EFFECT_FADEIN;
 		m_flEffectTime = gpGlobals->time;
-		m_flRemoveTime = gpGlobals->time + ShadowMP5LifeTime;
+		m_flRemoveTime = gpGlobals->time + ShadowMP5LifeTime + ShadowChainMGEnableDelay;		
 		m_flDamageTime = gpGlobals->time;
 		SetThink(&CChainMG_ShadowMP5::ShadowThink);
-		pev->nextthink = gpGlobals->time + 0.1s;
+		pev->nextthink = gpGlobals->time + ShadowMP5EnableDelay;
 	}
 
 	void CChainMG_ShadowMP5::Spawn(void)
@@ -351,11 +391,45 @@ namespace sv {
 	void CChainMG_ShadowMP5::Precache(void)
 	{
 		PRECACHE_MODEL("models/ef_chainmg_summon_mp5.mdl");
+
+		m_iSkillModelIndex[0] = PRECACHE_MODEL("sprites/ef_chainsr_skill.spr");
+		m_iSkillModelIndex[1] = PRECACHE_MODEL("sprites/ef_chainsr_skill2.spr");
 	}
 
 	void CChainMG_ShadowMP5::EF_Appear(void)
 	{
 		duration_t interval = gpGlobals->time - m_flEffectTime;
+
+		if (!pev->iuser1)
+		{
+			Vector vecOrigin = pev->origin;
+
+			pev->iuser1 = 1;
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_TEMPSPRITE);
+			WRITE_COORD(vecOrigin.x);
+			WRITE_COORD(vecOrigin.y);
+			WRITE_COORD(vecOrigin.z);
+			WRITE_SHORT(m_iSkillModelIndex[0]);
+			WRITE_BYTE(15);
+			WRITE_BYTE(255);
+			WRITE_BYTE(30);
+			MESSAGE_END();
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_TEMPSPRITE);
+			WRITE_COORD(vecOrigin.x);
+			WRITE_COORD(vecOrigin.y);
+			WRITE_COORD(vecOrigin.z);
+			WRITE_SHORT(m_iSkillModelIndex[1]);
+			WRITE_BYTE(15);
+			WRITE_BYTE(255);
+			WRITE_BYTE(10);
+			MESSAGE_END();
+
+			UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/chainsr_smoke.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		}
 
 		if (interval > m_flFadeInTime)
 		{
@@ -440,13 +514,12 @@ namespace sv {
 
 	void CChainMG_ShadowMP5::DoSingleDamage(CBaseEntity* pEnemy)
 	{
-		pev->frame = 0;
-		pev->sequence = 1;
-
-		ResetSequenceInfo();
-
-		UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/chainsr-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-
+		if (!pEnemy->IsAlive())
+		{
+			RemoveShadow();
+			return;
+		}
+			
 		TraceResult tr;
 		Vector vecStart = pev->origin;
 		Vector vecEnd = pEnemy->BodyTarget(vecEnd);
@@ -455,6 +528,14 @@ namespace sv {
 
 		if (tr.flFraction < 1.0 && tr.pHit != pEnemy->edict())
 			return;
+
+		pev->frame = 0;
+		pev->sequence = 1;
+
+		ResetSequenceInfo();
+
+		UTIL_EMIT_SOUND(this->edict(), CHAN_ITEM, "weapons/mp5-1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
 
 		ClearMultiDamage();
 		tr.iHitgroup = m_pLastHitGroup;
@@ -691,23 +772,30 @@ namespace sv {
 	{
 		pev->movetype = MOVETYPE_FLY;
 
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_BEAMPARTICLE); //defined as 32
-		WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
-		WRITE_SHORT(m_iTrail);// short (sprite index)
-		WRITE_SHORT(m_iTrail);// short (sprite index)
-		WRITE_SHORT(m_iTrail);// short (sprite index)
-		WRITE_BYTE(255); //r
-		WRITE_BYTE(255); //g
-		WRITE_BYTE(255); //b
-		WRITE_BYTE(0); //randomcolor
-		WRITE_BYTE(100); //scale in 0.01's
-		WRITE_BYTE(6); //freq(time of one cycle) in 0.01's
-		WRITE_BYTE(3); //fadetime in 0.1s
-		WRITE_BYTE(1);  //count
-		WRITE_BYTE(0);  //random in org
-		WRITE_BYTE(0);  //speed (if>0 do slow gravity)
-		MESSAGE_END();
+		UTIL_TempEmit(
+			"sprites/black_smoke3.spr",
+			1,
+			20,
+			5,
+			PARTICLE_ANIMATE | PARTICLE_ROTATE,
+			0,
+			60,
+			kRenderTransTexture,
+			200.0,
+			255.0,
+			255.0,
+			255.0,
+			Vector(0.0, 0.0, 0.0),
+			Vector(0.0, 0.0, 0.0),
+			0,
+			10,
+			0,
+			0,
+			0,
+			entindex(),
+			0,
+			0
+		);
 
 		m_flIgniteTime = gpGlobals->time;
 

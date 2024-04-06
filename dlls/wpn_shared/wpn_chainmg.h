@@ -35,13 +35,14 @@ namespace sv {
     {
     public:
         static constexpr const auto& DefaultReloadTime = 5.0s;
+        static constexpr const auto& DefaultDeployTime = 0.1s;
         static constexpr const char* V_Model = "models/v_chainmg.mdl";
         static constexpr const char* P_Model = "models/p_chainmg.mdl";
         static constexpr const char* W_Model = "models/w_chainmg.mdl";
         static constexpr const char* EventFile = "events/chainmg.sc";
         static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
         static constexpr const char* ClassName = "weapon_chainmg";
-        static constexpr const char* AnimExtension = "chainmg";
+        static constexpr const char* AnimExtension = "m134";
         static constexpr int MaxClip = 300;
         enum
         {
@@ -65,9 +66,6 @@ namespace sv {
 
         static constexpr int SPMax = 100;
         static constexpr int SPCost = 50;
-        static constexpr const auto& SPChargingTime = 0.32s;
-        static constexpr const auto& SPChargingTimeZombie = 0.32s;
-        static constexpr const auto& SPChargingTimeScenario = 0.32s;
         static constexpr const auto& SPCycleTime = 0.32s;
 
         //static constexpr float IdleEffectSize = 50.0;   //???
@@ -113,6 +111,9 @@ namespace sv {
 
         int m_iLastAnim;
         int m_iSkillModelIndex[2];
+        time_point_t m_flTimeNextCharge;
+        time_point_t m_flNextReload;
+        time_point_t m_flTimeCheckCharge;
 
         void Spawn() override;
         void Precache() override;
@@ -122,7 +123,7 @@ namespace sv {
             p->pszName = STRING(pev->classname);
             p->pszAmmo1 = "chainmg";
             p->iMaxAmmo1 = 300;
-            p->pszAmmo2 = NULL;
+            p->pszAmmo2 = "chainmg2";
             p->iMaxAmmo2 = -1;
             p->iMaxClip = MaxClip;
             p->iSlot = 0;
@@ -141,12 +142,19 @@ namespace sv {
         float GetArmorRatioModifier() override { return 1.5; }
         WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_SPEED, 6, 3, 140 }; }
 
+        BOOL Deploy() override;
+        void Holster(int skiplocal) override;
+        int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
         void WeaponIdle() override;
+        void ItemPostFrame()override;
+        void Reload() override;
         void SecondaryAttack() override;
         void WpnDeathCallBack(CBaseEntity* pVictim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-
+        void ResetChargeTimer();
         void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
         void ShadowSearchForEnemy(CBaseEntity* pIgnored, Vector vecOrigin, int iType, float flDamage, int iLastHitGroup);
+
+        duration_t GetSPChargingTime();
        
     };
 }

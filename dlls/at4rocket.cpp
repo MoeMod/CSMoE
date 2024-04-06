@@ -81,23 +81,31 @@ namespace sv {
 	{
 		pev->movetype = MOVETYPE_FLY;
 
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_BEAMPARTICLE); //defined as 32
-		WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
-		WRITE_SHORT(m_iTrail);// short (sprite index)
-		WRITE_SHORT(m_iTrail);// short (sprite index)
-		WRITE_SHORT(m_iTrail);// short (sprite index)
-		WRITE_BYTE(255); //r
-		WRITE_BYTE(255); //g
-		WRITE_BYTE(255); //b
-		WRITE_BYTE(0); //randomcolor
-		WRITE_BYTE(100); //scale in 0.01's
-		WRITE_BYTE(6); //freq(time of one cycle) in 0.01's
-		WRITE_BYTE(3); //fadetime in 0.1s
-		WRITE_BYTE(1);  //count
-		WRITE_BYTE(0);  //random in org
-		WRITE_BYTE(0);  //speed (if>0 do slow gravity)
-		MESSAGE_END();
+		UTIL_TempEmit(
+			"sprites/black_smoke3.spr",
+			1,
+			20,
+			5,
+			PARTICLE_ANIMATE | PARTICLE_ROTATE,
+			0,
+			60,
+			kRenderTransTexture,
+			200.0,
+			255.0,
+			255.0,
+			255.0,
+			Vector(0.0, 0.0, 0.0),
+			Vector(0.0, 0.0, 0.0),
+			0,
+			10,
+			0,
+			0,
+			0,
+			entindex(),
+			0,
+			0
+		);
+
 
 		if (m_iType == 1)
 		{

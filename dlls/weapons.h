@@ -1680,6 +1680,7 @@ private:
 	CChainMG* m_pWeapon;
 
 	int m_pLastHitGroup;
+	int m_iSkillModelIndex[2];
 	CBaseEntity* m_pEnemy;
 	time_point_t m_flDamageTime;
 	time_point_t m_flEffectTime;
@@ -1721,6 +1722,7 @@ private:
 	CChainMG* m_pWeapon;
 
 	int m_pLastHitGroup;
+	int m_iSkillModelIndex[2];
 	CBaseEntity* m_pEnemy;
 	time_point_t m_flDamageTime;
 	time_point_t m_flEffectTime;
@@ -1790,7 +1792,7 @@ private:
 	time_point_t m_flIgniteTime;
 };
 
-class CSpearEX : public CSpear
+class CSpearEX : public CBaseEntity
 {
 public:
 	float GetArmorRatioModifier() { return 1.85; }
@@ -1827,6 +1829,39 @@ public:
 	void Explode(duration_t flTimeRemove, bool bDetonate);
 
 public:
+	CBasePlayer* m_pOwner;
+	EHANDLE m_hLockingEntity;
+	EHANDLE m_rgCrowdPlayers[SPEAR_MAX_CROWD_PLAYERS];
+	int m_iNumCrowdPlayers;
+	float m_flPushVelocityModifier;
+	EHANDLE m_hEntityHit;
+	int m_LastHitGroup;
+	EHANDLE m_rgCrowdMonsters[SPEAR_MAX_CROWD_MONSTERS];
+	Vector m_rgvecCrowdPushVelocity[SPEAR_MAX_CROWD_MONSTERS];
+	time_point_t m_rgflTimeCrowdMovement[SPEAR_MAX_CROWD_MONSTERS];
+	int m_iNumCrowdMonsters;
+	time_point_t m_flTimeNextBleed;
+	BOOL m_bLockingTarget;
+	Vector m_vecLockingPos;
+	Vector m_vecVelocity;
+	Vector m_vecDirection;
+	float m_flPushForce;
+	float m_flPushBoostVel;
+	float m_flCrowdForce;
+	float m_flCrowdBoostVel;
+	int m_iArrowModel;
+	int m_iExplodeModel;
+	int m_iBeamModelIndex;
+	time_point_t m_flTimeExplode;
+	duration_t m_flPushDuration;
+	time_point_t m_flTimeStopPushing;
+	float m_flHitDamage;
+	float m_flExplodeDamage;
+	float m_flOwnerDamageModifier;
+	float m_flCrowdDamage;
+	float m_flExplodeForce;
+	int m_iExplosionCount;
+	int m_iType;
 	int m_iExplodeSprite;
 	time_point_t m_flTimeNextAutoAim;
 	EHANDLE m_hTarget;

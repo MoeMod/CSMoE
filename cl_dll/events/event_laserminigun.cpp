@@ -108,7 +108,7 @@ void EV_FireLaserMiniGun(event_args_s *args)
 		iModelLaser = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_laser1.spr");
 
 	
-	BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Tracer(vecBeamStart, vecBeamEnd, iModelLaser, 0.2, 2, 40.0f, 0.0f, 255.0f, 360.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+	BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints_Tracer(vecBeamStart, vecBeamEnd, iModelLaser, 5.0, 1.6, 120.0f, 0.0f, 255.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 
 
 	EV_HLDM_FireBullets( idx,
